@@ -1,0 +1,375 @@
+body, td, th, ul, dl, div
+{
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+
+body
+{
+	margin:0;
+	margin-left:15px;
+	margin-right:10px;
+}
+
+a:visited { text-decoration: none; color:#280092}
+a:hover		{ text-decoration: underline; color: #DD6900; }
+
+/* Used by the cart bar */
+.topcomps {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #006699;
+	text-decoration: none;
+}
+
+.topcomps a:visited { color: #006699; }
+.topcomps a:hover { color: #DD6900; }
+
+.topcompsbig {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #006699;
+}
+
+/* Footer */
+.footer {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	color: #656563;
+	background-color: #F5F5F7;
+	text-align:center;
+	padding: 1px 1px;
+}
+
+/* The only reason for insisting on the use of h1 or h2
+   is that search engines like this tag and pick it up */
+h2, h3, h4
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	color: #006699;
+	text-align:left;
+	margin-right:10px;
+}
+
+h2 { font-size:17px; }
+h3 { font-size:14px; }
+h4 { font-size:12px; }
+
+
+.topcomps h1
+{
+	font-size: 18px;
+  margin:0;
+	padding:0;
+	border:0;
+}
+
+.license {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	color: #000000;
+	text-decoration: none;
+}
+/* ***************** */
+
+CAPTION { font-weight: bold }
+DIV.qindex {
+	width: 100%;
+	background-color: #eeeeff;
+	border: 1px solid #b0b0b0;
+	text-align: left;
+	margin: 2px;
+	padding: 2px;
+	line-height: 140%;
+}
+DIV.nav {
+	width: 100%;
+	background-color: #eeeeff;
+	border: 1px solid #b0b0b0;
+	text-align: center;
+	margin: 2px;
+	padding: 2px;
+	line-height: 140%;
+}
+A.qindex {
+       text-decoration: none;
+       font-weight: bold;
+       color: #1A419D;
+}
+A.qindex:visited {
+       text-decoration: none;
+       font-weight: bold;
+       color: #1A419D
+}
+
+A.qindexHL {
+	text-decoration: none;
+	font-weight: bold;
+	background-color: #6666cc;
+	color: #ffffff;
+	border: 1px double #9295C2;
+}
+A.qindexHL:hover {
+	text-decoration: none;
+	background-color: #6666cc;
+	color: #ffffff;
+}
+A.qindexHL:visited { text-decoration: none; background-color: #6666cc; color: #ffffff }
+A.el { text-decoration: none; font-weight: bold }
+A.elRef { font-weight: bold }
+A.code:link { text-decoration: none; font-weight: normal; color: #0000FF}
+A.code:visited { text-decoration: none; font-weight: normal; color: #0000FF}
+A.codeRef:link { font-weight: normal; color: #0000FF}
+A.codeRef:visited { font-weight: normal; color: #0000FF}
+
+DL.el { margin-left: 0px; }
+
+.fragment 
+{
+  font-family: monospace
+}
+
+pre.fragment 
+{
+	border: 1px solid #CCCCCC;
+	background-color: #f5f5f5;
+	margin: 4px 8px 4px 2px;  /*top right bottom left*/
+  padding: 4px 6px 4px 6px;
+}
+
+DIV.ah 
+{ 
+background-color: black; 
+font-weight: bold; color: #ffffff; 
+margin-bottom: 3px; 
+margin-top: 3px 
+}
+TD.md { background-color: #F4F4FB; font-weight: bold; }
+TD.mdPrefix {
+       background-color: #F4F4FB;
+       color: #606060;
+	font-size: 80%;
+}
+TD.mdname1 { background-color: #F4F4FB; font-weight: bold; color: #602020; }
+TD.mdname { background-color: #F4F4FB; font-weight: bold; color: #602020; }
+DIV.groupHeader 
+{
+  margin-left: 16px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+DIV.groupText { margin-left: 16px; font-style: italic; font-size: 14px }
+
+TD.indexkey {
+	background-color: #eeeeff;
+	font-weight: bold;
+	padding: 2px 10px 2px 10px;
+  margin: 2px 0px 2px 0px;
+	border: 1px solid #CCCCCC;
+}
+TD.indexvalue {
+	background-color: #eeeeff;
+	font-style: italic;
+	padding: 2px 10px 2px 10px;
+  margin: 2px 0px 2px 0px;
+	border: 1px solid #CCCCCC;
+}
+TR.memlist {
+   background-color: #f0f0f0; 
+}
+P.formulaDsp { text-align: center; }
+IMG.formulaDsp { }
+IMG.formulaInl { vertical-align:middle; }
+SPAN.keyword       { color: #008000 }
+SPAN.keywordtype   { color: #604020 }
+SPAN.keywordflow   { color: #e08000 }
+SPAN.comment       { color: #800000 }
+SPAN.preprocessor  { color: #806020 }
+SPAN.stringliteral { color: #002080 }
+SPAN.charliteral   { color: #008080 }
+
+.mdTable 
+{
+	border: 0px solid #868686;
+	background-color: #F4F4FB;
+	width:100%;
+}
+
+.mdRow 
+{
+	padding: 8px 10px;
+}
+
+.mdescLeft {
+  padding: 0 8px 4px 8px;
+	font-size: 11px;
+	font-style: italic;
+	background-color: #FAFAFA;
+	border: 1px none #E0E0E0;
+
+	margin: 0px;
+}
+.mdescRight {
+  padding: 0 8px 4px 8px;
+	font-size: 11px;
+	font-style: italic;
+	background-color: #FAFAFA;
+	border: 1px none #E0E0E0;
+
+	margin: 0px;
+}
+.memItemLeft {
+	padding: 1px 0 0 8px;
+	margin: 4px;
+	border: 1px none #E0E0E0;
+	border-top-style: solid;
+	
+	background-color: #FAFAFA;
+	font-size: 11px;
+}
+.memItemRight {
+	padding: 1px 8px 0 8px;
+	margin: 4px;
+	border: 1px none #E0E0E0;
+	border-top-style: solid;
+	
+	background-color: #FAFAFA;
+	font-size: 11px;
+}
+.memTemplItemLeft {
+	padding: 1px 0 0 8px;
+	margin: 4px;
+	border: 1px none #E0E0E0;
+	background-color: #FAFAFA;
+	font-size: 11px;
+}
+.memTemplItemRight {
+	padding: 1px 8px 0 8px;
+	margin: 4px;
+	border: 1px none #E0E0E0;
+	background-color: #FAFAFA;
+	font-size: 11px;
+}
+.memTemplParams {
+	padding: 1px 0 0px 8px;
+	margin: 4px;
+	border: 1px none #E0E0E0;
+	border-top-style: solid;
+	
+  color: #606060;
+	background-color: #FAFAFA;
+	font-size: 11px;
+}
+
+TD.tiny 
+{ font-size: 75%;
+}
+
+a 
+{	color: #252E78;
+}
+
+a:visited 
+{	color: #3D2185;
+}
+
+.dirtab { padding: 4px;
+          border-collapse: collapse;
+          border: 1px solid #b0b0b0;
+}
+TH.dirtab { background: #eeeeff;
+            font-weight: bold;
+}
+HR { height: 1px;
+     border: none;
+     border-top: 1px solid black;
+}
+
+
+/* --- Extras needed by the custom forum only -- */
+
+/* This is the border line & background colour round the entire page */
+.bodyline	{ background-color: #FFFFFF; border: 1px #98AAB1 solid; }
+
+/* This is the outline round the main forum tables */
+.forumline	{ background-color: #FFFFFF; border: 2px #006699 solid; }
+
+
+/* Main table cell colours and backgrounds */
+td.row1	{ background-color: #EFEFEF; }
+td.row2	{ background-color: #DEE3E7; }
+td.row3	{ background-color: #D1D7DC; }
+
+/*
+  This is for the table cell above the Topics, Post & Last posts on the index.php page
+  By default this is the fading out gradiated silver background.
+  However, you could replace this with a bitmap specific for each forum
+*/
+td.rowpic {
+		background-color: #FFFFFF;
+		background-image: url(/phpBB2/templates/subSilver/images/cellpic2.jpg);
+		background-repeat: repeat-y;
+}
+
+/* Header cells - the blue and silver gradient backgrounds */
+th	{
+	color: #FFA34F; font-size: 11px; font-weight : bold;
+	background-color: #006699; height: 25px;
+	background-image: url(/phpBB2/templates/subSilver/images/cellpic3.gif);
+}
+
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+			background-image: url(/phpBB2/templates/subSilver/images/cellpic1.gif);
+			background-color:#D1D7DC; border: #FFFFFF; border-style: solid; height: 28px;
+}
+
+
+/*
+  Setting additional nice inner borders for the main table cells.
+  The names indicate which sides the border will be on.
+  Don't worry if you don't understand this, just ignore it :-)
+*/
+td.cat,td.catHead,td.catBottom {
+	height: 29px;
+	border-width: 0px 0px 0px 0px;
+}
+th.thHead,th.thSides,th.thTop,th.thLeft,th.thRight,th.thBottom,th.thCornerL,th.thCornerR {
+	font-weight: bold; border: #FFFFFF; border-style: solid; height: 28px; }
+td.row3Right,td.spaceRow {
+	background-color: #D1D7DC; border: #FFFFFF; border-style: solid; }
+
+th.thHead,td.catHead { font-size: 12px; border-width: 1px 1px 0px 1px; }
+th.thSides,td.catSides,td.spaceRow	 { border-width: 0px 1px 0px 1px; }
+th.thRight,td.catRight,td.row3Right	 { border-width: 0px 1px 0px 0px; }
+th.thLeft,td.catLeft	  { border-width: 0px 0px 0px 1px; }
+th.thBottom,td.catBottom  { border-width: 0px 1px 1px 1px; }
+th.thTop	 { border-width: 1px 0px 0px 0px; }
+th.thCornerL { border-width: 1px 0px 0px 1px; }
+th.thCornerR { border-width: 1px 1px 0px 0px; }
+
+/* General text */
+.gen { font-size : 12px; }
+.genmed { font-size : 11px; }
+.gensmall { font-size : 10px; }
+.gen,.genmed,.gensmall { color : #000000; }
+a.gen,a.genmed,a.gensmall { color: #006699; text-decoration: none; }
+
+/* Location, number of posts, post date etc */
+.postdetails		{ font-size : 10px; color : #000000; }
+
+/* Quote & Code blocks */
+td.code {
+	font-family: Courier, 'Courier New', sans-serif; font-size: 11px; color: #006600;
+	background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
+
+.quote {
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #444444; line-height: 125%;
+	background-color: #FAFAFA; border: #D1D7DC; border-style: solid;
+	border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px
+}
