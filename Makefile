@@ -11,13 +11,18 @@ BINDIST=$(DIST)-$(VER)-$(ARCH)
 # --------------------------------------------------------------------
 
 # Determine on the flight the system we are running on
-Darwin_ARCH := mac
-Linux_ARCH  := glx
-ARCH        := $($(shell uname)_ARCH)
+Darwin_PPC_ARCH  := mac
+Darwin_i386_ARCH := mci
+Linux_i386_ARCH  := glx
+ARCH        := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
 mac_CFLAGS       := -O -I.  -pedantic -Wall -std=c99
 mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
 mac_MEX_SUFFIX   := mexmac
+
+mci_CFLAGS       := -O -I.  -pedantic -Wall -std=c99
+mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
+mci_MEX_SUFFIX   := mexmaci
 
 glx_CFLAGS       := -O -I. -pedantic -Wall -std=c99
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)'
@@ -54,14 +59,24 @@ endif
 
 CFLAGS += -I. -Lvl
 
-src/sift             : src/sift-driver.o    vl/libvl.a
-src/mser             : src/mser-driver.o    vl/libvl.a
-src/test_stringop    : src/test_sringop.c   vl/libvl.a
-src/test_getopt_long : src/test_getopt_long vl/libvl.a
+src/sift             : src/sift-driver.c      vl/libvl.a
+src/mser             : src/mser-driver.c      vl/libvl.a
+src/test_stringop    : src/test_sringop.c     vl/libvl.a
+src/test_getopt_long : src/test_getopt_long.c vl/libvl.a
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
 # --------------------------------------------------------------------
+
+mex_src := mser
+mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
+
+.PHONY: all-mex
+all-mex : $(mex_tgt)
+
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c
+	mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
+	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
 # --------------------------------------------------------------------
 #                                                                  Doc
@@ -88,8 +103,13 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	rm -f mex/*.mexmac mex/*.mexglx
-	rm -f vlutil.html
+	rm -f toolbox/*.mexmac
+	rm -f toolbox/*.mexmaci
+	rm -f toolbox/*.mexglx
+	rm -f src/sift
+	rm -f src/mser
+	rm -f src/test_getopt_long
+	rm -f src/test_stringop
 	rm -rf $(DIST)-*
 
 .PHONY: dist
@@ -113,10 +133,10 @@ autorights: distclean
 	  . \
 	  --recursive \
 	  --template gpl \
-	  --years 2006 \
+	  --years 2007 \
 	  --authors "Andrea Vedaldi and Brian Fulkerson" \
 	  --holders "Andrea Vedaldi and Brian Fulkerson" \
-	  --program "VLUtil"
+	  --program "VLFeat"
 
 # --------------------------------------------------------------------
 #                                                       Debug Makefile
@@ -128,3 +148,6 @@ info :
 	@echo "lib_src  = $(lib_src)"
 	@echo "lib_obj  = $(lib_obj)"
 	@echo "lib_dep  = $(lib_dep)"
+	@echo "mex_src  = $(mex_src)"
+	@echo "mex_tgt  = $(mex_tgt)"
+

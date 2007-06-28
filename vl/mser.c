@@ -929,7 +929,6 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   verbose && printf("mser: cleaned-up regions: %d (%.1f%%)\n", 
                     nmer, 100.0 * (double) nmer / ner) ;
 
-
   /* -----------------------------------------------------------------
    *                                                   Save the result
    * -------------------------------------------------------------- */
