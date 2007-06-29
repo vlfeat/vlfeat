@@ -16,15 +16,15 @@ Darwin_i386_ARCH := mci
 Linux_i386_ARCH  := glx
 ARCH        := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
-mac_CFLAGS       := -O -I.  -pedantic -Wall -std=c99
+mac_CFLAGS       := -O -I.  -pedantic -Wall -std=c99 -g
 mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
 mac_MEX_SUFFIX   := mexmac
 
-mci_CFLAGS       := -O -I.  -pedantic -Wall -std=c99
-mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
+mci_CFLAGS       := -O -I.  -pedantic -Wall -std=c99 -g
+mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -Lvl -lvl
 mci_MEX_SUFFIX   := mexmaci
 
-glx_CFLAGS       := -O -I. -pedantic -Wall -std=c99
+glx_CFLAGS       := -O -I. -pedantic -Wall -std=c99 -g
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)'
 glx_MEX_SUFFIX   := mexglx
 
@@ -68,13 +68,13 @@ src/test_getopt_long : src/test_getopt_long.c vl/libvl.a
 #                                                      Build MEX files
 # --------------------------------------------------------------------
 
-mex_src := mser
+mex_src := mser sift
 mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h
 	mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
 	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
@@ -103,6 +103,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	rm -f vl/libvl.a
 	rm -f toolbox/*.mexmac
 	rm -f toolbox/*.mexmaci
 	rm -f toolbox/*.mexglx

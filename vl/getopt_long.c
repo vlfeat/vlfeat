@@ -24,6 +24,12 @@ int    optreset;
 
 /** @brief Parse long options - BSD style
  **
+ ** @param argc
+ ** @param argv
+ ** @param optstring  abbreviations of 
+ ** @param longopts   list of long options.
+ ** @param longindex  index of current option in @a longopts.
+ **
  ** This function extract long and short options from the argument
  ** list @a argv of @a argc entries.
  **
@@ -34,24 +40,19 @@ int    optreset;
  ** argument cannot appear in the middle of a short option sequence,
  ** but only at the end.
  **
- **
  ** A long option is introduced by a double dash @c --. Each long
  ** option is described by an instace of the ::option structure in the
  ** @a longopts table (the last entry must be filled with zeroes to
  ** denote the end).
  ** 
- ** Illegal options and mising arguments cause the function to skip
- ** the option and return '?'. If ::opterr is true (default), the
- ** function prints an error message to @a stderr. Finally, if @a
- ** optstring has a leading @c :, then error messages are supporessed
- ** and a missing argument causes @a : to be returned.
  **
- **
- ** @param argc
- ** @param argv
- ** @param optstring  abbreviations of 
- ** @param longopts   list of long options.
- ** @param longindex  index of current option in @a longopts.
+ ** @return the code of the next option. Illegal options and mising
+ ** arguments cause the function to skip the option and return '?'. If
+ ** ::opterr is true (default), the function prints an error message
+ ** to @a stderr. Finally, if @a optstring has a leading @c :, then
+ ** error messages are supporessed and a missing argument causes @a :
+ ** to be returned.
+
  **/
 
 int

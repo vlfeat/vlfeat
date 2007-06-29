@@ -1,4 +1,4 @@
-/** @file     mser.c
+/** @file     mser.mser.c
  ** @author   Andrea Vedaldi
  ** @brief    MSER MEX driver
  **/
@@ -18,9 +18,7 @@ mexFunction(int nout, mxArray *out[],
   double delta ;   
 
   int nel ;              
-  int ner = 0 ;          
-  int nmer = 0 ;         
-  int ndims ;            
+    int ndims ;            
   int const* dims ; 
      
   vl_mser_pix const *data ; 
@@ -89,7 +87,7 @@ mexFunction(int nout, mxArray *out[],
       odims [0] = dof ;
       odims [1] = nframes ;
       
-      out [OUT_FRAMES] = mxCreteNumericArray (2, odims, mxDOUBLE_CLASS) ;
+      out [OUT_FRAMES] = mxCreateNumericArray (2, odims, mxDOUBLE_CLASS, mxREAL) ;
       pt               = mxGetPr (out [OUT_FRAMES]) ;
       
       for (i = 0 ; i < nframes ; ++i) {
