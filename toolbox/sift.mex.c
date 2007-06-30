@@ -157,7 +157,7 @@ mexFunction(int nout, mxArray *out[],
           vl_sift_calc_keypoint_descriptor (filt, buf, keys + i, angles [q]) ;
 
           /* enough space ? */
-          if (reserved < nframes) {
+          if (reserved < nframes + 1) {
             reserved += 2 * nkeys ;
             frames = mxRealloc (frames,   4 * sizeof(double) * reserved) ;
             descr  = mxRealloc (descr,  128 * sizeof(double) * reserved) ;
@@ -168,11 +168,17 @@ mexFunction(int nout, mxArray *out[],
           frames [4 * nframes + 2] = keys [i] .sigma ;
           frames [4 * nframes + 3] = angles [q] ;
 
-          for (j = 0 ; j < 128 ; ++i) {
+          for (j = 0 ; j < 128 ; ++j) {
             descr [128 * nframes + j] = (vl_uint8) 512.0 * buf [j] ;
           }
+
+          ++ nframes ;
         }
       }
+    }
+
+    if (verbose) {
+      mexPrintf("sift: found %d keypoints\n", nframes) ;
     }
 
     /* save back */

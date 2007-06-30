@@ -84,6 +84,7 @@ toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h
 
 .PHONY: dox
 dox: doxygen.conf
+	make -C figures all
 	(test -e dox || mkdir dox)
 	doxygen doxygen.conf
 	touch dox
@@ -94,6 +95,7 @@ dox: doxygen.conf
 
 .PHONY: clean
 clean:
+	make -C figures clean
 	rm -f $(lib_obj)
 	rm -f $(lib_dep)
 	find . -name '*~'           -exec rm -f \{\} \;
@@ -103,6 +105,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	make -C figures distclean
 	rm -f vl/libvl.a
 	rm -f toolbox/*.mexmac
 	rm -f toolbox/*.mexmaci

@@ -970,22 +970,13 @@ normalize_histogram
  ** @param angles   orientations (output).
  ** @param k        keypoint.
  **
- ** The function computes the descriptor of the keypoint @a keypoint.
- ** The function fills the buffer @a descr_pt which must be large
- ** enough. The funciton uses @a angle0 as rotation of the keypoint.
- ** By calling the function multiple times, different orientations can
- ** be evaluated.
+ ** The function computes the SIFT descriptor of the keypoint @a k of
+ ** orientation @a angle0. The function fills the buffer @a descr
+ ** which must be large enough to hold the descriptor.
  **
- ** @remark The function needs to compute the gradient modululs and
- ** orientation of the Gaussian scale space octave to which the
- ** keypoint belongs. The result is cached, but discarded if different
- ** octaves are visited. Thereofre it is much quicker to evaluate the
- ** keypoints in their natural octave order.
  **
- ** The function silently abort the computations of keypoints without
- ** the scale space boundaries. See also siftComputeOrientations().
- **
- ** @return number of orientations found.
+ ** The function assumes that the keypoint is on the current octave.
+ ** If not, it does not do anything.
  **/
 
 void               
@@ -995,21 +986,19 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
                                  double angle0)
 {
   /* 
-     The SIFT descriptor is a  three dimensional histogram of the position
-     and orientation of the gradient.  There are NBP bins for each spatial
-     dimesions and NBO  bins for the orientation dimesion,  for a total of
-     NBP x NBP x NBO bins.
+     The SIFT descriptor is a three dimensional histogram of the
+     position and orientation of the gradient.  There are NBP bins for
+     each spatial dimesions and NBO bins for the orientation dimesion,
+     for a total of NBP x NBP x NBO bins.
      
-     The support  of each  spatial bin  has an extension  of SBP  = 3sigma
-     pixels, where sigma is the scale  of the keypoint.  Thus all the bins
-     together have a  support SBP x NBP pixels wide  . Since weighting and
-     interpolation of  pixel is used, another  half bin is  needed at both
-     ends of  the extension. Therefore, we  need a square window  of SBP x
-     (NBP + 1) pixels. Finally, since the patch can be arbitrarly rotated,
-     we need to consider  a window 2W += sqrt(2) x SBP  x (NBP + 1) pixels
-     wide.
-
-     Offsets to move in the descriptor. We use Lowe's convention.
+     The support of each spatial bin has an extension of SBP = 3sigma
+     pixels, where sigma is the scale of the keypoint.  Thus all the
+     bins together have a support SBP x NBP pixels wide. Since
+     weighting and interpolation of pixel is used, the support extends
+     by another half bin. Therefore, the support is asquare window of
+     SBP x (NBP + 1) pixels. Finally, since the patch can be
+     arbitrarly rotated, we need to consider a window 2W += sqrt(2) x
+     SBP x (NBP + 1) pixels wide.
   */      
   
   double const magnif      = 3.0 ;
@@ -1047,7 +1036,6 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   
   /* check bounds */
   if(k->o  != f->o_cur        ||
-     k->o  >= f->o_min + f->O ||
      xi    <  0               || 
      xi    >= w               || 
      yi    <  0               || 
@@ -1095,9 +1083,10 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
       vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
       vl_sift_pix nt = NBO * theta / (2*M_PI) ;
       
-      /* Get the gaussian weight of the sample. The gaussian window
-        has a standard deviation equal to NBP/2. Note that dx and dy
-        are in the normalized frame, so that -NBP/2 <= dx <= NBP/2. */
+      /* Get the Gaussian weight of the sample. The Gaussian window
+       * has a standard deviation equal to NBP/2. Note that dx and dy
+       * are in the normalized frame, so that -NBP/2 <= dx <=
+       * NBP/2. */
       vl_sift_pix const wsigma = NBP/2 ;
       vl_sift_pix win = fast_expn 
         ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
