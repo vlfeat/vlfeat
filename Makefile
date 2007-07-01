@@ -16,18 +16,19 @@ Darwin_i386_ARCH := mci
 Linux_i386_ARCH  := glx
 ARCH        := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
-mac_CFLAGS       := -O -I.  -pedantic -Wall -std=c99 -g
+mac_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
 mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
 mac_MEX_SUFFIX   := mexmac
 
-mci_CFLAGS       := -O -I.  -pedantic -Wall -std=c99 -g
+mci_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
 mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -Lvl -lvl
 mci_MEX_SUFFIX   := mexmaci
 
-glx_CFLAGS       := -O -I. -pedantic -Wall -std=c99 -g
+glx_CFLAGS       := -O0 -I. -pedantic -Wall -std=c99 -g
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)'
 glx_MEX_SUFFIX   := mexglx
 
+CFLAGS       := $($(ARCH)_CFLAGS)
 MEX_SUFFIX   := $($(ARCH)_MEX_SUFFIX)
 MEX_CFLAGS   := $($(ARCH)_MEX_CFLAGS)
 
@@ -59,10 +60,17 @@ endif
 
 CFLAGS += -I. -Lvl
 
-src/sift             : src/sift-driver.c      vl/libvl.a
-src/mser             : src/mser-driver.c      vl/libvl.a
-src/test_stringop    : src/test_sringop.c     vl/libvl.a
-src/test_getopt_long : src/test_getopt_long.c vl/libvl.a
+src/sift             : src/sift-driver.o      vl/libvl.a
+	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
+
+src/mser             : src/mser-driver.o      vl/libvl.a
+	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
+
+src/test_stringop    : src/test_sringop.o     vl/libvl.a
+	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
+
+src/test_getopt_long : src/test_getopt_long.o vl/libvl.a
+	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -74,7 +82,7 @@ mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h vl/libvl.a
 	mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
 	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
@@ -154,4 +162,3 @@ info :
 	@echo "lib_dep  = $(lib_dep)"
 	@echo "mex_src  = $(mex_src)"
 	@echo "mex_tgt  = $(mex_tgt)"
-

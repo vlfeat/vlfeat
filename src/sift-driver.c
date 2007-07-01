@@ -406,6 +406,7 @@ main(int argc, char **argv)
       /* process next octave */
       if (first) {
         err = vl_sift_process_first_octave (filt, fdata) ;
+        first = 0 ;
       } else {
         err = vl_sift_process_next_octave (filt) ;
       }

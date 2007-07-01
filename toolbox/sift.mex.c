@@ -4,6 +4,7 @@
  **/
 
 #include "mexutils.h"
+#include <vl/mathop.h>
 #include <vl/sift.h>
 #include <math.h>
 #include <assert.h>
@@ -94,10 +95,6 @@ mexFunction(int nout, mxArray *out[],
     }
   }
 
-  if (O < 0) {
-    O = VL_MAX (floor(log2(VL_MIN(M, N))) - omin - 3, 1) ;
-  }
-
   if (verbose) {    
     mexPrintf("sift: settings:\n") ;
     mexPrintf("sift:   octaves (O)         = %d\n", O) ;
@@ -163,10 +160,12 @@ mexFunction(int nout, mxArray *out[],
             descr  = mxRealloc (descr,  128 * sizeof(double) * reserved) ;
           }
 
-          frames [4 * nframes + 0] = keys [i] .x ;
-          frames [4 * nframes + 1] = keys [i] .y ;
+          /* Save back with MATLAB conventions. Notice tha the input image was
+           * the transpose of the actual image. */
+          frames [4 * nframes + 0] = keys [i] .y + 1 ;
+          frames [4 * nframes + 1] = keys [i] .x + 1 ;
           frames [4 * nframes + 2] = keys [i] .sigma ;
-          frames [4 * nframes + 3] = angles [q] ;
+          frames [4 * nframes + 3] = VL_PI / 2  - angles [q] ;
 
           for (j = 0 ; j < 128 ; ++j) {
             descr [128 * nframes + j] = (vl_uint8) 512.0 * buf [j] ;

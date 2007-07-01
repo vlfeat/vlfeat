@@ -130,14 +130,18 @@ copy_and_downsample
 /* ----------------------------------------------------------------- */
 /** @brief New SIFT filter
  **
- ** The function returns a new SIFT filter for the specified image and
- ** scale space geomtery.
- **
  ** @param width    image width.
  ** @param height   image height.
  ** @param O        number of octaves.
  ** @param S        number of levels per octave.
  ** @param o_min    first octave index.
+ **
+ ** The function returns a new SIFT filter for the specified image and
+ ** scale space geomtery.
+ **
+ ** Passing a negative value @a O sets the number of octaves to the
+ ** maximum meaningful value (this depends on the size of the image).
+ **
  ** @return new SIFT filter.
  **/
 
@@ -151,6 +155,11 @@ vl_sift_new (int width, int height,
   int w   = VL_SHIFT_LEFT (width,  -o_min) ;
   int h   = VL_SHIFT_LEFT (height, -o_min) ;
   int nel = w * h ;
+
+  /* negative value O => calculate max. value */
+  if (O < 0) {
+    O = VL_MAX (floor (log2 (VL_MIN(width, height))) - o_min - 3, 1) ;
+  }
 
   f-> width   = width ;
   f-> height  = height ;
@@ -182,7 +191,7 @@ vl_sift_new (int width, int height,
   f-> keys_res = 0 ;
 
   f-> peak_tresh = 0.0 ;
-  f-> edge_tresh = 0.5 ;
+  f-> edge_tresh = 1.0 ;
 
   f-> grad_o  = o_min - 1 ;
 
