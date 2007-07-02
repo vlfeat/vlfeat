@@ -1,4 +1,4 @@
-/** @file     generic-driver.c
+/** @file     generic-driver.h
  ** @author   Andrea Vedaldi
  ** @brief    Support for command line drivers - Definition.
  ** @internal

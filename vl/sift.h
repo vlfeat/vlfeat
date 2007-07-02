@@ -17,42 +17,80 @@
  **       get the keypoint descriptor.
  ** - Delete the SIFT filter by ::vl_sift_delete().
  **
+ ** @section sift-detector SIFT detector
+ **
  ** @section sift-descriptor SIFT descriptor
  **
- ** The SIFT descriptor is a three dimensional histogram <em>h(th,x,y)</em>
- ** of the orientation @e th and position <em>(x,y)</em> of the gradient
- ** inside a patch surronding the keypoint. 
+ ** The SIFT descriptor is a three dimensional histogram
+ ** @f$h(\theta,x,y)@f$ of the orientation @f$\theta@f$ and position
+ ** @f$(x,y)@f$ of the gradient inside a patch surronding the
+ ** keypoint. The following picutres illustrates the geometry of the
+ ** histogram:
  **
- ** While the descriptor <em>h(th,x,y)</em> is a 3-D array but is
- ** usually presented by stacking the array into a vector. The
- ** dimensions are stacked in the order <em>(th,x,y)</em>, so that @e
- ** th is the fastest varying index and <em>y</em> the slowest.
+ ** @image html sift-bins.png
+ **
+ ** While SIFT descriptor @f$h(\theta,x,y)@f$ is a 3-D array but it is
+ ** usually presented as a vector. This vector is obtained by stacking
+ ** the 3-D array being @f$\theta@f$ is the fastest varying index and
+ ** @e y the slowest.
+ **
+ ** The histogram uses soft binning, so that bins partially overlap.
+ ** There are @f$B_p@f$ bins along the @e x and @e y directions and 
+ ** @f$B_o@f$ along the @f$\theta@f$ direction.
+ **
+ ** The actual sizes of the descriptor depend on the size of the
+ ** keypoint as follows:
+ **
+ ** - Let @f$ \sigma  @f$ be the scale of the keypoint.
+ ** - A bin extends for @f$ \sigma @f$ pixels where @f$m@f$ is a constant
+ **   (the standard descriptor has @f$m=3@f$).
+ ** - Overall, the bins cover @f$m\sigma B_p/2@f$ pixels in each
+ **   direction.  This is also the deviation of the Gaussian window
+ **   which defines the smooth support of the descriptor.
+ ** - Due to the smooth binning, the bins actually extend up for
+ **   @f$m\sigma (B_p+1)/2@f$.
+ ** - Since the descriptor may be rotated, a window of up to 
+ **   @f$m\sigma (B_p+1)/2\sqrt{2}@f$ may need to be considered for
+ **   the computations.
+ **
+ ** The following table summarizes the descriptors parameters along
+ ** with their standard vale.
+ **
+ ** <table>
+ **  <tr>
+ **   <td>parameter</td>
+ **   <td>alt. name</td>
+ **   <td>standard value</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$B_p@f$</td>
+ **    <td>@c BP</td>
+ **    <td>4</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$B_o@f$</td>
+ **    <td>@c BO</td>
+ **    <td>8</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$m@f$</td>
+ **    <td>@c magnif</td>
+ **    <td>3</td>
+ **  </tr>
+ ** </table>
  **
  ** The keypoint coordinates <em>(x,y)</em> are expressed in the
  ** standard image convention (@e y axis pointing down). This also
  ** establishes the convention for expressing the angle @e th of a
- ** vector @e v (@e v could be either the gradient of the image or the
- ** direction of the keypoint). To slightly complicate the matter,
- ** however, the index @e th of the descrptor <em>h(th,x,y)</em>
- ** follows the opposite convention (this is for compatibility with
- ** Lowe's original SIFT implementation), as shown by the figure:
+ ** vector @e v (here @e v could be either the gradient of the image
+ ** or the direction of the keypoint). To slightly complicate the
+ ** matter, however, the index @e th of the descrptor
+ ** <em>h(th,x,y)</em> follows the opposite convention (this is for
+ ** compatibility with Lowe's original SIFT implementation), as shown
+ ** by the figure:
  **
  ** @image html sift-angle.png
  **
- ** Notice that converting from Lowe's to the standard convention amounts to
- ** changing the sign of the angle.
- **
- ** The histogram uses soft binning, so that bins partially overlap.
- ** There are @e NBP bins along the @e x and @e y directions and @e
- ** NBO along the @e th direction (the standard descriptor uses
- ** <em>NBP=4</em> and <em>NBO=8</em>). In normalized coordinate, the
- ** bin arrangment along the @e x direciton is as follows:
- **
- ** @image html sift-bins.png
- **
- ** The other directions are similar. Each triangle represent the
- ** weighed support of a bin. A sample is assigned to each bin
- ** proportionally to the relative weights (3-linear interoplation).
  **
  **/
  

@@ -32,6 +32,7 @@ char const help_message [] =
   " --frames        Specify frames file\n"
   " --descriptors   Specify descriptors file\n"
   " --meta          Specify meta file\n"
+  " --gss           Specify Gaussian scale space file\n"
   " --octaves -O    Number of octaves\n"
   " --levels -S     Number of levels per octave\n"
   " --first-octave  Index of the first octave\n"
@@ -48,6 +49,7 @@ enum {
   opt_meta,
   opt_frames, 
   opt_descriptors,
+  opt_gss,
   opt_first_octave,
   opt_edges_tresh,
   opt_peaks_tresh,
@@ -68,6 +70,7 @@ struct option const longopts [] = {
   { "meta",            optional_argument,      0,          opt_meta         },
   { "frames",          optional_argument,      0,          opt_frames       },
   { "descriptors",     optional_argument,      0,          opt_descriptors  },
+  { "gss",             optional_argument,      0,          opt_gss          },
   { "first-octave",    required_argument,      0,          opt_first_octave },
   { "edges-tresh",     required_argument,      0,          opt_edges_tresh  },
   { "peaks-tresh",     required_argument,      0,          opt_peaks_tresh  },
@@ -76,6 +79,75 @@ struct option const longopts [] = {
   { 0,                 0,                      0,          0                }
 } ;
 
+/* ----------------------------------------------------------------- */
+/** @brief Save octave on disk
+ **/
+
+static int
+save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
+          int verbose)
+{
+  char tmp [1024] ;
+  int S = filt -> S ;
+  int q, i ;
+  int s, err ;
+  int w, h ;
+  int o = filt -> o_cur ;
+  VlPgmImage pim ;
+  vl_uint8 *buffer = 0 ;
+
+  if (! fm -> active) {
+    return VL_ERR_OK ;
+  }
+  
+  w = vl_sift_get_octave_width  (filt) ;
+  h = vl_sift_get_octave_height (filt) ;
+  
+  pim.width     = w ;
+  pim.height    = h ;
+  pim.max_value = 255 ;
+  pim.is_raw    = 1 ;
+  
+  buffer = malloc (sizeof(vl_uint8) * w * h) ;
+  if (! buffer) {
+    err = VL_ERR_ALLOC ;
+    goto save_gss_quit ;
+  }
+  
+  q = vl_string_copy (tmp, sizeof(tmp), basename) ;
+  if (q >= sizeof(tmp)) {
+    err = VL_ERR_OVERFLOW ;
+    goto save_gss_quit ;
+  }
+  
+  for (s = 0 ; s < S ; ++s) {
+    vl_sift_pix * pt = vl_sift_get_octave (filt, s) ;
+    
+    /* conversion */
+    for (i = 0 ; i < w * h ; ++i) {
+      buffer [i] = (vl_uint8) pt [i] ;
+    }
+    
+    /* save */
+    snprintf(tmp + q, sizeof(tmp) - q, "_%02d_%03d", o, s) ;
+
+    err = vl_file_meta_open (fm, tmp, "w") ;
+    if (err) goto save_gss_quit ;    
+    
+    err = vl_pgm_insert (fm -> file, &pim, buffer) ;
+    if (err) goto save_gss_quit ;
+
+    if (verbose) {
+      printf("sift: saved gss level to '%s'\n", fm -> name) ;
+    }
+    
+    vl_file_meta_close (fm) ;
+  }
+    
+ save_gss_quit : ;
+  if (buffer) free (buffer) ;
+  vl_file_meta_close (fm) ;
+}
 
 /* ----------------------------------------------------------------- */
 /** @brief SIFT driver entry point 
@@ -86,7 +158,7 @@ main(int argc, char **argv)
   /* algorithm parameters */ 
   double   edges_tresh  = 2.0 ;  
   double   peaks_tresh  = 2.0 ;  
-  int      O = -1, S = -1, omin = -1 ;
+  int      O = -1, S = 3, omin = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
   char     err_msg [1024] ;
@@ -97,6 +169,7 @@ main(int argc, char **argv)
   VlFileMeta frm  = {1, "%.frame", VL_PROT_ASCII, "", 0} ;
   VlFileMeta dsc  = {0, "%.descr", VL_PROT_ASCII, "", 0} ;
   VlFileMeta met  = {0, "%.meta",  VL_PROT_ASCII, "", 0} ;
+  VlFileMeta gss  = {0, "%.pgm",   VL_PROT_ASCII, "", 0} ;
   VlFileMeta ifr  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
   
 #define ERR(args...) {                                          \
@@ -178,7 +251,13 @@ main(int argc, char **argv)
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;      
       break ;
 
-
+    case opt_gss :
+      /* --gss .................................................... */
+      err = vl_file_meta_parse (&gss, optarg) ;
+      if (err) 
+        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+      break ;
+    
 
     case 'O' :
       /* --octaves ............................................... */
@@ -242,24 +321,19 @@ main(int argc, char **argv)
   /* parse other arguments (filenames) */
   argc -= optind ;
   argv += optind ;
-  
-  if (verbose > 1) {
-    printf("sift: frames output\n") ;
-    printf("sift:    active   %d\n",  frm.active ) ;
-    printf("sift:    pattern  %s\n",  frm.pattern) ;
-    printf("sift:    protocol %s\n",  vl_string_protocol_name (frm.protocol)) ;
-    printf("sift: descriptors output\n") ;
-    printf("sift:    active   %d\n",  dsc.active ) ;
-    printf("sift:    pattern  %s\n",  dsc.pattern) ;
-    printf("sift:    protocol %s\n",  vl_string_protocol_name (dsc.protocol)) ;
-    printf("sift: meta output\n") ;
-    printf("sift:    active   %d\n",  met.active ) ;
-    printf("sift:    pattern  %s\n",  met.pattern) ;
-    printf("sift:    protocol %s\n",  vl_string_protocol_name (met.protocol)) ;
-    printf("sift: frames input\n") ;
-    printf("sift:    active   %d\n",  ifr.active ) ;
-    printf("sift:    pattern  %s\n",  ifr.pattern) ;
-    printf("sift:    protocol %s\n",  vl_string_protocol_name (ifr.protocol)) ;
+
+    if (verbose > 1) {
+#define PRNFO(name,fm)                                                  \
+      printf("sift: " name ": ") ;                                      \
+      printf("active=%d ",  (fm).active ) ;                             \
+      printf("pattern=%-10s ", (fm).pattern) ;                          \
+      printf("protocol=%-6s ", vl_string_protocol_name ((fm).protocol)) ; \
+      printf("\n") ;
+      
+      PRNFO("frames      ",frm) ;
+      PRNFO("descriptors ",dsc) ;
+      PRNFO("meta        ",met) ;
+      PRNFO("gss         ",gss) ;
   }
 
   /* ------------------------------------------------------------------
@@ -299,7 +373,7 @@ main(int argc, char **argv)
     }
     
     if (verbose > 1) {
-      printf("sift:    basename is '%s'\n", basename) ;
+      printf("sift: basename is '%s'\n", basename) ;
     }
 
 #define WERR(name)                                              \
@@ -322,25 +396,15 @@ main(int argc, char **argv)
       goto done ;
     }
 
-    /* open input file */
-    in = fopen (name, "r") ;
-    if (!in) {
-      err = VL_ERR_IO ;
-      snprintf(err_msg, sizeof(err_msg), 
-               "Could not open '%s'.",
-               name) ;
-      goto done ;
-    }
-
     /* open output files */
     err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name) ;    
     err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name) ;   
     err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name) ;
 
     if (verbose > 1) {
-      if (dsc.active) printf("mser:  writing descriptors to '%s'\n", dsc.name); 
-      if (frm.active) printf("mser:  writing frames      to '%s'\n", frm.name); 
-      if (met.active) printf("mser:  writign meta        to '%s'\n", met.name);
+      if (dsc.active) printf("sift: writing descriptors to '%s'\n", dsc.name); 
+      if (frm.active) printf("sift: writing frames to '%s'\n", frm.name); 
+      if (met.active) printf("sift: writign meta to '%s'\n", met.name);
     }
     
     /* Read image data -------------------------------------------- */
@@ -355,7 +419,7 @@ main(int argc, char **argv)
     }
     
     if (verbose) {
-      printf("sift:   image is %d by %d pixels\n",
+      printf("sift: image is %d by %d pixels\n",
              pim. width,
              pim. height) ;
     }
@@ -396,7 +460,7 @@ main(int argc, char **argv)
       err = VL_ERR_ALLOC ;
       goto done ;
     }
-
+    
     done  = 0 ;
     first = 1 ;
     while (1) {
@@ -405,10 +469,10 @@ main(int argc, char **argv)
       
       /* process next octave */
       if (first) {
-        err = vl_sift_process_first_octave (filt, fdata) ;
         first = 0 ;
+        err = vl_sift_process_first_octave (filt, fdata) ;
       } else {
-        err = vl_sift_process_next_octave (filt) ;
+        err = vl_sift_process_next_octave  (filt) ;
       }
       
       if (err) {
@@ -416,10 +480,28 @@ main(int argc, char **argv)
         break ;
       }
 
+      if (verbose > 1) {
+        printf("sift: next octave\n" );
+      }
+
+      /* optionally save GSS */
+      if (gss.active) {
+        err = save_gss (filt, &gss, basename, verbose) ;
+        if (err) {
+          snprintf (err_msg, sizeof(err_msg),
+                    "Could not write GSS level to PGM file.") ;
+          goto done ;
+        }
+      }
+
       /* run detector */
       vl_sift_detect (filt) ;
       keys  = vl_sift_get_keypoints (filt) ;
       nkeys = vl_sift_get_keypoints_num (filt) ;
+
+      if (verbose > 1) {
+        printf ("sift: %d keypoints\n", nkeys) ;
+      }
 
       /* for each keypoint */
       for (k = 0 ; k < nkeys ; ++k) {
@@ -486,6 +568,7 @@ main(int argc, char **argv)
     vl_file_meta_close (&frm) ;
     vl_file_meta_close (&dsc) ;
     vl_file_meta_close (&met) ;
+    vl_file_meta_close (&gss) ;
         
     /* if bad print error message */
     if (err) {

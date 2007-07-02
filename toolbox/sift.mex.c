@@ -1,6 +1,7 @@
 /** @file     sift.mser.c
  ** @author   Andrea Vedaldi
  ** @brief    SIFT MEX driver
+ ** @internal
  **/
 
 #include "mexutils.h"
@@ -10,17 +11,17 @@
 #include <assert.h>
 
 enum {
-  opt_octaves      = 0,
+  opt_octaves = 0,
   opt_levels,
   opt_first_octave,
   opt_verbose 
 } ;
 
 uMexOption options [] = {
-  {"Octaves",      1, opt_octaves        },
-  {"Levels",       1, opt_levels         },
-  {"FirstOctave",  1, opt_first_octave   },
-  {"Verbose",      0, opt_verbose        }
+  {"Octaves",      1,   opt_octaves       },
+  {"Levels",       1,   opt_levels        },
+  {"FirstOctave",  1,   opt_first_octave  },
+  {"Verbose",      0,   opt_verbose       }
 } ;
 
 /** @brief MEX entry point */
@@ -39,11 +40,10 @@ mexFunction(int nout, mxArray *out[],
   vl_sift_pix const *data ;
   int M, N ;
 
-  int O = -1 ;
-  int S = 3 ;
-  int omin = 0 ;
+  int O    = - 1 ;
+  int S    =   3 ;
+  int omin =   0 ;
 
-  
   /** -----------------------------------------------------------------
    **                                               Check the arguments
    ** -------------------------------------------------------------- */
@@ -112,48 +112,53 @@ mexFunction(int nout, mxArray *out[],
     vl_uint8          *descr  = 0 ;
     int                nframes = 0, reserved = 0, i,j,q ;
     
-    /* new filter */
+    /* create a filter to process the image */
     filt = vl_sift_new (M, N, O, S, omin) ;
     
-    /* process image */
+    /* ...............................................................
+     *                                             process each octave
+     * ............................................................ */
+
     while (true) {
+      int                   err ;
+      VlSiftKeypoint const *keys ;
+      int                   nkeys ;
       
       if (verbose) {
-        mexPrintf("sift: processing next octave\n") ;
+        mexPrintf ("sift: processing next octave\n") ;
       }
 
-      int err ;
-      VlSiftKeypoint const * keys ;
-      int nkeys ;
-
-      /* GSS and detector */
+      /* calculate the GSS for the next octave .................... */
       if (first) {
         err = vl_sift_process_first_octave (filt, data) ;
         first = 0 ;
       } else {
         err = vl_sift_process_next_octave (filt) ;
-      }
-        
+      }        
+
       if (err) break ;
 
+      /* run detector ............................................. */
       vl_sift_detect (filt) ;
 
-      /* output frames */
       keys  = vl_sift_get_keypoints (filt) ;
       nkeys = vl_sift_get_keypoints_num (filt) ;
 
+      /* for each keypoint ........................................ */
       for (i = 0 ; i < nkeys ; ++i) {
         double angles [4] ;
         int    nangles ;
-        nangles = 
-          vl_sift_calc_keypoint_orientations (filt, angles, keys + i) ;
-        
-        /* for each orientation */
+
+        /* obtain keypoint orientations ........................... */
+        nangles = vl_sift_calc_keypoint_orientations 
+          (filt, angles, keys + i) ;
+
+        /* for each orientation ................................... */
         for (q = 0 ; q < nangles ; ++q) {
           vl_sift_pix buf [128] ;
           vl_sift_calc_keypoint_descriptor (filt, buf, keys + i, angles [q]) ;
 
-          /* enough space ? */
+          /* make enough room for all these keypoints */
           if (reserved < nframes + 1) {
             reserved += 2 * nkeys ;
             frames = mxRealloc (frames,   4 * sizeof(double) * reserved) ;
@@ -166,24 +171,24 @@ mexFunction(int nout, mxArray *out[],
           frames [4 * nframes + 1] = keys [i] .x + 1 ;
           frames [4 * nframes + 2] = keys [i] .sigma ;
           frames [4 * nframes + 3] = VL_PI / 2  - angles [q] ;
-
+          
           for (j = 0 ; j < 128 ; ++j) {
             descr [128 * nframes + j] = (vl_uint8) 512.0 * buf [j] ;
           }
 
           ++ nframes ;
-        }
-      }
-    }
-
+        } /* next orientation */
+      } /* next keypoint */
+    } /* next octave */
+    
     if (verbose) {
-      mexPrintf("sift: found %d keypoints\n", nframes) ;
+      mexPrintf ("sift: found %d keypoints\n", nframes) ;
     }
-
+    
     /* save back */
     {
       int dims [2] ;
-
+      
       /* empty array */
       dims [0] = 0 ;
       dims [1] = 0 ;      

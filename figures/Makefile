@@ -7,7 +7,7 @@ pdf_targets := $(fig_sources:.fig=.pdf)
 png_targets := $(fig_sources:.fig=.png)
 
 %.png : %.pdf
-	convert -trim -density 100 $< $@
+	convert -trim -density 70 $< $@
 
 %.pdf : %.tex %-raw.tex %-raw.pdf
 	pdflatex $*.tex
@@ -20,13 +20,14 @@ png_targets := $(fig_sources:.fig=.png)
 	fig2dev -L pdftex $< $@
 
 %.tex : Makefile
-	echo -n -e "		           \n\
-	\\\\documentclass{article}         \n\
-	\\\\usepackage{graphicx,color}     \n\
-	\\\\begin{document}	           \n\
-	\\\\pagestyle{empty}               \n\
-	\\\\input{$*-raw.tex}              \n\
-	\\\\end{document}	           \n" > $@
+	echo -n -e "		                      \n\
+	\\\\documentclass[landscape]{article}         \n\
+	\\\\usepackage[margin=0pt]{geometry}          \n\
+	\\\\usepackage{graphicx,color}                \n\
+	\\\\begin{document}	                      \n\
+	\\\\pagestyle{empty}                          \n\
+	\\\\input{$*-raw.tex}                         \n\
+	\\\\end{document}	                      \n" > $@
 
 .PHONY: all
 all: $(png_targets)

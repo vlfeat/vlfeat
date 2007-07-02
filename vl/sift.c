@@ -58,7 +58,8 @@ fast_expn_init ()
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Copy an image upsampling the rows two times
+/** @internal
+ ** @brief Copy an image upsampling the rows two times
  **
  ** The destination buffer must be at least as big as two times the
  ** input buffer (total size). Upsampling is done by linear
@@ -68,7 +69,6 @@ fast_expn_init ()
  ** @param src     input image buffer.
  ** @param width   input image width.
  ** @param height  input image height.
- ** @internal
  **/
 
 static void 
@@ -191,7 +191,7 @@ vl_sift_new (int width, int height,
   f-> keys_res = 0 ;
 
   f-> peak_tresh = 0.0 ;
-  f-> edge_tresh = 1.0 ;
+  f-> edge_tresh = 10.0 ;
 
   f-> grad_o  = o_min - 1 ;
 
@@ -265,6 +265,11 @@ vl_sift_get_keypoints (VlSiftFilt const *f)
 /** @brief Get current octave data
  ** @param f SIFT filter.
  ** @param s level index.
+ **
+ ** The level index @a s ranges in the interval <tt>s_min = -1</tt>
+ ** and <tt> s_max = S + 2</tt>, where @c S is the number of levels
+ ** per octave.
+ **
  ** @return pointer to the octave data for level @a s.
  **/
 vl_sift_pix *
@@ -432,16 +437,15 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   w      = vl_sift_get_octave_width  (f) ;
   h      = vl_sift_get_octave_height (f) ;
   pt     = vl_sift_get_octave        (f, s_best) ;
-
-  /* next octave */
-  f-> o_cur += 1 ;
-  f-> nkeys  = 0 ;
-  w = f-> octave_width  = VL_SHIFT_LEFT(f->width,  - f->o_cur) ;
-  h = f-> octave_height = VL_SHIFT_LEFT(f->height, - f->o_cur) ;
-  
   octave = vl_sift_get_octave (f, s_min) ;
 
+  /* next octave */
   copy_and_downsample (octave, pt, w, h, 1) ;
+
+  f-> o_cur            += 1 ;
+  f-> nkeys             = 0 ;
+  w = f-> octave_width  = VL_SHIFT_LEFT(f->width,  - f->o_cur) ;
+  h = f-> octave_height = VL_SHIFT_LEFT(f->height, - f->o_cur) ;
   
   sa = sigma0 * powf (sigmak, s_min     ) ;
   sb = sigma0 * powf (sigmak, s_best - S) ;
