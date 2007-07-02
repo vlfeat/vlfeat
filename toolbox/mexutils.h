@@ -188,7 +188,19 @@ ustricmp(const char *s1, const char *s2)
  ** @param options
  ** @param next
  **
- ** @return
+ ** The function scans the MEX driver arguments array @a args of @a nargs elements
+ ** for the next option starting at location @a next.
+ **
+ ** This argument is suppsed to be the name of an option (case
+ ** insensitive). The option is looked up in the option table @a
+ ** options and decoded as the value uMexOption::val. Furthermore, if
+ ** uMexOption::has_arg is true, the next entry in the array @a args
+ ** is assumed to be argument of the option and stored in @a
+ ** optarg. Finally, @a next is advanced to point to the next option.
+ **
+ ** @return the code of the option, or -1 if the argument list is
+ ** exhausetd. In case of an error (e.g. unkown option) the function
+ ** prints an error message and quits the MEX file.
  **/
 static int uNextOption(mxArray const *args[], int nargs, 
                        uMexOption const *options, 
@@ -246,6 +258,12 @@ static int uNextOption(mxArray const *args[], int nargs,
   }
   
   /* argument */
+  if (*next >= nargs) {
+    snprintf(err_msg, sizeof(err_msg),
+             "Option '%s' requires an argument.", options[i].name) ;
+    mexErrMsgTxt(err_msg) ;        
+  }
+
   if (optarg) *optarg = args [*next] ;
   ++ (*next) ;
   return opt ;  

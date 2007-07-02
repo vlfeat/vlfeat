@@ -22,10 +22,6 @@
 
 #include "generic.h"
 
-/** @file
- ** @brief Maximally Stable Extremal Regions - Declaration
- **/
-
 /** @brief MSER image data type 
  ** 
  ** This is the data type of the image pixels. It has to be an

@@ -42,7 +42,7 @@
  ** keypoint as follows:
  **
  ** - Let @f$ \sigma  @f$ be the scale of the keypoint.
- ** - A bin extends for @f$ \sigma @f$ pixels where @f$m@f$ is a constant
+ ** - A bin extends for @f$m\sigma@f$ pixels where @f$m@f$ is a constant
  **   (the standard descriptor has @f$m=3@f$).
  ** - Overall, the bins cover @f$m\sigma B_p/2@f$ pixels in each
  **   direction.  This is also the deviation of the Gaussian window
@@ -90,8 +90,6 @@
  ** by the figure:
  **
  ** @image html sift-angle.png
- **
- **
  **/
  
 /* AUTORIGHTS */
@@ -159,29 +157,170 @@ typedef struct _VlSiftFilt
 } VlSiftFilt ;
 
 
-VlSiftFilt*        vl_sift_new                (int width, int height,
-                                               int O, int S,
-                                               int o_min) ;
-void               vl_sift_delete              (VlSiftFilt *f) ;
-int                vl_sift_process_first_octave(VlSiftFilt *f, 
-                                                vl_sift_pix const *im) ;
-int                vl_sift_process_next_octave (VlSiftFilt *f) ;
+/** @name Create and destroy
+ ** @{
+ **/
+VlSiftFilt*  vl_sift_new    (int width, int height,
+                             int O, int S,
+                             int o_min) ;
+void         vl_sift_delete (VlSiftFilt *f) ;
+/** @} */
 
-int                vl_sift_get_octave_width    (VlSiftFilt const *f) ;
-int                vl_sift_get_octave_height   (VlSiftFilt const *f) ;
+/** @name Process data
+ ** @{
+ **/
+int   vl_sift_process_first_octave       (VlSiftFilt *f, 
+                                          vl_sift_pix const *im) ;
+int   vl_sift_process_next_octave        (VlSiftFilt *f) ;
+void  vl_sift_detect                     (VlSiftFilt *f) ;
+int   vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
+                                          double angles [4],
+                                          VlSiftKeypoint const*k);
+void  vl_sift_calc_keypoint_descriptor   (VlSiftFilt *f,
+                                          vl_sift_pix *descr,
+                                          VlSiftKeypoint const* k,
+                                          double angle) ;
+/** @} */
 
-vl_sift_pix       *vl_sift_get_octave (VlSiftFilt const *f, int s) ;
+/** @name Retrieve data and parameters
+ ** @{
+ **/
+static int    vl_sift_get_octave_index   (VlSiftFilt const *f) ;
+static int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
+static int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
+static int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
+static double vl_sift_get_peak_tresh     (VlSiftFilt const *f) ;
+static double vl_sift_get_edge_tresh     (VlSiftFilt const *f) ;
 
-void               vl_sift_detect             (VlSiftFilt *f) ;
+static vl_sift_pix *vl_sift_get_octave  (VlSiftFilt const *f, int s) ;
+static VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
+/** @} */
 
-VlSiftKeypoint const * vl_sift_get_keypoints  (VlSiftFilt const *f) ;
-int                vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
+/** @name Set parameters
+ ** @{
+ **/
+static void vl_sift_set_peak_tresh (VlSiftFilt *f, double t) ;
+static void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
+/** @} */
 
-int                vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
-                                                       double angles [4],
-                                                       VlSiftKeypoint const*k);
-void               vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
-                                                     vl_sift_pix *descr,
-                                                     VlSiftKeypoint const* k,
-                                                     double angle) ;
-                                                       
+/* --------------------------------------------------------------------
+ *                                      Inline functions implementation
+ * ----------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------- */
+/** @brief Get current octave index.
+ ** @param f SIFT filter.
+ ** @return pointer to the keypoints list.
+ **/
+static VL_INLINE int
+vl_sift_get_octave_index (VlSiftFilt const *f) 
+{
+  return f-> o_cur ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get current octave width
+ ** @param f SIFT filter.
+ ** @return current octave width.
+ **/
+static VL_INLINE int 
+vl_sift_get_octave_width (VlSiftFilt const *f) 
+{
+  return f-> octave_width ; 
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get current octave height
+ ** @param f SIFT filter.
+ ** @return current octave height.
+ **/
+static VL_INLINE int 
+vl_sift_get_octave_height (VlSiftFilt const *f) 
+{
+  return f-> octave_height ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get current octave data
+ ** @param f SIFT filter.
+ ** @param s level index.
+ **
+ ** The level index @a s ranges in the interval <tt>s_min = -1</tt>
+ ** and <tt> s_max = S + 2</tt>, where @c S is the number of levels
+ ** per octave.
+ **
+ ** @return pointer to the octave data for level @a s.
+ **/
+static VL_INLINE vl_sift_pix *
+vl_sift_get_octave (VlSiftFilt const *f, int s) 
+{
+  int w = vl_sift_get_octave_width  (f) ;
+  int h = vl_sift_get_octave_height (f) ;  
+  return f->octave + w * h * (s - f->s_min) ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get number of keypoints.
+ ** @param f SIFT filter.
+ ** @return number of keypoints.
+ **/
+static VL_INLINE int 
+vl_sift_get_keypoints_num (VlSiftFilt const *f) 
+{
+  return f-> nkeys ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get keypoints.
+ ** @param f SIFT filter.
+ ** @return pointer to the keypoints list.
+ **/
+static VL_INLINE VlSiftKeypoint const *
+vl_sift_get_keypoints (VlSiftFilt const *f) 
+{
+  return f-> keys ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get peaks treashold
+ ** @param f SIFT filter.
+ ** @param t treshold.
+ **/
+static VL_INLINE double
+vl_sift_get_peak_tresh (VlSiftFilt const *f)
+{
+  return f -> peak_tresh ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get edges treshold
+ ** @param f SIFT filter.
+ ** @param t treshold.
+ **/
+static VL_INLINE double
+vl_sift_get_edge_tresh (VlSiftFilt const *f) 
+{
+  return f -> edge_tresh ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Set peaks treshold
+ ** @param f SIFT filter.
+ ** @param t treshold.
+ **/
+static VL_INLINE void
+vl_sift_set_peak_tresh (VlSiftFilt *f, double t) 
+{
+  f -> peak_tresh = t ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Set edges treshold
+ ** @param f SIFT filter.
+ ** @param t treshold.
+ **/
+static VL_INLINE void
+vl_sift_set_edge_tresh (VlSiftFilt *f, double t) 
+{
+  f -> edge_tresh = t ;
+}

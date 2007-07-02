@@ -31,7 +31,7 @@ struct _VlFileMeta
 
 
 /** @brief File meta information type
- ** @se ::_VlFileMeta
+ ** @see ::_VlFileMeta
  **/
 typedef struct _VlFileMeta VlFileMeta ;
 

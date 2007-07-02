@@ -81,6 +81,7 @@ struct option const longopts [] = {
 
 /* ----------------------------------------------------------------- */
 /** @brief Save octave on disk
+ ** @internal
  **/
 
 static int
@@ -147,6 +148,7 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
  save_gss_quit : ;
   if (buffer) free (buffer) ;
   vl_file_meta_close (fm) ;
+  return err ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -181,6 +183,7 @@ main(int argc, char **argv)
   /* ------------------------------------------------------------------
    *                                                      Parse options
    * --------------------------------------------------------------- */
+
   while (!err) {
     int ch = getopt_long(argc, argv, "vhd:p", longopts, 0) ;
 
@@ -345,16 +348,19 @@ main(int argc, char **argv)
     char             basename [1024] ;
     char const      *name = *argv++ ;
 
-    FILE            *in = 0 ;
-    vl_uint8        *data = 0 ;
+    FILE            *in    = 0 ;
+    vl_uint8        *data  = 0 ;
     vl_sift_pix     *fdata = 0 ;
     VlPgmImage       pim ;
 
     VlSiftFilt      *filt = 0 ;
-    int              q ;
-    vl_bool          done, first ;
+    int              q, i ;
+    vl_bool          first ;
 
-    /* Determine files  ------------------------------------------ */
+    
+    /* ...............................................................
+     *                                                 Determine files
+     * ............................................................ */
     
     /* get basenmae from filename */
     q = vl_string_basename (basename, sizeof(basename), name, 1) ;
@@ -403,11 +409,13 @@ main(int argc, char **argv)
 
     if (verbose > 1) {
       if (dsc.active) printf("sift: writing descriptors to '%s'\n", dsc.name); 
-      if (frm.active) printf("sift: writing frames to '%s'\n", frm.name); 
-      if (met.active) printf("sift: writign meta to '%s'\n", met.name);
+      if (frm.active) printf("sift: writing frames to '%s'\n",      frm.name); 
+      if (met.active) printf("sift: writign meta to '%s'\n",        met.name);
     }
     
-    /* Read image data -------------------------------------------- */
+    /* ...............................................................
+     *                                                       Read data
+     * ............................................................ */
 
     /* read source image header */
     err = vl_pgm_extract_head (in, &pim) ;
@@ -449,25 +457,33 @@ main(int argc, char **argv)
     for (q = 0 ; q < pim.width * pim.height ; ++q)
       fdata [q] = data [q] ;
     
-    /* Optionally read keypoint file  ----------------------------- */
+    /* ...............................................................
+     *                                     Optionally source keypoints
+     * ............................................................ */
 
-    /* Process data  ---------------------------------------------- */
+    /* ...............................................................
+     *                                                     Make filter
+     * ............................................................ */
 
     filt = vl_sift_new (pim.width, pim.height, O, S, omin) ;
+
     if (!filt) {
       snprintf(err_msg, sizeof(err_msg),
-               "Could not allocate SIFT filter.") ;
+               "Could not create SIFT filter.") ;
       err = VL_ERR_ALLOC ;
       goto done ;
     }
-    
-    done  = 0 ;
+
+    /* ...............................................................
+     *                                             Process each octave
+     * ............................................................ */
+   
     first = 1 ;
     while (1) {
       VlSiftKeypoint const *keys ;
-      int                   nkeys, k ;
+      int                   nkeys ;
       
-      /* process next octave */
+      /* calculate the GSS for the next octave .................... */
       if (first) {
         first = 0 ;
         err = vl_sift_process_first_octave (filt, fdata) ;
@@ -481,7 +497,8 @@ main(int argc, char **argv)
       }
 
       if (verbose > 1) {
-        printf("sift: next octave\n" );
+        printf("sift: GSS octave %d computed.\n",
+               vl_sift_get_octave_index (filt));
       }
 
       /* optionally save GSS */
@@ -494,30 +511,35 @@ main(int argc, char **argv)
         }
       }
 
-      /* run detector */
+      /* run detector ............................................. */
       vl_sift_detect (filt) ;
-      keys  = vl_sift_get_keypoints (filt) ;
+
+      keys  = vl_sift_get_keypoints     (filt) ;
       nkeys = vl_sift_get_keypoints_num (filt) ;
 
       if (verbose > 1) {
         printf ("sift: %d keypoints\n", nkeys) ;
       }
 
-      /* for each keypoint */
-      for (k = 0 ; k < nkeys ; ++k) {
+      /* for each keypoint ........................................ */
+      for (i = 0 ; i < nkeys ; ++i) {
         double angles [4] ;
         int    nangles ;
-        nangles = 
-          vl_sift_calc_keypoint_orientations (filt, angles, keys + k) ;
-        
-        /* for each orientation */
+
+        /* obtain keypoint orientations ........................... */
+        nangles = vl_sift_calc_keypoint_orientations 
+          (filt, angles, keys + i) ;
+
+        /* for each orientation ................................... */
         for (q = 0 ; q < nangles ; ++q) {
           vl_sift_pix descr [128] ;
-          vl_sift_calc_keypoint_descriptor (filt, descr, keys + k, angles [q]) ;
+
+          vl_sift_calc_keypoint_descriptor 
+            (filt, descr, keys + i, angles [q]) ;
           
           if (frm.active) {
-            fprintf(frm.file, "%g %g %g %g\n", 
-                    keys->x, keys->y, keys->sigma, angles [q])  ;
+            fprintf(frm.file, "%.10f %.10g %.10g %10g\n", 
+                    keys [i].x, keys [i].y, keys [i].sigma, angles [q])  ;
           }
           
           if (dsc.active) {
@@ -531,8 +553,11 @@ main(int argc, char **argv)
       }
     }
 
-    /* Meta file -------------------------------------------------- */
-        
+
+    /* ...............................................................
+     *                                                       Finish up
+     * ............................................................ */
+    
     if (met.active) {
       fprintf(met.file, "<sift\n") ;
       fprintf(met.file, "  input       = '%s'\n", name) ;
@@ -544,32 +569,31 @@ main(int argc, char **argv)
       }
       fprintf(met.file, ">\n") ;
     }
-
-    /* Next guy  ----------------------------------------------- */
+    
   done :
     /* release filter */
     if (filt) {
       vl_sift_delete (filt) ;
       filt = 0 ;
     }
-  
+    
     /* release image data */
     if (data) {
       free (data) ;
       data = 0 ;
     }
-
+    
     /* close files */
     if (in) {
       fclose (in) ;
       in = 0 ;
     }
-
+    
     vl_file_meta_close (&frm) ;
     vl_file_meta_close (&dsc) ;
     vl_file_meta_close (&met) ;
     vl_file_meta_close (&gss) ;
-        
+    
     /* if bad print error message */
     if (err) {
       fprintf
@@ -580,7 +604,7 @@ main(int argc, char **argv)
       exit_code = 1 ;
     }
   }
-
+  
   /* quit */
   return exit_code ;
 }

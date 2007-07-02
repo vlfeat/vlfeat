@@ -21,12 +21,13 @@ double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
 
 /** ---------------------------------------------------------------- */
 /** @brief Fast @ exp(- x) approximation
+ ** @internal
+ **
+ ** @param x argument.
  **
  ** The argument must be in the range 0 - ::EXPN_MAX .
  **
- ** @param x argument.
  ** @return @c exp(-x)
- ** @internal
  **/
 static VL_INLINE double
 fast_expn (double x)
@@ -58,17 +59,19 @@ fast_expn_init ()
 }
 
 /* ----------------------------------------------------------------- */
-/** @internal
- ** @brief Copy an image upsampling the rows two times
- **
- ** The destination buffer must be at least as big as two times the
- ** input buffer (total size). Upsampling is done by linear
- ** interpolation.
+/** @brief Copy, upsample rows and transpose
+ ** @internal
  **
  ** @param dst     output imgage buffer.
  ** @param src     input image buffer.
  ** @param width   input image width.
  ** @param height  input image height.
+ **
+ ** The output image has dimensions @a height by 2 @a width (so the
+ ** the destination buffer must be at least as big as two times the
+ ** input buffer).
+ **
+ ** Upsampling is performed by linear interpolation.
  **/
 
 static void 
@@ -81,7 +84,7 @@ copy_and_upsample_rows
 
   for(y = 0 ; y < height ; ++y) {
     b = a = *src++ ;
-    for(x = 0 ; x < width-1 ; ++x) {
+    for(x = 0 ; x < width - 1 ; ++x) {
       b = *src++ ;
       *dst = a ;             dst += height ;
       *dst = 0.5 * (a + b) ; dst += height ;
@@ -95,18 +98,19 @@ copy_and_upsample_rows
 
 /* ----------------------------------------------------------------- */
 /** @brief Copy and downasample an image
- **
- ** The image is downsampled @a d times, i.e. reduced to @c 1/2^d of
- ** its original size. The parameters @a width and @a height are the
- ** size of the input image. The destination image is assumed to be @c
- ** floor(width/2^d) pixels wide and @c floor(height/2^d) pixels high.
+ ** @internal
  **
  ** @param dst    output imgae buffer.
  ** @param src    input  image buffer.
  ** @param width  input  image width.
  ** @param height input  image height.
- ** @param d      octaves (>= 0).
- ** @internal
+ ** @param d      octaves (non negative).
+ ** 
+ ** The function downsamples the image @a d times, reducing it to @c
+ ** 1/2^d of its original size. The parameters @a width and @a height
+ ** are the size of the input image. The destination image is assumed
+ ** to be @c floor(width/2^d) pixels wide and @c floor(height/2^d)
+ ** pixels high.
  **/
 
 static void 
@@ -180,7 +184,7 @@ vl_sift_new (int width, int height,
 
   f-> sigman  = 0.5 * pow (2.0, - o_min) ;
   f-> sigma0  = 1.6 * pow (2.0, 1.0 / S) ;      
-  f-> sigmak  = pow (2.0, 1.0 / S) ;
+  f-> sigmak  =       pow (2.0, 1.0 / S) ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak) ) ;
 
   f-> octave_width  = 0 ;
@@ -213,83 +217,10 @@ vl_sift_delete (VlSiftFilt* f)
     if(f-> dog    ) free (f-> dog    ) ;
     if(f-> octave ) free (f-> octave ) ;
     if(f-> temp   ) free (f-> temp   ) ;
-    free(f) ;
+    free (f) ;
   }
 }
-
-/* ----------------------------------------------------------------- */
-/** @brief Get current octave width
- ** @param f SIFT filter.
- ** @return current octave width.
- **/
-int 
-vl_sift_get_octave_width (VlSiftFilt const *f) 
-{
-  return f-> octave_width ; 
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get current octave height
- ** @param f SIFT filter.
- ** @return current octave height.
- **/
-int 
-vl_sift_get_octave_height (VlSiftFilt const *f) 
-{
-  return f-> octave_height ;
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get number of keypoints.
- ** @param f SIFT filter.
- ** @return number of keypoints.
- **/
-int 
-vl_sift_get_keypoints_num (VlSiftFilt const *f) 
-{
-  return f-> nkeys ;
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get keypoints.
- ** @param f SIFT filter.
- ** @return pointer to the keypoints list.
- **/
-VlSiftKeypoint const *
-vl_sift_get_keypoints (VlSiftFilt const *f) 
-{
-  return f-> keys ;
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get current octave data
- ** @param f SIFT filter.
- ** @param s level index.
- **
- ** The level index @a s ranges in the interval <tt>s_min = -1</tt>
- ** and <tt> s_max = S + 2</tt>, where @c S is the number of levels
- ** per octave.
- **
- ** @return pointer to the octave data for level @a s.
- **/
-vl_sift_pix *
-vl_sift_get_octave (VlSiftFilt const *f, int s) 
-{
-  int w = vl_sift_get_octave_width  (f) ;
-  int h = vl_sift_get_octave_height (f) ;  
-  return f->octave + w * h * (s - f->s_min) ;
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get current octave index
- ** @param f SIFT filter.
- ** @return current octave index.
- **/
-int
-vl_sift_get_octave_index (VlSiftFilt const *f) 
-{
-  return f->o_cur ;
-}
+#include<stdio.h>
 
 /* ----------------------------------------------------------------- */
 /** @brief Start processing a new image
@@ -297,13 +228,14 @@ vl_sift_get_octave_index (VlSiftFilt const *f)
  ** @param f  SIFT filter.
  ** @param im image data.
  **
- ** The function start processing a new image by computing its
- ** Gaussian scale spadce at the lower octave.
+ ** The function starts processing a new image by computing its
+ ** Gaussian scale spadce at the lower octave. It also empties the
+ ** internal the keypoint buffer.
  **
  ** @return error code. The function returns ::VL_ERR_NO_MORE if there
- ** are no octaves (in practice this should never happen).
+ ** are no octaves at all to process (empty scale space).
  **
- ** @se ::vl_sift_process_next_octave().
+ ** @sa ::vl_sift_process_next_octave().
  **/
 int
 vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
@@ -397,7 +329,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 /* ----------------------------------------------------------------- */
 /** @brief Process next octave
  **
- ** @param SIFT filter.
+ ** @param f SIFT filter.
  **
  ** The function computes the next octave of the Gaussian scale space.
  ** Notice that this clears the record of any feature detected in the
@@ -579,7 +511,7 @@ vl_sift_detect (VlSiftFilt * f)
       }
       pt += 2 ;
     }
-    pt += 2*yo ;
+    pt += 2 * yo ;
   }
   
   /* ------------------------------------------------------------------
@@ -942,7 +874,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
       
       /* quadratic interpolation */
       double di = - 0.5 * (hp - hm) / (hp + hm - 2 * h0) ; 
-      double th = 2 * M_PI * (i + di + 0.5) / nbins ;      
+      double th = 2 * VL_PI * (i + di + 0.5) / nbins ;      
       angles [ nangles++ ] = th ;
       if( nangles == 4 )
         goto enough_angles ;
@@ -980,13 +912,13 @@ normalize_histogram
 /** @brief Compute the descriptor of a keypoint
  **
  ** @param f        SIFT filter.
- ** @param angles   orientations (output).
+ ** @param descr    SIFT descriptor (output)
  ** @param k        keypoint.
+ ** @param angle0   keypoint direction.
  **
  ** The function computes the SIFT descriptor of the keypoint @a k of
  ** orientation @a angle0. The function fills the buffer @a descr
  ** which must be large enough to hold the descriptor.
- **
  **
  ** The function assumes that the keypoint is on the current octave.
  ** If not, it does not do anything.
