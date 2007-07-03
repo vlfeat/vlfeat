@@ -17,7 +17,84 @@
  **       get the keypoint descriptor.
  ** - Delete the SIFT filter by ::vl_sift_delete().
  **
+ ** @section sift-scale-space SIFT scale space
+ **
+ ** SIFT keypoints are computed at different scales. To this end, the
+ ** image is projected in a Gaussian scale space by convoving it by
+ ** isotropic Gaussian kernels of increasing variance. This results in a
+ ** somewhat complex structure, illustrated next:
+ **
+ ** @image html sift-ss.png
+ **
+ ** - In the scale space, the image at scale @f$\sigma@f$ is simply
+ **   the image smoothed with a Gaussian kernel of that variance.  The
+ **   input image is assumed to be pre-smoothed at scale
+ **   @f$\sigma_n@f$ due to pixel aliasing.
+ ** - Scales are sampled at different points @f$\sigma(o,s)@f$ which
+ **   are logarithmically spaced.  The levels are indexed by @e o
+ **   (octave index) and @e s (level index). There are @e O octaves
+ **   and @e S levels per octave. At each octave, the image is
+ **   downsampled to save computations. The sampled levels are
+ **   represented as black vertical lines in the figure (their length
+ **   is proportional to the resolution of the image).
+ ** - The octave index starts at @f$o_{\mathrm{min}}@f$ and ends at
+ **   @f$o_{\mathrm{min}}+O-1@f$. The level index starts at
+ **   @f$s_{\mathrm{min}}=-1@f$ and ends at @f$s_{\mathrm{max}} = S+2@f$.
+ **   This means that scale levels are sampled twice, as belonging to
+ **   different octaves (this is apparent from the figure).
+ ** - The DOG scale space is obtained by subtracting contiguous GSS
+ **   levels.  The DOG levels are represented as vertical blue bars.
+ ** - The SIFT detector works in between DOG levels, finding keypoints
+ **   at the intersection of the green arrows. Notice that, due to the
+ **   choice of the GSS and DOG samples, these intersections
+ **   consitutite a non-redunant complete sampling of all octaves and
+ **   levels.
+ **
+ **  <table>
+ **  <tr>
+ **   <td>parameter</td>
+ **   <td>alt. name</td>
+ **   <td>standard value</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$O@f$</td>
+ **    <td>@c O</td>
+ **    <td>as big as possible</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$o_{\mathrm{min}}@f$</td>
+ **    <td>@c o_min</td>
+ **    <td>-1</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$S@f$</td>
+ **    <td>@c S</td>
+ **    <td>3</td>
+ **  </tr>
+ ** </table>
+ **
  ** @section sift-detector SIFT detector
+ **
+ ** The SIFT detectors finds peaks of the DOG scale space as follows:
+ **
+ ** - Peaks are searched in a neighborhood of 3x3x3 pixels (in both
+ **   space and scale).  Along the scale index, they are selected at
+ **   the intersecton fo the green arrows in the previous figure.
+ ** - Peaks are then quadratically interpolated.
+ ** - Peaks are filtered by contrast (peaks treshold) and
+ **   spatial stability (edges treshold).
+ **
+ ** Each peak passing these test is a SIFT keypoint. SIFT also assigns
+ ** up to four orientations to each keypoint by looking at the modes
+ ** of the distribution of the gradient orientation in a polling
+ ** region supported by a Gaussian windows 1.5 wider that the scale of
+ ** the keypoint:
+ **
+ ** @image html sift-orient.png
+ **
+ ** In addition to the biggest mode, up to other three modes whose
+ ** amplitude is within the 80% of the biggest mode are retained too,
+ ** returned as additional orientations.
  **
  ** @section sift-descriptor SIFT descriptor
  **

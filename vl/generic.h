@@ -4,6 +4,31 @@
  **
  ** This modules provides basic facilities such as basic types, error
  ** handling, endianness detection and serialization.
+ **
+ ** @section generic-error Error handling
+ **
+ ** Error handling uses the same style of the standard C library. Most
+ ** functions return 0 when they succeed and -1 when they fail, and
+ ** set the global variable ::vl_err_no with a code identifying the
+ ** error occurred. This variable is never set on success and should
+ ** be examinated right after an error occurred.
+ **
+ ** @section generic-endian Endinanness detection and conversions
+ **
+ ** An architecture is big endiand or little endian depending how
+ ** multi-btye data are stored in memory:
+ **
+ ** - <em>big endian</em> (big end first - Network order) if it
+ **   stores the most significant byte has the smaller memory address.
+ ** - <em>little endian</em> (small end first - Intel format) if it
+ **   stores the lesser significant byte at the smaller memory address.
+ **
+ ** Use the function ::vl_get_endianness() to detect endianness.  To
+ ** serialize/deserialize data in big endian (network) order, call the
+ ** functions ::vl_adapt_endianness_8(), ::vl_adapt_endianness_4(),
+ ** ::vl_adapt_endianness_2() after reading and before writing (the
+ ** functions change edinanness only if the architecture is little
+ ** endian and do nothing otherwise).
  **/
 
 /* AUTORIGHTS */
@@ -46,6 +71,7 @@ typedef int                 vl_bool ;    /**< boolean */
 /** @brief Small integer */
 #define VL_SMALL_INT  (- VL_BIG_INT - 1)
 
+
 /** ---------------------------------------------------------------- */
 /** @name Error handling 
  ** @{ 
@@ -66,9 +92,10 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
 #define VL_ERR_OK       0  /**< No error */
 #define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
 #define VL_ERR_ALLOC    2  /**< Resource allocation error */
-#define VL_ERR_BAD_ARG  3  /**< Bad argument error */
+#define VL_ERR_BAD_ARG  3  /**< Bad argument or illegal data error */
 #define VL_ERR_IO       4  /**< Input/output error */
-#define VL_ERR_NO_MORE  5  /**< Sequence exhausted */
+#define VL_ERR_EOF      5  /**< End-of-file or end-of-sequence error */
+#define VL_ERR_NO_MORE  5  /**< End-of-sequence @deprecated */
 
 /** @} */
 
@@ -106,8 +133,128 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
 
 /** ---------------------------------------------------------------- */
 
-vl_bool      vl_is_big_endian () ;
 char const * vl_get_version_string () ;
+
+/** @name Endianness detection and conversions
+ ** @{
+ **/
+
+#define VL_LITTLE_ENDIAN 0  /**< little endian. */
+#define VL_BIG_ENDIAN    1  /**< big endian. */
+       
+/** @def VL_ENDIANNESS
+ ** @brief Host endianness.
+ **
+ ** This macro is equal to ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN
+ ** depending on the endianness of the host.
+ **/
+#if   (('1234' >> 24) == '1')
+#define VL_ENDIANNESS VL_LITTLE_ENDIAN
+#elif (('4321' >> 24) == '1')
+#define VL_ENDIANNESS VL_BIG_ENDIAN
+#else
+#error Cannot determine host endianness!
+#endif
+
+static VL_INLINE int  vl_get_endianness () ;
+static VL_INLINE void vl_adapt_endianness_8 (void *dst, void* src) ;
+static VL_INLINE void vl_adapt_endianness_4 (void *dst, void* src) ;
+static VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
+/** @} */
+
+/** ---------------------------------------------------------------- */
+/** @brief Get endianness
+ ** @return @c ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN depending on the
+ ** host endianness.
+ **/
+
+static VL_INLINE int
+vl_get_endianness () 
+{
+  return VL_ENDIANNESS ;
+}
+
+/** ---------------------------------------------------------------- */
+/** @brief Change endianness of 8-byte value if required
+ **
+ ** @param dst destination 8-byte buffer.
+ ** @param src source 8-byte bufffer.
+ ** @see generic-endianness.
+ **/
+
+static VL_INLINE void
+vl_adapt_endianness_8 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if VL_ENDIANNESS == VL_BIG_ENDIAN
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+    dst_ [2] = src_ [2] ;
+    dst_ [3] = src_ [3] ;
+    dst_ [4] = src_ [4] ;
+    dst_ [5] = src_ [5] ;
+    dst_ [6] = src_ [6] ;
+    dst_ [7] = src_ [7] ;
+#else 
+    dst_ [0] = src_ [7] ;
+    dst_ [1] = src_ [6] ;
+    dst_ [2] = src_ [5] ;
+    dst_ [3] = src_ [4] ;
+    dst_ [4] = src_ [3] ;
+    dst_ [5] = src_ [2] ;
+    dst_ [6] = src_ [1] ;
+    dst_ [7] = src_ [0] ;
+#endif
+}
+
+/** ---------------------------------------------------------------- */
+/** @brief Change endianness of 4-byte value if required
+ **
+ ** @param dst destination 4-byte buffer.
+ ** @param src source 4-byte bufffer.
+ ** @see generic-endianness.
+ **/
+
+static VL_INLINE void
+vl_adapt_endianness_4 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if VL_ENDIANNESS == VL_BIG_ENDIAN
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+    dst_ [2] = src_ [2] ;
+    dst_ [3] = src_ [3] ;
+#else 
+    dst_ [0] = src_ [3] ;
+    dst_ [1] = src_ [2] ;
+    dst_ [2] = src_ [1] ;
+    dst_ [3] = src_ [0] ;
+#endif
+}
+
+/** ---------------------------------------------------------------- */
+/** @brief Change endianness of 2-byte value if required
+ **
+ ** @param dst destination 2-byte buffer.
+ ** @param src source 2-byte bufffer.
+ ** @see generic-endianness.
+ **/
+
+static VL_INLINE void
+vl_adapt_endianness_2 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if VL_ENDIANNESS == VL_BIG_ENDIAN
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+#else
+    dst_ [0] = src_ [1] ;
+    dst_ [1] = src_ [0] ;
+#endif
+}
 
 /* VL_GENERIC_H */
 #endif

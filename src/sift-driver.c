@@ -151,7 +151,7 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
   return err ;
 }
 
-/* ----------------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
 /** @brief SIFT driver entry point 
  **/
 int
@@ -180,9 +180,9 @@ main(int argc, char **argv)
     break ;                                                     \
   }
   
-  /* ------------------------------------------------------------------
-   *                                                      Parse options
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                                     Parse options
+   * -------------------------------------------------------------- */
 
   while (!err) {
     int ch = getopt_long(argc, argv, "vhd:p", longopts, 0) ;
@@ -190,7 +190,6 @@ main(int argc, char **argv)
     /* end of option list? */
     if (ch == -1) break;
 
-    /* process options */
     switch (ch) {
 
     case '?' :
@@ -216,11 +215,12 @@ main(int argc, char **argv)
       break ;
 
     case opt_version :
-      printf ("sift: driver version: %s libvl version: %s", 
+      printf ("sift: driver %s; libvl %s\n", 
               VL_SIFT_DRIVER_VERSION_STRING,
               vl_get_version_string()) ;
       exit(0) ;
       
+
 
 
     case opt_frames :
@@ -261,6 +261,7 @@ main(int argc, char **argv)
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
     
+
 
     case 'O' :
       /* --octaves ............................................... */
@@ -342,7 +343,7 @@ main(int argc, char **argv)
   /* ------------------------------------------------------------------
    *                                         Process one image per time
    * --------------------------------------------------------------- */
-
+    
   while (argc--) {
 
     char             basename [1024] ;
@@ -375,11 +376,11 @@ main(int argc, char **argv)
     }
     
     if (verbose) {
-      printf("sift: processing '%s'\n", name) ;
+      printf ("sift: processing '%s'\n", name) ;
     }
     
     if (verbose > 1) {
-      printf("sift: basename is '%s'\n", basename) ;
+      printf ("sift: basename is '%s'\n", basename) ;
     }
 
 #define WERR(name)                                              \
@@ -417,24 +418,33 @@ main(int argc, char **argv)
      *                                                       Read data
      * ............................................................ */
 
-    /* read source image header */
+    /* read PGM header */
     err = vl_pgm_extract_head (in, &pim) ;
+
     if (err) {
-      err = VL_ERR_IO ;
-      snprintf(err_msg, sizeof(err_msg), 
-               "PGM header corrputed.") ;
-      goto done ;
+      switch (vl_err_no) {
+      case  VL_ERR_PGM_IO :
+        snprintf(err_msg, sizeof(err_msg),  
+                 "Cannot read from '%s'.", name) ;
+        err = VL_ERR_IO ;
+        break ;
+
+      case VL_ERR_PGM_INV_HEAD :
+        snprintf(err_msg, sizeof(err_msg),  
+                 "'%s' contains a malformed PGM header.", name) ;
+        err = VL_ERR_IO ;
+        goto done ;
+      }
     }
     
-    if (verbose) {
-      printf("sift: image is %d by %d pixels\n",
-             pim. width,
-             pim. height) ;
-    }
+    if (verbose)
+      printf ("sift: image is %d by %d pixels\n",
+              pim. width,
+              pim. height) ;
     
     /* allocate buffer */
     data  = malloc(vl_pgm_get_data_size (&pim) * 
-                   vl_pgm_get_bpp       (&pim)) ;
+                   vl_pgm_get_bpp       (&pim) * sizeof (vl_uint8)   ) ;
     fdata = malloc(vl_pgm_get_data_size (&pim) * 
                    vl_pgm_get_bpp       (&pim) * sizeof (vl_sift_pix)) ;
     
@@ -445,11 +455,11 @@ main(int argc, char **argv)
       goto done ;
     } 
     
-    /* read PGM */
+    /* read PGM body */
     err  = vl_pgm_extract_data (in, &pim, data) ;
+
     if (err) {
-      snprintf(err_msg, sizeof(err_msg), 
-               "PGM body corrputed.") ;
+      snprintf(err_msg, sizeof(err_msg), "PGM body corrputed.") ;
       goto done ;
     }
 
@@ -518,7 +528,7 @@ main(int argc, char **argv)
       nkeys = vl_sift_get_keypoints_num (filt) ;
 
       if (verbose > 1) {
-        printf ("sift: %d keypoints\n", nkeys) ;
+        printf ("sift: %d unoriented keypoints\n", nkeys) ;
       }
 
       /* for each keypoint ........................................ */
@@ -538,16 +548,19 @@ main(int argc, char **argv)
             (filt, descr, keys + i, angles [q]) ;
           
           if (frm.active) {
-            fprintf(frm.file, "%.10f %.10g %.10g %10g\n", 
-                    keys [i].x, keys [i].y, keys [i].sigma, angles [q])  ;
+            vl_file_meta_put_double (&frm, keys [i].x     ) ;
+            vl_file_meta_put_double (&frm, keys [i].y     ) ;
+            vl_file_meta_put_double (&frm, keys [i].sigma ) ;
+            vl_file_meta_put_double (&frm, angles [q]     ) ;
+            if (frm.protocol == VL_PROT_ASCII) fprintf(frm.file, "\n") ;
           }
           
           if (dsc.active) {
             int i ;
             for (i = 0 ; i < 128 ; ++i) {
-              fprintf(dsc.file, "%g ", descr [i]) ;
+              vl_file_meta_put_uint8 (&dsc, 512.0 * descr [i]) ;
             }
-            fprintf(dsc.file, "\n") ;
+            if (dsc.protocol == VL_PROT_ASCII) fprintf(dsc.file, "\n") ;
           }
         }
       }

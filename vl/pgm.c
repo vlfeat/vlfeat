@@ -126,7 +126,9 @@ vl_pgm_get_bpp (VlPgmImage const *im)
  ** an image encoded in PGM format. The function fills the structure
  ** VlPgmImage according.
  **
- ** @return error code.
+ ** @return error code. The function sets ::vl_err_no to
+ ** ::VL_PGM_INV_HEAD or ::VL_PGM_INV_META depending wether the error
+ ** occurred in decoding the header or meta section of the PGM file.
  **/
 
 int
@@ -148,10 +150,8 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   sz = fread(magic, 1, 2, f) ;
   
   if (sz < 2) {
-    vl_err_no  = VL_ERR_PGM_IO ;
-    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
-             "Cannot read PGM header") ;
-    return 0 ;
+    vl_err_no  = VL_ERR_PGM_INV_HEAD ;
+    return -1 ;
   }
 
   good = magic [0] == 'P' ;
@@ -172,9 +172,7 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
 
   if( ! good ) {
     vl_err_no = VL_ERR_PGM_INV_HEAD ;
-    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
-             "Invalid PGM header") ;
-    return vl_err_no ;
+    return -1 ;
   }
 
   /* ------------------------------------------------------------------
@@ -210,15 +208,11 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   
   if(! good) {
     vl_err_no = VL_ERR_PGM_INV_META ;
-    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
-             "Invalid PGM preamble") ;
     return vl_err_no ;
   }
 
   if(! max_value >= 65536) {
     vl_err_no = VL_ERR_PGM_INV_META ;
-    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
-             "PGM max_value is bigger or equal to 65535") ;
     return vl_err_no ;
   }
 
@@ -271,7 +265,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
     good = c == data_size ;
     
     /* adjust endianess */
-    if( bpp == 2 && ! vl_is_big_endian() ) {
+    if( bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN ) {
       int i ;
       vl_uint8 *pt = (vl_uint8*) data ;
       for(i = 0 ; i < 2 * data_size ; i += 2) {
@@ -334,7 +328,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
           im->max_value) ;
 
   /* take care of endianness */
-  if (bpp == 2 && ! vl_is_big_endian()) {
+  if (bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN) {
     int i ;
     vl_uint8* temp = malloc (2 * data_size) ;
     memcpy(temp, data, 2 * data_size) ;

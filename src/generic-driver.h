@@ -16,6 +16,7 @@
 #include <vl/stringop.h>
 
 #include <stdio.h>
+#include <assert.h>
 
 /** @brief File meta information
  **/
@@ -48,7 +49,7 @@ typedef struct _VlFileMeta VlFileMeta ;
  **
  ** - Sets VlFileMeta::active to true.
  ** - Sets VlFileMeta::protocol to the file protocol id (if any).
- ** - Sets VlFileMeta::pattern  to the file pattern.
+ ** - Sets VlFileMeta::pattern  to the file pattern (if any).
  **
  ** @return error code. The funciton may fail either because the file
  ** protocol is not recognized (::VL_ERR_BAD_ARG) or because the file
@@ -79,11 +80,13 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
       break ;
     }
 
-    q = vl_string_copy 
-      (fm -> pattern, sizeof (fm -> pattern), arg) ;
+    if (vl_string_length (arg) > 0) {
+      q = vl_string_copy 
+        (fm -> pattern, sizeof (fm -> pattern), arg) ;
     
-    if (q >= sizeof (fm -> pattern)) {
-      return VL_ERR_OVERFLOW ;
+      if (q >= sizeof (fm -> pattern)) {
+        return VL_ERR_OVERFLOW ;
+      }
     }
     
   }
@@ -140,6 +143,123 @@ vl_file_meta_close (VlFileMeta * fm)
     fm -> file = 0 ;
   }
 }
+
+/* ----------------------------------------------------------------- */
+/** @brief Write double to file
+ **
+ ** @param fm   File meta information.
+ ** @param x    Datum to write.
+ **
+ ** @return error code. The function returns ::VL_ERR_ALLOC if the
+ ** datum cannot be written.
+ **/
+
+static VL_INLINE int
+vl_file_meta_put_double (VlFileMeta * fm, double x)
+{
+  int err ;
+  double y ;
+
+  switch (fm -> protocol) {
+
+  case VL_PROT_ASCII :
+    err = fprintf (fm -> file, "%g ", x) ;
+    break ;
+    
+  case VL_PROT_BINARY :
+    vl_adapt_endianness_8 (&y, &x) ;
+    err = fwrite (&y, sizeof(double), 1, fm -> file) ;
+    break ;
+
+  default :
+    assert (0) ;
+    break ;
+  }
+
+  return err ? VL_ERR_ALLOC : VL_ERR_OK ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Write uint8 to file
+ **
+ ** @param fm   File meta information.
+ ** @param x    Datum to write.
+ **
+ ** @return error code. The function returns ::VL_ERR_ALLOC if the
+ ** datum cannot be written.
+ **/
+
+static VL_INLINE int
+vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
+{
+  int err ;
+
+  switch (fm -> protocol) {
+
+  case VL_PROT_ASCII :
+    err = fprintf (fm -> file, "%d ", x) ;
+    break ;
+    
+  case VL_PROT_BINARY :
+    err = fwrite (&x, sizeof(vl_uint8), 1, fm -> file) ;
+    break ;
+
+  default :
+    assert (0) ;
+    break ;
+  }
+
+  return err ? VL_ERR_ALLOC : VL_ERR_OK ;
+}
+
+
+/* ----------------------------------------------------------------- */
+/** @brief Read doublex from file
+ **
+ ** @param fm  File meta information.
+ ** @param x   Datum read.
+ **
+ ** @return error code. The function returns ::VL_ERR_EOF if the
+ ** end-of-file is reached and ::VL_ERR_BAD_ARG if the file is
+ ** malformed.
+ **/
+
+static VL_INLINE int
+vl_file_meta_get_double (VlFileMeta *fm, double *x)
+{
+  int err, n ;
+  double y ;
+
+  switch (fm -> protocol) {
+
+  case VL_PROT_ASCII :
+    n = fscanf (fm -> file, "%lg", x) ;
+    err = n < 1 ;
+    break ;
+  
+  case VL_PROT_BINARY :
+    n = fread (&y, sizeof(double), 1, fm -> file) ;
+    err = n < 1 ;
+    vl_adapt_endianness_8 (x, &y) ;
+    break ;
+
+  default :
+    assert (0) ;
+    break ;
+  }
+
+  if (err) {
+    if (feof (fm -> file)) {
+      return VL_ERR_EOF ;
+    } else {
+      return VL_ERR_BAD_ARG ;
+    }
+  }
+
+  return VL_ERR_OK ;
+}
+
+
 
 /* VL_GENERIC_DRIVER */
 #endif

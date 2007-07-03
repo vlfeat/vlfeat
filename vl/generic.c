@@ -5,49 +5,11 @@
 
 /* AUTORIGHTS */
 
-#include "generic.h"
-
-#include <assert.h>
-#include <stdlib.h>
-#include <math.h>
-
-int vl_err_no = 0 ;
-char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
-
-/** ---------------------------------------------------------------- */
-/** @brief Check endianess
- **
- ** An architecture is <em>big endian</em> if it stores the most
- ** siginficant byte of a multi-byte data type at the lower memory
- ** address.
- **
- ** @return @c true if the machine is big endian.
- **/
-
-vl_bool
-vl_is_big_endian ()
-{
-  union {
-    vl_uint16 word ;
-    vl_uint8  byte [2] ;
-  } test ;  
-  test.word = 0x0001 ;
-  return test.byte [1] ;
-}
-
-/** ---------------------------------------------------------------- */
-/** @brief Get version string
- ** @return library version string
- **/
-
-char const *
-vl_get_version_string ()
-{
-  return VL_VERSION_STRING ;
-}
-
 /** @mainpage Vision Lab Features Library
  ** @version alpha-1
+ ** @author Andrea Vedaldi (@email vedaldi@cs.ucla.edu)
+ ** @author Brian Fulkerson (@email brian@cs.ucla.edu)
+ ** @copy 2007 Andrea Vedaldi and Brian Fulkerson
  **
  ** <em>This library contains implementations of common computer
  ** vision algorithms, with a special focus on visual features for
@@ -85,3 +47,33 @@ vl_get_version_string ()
  **   requires only the standard C-90 environment (except for the
  **   MATLAB drivers which require MATLAB).
  **/
+
+#include "generic.h"
+
+#include <assert.h>
+#include <stdlib.h>
+#include <math.h>
+
+int vl_err_no = 0 ;
+char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
+
+/** ---------------------------------------------------------------- */
+/** @brief Get version string
+ ** @return library version string
+ **/
+
+char const *
+vl_get_version_string ()
+{
+  return VL_VERSION_STRING 
+    " (" 
+#if   VL_ENDIANNESS == VL_BIG_ENDIAN
+    "big endian"
+#elif VL_ENDIANNESS == VL_LITTLE_ENDIAN
+    "little endian"
+#else
+    "unkown endianness"
+#endif
+    ")" ;
+}
+

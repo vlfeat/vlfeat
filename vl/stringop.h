@@ -55,7 +55,7 @@ char const* vl_string_protocol_name (int prot) ;
 int    vl_string_basename         (char *dst, int n, char const *src, int n_ext) ;
 int    vl_string_replace_wildcard (char *dst, int n, char const *src, char wild, char esc, char const* repl) ;
 char*  vl_string_find_char_rev    (char const *beg, char const* end, char c) ;
-
+int    vl_string_length           (char const *str) ;
 
 /* VL_STRINGOP_H */
 #endif

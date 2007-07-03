@@ -18,10 +18,10 @@
 
 /** @name PGM parser error codes */
 /*@{*/
-#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM heder.        */
-#define VL_ERR_PGM_INV_META  102 /**< Invalid PGM meta section. */
-#define VL_ERR_PGM_INV_DATA  103 /**< Invalid PGM data section. */
-#define VL_ERR_PGM_IO        104 /**< Generic I/O error.        */
+#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM heder serction. */
+#define VL_ERR_PGM_INV_META  102 /**< Invalid PGM meta section.   */
+#define VL_ERR_PGM_INV_DATA  103 /**< Invalid PGM data section.   */
+#define VL_ERR_PGM_IO        104 /**< Generic I/O error.          */
 /*@}*/
 
 /** @brief PGM image meta data

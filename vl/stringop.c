@@ -281,3 +281,19 @@ vl_string_find_char_rev (char const *beg, char const* end, char c)
   }
   return 0 ;
 }
+
+
+/** ---------------------------------------------------------------- */
+/** @brief Calculate string length
+ **
+ ** @param str string.
+ ** @return string length.
+ **/
+
+int
+vl_string_length (char const *str)
+{
+  int i ;
+  for(i = 0 ; str [i] ; ++i) ;
+  return i ;
+}

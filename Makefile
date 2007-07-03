@@ -28,7 +28,7 @@ glx_CFLAGS       := -O0 -I. -pedantic -Wall -std=c99 -g
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)'
 glx_MEX_SUFFIX   := mexglx
 
-CFLAGS       := $($(ARCH)_CFLAGS)
+CFLAGS       += $($(ARCH)_CFLAGS)
 MEX_SUFFIX   := $($(ARCH)_MEX_SUFFIX)
 MEX_CFLAGS   := $($(ARCH)_MEX_CFLAGS)
 
@@ -71,6 +71,8 @@ src/test_stringop    : src/test_sringop.o     vl/libvl.a
 
 src/test_getopt_long : src/test_getopt_long.o vl/libvl.a
 	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
+
+src/sift-driver.o : src/generic-driver.h
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
