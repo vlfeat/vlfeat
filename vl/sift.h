@@ -257,6 +257,11 @@ void  vl_sift_calc_keypoint_descriptor   (VlSiftFilt *f,
                                           vl_sift_pix *descr,
                                           VlSiftKeypoint const* k,
                                           double angle) ;
+void  vl_sift_keypoint_init              (VlSiftFilt const *f,
+                                          VlSiftKeypoint *k, 
+                                          double x,
+                                          double y,
+                                          double sigma) ;
 /** @} */
 
 /** @name Retrieve data and parameters

@@ -1087,3 +1087,111 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   }
 
 }
+
+
+/* ---------------------------------------------------------------- */
+/** @brief Get keypoint from position and scale
+ **
+ ** @param f     SIFT filter.
+ ** @param k     SIFT keypoint (output).
+ ** @param x     x coordinate of the center.
+ ** @peram y     y coordinate of the center.
+ ** @param sigma scale.
+ **
+ ** The function initializes the structure @a k from the
+ ** location @a x and @a y and scale @a sigma of the keypoint.
+ **/
+void
+vl_sift_keypoint_init (VlSiftFilt const *f,
+                       VlSiftKeypoint *k, 
+                       double x,
+                       double y,
+                       double sigma)
+{
+
+  /*
+    The formula linking the keypoint scale sigma to the octave and
+    scale index is
+
+    (1) sigma(o,s) = sigma0 2^(o+s/S)
+
+    for which
+    
+    (2) o + s/S = log2 sigma/sigma0 == phi.
+
+    In addition to the scale index s (which can be fractional due to
+    scale interpolation) a keypoint has an integer scale index is too
+    (which is the index of the scale level where it was detected in
+    the DoG scale space). We have the constraints:
+ 
+    - o and is are integer
+
+    - is is in the range [smin+1, smax-2  ]
+
+    - o  is in the range [omin,   omin+O-1]
+
+    - is = rand(s) most of the times (but not always, due to the way s
+      is obtained by quadratic interpolation of the DoG scale space).
+
+    Depending on the values of smin and smax, often (2) has multiple
+    solutions is,o that satisfy all constraints.  In this case we
+    choose the one with biggest index o (this saves a bit of
+    computation).
+
+    DETERMINING THE OCTAVE INDEX O
+
+    From (2) we have o = phi - s/S and we want to pick the biggest
+    possible index o in the feasible range. This corresponds to
+    selecting the smallest possible index s. We write s = is + ds
+    where in most cases |ds|<.5 (but in general |ds|<1). So we have
+
+       o = phi - s/S,   s = is + ds ,   |ds| < .5 (or |ds| < 1).
+
+    Since is is in the range [smin+1,smax-2], s is in the range
+    [smin+.5,smax-1.5] (or [smin,smax-1]), the number o is an integer
+    in the range phi+[-smax+1.5,-smin-.5] (or
+    phi+[-smax+1,-smin]). Thus the maximum value of o is obtained for
+    o = floor(phi-smin-.5) (or o = floor(phi-smin)).
+
+    Finally o is clamped to make sure it is contained in the feasible
+    range.
+
+    DETERMINING THE SCALE INDEXES S AND IS
+
+    Given o we can derive is by writing (2) as
+
+      s = is + ds = S(phi - o).
+
+    We then take is = round(s) and clamp its value to be in the
+    feasible range.
+  */
+
+  int    o, ix, iy, is ;
+  double s, phi, xper ;
+
+  phi = log2 (sigma / f->sigma0) ;
+  o   = vl_floor_d (phi -  ((double) f->s_min + 0.5) / f->S) ;
+  o   = VL_MIN (o, f->o_min + f->O - 1) ;
+  o   = VL_MAX (o, f->o_min           ) ;
+  s   = f->S * (phi - o) ;
+
+  is  = (int)(s + 0.5) ;
+  is  = VL_MIN(is, f->s_max - 2) ;
+  is  = VL_MAX(is, f->s_min + 1) ;
+  
+  xper = pow (2.0, o) ;
+  ix   = (int)(x / xper + 0.5) ;
+  iy   = (int)(y / xper + 0.5) ;
+  
+  k -> o  = o ;
+
+  k -> ix = ix ;
+  k -> iy = iy ;
+  k -> is = is ;
+
+  k -> x = x ;
+  k -> y = y ;
+  k -> s = s ;
+  
+  k->sigma = sigma ;
+}

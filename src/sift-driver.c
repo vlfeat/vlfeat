@@ -58,7 +58,7 @@ enum {
 } ;
 
 /* short options */
-char const opts [] = "vhd:O:S" ;
+char const opts [] = "vhO:S:" ;
 
 /* long options */
 struct option const longopts [] = {
@@ -83,7 +83,6 @@ struct option const longopts [] = {
 /** @brief Save octave on disk
  ** @internal
  **/
-
 static int
 save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
           int verbose)
@@ -149,6 +148,16 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
   if (buffer) free (buffer) ;
   vl_file_meta_close (fm) ;
   return err ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Keypoint ordering
+ ** @internal
+ **/
+
+int
+korder(void const* a, void const* b) {
+  return ((double*) a) [2] < ((double*) b) [2] ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -248,7 +257,7 @@ main(int argc, char **argv)
       break ;
 
     case opt_read_frames :
-      /* --meta ................................................... */
+      /* --read_frames ............................................ */
       err = vl_file_meta_parse (&ifr, optarg) ;      
       if (err) 
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;      
@@ -334,10 +343,11 @@ main(int argc, char **argv)
       printf("protocol=%-6s ", vl_string_protocol_name ((fm).protocol)) ; \
       printf("\n") ;
       
-      PRNFO("frames      ",frm) ;
-      PRNFO("descriptors ",dsc) ;
-      PRNFO("meta        ",met) ;
-      PRNFO("gss         ",gss) ;
+      PRNFO("frames      ", frm) ;
+      PRNFO("descriptors ", dsc) ;
+      PRNFO("meta        ", met) ;
+      PRNFO("gss         ", gss) ;
+      PRNFO("read-frames ", ifr) ;
   }
 
   /* ------------------------------------------------------------------
@@ -357,6 +367,9 @@ main(int argc, char **argv)
     VlSiftFilt      *filt = 0 ;
     int              q, i ;
     vl_bool          first ;
+
+    double           *ikeys = 0 ;
+    int              nikeys = 0, ikeys_size = 0 ;
 
     
     /* ...............................................................
@@ -383,16 +396,17 @@ main(int argc, char **argv)
       printf ("sift: basename is '%s'\n", basename) ;
     }
 
-#define WERR(name)                                              \
+#define WERR(name,op)                                           \
     if (err == VL_ERR_OVERFLOW) {                               \
       snprintf(err_msg, sizeof(err_msg),                        \
                "Output file name too long.") ;                  \
       goto done ;                                               \
     } else if (err) {                                           \
       snprintf(err_msg, sizeof(err_msg),                        \
-               "Could not open '%s' for writing.", name) ;      \
+               "Could not open '%s' for " #op, name) ;          \
       goto done ;                                               \
     }
+
 
     /* open input file */
     in = fopen (name, "r") ;
@@ -403,15 +417,17 @@ main(int argc, char **argv)
       goto done ;
     }
 
-    /* open output files */
-    err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name) ;    
-    err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name) ;   
-    err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name) ;
+    /* open other files */
+    err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name, writing) ;
+    err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name, writing) ;   
+    err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name, writing) ;
+    err = vl_file_meta_open (&ifr, basename, "r") ; WERR(ifr.name, reading) ;
 
     if (verbose > 1) {
       if (dsc.active) printf("sift: writing descriptors to '%s'\n", dsc.name); 
       if (frm.active) printf("sift: writing frames to '%s'\n",      frm.name); 
       if (met.active) printf("sift: writign meta to '%s'\n",        met.name);
+      if (ifr.active) printf("sift: reading frames from '%s'\n",    ifr.name);
     }
     
     /* ...............................................................
@@ -459,7 +475,8 @@ main(int argc, char **argv)
     err  = vl_pgm_extract_data (in, &pim, data) ;
 
     if (err) {
-      snprintf(err_msg, sizeof(err_msg), "PGM body corrputed.") ;
+      snprintf(err_msg, sizeof(err_msg), "PGM body malformed.") ;
+      err = VL_ERR_IO ;
       goto done ;
     }
 
@@ -470,6 +487,52 @@ main(int argc, char **argv)
     /* ...............................................................
      *                                     Optionally source keypoints
      * ............................................................ */
+    
+    if (ifr.active) {
+
+#define QERR                                                            \
+      if (err ) {                                                       \
+        snprintf (err_msg, sizeof(err_msg),                             \
+                  "'%s' malformed", ifr.name) ;                         \
+        err = VL_ERR_IO ;                                               \
+        goto done ;                                                     \
+      }
+      
+      while (1) {
+        double x, y, s, th ;
+
+        /* read next guy */
+        err = vl_file_meta_get_double (&ifr, &x) ;
+        if   (err == VL_ERR_EOF) break;
+        else QERR ;        
+        err = vl_file_meta_get_double (&ifr, &y ) ; QERR ;
+        err = vl_file_meta_get_double (&ifr, &s ) ; QERR ;
+        err = vl_file_meta_get_double (&ifr, &th) ;
+        if   (err == VL_ERR_EOF) break;
+        else QERR ;
+        
+        /* make enough space */
+        if (ikeys_size < nikeys + 1) {
+          ikeys_size += 10000 ;
+          ikeys       = realloc (ikeys, 4 * sizeof(double) * ikeys_size) ;
+        }
+
+        /* add the guy to the buffer */
+        ikeys [4 * nikeys + 0]  = x ;
+        ikeys [4 * nikeys + 1]  = y ;
+        ikeys [4 * nikeys + 2]  = s ;
+        ikeys [4 * nikeys + 3]  = th ;
+
+        ++ nikeys ;
+      }
+
+      /* now order by scale */
+      qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;      
+      
+      if (verbose) {
+        printf ("sift: read %d keypoitns from '%s'\n", nikeys, name) ;
+      }
+    }
 
     /* ...............................................................
      *                                                     Make filter
@@ -478,8 +541,8 @@ main(int argc, char **argv)
     filt = vl_sift_new (pim.width, pim.height, O, S, omin) ;
 
     if (!filt) {
-      snprintf(err_msg, sizeof(err_msg),
-               "Could not create SIFT filter.") ;
+      snprintf (err_msg, sizeof(err_msg), 
+                "Could not create SIFT filter.") ;
       err = VL_ERR_ALLOC ;
       goto done ;
     }
@@ -487,7 +550,7 @@ main(int argc, char **argv)
     /* ...............................................................
      *                                             Process each octave
      * ............................................................ */
-   
+    i     = 0 ;
     first = 1 ;
     while (1) {
       VlSiftKeypoint const *keys ;
@@ -516,42 +579,64 @@ main(int argc, char **argv)
         err = save_gss (filt, &gss, basename, verbose) ;
         if (err) {
           snprintf (err_msg, sizeof(err_msg),
-                    "Could not write GSS level to PGM file.") ;
+                    "Could not write GSS to PGM file.") ;
           goto done ;
         }
       }
 
       /* run detector ............................................. */
-      vl_sift_detect (filt) ;
-
-      keys  = vl_sift_get_keypoints     (filt) ;
-      nkeys = vl_sift_get_keypoints_num (filt) ;
-
-      if (verbose > 1) {
-        printf ("sift: %d unoriented keypoints\n", nkeys) ;
+      if (ikeys == 0) {
+        vl_sift_detect (filt) ;
+        
+        keys  = vl_sift_get_keypoints     (filt) ;
+        nkeys = vl_sift_get_keypoints_num (filt) ;
+        
+        if (verbose > 1) {
+          printf ("sift: detected %d unoriented keypoints\n", nkeys) ;
+        }
+      } else {
+        nkeys = nikeys ;
       }
 
       /* for each keypoint ........................................ */
-      for (i = 0 ; i < nkeys ; ++i) {
-        double angles [4] ;
-        int    nangles ;
+      for (; i < nkeys ; ++i) {
+        double           angles [4] ;
+        int              nangles ;
+        VlSiftKeypoint   ik ;
+        VlSiftKeypoint  *k ;
 
         /* obtain keypoint orientations ........................... */
-        nangles = vl_sift_calc_keypoint_orientations 
-          (filt, angles, keys + i) ;
+        if (ikeys) {
+          vl_sift_keypoint_init (filt, &ik, 
+                                 ikeys [4 * i + 0],
+                                 ikeys [4 * i + 1],
+                                 ikeys [4 * i + 2]) ;
+          
+          if (ik.o != vl_sift_get_octave_index (filt)) {
+            break ;
+          }
+            
+          k          = &ik ;
+          angles [0] = ikeys [4 * i + 3] ;
+          nangles    = 1 ;
+        } else {
+          k = keys + i ;
+          nangles = vl_sift_calc_keypoint_orientations 
+            (filt, angles, k) ;
+        }
 
         /* for each orientation ................................... */
         for (q = 0 ; q < nangles ; ++q) {
           vl_sift_pix descr [128] ;
 
           vl_sift_calc_keypoint_descriptor 
-            (filt, descr, keys + i, angles [q]) ;
+            (filt, descr, k, angles [q]) ;
           
           if (frm.active) {
-            vl_file_meta_put_double (&frm, keys [i].x     ) ;
-            vl_file_meta_put_double (&frm, keys [i].y     ) ;
-            vl_file_meta_put_double (&frm, keys [i].sigma ) ;
-            vl_file_meta_put_double (&frm, angles [q]     ) ;
+            vl_file_meta_put_double (&frm, k -> x     ) ;
+            vl_file_meta_put_double (&frm, k -> y     ) ;
+            vl_file_meta_put_double (&frm, k -> sigma ) ;
+            vl_file_meta_put_double (&frm, angles [q] ) ;
             if (frm.protocol == VL_PROT_ASCII) fprintf(frm.file, "\n") ;
           }
           
@@ -584,6 +669,13 @@ main(int argc, char **argv)
     }
     
   done :
+    /* release input keys buffer */
+    if (ikeys) {
+      free (ikeys) ;
+      ikeys_size = nikeys = 0 ;
+      ikeys = 0 ;
+    }
+
     /* release filter */
     if (filt) {
       vl_sift_delete (filt) ;

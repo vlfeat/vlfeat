@@ -100,8 +100,11 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
  ** @param basename  Basename.
  ** @param mode      Opening mode (as in @c fopen).
  **
- ** @return error code.
+ ** @return error code. The function sets ::vl_err_no to either
+ ** ::VL_ERR_OVERFLOW if the file name is too long or to ::VL_ERR_IO
+ ** if the file cannot be opened.
  **/
+
 static int
 vl_file_meta_open (VlFileMeta * fm, char const * basename, char const * mode) 
 {
@@ -118,16 +121,18 @@ vl_file_meta_open (VlFileMeta * fm, char const * basename, char const * mode)
                                   basename) ;
 
   if (q >= sizeof(fm -> name)) {
-    return VL_ERR_OVERFLOW ;
+    vl_err_no = VL_ERR_OVERFLOW ;
+    return -1 ;
   }
   
   if (fm -> active) {
     fm -> file = fopen (fm -> name, mode) ;
     if (! fm -> file) {
-      return VL_ERR_IO ;
+      vl_err_no = VL_ERR_IO ;
+      return -1 ;
     }
   }
-  return VL_ERR_OK ;
+  return 0 ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -212,9 +217,8 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
   return err ? VL_ERR_ALLOC : VL_ERR_OK ;
 }
 
-
 /* ----------------------------------------------------------------- */
-/** @brief Read doublex from file
+/** @brief Read double from file
  **
  ** @param fm  File meta information.
  ** @param x   Datum read.
@@ -233,6 +237,7 @@ vl_file_meta_get_double (VlFileMeta *fm, double *x)
   switch (fm -> protocol) {
 
   case VL_PROT_ASCII :
+    fscanf (fm -> file, " ") ;
     n = fscanf (fm -> file, "%lg", x) ;
     err = n < 1 ;
     break ;
@@ -249,7 +254,7 @@ vl_file_meta_get_double (VlFileMeta *fm, double *x)
   }
 
   if (err) {
-    if (feof (fm -> file)) {
+    if (n == EOF || feof (fm -> file)) {
       return VL_ERR_EOF ;
     } else {
       return VL_ERR_BAD_ARG ;
