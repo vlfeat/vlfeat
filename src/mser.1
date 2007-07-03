@@ -1,0 +1,49 @@
+.TH MSER 1 "July 207" Unix "Ueser Manuals"
+.SH NAME
+mser \- Maximally Stable Extremal Regions (MSER)
+.SH SYNOPSIS
+.B mser [
+.I options
+.B ] 
+.I files
+.B ...
+.SH OPTIONS
+.IP "--help -h"
+Print help message.
+.IP "--version "
+Print version string.
+.IP "--verbose -v"
+Increase verbosity level (may be repeated).
+.IP "--frames[=spec]"
+Writes feature frames.
+.I spec
+optionally sets the file specifier.
+.SH OVERVIEW
+.B mser
+computes the Maximally Stalbe Extremal Regions (MSER) of an image.
+The command is quite flexible: it can operate on may images at once
+and it exposes many parameters of the MSER algorithm.
+.SH SPECIFYING FILES
+In order to make it easy to work with multiple input files,
+.B sift
+makes uses of file specifiers. A file specifier
+.I spec
+specifies the format of the file and how its name has to be derived
+from the name of the input file. The format may be either binary (
+.I bin:
+) or ASCII (
+.I ascii:
+). File in binary format are vectors of homogeneous atomic values
+(such as doubles and bytes) and they are always in big-endian
+ordering. 
+.P
+The file name is derived from a pattern by substituting any occurence
+of the wildcard character `%' (the wildcard character can be escaped
+by preceding it by `\\') with the basename of the input file. For
+instance, the specifier
+.I bin:/tmp/%.sift
+with input file
+.I myimage.pgm
+correspond to the file
+.I /tmp/myyimage.sift
+in binary format.
