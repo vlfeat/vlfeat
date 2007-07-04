@@ -6,7 +6,7 @@
 
 /* AUTORIGHTS */
 
-#define VL_SIFT_DRIVER_VERSION_STRING "alpha-1"
+#define VL_SIFT_DRIVER_VERSION_STRING "beta-0"
 
 #include "generic-driver.h"
 
@@ -168,8 +168,8 @@ int
 main(int argc, char **argv)
 {  
   /* algorithm parameters */ 
-  double   edges_tresh  = 2.0 ;  
-  double   peaks_tresh  = 2.0 ;  
+  double   edges_tresh  = -1 ;  
+  double   peaks_tresh  = -1 ;  
   int      O = -1, S = 3, omin = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
@@ -396,7 +396,6 @@ main(int argc, char **argv)
 
     double           *ikeys = 0 ;
     int              nikeys = 0, ikeys_size = 0 ;
-
     
     /* ...............................................................
      *                                                 Determine files
@@ -575,6 +574,9 @@ main(int argc, char **argv)
 
     filt = vl_sift_new (pim.width, pim.height, O, S, omin) ;
 
+    if (edges_tresh >= 0) vl_sift_set_edge_tresh (filt, edges_tresh) ;
+    if (peaks_tresh >= 0) vl_sift_set_peak_tresh (filt, peaks_tresh) ;
+
     if (!filt) {
       snprintf (err_msg, sizeof(err_msg), 
                 "Could not create SIFT filter.") ;
@@ -625,6 +627,7 @@ main(int argc, char **argv)
         
         keys  = vl_sift_get_keypoints     (filt) ;
         nkeys = vl_sift_get_keypoints_num (filt) ;
+        i     = 0 ;
         
         if (verbose > 1) {
           printf ("sift: detected %d (unoriented) keypoints\n", nkeys) ;
@@ -700,7 +703,7 @@ main(int argc, char **argv)
           if (dsc.active) {
             int l ;
             for (l = 0 ; l < 128 ; ++l) {
-              vl_file_meta_put_uint8 (&dsc, 512.0 * descr [l]) ;
+              vl_file_meta_put_uint8 (&dsc, (vl_uint8) 512.0 * descr [l]) ;
             }
             if (dsc.protocol == VL_PROT_ASCII) fprintf(dsc.file, "\n") ;
           }
@@ -751,6 +754,7 @@ main(int argc, char **argv)
       in = 0 ;
     }
     
+    vl_file_meta_close (&out) ;
     vl_file_meta_close (&frm) ;
     vl_file_meta_close (&dsc) ;
     vl_file_meta_close (&met) ;

@@ -268,8 +268,11 @@ void  vl_sift_keypoint_init              (VlSiftFilt const *f,
  ** @{
  **/
 static int    vl_sift_get_octave_index   (VlSiftFilt const *f) ;
+static int    vl_sift_get_octave_num     (VlSiftFilt const *f) ;
+static int    vl_sift_get_octave_first   (VlSiftFilt const *f) ;
 static int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
 static int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
+static int    vl_sift_get_level_num      (VlSiftFilt const *f) ;
 static int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
 static double vl_sift_get_peak_tresh     (VlSiftFilt const *f) ;
 static double vl_sift_get_edge_tresh     (VlSiftFilt const *f) ;
@@ -292,13 +295,36 @@ static void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
 /* ----------------------------------------------------------------- */
 /** @brief Get current octave index.
  ** @param f SIFT filter.
- ** @return pointer to the keypoints list.
+ ** @return index of the current octave.
  **/
 static VL_INLINE int
 vl_sift_get_octave_index (VlSiftFilt const *f) 
 {
   return f-> o_cur ;
 }
+
+/* ----------------------------------------------------------------- */
+/** @brief Get number of octaves.
+ ** @param f SIFT filter.
+ ** @return number of octaves.
+ **/
+static VL_INLINE int
+vl_sift_get_octave_num (VlSiftFilt const *f) 
+{
+  return f-> O ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get first octave.
+ ** @param f SIFT filter.
+ ** @return index of the first octave.
+ **/
+static VL_INLINE int
+vl_sift_get_octave_first (VlSiftFilt const *f) 
+{
+  return f-> o_min ;
+}
+
 
 /* ----------------------------------------------------------------- */
 /** @brief Get current octave width
@@ -340,6 +366,18 @@ vl_sift_get_octave (VlSiftFilt const *f, int s)
   int h = vl_sift_get_octave_height (f) ;  
   return f->octave + w * h * (s - f->s_min) ;
 }
+
+/* ----------------------------------------------------------------- */
+/** @brief Get number of levels per octave
+ ** @param f SIFT filter.
+ ** @return number of leves per octave.
+ **/
+static VL_INLINE int
+vl_sift_get_level_num (VlSiftFilt const *f) 
+{
+  return f-> S ;
+}
+
 
 /* ----------------------------------------------------------------- */
 /** @brief Get number of keypoints.

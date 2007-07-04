@@ -4,51 +4,77 @@
 
 DIST=vlfeat
 VER=alpha-1
-BINDIST=$(DIST)-$(VER)-$(ARCH)
 
 # --------------------------------------------------------------------
 #
 # --------------------------------------------------------------------
 
 # Determine on the flight the system we are running on
-Darwin_PPC_ARCH  := mac
-Darwin_i386_ARCH := mci
-Linux_i386_ARCH  := glx
-ARCH        := $($(shell echo `uname -sp` | tr \  _)_ARCH)
+Darwin_PPC_ARCH    := mac
+Darwin_i386_ARCH   := mci
+Linux_i386_ARCH    := glx
+Linux_unknown_ARCH := glx
 
+ARCH             := $($(shell echo `uname -sp` | tr \  _)_ARCH)
+
+mac_BINDIR       := bin/mac
 mac_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
-mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)'
+mac_LDFLAGS      :=
+mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)' -L$(mac_BINDIR) -lvl
 mac_MEX_SUFFIX   := mexmac
 
+mci_BINDIR       := bin/maci
 mci_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
-mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -Lvl -lvl
+mci_LDFLAGS      :=
+mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -L$(mci_BINDIR) -lvl
 mci_MEX_SUFFIX   := mexmaci
 
+glx_BINDIR       := bin/glx
 glx_CFLAGS       := -O0 -I. -pedantic -Wall -std=c99 -g
-glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)'
+glx_LDFLAGS      := -lm
+glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)' -L$(glx_BINDIR) -lvl
 glx_MEX_SUFFIX   := mexglx
 
-CFLAGS       += $($(ARCH)_CFLAGS)
-MEX_SUFFIX   := $($(ARCH)_MEX_SUFFIX)
-MEX_CFLAGS   := $($(ARCH)_MEX_CFLAGS)
+CFLAGS           += $($(ARCH)_CFLAGS)
+LDFLAGS          += $($(ARCH)_LDFLAGS)
+MEX_SUFFIX       := $($(ARCH)_MEX_SUFFIX)
+MEX_CFLAGS       := $($(ARCH)_MEX_CFLAGS)
+BINDIR           := $($(ARCH)_BINDIR)
+BINDIST          := $(DIST)-$(VER)-$(ARCH)
 
 .PHONY : all
-all : vl/libvl.a src/sift src/mser
+all : all-lib all-bin all-mex
+
+$(BINDIR) $(BINDIR)/.lib_bits:
+	mkdir -p $(BINDIR)/.lib_bits
 
 # --------------------------------------------------------------------
 #                                                        Build libvl.a
 # --------------------------------------------------------------------
+# We place the object and dependency files in $(BINDIR)/.lib_bits/ and
+# the library in $(BINDIR)/libvl.a.
 
-lib_src = $(wildcard vl/*.c)
-lib_obj = $(lib_src:.c=.o)
-lib_dep = $(lib_src:.c=.d)
+lib_src := $(wildcard vl/*.c)
+lib_obj := $(notdir $(lib_src))
+lib_obj := $(addprefix $(BINDIR)/.lib_bits/, $(lib_obj:.c=.o))
+lib_dep := $(lib_obj:.o=.d)
 
-vl/%.d : vl/%.c
-	@echo "   D '$<' ==> '$@'"
-	@cc -M -MT 'lib/$*.o lib/$*.d' $< -MF $@
+# create library libvl.a
+.PHONY: all-lib
+all-lib: $(BINDIR)/libvl.a
 
-vl/libvl.a : $(lib_obj)
-	ar rcs $@ $^
+
+$(BINDIR)/.lib_bits/%.o : vl/%.c $(BINDIR)/.lib_bits
+	@echo "   CC '$<' ==> '$@'"
+	@cc $(CFLAGS) -c $< -o $@
+
+$(BINDIR)/.lib_bits/%.d : vl/%.c $(BINDIR)/.lib_bits
+	@echo "   D  '$<' ==> '$@'"
+	@cc -M -MT 'vl/$*.o vl/$*.d' $< -MF $@
+
+$(BINDIR)/libvl.a : $(lib_obj)
+	@echo "   A  '$<' ==> '$@'"
+	@ar rcs $@ $^
 
 ifeq ($(filter doc dox clean distclean info, $(MAKECMDGOALS)),)
 include $(lib_dep) 
@@ -57,26 +83,22 @@ endif
 # --------------------------------------------------------------------
 #                                                       Build binaries
 # --------------------------------------------------------------------
+# We place the exacutables in $(BINDIR).
 
-CFLAGS += -I. -Lvl
+bin_src := $(wildcard src/*.c)
+bin_tgt := $(notdir $(bin_src))
+bin_tgt := $(addprefix $(BINDIR)/, $(bin_tgt:.c=))
 
-src/sift             : src/sift-driver.o      vl/libvl.a
+.PHONY: all-bin
+all-bin : $(bin_tgt)
+
+$(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
-
-src/mser             : src/mser-driver.o      vl/libvl.a
-	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
-
-src/test_stringop    : src/test_sringop.o     vl/libvl.a
-	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
-
-src/test_getopt_long : src/test_getopt_long.o vl/libvl.a
-	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
-
-src/sift-driver.o : src/generic-driver.h
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
 # --------------------------------------------------------------------
+# We place the MEX files in toolbox/.
 
 mex_src := mser sift
 mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
@@ -84,7 +106,7 @@ mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h vl/libvl.a
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
 	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
@@ -120,10 +142,7 @@ distclean: clean
 	rm -f toolbox/*.mexmac
 	rm -f toolbox/*.mexmaci
 	rm -f toolbox/*.mexglx
-	rm -f src/sift
-	rm -f src/mser
-	rm -f src/test_getopt_long
-	rm -f src/test_stringop
+	rm -rf bin
 	rm -rf $(DIST)-*
 
 .PHONY: dist
@@ -164,3 +183,5 @@ info :
 	@echo "lib_dep  = $(lib_dep)"
 	@echo "mex_src  = $(mex_src)"
 	@echo "mex_tgt  = $(mex_tgt)"
+	@echo "bin_src  = $(bin_src)"
+	@echo "bin_tgt  = $(bin_tgt)"

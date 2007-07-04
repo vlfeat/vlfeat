@@ -24,6 +24,10 @@ Print help message.
 Print version string.
 .IP "--verbose -v"
 Increase verbosity level (may be repeated).
+.IP "--output[=spec]"
+Write a file with both frames and descriptors.
+.I spec
+optionally sets the specifier of the file.
 .IP "--frames[=spec]"
 Write a file with the frames only.
 .I spec
@@ -69,15 +73,20 @@ descriptor, producing a set of frames (or keypoints) and descriptors.
 By default, on input
 .I myimage.pgm
 the program produces a file 
-.I myimage.frame
-containing the frames (position x,y, orientation and scale) and a file
-.I myimage.descr
-containing the corresponding descriptors. Both files are vanilla ASCII files,
-with one row per keypoint. Options
+.I myimage.sift
+containing the frames (four floating point numbers: position x,y,
+orientation and scale) and descriptors (128 integer numbers).  The
+file is a vanilla ASCII files, with one row per feature. Options
 .B --frames
 and 
 .B --descriptors
-can be used to override this behaviour.
+can be used to produce separate files for frames and descriptors (in
+this case, and as long as
+.B --output
+is not specified) the aggregate file is not produced. Files can be
+produced in binary format, in which case each floating point number is
+saved as a double and each integer number as an unigned byte (see also
+the `On File Specifiers' section below).
 
 .P The
 .B --read-frames

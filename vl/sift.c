@@ -1016,7 +1016,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
       /* retrieve */
       vl_sift_pix mod   = *( pt + dxi*xo + dyi*yo + 0 ) ;
       vl_sift_pix angle = *( pt + dxi*xo + dyi*yo + 1 ) ;
-      vl_sift_pix theta = vl_mod_2pi_f (-angle + angle0) ;
+      vl_sift_pix theta = vl_mod_2pi_f (angle - angle0) ;
       
       /* fractional displacement */
       vl_sift_pix dx = xi + dxi - x;
