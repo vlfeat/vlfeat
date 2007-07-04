@@ -58,7 +58,7 @@ enum {
 } ;
 
 /* short options */
-char const opts [] = "vhO:S:" ;
+char const opts [] = "vhO:S:o:" ;
 
 /* long options */
 struct option const longopts [] = {
@@ -66,6 +66,7 @@ struct option const longopts [] = {
   { "help",            no_argument,            0,          'h'              },
   { "octaves",         required_argument,      0,          'O'              },
   { "levels",          required_argument,      0,          'S'              },
+  { "output",          optional_argument,      0,          'o'              },
   { "version",         no_argument,            0,          opt_version      },
   { "meta",            optional_argument,      0,          opt_meta         },
   { "frames",          optional_argument,      0,          opt_frames       },
@@ -75,7 +76,7 @@ struct option const longopts [] = {
   { "edges-tresh",     required_argument,      0,          opt_edges_tresh  },
   { "peaks-tresh",     required_argument,      0,          opt_peaks_tresh  },
   { "read-frames",     required_argument,      0,          opt_read_frames  },
-  { "orientations",    required_argument,      0,          opt_orientations },
+  { "orientations",    no_argument,            0,          opt_orientations },
   { 0,                 0,                      0,          0                }
 } ;
 
@@ -174,10 +175,13 @@ main(int argc, char **argv)
   vl_bool  err    = VL_ERR_OK ;
   char     err_msg [1024] ;
   int      n ;
-  int      exit_code = 0 ;
-  int      verbose = 0 ;
+  int      exit_code          = 0 ;
+  int      verbose            = 0 ;
+  vl_bool  force_output       = 0 ;
+  vl_bool  force_orientations = 0 ;
 
-  VlFileMeta frm  = {1, "%.frame", VL_PROT_ASCII, "", 0} ;
+  VlFileMeta out  = {1, "%.sift",  VL_PROT_ASCII, "", 0} ;
+  VlFileMeta frm  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
   VlFileMeta dsc  = {0, "%.descr", VL_PROT_ASCII, "", 0} ;
   VlFileMeta met  = {0, "%.meta",  VL_PROT_ASCII, "", 0} ;
   VlFileMeta gss  = {0, "%.pgm",   VL_PROT_ASCII, "", 0} ;
@@ -231,6 +235,13 @@ main(int argc, char **argv)
       
 
 
+    case 'o' :
+      /* --output  ................................................ */
+      err = vl_file_meta_parse (&out, optarg) ;
+      if (err) 
+        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+      force_output = 1 ;
+      break ;
 
     case opt_frames :
       /* --frames  ................................................ */
@@ -314,6 +325,10 @@ main(int argc, char **argv)
             argv [optind - 1]) ;
       break ;
 
+    case opt_orientations :
+      /* --orientations ......................................... */
+      force_orientations = 1 ;
+      break ;
       
     case 0 :
     default :
@@ -334,22 +349,33 @@ main(int argc, char **argv)
   /* parse other arguments (filenames) */
   argc -= optind ;
   argv += optind ;
-
-    if (verbose > 1) {
-#define PRNFO(name,fm)                                                  \
-      printf("sift: " name ": ") ;                                      \
-      printf("active=%d ",  (fm).active ) ;                             \
-      printf("pattern=%-10s ", (fm).pattern) ;                          \
-      printf("protocol=%-6s ", vl_string_protocol_name ((fm).protocol)) ; \
-      printf("\n") ;
-      
-      PRNFO("frames      ", frm) ;
-      PRNFO("descriptors ", dsc) ;
-      PRNFO("meta        ", met) ;
-      PRNFO("gss         ", gss) ;
-      PRNFO("read-frames ", ifr) ;
+  
+  /* 
+     if --output is not specified, specifying --frames or --descriptors
+     prevent the aggregate outout file to be produced.
+  */
+  if (! force_output && (frm.active || dsc.active)) {
+    out.active = 0 ;
   }
 
+  if (verbose > 1) {
+#define PRNFO(name,fm)                                                  \
+    printf("sift: " name) ;                                             \
+    printf("%3s ",  (fm).active ? "yes" : "no") ;                       \
+    printf("%-6s ", vl_string_protocol_name ((fm).protocol)) ;          \
+    printf("%-10s\n", (fm).pattern) ;
+    
+    PRNFO("write aggregate . ", out) ;
+    PRNFO("write frames .... ", frm) ;
+    PRNFO("write descriptors ", dsc) ;
+    PRNFO("write meta ...... ", met) ;
+    PRNFO("write GSS ....... ", gss) ;
+    PRNFO("read  frames .... ", ifr) ;
+    
+    if (force_orientations)
+      printf("sift: will compute orientations\n") ;
+  }
+  
   /* ------------------------------------------------------------------
    *                                         Process one image per time
    * --------------------------------------------------------------- */
@@ -389,24 +415,12 @@ main(int argc, char **argv)
     }
     
     if (verbose) {
-      printf ("sift: processing '%s'\n", name) ;
+      printf ("sift: <== '%s'\n", name) ;
     }
     
     if (verbose > 1) {
       printf ("sift: basename is '%s'\n", basename) ;
     }
-
-#define WERR(name,op)                                           \
-    if (err == VL_ERR_OVERFLOW) {                               \
-      snprintf(err_msg, sizeof(err_msg),                        \
-               "Output file name too long.") ;                  \
-      goto done ;                                               \
-    } else if (err) {                                           \
-      snprintf(err_msg, sizeof(err_msg),                        \
-               "Could not open '%s' for " #op, name) ;          \
-      goto done ;                                               \
-    }
-
 
     /* open input file */
     in = fopen (name, "r") ;
@@ -415,19 +429,6 @@ main(int argc, char **argv)
       snprintf(err_msg, sizeof(err_msg), 
                "Could not open '%s' for reading.", name) ;
       goto done ;
-    }
-
-    /* open other files */
-    err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name, writing) ;
-    err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name, writing) ;   
-    err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name, writing) ;
-    err = vl_file_meta_open (&ifr, basename, "r") ; WERR(ifr.name, reading) ;
-
-    if (verbose > 1) {
-      if (dsc.active) printf("sift: writing descriptors to '%s'\n", dsc.name); 
-      if (frm.active) printf("sift: writing frames to '%s'\n",      frm.name); 
-      if (met.active) printf("sift: writign meta to '%s'\n",        met.name);
-      if (ifr.active) printf("sift: reading frames from '%s'\n",    ifr.name);
     }
     
     /* ...............................................................
@@ -487,8 +488,23 @@ main(int argc, char **argv)
     /* ...............................................................
      *                                     Optionally source keypoints
      * ............................................................ */
+
+#define WERR(name,op)                                           \
+    if (err == VL_ERR_OVERFLOW) {                               \
+      snprintf(err_msg, sizeof(err_msg),                        \
+               "Output file name too long.") ;                  \
+      goto done ;                                               \
+    } else if (err) {                                           \
+      snprintf(err_msg, sizeof(err_msg),                        \
+               "Could not open '%s' for " #op, name) ;          \
+      goto done ;                                               \
+    }
     
     if (ifr.active) {
+      
+      /* open file */
+      err = vl_file_meta_open (&ifr, basename, "r") ; 
+      WERR(ifr.name, reading) ;
 
 #define QERR                                                            \
       if (err ) {                                                       \
@@ -530,10 +546,29 @@ main(int argc, char **argv)
       qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;      
       
       if (verbose) {
-        printf ("sift: read %d keypoitns from '%s'\n", nikeys, name) ;
+        printf ("sift: read %d keypoitns from '%s'\n", nikeys, ifr.name) ;
       }
+
+      /* close file */
+      vl_file_meta_close (&ifr) ;
     }
 
+    /* ...............................................................
+     *                                               Open output files
+     * ............................................................ */
+    
+    err = vl_file_meta_open (&out, basename, "w") ; WERR(out.name, writing) ;
+    err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name, writing) ;
+    err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name, writing) ;   
+    err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name, writing) ;
+
+    if (verbose > 1) {
+      if (out.active) printf("sift: writing all ....... to . '%s'\n", out.name); 
+      if (frm.active) printf("sift: writing frames .... to . '%s'\n", frm.name); 
+      if (dsc.active) printf("sift: writing descriptors to . '%s'\n", dsc.name); 
+      if (met.active) printf("sift: writign meta ...... to . '%s'\n", met.name);
+    }
+    
     /* ...............................................................
      *                                                     Make filter
      * ............................................................ */
@@ -570,7 +605,7 @@ main(int argc, char **argv)
       }
 
       if (verbose > 1) {
-        printf("sift: GSS octave %d computed.\n",
+        printf("sift: GSS octave %d computed\n",
                vl_sift_get_octave_index (filt));
       }
 
@@ -592,7 +627,7 @@ main(int argc, char **argv)
         nkeys = vl_sift_get_keypoints_num (filt) ;
         
         if (verbose > 1) {
-          printf ("sift: detected %d unoriented keypoints\n", nkeys) ;
+          printf ("sift: detected %d (unoriented) keypoints\n", nkeys) ;
         }
       } else {
         nkeys = nikeys ;
@@ -600,10 +635,10 @@ main(int argc, char **argv)
 
       /* for each keypoint ........................................ */
       for (; i < nkeys ; ++i) {
-        double           angles [4] ;
-        int              nangles ;
-        VlSiftKeypoint   ik ;
-        VlSiftKeypoint  *k ;
+        double                angles [4] ;
+        int                   nangles ;
+        VlSiftKeypoint        ik ;
+        VlSiftKeypoint const *k ;
 
         /* obtain keypoint orientations ........................... */
         if (ikeys) {
@@ -617,8 +652,15 @@ main(int argc, char **argv)
           }
             
           k          = &ik ;
-          angles [0] = ikeys [4 * i + 3] ;
-          nangles    = 1 ;
+          
+          /* optionally compute orientations too */
+          if (force_orientations) {
+            nangles = vl_sift_calc_keypoint_orientations 
+              (filt, angles, k) ;            
+          } else {
+            angles [0] = ikeys [4 * i + 3] ;
+            nangles    = 1 ;
+          }
         } else {
           k = keys + i ;
           nangles = vl_sift_calc_keypoint_orientations 
@@ -629,8 +671,23 @@ main(int argc, char **argv)
         for (q = 0 ; q < nangles ; ++q) {
           vl_sift_pix descr [128] ;
 
-          vl_sift_calc_keypoint_descriptor 
-            (filt, descr, k, angles [q]) ;
+          /* compute descriptor (if necessary) */
+          if (out.active || dsc.active) {
+            vl_sift_calc_keypoint_descriptor 
+              (filt, descr, k, angles [q]) ;
+          }
+
+          if (out.active) {
+            int l ;
+            vl_file_meta_put_double (&out, k -> x     ) ;
+            vl_file_meta_put_double (&out, k -> y     ) ;
+            vl_file_meta_put_double (&out, k -> sigma ) ;
+            vl_file_meta_put_double (&out, angles [q] ) ;
+            for (l = 0 ; l < 128 ; ++l) {
+              vl_file_meta_put_uint8 (&out, 512.0 * descr [l]) ;
+            }
+            if (out.protocol == VL_PROT_ASCII) fprintf(out.file, "\n") ;
+          }
           
           if (frm.active) {
             vl_file_meta_put_double (&frm, k -> x     ) ;
@@ -639,11 +696,11 @@ main(int argc, char **argv)
             vl_file_meta_put_double (&frm, angles [q] ) ;
             if (frm.protocol == VL_PROT_ASCII) fprintf(frm.file, "\n") ;
           }
-          
+
           if (dsc.active) {
-            int i ;
-            for (i = 0 ; i < 128 ; ++i) {
-              vl_file_meta_put_uint8 (&dsc, 512.0 * descr [i]) ;
+            int l ;
+            for (l = 0 ; l < 128 ; ++l) {
+              vl_file_meta_put_uint8 (&dsc, 512.0 * descr [l]) ;
             }
             if (dsc.protocol == VL_PROT_ASCII) fprintf(dsc.file, "\n") ;
           }
@@ -698,6 +755,7 @@ main(int argc, char **argv)
     vl_file_meta_close (&dsc) ;
     vl_file_meta_close (&met) ;
     vl_file_meta_close (&gss) ;
+    vl_file_meta_close (&ifr) ;
     
     /* if bad print error message */
     if (err) {

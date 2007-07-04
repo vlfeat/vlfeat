@@ -1,12 +1,22 @@
 .TH SIFT 1 "July 207" Unix "Ueser Manuals"
+
 .SH NAME
 sift \- Scale Invariant Feature Transform (SIFT)
+
 .SH SYNOPSIS
 .B sift [
 .I options
 .B ] 
 .I files
 .B ...
+
+.SH DESCRIPTION
+.B sift
+computes the Scale Invariant Feature Transform (SIFT) of an image.
+The command operate on may images at once, exposes many parameters of
+the SIFT algorithm and can bypass the SIFT detector by reading frames
+(keypoints) from a file.
+
 .SH OPTIONS
 .IP "--help -h"
 Print help message.
@@ -15,28 +25,74 @@ Print version string.
 .IP "--verbose -v"
 Increase verbosity level (may be repeated).
 .IP "--frames[=spec]"
-Writes feature frames.
+Write a file with the frames only.
 .I spec
-optionally sets the file specifier.
+optionally sets the specifier of the frames file.
 .IP "--descriptors[=spec]"
-Writes feature descriptors.
+Write a file with the descriptors only.
 .I spec
-optionally sets the file specifier.
+optionally sets the specifiers of the descriptors file.
 .IP "--gss[=spec]"
-Writes the Gaussian Scale Space leveles as a set of PGM images.
+Write the Gaussian Scale Space leveles as a set of PGM images.
 .I spec
-optionally set the file specifier.
+optionally sets the specifier of the PGM files.
 .IP "--read-frames=spec"
-Do not run the detector. Instead read the keypoints from
+Do not run the SIFT detector. Instead read th feature frames from the file
+specified by
 .I spec
-(file specifier).
-.SH OVERVIEW
-.B sift
-computes the Scale Invariant Feature Transform (SIFT) of an image.
-The command is quite flexible: it can operate on may images at once,
-it exposes many parameters of the SIFT algorithm and it can source
-SIFT keypoints from a file bypassing the SIFT detector.
-.SH SPECIFYING FILES
+\.
+.IP "--octaves=x -Ox"
+Set the number of octaves to
+.I O
+.IP "--levels=x -Lx"
+Set the number of levels per octave to
+.I x
+.IP "--first-octave=x"
+Set the index of the first octave to
+.I x
+.IP "--edges-tresh=x"
+Set the edge threshold to
+.I x
+.IP "--peaks-tresh=x"
+Set the peak threshold to
+.I x
+.IP "--orientations"
+When reading the feature frames from a file, use the SIFT orientation
+assignment step to assign their orientations.
+
+.SH USAGE
+
+.B sift 
+accepts one or more PGM images as input and run the SIFT detector and
+descriptor, producing a set of frames (or keypoints) and descriptors.
+
+By default, on input
+.I myimage.pgm
+the program produces a file 
+.I myimage.frame
+containing the frames (position x,y, orientation and scale) and a file
+.I myimage.descr
+containing the corresponding descriptors. Both files are vanilla ASCII files,
+with one row per keypoint. Options
+.B --frames
+and 
+.B --descriptors
+can be used to override this behaviour.
+
+.P The
+.B --read-frames
+option bypasses the SIFT detector and reads the frames from the
+specified file. Use this option in combination with
+.B --orientations
+to read the frames but re-calculate their orientations. In all cases,
+frames are still written alogn with their descriptors. For the frames
+to be processed in the same order in which they are read, make sure
+that frames are ordered by increasing scale (notice however that if
+.B --orientations
+is used, the number of frames may change if multiple orientations are detected).
+
+
+.SS ON FILE SPECIFIERS
 In order to make it easy to work with multiple input files,
 .B sift
 makes uses of file specifiers. A file specifier
@@ -49,6 +105,7 @@ from the name of the input file. The format may be either binary (
 ). File in binary format are vectors of homogeneous atomic values
 (such as doubles and bytes) and they are always in big-endian
 ordering. 
+
 .P
 The file name is derived from a pattern by substituting any occurence
 of the wildcard character `%' (the wildcard character can be escaped
@@ -61,4 +118,40 @@ correspond to the file
 .I /tmp/myyimage.sift
 in binary format.
 
+.SH EXAMPLES
+.TP
+sift /tmp/myimage.pgm
+Caluclates the SIFT frames and descriptors of image
+.I /tmp/myimage.pgm
+and save them back to
+.I myimage.sift
+in the current directory.
 
+.TP 
+sift /tmp/myimage.pgm --frames=bin:/tmp/%.frame
+Calculates only the SIFT frames and saves them in binary format to
+.I /tmp/myimage.frame.
+
+.TP
+sift /tmp/myimage1.pgm /tmp/myimage2.pgm --frames --descriptors=bin:
+Calculate frames and descriptors of the two images and produce the frames files
+.I myimage1.frame
+and 
+.I myimage2.frame
+in ASCII format and the descriptors files
+.I myimage1.descr
+and
+.I myimage2.descr
+in binary format.
+
+.TP
+sift /tmp/myimage.pgm --first-octave=0 -vv
+Start the scale space from the octave of index 0 (as opposed to -1) and
+print lots of diagnostic information.
+
+
+.SH AUTHOR
+Andrea Vedaldi (vedaldi@cs.ucla.edu)
+
+.SH SEE ALSO
+convert (1)
