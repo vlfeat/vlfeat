@@ -460,7 +460,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     vl_uint buckets [ VL_MSER_PIX_MAXVAL ] ;
 
     /* clear buckets */
-    bzero(buckets, sizeof(vl_uint) * VL_MSER_PIX_MAXVAL ) ;
+    memset (buckets, 0, sizeof(vl_uint) * VL_MSER_PIX_MAXVAL ) ;
 
     /* compute bucket size (how many pixels for each intensity
        value) */
@@ -1005,7 +1005,7 @@ vl_mser_fit_ell (VlMserFilt* f)
   for(d = 0 ; d < f->dof ; ++d) {
 
     /* start from the upper-left pixel (0,0,...,0) */
-    bzero(subs, sizeof(int) * ndims) ;
+    memset (subs, 0, sizeof(int) * ndims) ;
         
     /* step 1: fill acc pretending that each region has only one pixel */
     if(d < ndims) {

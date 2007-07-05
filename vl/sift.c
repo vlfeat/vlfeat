@@ -811,7 +811,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
   update_gradient (f) ;
 
   /* clear histogram */
-  bzero(hist, sizeof(double) * nbins) ;
+  memset (hist, 0, sizeof(double) * nbins) ;
   
   /* compute orientation histogram */
   pt = f-> grad + xo*xi + yo*yi + so*(si - f->s_min - 1) ;
@@ -993,7 +993,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   update_gradient (f) ;
 
   /* clear descriptor */
-  bzero(descr, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
+  memset (descr, 0, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
 
   /* Center the scale space and the descriptor on the current keypoint. 
    * Note that dpt is pointing to the bin of center (SBP/2,SBP/2,0).
@@ -1026,7 +1026,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
          orientation and extension */
       vl_sift_pix nx = ( ct0 * dx + st0 * dy) / SBP ;
       vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
-      vl_sift_pix nt = NBO * theta / (2*M_PI) ;
+      vl_sift_pix nt = NBO * theta / (2*VL_PI) ;
       
       /* Get the Gaussian weight of the sample. The Gaussian window
        * has a standard deviation equal to NBP/2. Note that dx and dy

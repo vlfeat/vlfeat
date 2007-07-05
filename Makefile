@@ -9,6 +9,11 @@ VER=alpha-1
 #
 # --------------------------------------------------------------------
 
+# generic flags
+CFLAGS           += -O0 -I. -pedantic -Wall -std=c99 -g
+CFLAGS           += -Wno-variadic-macros
+LDFLAGS          +=
+
 # Determine on the flight the system we are running on
 Darwin_PPC_ARCH    := mac
 Darwin_i386_ARCH   := mci
@@ -19,18 +24,18 @@ ARCH             := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
 mac_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
-mac_LDFLAGS      :=
+mac_LDFLAGS      := -DBIG_ENDIAN
 mac_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mac_CFLAGS)' -L$(mac_BINDIR) -lvl
 mac_MEX_SUFFIX   := mexmac
 
 mci_BINDIR       := bin/maci
-mci_CFLAGS       := -O0 -I.  -pedantic -Wall -std=c99 -g
+mci_CFLAGS       := -DLITTLE_ENDIAN
 mci_LDFLAGS      :=
 mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -L$(mci_BINDIR) -lvl
 mci_MEX_SUFFIX   := mexmaci
 
 glx_BINDIR       := bin/glx
-glx_CFLAGS       := -O0 -I. -pedantic -Wall -std=c99 -g
+glx_CFLAGS       := -DLITTLE_ENDIAN
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)' -L$(glx_BINDIR) -lvl
 glx_MEX_SUFFIX   := mexglx
@@ -45,8 +50,10 @@ BINDIST          := $(DIST)-$(VER)-$(ARCH)
 .PHONY : all
 all : all-lib all-bin all-mex
 
-$(BINDIR) $(BINDIR)/.lib_bits:
+# this creates the directory hiearchy 
+$(BINDIR) $(BINDIR)/.lib_bits $(BINDIR)/.lib_bits/.stamp:
 	mkdir -p $(BINDIR)/.lib_bits
+	touch $@
 
 # --------------------------------------------------------------------
 #                                                        Build libvl.a
@@ -63,17 +70,16 @@ lib_dep := $(lib_obj:.o=.d)
 .PHONY: all-lib
 all-lib: $(BINDIR)/libvl.a
 
-
-$(BINDIR)/.lib_bits/%.o : vl/%.c $(BINDIR)/.lib_bits
+$(BINDIR)/.lib_bits/%.o : vl/%.c $(BINDIR)/.lib_bits/.stamp
 	@echo "   CC '$<' ==> '$@'"
 	@cc $(CFLAGS) -c $< -o $@
 
-$(BINDIR)/.lib_bits/%.d : vl/%.c $(BINDIR)/.lib_bits
+$(BINDIR)/.lib_bits/%.d : vl/%.c $(BINDIR)/.lib_bits/.stamp
 	@echo "   D  '$<' ==> '$@'"
 	@cc -M -MT 'vl/$*.o vl/$*.d' $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
-	@echo "   A  '$<' ==> '$@'"
+	@echo "   A  '$@'"
 	@ar rcs $@ $^
 
 ifeq ($(filter doc dox clean distclean info, $(MAKECMDGOALS)),)
@@ -93,7 +99,8 @@ bin_tgt := $(addprefix $(BINDIR)/, $(bin_tgt:.c=))
 all-bin : $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
-	cc $(CFLAGS) $(LDFLAGS) $^ -o $@
+	@echo "   CC '$<' ==> '$@'"
+	@cc $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -107,7 +114,8 @@ mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 all-mex : $(mex_tgt)
 
 toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h $(BINDIR)/libvl.a
-	mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
+	@echo "   MX '$<' ==> '$@'"
+	@mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
 	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
 # --------------------------------------------------------------------

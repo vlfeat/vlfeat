@@ -13,8 +13,9 @@
 
 #include "generic.h"
 #include <stdio.h>
-#ifndef VL_PGM_H
-#define VL_PGM_H
+
+#ifndef VL_PGM
+#define VL_PGM
 
 /** @name PGM parser error codes */
 /*@{*/
@@ -52,4 +53,5 @@ int vl_pgm_insert        (FILE *f,
 int vl_pgm_get_data_size (VlPgmImage const *im) ;
 int vl_pgm_get_bpp       (VlPgmImage const *im) ;
 
-#endif VL_PGM_H
+/* VL_PGM */
+#endif

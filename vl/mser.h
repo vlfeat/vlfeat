@@ -17,8 +17,8 @@
 
 /* AUTORIGHTS */
 
-#ifndef VL_MSER_H
-#define VL_MSER_H
+#ifndef VL_MSER
+#define VL_MSER
 
 #include "generic.h"
 
@@ -44,4 +44,5 @@ vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
 vl_uint          vl_mser_get_num_ell      (VlMserFilt const *filt) ;
 vl_uint          vl_mser_get_dof_ell      (VlMserFilt const *filt) ;
 
-#endif VL_MSER_H
+/* VL_MSER */
+#endif

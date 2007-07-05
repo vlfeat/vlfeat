@@ -1,4 +1,4 @@
-/** @file     sift-driver.c
+/** @file     sift.c
  ** @author   Andrea Vedaldi
  ** @brief    SIFT command line driver - Definition
  ** @internal

@@ -1,4 +1,4 @@
-/** @file     sift.mser.c
+/** @file     sift.c
  ** @author   Andrea Vedaldi
  ** @brief    SIFT MEX driver
  ** @internal

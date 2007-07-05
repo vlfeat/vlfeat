@@ -148,12 +148,16 @@ char const * vl_get_version_string () ;
  ** This macro is equal to ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN
  ** depending on the endianness of the host.
  **/
-#if   (('1234' >> 24) == '1')
+#if                                                \
+  defined(__LITTLE_ENDIAN__)                   ||  \
+  defined(__i386__)  || defined(__ia64__)      ||  \
+  defined(WIN32)     || defined(__x86_64)      ||  \
+  defined(__alpha__) || defined(__alpha)       ||  \
+  defined(__arm__)   || defined(__SYMBIAN32__) ||  \
+  (defined(__mips__) && defined(__MIPSEL__)) 
 #define VL_ENDIANNESS VL_LITTLE_ENDIAN
-#elif (('4321' >> 24) == '1')
-#define VL_ENDIANNESS VL_BIG_ENDIAN
 #else
-#error Cannot determine host endianness!
+#define VL_ENDIANNESS VL_BIG_ENDIAN
 #endif
 
 static VL_INLINE int  vl_get_endianness () ;
