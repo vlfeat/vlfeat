@@ -36,8 +36,8 @@ char const help_message [] =
   " --octaves -O    Number of octaves\n"
   " --levels -S     Number of levels per octave\n"
   " --first-octave  Index of the first octave\n"
-  " --edges-tresh   Edges treshold\n"
-  " --peaks-tresh   Peaks treshold\n"
+  " --edge-tresh    Edge treshold\n"
+  " --peak-tresh    Peak treshold\n"
   " --read-frames   Specify a file from which to read frames\n"
   " --orientations  Force the computation of the oriantations\n"
   "\n" ;
@@ -51,8 +51,8 @@ enum {
   opt_descriptors,
   opt_gss,
   opt_first_octave,
-  opt_edges_tresh,
-  opt_peaks_tresh,
+  opt_edge_tresh,
+  opt_peak_tresh,
   opt_read_frames,
   opt_orientations
 } ;
@@ -73,8 +73,8 @@ struct option const longopts [] = {
   { "descriptors",     optional_argument,      0,          opt_descriptors  },
   { "gss",             optional_argument,      0,          opt_gss          },
   { "first-octave",    required_argument,      0,          opt_first_octave },
-  { "edges-tresh",     required_argument,      0,          opt_edges_tresh  },
-  { "peaks-tresh",     required_argument,      0,          opt_peaks_tresh  },
+  { "edge-tresh",      required_argument,      0,          opt_edge_tresh   },
+  { "peak-tresh",      required_argument,      0,          opt_peak_tresh   },
   { "read-frames",     required_argument,      0,          opt_read_frames  },
   { "orientations",    no_argument,            0,          opt_orientations },
   { 0,                 0,                      0,          0                }
@@ -168,8 +168,8 @@ int
 main(int argc, char **argv)
 {  
   /* algorithm parameters */ 
-  double   edges_tresh  = -1 ;  
-  double   peaks_tresh  = -1 ;  
+  double   edge_tresh  = -1 ;  
+  double   peak_tresh  = -1 ;  
   int      O = -1, S = 3, omin = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
@@ -309,18 +309,18 @@ main(int argc, char **argv)
       
 
 
-    case opt_edges_tresh :
+    case opt_edge_tresh :
       /* --edge-tresh ........................................... */
-      n = sscanf (optarg, "%lf", &edges_tresh) ;
-      if (n == 0 || edges_tresh < 0)
+      n = sscanf (optarg, "%lf", &edge_tresh) ;
+      if (n == 0 || edge_tresh < 0)
         ERR("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
 
-    case opt_peaks_tresh :
+    case opt_peak_tresh :
       /* --edge-tresh ........................................... */
-      n = sscanf (optarg, "%lf", &peaks_tresh) ;
-      if (n == 0 || peaks_tresh < 0)
+      n = sscanf (optarg, "%lf", &peak_tresh) ;
+      if (n == 0 || peak_tresh < 0)
         ERR("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
@@ -545,7 +545,7 @@ main(int argc, char **argv)
       qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;      
       
       if (verbose) {
-        printf ("sift: read %d keypoitns from '%s'\n", nikeys, ifr.name) ;
+        printf ("sift: read %d keypoints from '%s'\n", nikeys, ifr.name) ;
       }
 
       /* close file */
@@ -574,14 +574,32 @@ main(int argc, char **argv)
 
     filt = vl_sift_new (pim.width, pim.height, O, S, omin) ;
 
-    if (edges_tresh >= 0) vl_sift_set_edge_tresh (filt, edges_tresh) ;
-    if (peaks_tresh >= 0) vl_sift_set_peak_tresh (filt, peaks_tresh) ;
+    if (edge_tresh >= 0) vl_sift_set_edge_tresh (filt, edge_tresh) ;
+    if (peak_tresh >= 0) vl_sift_set_peak_tresh (filt, peak_tresh) ;
 
     if (!filt) {
       snprintf (err_msg, sizeof(err_msg), 
                 "Could not create SIFT filter.") ;
       err = VL_ERR_ALLOC ;
       goto done ;
+    }
+
+    if (verbose > 1) {    
+      printf ("sift: filter settings:\n") ;
+      printf ("sift:   octaves      (O)     = %d\n", 
+              vl_sift_get_octave_num   (filt)) ;
+      printf ("sift:   levels       (S)     = %d\n",
+              vl_sift_get_level_num    (filt)) ;
+      printf ("sift:   first octave (o_min) = %d\n", 
+              vl_sift_get_octave_first (filt)) ;
+      printf ("sift:   edge tresh           = %g\n",
+              vl_sift_get_edge_tresh   (filt)) ;
+      printf ("sift:   peak tresh           = %g\n",
+              vl_sift_get_peak_tresh   (filt)) ;
+      printf ("sift: will source frames? %s\n",
+              ikeys ? "yes" : "no") ;
+      printf ("sift: will force orientations? %s\n",
+              force_orientations ? "yes" : "no") ;      
     }
 
     /* ...............................................................

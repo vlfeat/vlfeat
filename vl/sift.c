@@ -15,6 +15,9 @@
 #include <string.h>
 #include <math.h>
 
+/** @biref Use bilinear interp. to compute orientations @internal */
+#define VL_SIFT_BILINEAR_ORIENTATIONS 1
+
 #define EXPN_SZ  256         /**< ::fast_expn table size @internal */ 
 #define EXPN_MAX 25.0        /**< ::fast_expn table max  @internal */
 double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
@@ -232,8 +235,9 @@ vl_sift_delete (VlSiftFilt* f)
  ** Gaussian scale spadce at the lower octave. It also empties the
  ** internal the keypoint buffer.
  **
- ** @return error code. The function returns ::VL_ERR_NO_MORE if there
- ** are no octaves at all to process (empty scale space).
+ ** @return error code. The function returns ::VL_ERR_EOF if there are
+ ** no octaves at all to process (this happens only if the scale
+ ** space is empty, i.e. never).
  **
  ** @sa ::vl_sift_process_next_octave().
  **/
@@ -264,7 +268,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 
   /* is there at least one octave? */
   if (f->O == 0)
-    return VL_ERR_NO_MORE ;
+    return VL_ERR_EOF ;
 
   /* ------------------------------------------------------------------
    *                                                  Make bottom level
@@ -336,7 +340,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
  ** previous octave.
  **
  ** @return error code. The function returns the error
- ** ::VL_ERR_NO_MORE when there are no more ocvatves to process.
+ ** ::VL_ERR_EOF when there are no more ocvatves to process.
  **
  ** @sa ::vl_sift_process_first_octave().
  **/
@@ -362,7 +366,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
 
   /* is there another octave ? */
   if (f->o_cur == o_min + O - 1)
-    return VL_ERR_NO_MORE ;
+    return VL_ERR_EOF ;
 
   /* retrieve base */
   s_best = VL_MIN(s_min + S, s_max) ;
@@ -787,7 +791,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 
   int          nangles     = 0 ;
 
-  enum {nbins = 36 } ;
+  enum {nbins = 36} ;
 
   double hist [nbins], maxh ;
   vl_sift_pix const * pt ;
@@ -819,28 +823,40 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 #undef  at
 #define at(dx,dy) (*(pt + xo * (dx) + yo * (dy)))
 
-  for(ys  =  VL_MAX (- W, 1 - yi    ) ; 
-      ys <=  VL_MIN (+ W, h - 2 - yi) ; ++ys) {
+  for(ys  =  VL_MAX (- W - 1, 1 - yi    ) ; 
+      ys <=  VL_MIN (+ W + 1, h - 2 - yi) ; ++ys) {
     
-    for(xs  = VL_MAX (- W, 1 - xi    ) ; 
-        xs <= VL_MIN (+ W, w - 2 - xi) ; ++xs) {
+    for(xs  = VL_MAX (- W - 1, 1 - xi    ) ; 
+        xs <= VL_MIN (+ W + 1, w - 2 - xi) ; ++xs) {
       
-      double dx = xi + xs - x;
-      double dy = yi + ys - y;
+      double dx = (double)(xi + xs) - x;
+      double dy = (double)(yi + ys) - y;
       double r2 = dx*dx + dy*dy ;
-      double wgt, mod, ang ;
-      int    bin ;
+      double wgt, mod, ang, fbin ;
 
       /* limit to a circular window */
-      if (r2 >= W*W + 0.5) continue ;
+      if (r2 >= W*W + 0.6) continue ;
 
-      wgt = fast_expn (r2 / (2*sigmaw*sigmaw)) ;
-      mod = *(pt + xs*xo + ys*yo    ) ;
-      ang = *(pt + xs*xo + ys*yo + 1) ;
-
-      bin = (int) floor (nbins * ang / (2*VL_PI)) ;
-      hist [bin] += mod * wgt ;        
-
+      wgt  = fast_expn (r2 / (2*sigmaw*sigmaw)) ;
+      mod  = *(pt + xs*xo + ys*yo    ) ;
+      ang  = *(pt + xs*xo + ys*yo + 1) ;
+      fbin = nbins * ang / (2 * VL_PI) ;
+       
+#if defined(VL_SIFT_BILINEAR_ORIENTATIONS)
+      {
+        int    bin  = vl_floor_d (fbin - 0.5) ;
+        double rbin = fbin - bin - 0.5 ;
+        hist [(bin + nbins) % nbins] += (1 - rbin) * mod * wgt ;
+        hist [(bin + 1    ) % nbins] += (    rbin) * mod * wgt ;
+      }
+#else
+      {
+        int    bin  = vl_floor_d (fbin) ;
+        bin = vl_floor_d (nbins * ang / (2*VL_PI)) ;
+        hist [(bin) % nbins] += mod * wgt ;        
+      }
+#endif
+      
     } /* for xs */
   } /* for ys */
 
@@ -1026,7 +1042,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
          orientation and extension */
       vl_sift_pix nx = ( ct0 * dx + st0 * dy) / SBP ;
       vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
-      vl_sift_pix nt = NBO * theta / (2*VL_PI) ;
+      vl_sift_pix nt = NBO * theta / (2 * VL_PI) ;
       
       /* Get the Gaussian weight of the sample. The Gaussian window
        * has a standard deviation equal to NBP/2. Note that dx and dy

@@ -68,50 +68,48 @@ end
 
 h=line(xall,yall) ;
 
-% --------------------------------------------------------------------
-%                                                     Helper functions
-% --------------------------------------------------------------------
 
-% Renders a single descriptor
-function [x,y] = render_descr( d )
+% --------------------------------------------------------------------
+function [x,y] = render_descr(d)
+% --------------------------------------------------------------------
 
 lowe_compatible=0; 
-NBP=4 ;
-NBO=8 ;
+BP = 4 ;
+BO = 8 ;
 
-[x,y] = meshgrid(-NBP/2:NBP/2,-NBP/2:NBP/2) ;
+[x,y] = meshgrid(-BP/2:BP/2,-BP/2:BP/2) ;
 
 % Rescale d so that the biggest peak fits inside the bin diagram
 d = 0.4 * d / max(d(:)) ;
 
-% We have NBP*NBP bins to plot. Here are the centers:
+% We have BP*BP bins to plot. Here are the centers:
 xc = x(1:end-1,1:end-1) + 0.5 ;
 yc = y(1:end-1,1:end-1) + 0.5 ;
 
-% We swap the order of the bin diagrams because they are stored row
-% major into the descriptor (Lowe's convention that we follow.)
+% We scramble the the centers to have the in row major order
+% (descriptor convention).
 xc = xc' ;
 yc = yc' ;
 
-% Each bin contains a star with eight tips
-xc = repmat(xc(:)',NBO,1) ;
-yc = repmat(yc(:)',NBO,1) ;
+% Each bin contains a star with BO tips
+xc = repmat(xc(:)',BO,1) ;
+yc = repmat(yc(:)',BO,1) ;
 
 % Do the stars 
-th=linspace(0,2*pi,NBO+1) ;
+th=linspace(0,2*pi,BO+1) ;
 th=th(1:end-1) ;
 if lowe_compatible
-  xd = repmat(cos(-th), 1, NBP*NBP ) ;
-  yd = repmat(sin(-th), 1, NBP*NBP ) ;
+  xd = repmat(cos(-th), 1, BP*BP) ;
+  yd = repmat(sin(-th), 1, BP*BP) ;
 else
-  xd = repmat(cos(th), 1, NBP*NBP ) ;
-  yd = repmat(sin(th), 1, NBP*NBP ) ;
+  xd = repmat(cos(th), 1, BP*BP) ;
+  yd = repmat(sin(th), 1, BP*BP) ;
 end
 xd = xd .* d(:)' ;
 yd = yd .* d(:)' ;
 
 % Re-arrange in sequential order the lines to draw
-nans = NaN * ones(1,NBP^2*NBO) ;
+nans = NaN * ones(1,BP^2*BO) ;
 x1 = xc(:)' ;
 y1 = yc(:)' ;
 x2 = x1 + xd ;
@@ -120,7 +118,7 @@ xstars = [x1;x2;nans] ;
 ystars = [y1;y2;nans] ;
 
 % Horizontal lines of the grid
-nans = NaN * ones(1,NBP+1);
+nans = NaN * ones(1,BP+1);
 xh = [x(:,1)' ; x(:,end)' ; nans] ;
 yh = [y(:,1)' ; y(:,end)' ; nans] ;
 

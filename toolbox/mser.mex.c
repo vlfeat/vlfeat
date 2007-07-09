@@ -18,7 +18,7 @@ mexFunction(int nout, mxArray *out[],
   double delta ;   
 
   int nel ;              
-    int ndims ;            
+  int ndims ;            
   int const* dims ; 
      
   vl_mser_pix const *data ; 
@@ -63,6 +63,13 @@ mexFunction(int nout, mxArray *out[],
     
     /* new filter */
     filt = vl_mser_new (ndims, dims) ;
+
+    vl_mser_set_delta (filt, delta) ;
+
+    if (verbose) {
+      mexPrintf("mser: filter settings:\n") ;
+      mexPrintf("mser:  delta = %d\n", vl_mser_get_delta (filt) ) ;
+    }
     
     /* process image */
     vl_mser_process (filt, data) ;
@@ -71,13 +78,14 @@ mexFunction(int nout, mxArray *out[],
     nregions         = vl_mser_get_num_regions (filt) ;
     regions          = vl_mser_get_regions     (filt) ;
     odims [0]        = nregions ;
-    out [OUT_PIVOTS] = mxCreateNumericArray (1, odims, mxUINT32_CLASS,mxREAL) ;
+    out [OUT_PIVOTS] = mxCreateNumericArray (1, odims, mxDOUBLE_CLASS,mxREAL) ;
     pt               = mxGetPr (out [OUT_PIVOTS]) ;
 
-    for (i = 0 ; i < nregions ; ++i) pt [i] = regions [i] ;
+    for (i = 0 ; i < nregions ; ++i) 
+      pt [i] = regions [i] + 1 ;
 
     /* optionally compute and save frames */
-    if (nout >= 1) {
+    if (nout > 1) {
       vl_mser_fit_ell (filt) ;
       
       nframes = vl_mser_get_num_ell (filt) ;

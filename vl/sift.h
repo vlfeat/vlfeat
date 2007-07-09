@@ -8,13 +8,12 @@
  **   filter can be reused if the image size does not change.
  ** - For each octave:
  **   - Compute the DOG scale space by either ::vl_sift_process_first_octave() or
- **    ::vl_sift_process_next_octave().
+ **    ::vl_sift_process_next_octave() (stop if ::VL_ERR_EOF is returned).
  **   - Run the SIFT detector by ::vl_sift_detect() to get the keypoints.
  **   - For each keypoint:
- **     - Running the SIFT keypoint oriantation assignment 
- **       ::vl_sift_calc_keypoint_orientations() to get the keypoint orientation(s).
- **     - Running the SIFT description ::vl_sift_calc_keypoint_descriptor() to
- **       get the keypoint descriptor.
+ **     - Use ::vl_sift_calc_keypoint_orientations() to get the keypoint orientation(s).
+ **     - For each orientation:
+ **       - Use ::vl_sift_calc_keypoint_descriptor()   to get the keypoint descriptor.
  ** - Delete the SIFT filter by ::vl_sift_delete().
  **
  ** @section sift-scale-space SIFT scale space
@@ -55,21 +54,25 @@
  **   <td>parameter</td>
  **   <td>alt. name</td>
  **   <td>standard value</td>
+ **   <td>set by</td>
  **  </tr>
  **  <tr>
  **    <td>@f$O@f$</td>
  **    <td>@c O</td>
  **    <td>as big as possible</td>
+ **    <td>::vl_sift_new()</td>
  **  </tr>
  **  <tr>
  **    <td>@f$o_{\mathrm{min}}@f$</td>
  **    <td>@c o_min</td>
  **    <td>-1</td>
+ **    <td>::vl_sift_new()</td>
  **  </tr>
  **  <tr>
  **    <td>@f$S@f$</td>
  **    <td>@c S</td>
  **    <td>3</td>
+ **    <td>::vl_sift_new()</td>
  **  </tr>
  ** </table>
  **
@@ -81,13 +84,13 @@
  **   space and scale).  Along the scale index, they are selected at
  **   the intersecton fo the green arrows in the previous figure.
  ** - Peaks are then quadratically interpolated.
- ** - Peaks are filtered by contrast (peaks treshold) and
- **   spatial stability (edges treshold).
+ ** - Peaks are filtered by contrast (peak treshold) and
+ **   spatial stability (edge treshold).
  **
  ** Each peak passing these test is a SIFT keypoint. SIFT also assigns
  ** up to four orientations to each keypoint by looking at the modes
  ** of the distribution of the gradient orientation in a polling
- ** region supported by a Gaussian windows 1.5 wider that the scale of
+ ** region supported by a Gaussian windows 1.5 wider than the scale of
  ** the keypoint:
  **
  ** @image html sift-orient.png
@@ -95,6 +98,24 @@
  ** In addition to the biggest mode, up to other three modes whose
  ** amplitude is within the 80% of the biggest mode are retained too,
  ** returned as additional orientations.
+ **
+ ** <table>
+ **  <tr>
+ **   <td>parameter</td>
+ **   <td>standard value</td>
+ **   <td>set by</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@c edge_tresh</td>
+ **    <td>10.0</td>
+ **    <td>::vl_sift_set_edge_tresh()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@c peak_tresh</td>
+ **    <td>0</td>
+ **    <td>::vl_sift_set_peak_tresh()</td>
+ **  </tr>
+ ** </table>
  **
  ** @section sift-descriptor SIFT descriptor
  **
@@ -170,6 +191,8 @@
  **/
  
 /* AUTORIGHTS */
+
+#include <stdio.h>
 
 #include "generic.h"
 

@@ -107,7 +107,7 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # --------------------------------------------------------------------
 # We place the MEX files in toolbox/.
 
-mex_src := mser sift
+mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.mex.c))))
 mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 
 .PHONY: all-mex

@@ -32,25 +32,34 @@ uMexOption options [] = {
   {"Verbose",      0,   opt_verbose       }
 } ;
 
-void
-rotate_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
+/** @brief Transpose desriptor
+ ** @internal
+ **
+ ** @param dst destination buffer.
+ ** @param src source buffer.
+ **
+ ** The function writes to @a dst the transpose of the SIFT descriptor
+ ** @a src. The tranpsose is defined as the descriptor that one
+ ** obtains from computing the normal descriptor on the transposed
+ ** image.
+ **/
+static VL_INLINE void
+transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
 {
   int BO = 8 ;
   int BP = 4 ;
   int i, j, t, tp ;
   
-  for (j = 0 ; j < BP ; ++j) 
-    for (i = 0 ; i < BP ; ++i) 
-      for (t = 0 ; t < BO ; ++t) {
-        tp = BO - t  - BO/4 ;
-        /*        tp = BO - t - BO/4  ;*/
-        if (tp >= BO) tp -= BO ;
-        if (tp < 0 ) tp += BO ;
-        if (tp < 0 ) tp += BO ;
-        dst [t + BO * i + BP*BO *j] = 
-          src [tp + BO * j + BP*BO * i] ;
-      }
-
+  for (j = 0 ; j < BP ; ++j) {
+    int jp = BP - 1 - j ;
+    for (i = 0 ; i < BP ; ++i) {
+      int o  = BO * i + BP*BO * j  ;
+      int op = BO * i + BP*BO * jp ;      
+      dst [op] = src[o] ;      
+      for (t = 1 ; t < BO ; ++t) 
+        dst [BO - t + op] = src [t + o] ;
+    }
+  }
 }
 
 /** @brief MEX entry point */
@@ -77,7 +86,7 @@ mexFunction(int nout, mxArray *out[],
   double             peak_tresh = -1 ;
 
   double            *ikeys = 0 ;
-  int                nikeys = 0 ;
+  int                nikeys = -1 ;
   vl_bool            force_orientations = 0 ;
 
   /** -----------------------------------------------------------------
@@ -184,7 +193,9 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("sift:   peak tresh           = %g\n",
                 vl_sift_get_peak_tresh   (filt)) ;
       mexPrintf("sift: will source frames? %s\n",
-                force_orientations ? "yes" : "no") ;
+                (nikeys >= 0) ? "yes" : "no") ;
+      mexPrintf("sift: will force orientations? %s\n",
+                force_orientations ? "yes" : "no") ;      
     }
 
     
@@ -218,7 +229,7 @@ mexFunction(int nout, mxArray *out[],
       }
 
       /* run detector ............................................. */
-      if (ikeys == 0) {
+      if (nikeys < 0) {
         vl_sift_detect (filt) ;
         
         keys  = vl_sift_get_keypoints     (filt) ;
@@ -240,7 +251,7 @@ mexFunction(int nout, mxArray *out[],
         VlSiftKeypoint const *k ;
 
         /* obtain keypoint orientations ........................... */
-        if (ikeys) {
+        if (nikeys >= 0) {
           vl_sift_keypoint_init (filt, &ik, 
                                  ikeys [4 * i + 1] - 1,
                                  ikeys [4 * i + 0] - 1,
@@ -257,7 +268,7 @@ mexFunction(int nout, mxArray *out[],
             nangles = vl_sift_calc_keypoint_orientations 
               (filt, angles, k) ;            
           } else {
-            angles [0] = - ikeys [4 * i + 3] ;
+            angles [0] = VL_PI / 2 - ikeys [4 * i + 3] ;
             nangles    = 1 ;
           }
         } else {
@@ -275,7 +286,7 @@ mexFunction(int nout, mxArray *out[],
           if (nout > 1) {
             vl_sift_calc_keypoint_descriptor 
               (filt, buf, k, angles [q]) ;
-            rotate_descriptor (rbuf, buf) ;
+            transpose_descriptor (rbuf, buf) ;
           }
 
           /* make enough room for all these keypoints */
@@ -292,7 +303,7 @@ mexFunction(int nout, mxArray *out[],
           frames [4 * nframes + 0] = k -> y + 1 ;
           frames [4 * nframes + 1] = k -> x + 1 ;
           frames [4 * nframes + 2] = k -> sigma ;
-          frames [4 * nframes + 3] = - angles [q] ;
+          frames [4 * nframes + 3] = VL_PI / 2 - angles [q] ;
           
           if (nout > 1) {
             for (j = 0 ; j < 128 ; ++j) {

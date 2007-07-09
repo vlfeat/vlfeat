@@ -44,5 +44,8 @@ vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
 vl_uint          vl_mser_get_num_ell      (VlMserFilt const *filt) ;
 vl_uint          vl_mser_get_dof_ell      (VlMserFilt const *filt) ;
 
+void  vl_mser_set_delta (VlMserFilt *filt,  vl_mser_pix x) ;
+vl_mser_pix  vl_mser_get_delta (VlMserFilt const *filt) ;
+
 /* VL_MSER */
 #endif
