@@ -9,15 +9,15 @@ png_targets := $(fig_sources:.fig=.png)
 %.png : %.pdf
 	convert -trim -density 70 $< $@
 
-%.pdf : %.tex %-raw.tex %-raw.pdf
-	pdflatex $*.tex
-	rm $*.log $*.aux
-
 %-raw.tex : %.fig
 	fig2dev -L pdftex_t -p $*-raw.pdf $< $@
 
 %-raw.pdf : %.fig
 	fig2dev -L pdftex $< $@
+
+%.pdf : %.tex %-raw.tex %-raw.pdf
+	pdflatex $*.tex
+	rm $*.log $*.aux
 
 %.tex : Makefile
 	echo -n -e "		                      \n\

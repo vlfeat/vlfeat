@@ -1,17 +1,7 @@
 function test_sift
 % TEST_SIFT  Test SIFT implementation(s)
 
-%I = imreadbw('../data/box.pgm') ;
-%I = single(I*255) ;
-
-% generate test pattern
-ur    = linspace(-1,1,128) ;
-vr    = linspace(-1,1,128) ;
-[u,v] = meshgrid(ur,vr);
-%I     = u.^2 + v.^2 > (1/4).^2 ;
-I     = abs(u) + abs(v) > (1/4) ;
-I     = 255 * I ;
-I(1:64,:) = 0 ;
+I = test_pattern(101) ;
 
 % run various instances of the code
 [a0,b0]  = sift(single(I),'verbose','peaktresh',0,'levels',4) ;
@@ -26,16 +16,11 @@ h=plotsiftdescriptor(b2,a2) ; set(h,'color','r','linewidth',2) ;
 h=plotsiftdescriptor(b3,a3) ; set(h,'color','y','linewidth',1) ;
 title('Same descriptor computed in four ways') ;
 
-disp([a0 a1 a2 a3]) ;
+%disp([a0 a1 a2 a3]) ;
 
 % --------------------------------------------------------------------
 function [a,b]=cmd_sift(I,param,do_read)
 % --------------------------------------------------------------------
-
-root   = vlfeat_root ;
-pfx_im = fullfile(root,'results','autotest.pgm') ;
-
-imwrite(I, pfx_im) ;
 
 switch mexext
   case 'mexmac'
@@ -47,27 +32,28 @@ switch mexext
 end
 
 pfx_sift_cmd = fullfile(vlfeat_root,'bin',arch,'sift') ;
+pfx_im       = fullfile(vlfeat_root,'results','autotest.pgm') ;
 pfx_d        = fullfile(vlfeat_root,'results','autotest.descr') ;
-pfx_f        = fullfile(vlfeat_root,'results','autotest.frames') ;
+pfx_f        = fullfile(vlfeat_root,'results','autotest.frame') ;
+
+imwrite(uint8(I), pfx_im) ;
 
 str = [pfx_sift_cmd, ' ', param, ' ', ...
-       ' --descriptors=', pfx_d, ...
-       ' --frames=',      pfx_f, ...
+       ' --descriptors=', pfx_d, ...,
+       ' --frames=',      pfx_f, ...,
        ' -v -v ' pfx_im] ;
 
 if (nargin > 2)
   str = [str ' --read-frames=' pfx_f] ;
 end
 
-fprintf('> %s',str) ;
+fprintf('> %s\n',str) ;
 
 [err,msg] = system(str) ;
 
-if (err)
-  error(msg)
-end
+if (err), error(msg) ; end
 
-disp(msg) ;
+fprintf(msg) ;
 
 a = load(pfx_f,'-ASCII')' ;
 b = load(pfx_d,'-ASCII')' ;

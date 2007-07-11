@@ -313,7 +313,7 @@ main(int argc, char **argv)
     vl_mser_process (filt, (vl_mser_pix*) data) ;
 
     /* Save result  ----------------------------------------------- */
-    nregions = vl_mser_get_num_regions (filt) ;
+    nregions = vl_mser_get_regions_num (filt) ;
     regions  = vl_mser_get_regions     (filt) ;
     
     if (piv.active) {
@@ -325,8 +325,8 @@ main(int argc, char **argv)
     if (frm.active) {
       vl_mser_fit_ell (filt) ;
 
-      nframes = vl_mser_get_num_ell (filt) ;
-      dof     = vl_mser_get_dof_ell (filt) ;
+      nframes = vl_mser_get_ell_num (filt) ;
+      dof     = vl_mser_get_ell_dof (filt) ;
       frames  = vl_mser_get_ell     (filt) ;
       for (i = 0 ; i < nframes ; ++i) {
         for (j = 0 ; j < dof ; ++j) {

@@ -75,7 +75,7 @@ mexFunction(int nout, mxArray *out[],
     vl_mser_process (filt, data) ;
     
     /* save regions back to array */
-    nregions         = vl_mser_get_num_regions (filt) ;
+    nregions         = vl_mser_get_regions_num (filt) ;
     regions          = vl_mser_get_regions     (filt) ;
     odims [0]        = nregions ;
     out [OUT_PIVOTS] = mxCreateNumericArray (1, odims, mxDOUBLE_CLASS,mxREAL) ;
@@ -88,8 +88,8 @@ mexFunction(int nout, mxArray *out[],
     if (nout > 1) {
       vl_mser_fit_ell (filt) ;
       
-      nframes = vl_mser_get_num_ell (filt) ;
-      dof     = vl_mser_get_dof_ell (filt) ;
+      nframes = vl_mser_get_ell_num (filt) ;
+      dof     = vl_mser_get_ell_dof (filt) ;
       frames  = vl_mser_get_ell     (filt) ;
       
       odims [0] = dof ;
