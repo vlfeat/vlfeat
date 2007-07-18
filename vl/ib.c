@@ -10,7 +10,7 @@ typedef struct _VlIB
 {
     vl_node   * nodes; 
     vl_double * beta;
-    vl_double * bidx;
+    vl_node * bidx;
     vl_node nnodes;
 
     vl_node * which;  
@@ -76,6 +76,8 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
 {
     vl_node lastnode = ib->nnodes-1;
     vl_node c;
+    /* clear which */
+    ib->nwhich = 0;
 
     /* merge i and j */
     for(c=0; c<ib->ncols; c++)    /* Pic */
@@ -84,6 +86,7 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     ib->beta[i] = BETA_MAX; /* beta */
     ib->bidx[i] = 0; /* bidx */
     ib->nodes[i] = new; /* nodes */
+    ib->which[ib->nwhich++] = i; /* add i to which */
 
     /* copy lastnode into j */
     for(c=0; c<ib->ncols; c++)    /* Pic */
@@ -92,6 +95,21 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     ib->beta[j] = ib->beta[lastnode]; /* beta */
     ib->bidx[j] = ib->bidx[lastnode]; /* bidx */
     ib->nodes[j] = ib->nodes[lastnode]; /* nodes */
+
+    vl_node n;
+    for(n=0; n < ib->nnodes; n++)
+    {
+        /* find any bidx = i || bidx == j and add them to which */
+        if(ib->bidx[n] == i || ib->bidx[n] == j)
+        {
+            ib->bidx[n] = 0;
+            ib->beta[n] = BETA_MAX;
+            ib->which[ib->nwhich++] = n;
+        }
+        /* find any bidx = lastnode and make it bidx = j */
+        else if(ib->bidx[n] == lastnode)
+            ib->bidx[n] = j;
+    }
 
     /* delete a node */
     ib->nnodes--;
@@ -103,6 +121,11 @@ void vl_ib_update_beta(VlIB * ib)
     vl_node i;
     vl_prob * Pi  = ib->Pi;
     vl_prob * Pic = ib->Pic;
+
+    fprintf(stderr, "Which is: ");
+    for(i=0; i<ib->nwhich; i++)
+        fprintf(stderr, "%d ", ib->which[i]);
+    fprintf(stderr, "\n");
 
     for(i=0; i<ib->nwhich; i++)
     {
@@ -137,16 +160,19 @@ void vl_ib_update_beta(VlIB * ib)
 
             /* TODO: Does it matter if we pick min beta or max C1 - Beta*C2? */
             vl_double beta = -C1;
+            fprintf(stderr, "beta %f a %d b %d\n", beta, a, b);
 
             if (beta < ib->beta[a])
             {
                 ib->beta[a] = beta;
                 ib->bidx[a] = b;
+                /* fprintf(stderr, "minbeta %f\n", ib->beta[a]); */
             }
             if (beta < ib->beta[b])
             {
                 ib->beta[b] = beta;
                 ib->bidx[b] = a;
+                /* fprintf(stderr, "minbeta %f\n", ib->beta[b]); */
             }
         }
     }
@@ -164,11 +190,12 @@ VlIB * vl_ib_new_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 
     /* nodelist contains all the remaining nodes. This also has to be modified
      * after a merge, but order doesn't matter (as long as Pi and Pic agree) */
-    vl_node nnodes = nrows;
-    ib->nodes = vl_ib_new_nodelist(nnodes);
-    ib->beta   = malloc(sizeof(vl_prob)*nnodes);
+    ib->nnodes = nrows;
+    ib->nodes = vl_ib_new_nodelist(ib->nnodes);
+    ib->beta   = malloc(sizeof(vl_prob)*ib->nnodes);
+    ib->bidx   = malloc(sizeof(vl_node)*ib->nnodes);
     vl_node i;
-    for(i=0; i<nnodes; i++)
+    for(i=0; i<ib->nnodes; i++)
         ib->beta[i] = BETA_MAX;
     
     /* Have to manipulate the which list (delete) */
@@ -182,19 +209,20 @@ VlIB * vl_ib_new_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 void vl_ib_delete_ib(VlIB * ib)
 {
     free(ib->nodes);
-    ib->nodes = 0;
     free(ib->beta);
-    ib->beta = 0;
+    free(ib->bidx);
     free(ib->which);
-    ib->which = 0;
     free(ib->Pi);
-    ib->Pi = 0;
     free(ib);
 }
 
 vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
-    vl_node * parents = calloc(nrows*2-1, sizeof(vl_node));
+    vl_node * parents = malloc(sizeof(vl_node)*(nrows*2-1));
+    vl_node n;
+     /* Initially, all parents point to a nonexistant node */
+    for(n=0; n<nrows*2-1; n++)
+        parents[n] = nrows*2; 
 
     VlIB * ib = vl_ib_new_ib(Pic, nrows, ncols);
 
@@ -217,8 +245,8 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
         parents[ib->nodes[bestj]] = newnode;
 
         /* Merge the nodes which produced the minimum beta */
+        fprintf(stderr, "Merging %d and %d into %d beta %f\n", ib->nodes[besti], ib->nodes[bestj], newnode, ib->beta[besti]);
         vl_ib_merge_nodes(ib, besti, bestj, newnode);
-        vl_ib_update_which();
         /* Remove node from:
          *  o which
          *  o nodelist 
