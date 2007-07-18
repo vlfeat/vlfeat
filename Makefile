@@ -35,7 +35,7 @@ mci_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(mci_CFLAGS)' -L$(mci_BINDIR) -lvl
 mci_MEX_SUFFIX   := mexmaci
 
 glx_BINDIR       := bin/glx
-glx_CFLAGS       := -DLITTLE_ENDIAN
+glx_CFLAGS       := -DLITTLE_ENDIAN -I.
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   := CFLAGS='$$CFLAGS $(glx_CFLAGS)' -L$(glx_BINDIR) -lvl
 glx_MEX_SUFFIX   := mexglx
