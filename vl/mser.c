@@ -518,7 +518,7 @@ modified_selection (VlMserFilt *f,  vl_mser_pix const* im, int ner)
   }
 
   /* -----------------------------------------------------------------
-   *                                 Compute areas of tops and bottoms
+   *                                             Compute areas of tops
    * -------------------------------------------------------------- */
 
   /* 
@@ -569,31 +569,47 @@ modified_selection (VlMserFilt *f,  vl_mser_pix const* im, int ner)
     }
   }
     
-    /* -----------------------------------------------------------------
-     *                                                 Compute variation
+  /* -----------------------------------------------------------------
+   *                                                 Compute variation
    * -------------------------------------------------------------- */
 
   for(i = 0 ; i < ner ; ++i) {
     int area     = er [i] .area ;
     int area_top = er [i] .area_top ;
-    int area_bot = er [i] .area_bot ;    
-    er [i] .variation = 
-      (float)(area_top - area) / (float)area ;
-
-    /* assume all regions are maximally stable */
-    if (er [i] .variation < .1) {
-      er [i] .max_stable = 1 ;
-      ++ nmer ;
-    } else {
-      er [i] .max_stable = 0 ;
-    }        
+    er [i] .variation  = (float) (area_top - area) / area ;
+    er [i] .max_stable = 1 ;
   }
 
   verbose && printf(" done.\n") ;
 
+  /* -----------------------------------------------------------------
+   *                     Remove regions which are NOT maximally stable
+   * -------------------------------------------------------------- */
+  
+  verbose && printf("mser: selecting maximally stable ...") ;
+  
+  nmer = ner ;
+  for(i = 0 ; i < ner ; ++i) {
+    vl_uint  parent  = er [i]      .parent ;
+    vl_single   var  = er [i]      .variation ;
+    vl_single  pvar  = er [parent] .variation ;
+    vl_uint   loser ;
+    
+    /* comparison is made only if parent is within... */
+    if(var < .10) continue ;
+
+    /* decide which one to keep and put that in loser */
+    if(var < pvar) loser = parent ; else loser = i ;
+    
+    /* make loser NON maximally stable */
+    if(er [loser] .max_stable) {
+      -- nmer ;
+      er [loser] .max_stable = 0 ;
+    }
+  }
+
   verbose && printf("done (%d left, %.1f%%)\n", 
                     nmer, 100.0 * (double) nmer / ner) ;
-
 
   /* -----------------------------------------------------------------
    *                                                 Further filtering
@@ -756,7 +772,7 @@ vl_mser_new (int ndims, int const* dims)
   f-> verbose = 1 ;
   f-> cleanup_small = 0 ;
   f-> cleanup_big   = 0  ;
-  f-> cleanup_bad   = 0 ;
+  f-> cleanup_bad   = 1 ;
   f-> cleanup_dup   = 1 ;
   f-> delta         = 5 ;
 

@@ -11,44 +11,69 @@
  ** - Retrieve the results
  ** - Delete the MSER filter by ::vl_mser_delete().
  **
- **
  ** @section mser-definition Maximally Stable Extremal Regions
  **
- ** An extremal region @f$R_l@f$ of an image is a connected components
- ** of the level sets @f$S_l = \{ x : I(x) \leq l \}@f$.
+ ** An extremal region @f$R_l@f$ of an image is a connected component
+ ** of the level set @f$S_l = \{ x : I(x) \leq l \}@f$.
  **
  ** @image html mser-er.png
  **
- ** As @f$l@f$ is increased, one obtains families of nested
- ** regions. All together, they form a tree.
- **
+ ** For each value of @f$l@f$, one has many extremal regions, but they
+ ** are disjoint (as they are maximal connected components).  For
+ ** simplicity, let @f$l@f$ span a finite number of values (a sampling
+ ** of the image range).  One obtains a family of regions @f$R_l@f$;
+ ** by connecting two regions @f$R_l@f$and @f$R_{l+1}@f$ if, and only
+ ** if, @f$R_l\subset R_{l+1}@f$, one arranges all such extremal
+ ** regions in a tree.
+ ** 
  ** @image html mser-tree.png
  **
- ** The maximally stable extremal regions are extremal regions which
- ** satisfy some stability criterion. Here we use a definition which
- ** is similar but not identical to the original paper. This
- ** definition is somewhat simpler both to understand and code (it
- ** also runs faster), but uses a few parameters more.
+ ** The <em>maximally stable extremal regions</em> are extremal
+ ** regions which satisfy a stability criterion. Here we use a
+ ** criterion which is similar but not identical to the original
+ ** paper. This definition is somewhat simpler both to understand and
+ ** code (it also runs faster).
  **
- ** Let @f$R_l,R_{l+1},\dots,R_{l+\Delta}@f$ be a branch of
- ** nested extremal regions.  We say that the branch is
- ** <em>stable</em> if the relative area variation
- ** @f[
- **  \frac{|R_{l+\Delta} - R_l|}{\Delta|R_l|}
+ ** Let @f$B(R_l)=(R_l,R_{l+1},\dots,R_{l+\Delta})@f$ be the branch of
+ ** the tree rooted at @f$R_l@f$.  We associate to the branch the
+ ** (in)stability score
+ **
+ ** @f[ 
+ **   v(R_l) = \frac{|R_{l+\Delta} - R_l|}{|R_l|}.
  ** @f]
- ** is below the threshold @c variation. Intuitively, this means that
- ** all the regions along the branch vary little as the intensity is
- ** changed from @f$l@f$ to @f$l+\Delta@f$. Any region of a stable
- ** branch can be taken as representative of the branch; here we take
- ** the lower region @f$R_l@f$, which is then dubbed <em>stable extremal
- ** region</em>.
  **
- ** This definition may mark as stable many partially overlapping
- ** branches, yielding duplicated stable extremal regions.  In order
- ** to remove duplicates, stable regons are scanned from top to bottom
- ** and regions removed if the one immediately on top has relative
- ** variation smaller than @c variation.
+ ** The score is low if the regions along the branch have similar area
+ ** (and thus similar shape). We aim to select maximally stable
+ ** branches; then a maximally stable region is just a representative
+ ** region selected from a maximally stable branch (for simplicity we
+ ** select @f$R_l@f$, but one could choose for example
+ ** @f$R_{l+\Delta/2}@f$).
  ** 
+ ** Roughly speaking, a branch is maximally stable if it is a local
+ ** minimum of the stability score. More accurately, we start by
+ ** assuming that all branches are maximally stable. Then we consider
+ ** each region @f$R_{l}@f$ and its parent region @f$R_{l+1}\supset
+ ** R_l@f$. If the two regions are close (in term of shape), we mark
+ ** as unstable the one with higher (in)stability score. Formally
+ **
+ ** - if @f$v(R_l)<\tau@f$
+ **   - if @f$v(R_l)<v(R_{l+1})@f$, mark @f$R_{l+1}@f$ as unstable;
+ **   - otherwise, mark @f$R_l@f$ as unstable.
+ **
+ ** Maximal stability measures stability relatively to regions close
+ ** by. We optionally refine the selection by running some or all of
+ ** the following tests:
+ **
+ ** - Regions too small or too big are marked unstable.
+ **
+ ** - Absolutely unstable regions are marked unstable. By this we mean
+ **   regions whose (in)stabilty score is above a certain treshold.
+ **
+ ** - Duplicated regions are marked unstable. These are detected as
+ **   follows: for any two regions @f$R_l\subset R_{l+q}@f$ whose
+ **   relative area variation @f$|R_{l+q} - R_l|/|R_l|@f$ is
+ **   below a treshold, we mark @f$R_{l+q}@f$ as unstable.
+ **
  ** @section mser-n-dimension N-dimensional images
  **
  ** The code supports images of arbitrary dimension. For instance, it
@@ -217,7 +242,7 @@ typedef struct _VlMserExtrReg
   vl_uint      area ;       /**< area of the region                           */
   vl_uint      area_top ;   /**< area of the region DELTA levels above        */
   vl_uint      area_bot  ;  /**< area of the region DELTA levels below        */
-  vl_single    variation ;  /**< area variation                               */
+  vl_single    variation ;  /**< rel. area variation                          */
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
 } VlMserExtrReg ;
 
