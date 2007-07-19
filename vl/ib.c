@@ -64,12 +64,14 @@ void vl_ib_min_beta(VlIB * ib, vl_node * besti, vl_node * bestj, vl_double * min
 
     vl_node i;
     for(i=0; i<ib->nnodes; i++)
-        if(*minbeta < ib->beta[i])
+    {
+        if(ib->beta[i] < *minbeta)
         {
             *minbeta = ib->beta[i];
             *besti = i;
             *bestj = ib->bidx[i];
         }
+    }
 }
 
 void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
@@ -79,6 +81,8 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     /* clear which */
     ib->nwhich = 0;
 
+    if(i > j) { vl_node tmp = j; j = i; i = tmp; }
+
     /* merge i and j */
     for(c=0; c<ib->ncols; c++)    /* Pic */
         ib->Pic[i*ib->ncols + c] += ib->Pic[j*ib->ncols + c];
@@ -86,7 +90,8 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     ib->beta[i] = BETA_MAX; /* beta */
     ib->bidx[i] = 0; /* bidx */
     ib->nodes[i] = new; /* nodes */
-    ib->which[ib->nwhich++] = i; /* add i to which */
+    /* i will always be added to which */
+    /* ib->which[ib->nwhich++] = i; */
 
     /* copy lastnode into j */
     for(c=0; c<ib->ncols; c++)    /* Pic */
@@ -95,6 +100,11 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     ib->beta[j] = ib->beta[lastnode]; /* beta */
     ib->bidx[j] = ib->bidx[lastnode]; /* bidx */
     ib->nodes[j] = ib->nodes[lastnode]; /* nodes */
+
+    /* fprintf(stderr, "i %d j %d lastnode %d\n", i, j, lastnode); */
+    /* delete a node */
+    ib->nnodes--;
+    /* fprintf(stderr, "nnodes %d\n", ib->nnodes); */
 
     vl_node n;
     for(n=0; n < ib->nnodes; n++)
@@ -111,8 +121,6 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
             ib->bidx[n] = j;
     }
 
-    /* delete a node */
-    ib->nnodes--;
 }
 
 #define PLOGP(x) (x)*log((x))
@@ -160,7 +168,6 @@ void vl_ib_update_beta(VlIB * ib)
 
             /* TODO: Does it matter if we pick min beta or max C1 - Beta*C2? */
             vl_double beta = -C1;
-            fprintf(stderr, "beta %f a %d b %d\n", beta, a, b);
 
             if (beta < ib->beta[a])
             {
@@ -238,6 +245,8 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 
         /* Find best merge */
         vl_ib_min_beta(ib, &besti, &bestj, &minbeta);
+        if(minbeta == BETA_MAX)
+            break; /* All that remain are null rows */
 
         /* Add the parent pointers for the new node */
         newnode = nrows+i;
@@ -245,7 +254,7 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
         parents[ib->nodes[bestj]] = newnode;
 
         /* Merge the nodes which produced the minimum beta */
-        fprintf(stderr, "Merging %d and %d into %d beta %f\n", ib->nodes[besti], ib->nodes[bestj], newnode, ib->beta[besti]);
+        fprintf(stderr, "Merging %d and %d into %d beta %.4g\n", ib->nodes[besti], ib->nodes[bestj], newnode, ib->beta[besti]);
         vl_ib_merge_nodes(ib, besti, bestj, newnode);
         /* Remove node from:
          *  o which
