@@ -5,7 +5,7 @@
  ** Running the MSER filter usually involves the following steps:
  **
  ** - Initialize the MSER filter by ::vl_mser_new(). The
- **   filter can be reused if the image size does not change.
+ **   filter can be reused for images of the same size.
  ** - Call ::vl_mser_process() to compute the MSERs.
  ** - Optionally call ::vl_mser_ell_fit() to fit ellipsoids to the MSERs.
  ** - Retrieve the results
@@ -30,7 +30,7 @@
  ** definition is somewhat simpler both to understand and code (it
  ** also runs faster), but uses a few parameters more.
  **
- ** Let @f$R_l,R_{l+1},\dots,R_{l+\Delta}@f$ be a branch of such
+ ** Let @f$R_l,R_{l+1},\dots,R_{l+\Delta}@f$ be a branch of
  ** nested extremal regions.  We say that the branch is
  ** <em>stable</em> if the relative area variation
  ** @f[
