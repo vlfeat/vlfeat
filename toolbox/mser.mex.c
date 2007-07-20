@@ -68,7 +68,11 @@ mexFunction(int nout, mxArray *out[],
 
     if (verbose) {
       mexPrintf("mser: filter settings:\n") ;
-      mexPrintf("mser:  delta = %d\n", vl_mser_get_delta (filt) ) ;
+      mexPrintf("mser:  delta    = %d\n", vl_mser_get_delta    (filt) ) ;
+      mexPrintf("mser:  epsilon  = %g\n", vl_mser_get_epsilon  (filt) ) ;
+      mexPrintf("mser:  max_area = %g\n", vl_mser_get_max_area (filt) ) ;
+      mexPrintf("mser:  min_area = %g\n", vl_mser_get_min_area (filt) ) ;
+      mexPrintf("mser:  max_var  = %g\n", vl_mser_get_max_var  (filt) ) ;
     }
     
     /* process image */
@@ -86,7 +90,7 @@ mexFunction(int nout, mxArray *out[],
 
     /* optionally compute and save frames */
     if (nout > 1) {
-      vl_mser_fit_ell (filt) ;
+      vl_mser_ell_fit (filt) ;
       
       nframes = vl_mser_get_ell_num (filt) ;
       dof     = vl_mser_get_ell_dof (filt) ;
@@ -103,6 +107,22 @@ mexFunction(int nout, mxArray *out[],
           pt [i * dof + j] = frames [i * dof + j] + ((j < ndims)?1.0:0.0) ;
         }
       }
+    }
+
+    if (verbose) {
+      VlMserStats const* s = vl_mser_get_stats (filt) ;
+      int tot = s-> num_extremal ;
+
+#define REMAIN(test,num)                                                \
+      mexPrintf("mser:   " test " %5d (%5.2g %%)\n",tot-(num),(double)(tot-(num))/tot) ; \
+      tot -= (num) ;
+      
+      mexPrintf("mser: filter statistics:\n") ;
+      mexPrintf("mser:       extremal : %d\n", tot) ;
+      REMAIN("  max stable :", s->num_unstable) ;
+      REMAIN("small enough :", s->num_too_big) ;
+      REMAIN("  big enough :", s->num_too_small) ;
+      REMAIN("   abs stable:", s->num_abs_unstable) ;
     }
 
     /* cleanup */

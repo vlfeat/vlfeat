@@ -18,13 +18,12 @@
  **
  ** @image html mser-er.png
  **
- ** For each value of @f$l@f$, one has many extremal regions, but they
- ** are disjoint (as they are maximal connected components).  For
- ** simplicity, let @f$l@f$ span a finite number of values (a sampling
- ** of the image range).  One obtains a family of regions @f$R_l@f$;
- ** by connecting two regions @f$R_l@f$and @f$R_{l+1}@f$ if, and only
- ** if, @f$R_l\subset R_{l+1}@f$, one arranges all such extremal
- ** regions in a tree.
+ ** For each intenstiy @f$l@f$, one has multiple disjoint extremal
+ ** regions in the level set @f$S_l@f$. Let @f$l@f$ span a finite
+ ** number of values @f$\mathcal{L}=\{0,\dots,M-1\}@f$ (a sampling of
+ ** the image range).  One obtains a family of regions @f$R_l@f$; by
+ ** connecting two regions @f$R_l@f$and @f$R_{l+1}@f$ if, and only if,
+ ** @f$R_l\subset R_{l+1}@f$, regions form a tree:
  ** 
  ** @image html mser-tree.png
  **
@@ -50,29 +49,76 @@
  ** @f$R_{l+\Delta/2}@f$).
  ** 
  ** Roughly speaking, a branch is maximally stable if it is a local
- ** minimum of the stability score. More accurately, we start by
+ ** minimum of the (in)stability score. More accurately, we start by
  ** assuming that all branches are maximally stable. Then we consider
- ** each region @f$R_{l}@f$ and its parent region @f$R_{l+1}\supset
- ** R_l@f$. If the two regions are close (in term of shape), we mark
- ** as unstable the one with higher (in)stability score. Formally
+ ** each branch @f$B(R_{l})@f$ and its parent branch
+ ** @f$B(R_{l+1}):R_{l+1}\supset R_l@f$. If the two representative
+ ** regions @f$B(R_{l})@f$ and @f$B(R_{l+1})@f$ are close (in term of
+ ** shape), we mark as unstable the one with higher (in)stability
+ ** score. Formally:
  **
- ** - if @f$v(R_l)<\tau@f$
+ ** - if @f$|R_{l+1}-R_{l}|/|R_l|<\epsilon@f$
  **   - if @f$v(R_l)<v(R_{l+1})@f$, mark @f$R_{l+1}@f$ as unstable;
  **   - otherwise, mark @f$R_l@f$ as unstable.
  **
- ** Maximal stability measures stability relatively to regions close
- ** by. We optionally refine the selection by running some or all of
- ** the following tests:
+ ** This criterion selects among nearby regions the one that are more
+ ** stable. We optionally refine the selection by running some or all
+ ** of the following tests:
  **
- ** - Regions too small or too big are marked unstable.
+ ** - @f$a_- \leq |R_{l}|/|R_{\infty}| \leq a_+@f$: exclude extremal
+ **   regions too small or too big (@f$|R_{\infty}|@f$ is the area of
+ **   the image).
  **
- ** - Absolutely unstable regions are marked unstable. By this we mean
- **   regions whose (in)stabilty score is above a certain treshold.
+ ** - @f$v(R_{l}) < v_+@f$: test for absolute stability.
  **
- ** - Duplicated regions are marked unstable. These are detected as
- **   follows: for any two regions @f$R_l\subset R_{l+q}@f$ whose
+ ** - For any two regions @f$R_l\subset R_{l+q}@f$ whose
  **   relative area variation @f$|R_{l+q} - R_l|/|R_l|@f$ is
- **   below a treshold, we mark @f$R_{l+q}@f$ as unstable.
+ **   below a treshold, mark @f$R_{l}@f$ as unstable: remove duplicated regions.
+ **
+ **  <table>
+ **  <tr>
+ **   <td>parameter</td>
+ **   <td>alt. name</td>
+ **   <td>standard value</td>
+ **   <td>set by</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$\Delta@f$</td>
+ **    <td>@c delta</td>
+ **    <td>5</td>
+ **    <td>::vl_mser_set_delta()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$\epsilon@f$</td>
+ **    <td>@c epsilon</td>
+ **    <td>0.2</td>
+ **    <td>::vl_mser_set_epsilon()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$a_+@f$</td>
+ **    <td>@c max_area</td>
+ **    <td>0.75</td>
+ **    <td>::vl_mser_set_max_area()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$a_-@f$</td>
+ **    <td>@c min_area</td>
+ **    <td>3.0/@f$|R_\infty|@f$</td>
+ **    <td>::vl_mser_set_min_area()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$v_+@f$</td>
+ **    <td>@c max_var</td>
+ **    <td>0.25</td>
+ **    <td>::vl_mser_set_max_var()</td>
+ **  </tr>
+ **  <tr>
+ **    <td></td>
+ **    <td>@c no_dups</td>
+ **    <td>@c true (1)</td>
+ **    <td>::vl_mser_set_no_dups()</td>
+ **  </tr>
+ ** </table>
  **
  ** @section mser-n-dimension N-dimensional images
  **
@@ -86,15 +132,23 @@
  ** idea is easy to grasp.
  **
  ** - Pixels are sorted by increasing intensity.
- ** - Adding a pixel per time in this order, pixels are joined into a tree with the
- **   following properties:
+ ** - Pixels are added to a forest by increasing intensity. The forest has the
+ **   followin properties:
  **   - All the descendent of a certain pixels are subset of an extremal region.
  **   - All the extremal regions are the descendents of some pixels.
- ** - Extremal regions are extracted from the tree.
+ ** - Extremal regions are extracted from the region tree and the extremal regions tree is
+ **   calculated.
  ** - Stable regions are marked.
  ** - Duplicates and other bad regions are removed.
  **
- **
+ ** @remark The extremal region tree which is calculated is a subset
+ ** of the actual extremal region tree. In particular, it does not
+ ** contain redundant entries extremal regions that coincde as
+ ** sets. So, for example, in the calculated extremal region tree, the
+ ** parent @f$R_q@f$ of an extremal region @f$R_{l}@f$ may or may
+ ** <em>not</em> correspond to @f$R_{l+1}@f$, depending wether @f$q\leq
+ ** l+1@f$ or not. These subtelties are important when caluclating the
+ ** stability tests.
  **/
 
 /* AUTORIGHTS */
@@ -121,6 +175,20 @@ typedef vl_uint8 vl_mser_pix ;
 /** @brief MSER Filter */
 typedef struct _VlMserFilt VlMserFilt ;
 
+/** @brief MSER filter statistics */
+typedef struct _VlMserStats VlMserStats ;
+
+/** @brief MSER filter statistics definition */
+struct _VlMserStats 
+{
+  int num_extremal ;      /**< number of extremal regions                                */
+  int num_unstable ;      /**< number of unstable extremal regions                       */
+  int num_abs_unstable ;  /**< number of regions that failed the absolute stability test */
+  int num_too_big ;       /**< number of regions that failed the maximum size test       */
+  int num_too_small ;     /**< number of regions that failed the minimum size test       */
+  int num_duplicates ;    /**< number of regions that failed the duplicate test          */
+} ;
+
 /** @name Construction and Destruction
  ** @{
  **/
@@ -140,20 +208,33 @@ void             vl_mser_ell_fit (VlMserFilt *filt) ;
  ** @{
  **/
 static vl_mser_pix      vl_mser_get_delta        (VlMserFilt const *filt) ;
-static double           vl_mser_get_variation    (VlMserFilt const *filt) ;
+static double           vl_mser_get_epsilon      (VlMserFilt const *filt) ;
+
+static vl_bool          vl_mser_get_no_dups      (VlMserFilt const *filt) ;
+static double           vl_mser_get_min_area     (VlMserFilt const *filt) ;
+static double           vl_mser_get_max_area     (VlMserFilt const *filt) ;
+static double           vl_mser_get_max_var      (VlMserFilt const *filt) ;
+
 static vl_uint          vl_mser_get_regions_num  (VlMserFilt const *filt) ;
 static vl_uint const*   vl_mser_get_regions      (VlMserFilt const *filt) ;
 static vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
 static vl_uint          vl_mser_get_ell_num      (VlMserFilt const *filt) ;
 static vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *filt) ;
+
+static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *filt) ;
 /** @} */
 
 /** @name Setting parameters
  ** @{
  **/
-static void  vl_mser_set_variation (VlMserFilt *filt, double x) ;
+static void  vl_mser_set_epsilon   (VlMserFilt *filt, double      x) ;
 static void  vl_mser_set_delta     (VlMserFilt *filt, vl_mser_pix x) ;
+static void  vl_mser_set_no_dups   (VlMserFilt *filt, vl_bool     x) ;
+static void  vl_mser_set_min_area  (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_area  (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_var   (VlMserFilt *filt, double      x) ;
 /** @} */
+
 
 /* --------------------------------------------------------------------
  *                                      Inline functions implementation
@@ -217,20 +298,20 @@ typedef struct _VlMserReg
  ** ER are arranged into a tree. @a parent points to the parent ER, or
  ** to iself if the ER is the root.
  **
- ** The image region corresponding to an ER is identified to a single
- ** pixel, whose index is VlMserExtrReg::value. The region is the maximal
- ** connected component containing that pixel and all the pixel with
- ** intensity lower or equal to it.
+ ** An instance of the structure represents the extremal region of the
+ ** level set of intensity VlMserExtrReg::value and containing the
+ ** pixel VlMserExtReg::index.
  **
- ** VlMserExtrReg::area, VlMserExtrReg::area_top and
- ** VlMserExtrReg::area_bot are the areas of the region, the region
- ** `above' and the region 'below' respectively.  
+ ** VlMserExtrReg::area is the are of the extremal region and
+ ** VlMserExtrReg::area_top is the area of the extremal region
+ ** containing this region in the level set of intenisty
+ ** VlMserExtrReg::area + @c delta.
  **
- ** VlMserExtrReg::variation is the relative area variation.
+ ** VlMserExtrReg::variation is the relative area variation @c
+ ** (area_top-area)/area.
  **
- ** VlMserExtrReg::max_stable is the identifier of the corresponding
- ** Maxmally Stable Extremal Region (MSER). However not all ER are
- ** MSER too; in this case this value is equal to zero.
+ ** VlMserExtrReg::max_stable is a flag signaling wether this extremal
+ ** region is also maximally stable.
  **/
 
 typedef struct _VlMserExtrReg
@@ -238,10 +319,8 @@ typedef struct _VlMserExtrReg
   int          parent ;     /**< index of the parent region                   */
   int          index ;      /**< index of pivot pixel                         */
   vl_mser_pix  value ;      /**< value of pivot pixel                         */
-  vl_uint      shortcut ;
+  vl_uint      shortcut ;   /**< shortcut used when building a tree           */
   vl_uint      area ;       /**< area of the region                           */
-  vl_uint      area_top ;   /**< area of the region DELTA levels above        */
-  vl_uint      area_bot  ;  /**< area of the region DELTA levels below        */
   vl_single    variation ;  /**< rel. area variation                          */
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
 } VlMserExtrReg ;
@@ -252,30 +331,11 @@ typedef struct _VlMserExtrReg
  ** The MSER filter computes the Maximally Stable Extremal Regions of
  ** an image.
  **
- ** The filter is designed as an <em>opaque</em> object. As such, one
- ** should avoid accessing directly the data fields but use the
- ** appropriate functions instead.
+ ** The filter is designed as an <em>opaque</em> object: one should
+ ** avoid to access directly the data fields and use the appropriate
+ ** access functions instead.
  **
- ** An image is a N-dimensional array of integers (of class
- ** ::vl_mser_pix). Given the image geometry (number of dimensions and
- ** dimensions), a MSER filter is created by ::vl_mser_new().  The
- ** regions are extracted from the image data by ::vl_mser_process().
- **
- ** Once computed, the number of MSERs found is returned by
- ** ::vl_mser_get_num_regions(). The actual regions can be obtained by
- ** means of ::vl_mser_get_regions().
- **
- ** Optionally, it is possible to fit N-dimensional ellipsoids to the
- ** MSERs by calling ::vl_mser_fit_ell(). The number of ellipsoids @c
- ** K fitted can be retrieved by ::vl_mser_get_num_ell(). The number
- ** of degrees of freedom @c D of an N-dimensional ellipsoids is
- ** returned by ::vl_mser_get_dof_ell().
- **
- ** A filter should be disposed by ::vl_mser_delete().
- **
- ** @section internals Internals
- **
- ** This filter implements the MSER detector.
+ ** @sa mser
  **/
 
 struct _VlMserFilt
@@ -302,29 +362,32 @@ struct _VlMserFilt
   vl_uint           *mer ;     /**< maximally stalbe extremal regions       */
   int                ner ;     /**< number of extremal regions              */
   int                nmer ;    /**< number of maximally stable extr. reg.   */
+  int                rer ;     /**< size of er buffer                       */
+  int                rmer ;    /**< size of mer buffer                      */
   /*@}*/
 
   /** @name Ellipsoids fitting */
   /*@{*/
   vl_single         *acc ;     /**< moment accumulator.                    */
   vl_single         *ell ;     /**< ellipsoids list.                       */
-  int                ell_sz ;  /**< reserved space in ell. list            */
+  int                rell ;    /**< size of ell buffer                     */
   int                nell ;    /**< number of ellipsoids extracted         */
   int                dof ;     /**< number of dof of ellipsoids.           */
 
   /*@}*/
 
-  double variation ;
-
   /** @name Configuration */
   /*@{*/
   vl_bool   verbose ;          /**< be verbose                             */
-  vl_bool   cleanup_big ;      /**< cleanup regions too big                */
-  vl_bool   cleanup_small ;    /**< cleanup regions too small              */
-  vl_bool   cleanup_bad ;      /**< cleanup regions too bad                */
-  vl_bool   cleanup_dup ;      /**< cleanup regions too similar to others  */
-  int       delta ;            /**< DELTA                                  */
+  int       delta ;            /**< delta filter paramter                  */
+  double    epsilon ;          /**< epsilon filter parameter               */
+  double    max_area ;         /** badness test parameter                  */
+  double    min_area ;         /** badness test parameter                  */
+  double    max_var ;          /** badness test parameter                  */
+  vl_bool   no_dups  ;         /** badness test parameter                  */
   /*@}*/
+
+  VlMserStats stats ;          /** run statistic                           */
 } ;
 
 /* ----------------------------------------------------------------- */
@@ -338,7 +401,6 @@ vl_mser_get_delta (VlMserFilt const *f)
   return f-> delta ;
 }
 
-/* ----------------------------------------------------------------- */
 /** @brief Set delta
  ** @param f MSER filter.
  ** @return value of @c delta.
@@ -350,25 +412,98 @@ vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Get variation
+/** @brief Get epsilon
  ** @param f MSER filter.
- ** @return value of @c delta.
+ ** @return value of @c epsilon.
  **/
 static VL_INLINE double
-vl_mser_get_variation (VlMserFilt const *f) 
+vl_mser_get_epsilon (VlMserFilt const *f) 
 {
-  return f-> variation ;
+  return f-> epsilon ;
+}
+
+/** @brief Get epsilon
+ ** @param f MSER filter.
+ ** @return value of @c epsilon.
+ **/
+static VL_INLINE void
+vl_mser_set_epsilon (VlMserFilt *f, double x) 
+{
+  f-> epsilon = x ;
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Get variation
+/** @brief Get statistics
  ** @param f MSER filter.
- ** @return value of @c delta.
+ ** @return statistics.
+ **/
+static VL_INLINE VlMserStats const*
+vl_mser_get_stats (VlMserFilt const *f) 
+{
+  return & f-> stats ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get maximum region area
+ ** @param f MSER filter.
+ ** @return maximum region area.
+ **/
+static VL_INLINE double
+vl_mser_get_max_area (VlMserFilt const *f) 
+{
+  return f-> max_area ;
+}
+
+/** @brief Set maximum region area
+ ** @param f MSER filter.
+ ** @param x maximum region area.
  **/
 static VL_INLINE void
-vl_mser_set_variation (VlMserFilt *f, double x) 
+vl_mser_set_max_area (VlMserFilt *f, double x) 
 {
-  f-> variation = x ;
+  f-> max_area = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get minimum region area
+ ** @param f MSER filter.
+ ** @return minimum region area.
+ **/
+static VL_INLINE double
+vl_mser_get_min_area (VlMserFilt const *f) 
+{
+  return f-> min_area ;
+}
+
+/** @brief Set minimum region area
+ ** @param f MSER filter.
+ ** @param x minimum region area.
+ **/
+static VL_INLINE void
+vl_mser_set_min_area (VlMserFilt *f, double x) 
+{
+  f-> min_area = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get maximum region variation
+ ** @param f MSER filter.
+ ** @return maximum region variation.
+ **/
+static VL_INLINE double
+vl_mser_get_max_var (VlMserFilt const *f) 
+{
+  return f-> max_var ;
+}
+
+/** @brief Set maximum region variation
+ ** @param f MSER filter.
+ ** @return maximum region variation.
+ **/
+static VL_INLINE void
+vl_mser_set_max_var (VlMserFilt *f, double x) 
+{
+  f-> max_var = x ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -382,7 +517,6 @@ vl_mser_get_regions (VlMserFilt const* f)
   return f-> mer ;
 }
 
-/* ----------------------------------------------------------------- */
 /** @brief Get number of maximally stable extremal regions
  ** @param f MSER filter.
  ** @return number of MSERs.
@@ -394,25 +528,24 @@ vl_mser_get_regions_num (VlMserFilt const* f)
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Get number of degrees of freedom of ellipsoids
+/** @brief Get remove duplicates switch
  ** @param f MSER filter.
- ** @return number of degrees of freedom.
+ ** @return duplicates switch.
  **/
-static VL_INLINE vl_uint
-vl_mser_get_ell_dof (VlMserFilt const* f)
+static VL_INLINE vl_bool 
+vl_mser_get_no_dups (VlMserFilt const* f)
 {
-  return f-> dof ;
+  return f-> no_dups ;
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Get number of ellipsoids
+/** @brief Set duplicates switch
  ** @param f MSER filter.
- ** @return number of ellipsoids
+ ** @param duplicates switch.
  **/
-static VL_INLINE vl_uint
-vl_mser_get_ell_num (VlMserFilt const* f)
+static VL_INLINE void
+vl_mser_set_no_dups (VlMserFilt *f, vl_bool x)
 {
-  return f-> nell ;
+  f-> no_dups = x  ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -424,6 +557,26 @@ static VL_INLINE vl_single const *
 vl_mser_get_ell (VlMserFilt const* f)
 {
   return f-> ell ;
+}
+
+/** @brief Get number of degrees of freedom of ellipsoids
+ ** @param f MSER filter.
+ ** @return number of degrees of freedom.
+ **/
+static VL_INLINE vl_uint
+vl_mser_get_ell_dof (VlMserFilt const* f)
+{
+  return f-> dof ;
+}
+
+/** @brief Get number of ellipsoids
+ ** @param f MSER filter.
+ ** @return number of ellipsoids
+ **/
+static VL_INLINE vl_uint
+vl_mser_get_ell_num (VlMserFilt const* f)
+{
+  return f-> nell ;
 }
 
 /* VL_MSER */

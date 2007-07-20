@@ -323,7 +323,7 @@ main(int argc, char **argv)
     }
 
     if (frm.active) {
-      vl_mser_fit_ell (filt) ;
+      vl_mser_ell_fit (filt) ;
 
       nframes = vl_mser_get_ell_num (filt) ;
       dof     = vl_mser_get_ell_dof (filt) ;
