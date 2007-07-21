@@ -29,7 +29,8 @@ uMexOption options [] = {
   {"PeakTresh",    1,   opt_peak_tresh    },
   {"EdgeTresh",    1,   opt_edge_tresh    },
   {"Orientations", 0,   opt_orientations  },
-  {"Verbose",      0,   opt_verbose       }
+  {"Verbose",      0,   opt_verbose       },
+  {0,              0,   0                 }
 } ;
 
 /** @brief Transpose desriptor
@@ -118,7 +119,6 @@ mexFunction(int nout, mxArray *out[],
       if (!uIsRealScalar(optarg) || (O = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Octaves' must be a positive integer.") ;
       }
-      O = *mxGetPr(optarg) ;
       break ;
       
     case opt_levels :

@@ -6,8 +6,6 @@
 
 /* AUTORIGHTS */
 
-#define VL_MSER_DRIVER_VERSION_STRING "alpha-1"
-
 #include "generic-driver.h"
 
 #include <vl/generic.h>
@@ -29,36 +27,50 @@ char const help_message [] =
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
   " --output -o     Specify output file\n"
-  " --pivot         Specify pivots file\n"
-  " --frame         Specify frames file\n"
+  " --pivots        Specify pivots file\n"
+  " --frames        Specify frames file\n"
   " --meta          Specify meta file\n"
-  " --no-frame      Do not output frames\n"
-  " --delta -d      MSER stability\n"
+  " --delta -d      Specify MSER delta paramter\n"
+  " --epsilon -e    Specify MSER epsilon parameter\n"
+  " --no-dups       Remove duplicate\n"
+  " --dups          Keep duplicates\n"
+  " --max-area      Specify maximum region (relative) area\n"
+  " --min-area      Specify minimum region (relative) area\n"
+  " --max-variation Specify maximum absolute region stability\n"
   "\n" ;
 
 /* ----------------------------------------------------------------- */
 /* long options codes */
 enum { 
   opt_pivot    = 1000, 
-  opt_frame, 
-  opt_no_frame,
+  opt_frame,
   opt_meta, 
-  opt_version 
+  opt_version,
+  opt_no_dups,
+  opt_dups,
+  opt_max_area,
+  opt_min_area,
+  opt_max_var
 } ;
 
 /* short options */
-char const opts [] = "vhd:" ;
+char const opts [] = "vhd:e:" ;
 
 /* long options */
 struct option const longopts [] = {
   { "verbose",         no_argument,            0,          'v'          },
   { "help",            no_argument,            0,          'h'          },
   { "delta",           required_argument,      0,          'd'          },
-  { "pivot",           optional_argument,      0,          opt_pivot    },
-  { "frame",           optional_argument,      0,          opt_frame    },
-  { "no-frame",        no_argument,            0,          opt_no_frame },
+  { "epsilon",         required_argument,      0,          'e'          },
+  { "pivots",          optional_argument,      0,          opt_pivot    },
+  { "frames",          optional_argument,      0,          opt_frame    },
   { "meta",            optional_argument,      0,          opt_meta     },
   { "version",         no_argument,            0,          opt_version  },
+  { "no-dups",         no_argument,            0,          opt_no_dups  },
+  { "dups",            no_argument,            0,          opt_dups     },
+  { "max-area",        required_argument,      0,          opt_max_area },
+  { "min-area",        required_argument,      0,          opt_min_area },
+  { "max-variation",   required_argument,      0,          opt_max_var  },
   { 0,                 0,                      0,          0            }
 } ;
 
@@ -70,14 +82,20 @@ int
 main(int argc, char **argv)
 {  
   /* algorithm parameters */ 
-  double   delta  = 2.0 ;  
+  double   delta    = -1 ;
+  double   epsilon  = -1 ;
+  int      no_dups  = -1 ;
+  double   max_area = -1 ;
+  double   min_area = -1 ;
+  double   max_var  = -1 ;
+
   vl_bool  err    = VL_ERR_OK ;
   char     err_msg [1024] ;
   int      n ;
   int      exit_code = 0 ;
   int      verbose = 0 ;
 
-  VlFileMeta frm  = {1, "%.frame", VL_PROT_ASCII, "", 0} ;
+  VlFileMeta frm  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
   VlFileMeta piv  = {0, "%.piv",   VL_PROT_ASCII, "", 0} ;
   VlFileMeta met  = {0, "%.meta",  VL_PROT_ASCII, "", 0} ;
   
@@ -99,57 +117,83 @@ main(int argc, char **argv)
     /* process options */
     switch (ch) {
 
+      /* .......................................................... */
     case '?' :
-      /* unkown option ............................................ */
       ERR("Invalid option '%s'.", argv [optind - 1]) ;
       break ;
-   
+      
     case ':' :
-      /* missing argument ......................................... */
       ERR("Missing mandatory argument for option '%s'.", 
           argv [optind - 1]) ;
       break ;
-   
+      
     case 'h' :
-      /* --help ................................................... */
       printf (help_message, argv [0]) ;
       exit (0) ;
       break ;
 
     case 'v' :
-      /* --verbose ................................................ */
       ++ verbose ;
       break ;
       
-    case 'd' :
-      /* --delta .................................................. */
+
+      /* .......................................................... */
+    case 'd' :      
       n = sscanf (optarg, "%lf", &delta) ;
       if (n == 0 || delta < 0)
         ERR("The argument of '%s' must be a non-negative number.",
             argv [optind - 1]) ;
       break ;
+
+    case 'e' :
+      n = sscanf (optarg, "%lf", &epsilon) ;
+      if (n == 0 || epsilon < 0)
+        ERR("The argument of '%s' must be a non-negative number.",
+            argv [optind - 1]) ;
+      break ;
+
+      /* ........................................................... */
+    case opt_max_area :
+      n = sscanf (optarg, "%lf", &max_area) ;
+      if (n == 0 || max_area < 0 || max_area > 1)
+        ERR("max-area argument must be in the [0,1] range.") ;
+      break ;
+
+    case opt_min_area :
+      n = sscanf (optarg, "%lf", &min_area) ;
+      if (n == 0 || min_area < 0 || min_area > 1)
+        ERR("min-area argument must be in the [0,1] range.") ;
+      break ;
+
+    case opt_max_var :
+      n = sscanf (optarg, "%lf", &max_var) ;
+      if (n == 0 || max_var < 0 || max_var > 1)
+        ERR("max-variation argument must be non-negative.") ;
+      break ;      
       
+      /* ........................................................... */
+    case opt_no_dups :
+      no_dups = 1 ;
+      break ;
+      
+    case opt_dups :
+      no_dups = 0 ;
+      break ;
+      
+      /* ........................................................... */
     case opt_frame :
-      /* --frame  /................................................ */
       err = vl_file_meta_parse (&frm, optarg) ;
       if (err) 
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
-    case opt_no_frame :
-      /* --no-frame ............................................... */
-      frm.active = 0 ;
-      break ;
- 
     case opt_pivot :
-      /* --pivot .................................................. */
       err = vl_file_meta_parse (&piv, optarg) ;
       if (err) 
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
     case opt_meta :
-      /* --meta ................................................... */
       err = vl_file_meta_parse (&met, optarg) ;      
       if (err) 
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
@@ -158,9 +202,9 @@ main(int argc, char **argv)
         ERR("meta file supports only ASCII protocol") ;
       break ;
 
+      /* .......................................................... */
     case 0 :
     default :
-      /* should not get here ...................................... */
       assert (0) ;
       break ;
     }
@@ -177,7 +221,12 @@ main(int argc, char **argv)
   /* parse other arguments (filenames) */
   argc -= optind ;
   argv += optind ;
-  
+
+  /* make sure at least one file */
+  if (piv.active == 0 && frm.active == 0) {
+    frm.active = 1 ;
+  }
+     
   if (verbose > 1) {
     printf("mser: frames output\n") ;
     printf("mser:    active   %d\n",  frm.active ) ;
@@ -308,7 +357,24 @@ main(int argc, char **argv)
       snprintf(err_msg, sizeof(err_msg), 
               "Could not initialize MSER filter.") ;
       goto done ;
-    } 
+    }
+
+    if (delta    >= 0) vl_mser_set_delta         (filt, delta   ) ;
+    if (epsilon  >= 0) vl_mser_set_epsilon       (filt, epsilon ) ;
+    if (max_area >= 0) vl_mser_set_max_area      (filt, max_area) ;
+    if (min_area >= 0) vl_mser_set_min_area      (filt, min_area) ;
+    if (max_var  >= 0) vl_mser_set_max_var       (filt, max_var ) ;
+    if (no_dups  >= 0) vl_mser_set_no_dups       (filt, no_dups ) ;
+
+    if (verbose) {
+      printf("mser: filter settings:\n") ;
+      printf("mser:  delta    = %d\n", vl_mser_get_delta    (filt) ) ;
+      printf("mser:  epsilon  = %g\n", vl_mser_get_epsilon  (filt) ) ;
+      printf("mser:  max_area = %g\n", vl_mser_get_max_area (filt) ) ;
+      printf("mser:  min_area = %g\n", vl_mser_get_min_area (filt) ) ;
+      printf("mser:  max_var  = %g\n", vl_mser_get_max_var  (filt) ) ;
+      printf("mser:  no_dups  = %d\n", vl_mser_get_no_dups  (filt) ) ;
+    }
 
     vl_mser_process (filt, (vl_mser_pix*) data) ;
 

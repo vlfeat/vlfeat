@@ -4,18 +4,55 @@
  **/
 
 #include "mexutils.h"
+
 #include <vl/mser.h>
+
+#include <assert.h>
+
+enum {
+  opt_delta = 0,
+  opt_epsilon,
+  opt_max_area,
+  opt_min_area,
+  opt_max_var,
+  opt_dups,
+  opt_no_dups,
+  opt_verbose
+} ;
+
+uMexOption options [] = {
+  {"Delta",               1,   opt_delta    },
+  {"Epsilon",             1,   opt_epsilon  },
+  {"MaxArea",             1,   opt_max_area },
+  {"MinArea",             1,   opt_min_area },
+  {"MaxVariation",        1,   opt_max_var  },
+  {"Dups",                0,   opt_dups     },
+  {"NoDups",              0,   opt_no_dups  },
+  {"Verbose",             0,   opt_verbose  },
+  {0,                     0,   0            }
+} ;
+
 
 /** @brief MEX entry point */
 void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {
-  enum {IN_I=0, IN_DELTA} ;
+  enum {IN_I=0, IN_END} ;
   enum {OUT_PIVOTS=0, OUT_FRAMES} ;
 
-  int verbose = 1 ;
-  double delta ;   
+  int                verbose = 0 ;
+  int                opt ;
+  int                next = IN_END ;
+  mxArray const     *optarg ;
+
+  /* algorithm parameters */ 
+  double   delta    = -1 ;
+  double   epsilon  = -1 ;
+  int      no_dups  = -1 ;
+  double   max_area = -1 ;
+  double   min_area = -1 ;
+  double   max_var  = -1 ;
 
   int nel ;              
   int ndims ;            
@@ -26,9 +63,7 @@ mexFunction(int nout, mxArray *out[],
   /** -----------------------------------------------------------------
    **                                               Check the arguments
    ** -------------------------------------------------------------- */
-  if (nin != 2) {
-    mexErrMsgTxt("Two arguments required.") ;
-  } else if (nout > 4) {
+  if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
   
@@ -36,19 +71,69 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("I must be of class UINT8") ;
   }
 
-  if(!uIsRealScalar(in[IN_DELTA])) {
-    mexErrMsgTxt("DELTA must be a real scalar") ;
-  }
-  delta = *mxGetPr(in[IN_DELTA])  ;
-  if(delta < 0.0) {
-    mexErrMsgTxt("DELTA must be non-negative") ;
-  }
-
   /* get dimensions */
   nel   = mxGetNumberOfElements(in[IN_I]) ;
   ndims = mxGetNumberOfDimensions(in[IN_I]) ;
   dims  = mxGetDimensions(in[IN_I]) ;
   data  = mxGetData(in[IN_I]) ;
+
+  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+    switch (opt) {
+
+    case opt_verbose :
+      ++ verbose ;
+      break ;
+
+    case opt_delta :
+      if (!uIsRealScalar(optarg) || (delta = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'Delta' must be non-negative.") ;
+      }
+      break ;
+
+    case opt_epsilon :
+      if (!uIsRealScalar(optarg) || (epsilon = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'Epsilon' must be non-negative.") ;
+      }
+      break ;
+
+    case opt_max_area : 
+      if (!uIsRealScalar(optarg)           || 
+          (max_area = *mxGetPr(optarg)) < 0 ||
+          max_area > 1) {
+        mexErrMsgTxt("'MaxArea' must be in the range [0,1].") ;
+      }
+      break ;
+
+    case opt_min_area : 
+      if (!uIsRealScalar(optarg)           || 
+          (min_area = *mxGetPr(optarg)) < 0 ||
+          min_area > 1) {
+        mexErrMsgTxt("'MinArea' must be in the range [0,1].") ;
+      }
+      break ;
+
+    case opt_max_var : 
+      if (!uIsRealScalar(optarg)           || 
+          (max_var = *mxGetPr(optarg)) < 0 ||
+          max_var > 1) {
+        mexErrMsgTxt("'MaxVariation' must be in the range [0,1].") ;
+      }
+      break ;
+
+    case opt_dups : 
+      no_dups = 0 ;
+      break ;
+
+    case opt_no_dups : 
+      no_dups = 1 ;
+      break ;
+      
+    default :
+        assert(0) ;
+        break ;
+    }
+  }
+
 
   /* -----------------------------------------------------------------
    *                                                     Run algorithm
@@ -64,7 +149,12 @@ mexFunction(int nout, mxArray *out[],
     /* new filter */
     filt = vl_mser_new (ndims, dims) ;
 
-    vl_mser_set_delta (filt, delta) ;
+    if (delta    >= 0) vl_mser_set_delta         (filt, delta   ) ;
+    if (epsilon  >= 0) vl_mser_set_epsilon       (filt, epsilon ) ;
+    if (max_area >= 0) vl_mser_set_max_area      (filt, max_area) ;
+    if (min_area >= 0) vl_mser_set_min_area      (filt, min_area) ;
+    if (max_var  >= 0) vl_mser_set_max_var       (filt, max_var ) ;
+    if (no_dups  >= 0) vl_mser_set_no_dups       (filt, no_dups ) ;
 
     if (verbose) {
       mexPrintf("mser: filter settings:\n") ;
@@ -73,6 +163,7 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("mser:  max_area = %g\n", vl_mser_get_max_area (filt) ) ;
       mexPrintf("mser:  min_area = %g\n", vl_mser_get_min_area (filt) ) ;
       mexPrintf("mser:  max_var  = %g\n", vl_mser_get_max_var  (filt) ) ;
+      mexPrintf("mser:  no_dups  = %d\n", vl_mser_get_no_dups  (filt) ) ;
     }
     
     /* process image */

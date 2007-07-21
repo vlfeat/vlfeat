@@ -172,7 +172,17 @@ typedef vl_uint8 vl_mser_pix ;
 #define VL_MSER_PIX_MAXVAL 256
 
 
-/** @brief MSER Filter */
+/** @brief MSER Filter 
+ **
+ ** The MSER filter computes the Maximally Stable Extremal Regions of
+ ** an image.
+ **
+ ** The filter is designed as an <em>opaque</em> object: one should
+ ** avoid to access directly the data fields and use the appropriate
+ ** access functions instead.
+ **
+ ** @sa mser
+ **/
 typedef struct _VlMserFilt VlMserFilt ;
 
 /** @brief MSER filter statistics */
@@ -236,12 +246,11 @@ static void  vl_mser_set_max_var   (VlMserFilt *filt, double      x) ;
 /** @} */
 
 
-/* --------------------------------------------------------------------
- *                                      Inline functions implementation
- * ----------------------------------------------------------------- */
+/* ====================================================================
+ *                                                   INLINE DEFINITIONS
+ * ================================================================== */
 
-/** @brief MSER accumulator data type 
- ** @internal
+/** @internal @brief MSER accumulator data type 
  **
  ** This is a large integer type. It should be large enough to contain
  ** a number equal to the area (volume) of the image by the image
@@ -250,12 +259,11 @@ static void  vl_mser_set_max_var   (VlMserFilt *filt, double      x) ;
  **/
 typedef vl_single vl_mser_acc ;
 
-/** @brief Basic region flag: null region @internal */
+/** @internal @brief Basic region flag: null region */
 #define VL_MSER_VOID_NODE ((1ULL<<32) - 1)
 
 /* ----------------------------------------------------------------- */
-/** @brief MSER: basic region
- ** @internal
+/** @internal @brief MSER: basic region (declaration)
  **
  ** Extremal regions and maximally stable extremal regions are
  ** instances of image regions.
@@ -278,18 +286,19 @@ typedef vl_single vl_mser_acc ;
  ** regions are extremal regions however; if the region is NOT
  ** extremal, this field is set to .... 
  **/
-
-typedef struct _VlMserReg
+struct _VlMserReg
 {
   vl_uint parent ;   /**< points to the parent region.            */
   vl_uint shortcut ; /**< points to a region closer to a root.    */
   vl_uint height ;   /**< region height in the forest.            */
   vl_uint area ;     /**< area of the region.                     */
-} VlMserReg ;
+} ;
+
+/** @internal @brief MSER: basic region */
+typedef struct _VlMserReg VlMserReg ;
 
 /* ----------------------------------------------------------------- */
-/** @brief MSER: extremal region
- ** @internal
+/** @internal @brief MSER: extremal region
  **
  ** Extermal regions (ER) are extracted from the region forest. Each
  ** region is represented by an instance of this structure. The
@@ -313,8 +322,7 @@ typedef struct _VlMserReg
  ** VlMserExtrReg::max_stable is a flag signaling wether this extremal
  ** region is also maximally stable.
  **/
-
-typedef struct _VlMserExtrReg
+struct _VlMserExtrReg
 {
   int          parent ;     /**< index of the parent region                   */
   int          index ;      /**< index of pivot pixel                         */
@@ -323,25 +331,17 @@ typedef struct _VlMserExtrReg
   vl_uint      area ;       /**< area of the region                           */
   vl_single    variation ;  /**< rel. area variation                          */
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
-} VlMserExtrReg ;
+} ;
+
+/** @internal @brief MSER: etremal region */
+typedef struct _VlMserExtrReg VlMserExtrReg ;
 
 /* ----------------------------------------------------------------- */
-/** @brief MSER filter
- **
- ** The MSER filter computes the Maximally Stable Extremal Regions of
- ** an image.
- **
- ** The filter is designed as an <em>opaque</em> object: one should
- ** avoid to access directly the data fields and use the appropriate
- ** access functions instead.
- **
- ** @sa mser
- **/
-
+/** @internal @brief MSER filter */
 struct _VlMserFilt
 {  
   
-  /** @name Image data and meta data */
+  /** @name Image data and meta data @internal */
   /*@{*/
   int                ndims ;   /**< number of dimensions                    */
   int               *dims ;    /**< dimensions                              */
