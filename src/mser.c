@@ -6,6 +6,8 @@
 
 /* AUTORIGHTS */
 
+#define VL_MSER_DRIVER_VERSION 0.1 
+
 #include "generic-driver.h"
 
 #include <vl/generic.h>
@@ -135,7 +137,13 @@ main(int argc, char **argv)
     case 'v' :
       ++ verbose ;
       break ;
-      
+
+    case opt_version :
+      printf ("sift: driver %s; libvl %s\n", 
+              VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
+              vl_get_version_string()) ;
+      exit(0) ;
+      break ;
 
       /* .......................................................... */
     case 'd' :      
@@ -202,7 +210,7 @@ main(int argc, char **argv)
         ERR("meta file supports only ASCII protocol") ;
       break ;
 
-      /* .......................................................... */
+      /* .......................................................... */      
     case 0 :
     default :
       assert (0) ;

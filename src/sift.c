@@ -6,7 +6,7 @@
 
 /* AUTORIGHTS */
 
-#define VL_SIFT_DRIVER_VERSION_STRING "beta-0"
+#define VL_SIFT_DRIVER_VERSION 0.1
 
 #include "generic-driver.h"
 
@@ -229,7 +229,7 @@ main(int argc, char **argv)
 
     case opt_version :
       printf ("sift: driver %s; libvl %s\n", 
-              VL_SIFT_DRIVER_VERSION_STRING,
+              VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
               vl_get_version_string()) ;
       exit(0) ;
       

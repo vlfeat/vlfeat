@@ -76,7 +76,7 @@ $(BINDIR)/.lib_bits/%.o : vl/%.c $(BINDIR)/.lib_bits/.stamp
 
 $(BINDIR)/.lib_bits/%.d : vl/%.c $(BINDIR)/.lib_bits/.stamp
 	@echo "   D  '$<' ==> '$@'"
-	@cc -M -MT 'vl/$*.o vl/$*.d' $< -MF $@
+	@cc -M -MT '$(BINDIR)/.lib_bits/$*.o $(BINDIR)/.lbi_bits/$*.d' $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
 	@echo "   A  '$@'"

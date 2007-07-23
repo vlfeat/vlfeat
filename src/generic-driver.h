@@ -40,8 +40,7 @@ typedef struct _VlFileMeta VlFileMeta ;
 /** @brief Parse argument for file meta information
  **
  ** @param optarg  argument to parse.
- ** @param out     ::vl_driver_out structure to fill.
- ** @param int     error code.
+ ** @param fm      structure to initalize.
  **
  ** The function parses the string @a optarg to fill the structure @a
  ** fm. @a optarg is supposed to be composed of two parts: a file

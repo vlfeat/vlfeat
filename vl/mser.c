@@ -1,10 +1,187 @@
-/** @file     mser.c
+/** @internal
+ ** @file     mser.c
  ** @brief    Maximally Stable Extremal Regions (MSER) - Definition
  ** @author   Andrea Vedaldi
- ** @internal
  **/
 
 /* AUTORIGHTS */
+
+/** @file mser.h
+ **
+ ** @section mser Maximally Stable Extremal Regions Overview
+ **
+ ** Running the MSER filter usually involves the following steps:
+ **
+ ** - Initialize the MSER filter by ::vl_mser_new(). The
+ **   filter can be reused for images of the same size.
+ ** - Compute the MSERS by ::vl_mser_process().
+ ** - Optionally fit ellipsoids to the MSERs by  ::vl_mser_ell_fit().
+ ** - Retrieve the results by ::vl_mser_get_regions() (and optionally ::vl_mser_get_ell()).
+ ** - Optionally retrieve filter statistics by ::vl_mser_get_stats().
+ ** - Delete the MSER filter by ::vl_mser_delete().
+ **
+ ** @subsection mser-definition MSER definition
+ **
+ ** An extremal region @f$R_l@f$ of an image is a connected component
+ ** of the level set @f$S_l = \{ x : I(x) \leq l \}@f$.
+ **
+ ** @image html mser-er.png
+ **
+ ** For each intenstiy @f$l@f$, one has multiple disjoint extremal
+ ** regions in the level set @f$S_l@f$. Let @f$l@f$ span a finite
+ ** number of values @f$\mathcal{L}=\{0,\dots,M-1\}@f$ (a sampling of
+ ** the image range).  One obtains a family of regions @f$R_l@f$; by
+ ** connecting two regions @f$R_l@f$and @f$R_{l+1}@f$ if, and only if,
+ ** @f$R_l\subset R_{l+1}@f$, regions form a tree:
+ ** 
+ ** @image html mser-tree.png
+ **
+ ** The <em>maximally stable extremal regions</em> are extremal
+ ** regions which satisfy a stability criterion. Here we use a
+ ** criterion which is similar but not identical to the original
+ ** paper. This definition is somewhat simpler both to understand and
+ ** code (it also runs faster).
+ **
+ ** Let @f$B(R_l)=(R_l,R_{l+1},\dots,R_{l+\Delta})@f$ be the branch of
+ ** the tree rooted at @f$R_l@f$.  We associate to the branch the
+ ** (in)stability score
+ **
+ ** @f[ 
+ **   v(R_l) = \frac{|R_{l+\Delta} - R_l|}{|R_l|}.
+ ** @f]
+ **
+ ** The score is low if the regions along the branch have similar area
+ ** (and thus similar shape). We aim to select maximally stable
+ ** branches; then a maximally stable region is just a representative
+ ** region selected from a maximally stable branch (for simplicity we
+ ** select @f$R_l@f$, but one could choose for example
+ ** @f$R_{l+\Delta/2}@f$).
+ ** 
+ ** Roughly speaking, a branch is maximally stable if it is a local
+ ** minimum of the (in)stability score. More accurately, we start by
+ ** assuming that all branches are maximally stable. Then we consider
+ ** each branch @f$B(R_{l})@f$ and its parent branch
+ ** @f$B(R_{l+1}):R_{l+1}\supset R_l@f$. If the two representative
+ ** regions @f$B(R_{l})@f$ and @f$B(R_{l+1})@f$ are close (in term of
+ ** shape), we mark as unstable the one with higher (in)stability
+ ** score. Formally:
+ **
+ ** - if @f$|R_{l+1}-R_{l}|/|R_l|<\epsilon@f$
+ **   - if @f$v(R_l)<v(R_{l+1})@f$, mark @f$R_{l+1}@f$ as unstable;
+ **   - otherwise, mark @f$R_l@f$ as unstable.
+ **
+ ** This criterion selects among nearby regions the one that are more
+ ** stable. We optionally refine the selection by running some or all
+ ** of the following tests:
+ **
+ ** - @f$a_- \leq |R_{l}|/|R_{\infty}| \leq a_+@f$: exclude extremal
+ **   regions too small or too big (@f$|R_{\infty}|@f$ is the area of
+ **   the image).
+ **
+ ** - @f$v(R_{l}) < v_+@f$: test for absolute stability.
+ **
+ ** - For any two regions @f$R_l\subset R_{l+q}@f$ whose
+ **   relative area variation @f$|R_{l+q} - R_l|/|R_l|@f$ is
+ **   below a treshold, mark @f$R_{l}@f$ as unstable: remove duplicated regions.
+ **
+ **  <table>
+ **  <tr>
+ **   <td>parameter</td>
+ **   <td>alt. name</td>
+ **   <td>standard value</td>
+ **   <td>set by</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$\Delta@f$</td>
+ **    <td>@c delta</td>
+ **    <td>5</td>
+ **    <td>::vl_mser_set_delta()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$\epsilon@f$</td>
+ **    <td>@c epsilon</td>
+ **    <td>0.2</td>
+ **    <td>::vl_mser_set_epsilon()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$a_+@f$</td>
+ **    <td>@c max_area</td>
+ **    <td>0.75</td>
+ **    <td>::vl_mser_set_max_area()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$a_-@f$</td>
+ **    <td>@c min_area</td>
+ **    <td>3.0/@f$|R_\infty|@f$</td>
+ **    <td>::vl_mser_set_min_area()</td>
+ **  </tr>
+ **  <tr>
+ **    <td>@f$v_+@f$</td>
+ **    <td>@c max_var</td>
+ **    <td>0.25</td>
+ **    <td>::vl_mser_set_max_var()</td>
+ **  </tr>
+ **  <tr>
+ **    <td></td>
+ **    <td>@c no_dups</td>
+ **    <td>@c true (1)</td>
+ **    <td>::vl_mser_set_no_dups()</td>
+ **  </tr>
+ ** </table>
+ **
+ ** @subsection mser-vol Volumetric images
+ **
+ ** The code supports images of arbitrary dimension. For instance, it
+ ** is possible to find the MSER regions of volumetric images or time
+ ** sequences. See ::vl_mser_new() for further details.s
+ **
+ ** @subsection mser-ell Ellipsoids
+ **
+ ** Usually extremal regions are returned as a set of ellipsoids
+ ** fitted to the actual regions (which have arbirary shape). The fit
+ ** is done by calculating the mean and variance of the pixels
+ ** composing the region:
+ ** @f[
+ ** \mu_l = \frac{1}{|R_l|}\sum_{x\in R_l}x,
+ ** \qquad
+ ** \Sigma_l = \frac{1}{|R_l|}\sum_{x\in R_l} (x-\mu_l)^\top(x-\mu_l)
+ ** @f]
+ ** Ellipsoids are fitted by ::vl_mser_ell_fit().  Notice that for a
+ ** <em>n</em> dimensional image, the mean has <em>n</em> components
+ ** and the variance has <em>n(n+1)/2</em> independent components. The
+ ** total number of componetns is obtained by ::vl_mser_get_ell_dof()
+ ** and the total number of fitted ellipsoids by
+ ** ::vl_mser_get_ell_num(). A matrix with an ellipsoid per column is
+ ** returned by ::vl_mser_get_ell(). The column is the stacking of the
+ ** mean and of the independet compontents of the variance, in the
+ ** order <em>(1,1),(1,2),..,(1,n), (2,2),(2,3)...</em>. In the
+ ** caluclations, the pixel coordinate @f$x=(x_1,...,x_n)@f$ use the
+ ** stanadard index order and ranges.
+ **
+ ** @subsection mser-algo Algorithm
+ **
+ ** The algorithm is quite efficient. While some details may be
+ ** tricky, the overall idea is easy to grasp.
+ **
+ ** - Pixels are sorted by increasing intensity.
+ ** - Pixels are added to a forest by increasing intensity. The forest has the
+ **   followin properties:
+ **   - All the descendent of a certain pixels are subset of an extremal region.
+ **   - All the extremal regions are the descendents of some pixels.
+ ** - Extremal regions are extracted from the region tree and the extremal regions tree is
+ **   calculated.
+ ** - Stable regions are marked.
+ ** - Duplicates and other bad regions are removed.
+ **
+ ** @remark The extremal region tree which is calculated is a subset
+ ** of the actual extremal region tree. In particular, it does not
+ ** contain redundant entries extremal regions that coincde as
+ ** sets. So, for example, in the calculated extremal region tree, the
+ ** parent @f$R_q@f$ of an extremal region @f$R_{l}@f$ may or may
+ ** <em>not</em> correspond to @f$R_{l+1}@f$, depending wether
+ ** @f$q\leq l+1@f$ or not. These subtelties are important when
+ ** caluclating the stability tests.
+ **/
 
 #include "mser.h"
 
@@ -686,10 +863,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
  **
  ** @param f MSER filter.
  **
- ** The function fits ellipsoids to the extracted maximally stable
- ** extremal regions. It should be called after computing the
- ** maximally stable extremal regions by :: vl_mser_process() and
- ** before retrieving the ellipsoids by means of ::vl_mser_get_ell().
+ ** @sa @ref mser-ell
  **/
 
 void
