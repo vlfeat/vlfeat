@@ -37,10 +37,28 @@
 #define VL_GENERIC_H
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "alpha-1"
+#define VL_VERSION_STRING "0.1"
 
 /** @brief Inline function declaration */
 #define VL_INLINE __inline__
+
+/** @internal @brief Stringify argument helper
+ ** @see ::VL_STRINGIFY
+ **/
+#define VL_STRINGIFY_(x) # x
+
+/** @brief Stringify macro
+ **
+ ** @param x macro to stringify
+ **
+ ** For instance, the following fragment
+ ** @code
+ ** #define A x.y.z
+ ** printf(VL_STRINGIFY(A)) ;
+ ** @endcode
+ ** will print the string @c x.y.z.
+ **/
+#define VL_STRINGIFY(x) VL_STRINGIFY_(x)
 
 /** ---------------------------------------------------------------- */
 /** @name Atomic data types
@@ -170,6 +188,7 @@ static VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
 /** @brief Get endianness
  ** @return @c ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN depending on the
  ** host endianness.
+ ** @sa @ref generic-endian
  **/
 
 static VL_INLINE int
@@ -183,7 +202,7 @@ vl_get_endianness ()
  **
  ** @param dst destination 8-byte buffer.
  ** @param src source 8-byte bufffer.
- ** @see generic-endianness.
+ ** @see @ref generic-endian.
  **/
 
 static VL_INLINE void
@@ -217,7 +236,7 @@ vl_adapt_endianness_8 (void *dst, void* src)
  **
  ** @param dst destination 4-byte buffer.
  ** @param src source 4-byte bufffer.
- ** @see generic-endianness.
+ ** @sa @ref generic-endian
  **/
 
 static VL_INLINE void

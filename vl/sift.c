@@ -15,7 +15,7 @@
 #include <string.h>
 #include <math.h>
 
-/** @biref Use bilinear interp. to compute orientations @internal */
+/** @internal @brief Use bilinear interp. to compute orientations @internal */
 #define VL_SIFT_BILINEAR_ORIENTATIONS 1
 
 #define EXPN_SZ  256         /**< ::fast_expn table size @internal */ 
@@ -23,8 +23,7 @@
 double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
 
 /** ---------------------------------------------------------------- */
-/** @brief Fast @ exp(- x) approximation
- ** @internal
+/** @internal @brief Fast @ exp(- x) approximation
  **
  ** @param x argument.
  **
@@ -47,8 +46,7 @@ fast_expn (double x)
   return a + r * (b - a) ;
 }
 
-/** @brief Initialize ::fast_expn table
- ** @internal
+/** @internal @brief Initialize ::fast_expn table
  **/
 
 static
@@ -62,8 +60,7 @@ fast_expn_init ()
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Copy, upsample rows and transpose
- ** @internal
+/** @internal @brief Copy, upsample rows and transpose
  **
  ** @param dst     output imgage buffer.
  ** @param src     input image buffer.
@@ -100,8 +97,7 @@ copy_and_upsample_rows
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Copy and downasample an image
- ** @internal
+/** @internal @brief Copy and downasample an image
  **
  ** @param dst    output imgae buffer.
  ** @param src    input  image buffer.

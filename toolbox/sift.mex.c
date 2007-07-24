@@ -29,7 +29,8 @@ uMexOption options [] = {
   {"PeakTresh",    1,   opt_peak_tresh    },
   {"EdgeTresh",    1,   opt_edge_tresh    },
   {"Orientations", 0,   opt_orientations  },
-  {"Verbose",      0,   opt_verbose       }
+  {"Verbose",      0,   opt_verbose       },
+  {0,              0,   0                 }
 } ;
 
 /** @brief Transpose desriptor
@@ -118,7 +119,6 @@ mexFunction(int nout, mxArray *out[],
       if (!uIsRealScalar(optarg) || (O = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Octaves' must be a positive integer.") ;
       }
-      O = *mxGetPr(optarg) ;
       break ;
       
     case opt_levels :
@@ -181,20 +181,20 @@ mexFunction(int nout, mxArray *out[],
     if (edge_tresh >= 0) vl_sift_set_edge_tresh (filt, edge_tresh) ;
     
     if (verbose) {    
-      mexPrintf("sift: filter settings:\n") ;
-      mexPrintf("sift:   octaves      (O)     = %d\n", 
+      mexPrintf("siftmx: filter settings:\n") ;
+      mexPrintf("siftmx:   octaves      (O)     = %d\n", 
                 vl_sift_get_octave_num   (filt)) ;
-      mexPrintf("sift:   levels       (S)     = %d\n",
+      mexPrintf("siftmx:   levels       (S)     = %d\n",
                 vl_sift_get_level_num    (filt)) ;
-      mexPrintf("sift:   first octave (o_min) = %d\n", 
+      mexPrintf("siftmx:   first octave (o_min) = %d\n", 
                 vl_sift_get_octave_first (filt)) ;
-      mexPrintf("sift:   edge tresh           = %g\n",
+      mexPrintf("siftmx:   edge tresh           = %g\n",
                 vl_sift_get_edge_tresh   (filt)) ;
-      mexPrintf("sift:   peak tresh           = %g\n",
+      mexPrintf("siftmx:   peak tresh           = %g\n",
                 vl_sift_get_peak_tresh   (filt)) ;
-      mexPrintf("sift: will source frames? %s\n",
+      mexPrintf("siftmx: will source frames? %s\n",
                 (nikeys >= 0) ? "yes" : "no") ;
-      mexPrintf("sift: will force orientations? %s\n",
+      mexPrintf("siftmx: will force orientations? %s\n",
                 force_orientations ? "yes" : "no") ;      
     }
 
@@ -210,7 +210,7 @@ mexFunction(int nout, mxArray *out[],
       int                   nkeys = 0 ;
       
       if (verbose) {
-        mexPrintf ("sift: processing next octave\n") ;
+        mexPrintf ("siftmx: processing next octave\n") ;
       }
 
       /* calculate the GSS for the next octave .................... */
@@ -224,7 +224,7 @@ mexFunction(int nout, mxArray *out[],
       if (err) break ;
       
       if (verbose > 1) {
-        printf("sift: GSS octave %d computed\n",
+        printf("siftmx: GSS octave %d computed\n",
                vl_sift_get_octave_index (filt));
       }
 
@@ -237,7 +237,7 @@ mexFunction(int nout, mxArray *out[],
         i     = 0 ;
         
         if (verbose > 1) {
-          printf ("sift: detected %d (unoriented) keypoints\n", nkeys) ;
+          printf ("siftmx: detected %d (unoriented) keypoints\n", nkeys) ;
         }
       } else {
         nkeys = nikeys ;
@@ -317,7 +317,7 @@ mexFunction(int nout, mxArray *out[],
     } /* next octave */
     
     if (verbose) {
-      mexPrintf ("sift: found %d keypoints\n", nframes) ;
+      mexPrintf ("siftmx: found %d keypoints\n", nframes) ;
     }
     
     /* save back */

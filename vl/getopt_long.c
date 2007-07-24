@@ -1,5 +1,5 @@
 /** @file    getopt_long.c
- ** @auhtor  Andrea Vedaldi
+ ** @author  Andrea Vedaldi
  ** @brief   getopt_long - Definition
  **/
 

@@ -183,10 +183,11 @@ ustricmp(const char *s1, const char *s2)
 /** ---------------------------------------------------------------- */
 /** @brief Process next option
  **
- ** @param args
- ** @param nargs
- ** @param options
- ** @param next
+ ** @param args     MEX argument array.
+ ** @param nargs    MEX argument array length.
+ ** @param options  List of option definitions.
+ ** @param next     Pointer to the next option (in and out).
+ ** @param optarg   Pointer to the option optional argument (out).
  **
  ** The function scans the MEX driver arguments array @a args of @a nargs elements
  ** for the next option starting at location @a next.

@@ -2,17 +2,6 @@
  ** @brief    Maximally Stable Extremal Regions (MSER) - Declaration
  ** @author   Andrea Vedaldi
  ** 
- ** Running the MSER filter usually involves the following steps:
- **
- ** - Initialize the MSER filter by ::vl_mser_new(). The
- **   filter can be reused if the image size does not change.
- ** - Call ::vl_mser_process() to compute the MSERs.
- ** - Delete the MSER filter by ::vl_mser_delete().
- **
- ** @section mser-volumetric Volumetric images
- **
- ** The code supports images of arbitrary dimension. For instance, it
- ** is possible to find the MSER regions of volumetric images.
  **/
 
 /* AUTORIGHTS */
@@ -29,23 +18,421 @@
  **/
 typedef vl_uint8 vl_mser_pix ;
 
-/** @brief MSER Filter */
+/** @brief Maximum value
+ **
+ ** Maximum value of the integer type ::vl_mser_pix.
+ **/
+#define VL_MSER_PIX_MAXVAL 256
+
+
+/** @brief MSER Filter 
+ **
+ ** The MSER filter computes the Maximally Stable Extremal Regions of
+ ** an image.
+ **
+ ** This structure is @ref main-design-opaque "opaque".
+ **
+ ** @sa @ref mser
+ **/
 typedef struct _VlMserFilt VlMserFilt ;
 
+/** @brief MSER filter statistics */
+typedef struct _VlMserStats VlMserStats ;
+
+/** @brief MSER filter statistics definition */
+struct _VlMserStats 
+{
+  int num_extremal ;      /**< number of extremal regions                                */
+  int num_unstable ;      /**< number of unstable extremal regions                       */
+  int num_abs_unstable ;  /**< number of regions that failed the absolute stability test */
+  int num_too_big ;       /**< number of regions that failed the maximum size test       */
+  int num_too_small ;     /**< number of regions that failed the minimum size test       */
+  int num_duplicates ;    /**< number of regions that failed the duplicate test          */
+} ;
+
+/** @name Construction and Destruction
+ ** @{
+ **/
 VlMserFilt*      vl_mser_new     (int ndims, int const* dims) ;
 void             vl_mser_delete  (VlMserFilt *filt) ;
+/** @} */
+
+/** @name Processing 
+ ** @{
+ **/
 void             vl_mser_process (VlMserFilt *filt, 
                                   vl_mser_pix const *im) ;
-void             vl_mser_fit_ell (VlMserFilt *filt) ;
+void             vl_mser_ell_fit (VlMserFilt *filt) ;
+/** @} */
 
-vl_uint          vl_mser_get_num_regions  (VlMserFilt const *filt) ;
-vl_uint const*   vl_mser_get_regions      (VlMserFilt const *filt) ;
-vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
-vl_uint          vl_mser_get_num_ell      (VlMserFilt const *filt) ;
-vl_uint          vl_mser_get_dof_ell      (VlMserFilt const *filt) ;
+/** @name Retrieving data
+ ** @{
+ **/
+static vl_uint          vl_mser_get_regions_num  (VlMserFilt const *filt) ;
+static vl_uint const*   vl_mser_get_regions      (VlMserFilt const *filt) ;
+static vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
+static vl_uint          vl_mser_get_ell_num      (VlMserFilt const *filt) ;
+static vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *filt) ;
+static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *filt) ;
+/** @} */
 
-void  vl_mser_set_delta (VlMserFilt *filt,  vl_mser_pix x) ;
-vl_mser_pix  vl_mser_get_delta (VlMserFilt const *filt) ;
+/** @name Retrieving parameters
+ ** @{
+ **/
+static vl_mser_pix      vl_mser_get_delta        (VlMserFilt const *filt) ;
+static double           vl_mser_get_epsilon      (VlMserFilt const *filt) ;
+static vl_bool          vl_mser_get_no_dups      (VlMserFilt const *filt) ;
+static double           vl_mser_get_min_area     (VlMserFilt const *filt) ;
+static double           vl_mser_get_max_area     (VlMserFilt const *filt) ;
+static double           vl_mser_get_max_var      (VlMserFilt const *filt) ;
+/** @} */
+
+/** @name Setting parameters
+ ** @{
+ **/
+static void  vl_mser_set_epsilon   (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_delta     (VlMserFilt *filt, vl_mser_pix x) ;
+static void  vl_mser_set_no_dups   (VlMserFilt *filt, vl_bool     x) ;
+static void  vl_mser_set_min_area  (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_area  (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_var   (VlMserFilt *filt, double      x) ;
+/** @} */
+
+
+/* ====================================================================
+ *                                                   INLINE DEFINITIONS
+ * ================================================================== */
+
+/** @internal @brief MSER accumulator data type 
+ **
+ ** This is a large integer type. It should be large enough to contain
+ ** a number equal to the area (volume) of the image by the image
+ ** widht by the image height (for instance, if the image is a square
+ ** of side 256, the maximum value is 256 x 256 x 256).
+ **/
+typedef vl_single vl_mser_acc ;
+
+/** @internal @brief Basic region flag: null region */
+#define VL_MSER_VOID_NODE ((1ULL<<32) - 1)
+
+/* ----------------------------------------------------------------- */
+/** @internal @brief MSER: basic region (declaration)
+ **
+ ** Extremal regions and maximally stable extremal regions are
+ ** instances of image regions.
+ **
+ ** There is an image region for each pixel of the image. Each region
+ ** is represented by an instance of this structure.  Regions are
+ ** stored into an array in pixel order.
+ **
+ ** Regions are arranged into a forest. VlMserReg::parent points to
+ ** the parent node, or to the node itself if the node is a root.
+ ** VlMserReg::parent is the index of the node in the node array
+ ** (which therefore is also the index of the corresponding
+ ** pixel). VlMserReg::height is the distance of the fartest leaf. If
+ ** the node itself is a leaf, then VlMserReg::height is zero.
+ **
+ ** VlMserReg::area is the area of the image region corresponding to
+ ** this node.
+ **
+ ** VlMserReg::region is the extremal region identifier. Not all
+ ** regions are extremal regions however; if the region is NOT
+ ** extremal, this field is set to .... 
+ **/
+struct _VlMserReg
+{
+  vl_uint parent ;   /**< points to the parent region.            */
+  vl_uint shortcut ; /**< points to a region closer to a root.    */
+  vl_uint height ;   /**< region height in the forest.            */
+  vl_uint area ;     /**< area of the region.                     */
+} ;
+
+/** @internal @brief MSER: basic region */
+typedef struct _VlMserReg VlMserReg ;
+
+/* ----------------------------------------------------------------- */
+/** @internal @brief MSER: extremal region (declaration)
+ **
+ ** Extermal regions (ER) are extracted from the region forest. Each
+ ** region is represented by an instance of this structure. The
+ ** structures are stored into an array, in arbitrary order.
+ **
+ ** ER are arranged into a tree. @a parent points to the parent ER, or
+ ** to iself if the ER is the root.
+ **
+ ** An instance of the structure represents the extremal region of the
+ ** level set of intensity VlMserExtrReg::value and containing the
+ ** pixel VlMserExtReg::index.
+ **
+ ** VlMserExtrReg::area is the are of the extremal region and
+ ** VlMserExtrReg::area_top is the area of the extremal region
+ ** containing this region in the level set of intenisty
+ ** VlMserExtrReg::area + @c delta.
+ **
+ ** VlMserExtrReg::variation is the relative area variation @c
+ ** (area_top-area)/area.
+ **
+ ** VlMserExtrReg::max_stable is a flag signaling wether this extremal
+ ** region is also maximally stable.
+ **/
+struct _VlMserExtrReg
+{
+  int          parent ;     /**< index of the parent region                   */
+  int          index ;      /**< index of pivot pixel                         */
+  vl_mser_pix  value ;      /**< value of pivot pixel                         */
+  vl_uint      shortcut ;   /**< shortcut used when building a tree           */
+  vl_uint      area ;       /**< area of the region                           */
+  vl_single    variation ;  /**< rel. area variation                          */
+  vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
+} ;
+
+/** @internal @brief MSER: etremal region */
+typedef struct _VlMserExtrReg VlMserExtrReg ;
+
+/* ----------------------------------------------------------------- */
+/** @internal @brief MSER filter 
+ ** @see @ref mser
+ **/
+struct _VlMserFilt
+{  
+  
+  /** @name Image data and meta data @internal */
+  /*@{*/
+  int                ndims ;   /**< number of dimensions                    */
+  int               *dims ;    /**< dimensions                              */
+  int                nel ;     /**< number of image elements (pixels)       */
+  int               *subs ;    /**< N-dimensional subscript                 */
+  int               *dsubs ;   /**< another subscript                       */
+  int               *strides ; /**< strides to move in image data           */
+  /*@}*/
+
+  vl_uint           *perm ;    /**< pixel ordering                          */
+  vl_uint           *joins ;   /**< sequence of join ops                    */
+  int                njoins ;  /**< number of join ops                      */
+
+  /** @name Regions */
+  /*@{*/
+  VlMserReg         *r ;       /**< basic regions                           */
+  VlMserExtrReg     *er ;      /**< extremal tree                           */
+  vl_uint           *mer ;     /**< maximally stalbe extremal regions       */
+  int                ner ;     /**< number of extremal regions              */
+  int                nmer ;    /**< number of maximally stable extr. reg.   */
+  int                rer ;     /**< size of er buffer                       */
+  int                rmer ;    /**< size of mer buffer                      */
+  /*@}*/
+
+  /** @name Ellipsoids fitting */
+  /*@{*/
+  vl_single         *acc ;     /**< moment accumulator.                    */
+  vl_single         *ell ;     /**< ellipsoids list.                       */
+  int                rell ;    /**< size of ell buffer                     */
+  int                nell ;    /**< number of ellipsoids extracted         */
+  int                dof ;     /**< number of dof of ellipsoids.           */
+
+  /*@}*/
+
+  /** @name Configuration */
+  /*@{*/
+  vl_bool   verbose ;          /**< be verbose                             */
+  int       delta ;            /**< delta filter paramter                  */
+  double    epsilon ;          /**< epsilon filter parameter               */
+  double    max_area ;         /** badness test parameter                  */
+  double    min_area ;         /** badness test parameter                  */
+  double    max_var ;          /** badness test parameter                  */
+  vl_bool   no_dups  ;         /** badness test parameter                  */
+  /*@}*/
+
+  VlMserStats stats ;          /** run statistic                           */
+} ;
+
+/* ----------------------------------------------------------------- */
+/** @brief Get delta
+ ** @param f MSER filter.
+ ** @return value of @c delta.
+ **/
+static VL_INLINE vl_mser_pix
+vl_mser_get_delta (VlMserFilt const *f) 
+{
+  return f-> delta ;
+}
+
+/** @brief Set delta
+ ** @param f MSER filter.
+ ** @param x value of @c delta.
+ **/
+static VL_INLINE void
+vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
+{
+  f-> delta = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get epsilon
+ ** @param  f MSER filter.
+ ** @return value of @c epsilon.
+ **/
+static VL_INLINE double
+vl_mser_get_epsilon (VlMserFilt const *f) 
+{
+  return f-> epsilon ;
+}
+
+/** @brief Get epsilon
+ ** @param f MSER filter.
+ ** @param x value of @c epsilon.
+ **/
+static VL_INLINE void
+vl_mser_set_epsilon (VlMserFilt *f, double x) 
+{
+  f-> epsilon = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get statistics
+ ** @param f MSER filter.
+ ** @return statistics.
+ **/
+static VL_INLINE VlMserStats const*
+vl_mser_get_stats (VlMserFilt const *f) 
+{
+  return & f-> stats ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get maximum region area
+ ** @param f MSER filter.
+ ** @return maximum region area.
+ **/
+static VL_INLINE double
+vl_mser_get_max_area (VlMserFilt const *f) 
+{
+  return f-> max_area ;
+}
+
+/** @brief Set maximum region area
+ ** @param f MSER filter.
+ ** @param x maximum region area.
+ **/
+static VL_INLINE void
+vl_mser_set_max_area (VlMserFilt *f, double x) 
+{
+  f-> max_area = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get minimum region area
+ ** @param f MSER filter.
+ ** @return minimum region area.
+ **/
+static VL_INLINE double
+vl_mser_get_min_area (VlMserFilt const *f) 
+{
+  return f-> min_area ;
+}
+
+/** @brief Set minimum region area
+ ** @param f MSER filter.
+ ** @param x minimum region area.
+ **/
+static VL_INLINE void
+vl_mser_set_min_area (VlMserFilt *f, double x) 
+{
+  f-> min_area = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get maximum region variation
+ ** @param f MSER filter.
+ ** @return maximum region variation.
+ **/
+static VL_INLINE double
+vl_mser_get_max_var (VlMserFilt const *f) 
+{
+  return f-> max_var ;
+}
+
+/** @brief Set maximum region variation
+ ** @param f MSER filter.
+ ** @param x maximum region variation.
+ **/
+static VL_INLINE void
+vl_mser_set_max_var (VlMserFilt *f, double x) 
+{
+  f-> max_var = x ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get maximally stable extremal regions
+ ** @param f MSER filter.
+ ** @return array of MSER pivots.
+ **/
+static VL_INLINE vl_uint const *
+vl_mser_get_regions (VlMserFilt const* f)
+{
+  return f-> mer ;
+}
+
+/** @brief Get number of maximally stable extremal regions
+ ** @param f MSER filter.
+ ** @return number of MSERs.
+ **/
+static VL_INLINE vl_uint
+vl_mser_get_regions_num (VlMserFilt const* f)
+{
+  return f-> nmer ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get remove duplicates switch
+ ** @param f MSER filter.
+ ** @return duplicates switch.
+ **/
+static VL_INLINE vl_bool 
+vl_mser_get_no_dups (VlMserFilt const* f)
+{
+  return f-> no_dups ;
+}
+
+/** @brief Set duplicates switch
+ ** @param f MSER filter.
+ ** @param x duplicates switch.
+ **/
+static VL_INLINE void
+vl_mser_set_no_dups (VlMserFilt *f, vl_bool x)
+{
+  f-> no_dups = x  ;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Get ellipsoids
+ ** @param f MSER filter.
+ ** @return ellipsoids.
+ **/
+static VL_INLINE vl_single const *
+vl_mser_get_ell (VlMserFilt const* f)
+{
+  return f-> ell ;
+}
+
+/** @brief Get number of degrees of freedom of ellipsoids
+ ** @param f MSER filter.
+ ** @return number of degrees of freedom.
+ **/
+static VL_INLINE vl_uint
+vl_mser_get_ell_dof (VlMserFilt const* f)
+{
+  return f-> dof ;
+}
+
+/** @brief Get number of ellipsoids
+ ** @param f MSER filter.
+ ** @return number of ellipsoids
+ **/
+static VL_INLINE vl_uint
+vl_mser_get_ell_num (VlMserFilt const* f)
+{
+  return f-> nell ;
+}
 
 /* VL_MSER */
 #endif
