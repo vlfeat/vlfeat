@@ -30,6 +30,7 @@ void vl_ib_normalizeP(vl_prob * P, vl_node nrows, vl_node ncols)
         sum += P[i];
     for(i=0; i<nrows*ncols; i++)
         P[i] /= sum;
+    sum = 0;
 }
 
 vl_node * vl_ib_new_nodelist(vl_node nrows)
@@ -99,7 +100,6 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
     ib->bidx[j] = ib->bidx[lastnode]; /* bidx */
     ib->nodes[j] = ib->nodes[lastnode]; /* nodes */
 
-    /* fprintf(stderr, "i %d j %d lastnode %d\n", i, j, lastnode); */
     /* delete a node */
     ib->nnodes--;
     /* fprintf(stderr, "nnodes %d\n", ib->nnodes); */
@@ -183,7 +183,7 @@ void vl_ib_update_beta(VlIB * ib)
     }
 }
 
-void vl_ib_calculate_information(VlIB * ib)
+void vl_ib_calculate_information(VlIB * ib, vl_prob * I, vl_prob * H)
 {
 
     vl_prob * Pic = ib->Pic;
@@ -194,25 +194,24 @@ void vl_ib_calculate_information(VlIB * ib)
         Pc[c] = 0;
 
     for(c=0; c<ib->ncols; c++)
-        for(r=0; r<ib->nrows; r++)
+        for(r=0; r<ib->nnodes; r++)
             Pc[c] += Pic[r*ib->ncols+c];
 
-    vl_prob H = 0;
-    vl_prob I = 0;
+    *H = 0;
+    *I = 0;
 
-    for(r=0; r<ib->nrows; r++)
+    for(r=0; r<ib->nnodes; r++)
     {
         if(Pi[r] == 0) continue;
-        H += -log(Pi[r])*Pi[r];
+        *H += -log(Pi[r])*Pi[r];
         for(c=0; c<ib->ncols; c++)
         {
             if(Pc[c] == 0) continue;
-            I += Pic[r*ib->ncols+c] * log( Pic[r*ib->ncols+c] / (Pi[r]*Pc[c]));
+            *I += Pic[r*ib->ncols+c] * log( Pic[r*ib->ncols+c] / (Pi[r]*Pc[c]));
         }
     }
 
-    fprintf(stderr, "I=%g, H=%g\n", I, H);
-    fprintf(stderr, "Log 2.7183 = %g\n", log(2.7183));
+    fprintf(stderr, "I=%g, H=%g\n", *I, *H);
     free(Pc);
 }
 
@@ -287,13 +286,8 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
         /* Merge the nodes which produced the minimum beta */
         fprintf(stderr, "Merging %d and %d into %d beta %.4g\n", ib->nodes[besti], ib->nodes[bestj], newnode, ib->beta[besti]);
         vl_ib_merge_nodes(ib, besti, bestj, newnode);
-        vl_ib_calculate_information(ib);
-        /* Remove node from:
-         *  o which
-         *  o nodelist 
-         *  o Pic
-         *  o Pi
-         **/
+        vl_prob I, H;
+        vl_ib_calculate_information(ib, &I, &H);
     }
 
     vl_ib_delete_ib(ib);
