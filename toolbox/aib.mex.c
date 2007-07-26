@@ -1,12 +1,12 @@
-/** @file     ib.mex.c
+/** @file     aib.mex.c
  ** @author   Brian Fulkerson
- ** @brief    IB MEX driver
+ ** @brief    AIB MEX driver
  ** @internal
  **/
 
 #include "mexutils.h"
 #include <vl/mathop.h>
-#include <vl/ib.h>
+#include <vl/aib.h>
 #include <assert.h>
 
 
@@ -40,7 +40,7 @@ mexFunction(int nout, mxArray *out[],
   }
   */
 
-  vl_node * parents = vl_ib(Pic, rows, cols);
+  vl_node * parents = vl_aib(Pic, rows, cols);
   int dims[2];
   /* Create an empty array */
   dims[0] = 2*rows-1;
