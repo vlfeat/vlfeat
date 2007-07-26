@@ -88,10 +88,8 @@ void vl_ib_merge_nodes(VlIB * ib, vl_node i, vl_node j, vl_node new)
         ib->Pic[i*ib->ncols + c] += ib->Pic[j*ib->ncols + c];
     ib->Pi[i] += ib->Pi[j]; /* Pi */
     ib->beta[i] = BETA_MAX; /* beta */
-    ib->bidx[i] = 0; /* bidx */
     ib->nodes[i] = new; /* nodes */
     /* i will always be added to which */
-    /* ib->which[ib->nwhich++] = i; */
 
     /* copy lastnode into j */
     for(c=0; c<ib->ncols; c++)    /* Pic */
@@ -185,6 +183,39 @@ void vl_ib_update_beta(VlIB * ib)
     }
 }
 
+void vl_ib_calculate_information(VlIB * ib)
+{
+
+    vl_prob * Pic = ib->Pic;
+    vl_prob * Pi =  ib->Pi;
+    vl_prob * Pc = malloc(sizeof(vl_prob)*ib->ncols);
+    vl_node r,c;
+    for(c=0; c<ib->ncols; c++)
+        Pc[c] = 0;
+
+    for(c=0; c<ib->ncols; c++)
+        for(r=0; r<ib->nrows; r++)
+            Pc[c] += Pic[r*ib->ncols+c];
+
+    vl_prob H = 0;
+    vl_prob I = 0;
+
+    for(r=0; r<ib->nrows; r++)
+    {
+        if(Pi[r] == 0) continue;
+        H += -log(Pi[r])*Pi[r];
+        for(c=0; c<ib->ncols; c++)
+        {
+            if(Pc[c] == 0) continue;
+            I += Pic[r*ib->ncols+c] * log( Pic[r*ib->ncols+c] / (Pi[r]*Pc[c]));
+        }
+    }
+
+    fprintf(stderr, "I=%g, H=%g\n", I, H);
+    fprintf(stderr, "Log 2.7183 = %g\n", log(2.7183));
+    free(Pc);
+}
+
 VlIB * vl_ib_new_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
     VlIB * ib = malloc(sizeof(VlIB));
@@ -256,6 +287,7 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
         /* Merge the nodes which produced the minimum beta */
         fprintf(stderr, "Merging %d and %d into %d beta %.4g\n", ib->nodes[besti], ib->nodes[bestj], newnode, ib->beta[besti]);
         vl_ib_merge_nodes(ib, besti, bestj, newnode);
+        vl_ib_calculate_information(ib);
         /* Remove node from:
          *  o which
          *  o nodelist 
