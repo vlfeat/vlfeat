@@ -18,6 +18,7 @@ typedef struct _VlIB
 
     vl_prob * Pic;
     vl_prob * Pi;
+    vl_prob * Pc;
     vl_node nrows;
     vl_node ncols;
 } VlIB;
@@ -30,7 +31,6 @@ void vl_ib_normalizeP(vl_prob * P, vl_node nrows, vl_node ncols)
         sum += P[i];
     for(i=0; i<nrows*ncols; i++)
         P[i] /= sum;
-    sum = 0;
 }
 
 vl_node * vl_ib_new_nodelist(vl_node nrows)
@@ -55,6 +55,20 @@ vl_prob * vl_ib_new_Pi(vl_prob * Pic, vl_node nrows, vl_node ncols)
         Pi[r] = sum;
     }
     return Pi;
+}
+
+vl_prob * vl_ib_new_Pc(vl_prob * Pic, vl_node nrows, vl_node ncols)
+{
+    vl_prob * Pc = malloc(sizeof(vl_prob)*ncols);
+    vl_node r, c;
+    for(c=0; c<ncols; c++)
+    {
+        vl_prob sum = 0;
+        for(r=0; r<nrows; r++)
+            sum += Pic[r*ncols+c];
+        Pc[c] = sum;
+    }
+    return Pc;
 }
 
 void vl_ib_min_beta(VlIB * ib, vl_node * besti, vl_node * bestj, vl_double * minbeta)
@@ -128,7 +142,7 @@ void vl_ib_update_beta(VlIB * ib)
     vl_prob * Pi  = ib->Pi;
     vl_prob * Pic = ib->Pic;
 
-    fprintf(stderr, "Which is: ");
+    fprintf(stderr, "Considering: ");
     for(i=0; i<ib->nwhich; i++)
         fprintf(stderr, "%d ", ib->which[i]);
     fprintf(stderr, "\n");
@@ -185,34 +199,23 @@ void vl_ib_update_beta(VlIB * ib)
 
 void vl_ib_calculate_information(VlIB * ib, vl_prob * I, vl_prob * H)
 {
-
-    vl_prob * Pic = ib->Pic;
-    vl_prob * Pi =  ib->Pi;
-    vl_prob * Pc = malloc(sizeof(vl_prob)*ib->ncols);
-    vl_node r,c;
-    for(c=0; c<ib->ncols; c++)
-        Pc[c] = 0;
-
-    for(c=0; c<ib->ncols; c++)
-        for(r=0; r<ib->nnodes; r++)
-            Pc[c] += Pic[r*ib->ncols+c];
-
     *H = 0;
     *I = 0;
 
+    vl_node r, c;
     for(r=0; r<ib->nnodes; r++)
     {
-        if(Pi[r] == 0) continue;
-        *H += -log(Pi[r])*Pi[r];
+        if(ib->Pi[r] == 0) continue;
+        *H += -log(ib->Pi[r])*ib->Pi[r];
         for(c=0; c<ib->ncols; c++)
         {
-            if(Pc[c] == 0) continue;
-            *I += Pic[r*ib->ncols+c] * log( Pic[r*ib->ncols+c] / (Pi[r]*Pc[c]));
+            if(ib->Pc[c] == 0) continue;
+            *I += ib->Pic[r*ib->ncols+c] * 
+                  log( ib->Pic[r*ib->ncols+c] / (ib->Pi[r]*ib->Pc[c]));
         }
     }
 
     fprintf(stderr, "I=%g, H=%g\n", *I, *H);
-    free(Pc);
 }
 
 VlIB * vl_ib_new_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
@@ -224,6 +227,7 @@ VlIB * vl_ib_new_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 
     vl_ib_normalizeP(ib->Pic, ib->nrows, ib->ncols);
     ib->Pi = vl_ib_new_Pi(ib->Pic, ib->nrows, ib->ncols);
+    ib->Pc = vl_ib_new_Pc(ib->Pic, ib->nrows, ib->ncols);
 
     /* nodelist contains all the remaining nodes. This also has to be modified
      * after a merge, but order doesn't matter (as long as Pi and Pic agree) */
@@ -250,6 +254,7 @@ void vl_ib_delete_ib(VlIB * ib)
     free(ib->bidx);
     free(ib->which);
     free(ib->Pi);
+    free(ib->Pc);
     free(ib);
 }
 
@@ -291,7 +296,6 @@ vl_node * vl_ib(vl_prob * Pic, vl_node nrows, vl_node ncols)
     }
 
     vl_ib_delete_ib(ib);
-    ib = 0;
 
     return parents;
 } 
