@@ -1,3 +1,9 @@
+/** @file   aib.c
+ ** @author Brian Fulkerson
+ ** @brief  Agglomerative Information Bottleneck (AIB) with practical speedups.
+ ** @internal
+ **/
+
 #include "aib.h"
 
 #include <stdio.h>
@@ -5,7 +11,10 @@
 #include <float.h> /* DBL_MAX */
 #include <math.h>
 
+/** @internal @brief The maximum value which beta may take */
 #define BETA_MAX DBL_MAX
+
+/** @internal @brief An internal structure which has pointers to our data */
 typedef struct _VlAIB
 {
     vl_node   * nodes; 
@@ -23,26 +32,52 @@ typedef struct _VlAIB
     vl_node ncols;
 } VlAIB;
 
-void vl_aib_normalizeP(vl_prob * P, vl_node nrows, vl_node ncols)
+/** ---------------------------------------------------------------- */
+/** @internal @brief Normalizes an array of probabilities to sum to 1
+ **
+ ** @param P        The array of probabilities 
+ ** @param nelem    The number of elements in the array
+ **
+ ** @return Modifies P to contain values which sum to 1
+ **/
+void vl_aib_normalize_P(vl_prob * P, vl_node nelem)
 {
     vl_node i;
     vl_prob sum = 0;
-    for(i=0; i<nrows*ncols; i++)
+    for(i=0; i<nelem; i++)
         sum += P[i];
-    for(i=0; i<nrows*ncols; i++)
+    for(i=0; i<nelem; i++)
         P[i] /= sum;
 }
 
-vl_node * vl_aib_new_nodelist(vl_node nrows)
+
+/** ---------------------------------------------------------------- */
+/** @internal @brief Allocates and creates a list of nodes
+ **
+ ** @param nnodes   The size of the list which will be created 
+ **
+ ** @return an array containing elements 0...nnodes
+ **/
+vl_node * vl_aib_new_nodelist(vl_node nnodes)
 {
-    vl_node * nodelist = malloc(sizeof(vl_node)*nrows);
+    vl_node * nodelist = malloc(sizeof(vl_node)*nnodes);
     vl_node n;
-    for(n=0; n<nrows; n++)
+    for(n=0; n<nnodes; n++)
         nodelist[n] = n;
 
     return nodelist;
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Allocates and creates the marginal distribution Pi
+ **
+ ** @param Pic      A two-dimensional array of probabilities
+ ** @param nrows    The number of rows in Pic
+ ** @param ncols    The number of columns in Pic
+ **
+ ** @return an array of size @a nrows which contains the marginal distribution
+ **         over the rows
+ **/
 vl_prob * vl_aib_new_Pi(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
     vl_prob * Pi = malloc(sizeof(vl_prob)*nrows);
@@ -57,6 +92,16 @@ vl_prob * vl_aib_new_Pi(vl_prob * Pic, vl_node nrows, vl_node ncols)
     return Pi;
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Allocates and creates the marginal distribution Pc
+ **
+ ** @param Pic      A two-dimensional array of probabilities
+ ** @param nrows    The number of rows in Pic
+ ** @param ncols    The number of columns in Pic
+ **
+ ** @return an array of size @a ncols which contains the marginal distribution
+ **         over the columns
+ **/
 vl_prob * vl_aib_new_Pc(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
     vl_prob * Pc = malloc(sizeof(vl_prob)*ncols);
@@ -71,6 +116,18 @@ vl_prob * vl_aib_new_Pc(vl_prob * Pic, vl_node nrows, vl_node ncols)
     return Pc;
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Find the two nodes which have minimum beta.
+ **
+ ** @param aib      A pointer to the internal data structure
+ ** @param besti    The index of one member of the pair which has mininum beta
+ ** @param bestj    The index of the other member of the pair which 
+ **                 minimizes beta
+ ** @param minbeta  The minimum beta value corresponding to (@a i, @a j)
+ **
+ ** Searches @a aib->beta to find the minimum value and fills @a minbeta and 
+ ** @a besti and @a bestj with this information.
+ **/
 void vl_aib_min_beta(VlAIB * aib, vl_node * besti, vl_node * bestj, vl_double * minbeta)
 {
     *minbeta = aib->beta[0];
@@ -89,6 +146,20 @@ void vl_aib_min_beta(VlAIB * aib, vl_node * besti, vl_node * bestj, vl_double * 
     }
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Merges two nodes i,j in the internal datastructure
+ **
+ ** @param aib      A pointer to the internal data structure
+ ** @param i        The index of one member of the pair to merge
+ ** @param j        The index of the other member of the pair to merge
+ ** @param new      The index of the new node which corresponds to the union of  **                 (@a i, @a j).
+ **
+ ** Nodes are merged by replacing i with the union of i,j and moving the node in ** last position of the nodelist (called @a lastnode) to the jth position.
+ **
+ ** After the nodes have been merged, it updates which nodes should be 
+ ** considered on the next iteration based on which beta values could 
+ ** potentially change. The merged node will always be part of this list.
+ **/
 void vl_aib_merge_nodes(VlAIB * aib, vl_node i, vl_node j, vl_node new)
 {
     vl_node lastnode = aib->nnodes-1;
@@ -135,6 +206,21 @@ void vl_aib_merge_nodes(VlAIB * aib, vl_node i, vl_node j, vl_node new)
 
 }
 
+
+/** ---------------------------------------------------------------- */
+/** @internal @brief Updates aib->beta and aib->bidx according to aib->which
+ **
+ ** @param aib      A pointer to the internal data structure
+ **
+ ** Calculates new @a beta values for the nodes listed in @a aib->which. 
+ ** @a beta is the loss of mutual information caused by merging two nodes.
+ **
+ ** More concretely, for @a (i,j), where X corresponds to the rows of Pic,
+ ** Y corresponds to the columns of Pic and M corresponds to the rows of Pic 
+ ** after a merge, @a beta is: 
+ **
+ ** @a beta = I(@a X, @a Y) - I(@a M, @a Y)
+ **/
 #define PLOGP(x) (x)*log((x))
 void vl_aib_update_beta(VlAIB * aib)
 {
@@ -191,6 +277,16 @@ void vl_aib_update_beta(VlAIB * aib)
     }
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Calculates the current information and entropy
+ **
+ ** @param aib      A pointer to the internal data structure
+ ** @param I        The current mutual information.
+ ** @param H        The current entropy.
+ **
+ ** Calculates the current mutual information and entropy of Pic and sets
+ ** @a I and @a H to these new values.
+ **/
 void vl_aib_calculate_information(VlAIB * aib, vl_prob * I, vl_prob * H)
 {
     *H = 0;
@@ -212,6 +308,31 @@ void vl_aib_calculate_information(VlAIB * aib, vl_prob * I, vl_prob * H)
     fprintf(stderr, "I=%g, H=%g\n", *I, *H);
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Allocates and initializes the internal data structure
+ **
+ ** @param Pic      A pointer to a 2D array of probabilities
+ ** @param nrows    The number of rows in the array     
+ ** @param ncols    The number of columns in the array
+ **
+ ** Creates a new @a VlAIB struct containing pointers to all the data that 
+ ** will be used during the AIB process. 
+ **
+ ** Allocates memory for the following:
+ ** - Pi (nrows*sizeof(vl_prob))
+ ** - Pc (ncols*sizeof(vl_prob))
+ ** - nodelist (nrows*sizeof(vl_node))
+ ** - which (nrows*sizeof(vl_node))
+ ** - beta (nrows*sizeof(vl_double))
+ ** - bidx (nrows*sizeof(vl_node))
+ **
+ ** Since it simply copies to pointer to Pic, the total additional memory
+ ** requirement is: 
+ ** (nrows+ncols)*sizeof(vl_prob) + 3*nrows*sizeof(vl_prob) + 
+ ** nrows*sizeof(vl_double)
+ **
+ ** @returns An allocated and initialized @a VlAIB pointer
+ **/
 VlAIB * vl_aib_new_aib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
     VlAIB * aib = malloc(sizeof(VlAIB));
@@ -219,7 +340,7 @@ VlAIB * vl_aib_new_aib(vl_prob * Pic, vl_node nrows, vl_node ncols)
     aib->nrows = nrows;
     aib->ncols = ncols;
 
-    vl_aib_normalizeP(aib->Pic, aib->nrows, aib->ncols);
+    vl_aib_normalize_P(aib->Pic, aib->nrows*aib->ncols);
     aib->Pi = vl_aib_new_Pi(aib->Pic, aib->nrows, aib->ncols);
     aib->Pc = vl_aib_new_Pc(aib->Pic, aib->nrows, aib->ncols);
 
@@ -227,7 +348,7 @@ VlAIB * vl_aib_new_aib(vl_prob * Pic, vl_node nrows, vl_node ncols)
      * after a merge, but order doesn't matter (as long as Pi and Pic agree) */
     aib->nnodes = nrows;
     aib->nodes = vl_aib_new_nodelist(aib->nnodes);
-    aib->beta   = malloc(sizeof(vl_prob)*aib->nnodes);
+    aib->beta   = malloc(sizeof(vl_double)*aib->nnodes);
     aib->bidx   = malloc(sizeof(vl_node)*aib->nnodes);
     vl_node i;
     for(i=0; i<aib->nnodes; i++)
@@ -240,6 +361,12 @@ VlAIB * vl_aib_new_aib(vl_prob * Pic, vl_node nrows, vl_node ncols)
     return aib;
 }
 
+/** ---------------------------------------------------------------- */
+/** @internal @brief Deletes a VlAIB and frees all memory associated 
+ ** with it.
+ **
+ ** @param aib  The VlAIB to be deleted.
+ **/ 
 void vl_aib_delete_aib(VlAIB * aib)
 {
     free(aib->nodes);
@@ -251,6 +378,19 @@ void vl_aib_delete_aib(VlAIB * aib)
     free(aib);
 }
 
+/** ---------------------------------------------------------------- */
+/** @brief Runs AIB on Pic
+ **
+ ** @param Pic   The joint probability of P(i,c).
+ ** @param nrows The number of rows in Pic
+ ** @param ncols The number of columns in Pic
+ **
+ ** Runs Agglomerative Information Bottleneck on the data defined by
+ ** @a Pic. Merges Pic in the i direction until no more merges are possible
+ ** and returns these merges as a tree represented by pointers to parents.
+ **
+ ** @return An array of parent pointers. The array has size nrows*2-1
+ **/ 
 vl_node * vl_aib(vl_prob * Pic, vl_node nrows, vl_node ncols)
 {
     vl_node * parents = malloc(sizeof(vl_node)*(nrows*2-1));
