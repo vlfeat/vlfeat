@@ -149,7 +149,7 @@ mexFunction(int nout, mxArray *out[],
     /* new filter */
     filt = vl_mser_new (ndims, dims) ;
 
-    if (delta    >= 0) vl_mser_set_delta         (filt, delta   ) ;
+    if (delta    >= 0) vl_mser_set_delta         (filt, (vl_mser_pix) delta   ) ;
     if (epsilon  >= 0) vl_mser_set_epsilon       (filt, epsilon ) ;
     if (max_area >= 0) vl_mser_set_max_area      (filt, max_area) ;
     if (min_area >= 0) vl_mser_set_min_area      (filt, min_area) ;

@@ -10,6 +10,10 @@
 #include"mex.h"
 #include<ctype.h>
 
+#ifdef __VISUALC__
+#define snprintf _snprintf
+#endif
+
 /** ---------------------------------------------------------------- */
 /** @brief Is the array real?
  **

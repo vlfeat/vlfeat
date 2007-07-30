@@ -107,16 +107,15 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # --------------------------------------------------------------------
 # We place the MEX files in toolbox/.
 
-mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.mex.c))))
+mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.c))))
 mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h $(BINDIR)/libvl.a
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	@echo "   MX '$<' ==> '$@'"
 	@mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
-	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
 
 # --------------------------------------------------------------------
 #                                                                  Doc
@@ -149,6 +148,8 @@ distclean: clean
 	rm -f toolbox/*.mexmac
 	rm -f toolbox/*.mexmaci
 	rm -f toolbox/*.mexglx
+	rm -f toolbox/*.mexw32
+	rm -f toolbox/*.dll
 	rm -rf bin
 	rm -rf $(DIST)-*
 

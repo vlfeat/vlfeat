@@ -49,7 +49,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
 {
   int BO = 8 ;
   int BP = 4 ;
-  int i, j, t, tp ;
+  int i, j, t ;
   
   for (j = 0 ; j < BP ; ++j) {
     int jp = BP - 1 - j ;
@@ -116,13 +116,13 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_octaves :
-      if (!uIsRealScalar(optarg) || (O = *mxGetPr(optarg)) < 0) {
+      if (!uIsRealScalar(optarg) || (O = (int) *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Octaves' must be a positive integer.") ;
       }
       break ;
       
     case opt_levels :
-      if (! uIsRealScalar(optarg) || (S = *mxGetPr(optarg)) < 1) {
+      if (! uIsRealScalar(optarg) || (S = (int) *mxGetPr(optarg)) < 1) {
         mexErrMsgTxt("'Levels' must be a positive integer.") ;
       }
       break ;
@@ -131,7 +131,7 @@ mexFunction(int nout, mxArray *out[],
       if (!uIsRealScalar(optarg)) {
         mexErrMsgTxt("'FirstOctave' must be an integer") ;
       }
-      o_min = *mxGetPr(optarg) ;
+      o_min = (int) *mxGetPr(optarg) ;
       break ;
 
     case opt_edge_tresh :
@@ -307,7 +307,7 @@ mexFunction(int nout, mxArray *out[],
           
           if (nout > 1) {
             for (j = 0 ; j < 128 ; ++j) {
-              descr [128 * nframes + j] = (vl_uint8) 512.0 * rbuf [j] ;
+              descr [128 * nframes + j] = (vl_uint8) (512.0 * rbuf [j]) ;
             }
           }
 

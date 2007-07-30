@@ -42,6 +42,13 @@
 /** @brief Inline function declaration */
 #define VL_INLINE __inline__
 
+#ifdef __VISUALC__
+#undef VL_INLINE
+#define VL_INLINE __inline
+#define fscanf fscanf_s
+#define snprintf _snprintf
+#endif
+
 /** @internal @brief Stringify argument helper
  ** @see ::VL_STRINGIFY
  **/
@@ -89,6 +96,8 @@ typedef int                 vl_bool ;    /**< boolean */
 /** @brief Small integer */
 #define VL_SMALL_INT  (- VL_BIG_INT - 1)
 
+/** @brief Logarithm of 2 */
+#define VL_LOG_OF_2 0.693147180559945
 
 /** ---------------------------------------------------------------- */
 /** @name Error handling 
@@ -146,7 +155,6 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
  ** @return @c x << n .
  **/
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
-
 /* @} */
 
 /** ---------------------------------------------------------------- */
