@@ -1,0 +1,29 @@
+function h=plotpoint(V,varargin)
+% PLOTPOINT  Plot 2 or 3 dimensional points
+%   PLOTPOINT(V) plots the 2 or 3 dimensional points V. V is a 2xK or
+%   3xK array, with one point per column.
+%
+%   H=PLOTPOINT(...) returns the handle H of the plot.
+%
+%   PLOTPOINT() is a simple wrapper around the PLOT() and PLOT3()
+%   functions. By default, PLOTPOINT(V) plots the points with line
+%   style '.'.  PLOTPOINT(V,...) does not use the default line style;
+%   rather it passess any extra argument to the underlying plot
+%   function.
+%
+%   See also PLOT(), PLOT3().
+
+% AUTORIGHTS
+
+if length(varargin) == 0 
+  varargin = {'.'};
+end
+
+switch size(V,1)
+  case 2
+    h=plot(V(1,:),V(2,:),varargin{:}) ;
+  case 3 
+    h=plot3(V(1,:),V(2,:),V(3,:),varargin{:}) ;
+  otherwise
+    error(['V must be either 2xK or 3xK.']) ;          
+end
