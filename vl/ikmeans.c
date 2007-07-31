@@ -128,3 +128,36 @@ void ikmeans(data_t * data_pt, int M, int N, idx_t K,
 
 }
 
+
+void vl_ikmeans_push(data_t * data_pt, acc_t * centers_pt, int M, int N, idx_t K,
+                     idx_t * asgn_pt)
+{
+    int i,j,k ;
+
+    /* assign data to centers */
+    for(j=0 ; j < N ; ++j)
+    {
+        acc_t best_dist = 0 ;
+        idx_t best = (idx_t)-1 ;
+
+        for(k = 0 ; k < K ; ++k)
+        {
+            acc_t dist = 0 ;
+
+            /* compute distance with this center */
+            for(i = 0 ; i < M ; ++i)
+            {
+                acc_t delta = data_pt[ j*M + i ] - centers_pt[ k*M + i ] ;
+                dist += delta*delta ;
+            }
+
+            /* compare with current best */
+            if( best == (idx_t)-1 || dist < best_dist )
+            {
+                best = k  ;
+                best_dist = dist ;
+            }
+        }
+        asgn_pt[j] = best ;
+    }
+}
