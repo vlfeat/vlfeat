@@ -2,18 +2,65 @@
 # author:     Andrea Vedaldi
 # descrption: Microsoft NMake makefile
 
+# Customization:
+# - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
+
 MATLABROOT = C:\MATLAB7
+
+# --------------------------------------------------------------------
+#                                                                Flags
+# --------------------------------------------------------------------
+# Debug info is embedded in .obj and .lib files (CodeView /Z7 option)
+# but in .pdb files for .exe and .dll (since the linker does not
+# produce CodeView output anymore).
+#
+# CFLAGS
+#   /nologo            : CL does not display splash
+#   _CRT_NO_DEPRECATE  : Do not deprecate `insecure' fscanf, snprintf, ...
+#   __LITTLE_ENDIAN__  : Signal little endian architecture
+#   /I.                : Add VLROOT to include search path
+#   /Z7                : Embedded CodeView debug info in .obj
+#   /MT                : Multi-thread run-time library
+#   /TC                : Source code is C (not C++)
+#   /W3                : Usa all warnings
+#   /Zp8               : Align structures to 8 bytes
+#   /O2
+#
+# LFLAGS
+#   /NOLOGO            : LINK does not display splash
+#   /INCREMENTAL:NO    : No incremental linking
+#   /MANIFEST:NO       : No manifest
+#   /DEBUG             : Generate debug info (.pdb files)
+#
+# MEX_RC               : MEX .rc file location
+#
+# MEX_CFLAGS
+#   /D_WINDLL          : Signal DLL code
+#   /DMATLAB_MEX_FILE  : Signal MATLAB MEX code
+#
+# MEX_LFLAGS
+#  /DLL                : Produce a DLL
+#  /EXPORT:mexFunction : Export MEX file entry point
+
 bindir     = bin\win32
-objdir     = bin\win32\objs
-CFLAGS     = /D"__VISUALC__" /D"WIN32" \
+objdir     = $(bindir)\objs
+
+CFLAGS     = /nologo /TC /MT \
+             /D"__VISUALC__" /D"WIN32" \
              /D"__LITTLE_ENDIAN__" \
              /D"_CRT_SECURE_NO_DEPRECATE" \
-             /I. /W3 /nologo /Z7 /TC /MT
+             /I. \
+             /W1 /Wp64 /Z7 /Zp8 /O2
+
 LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
-             /LIBPATH:$(bindir) vl.lib /SUBSYSTEM:CONSOLE
+             /LIBPATH:$(bindir) vl.lib \
+             /DEBUG
+
 MEX_RC     = $(MATLABROOT)\extern\include\mexversion.rc
+
 MEX_CFLAGS = $(CFLAGS) /I$(MATLABROOT)\extern\include \
              /DMATLAB_MEX_FILE /D_WINDLL
+
 MEX_LFLAGS = $(LFLAGS) \
              /DLL /EXPORT:mexFunction \
              /MACHINE:X86 \
@@ -45,10 +92,16 @@ libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)
 cmdexe = $(cmdsrc:src/=bin\win32\)
 cmdexe = $(cmdexe:.c=.exe)
+cmdpdb = $(cmdexe:.exe=.pdb)
 mexdll = $(mexsrc:.c=.dll)
 mexres = $(mexsrc:.c=.res)
+mexpdb = $(mexsrc:.c=.pdb)
 
+!IFDEF MATLABROOT
 all: $(objdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
+!ELSE
+all: $(objdir) $(bindir)\vl.lib $(cmdexe)
+!ENDIF
 
 # --------------------------------------------------------------------
 #                                                    Maintenance rules
@@ -57,6 +110,8 @@ all: $(objdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
 clean:
 	-del $(libobj)
 	-del /Q $(objdir)
+	-del $(cmdpdb)
+	-del $(mexpdb)
 
 distclean: clean
 	-del $(cmdexe)
@@ -85,23 +140,27 @@ $(objdir) :
 
 # vl\*.c -> $objdir\*.obj
 {vl}.c{$(objdir)}.obj:
-	$(CC) $(CFLAGS) /c /Fo"$(@)" "$(<)"
+	@echo CC  $(<) ===^> $(@)
+	@$(CC) $(CFLAGS) /c /Fo"$(@)" "$(<)"
 
 # src\*.c -> $bindir\*.exe
 {src}.c{$(bindir)}.exe:
-	$(CC) $(CFLAGS) /Fe"$(@)" /Fo"$(@R).obj" "$(<)" /link $(LFLAGS)
-	-del "$(@R).obj"
+	@echo CC  $(<) ===^> $(@)
+	@$(CC) $(CFLAGS) /Fe"$(@)" /Fo"$(@R).obj" "$(<)" /link $(LFLAGS)
+	@-del "$(@R).obj"
 
 # toolbox\*.c -> tooblox\*.dll
 {toolbox}.c{toolbox}.dll:
-	$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
-	RC /fo"$(@R).res" $(MEX_RC)
-	LINK $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@)
-	-del "$(@R).obj"
-	-del "$(@R).exp"
-	-del "$(@R).lib"
-	-del "$(@R).res"
+	@echo CC  $(<) ===^> $(@R).dll
+	@$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
+	@RC /fo"$(@R).res" $(MEX_RC)
+	@LINK $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@)
+	@-del "$(@R).obj"
+	@-del "$(@R).exp"
+	@-del "$(@R).lib"
+	@-del "$(@R).res"
 
 # *.obj -> *.lib
 $(bindir)\vl.lib : $(libobj)
-	lib $(**) /OUT:"$(@)" /NOLOGO
+	@echo LIB ^*.obj ===^> $(@R).dll
+	@lib $(**) /OUT:"$(@)" /NOLOGO
