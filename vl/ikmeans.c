@@ -21,7 +21,7 @@ int cmp_pair (void const *a, void const *b)
 }
 
 
-void ikmeans(data_t * data_pt, int M, int N, idx_t K,
+void vl_ikmeans(data_t * data_pt, int M, int N, idx_t K,
              acc_t * centers_pt, idx_t * asgn_pt)
 {
 

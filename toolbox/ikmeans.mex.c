@@ -85,7 +85,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
     /* npasses is hardcoded to 200, max */
-    ikmeans(data_pt, M, N, K, centers_pt, asgn_pt);
+    vl_ikmeans(data_pt, M, N, K, centers_pt, asgn_pt);
 
     int j;
     /* adjust */
