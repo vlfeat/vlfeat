@@ -1,8 +1,8 @@
-function [Fx,Fy] = grad(F,varargin) ;
-% GRAD  Gradient
+function [Fx,Fy] = imgrad(F,varargin) ;
+% IMGRAD  Image gradient
 %   [Fx,Fy] = GRAD(F) returns the finite differencies gradient of the
-%   function F. The function uses central differencies and for all
-%   but the boundaries pixels, for which it uses forward/backward
+%   image F. The function uses central differencies and for all but
+%   the boundaries pixels, for which it uses forward/backward
 %   differencies as appropriate.
 %
 %   GRAD(F,'forward') uses only forward differencies (except on the

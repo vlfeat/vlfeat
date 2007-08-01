@@ -21,6 +21,7 @@
  ** algorithm to use O(L^2) time in many cases and O((C+2)*L) 
  ** space (as opposed to [Slonim] which takes O(L^3)) time and O(L^2) space).
  **/
+
 #ifndef VL_AIB_H
 #define VL_AIB_H
 
@@ -28,10 +29,11 @@
 
 /** @brief AIB probability type */
 typedef vl_double vl_prob ;
+
 /** @brief AIB node type */
 typedef vl_uint32 vl_node ;
 
-vl_node * vl_aib(vl_prob * Pic, vl_node nrows, vl_node ncols);
+vl_node * vl_aib (vl_prob * Pic, vl_node nrows, vl_node ncols) ;
 
 /* VL_AIB_H */
 #endif

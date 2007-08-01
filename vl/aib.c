@@ -1,7 +1,7 @@
-/** @file   aib.c
+/** @internal
+ ** @file   aib.c
  ** @author Brian Fulkerson
  ** @brief  Agglomerative Information Bottleneck (AIB) with practical speedups.
- ** @internal
  **/
 
 #include "aib.h"

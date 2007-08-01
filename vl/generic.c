@@ -24,10 +24,11 @@
  **   - @ref main-design-guidelines "Guidelines"
  **   - @ref main-design-opaque     "Opaque structures"
  ** - Support functionalities
- **   - @ref generic.h  "Atomic data types, errors, and others"
- **   - @ref mathop.h   "Math operations"
- **   - @ref stringop.h "String operations"
- **   - @ref imop.h     "Image operations"
+ **   - @ref generic.h   "Atomic data types, errors, and others"
+ **   - @ref mathop.h    "Math operations"
+ **   - @ref stringop.h  "String operations"
+ **   - @ref imop.h      "Image operations"
+ **   - @ref rodrigues.h "Rodrigues formuals"
  ** - Main functionalities
  **   - @ref sift.h "Scale Invariant Feature Transform (SIFT)"
  **   - @ref mser.h "Maximally Stable Extremal Regions (MSER)"

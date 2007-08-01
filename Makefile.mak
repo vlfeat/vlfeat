@@ -24,7 +24,8 @@ MATLABROOT = C:\MATLAB7
 #   /TC                : Source code is C (not C++)
 #   /W3                : Usa all warnings
 #   /Zp8               : Align structures to 8 bytes
-#   /O2
+#   /O2                : Optimize for speed
+#   /arch:SSE2         : Enable SSE2 instructions
 #
 # LFLAGS
 #   /NOLOGO            : LINK does not display splash
@@ -50,7 +51,7 @@ CFLAGS     = /nologo /TC /MT \
              /D"__LITTLE_ENDIAN__" \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /I. \
-             /W1 /Wp64 /Z7 /Zp8 /O2
+             /W1 /Wp64 /Z7 /Zp8 /O2 /arch:SSE2
 
 LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
              /LIBPATH:$(bindir) vl.lib \
@@ -75,18 +76,34 @@ libsrc =            	\
  vl\stringop.c          \
  vl\pgm.c               \
  vl\sift.c              \
- vl\mser.c
+ vl\mser.c              \
+ vl\rodrigues.c         \
+ vl\aib.c               \
+ vl\ikmeans.c
 
 cmdsrc =                \
  src/sift.c             \
  src/mser.c             \
+ src/aib.c              \
  src/test_getopt_long.c \
- src/test_stringop.c
+ src/test_stringop.c    \
+ src/test_nan.c
 
 mexsrc =                \
  toolbox\sift.c         \
  toolbox\mser.c         \
- toolbox\erfill.c
+ toolbox\erfill.c       \
+ toolbox\imsmooth.c     \
+ toolbox\rodr.c         \
+ toolbox\irodr.c        \
+ toolbox\ikwbackwardmx.c\
+ toolbox\ikmeans.c      \
+ toolbox\ikmeanspush.c  \
+ toolbox\tpsumx.c       \
+ toolbox\whistc.c       \
+ toolbox\binsum.c       \
+ toolbox\alldist2.c     \
+ toolbox\aib.c
 
 libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)
