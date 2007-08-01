@@ -1,5 +1,4 @@
-/** @file     generic-driver.h
- ** @author   Andrea Vedaldi
+/** @author   Andrea Vedaldi
  ** @brief    Support for command line drivers - Definition.
  ** @internal
  **
@@ -162,6 +161,7 @@ static VL_INLINE int
 vl_file_meta_put_double (VlFileMeta * fm, double x)
 {
   int err ;
+  size_t n ;
   double y ;
 
   switch (fm -> protocol) {
@@ -172,7 +172,8 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
     
   case VL_PROT_BINARY :
     vl_adapt_endianness_8 (&y, &x) ;
-    err = fwrite (&y, sizeof(double), 1, fm -> file) ;
+    n = fwrite (&y, sizeof(double), 1, fm -> file) ;
+    err = n < 1 ;
     break ;
 
   default :
@@ -196,16 +197,19 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
 static VL_INLINE int
 vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
 {
+  size_t n ;
   int err ;
 
   switch (fm -> protocol) {
 
   case VL_PROT_ASCII :
     err = fprintf (fm -> file, "%d ", x) ;
+    if (err) return VL_ERR_ALLOC ;
     break ;
     
   case VL_PROT_BINARY :
-    err = fwrite (&x, sizeof(vl_uint8), 1, fm -> file) ;
+    n = fwrite (&x, sizeof(vl_uint8), 1, fm -> file) ;
+    if (n < 1) return VL_ERR_ALLOC ;
     break ;
 
   default :
@@ -213,7 +217,7 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
     break ;
   }
 
-  return err ? VL_ERR_ALLOC : VL_ERR_OK ;
+  return VL_ERR_OK ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -230,34 +234,28 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
 static VL_INLINE int
 vl_file_meta_get_double (VlFileMeta *fm, double *x)
 {
-  int err, n ;
+  int err ;
+  size_t n ;
   double y ;
 
   switch (fm -> protocol) {
 
   case VL_PROT_ASCII :
     fscanf (fm -> file, " ") ;
-    n = fscanf (fm -> file, "%lg", x) ;
-    err = n < 1 ;
+    err = fscanf (fm -> file, "%lg", x) ;
+    if (err == EOF) return VL_ERR_EOF ;
+    if (err <  1  ) return VL_ERR_BAD_ARG ;
     break ;
   
   case VL_PROT_BINARY :
     n = fread (&y, sizeof(double), 1, fm -> file) ;
-    err = n < 1 ;
+    if (n < 1) return VL_ERR_BAD_ARG ;
     vl_adapt_endianness_8 (x, &y) ;
     break ;
 
   default :
     assert (0) ;
     break ;
-  }
-
-  if (err) {
-    if (n == EOF || feof (fm -> file)) {
-      return VL_ERR_EOF ;
-    } else {
-      return VL_ERR_BAD_ARG ;
-    }
   }
 
   return VL_ERR_OK ;

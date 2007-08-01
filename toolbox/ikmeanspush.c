@@ -68,6 +68,8 @@ mexFunction(int nout, mxArray *out[],
     vl_ikmeans_push(data_pt, centers_pt, M, N, K, asgn_pt);
 
     /* 1 based indexing for matlab  */
-    int j;
-    for(j = 0 ; j < N ; ++j) ++ asgn_pt[j] ;
+    {
+      int j;
+      for(j = 0 ; j < N ; ++j) ++ asgn_pt[j] ;
+    }
 }

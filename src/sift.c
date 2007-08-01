@@ -132,7 +132,7 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
     /* save */
     snprintf(tmp + q, sizeof(tmp) - q, "_%02d_%03d", o, s) ;
 
-    err = vl_file_meta_open (fm, tmp, "w") ;
+    err = vl_file_meta_open (fm, tmp, "wb") ;
     if (err) goto save_gss_quit ;    
     
     err = vl_pgm_insert (fm -> file, &pim, buffer) ;
@@ -187,9 +187,9 @@ main(int argc, char **argv)
   VlFileMeta gss  = {0, "%.pgm",   VL_PROT_ASCII, "", 0} ;
   VlFileMeta ifr  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
   
-#define ERR(args...) {                                          \
+#define ERR(...) {                                          \
     err = VL_ERR_BAD_ARG ;                                      \
-    snprintf(err_msg, sizeof(err_msg), args) ;                  \
+    snprintf(err_msg, sizeof(err_msg), __VA_ARGS__) ;                  \
     break ;                                                     \
   }
   
@@ -232,7 +232,7 @@ main(int argc, char **argv)
               VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
               vl_get_version_string()) ;
       exit(0) ;
-      
+      break ;
 
 
     case 'o' :
@@ -422,7 +422,7 @@ main(int argc, char **argv)
     }
 
     /* open input file */
-    in = fopen (name, "r") ;
+    in = fopen (name, "rb") ;
     if (!in) {
       err = VL_ERR_IO ;
       snprintf(err_msg, sizeof(err_msg), 
@@ -502,7 +502,7 @@ main(int argc, char **argv)
     if (ifr.active) {
       
       /* open file */
-      err = vl_file_meta_open (&ifr, basename, "r") ; 
+      err = vl_file_meta_open (&ifr, basename, "rb") ; 
       WERR(ifr.name, reading) ;
 
 #define QERR                                                            \
@@ -556,10 +556,10 @@ main(int argc, char **argv)
      *                                               Open output files
      * ............................................................ */
     
-    err = vl_file_meta_open (&out, basename, "w") ; WERR(out.name, writing) ;
-    err = vl_file_meta_open (&dsc, basename, "w") ; WERR(dsc.name, writing) ;
-    err = vl_file_meta_open (&frm, basename, "w") ; WERR(frm.name, writing) ;   
-    err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name, writing) ;
+    err = vl_file_meta_open (&out, basename, "wb") ; WERR(out.name, writing) ;
+    err = vl_file_meta_open (&dsc, basename, "wb") ; WERR(dsc.name, writing) ;
+    err = vl_file_meta_open (&frm, basename, "wb") ; WERR(frm.name, writing) ;   
+    err = vl_file_meta_open (&met, basename, "wb") ; WERR(met.name, writing) ;
 
     if (verbose > 1) {
       if (out.active) printf("sift: writing all ....... to . '%s'\n", out.name); 
@@ -705,7 +705,7 @@ main(int argc, char **argv)
             vl_file_meta_put_double (&out, k -> sigma ) ;
             vl_file_meta_put_double (&out, angles [q] ) ;
             for (l = 0 ; l < 128 ; ++l) {
-              vl_file_meta_put_uint8 (&out, 512.0 * descr [l]) ;
+              vl_file_meta_put_uint8 (&out, (vl_uint8) (512.0 * descr [l])) ;
             }
             if (out.protocol == VL_PROT_ASCII) fprintf(out.file, "\n") ;
           }
@@ -721,7 +721,7 @@ main(int argc, char **argv)
           if (dsc.active) {
             int l ;
             for (l = 0 ; l < 128 ; ++l) {
-              vl_file_meta_put_uint8 (&dsc, (vl_uint8) 512.0 * descr [l]) ;
+              vl_file_meta_put_uint8 (&dsc, (vl_uint8) (512.0 * descr [l])) ;
             }
             if (dsc.protocol == VL_PROT_ASCII) fprintf(dsc.file, "\n") ;
           }

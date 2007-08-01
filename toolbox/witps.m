@@ -1,0 +1,42 @@
+function [x1,x2]=witps(xp1,xp2,Y,Yp)
+% WITPS  Inverse thin-plate spline warping
+%   [X1,X2]=wtps(XP1,XP2,Y,Yp) computes the inverse thin-plate spline
+%   (TPS) warp of the points XP1,XP2.
+%
+%   REMARK. The inverse of a thin-plate spline in general is NOT a
+%   thin-plate spline and some splines do not have an inverse.  This
+%   function uses Gauss-Newton to compute a set of points (X1,X2) such
+%   that [XP1,XP2]=WTPS(X1,X2,Y,Yp).
+%
+%   See also WTPS.
+
+% Initial guess by inverting the control points
+[x1,x2] = wtps(tps(xp1,xp2,Yp),Y) ;
+
+X  = [x1(:)';x2(:)'] ;
+Xp = [xp1(:)',;xp2(:)'] ;
+
+% Gauss-Newton
+K = size(Y,2) ;
+N = size(X,2) ;
+U = tpsu(Y,Y) ;
+L = [[ones(1,K); Y], zeros(3) ; U, ones(K,1), Y'] ;
+invL = inv(L) ;
+A = [Yp, zeros(2,3)] * invL ;
+
+for t=1:5  
+  [U,dU]  = tpsu(Y,X);
+  W = A * [repmat([0 0;1 0;0 1],1,N); reshape(dU, K, 2*N)] ;
+  err = Xp - A * [ ones(1,N) ; X(1,:) ; X(2,:) ; U ] ;
+    
+  W = reshape(W,4,N) ;
+  dets = W(1,:).*W(4,:) - W(3,:).*W(2,:) ;
+  dX = [ (  W(4,:).*err(1,:) - W(3,:).*err(2,:) ) ./ dets ; ... 
+         (- W(2,:).*err(1,:) + W(1,:).*err(2,:) ) ./ dets ] ;
+  X = X + dX ;
+end
+
+[M,N] = size(xp1) ;
+x1 = reshape(X(1,:),M,N) ;
+x2 = reshape(X(2,:),M,N) ;
+

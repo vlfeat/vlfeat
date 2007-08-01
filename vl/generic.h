@@ -89,6 +89,55 @@ typedef int                 vl_bool ;    /**< boolean */
 /** @brief Small integer */
 #define VL_SMALL_INT  (- VL_BIG_INT - 1)
 
+/** @brief Logarithm of 2 */
+#define VL_LOG_OF_2 0.693147180559945
+
+/* 
+   For the code below: An ANSI C compiler takes the two expressions,
+   LONG_VAR and CHAR_VAR, and implicitly casts them to the type of the
+   first member of the union. Refer to K&R Second Edition Page 148,
+   last paragraph.
+*/
+
+/** @brief IEEE single quiet NaN constant */
+static union { vl_uint32 raw ; vl_single value ; } 
+  const vl_nan_f = 
+    { 0x7FC00000UL } ;
+
+/** @brief IEEE single infinity constant */
+static union { vl_uint32 raw ; vl_single value ; } 
+  const vl_infinity_f = 
+    { 0x7F800000UL } ;
+
+/** @brief IEEE double quiet NaN constant */
+static union { vl_uint64 raw ; vl_double value ; } 
+  const vl_nan_d = 
+    { 0x7FF8000000000000ULL } ;
+
+/** @brief IEEE double infinity constant */
+static union { vl_uint64 raw ; vl_double value ; } 
+  const vl_infinity_d = 
+    { 0x7FF0000000000000ULL } ;
+
+/** @brief Single NaN (not signaling) */
+#define VL_NAN_F (vl_nan_f.value)
+
+/** @brief Single Infinity (not signaling) */
+#define VL_INFINITY_F (vl_infinity_f.value)
+
+/** @brief Double NaN (not signaling) */
+#define VL_NAN_D (vl_nan_d.value)
+
+/** @brief Double Infinity (not signaling) */
+#define VL_INFINITY_D (vl_infinity_d.value)
+
+#ifdef __VISUALC__
+#undef VL_INLINE
+#define VL_INLINE __inline
+#define fscanf fscanf_s
+#define snprintf _snprintf
+#define isnan _isnan
+#endif
 
 /** ---------------------------------------------------------------- */
 /** @name Error handling 
@@ -146,7 +195,6 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
  ** @return @c x << n .
  **/
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
-
 /* @} */
 
 /** ---------------------------------------------------------------- */

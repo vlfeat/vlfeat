@@ -22,6 +22,8 @@
 #define EXPN_MAX 25.0        /**< ::fast_expn table max  @internal */
 double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
 
+#define log2(x) (log(x)/VL_LOG_OF_2)
+
 /** ---------------------------------------------------------------- */
 /** @internal @brief Fast @ exp(- x) approximation
  **

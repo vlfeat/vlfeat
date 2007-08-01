@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h> /* memset */
 
 /* pairs are used to generate random permutations of data */
@@ -29,7 +28,7 @@ void vl_ikmeans(data_t * data_pt, int M, int N, idx_t K,
     idx_t i, j, k, pass;
     int done;
     int npasses = 200;
-    bool verbose = true;
+    vl_bool verbose = 1 ;
     acc_t *counts_pt = malloc (sizeof (acc_t) * K);
     pair_t *pairs_pt = (pair_t *) malloc (sizeof (pair_t) * N);
 
@@ -49,7 +48,7 @@ void vl_ikmeans(data_t * data_pt, int M, int N, idx_t K,
     if (verbose)
         printf ("ikmeans: passes:");
 
-    for (pass = 0; true; ++pass)
+    for (pass = 0; 1; ++pass)
     {
 
         if (verbose)

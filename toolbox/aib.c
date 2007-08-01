@@ -40,25 +40,27 @@ mexFunction(int nout, mxArray *out[],
   }
   */
 
-  vl_node * parents = vl_aib(Pic, rows, cols);
-  int dims[2];
-  /* Create an empty array */
-  dims[0] = 2*rows-1;
-  dims[1] = 1;
-  out[OUT_PARENTS] = mxCreateNumericArray(2, dims, mxUINT32_CLASS, mxREAL);
-  vl_node * mexparents = (vl_node *)mxGetData(out[OUT_PARENTS]);
-
-  int n;
-  for(n=0; n<2*rows-1; n++)
+  {
+    vl_node *parents = vl_aib(Pic, rows, cols);
+    vl_node *mexparents ;
+    int dims [2], n ;
+    /* Create an empty array */
+    dims[0] = 2*rows-1;
+    dims[1] = 1;
+    out[OUT_PARENTS] = mxCreateNumericArray(2, dims, mxUINT32_CLASS, mxREAL);
+    mexparents = (vl_node *)mxGetData(out[OUT_PARENTS]);
+    
+    for(n=0; n<2*rows-1; n++)
       if(parents[n] == 2*rows)
-          mexparents[n] = 0;
+        mexparents[n] = 0;
       else
-          mexparents[n] = parents[n]+1; /* parents + 1 for matlab indexing */
-
-  /* Fill it with our stuff
-  dims[0] = rows*2-1;
-  dims[1] = 1;
-  mxSetDimensions(out[OUT_PARENTS], dims, 2);
-  mxSetData(out[OUT_PARENTS], parents);
-  */
+        mexparents[n] = parents[n]+1; /* parents + 1 for matlab indexing */
+    
+    /* Fill it with our stuff
+       dims[0] = rows*2-1;
+       dims[1] = 1;
+       mxSetDimensions(out[OUT_PARENTS], dims, 2);
+       mxSetData(out[OUT_PARENTS], parents);
+    */
+  }
 }

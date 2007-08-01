@@ -1,7 +1,7 @@
 function test_sift
 % TEST_SIFT  Test SIFT implementation(s)
 
-I = test_pattern(101) ;
+I = test_pattern(101);
 
 % run various instances of the code
 [a0,b0]  = sift(single(I),'verbose','peaktresh',0,'levels',4) ;
@@ -24,14 +24,16 @@ function [a,b]=cmd_sift(I,param,do_read)
 
 switch mexext
   case 'mexmac'
-    arch = 'mac' ;
+    arch = 'mac/sift' ;
   case 'mexmaci'
-    arch = 'maci' ;
+    arch = 'maci/sift' ;
   case 'mexglx'
-    arch = 'glx' ;
+    arch = 'glx/sift' ;
+  case 'dll' ;
+    arch = 'win32\sift.exe' ;
 end
 
-pfx_sift_cmd = fullfile(vlfeat_root,'bin',arch,'sift') ;
+pfx_sift_cmd = fullfile(vlfeat_root,'bin',arch) ;
 pfx_im       = fullfile(vlfeat_root,'results','autotest.pgm') ;
 pfx_d        = fullfile(vlfeat_root,'results','autotest.descr') ;
 pfx_f        = fullfile(vlfeat_root,'results','autotest.frame') ;

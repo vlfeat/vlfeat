@@ -18,23 +18,24 @@ static struct option longopts[] = {
 int
 main (int argc, char *argv[])
 {
-  
   int ch ;
   
+  printf("*** parsing options: start\n") ;
+
   while ((ch = getopt_long(argc, argv, "bf:", longopts, 0)) != -1) {
 
     switch (ch) {
 
     case 'b':
-      printf("option `-b' or `--buffy'\n") ;
+      printf("option `b' or `buffy'\n") ;
       break;
 
     case 'f':
-      printf("option `-f' or `--flouride' with arg `%s'\n", optarg) ;
+      printf("option `f' or `flouride' with arg `%s'\n", optarg) ;
       break ;
 
     case 1002 :
-      printf("option `--spike' with arg `%s'\n", optarg) ;
+      printf("option `spike' with arg `%s'\n", optarg) ;
       break ;
 
     case 0:
@@ -54,11 +55,11 @@ main (int argc, char *argv[])
     }    
   }
 
+  printf("*** parsing options: end\n");
   {
     int i ;
-    for(i = 0 ; i < argc ; ++i) 
-      printf("%d %s\n", i, argv[i]) ;
-    printf("*** non-options start at =%d ***\n",optind);
+    for(i = optind ; i < argc ; ++i) 
+		printf("non-option: '%s'\n", argv[i]) ;
   }
 
   return 0 ;

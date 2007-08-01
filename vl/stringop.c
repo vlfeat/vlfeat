@@ -33,8 +33,8 @@ vl_string_parse_protocol (char const *str, int *prot)
   if (prot == 0) 
     prot = &dummy ;
 
-  /* look for : */
-  cpt = strpbrk(str, ":") ;
+  /* look for :// */
+  cpt = strstr(str, "://") ;
 
   if (cpt == 0) {
     *prot = VL_PROT_NONE ;
@@ -50,7 +50,7 @@ vl_string_parse_protocol (char const *str, int *prot)
     else {
       *prot = VL_PROT_UNKNOWN ;
     }
-    ++ cpt ;
+    cpt += 3 ;
   }
   return (char*) cpt ;
 }

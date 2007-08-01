@@ -51,32 +51,32 @@ BINDIST          := $(DIST)-$(VER)-$(ARCH)
 all : all-lib all-bin all-mex
 
 # this creates the directory hiearchy 
-$(BINDIR) $(BINDIR)/.lib_bits $(BINDIR)/.lib_bits/.stamp:
-	mkdir -p $(BINDIR)/.lib_bits
+$(BINDIR) $(BINDIR)/objs $(BINDIR)/objs/.stamp:
+	mkdir -p $(BINDIR)/objs
 	touch $@
 
 # --------------------------------------------------------------------
 #                                                        Build libvl.a
 # --------------------------------------------------------------------
-# We place the object and dependency files in $(BINDIR)/.lib_bits/ and
+# We place the object and dependency files in $(BINDIR)/objs/ and
 # the library in $(BINDIR)/libvl.a.
 
 lib_src := $(wildcard vl/*.c)
 lib_obj := $(notdir $(lib_src))
-lib_obj := $(addprefix $(BINDIR)/.lib_bits/, $(lib_obj:.c=.o))
+lib_obj := $(addprefix $(BINDIR)/objs/, $(lib_obj:.c=.o))
 lib_dep := $(lib_obj:.o=.d)
 
 # create library libvl.a
 .PHONY: all-lib
 all-lib: $(BINDIR)/libvl.a
 
-$(BINDIR)/.lib_bits/%.o : vl/%.c $(BINDIR)/.lib_bits/.stamp
+$(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.stamp
 	@echo "   CC '$<' ==> '$@'"
 	@cc $(CFLAGS) -c $< -o $@
 
-$(BINDIR)/.lib_bits/%.d : vl/%.c $(BINDIR)/.lib_bits/.stamp
+$(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.stamp
 	@echo "   D  '$<' ==> '$@'"
-	@cc -M -MT '$(BINDIR)/.lib_bits/$*.o $(BINDIR)/.lbi_bits/$*.d' $< -MF $@
+	@cc -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d' $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
 	@echo "   A  '$@'"
@@ -107,16 +107,15 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # --------------------------------------------------------------------
 # We place the MEX files in toolbox/.
 
-mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.mex.c))))
+mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.c))))
 mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.mex.c toolbox/mexutils.h $(BINDIR)/libvl.a
+toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	@echo "   MX '$<' ==> '$@'"
-	@mex $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_CLIBS) $< -outdir 'toolbox' ;
-	@mv toolbox/$*.mex.$(MEX_SUFFIX) toolbox/$*.$(MEX_SUFFIX)
+	@mex $(MEX_CFLAGS) $< -outdir 'toolbox'
 
 # --------------------------------------------------------------------
 #                                                                  Doc
@@ -135,12 +134,10 @@ dox: doxygen.conf
 .PHONY: clean
 clean:
 	make -C figures clean
-	rm -f $(lib_obj)
-	rm -f $(lib_dep)
-	find . -name '*~'           -exec rm -f \{\} \;
-	find . -name '.DS_Store'    -exec rm -f \{\} \;
-	find . -name '.gdb_history' -exec rm -f \{\} \;
-	rm -f src/*.o
+	rm -rf `find . -name 'objs' -type d`
+	rm -f  `find . -name '*~'`
+	rm -f  `find . -name '.DS_Store'`
+	rm -f  `find . -name '.gdb_history'`
 
 .PHONY: distclean
 distclean: clean
@@ -149,6 +146,9 @@ distclean: clean
 	rm -f toolbox/*.mexmac
 	rm -f toolbox/*.mexmaci
 	rm -f toolbox/*.mexglx
+	rm -f toolbox/*.mexw32
+	rm -f toolbox/*.dll
+	rm -f toolbox/*.pdb
 	rm -rf bin
 	rm -rf $(DIST)-*
 

@@ -7,6 +7,7 @@
 
 #include "pgm.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -262,7 +263,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
                bpp,
                data_size,
                f ) ;
-    good = c == data_size ;
+    good = (c == data_size) ;
     
     /* adjust endianess */
     if( bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN ) {

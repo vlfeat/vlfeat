@@ -39,8 +39,8 @@
 static VL_INLINE
 vl_single vl_mod_2pi_f (vl_single x)
 {
-  while (x < 0.0      ) x += 2 * VL_PI ;
-  while (x > 2 * VL_PI) x -= 2 * VL_PI ;
+  while (x < 0.0      ) x += (vl_single) (2 * VL_PI);
+  while (x > 2 * VL_PI) x -= (vl_single) (2 * VL_PI);
   return x ;
 }
 
@@ -135,16 +135,16 @@ vl_fast_atan2_f (vl_single y, vl_single x)
   */
 
   vl_single angle, r ;
-  vl_single const c3 = 0.1821 ;
-  vl_single const c1 = 0.9675 ;
-  vl_single abs_y    = vl_abs_f (y) + 1e-10 ;
+  vl_single const c3 = 0.1821F ;
+  vl_single const c1 = 0.9675F ;
+  vl_single abs_y    = vl_abs_f (y) + 1e-10F ;
   
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
-    angle = VL_PI / 4 ;
+    angle = (vl_single) (VL_PI / 4) ;
   } else {
     r = (x + abs_y) / (abs_y - x) ;
-    angle = 3 * VL_PI / 4 ;
+    angle = (vl_single) (3 * VL_PI / 4) ;
   } 
   angle += (c3*r*r - c1) * r ; 
   return (y < 0) ? - angle : angle ;
