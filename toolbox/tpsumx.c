@@ -10,9 +10,6 @@
 
 /** Matlab driver.
  **/
-#define greater(a,b) (a) > (b)
-#define max(a,b) (((a)>(b))?(a):(b))
-#define min(a,b) (((a)<(b))?(a):(b))
 #define getM(arg) mxGetM(in[arg])
 #define getN(arg) mxGetN(in[arg])
 #define getPr(arg) mxGetPr(in[arg])

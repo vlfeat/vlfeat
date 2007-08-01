@@ -136,6 +136,7 @@ static union { vl_uint64 raw ; vl_double value ; }
 #define VL_INLINE __inline
 #define fscanf fscanf_s
 #define snprintf _snprintf
+#define isnan _isnan
 #endif
 
 /** ---------------------------------------------------------------- */

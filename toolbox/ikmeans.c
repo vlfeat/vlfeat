@@ -87,9 +87,10 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     /* npasses is hardcoded to 200, max */
     ikmeans(data_pt, M, N, K, centers_pt, asgn_pt);
 
-    int j;
     /* adjust */
-    for (j = 0; j < N; ++j)
-        ++asgn_pt[j];
-
+    {
+      int j ;
+      for (j = 0 ; j < N ; ++j)
+        ++ asgn_pt [j] ;
+    }
 }

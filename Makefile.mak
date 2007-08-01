@@ -82,12 +82,12 @@ libsrc =            	\
  vl\ikmeans.c
 
 cmdsrc =                \
- src/sift.c             \
- src/mser.c             \
- src/aib.c              \
- src/test_getopt_long.c \
- src/test_stringop.c    \
- src/test_nan.c
+ src\sift.c             \
+ src\mser.c             \
+ src\aib.c              \
+ src\test_getopt_long.c \
+ src\test_stringop.c    \
+ src\test_nan.c
 
 mexsrc =                \
  toolbox\sift.c         \
@@ -96,7 +96,7 @@ mexsrc =                \
  toolbox\imsmooth.c     \
  toolbox\rodr.c         \
  toolbox\irodr.c        \
- toolbox\ikwbackwardmx.c\
+ toolbox\imwbackwardmx.c\
  toolbox\ikmeans.c      \
  toolbox\ikmeanspush.c  \
  toolbox\tpsumx.c       \
@@ -107,7 +107,7 @@ mexsrc =                \
 
 libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)
-cmdexe = $(cmdsrc:src/=bin\win32\)
+cmdexe = $(cmdsrc:src\=bin\win32\)
 cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
 mexdll = $(mexsrc:.c=.dll)

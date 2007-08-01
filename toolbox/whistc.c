@@ -31,14 +31,16 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ** @brief HISTC MEX function implementation.
  **/
 
-#include"mex.h"
-#include<stdlib.h>
-#include<math.h>
+#include "mexutils.h"
+
+#include <vl/generic.h>
+
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
 
 /** WHISTC(X,W,EDGES) 
  **/
-#define min(a,b) ((a<b)?a:b)
-#define max(a,b) ((a<b)?b:a)
 
 typedef struct 
 {
@@ -116,11 +118,11 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("X and W must have the same dimension.") ;
   }
 
-  if(min( mxGetM(in[EDGES]), mxGetN(in[EDGES]) ) != 1) {
+  if(VL_MIN( mxGetM(in[EDGES]), mxGetN(in[EDGES]) ) != 1) {
     mexErrMsgTxt("EDGES must be a vector.") ;
   }
   
-  NE = max(mxGetM(in[EDGES]), mxGetN(in[EDGES])) ;
+  NE = VL_MAX(mxGetM(in[EDGES]), mxGetN(in[EDGES])) ;
 
   if(NE < 2) {
     mexErrMsgTxt("At least two edges are required.\n") ;
