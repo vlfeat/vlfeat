@@ -12,6 +12,9 @@
 #include<string.h>
 #include<assert.h>
 
+#include <vl/generic.h>
+#include <vl/ikmeans.h>
+
 /* driver */
 void
 mexFunction(int nout, mxArray *out[],
@@ -54,18 +57,16 @@ mexFunction(int nout, mxArray *out[],
         mexErrMsgTxt("DATA and CENTERS must have the same number of columns.") ;
     }
 
-    {
-        int dims[2] ;
-        dims[0] = 1 ;
-        dims[1] = N ;
-        out[OUT_ASGN] = mxCreateNumericArray(2,dims,mxUINT32_CLASS,mxREAL);
-    }
+    out[OUT_ASGN] = mxCreateNumericMatrix(1,N,mxUINT32_CLASS,mxREAL);
 
     data_pt    = (data_t*) mxGetPr(in[IN_DATA]) ;
     centers_pt = (acc_t*)  mxGetPr(in[IN_CENTERS]) ;
-    asgn_pt    = (idx_t*)  mxGetPr(out[OUT_ASGN]) ;
 
-    vl_ikmeans_push(data_pt, centers_pt, M, N, K, asgn_pt);
+    asgn_pt = vl_ikmeans_push(centers_pt, K, data_pt, M, N);
+    memcpy(mxGetPr(out[OUT_ASGN]), asgn_pt, N*sizeof(vl_uint32));
+    free(asgn_pt);
+    asgn_pt = (idx_t *) mxGetPr(out[OUT_ASGN]);
+
 
     /* 1 based indexing for matlab  */
     {

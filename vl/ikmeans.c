@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h> /* memset */
+#include <stdbool.h>
 
 /* pairs are used to generate random permutations of data */
 typedef struct
@@ -20,9 +21,13 @@ int cmp_pair (void const *a, void const *b)
 }
 
 
-void vl_ikmeans(data_t * data_pt, int M, int N, idx_t K,
-             acc_t * centers_pt, idx_t * asgn_pt)
+/* If you don't want to save results, pass NULL for asgn_pt */
+acc_t * vl_ikmeans(data_t * data_pt, int M, int N, idx_t K, idx_t * asgn_pt)
 {
+
+    acc_t * centers_pt = malloc(sizeof(acc_t)*M*K);
+    bool saveasgn = (asgn_pt != NULL);
+    if(!saveasgn) asgn_pt = malloc(sizeof(idx_t)*N);
 
     /* random permutation */
     idx_t i, j, k, pass;
@@ -124,13 +129,16 @@ void vl_ikmeans(data_t * data_pt, int M, int N, idx_t K,
     }
     free (pairs_pt);
     free (counts_pt);
+    if(!saveasgn) free(asgn_pt);
 
+    return centers_pt;
 }
 
 
-void vl_ikmeans_push(data_t * data_pt, acc_t * centers_pt, int M, int N, idx_t K,
-                     idx_t * asgn_pt)
+idx_t * vl_ikmeans_push(acc_t * centers_pt, idx_t K, data_t * data_pt, int M, int N)
 {
+    idx_t * asgn_pt = malloc(sizeof(idx_t)*N);
+
     int i,j,k ;
 
     /* assign data to centers */
@@ -159,4 +167,6 @@ void vl_ikmeans_push(data_t * data_pt, acc_t * centers_pt, int M, int N, idx_t K
         }
         asgn_pt[j] = best ;
     }
+
+    return asgn_pt;
 }

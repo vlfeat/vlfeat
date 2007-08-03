@@ -47,7 +47,6 @@ data_t * vl_hikm_copy_subset(data_t * data, idx_t * ids, int N, int M, idx_t id,
 
     *N2 = count;
     return new_data;
-    fprintf(stderr, "Stupid\n");
 }
 
 VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data, 
@@ -56,8 +55,8 @@ VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data,
     VlHIKMNode * node = malloc(sizeof(VlHIKMNode));
     node->children = 0;
     /* get the center points */
-    node->centers = vl_ikmeans(data, N, hikm->M, K);
-    idx_t * ids = vl_ikmeans_push(data, N, hikm->M, node->centers, K);
+    idx_t * ids = malloc(sizeof(idx_t)*N);
+    node->centers = vl_ikmeans(data, hikm->M, N, K, ids);
     node->K = K;
 
     if(depth != 1)
@@ -78,6 +77,8 @@ VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data,
             free(new_data);
         }
     }
+    free(ids);
+
     return node;
 }
 
