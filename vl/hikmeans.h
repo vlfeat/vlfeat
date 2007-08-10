@@ -21,7 +21,7 @@ typedef struct _VlHIKMTree {
     VlHIKMNode * root;
 } VlHIKMTree;
 
-VlHIKMTree * vl_hikm(data_t * data_pt, int M, int N, int K, int nleaves, idx_t * asgn);
+VlHIKMTree * vl_hikm(data_t * data_pt, int M, int N, int K, int nleaves);
 void vl_hikm_delete(VlHIKMTree * hikm);
 
 idx_t * vl_hikm_push(VlHIKMTree * hikm, data_t * data_pt, int N);

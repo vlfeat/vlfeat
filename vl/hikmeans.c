@@ -90,7 +90,7 @@ VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data,
     return node;
 }
 
-VlHIKMTree * vl_hikm(data_t * data, int M, int N, int K, int nleaves, idx_t * asgn)
+VlHIKMTree * vl_hikm(data_t * data, int M, int N, int K, int nleaves)
 {
     VlHIKMTree * hikm = malloc(sizeof(VlHIKMTree));
     // First, figure out the depth
@@ -116,5 +116,29 @@ void vl_hikm_delete(VlHIKMTree * hikm)
 
 idx_t * vl_hikm_push(VlHIKMTree * hikm, data_t * data, int N)
 {
-    return 0;
+    idx_t * ids = malloc(sizeof(idx_t)*hikm->depth*N);
+    int i,d;
+    int depth = hikm->depth;
+    int M = hikm->M;
+
+    /* For each datapoint */
+    for(i=0; i<N; i++)
+    {
+        fprintf(stderr, "Pushing %d\n", i);
+        VlHIKMNode * node = hikm->root;
+        d=0;
+        while(node->centers)
+        {
+            idx_t best = vl_ikmeans_push_one(node->centers, node->K, &data[i*M], M);
+            ids[i*depth+d] = best;
+            fprintf(stderr, "Level %d best is %d k was %d\n", d, best, node->K);
+            d++;
+
+            if(!node->children) break;
+
+            node = node->children[best];
+        }
+    }
+
+    return ids;
 }

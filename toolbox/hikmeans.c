@@ -83,7 +83,6 @@ mxArray *  hkmtree_to_matlab(VlHIKMTree * tree)
 /* driver */
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-    idx_t *asgn_pt;
     acc_t *centers_pt;
     data_t *data_pt;
 
@@ -138,24 +137,26 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     }
 
     data_pt = (data_t *) mxGetPr (in[IN_DATA]);
-    /*out[OUT_CENTERS] = mxCreateNumericMatrix (M, K, mxINT32_CLASS, mxREAL); */
-    out[OUT_ASGN] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL);
-
-    asgn_pt = (idx_t *) mxGetPr (out[OUT_ASGN]);
 
     /* K is the number of clusters */
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
-    VlHIKMTree * tree = vl_hikm(data_pt, M, N, K, nleaves, asgn_pt);
+    VlHIKMTree * tree = vl_hikm(data_pt, M, N, K, nleaves);
+    idx_t * ids       = vl_hikm_push(tree, data_pt, N);
+    int depth = tree->depth;
 
     /* copy the tree to matlab */
     out[OUT_TREE] = hkmtree_to_matlab(tree);
     vl_hikm_delete(tree);
-    
+
+    /* copy the assignments to matlab */
+    out[OUT_ASGN] = mxCreateNumericMatrix (K, N, mxUINT32_CLASS, mxREAL);
     /* Matlab has 1 based indexing */
     {
-      int j ;
-      for (j = 0 ; j < N ; ++j)
-        ++ asgn_pt [j] ;
+        int j;
+        for (j = 0 ; j < N*depth ; j++) ids[j]++;
     }
+    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(idx_t)*depth*N);
+    free(ids);
+    
 }

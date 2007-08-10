@@ -134,38 +134,45 @@ acc_t * vl_ikmeans(data_t * data_pt, int M, int N, idx_t K, idx_t * asgn_pt)
     return centers_pt;
 }
 
+VL_INLINE idx_t vl_ikmeans_push_one(acc_t * centers_pt, idx_t K, data_t * data_pt, int M)
+{
+    int i,k ;
+
+    /* assign data to centers */
+    acc_t best_dist = 0 ;
+    idx_t best = (idx_t)-1 ;
+
+    for(k = 0 ; k < K ; ++k)
+    {
+        acc_t dist = 0 ;
+
+        /* compute distance with this center */
+        for(i = 0 ; i < M ; ++i)
+        {
+            acc_t delta = data_pt[i] - centers_pt[k*M + i] ;
+            dist += delta*delta ;
+        }
+
+        /* compare with current best */
+        if( best == (idx_t)-1 || dist < best_dist )
+        {
+            best = k  ;
+            best_dist = dist ;
+        }
+    }
+    return best;
+}
 
 idx_t * vl_ikmeans_push(acc_t * centers_pt, idx_t K, data_t * data_pt, int M, int N)
 {
     idx_t * asgn_pt = malloc(sizeof(idx_t)*N);
 
-    int i,j,k ;
+    int j ;
 
     /* assign data to centers */
     for(j=0 ; j < N ; ++j)
     {
-        acc_t best_dist = 0 ;
-        idx_t best = (idx_t)-1 ;
-
-        for(k = 0 ; k < K ; ++k)
-        {
-            acc_t dist = 0 ;
-
-            /* compute distance with this center */
-            for(i = 0 ; i < M ; ++i)
-            {
-                acc_t delta = data_pt[ j*M + i ] - centers_pt[ k*M + i ] ;
-                dist += delta*delta ;
-            }
-
-            /* compare with current best */
-            if( best == (idx_t)-1 || dist < best_dist )
-            {
-                best = k  ;
-                best_dist = dist ;
-            }
-        }
-        asgn_pt[j] = best ;
+        asgn_pt[j] = vl_ikmeans_push_one(centers_pt, K, &data_pt[j*M], M);
     }
 
     return asgn_pt;

@@ -17,5 +17,6 @@ acc_t * vl_ikmeans(data_t * data, int M, int N, idx_t K, idx_t * asgn);
 
 /* Returns the assignments */
 idx_t * vl_ikmeans_push(acc_t * centers, idx_t K, data_t * data, int M, int N);
+idx_t vl_ikmeans_push_one(acc_t * centers, idx_t K, data_t * data, int M);
 /* VL_IKMEANS_H */
 #endif
