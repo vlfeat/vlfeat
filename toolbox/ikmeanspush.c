@@ -20,9 +20,6 @@ void
 mexFunction(int nout, mxArray *out[],
         int nin, const mxArray *in[])
 {
-    typedef unsigned char data_t ;
-    typedef int           acc_t ;
-    typedef unsigned int  idx_t ;
     idx_t*    asgn_pt ;
     acc_t*    centers_pt ;
     data_t*   data_pt ;

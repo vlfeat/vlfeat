@@ -18,10 +18,10 @@ typedef struct _VlHIKMNode
 typedef struct _VlHIKMTree {
     int M; /* dimension of data */
     int depth;
-    VlHIKMNode * tree;
+    VlHIKMNode * root;
 } VlHIKMTree;
 
-VlHIKMTree * vl_hikm(data_t * data_pt, int N, int M, int K, int nleaves);
+VlHIKMTree * vl_hikm(data_t * data_pt, int M, int N, int K, int nleaves, idx_t * asgn);
 void vl_hikm_delete(VlHIKMTree * hikm);
 
 idx_t * vl_hikm_push(VlHIKMTree * hikm, data_t * data_pt, int N);
