@@ -150,7 +150,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     vl_hikm_delete(tree);
 
     /* copy the assignments to matlab */
-    out[OUT_ASGN] = mxCreateNumericMatrix (K, N, mxUINT32_CLASS, mxREAL);
+    out[OUT_ASGN] = mxCreateNumericMatrix (depth, N, mxUINT32_CLASS, mxREAL);
     /* Matlab has 1 based indexing */
     {
         int j;

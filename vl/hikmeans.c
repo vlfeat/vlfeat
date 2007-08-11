@@ -34,7 +34,6 @@ data_t * vl_hikm_copy_subset(data_t * data, idx_t * ids, int N, int M, idx_t id,
         if(ids[i] == id)
             count++;
     *N2 = count;
-    fprintf(stderr, "Count is %d\n", count);
 
     data_t * new_data = malloc(sizeof(data_t)*M*count);
 
@@ -53,7 +52,7 @@ data_t * vl_hikm_copy_subset(data_t * data, idx_t * ids, int N, int M, idx_t id,
 VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data, 
                        int N, int K, int depth)
 {
-    fprintf(stderr, "xmeans depth=%d N=%d\n", depth, N);
+    fprintf(stderr, "xmeans depth=%d\n", depth);
     VlHIKMNode * node = malloc(sizeof(VlHIKMNode));
     node->children = 0;
     /* get the center points */
@@ -61,7 +60,6 @@ VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data,
     fprintf(stderr, "ikmeans with M=%d N=%d K=%d ids=%p\n", hikm->M, N, K, ids);
     node->centers = vl_ikmeans(data, hikm->M, N, K, ids);
     node->K = K;
-    fprintf(stderr, "Done with ikm\n");
 
     if(depth != 1)
     {
@@ -75,16 +73,12 @@ VlHIKMNode * vl_hikm_xmeans(VlHIKMTree * hikm, data_t * data,
         for(c=0; c < K; c++)
         {
             int N2;
-            fprintf(stderr, "Creating some new data\n");
             data_t * new_data = vl_hikm_copy_subset(data, ids, N, hikm->M, c, 
                                 &N2);
-            fprintf(stderr, "Done creating subset\n");
             node->children[c] = (VlHIKMNode *)vl_hikm_xmeans(hikm, new_data, N2, K, depth-1);
-            fprintf(stderr, "Freeing data\n");
             free(new_data);
         }
     }
-    fprintf(stderr, "Freeing ids\n");
     free(ids);
 
     return node;
@@ -97,7 +91,7 @@ VlHIKMTree * vl_hikm(data_t * data, int M, int N, int K, int nleaves)
     hikm->depth = ceil(log(nleaves)/log(K));
     hikm->M = M;
 
-    fprintf(stderr, "starting tree build, depth = %d\n", hikm->depth);
+    fprintf(stderr, "Starting tree build, depth = %d\n", hikm->depth);
     // Now, build the tree recursively
     hikm->root = vl_hikm_xmeans(hikm, data, N, K, hikm->depth);
 
@@ -124,14 +118,12 @@ idx_t * vl_hikm_push(VlHIKMTree * hikm, data_t * data, int N)
     /* For each datapoint */
     for(i=0; i<N; i++)
     {
-        fprintf(stderr, "Pushing %d\n", i);
         VlHIKMNode * node = hikm->root;
         d=0;
         while(node->centers)
         {
             idx_t best = vl_ikmeans_push_one(node->centers, node->K, &data[i*M], M);
             ids[i*depth+d] = best;
-            fprintf(stderr, "Level %d best is %d k was %d\n", d, best, node->K);
             d++;
 
             if(!node->children) break;
