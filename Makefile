@@ -11,7 +11,7 @@ DIST=vlfeat-$(VER)
 
 # generic flags
 CFLAGS           += -I. -pedantic -Wall -std=c99 -g -O0
-CFLAGS           += -Wno-variadic-macros
+CFLAGS           += -Wno-variadic-macros -Wno-unused-function
 LDFLAGS          +=
 MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl
 
@@ -122,12 +122,13 @@ toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 #                                                                  Doc
 # --------------------------------------------------------------------
 
-.PHONY: doc, dox
+.PHONY: doc dox
 
-doc: dox
+doc:
+	make -C doc all
 
 dox:
-	make -C figures all
+	make -C doc/figures all
 	(test -e dox || mkdir dox)
 	doxygen doxygen.conf
 
@@ -141,7 +142,7 @@ TIMESTAMP:
 
 .PHONY: clean
 clean:
-	make -C figures clean
+	make -C doc clean
 	rm -rf `find ./bin -name 'objs' -type d`
 	rm -f  `find . -name '*~'`
 	rm -f  `find . -name '.DS_Store'`
@@ -150,7 +151,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	make -C figures distclean
+	make -C doc distclean
 	rm -rf bin
 	rm -rf dox
 	rm -f  toolbox/*.mexmac

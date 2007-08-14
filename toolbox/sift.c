@@ -135,14 +135,14 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_edge_tresh :
-      if (!uIsRealScalar(optarg) || (edge_tresh = *mxGetPr(optarg)) < 0) {
-        mexErrMsgTxt("'EdgeTresh' must be a positive real.") ;
+      if (!uIsRealScalar(optarg) || (edge_tresh = *mxGetPr(optarg)) < 1) {
+        mexErrMsgTxt("'EdgeTresh' must be not smaller than 1.") ;
       }
       break ;
 
     case opt_peak_tresh :
       if (!uIsRealScalar(optarg) || (peak_tresh = *mxGetPr(optarg)) < 0) {
-        mexErrMsgTxt("'PeakTresh' must be a positive real.") ;
+        mexErrMsgTxt("'PeakTresh' must be a non-negative real.") ;
       }
       break ;
 

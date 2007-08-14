@@ -312,8 +312,8 @@ main(int argc, char **argv)
     case opt_edge_tresh :
       /* --edge-tresh ........................................... */
       n = sscanf (optarg, "%lf", &edge_tresh) ;
-      if (n == 0 || edge_tresh < 0)
-        ERR("The argument of '%s' must be a non-negative float.",
+      if (n == 0 || edge_tresh < 1)
+        ERR("The argument of '%s' must be not smaller than 1.",
             argv [optind - 1]) ;
       break ;
 

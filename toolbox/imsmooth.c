@@ -54,12 +54,12 @@ econvolve(double*       dst_pt,
       double        x ;
       
       /* beginning */
-      stop = src_pt + max(0, i-W) ;
+      stop = src_pt + VL_MAX (0, i-W) ;
       x    = *stop ;
       while( start <= stop ) { acc += (*g++) * x ; start++ ; }
       
       /* middle */
-      stop =  src_pt + min(M-1, i+W) ;
+      stop =  src_pt + VL_MIN (M-1, i+W) ;
       while( start <  stop ) acc += (*g++) * (*start++) ;
       
       /* end */
