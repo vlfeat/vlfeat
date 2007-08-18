@@ -11,6 +11,7 @@
 #include<assert.h>
 
 #include <vl/ikmeans.h>
+#include <vl/generic.h>
 
 /* driver */
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
@@ -64,30 +65,21 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     }
 
     data_pt = (data_t *) mxGetPr (in[IN_DATA]);
-    {
-        int dims[2];
+    out[OUT_CENTERS] = mxCreateNumericMatrix (M, K, mxINT32_CLASS, mxREAL);
+    out[OUT_ASGN] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL);
 
-        dims[0] = M;
-        dims[1] = K;
-        out[OUT_CENTERS] =
-            mxCreateNumericArray (2, dims, mxINT32_CLASS, mxREAL);
-        dims[0] = 1;
-        dims[1] = N;
-        out[OUT_ASGN] = mxCreateNumericArray (2, dims, mxUINT32_CLASS, mxREAL);
-    }
-
-    centers_pt = (acc_t *) mxGetPr (out[OUT_CENTERS]);
     asgn_pt = (idx_t *) mxGetPr (out[OUT_ASGN]);
 
-    /* ikmeans starts here  */
-    /* [centers_pt, asgn_pt] = f(data_pt, M, K, N) */
     /* K is the number of clusters */
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
-    /* npasses is hardcoded to 200, max */
-    ikmeans(data_pt, M, N, K, centers_pt, asgn_pt);
+    centers_pt = vl_ikmeans(data_pt, M, N, K, asgn_pt);
 
-    /* adjust */
+    /* copy the centers to matlab */
+    memcpy(mxGetPr(out[OUT_CENTERS]), centers_pt, M*K*sizeof(vl_int32));
+    free(centers_pt);
+    
+    /* Matlab has 1 based indexing */
     {
       int j ;
       for (j = 0 ; j < N ; ++j)
