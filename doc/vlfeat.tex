@@ -53,7 +53,14 @@ the documentation of the core library [].
 % --------------------------------------------------------------------
 
 SIFT (scale-invariant feature transform) bundles a feature detector
-and a feature descriptor.
+and a feature descriptor. A feature detector selects {\em frames}
+(also called ``keypoint'', ``interest points'', ``regions''), which
+are stable image regions. Here ``stable'' means that the same regions
+are selected up to a prescribed set of image transformations (for
+instance noise, viewpoint change or illumination change). A feature
+descriptor computes, from the local appearance of each frame, a {\em
+  descriptors}, which is a distinctive lable that identifies robustly
+the frame.
 
 \begin{figure*}
 \subfloat[]{
