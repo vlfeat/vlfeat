@@ -407,7 +407,7 @@ vl_sift_new (int width, int height,
   f-> grad    = malloc (sizeof(vl_sift_pix) * nel * 2 
                         * (f->s_max - f->s_min    )  ) ;
 
-  f-> sigman  = 0.5 * pow (2.0, - o_min) ;
+  f-> sigman  = 0.5 ;
   f-> sigma0  = 1.6 * pow (2.0, 1.0 / S) ;      
   f-> sigmak  =       pow (2.0, 1.0 / S) ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak) ) ;
@@ -445,6 +445,7 @@ vl_sift_delete (VlSiftFilt* f)
     free (f) ;
   }
 }
+
 #include<stdio.h>
 
 /* ----------------------------------------------------------------- */
@@ -531,11 +532,13 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
      The image has nominal smoothing simgan. 
   */
   
-  sa = sigma0 * pow (sigmak, s_min) ;
-  sb = sigman * pow (2.0,    o_min) ;
+  sa = sigma0 * pow (sigmak,   s_min) ;
+  sb = sigman * pow (2.0,    - o_min) ;
 
+  printf("sa %g,sb %g\n",sa,sb) ; 
   if (sa > sb) {
     double sd = sqrt (sa*sa - sb*sb) ;
+    printf("smoothing by %g\n",sd) ; 
     vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
   }
   
@@ -716,7 +719,7 @@ vl_sift_detect (VlSiftFilt * f)
         if (CHECK_NEIGHBORS(>,+) || 
             CHECK_NEIGHBORS(<,-) ) {
           
-          /* make room for a keypoint more at least */
+          /* make room for more keypoints */
           if (f->nkeys >= f->keys_res) {
             f->keys_res += 500 ;
             if (f->keys) {
@@ -812,7 +815,7 @@ vl_sift_detect (VlSiftFilt * f)
         int    maxi    = -1 ;
         double tmp ;
         
-        /* look for maximally stable pivot */
+        /* look for the maximally stable pivot */
         for (i = j ; i < 3 ; ++i) {
           double a    = Aat (i,j) ;
           double absa = vl_abs_d (a) ;
@@ -859,16 +862,16 @@ vl_sift_detect (VlSiftFilt * f)
         }
       }
 
-      /* ........................................................... */
-      
+      /* ........................................................... */      
       /* If the translation of the keypoint is big, move the keypoint
        * and re-iterate the computation. Otherwise we are all set.
        */
-      dx= ((b[0] >  0.6 && x < w - 2) ?  1 : 0 )
-        + ((b[0] < -0.6 && x > 1    ) ? -1 : 0 ) ;
+
+      dx= ((b[0] >  0.6 && x < w - 2) ?  1 : 0)
+        + ((b[0] < -0.6 && x > 1    ) ? -1 : 0) ;
       
-      dy= ((b[1] >  0.6 && y < h - 2) ?  1 : 0 )
-        + ((b[1] < -0.6 && y > 1    ) ? -1 : 0 ) ;
+      dy= ((b[1] >  0.6 && y < h - 2) ?  1 : 0)
+        + ((b[1] < -0.6 && y > 1    ) ? -1 : 0) ;
             
       if (dx == 0 && dy == 0) break ;
     }

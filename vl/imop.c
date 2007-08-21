@@ -12,6 +12,7 @@
 #include "imop.h"
 
 #include <assert.h>
+#include <string.h>
 
 /** @fn ::vl_convtransp_f(
  ** vl_single*,vl_single const*,vl_single const*,int,int,int,int)

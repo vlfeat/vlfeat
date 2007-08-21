@@ -86,6 +86,11 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
 
   int j ;
 
+  if (sigma < (PIX)(1e-5)) {
+    dst = memcpy(dst,src,width*height*sizeof(PIX)) ;
+    return ;
+  }                       
+
   /* setup filter */
   if (filt_sigma != sigma) {
     PIX acc = 0.0 ;
