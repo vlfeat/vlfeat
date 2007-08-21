@@ -10,6 +10,7 @@
 #include <math.h>
 #include <assert.h>
 
+
 enum {
   opt_octaves = 0,
   opt_levels,
@@ -63,6 +64,19 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
   }
 }
 
+/* ----------------------------------------------------------------- */
+/** @brief Keypoint ordering
+ ** @internal
+ **/
+int
+korder (void const* a, void const* b) {
+  double x = ((double*) a) [2] - ((double*) b) [2] ;
+  if (x < 0) return -1 ;
+  if (x > 0) return +1 ;
+  return 0 ;
+}
+
+/* ----------------------------------------------------------------- */
 /** @brief MEX entry point */
 void
 mexFunction(int nout, mxArray *out[], 
@@ -86,6 +100,7 @@ mexFunction(int nout, mxArray *out[],
   double             edge_tresh = -1 ;
   double             peak_tresh = -1 ;
 
+  mxArray           *ikeys_array = 0 ;
   double            *ikeys = 0 ;
   int                nikeys = -1 ;
   vl_bool            force_orientations = 0 ;
@@ -150,17 +165,19 @@ mexFunction(int nout, mxArray *out[],
       if (!uIsRealMatrix(optarg, 4, -1)) {
         mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
       }
-      nikeys = mxGetN(optarg) ;
-      ikeys  = mxGetPr(optarg) ;
+      ikeys_array = mxDuplicateArray (optarg) ;
+      nikeys      = mxGetN (optarg) ;
+      ikeys       = mxGetPr (ikeys_array) ;
+      qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;
       break ;
-
+      
     case opt_orientations :
       force_orientations = 1 ;
       break ;
       
     default :
-        assert(0) ;
-        break ;
+      assert(0) ;
+      break ;
     }
   }
   
@@ -192,8 +209,9 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_edge_tresh   (filt)) ;
       mexPrintf("siftmx:   peak tresh           = %g\n",
                 vl_sift_get_peak_tresh   (filt)) ;
-      mexPrintf("siftmx: will source frames? %s\n",
-                (nikeys >= 0) ? "yes" : "no") ;
+      mexPrintf((nikeys >= 0) ? 
+                "siftmx: will source frames? yes (%d)\n" :
+                "siftmx: will source frames? no\n", nikeys) ;
       mexPrintf("siftmx: will force orientations? %s\n",
                 force_orientations ? "yes" : "no") ;      
     }
@@ -210,7 +228,8 @@ mexFunction(int nout, mxArray *out[],
       int                   nkeys = 0 ;
       
       if (verbose) {
-        mexPrintf ("siftmx: processing next octave\n") ;
+        mexPrintf ("siftmx: processing octave %d\n",
+                   vl_sift_get_octave_index (filt)) ;
       }
 
       /* calculate the GSS for the next octave .................... */
@@ -260,7 +279,7 @@ mexFunction(int nout, mxArray *out[],
           if (ik.o != vl_sift_get_octave_index (filt)) {
             break ;
           }
-            
+
           k = &ik ;
           
           /* optionally compute orientations too */
@@ -292,7 +311,7 @@ mexFunction(int nout, mxArray *out[],
           /* make enough room for all these keypoints */
           if (reserved < nframes + 1) {
             reserved += 2 * nkeys ;
-            frames = mxRealloc (frames,   4 * sizeof(double) * reserved) ;
+            frames = mxRealloc (frames, 4 * sizeof(double) * reserved) ;
             if (nout > 1) {
               descr  = mxRealloc (descr,  128 * sizeof(double) * reserved) ;
             }
@@ -347,5 +366,7 @@ mexFunction(int nout, mxArray *out[],
     
     /* cleanup */
     vl_sift_delete (filt) ;
+    
+    if (ikeys_array) mxDestroyArray(ikeys_array) ;
   }
 }

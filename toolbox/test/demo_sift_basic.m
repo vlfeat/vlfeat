@@ -7,7 +7,7 @@ figure(1) ; clf ;
 % --------------------------------------------------------------------
 %                                                        Load a figure
 % --------------------------------------------------------------------
-I = imread(fullfile(vlfeat_root,'data','car1.jpg')) ;
+I = imread(fullfile(vlfeat_root,'data','a.jpg')) ;
 
 image(I) ; colormap gray ;
 axis equal ; axis off ; axis tight ;

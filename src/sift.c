@@ -29,6 +29,7 @@ char const help_message [] =
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
   " --version       Print version information\n"
+  " --output -      Specify outout file\n"
   " --frames        Specify frames file\n"
   " --descriptors   Specify descriptors file\n"
   " --meta          Specify meta file\n"
@@ -155,10 +156,12 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
 /** @brief Keypoint ordering
  ** @internal
  **/
-
 int
-korder(void const* a, void const* b) {
-  return ((double*) a) [2] < ((double*) b) [2] ;
+korder (void const* a, void const* b) {
+  double x = ((double*) a) [2] - ((double*) b) [2] ;
+  if (x < 0) return -1 ;
+  if (x > 0) return +1 ;
+  return 0 ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -542,7 +545,7 @@ main(int argc, char **argv)
       }
 
       /* now order by scale */
-      qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;      
+      qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;
       
       if (verbose) {
         printf ("sift: read %d keypoints from '%s'\n", nikeys, ifr.name) ;
