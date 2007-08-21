@@ -14,12 +14,13 @@ I = single(I) ;
 %                                                        Test detector
 % --------------------------------------------------------------------
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
-                                       ' --peak-tresh=0 --edge-tresh=100']) ;
-%                   ' --peak-tresh=2.55 --edge-tresh=10']) ;
+                   ' --peak-tresh=3.4 --edge-tresh=10']) ;
+%                                       ' --peak-tresh=0 --edge-tresh=100']) ;
+
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;
 d1        = uint8(data(:,5:end)') ;
-[f,d]     = sift(I,'FirstOctave',-1,'edgetresh',10,'peaktresh',255*0.01) ;
+[f,d]     = sift(I,'FirstOctave',-1,'edgetresh',10,'peaktresh',3.4) ;
 
 disp(msg) ;
 
@@ -33,10 +34,12 @@ h = plotframe(f) ;  set(h,'color','g','linewidth',4) ;
 h = plotframe(f1) ; set(h,'color','b','linewidth',2) ;
 h = plotframe(f0) ; set(h,'color','r','linewidth',1) ;
 
+legend('MATLAB','command line','original SIFT') ;
+
 axis equal ; axis off ; axis tight ;
 demo_print('sift_cmd_1') ;
 
-figure(2) ;
+figure(2) ; clf ;
 imagesc(I) ; colormap gray ; hold on ;
 s      = m0(1,perm(1:20)) ;
 s0     = m0(2,perm(1:20)) ;
@@ -46,6 +49,8 @@ s1     = m1(2,a) ;
 h = plotsiftdescriptor(d(:,s),  f(:,s)  ) ; set(h,'color','g','linewidth',4) ;
 h = plotsiftdescriptor(d1(:,s1),f1(:,s1)) ; set(h,'color','b','linewidth',2) ;
 h = plotsiftdescriptor(d0(:,s0),f0(:,s0)) ; set(h,'color','r','linewidth',1) ;
+
+legend('MATLAB','command line','original SIFT') ;
 
 axis equal ; axis off ; axis tight ;
 demo_print('sift_cmd_2') ;
@@ -59,7 +64,6 @@ save(p_tmp,'tmp','-ASCII') ;
 
 [err,msg] = demo_cmd('sift',[p_img ...
                     ' --output=ascii://' p_txt ...
-                    ' --peak-tresh=2.55 --edge-tresh=10' ...
                     ' --read-frames=ascii://' p_tmp ...
                     ' -v']) ;
 data      = load(p_txt,'-ASCII') ;
@@ -79,6 +83,8 @@ h = plotframe(f) ;  set(h,'color','g','linewidth',4) ;
 h = plotframe(f1) ; set(h,'color','b','linewidth',2) ;
 h = plotframe(f0) ; set(h,'color','r','linewidth',1) ;
 
+legend('MATLAB','command line','original SIFT') ;
+
 axis equal ; axis off ; axis tight ;
 demo_print('sift_cmd_3') ;
 
@@ -92,6 +98,8 @@ s1     = m1(2,a) ;
 h = plotsiftdescriptor(d(:,s),  f(:,s)  ) ; set(h,'color','g','linewidth',4) ;
 h = plotsiftdescriptor(d1(:,s1),f1(:,s1)) ; set(h,'color','b','linewidth',2) ;
 h = plotsiftdescriptor(d0(:,s0),f0(:,s0)) ; set(h,'color','r','linewidth',1) ;
+
+legend('MATLAB','command line','original SIFT') ;
 
 axis equal ; axis off ; axis tight ;
 demo_print('sift_cmd_4') ;

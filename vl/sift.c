@@ -535,10 +535,8 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
   sa = sigma0 * pow (sigmak,   s_min) ;
   sb = sigman * pow (2.0,    - o_min) ;
 
-  printf("sa %g,sb %g\n",sa,sb) ; 
   if (sa > sb) {
     double sd = sqrt (sa*sa - sb*sb) ;
-    printf("smoothing by %g\n",sd) ; 
     vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
   }
   

@@ -10,11 +10,12 @@ aux/vlfeat.tex : vlfeat.tex
 	ln -sf ../vlfeat.tex aux/vlfeat.tex
 	ln -sf ../vl.cfg     aux/vl.cfg
 
-html/vlfeat.html : vlfeat.tex aux/vlfeat.tex
+html/vlfeat.html : vlfeat.tex vl.cfg aux/vlfeat.tex
 	make -C figures all
 	mkdir -p html
 	cd aux ; htlatex $< "vl,html,2" "" "-d../html/"
-	ln -sf ../../figures html/figures
+	mkdir -p html/figures
+	rsync figures/*.png html/figures
 
 vlfeat.pdf : vlfeat.tex aux/figures
 	make -C figures all

@@ -13,7 +13,7 @@ function h=plotsiftdescriptor(d,f)
 %   REMARK. Currently the function supports only descriptors with 4x4
 %   spatial bins and 8 orientation bins (Lowe's default.)
 %
-%   See also PLOTSIFTFRAME(), PLOTMATCHES(), PLOTSS().
+%   See also PLOTFRAME().
 
 % AUTORIGHTS
 
