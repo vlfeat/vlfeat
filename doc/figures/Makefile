@@ -2,6 +2,8 @@
 # author:      Andrea Vedaldi
 # description: Fig + LaTeX --> png, eps, pdf
 
+SHELL=/bin/sh
+
 fig_sources  := $(wildcard *.fig)
 demo_sources := $(wildcard demo/*.eps)
 
@@ -30,14 +32,14 @@ demo_targets := $(demo_sources:.eps=.pdf)
 	rm $*.log $*.aux
 
 %.tex :
-	echo -n -e "		                      \n\
-	\\\\documentclass[landscape]{article}         \n\
-	\\\\usepackage[margin=0pt]{geometry}          \n\
-	\\\\usepackage{graphicx,color}                \n\
-	\\\\begin{document}	                      \n\
-	\\\\pagestyle{empty}                          \n\
-	\\\\input{$*-raw.tex}                         \n\
-	\\\\end{document}	                      \n" > $@
+	/bin/echo '\documentclass[landscape]{article}' >$@
+	/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
+	/bin/echo '\usepackage{graphicx,color}'       >>$@
+	/bin/echo '\begin{document}'                  >>$@
+	/bin/echo '\pagestyle{empty}'                 >>$@
+	/bin/echo '\input{$(*)-raw.tex}'              >>$@
+	/bin/echo '\end{document}'	              >>$@
+	cat $@
 
 demo/%.pdf : demo/%.eps
 	epstopdf --outfile=$@ $<

@@ -9,7 +9,7 @@
 \usepackage{subfig}
 \usepackage{xspace}
 \usepackage{ifpdf}
-\usepackage{visionlab}
+%\usepackage{visionlab}
 
 \ifpdf
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
@@ -19,6 +19,7 @@
 \fi
 
 \newcommand{\VLFeat}{{\sc VLFeat}\xspace}
+\newcommand{\block}{\vspace{.5em}\noindent}
 \title{An Introduction to the\\ VisionLab Features Library}
 \author{Andrea Vedaldi \and Brian Fulkerson}
 
@@ -64,19 +65,19 @@ the frame.
 
 \begin{figure*}
 \subfloat[]{
-\label{fig:sift-intro-a}
-\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_0}}
+\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_0}
+\label{fig:sift-intro-a}}
 \hfill
 \subfloat[]{
-\label{fig:sift-intro-b}
-\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_2}}
+\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_2}
+\label{fig:sift-intro-b}}
 \hfill
 \subfloat[]{
-\label{fig:sift-intro-c}
-\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_3}}
-\caption{{\em SIFT: frames and descriptors.} \subref{fig:sift-intro-a}
-  a test image, \subref{fig:sift-intro-b} 50 detected features
-  \subref{fig:sift-intro-c} and their
+\includegraphics[width=0.32\textwidth]{figures/demo/sift_basic_3}
+\label{fig:sift-intro-c}}
+\caption{{\em SIFT: frames and descriptors.} \protect\subref{fig:sift-intro-a}
+  a test image, \protect\subref{fig:sift-intro-b} 50 detected features
+  \protect\subref{fig:sift-intro-c} and their
   descriptors.}\label{fig:sift-intro}
 \end{figure*}
 
@@ -278,12 +279,12 @@ Lowe's and vice-versa.
 }\\
 \end{center}
 \caption{ {\em SIFT: comparison to Lowe's original implementation.}
-  \subref{fig:sift-custom.a} SIFT frames detected by our
+  \protect\subref{fig:sift-custom.a} SIFT frames detected by our
   implementation (both through the MATLAB and command line interfaces)
   and the original Lowe's implementation: there is a very good
   correspondence (up to numerical errors).  Noice however that a few
   frames are detected by one implementation but not the other.
-  \subref{fig:sift-custom.b} The same for the sift descriptors of some
+  \protect\subref{fig:sift-custom.b} The same for the sift descriptors of some
   of the frames: again the correspondence is very good.}
 \label{fig:sift-conformity}
 \end{figure}

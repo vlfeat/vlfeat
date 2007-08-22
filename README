@@ -46,8 +46,12 @@ CREATING THE DOCUMENTATION
   under Mac OS X and Linux only. Compiling the documentation
   requires the following additional tools
   
-  - fig2dev (part of XFig)
-  - a modern LaTeX (with htlatex, pdflatex, dvips, dvipng)
+  - fig2dev (part of transfig)
+  - a modern LaTeX with
+    + pdflatex
+    + dvips
+    + htlatex (possibily part of TeX4ht)
+    + dvipng  (possibily a separated package)
   - doxygen
 
   FIGURES. Figures are preprocessed by typing
@@ -63,6 +67,7 @@ CREATING THE DOCUMENTATION
 
   TUTORIAL. To compile the tutorial, issue
 
+  > make docdeep
   > make doc
 
   SOURCE CODE DOCUMENTATION. To compile the source code
@@ -81,4 +86,4 @@ APPENDIX
   - varadic macro support
 
 CHANGES
-  0.1     Initial public release.
+  beta-1     Initial public release.

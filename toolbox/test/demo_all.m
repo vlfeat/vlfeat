@@ -2,3 +2,4 @@
 demo_sift_basic ;
 demo_sift_peak ;
 demo_sift_edge ;
+demo_sift_cmd ;

@@ -2,8 +2,10 @@
 # author:      Andrea Vedaldi
 # description: Build everything
 
-VER=0.1
-DIST=vlfeat-$(VER)
+NAME               := vlfeat
+VER                := beta-1
+DIST                = $(NAME)-$(VER)
+BINDIST             = $(DIST)-$(ARCH)
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -122,10 +124,15 @@ toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 #                                                                  Doc
 # --------------------------------------------------------------------
 
-.PHONY: doc dox
+.PHONY: doc dox docdeep
 
 doc:
 	make -C doc all
+
+docdeep: all
+	mkdir -p results
+	cd toolbox ; \
+	matlab -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
 dox:
 	make -C doc/figures all
@@ -227,4 +234,3 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
-
