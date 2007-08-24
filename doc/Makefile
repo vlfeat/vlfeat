@@ -31,9 +31,10 @@ fig:
 .PHONY: clean
 clean:
 	make -C figures clean
-	rm -rf html vlfeat.pdf
+	rm -rf aux
 
 .PHONY: distclean
 distclean: clean
 	make -C figures distclean
-	rm -rf aux
+	rm -rf html vlfeat.pdf
+

@@ -103,7 +103,8 @@ mexsrc =                \
  toolbox\whistc.c       \
  toolbox\binsum.c       \
  toolbox\alldist2.c     \
- toolbox\aib.c
+ toolbox\aib.c          \
+ toolbox\ubcmatch.c
 
 libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)

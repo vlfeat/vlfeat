@@ -36,23 +36,6 @@ function h=plotframe(frames,varargin)
 %  plot function.
 
 % AUTORIGHTS
-% Copyright (C) 2006 Andrea Vedaldi
-%       
-% This file is part of VLUtil.
-% 
-% VLUtil is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2, or (at your option)
-% any later version.
-% 
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-% 
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software Foundation,
-% Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 % number of vertices drawn for each frame
 np        = 40 ;
@@ -181,8 +164,8 @@ switch kind
 
   case 'disk'
     eframes(1:2,:) = frames(1:2,:) ;
-    eframes(3,:) = frames(3,:) ;
-    eframes(6,:) = frames(3,:) ;
+    eframes(3,:)   = frames(3,:) ;
+    eframes(6,:)   = frames(3,:) ;
     
   case 'odisk' 
     r = frames(3,:) ;
@@ -193,6 +176,8 @@ switch kind
     eframes(3:6,:) = [c ; s ; -s ; c] ;
 
   case 'ellipse'
+%    sz = find(1e6 * abs(eframes(3,:)) < abs(eframes(4,:)+eframes(5,:))
+    
     eframes(1:2,:) = frames(1:2,:) ;
     
     eframes(3,:) = sqrt(frames(3,:)) ;

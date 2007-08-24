@@ -19,7 +19,7 @@ enum {
   opt_no_dups,
   opt_verbose
 } ;
-
+]
 uMexOption options [] = {
   {"Delta",               1,   opt_delta    },
   {"Epsilon",             1,   opt_epsilon  },

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h> /* memset */
-#include <stdbool.h>
 
 /* pairs are used to generate random permutations of data */
 typedef struct
@@ -26,8 +25,8 @@ acc_t * vl_ikmeans(data_t * data_pt, int M, int N, idx_t K, idx_t * asgn_pt)
 {
 
     acc_t * centers_pt = malloc(sizeof(acc_t)*M*K);
-    bool saveasgn = (asgn_pt != NULL);
-    if(!saveasgn) asgn_pt = malloc(sizeof(idx_t)*N);
+    vl_bool saveasgn = (asgn_pt != NULL);
+
 
     /* random permutation */
     idx_t i, j, k, pass;
@@ -36,6 +35,8 @@ acc_t * vl_ikmeans(data_t * data_pt, int M, int N, idx_t K, idx_t * asgn_pt)
     vl_bool verbose = 1 ;
     acc_t *counts_pt = malloc (sizeof (acc_t) * K);
     pair_t *pairs_pt = (pair_t *) malloc (sizeof (pair_t) * N);
+
+    if(!saveasgn) asgn_pt = malloc(sizeof(idx_t)*N);
 
     for (j = 0; j < N; ++j)
     {

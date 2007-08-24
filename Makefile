@@ -194,6 +194,8 @@ bindist: all doc clean TIMESTAMP
 	tar chzvf $(BINDIST).tar.gz ../$(d)                           \
 	  --exclude '.git'                                            \
 	  --exclude 'results'                                         \
+	  --exclude 'doc/figures/demo/*.eps'                          \
+	  --exclude '*.pdb'                                           \
 	  --exclude '$(DIST)-*'                                       \
 	  --exclude '$(BINDIST)-*'
 

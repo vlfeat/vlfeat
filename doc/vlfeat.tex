@@ -289,60 +289,51 @@ Lowe's and vice-versa.
 \label{fig:sift-conformity}
 \end{figure}
 
-
 % --------------------------------------------------------------------
 \section{MSER}\label{mser}
 % --------------------------------------------------------------------
 
+MSER is a feature detector (Fig.~\ref{fig:mser-intro}). Analogously to
+the SIFT detector (see Sect.~\ref{sift}), the MSER algorithm
+takes and image and extracts a number of feature frames. The frames
+are the maximally stable extremal regions (MSERs) of the image. A MSER
+is just a connected component of one of the level sets $\{x:I(y)\leq
+\gamma\}$ of intensity $\gamma$ of the iamge $I$.
+
+\begin{figure*}[h]
+\subfloat[]{
+\includegraphics[width=0.32\textwidth]{figures/demo/mser_basic_0}
+\label{fig:mser-intro-a}}
+\hfill
+\subfloat[]{
+\includegraphics[width=0.32\textwidth]{figures/demo/mser_basic_1}
+\label{fig:mser-intro-b}}
+\hfill
+\subfloat[]{
+\includegraphics[width=0.32\textwidth]{figures/demo/mser_basic_2}
+\label{fig:mser-intro-c}}
+\caption{{\em MSER: frames} \protect\subref{fig:sift-intro-a}
+  a test image, \protect\subref{fig:sift-intro-b} detected MSERs (positive and negative), \protect\subref{fig:sift-intro-c} MSERs as fitted ellipses.}
+\label{fig:mser-intro}
+\end{figure*}
+
+An MSER can be identified by a single pixel $x$, called {\em seed}, as
+the connected compoment of intensity $\gamma=I(x)$ which contains the
+pixel $x$. Notice that not all pixels of a regions are seeds, but
+there exists at least one.
+
+Notice that MSERs have arbitrary shape
+(Fig.~\ref{fig:mser-intro-b}). Usually they are simplified by fitting
+to them ellipsoids, as in (Fig.~\ref{fig:mser-intro-c}).
 
 % --------------------------------------------------------------------
-\appendix
-\section{Overview of SIFT}\label{sift.overview}
+\section*{References}
 % --------------------------------------------------------------------
 
-This section gives a very quick overview of the SIFT detector and
-descriptor. For details the reader is reccomended to refer to [].
+% --------------------------------------------------------------------
+\subsection*{Acknowledgments}
+% --------------------------------------------------------------------
 
-\block{\bf Gaussian scale space and DoG.} SIFT starts by computing a
-Gaussian scale space of the input image (Fig.~\ref{fig:sift-ss}). It
-then computes second scale space, DoG (difference of Gaussians), by
-subtracting successive layers of the Gaussian scale space.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\columnwidth]{figures/sift-ss}
-\end{center}
-\caption{{\em SIFT Scale Space.} From left to right, the input image
-  $I$ is gradually convolved by Gaussian kernels of wider and wider
-  variance and the resolution lowered. There are $O$ octaves and $S$
-  levels per octave.}\label{fig:sift-ss}
-\end{figure}
-
-\block{\bf SIFT detector.} SIFT frames (keypoints) are selected as
-local extrema of the DoG scale space (which is a 3-D
-function). Unstable local extrema are filtered based on two
-thresholds:
-\begin{itemize}
-\item {\em Peak threshold}. Extrema whose value is below this
-  threshold are discared.
-\item {\em Edge threshold}. The local curvature of the DoG function is
-  evaluated and extrema whose curvature is below this threshold are
-  discarded.
-\end{itemize}
-
-\block{\bf SIFT descriptor.} The SIFT descriptor is a 3-D histogram of
-the local image gradient (Fig.~\ref{fig:sift-bins}).
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=\columnwidth]{figures/sift-bins}
-\end{center}
-\caption{{\em SIFT descriptor.} The SIFT descriptor is a 3-D histogram
-  of the gradient orentations and positions of the local image
-  patch. There are $N_o$ bins for the orientation and $N_p$ for each
-  spatial direction. Binning is linearly interpolated and the gradient
-  magnitude is weighed by a Gaussian window.}\label{fig:sift-bins}
-\end{figure}
 
 % --------------------------------------------------------------------
 \end{document}
