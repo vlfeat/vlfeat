@@ -1,166 +1,179 @@
-.TH SIFT 1 "July 207" Unix "Ueser Manuals"
-
+.TH SIFT 1 "" "VLFeat" "VLFeat"
+.\" ------------------------------------------------------------------
 .SH NAME
-sift \- Scale Invariant Feature Transform (SIFT)
-
+.\" ------------------------------------------------------------------
+sift \- Scale Invariant Feature Transform
+.\" ------------------------------------------------------------------
 .SH SYNOPSIS
-.B sift [
-.I options
-.B ] 
-.I files
-.B ...
-
-.SH DESCRIPTION
+.\" ------------------------------------------------------------------
 .B sift
-computes the Scale Invariant Feature Transform (SIFT) of an image.
-The command operate on may images at once, exposes many parameters of
-the SIFT algorithm and can bypass the SIFT detector by reading frames
-(keypoints) from a file.
-
+.RI [ options ]
+FILE .\|.\|.
+.\" ------------------------------------------------------------------
 .SH OPTIONS
-.IP "--help -h"
-Print help message.
-.IP "--version "
-Print version string.
-.IP "--verbose -v"
+.\" ------------------------------------------------------------------
+.TP
+.B \-v\fR,\fP \-\^\-verbose
 Increase verbosity level (may be repeated).
-.IP "--output[=spec]"
-Write a file with both frames and descriptors.
-.I spec
-optionally sets the specifier of the file.
-.IP "--frames[=spec]"
-Write a file with the frames only.
-.I spec
-optionally sets the specifier of the frames file.
-.IP "--descriptors[=spec]"
-Write a file with the descriptors only.
-.I spec
-optionally sets the specifiers of the descriptors file.
-.IP "--gss[=spec]"
-Write the Gaussian Scale Space leveles as a set of PGM images.
-.I spec
-optionally sets the specifier of the PGM files.
-.IP "--read-frames=spec"
-Do not run the SIFT detector. Instead read th feature frames from the file
-specified by
-.I spec
-\.
-.IP "--octaves=x -Ox"
-Set the number of octaves to
-.I O
-.IP "--levels=x -Lx"
-Set the number of levels per octave to
-.I x
-.IP "--first-octave=x"
-Set the index of the first octave to
-.I x
-.IP "--edges-tresh=x"
-Set the edge threshold to
-.I x
-.IP "--peaks-tresh=x"
-Set the peak threshold to
-.I x
-.IP "--orientations"
-When reading the feature frames from a file, use the SIFT orientation
-assignment step to assign their orientations.
-
-.SH USAGE
-
-.B sift 
-accepts one or more PGM images as input and run the SIFT detector and
-descriptor, producing a set of frames (or keypoints) and descriptors.
-
-By default, on input
-.I myimage.pgm
-the program produces a file 
-.I myimage.sift
-containing the frames (four floating point numbers: position x,y,
-orientation and scale) and descriptors (128 integer numbers).  The
-file is a vanilla ASCII files, with one row per feature. Options
+.TP
+.B \-h\fR,\fP \-\^\-help
+Show options and version.
+.TP
+.BI \-\^\-output "\fR[=\fPFILESPEC\fR],\fP " \-o FILESPEC
+Enable/specify seeds output.
+.TP
+.BI \-\^\-frames \fR[=\fPFILESPEC\fR]\fP
+Enable/specify frames output.
+.TP
+.BI \-\^\-descriptors \fR[=\fPFILESPEC\fR]\fP
+Enable/specify descriptors output.
+.TP
+.BI \-\^\-gss \fR[=\fPFILESPEC\fR]\fP
+Enable/specify the Gaussian Scale Space (GSS) output.
+.TP
+.BI \-\^\-meta \fR[=\fPFILESPEC\fR]\fP
+Enable/specify meta output.
+.TP
+.BI \-\^\-first-octave \fR=\fPINTEGER
+Specifiy the index of the first octave of the GSS.
+.TP
+.BI \-\^\-edge-tresh \fR=\fPREAL
+Specify the edge treshold.
+.TP
+.BI \-\^\-peak-tresh \fR=\fPREAL
+Specify the peak treshold.
+.TP
+.BI \-\^\-read-frames \fR[=\fPFILESPEC\fR]\fP
+Enable/specify reading the frames from a file.
+.B \-\^\-orientations
+Force the computation of the frame orientations.
+.\" ------------------------------------------------------------------
+.SH DESCRIPTION
+.\" ------------------------------------------------------------------
+.B sift
+computes the 
+.I Scale Invariant Feature Transform (SIFT).
+\. In the simplest case,
+.B sift
+reads an image file (in PGM format), computes the SIFT frames and
+their descriptors and write them to a file. Alternatively,
 .B --frames
-and 
+option can be used to suppress the standard output and produce a file
+with the feature frames only.  Similarly,
 .B --descriptors
-can be used to produce separate files for frames and descriptors (in
-this case, and as long as
+suppresses the standard output and produce a file of descriptors only.
 .B --output
-is not specified) the aggregate file is not produced. Files can be
-produced in binary format, in which case each floating point number is
-saved as a double and each integer number as an unigned byte (see also
-the `On File Specifiers' section below).
-
-.P The
+can be used in combination with the previous too if the combined
+output of frames and descriptors is required.
+.P 
+The
 .B --read-frames
 option bypasses the SIFT detector and reads the frames from the
-specified file. Use this option in combination with
+specified file. This option can be used iin combination with
 .B --orientations
-to read the frames but re-calculate their orientations. In all cases,
-frames are still written alogn with their descriptors. For the frames
-to be processed in the same order in which they are read, make sure
-that frames are ordered by increasing scale (notice however that if
+to read the frames but calculate their orientations anyway. Both option
+do not change how the frames and the descriptors are written to disk.
+Notice that if
 .B --orientations
 is used, the number of frames may change if multiple orientations are detected).
-
-
-.SS ON FILE SPECIFIERS
-In order to make it easy to work with multiple input files,
-.B sift
-makes uses of file specifiers. A file specifier
-.I spec
-specifies the format of the file and how its name has to be derived
-from the name of the input file. The format may be either binary (
-.I bin:
-) or ASCII (
-.I ascii:
-). File in binary format are vectors of homogeneous atomic values
-(such as doubles and bytes) and they are always in big-endian
-ordering. 
-
 .P
-The file name is derived from a pattern by substituting any occurence
-of the wildcard character `%' (the wildcard character can be escaped
-by preceding it by `\\') with the basename of the input file. For
-instance, the specifier
-.I bin:/tmp/%.sift
-with input file
-.I myimage.pgm
-correspond to the file
-.I /tmp/myyimage.sift
-in binary format.
-
-.SH EXAMPLES
+A frame is an oriented ellipse (also called affine frame) and is
+specified by 6 floating point numbers (in order: coordinate of the
+center
+.I x
+and
+.I y,
+and elements
+.IR A11 ,
+.IR A21 ,
+.IR A21 ,
+.I  A22
+of the matrix mapping the unit circle to the ellipse).  A feature
+descriptor is an histogram. It is specifyied by 128 non-negative
+integer numbers.
+.P
+.B sift
+can process multiple images and derive the names of the various output
+files by means of
+.I FILESPEC
+(see
+.BR vlfeat (7)).
+Both frames and descriptors can be saved/loaded either in ascii or binary
+format.
+.
 .TP
-sift /tmp/myimage.pgm
+Ascii format
+.
+Each descriptor is a list of 128 decimal numbers and
+occupies a line of text.  Each frame is a list of 5 numbers,
+specifying an elliptical frame, one per line of text.  The combined
+output file (with both frames and descriptors) stores a frame
+.I and
+the corresponding descriptor for each line of text.
+.
+.TP
+Binary format
+.
+The binary format is similar to the ASCII format, except
+that each frame element is stored as an IEEE double floating point
+number (eight bytes) and each descriptor element is stored as an
+unsiged integer (one byte). The data is written in little
+endian order.
+.
+.\" ------------------------------------------------------------------
+.SH EXAMPLES
+.\" ------------------------------------------------------------------
+.TP
+sift test.pgm --peak-tresh=0.03
 Caluclates the SIFT frames and descriptors of image
 .I /tmp/myimage.pgm
+with peak treshold equal to 0.03
 and save them back to
-.I myimage.sift
-in the current directory.
-
+.I test.sift 
+in ascii format.
 .TP 
-sift /tmp/myimage.pgm --frames=bin:/tmp/%.frame
-Calculates only the SIFT frames and saves them in binary format to
-.I /tmp/myimage.frame.
-
+sift test.pgm --frames
+Writes the frames to 
+.I 
+test.frame
+in ascii format and does not compute the descriptors.
+.
 .TP
-sift /tmp/myimage1.pgm /tmp/myimage2.pgm --frames --descriptors=bin:
-Calculate frames and descriptors of the two images and produce the frames files
-.I myimage1.frame
-and 
-.I myimage2.frame
-in ASCII format and the descriptors files
-.I myimage1.descr
-and
-.I myimage2.descr
+sift test.pgm --descriptors=bin://
+writes only the frames to
+.IR test.descr.
 in binary format.
-
+.
 .TP
-sift /tmp/myimage.pgm --first-octave=0 -vv
-Start the scale space from the octave of index 0 (as opposed to -1) and
-print lots of diagnostic information.
-
-
-.SH AUTHOR
-Andrea Vedaldi (vedaldi@cs.ucla.edu)
-
+sift test.pgm \-\^\-frames=my.frames -o bin:///tmp/%.sift
+writes the frames in ascii format to
+.I my.frames 
+and the combined frames-descriptors file in binary format to
+.IR /tmp/test.sift .
+.
+.TP
+sift test1.pgm test2.pgm \-\^\-read-frames=bin:/tmp/%.key 
+reads the
+frames of images
+.I test1.pgm
+and 
+.I test2.pgm
+from the binary files
+.I /tmp/test1.key
+and
+.I /tmp/test2.key
+and writes the frames and their descriptors to the files
+.I test1.sift
+and
+.I test2.sift
+respectively.
+.
+.\" ------------------------------------------------------------------
 .SH SEE ALSO
-convert (1)
+.\" ------------------------------------------------------------------
+.BR vlfeat (7).
+
+D. G. Lowe. 
+Distinctive image features from scale-invariant keypoints. 
+.IR IJCV , 
+2(60):91-110, 2004.

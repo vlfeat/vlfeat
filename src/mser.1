@@ -1,49 +1,144 @@
-.TH MSER 1 "July 207" Unix "Ueser Manuals"
+.TH MSER 1 "" "VLFeat" "VLFeat"
+.\" ------------------------------------------------------------------
 .SH NAME
-mser \- Maximally Stable Extremal Regions (MSER)
+.\" ------------------------------------------------------------------
+mser \- Maximally Stable Extremal Regions
+.\" ------------------------------------------------------------------
 .SH SYNOPSIS
-.B mser [
-.I options
-.B ] 
-.I files
-.B ...
-.SH OPTIONS
-.IP "--help -h"
-Print help message.
-.IP "--version "
-Print version string.
-.IP "--verbose -v"
-Increase verbosity level (may be repeated).
-.IP "--frames[=spec]"
-Writes feature frames.
-.I spec
-optionally sets the file specifier.
-.SH OVERVIEW
+.\" ------------------------------------------------------------------
 .B mser
-computes the Maximally Stalbe Extremal Regions (MSER) of an image.
-The command is quite flexible: it can operate on multiple images at
-once and it exposes many parameters of the MSER algorithm.
-.SH SPECIFYING FILES
-In order to make it easy to work with multiple input files,
-.B sift
-makes uses of file specifiers. A file specifier
-.I spec
-specifies the format of the file and how its name has to be derived
-from the name of the input file. The format may be either binary (
-.I bin:
-) or ASCII (
-.I ascii:
-). File in binary format are vectors of homogeneous atomic values
-(such as doubles and bytes) and they are always in big-endian
-ordering. 
+.RI [ options ]
+FILE .\|.\|.
+.\" ------------------------------------------------------------------
+.SH OPTIONS
+.\" ------------------------------------------------------------------
+.TP
+.B \-v\fR,\fP \-\^\-verbose
+Increase verbosity level (may be repeated).
+.TP
+.B \-h\fR,\fP \-\^\-help
+Show options and version.
+.TP
+.BI \-\^\-seeds \fR[=\fPFILESPEC\fR]\fP
+Enable/specify seeds output.
+.TP
+.BI \-\^\-frames \fR[=\fPFILESPEC\fR]\fP
+Enable/specify frames output.
+.TP
+.BI \-\^\-meta \fR[=\fPFILESPEC\fR]\fP
+Enable/specify meta output.
+.TP
+.BI \-d " REAL" "\fR,\fP \-\^\-delta" "=REAL"
+Specify delta parameter.
+.TP
+.BI \-\^\-min-area \fR=\fPREAL
+Specifiy minimum region area.
+.TP
+.BI \-\^\-max-area \fR=\fPREAL
+Specify maximum region area.
+.TP
+.BI \-\^\-max-variation \fR=\fPREAL
+Specify maximum region variation.
+.TP
+.BI \-\^\-min-diversity \fR=\fPREAL
+Specify minimum region diversity.
+.\" ------------------------------------------------------------------
+.SH DESCRIPTION
+.\" ------------------------------------------------------------------
+.B mser
+computes the 
+.I Maximally Stalbe Extremal Regions (MSER)
+\. In the simplest case,
+.B mser 
+reads an image file (in PGM format), computes the MSERs and write them
+as a file of region seeds. Alternatively, the
+.B --frames
+option can be used to compute elliptical frames instead of region seeds.
+It is also possible to use 
+.B --frames
+and
+.B --seeds
+in combination to save both seeds and frames.
+.
 .P
-The file name is derived from a pattern by substituting any occurence
-of the wildcard character `%' (the wildcard character can be escaped
-by preceding it by `\\') with the basename of the input file. For
-instance, the specifier
-.I bin:/tmp/%.sift
-with input file
-.I myimage.pgm
-correspond to the file
-.I /tmp/myyimage.sift
-in binary format.
+A region seed is and index of the image pixels and is specified by a
+  non negative integer number. A frame is an oriented ellipse and is
+specified by 5 floating point numbers (in order: coordinate of the
+center
+.I x
+and
+.I y,
+and elements
+.IR S11 ,
+.IR S12 ,
+.IR S22
+of the co-variance matrix). 
+.P
+.B mser
+can process multiple images and derive the names of the various output
+files by means of
+.I FILESPEC
+(see also
+.BR vlfeat (7)).
+Both seeds and frames can be saved either in ascii or binary format.
+.
+.TP
+Ascii format
+.
+Each seed is a decimal number, one per line of text, and each
+frame is a list of 6 floating point numbers, one per line of text.
+.
+.TP 
+Binary format
+.
+The binary format is similar to the ascii format, except that each
+seed is stored as a unsigned interger (four bytes) and each frame
+component is stored as an IEEE double (eight bytes). The data is
+written in little endian order.
+.
+.\" ------------------------------------------------------------------
+.SH EXAMPLES
+.\" ------------------------------------------------------------------
+.
+.TP
+mser test.pgm -d 5
+Computes the MSERs of image
+.I test.pgm
+setting the parameter
+.I delta
+to 5
+and save the result as a sequence of region seeds to
+.IR test.mser .
+.TP
+mser test.pgm \-\^\-frames
+Computes the MSERs of image
+.IR test.pgm , 
+fits elliptical frames to them and saves the frames to
+.IR test.frame .
+.
+.TP
+mser test.pgm \-\^\-frames=bin:///tmp/%.frame \-\^\-seeds
+Computes the MSERs of image
+.IR test.pgm , 
+fits elliptical frames to them and saves
+the frames to 
+.I /tmp/test.frame
+and the region seeds to
+.IR test.mser .
+.
+.\" ------------------------------------------------------------------
+.SH SEE ALSO
+.\" ------------------------------------------------------------------
+.P
+.BR vlfeat (7)
+.
+.P
+J. Matas, O. Chum, M. Urban, and T. Pajdla. 
+Robust wide baseline stereo from maximally stable extremal regions. In
+.IR "Proc. BMVC" , 
+2002.
+.
+.P
+A. Vedaldi and B. Fulkerson.
+VLFeat Library.
+.IR http://vision.ucla.edu/~vedaldi/code/vlfeat/vlfeat.html

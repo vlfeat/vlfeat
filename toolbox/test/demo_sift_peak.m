@@ -1,4 +1,4 @@
-% DEMO_SIFT_EDGE  Demo: SIFT: peak treshold
+% DEMO_SIFT_PEAK  Demo: SIFT: peak treshold
 
 randn('state',0) ;
 rand('state',0) ;

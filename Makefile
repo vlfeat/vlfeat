@@ -3,7 +3,7 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := beta-1
+VER                := beta-2
 DIST                = $(NAME)-$(VER)
 BINDIST             = $(DIST)-$(ARCH)
 
@@ -167,8 +167,7 @@ distclean: clean
 	rm -f  toolbox/*.mexw32
 	rm -f  toolbox/*.dll
 	rm -f  toolbox/*.pdb
-	rm -f  $(DIST)-*
-	rm -f  $(BINDIST)-*
+	rm -f  $(NAME)-*.tar.gz
 
 .PHONY: dist
 dist: d := $(notdir $(CURDIR)) 

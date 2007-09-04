@@ -15,7 +15,10 @@ I = single(I) ;
 % --------------------------------------------------------------------
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
                    ' --peak-tresh=3.4 --edge-tresh=10']) ;
-%                                       ' --peak-tresh=0 --edge-tresh=100']) ;
+%                                       ' --peak-tresh=0
+%                                       --edge-tresh=100']) ;
+
+if (err), error(msg) ; end
 
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;

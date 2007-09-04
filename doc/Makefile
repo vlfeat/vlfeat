@@ -6,9 +6,10 @@ all: vlfeat.pdf html/vlfeat.html
 
 aux/vlfeat.tex : vlfeat.tex
 	mkdir -p aux
-	ln -sf ../figures    aux/figures
-	ln -sf ../vlfeat.tex aux/vlfeat.tex
-	ln -sf ../vl.cfg     aux/vl.cfg
+	ln -sf ../figures      aux/figures
+	ln -sf ../vlfeat.tex   aux/vlfeat.tex
+	ln -sf ../vl.cfg       aux/vl.cfg
+	ln -sf ../vlfeat.bbl   aux/vlfeat.bbl
 
 html/vlfeat.html : vlfeat.tex aux/vlfeat.tex vl.cfg
 	make -C figures all

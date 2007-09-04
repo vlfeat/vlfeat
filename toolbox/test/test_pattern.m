@@ -1,5 +1,6 @@
 function I = test_pattern(n)
 % TEST_PATTERN  Generate test pattern
+%   I=TEST_PATTERN(N) returns the N-th test pattern.
 
 ur    = linspace(-1,1,128) ;
 vr    = linspace(-1,1,128) ;
@@ -28,11 +29,8 @@ switch n
     I = 255 * rand(32,32) ;
     
   case 101
-    I = 255 * imreadbw(fullfile(vlfeat_root,'data','car1.jpg')) ;
+    I = 255 * imreadbw(fullfile(vlfeat_root,'data','a.jpg')) ;
     
   case 102
     I = 255 * imreadbw(fullfile(vlfeat_root,'data','box.pgm')) ;   
 end
-
-
-

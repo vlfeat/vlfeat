@@ -61,28 +61,26 @@
  ** minimum of the (in)stability score. More accurately, we start by
  ** assuming that all branches are maximally stable. Then we consider
  ** each branch @f$B(R_{l})@f$ and its parent branch
- ** @f$B(R_{l+1}):R_{l+1}\supset R_l@f$. If the two representative
- ** regions @f$B(R_{l})@f$ and @f$B(R_{l+1})@f$ are close (in term of
- ** shape), we mark as unstable the one with higher (in)stability
- ** score. Formally:
+ ** @f$B(R_{l+1}):R_{l+1}\supset R_l@f$ (notice that, due to the
+ ** discrete nature of the calculations, they might be geometrically
+ ** identical) and we mark as unstble the less stable one, i.e.:
  **
- ** - if @f$|R_{l+1}-R_{l}|/|R_l|<\epsilon@f$
  **   - if @f$v(R_l)<v(R_{l+1})@f$, mark @f$R_{l+1}@f$ as unstable;
- **   - otherwise, mark @f$R_l@f$ as unstable.
+ **   - if @f$v(R_l)>v(R_{l+1})@f$, mark @f$R_{l}@f$ as unstable;
+ **   - otherwise, do nothing.
  **
  ** This criterion selects among nearby regions the one that are more
- ** stable. We optionally refine the selection by running some or all
- ** of the following tests:
+ ** stable. We optionally refine the selection by running (starting
+ ** from the bigger and going to the smaller regions) the following
+ ** tests:
  **
- ** - @f$a_- \leq |R_{l}|/|R_{\infty}| \leq a_+@f$: exclude extremal
- **   regions too small or too big (@f$|R_{\infty}|@f$ is the area of
- **   the image).
+ ** - @f$a_- \leq |R_{l}|/|R_{\infty}| \leq a_+@f$: exclude MSERs too
+ **   small or too big (@f$|R_{\infty}|@f$ is the area of the image).
  **
- ** - @f$v(R_{l}) < v_+@f$: test for absolute stability.
+ ** - @f$v(R_{l}) < v_+@f$: exclude MSERs too unstable.
  **
- ** - For any two regions @f$R_l\subset R_{l+q}@f$ whose
- **   relative area variation @f$|R_{l+q} - R_l|/|R_l|@f$ is
- **   below a treshold, mark @f$R_{l}@f$ as unstable: remove duplicated regions.
+ ** - For any MSER @f$R_l@f$, find the parent MSER @f$R_{l'}@f$ and check wether
+ **   @f$|R_{l'} - R_l|/|R_l'| < d_+@f$: remove duplicated MSERs.
  **
  **  <table>
  **  <tr>
@@ -96,12 +94,6 @@
  **    <td>@c delta</td>
  **    <td>5</td>
  **    <td>::vl_mser_set_delta()</td>
- **  </tr>
- **  <tr>
- **    <td>@f$\epsilon@f$</td>
- **    <td>@c epsilon</td>
- **    <td>0.2</td>
- **    <td>::vl_mser_set_epsilon()</td>
  **  </tr>
  **  <tr>
  **    <td>@f$a_+@f$</td>
@@ -119,13 +111,13 @@
  **    <td>@f$v_+@f$</td>
  **    <td>@c max_var</td>
  **    <td>0.25</td>
- **    <td>::vl_mser_set_max_var()</td>
+ **    <td>::vl_mser_set_max_variation()</td>
  **  </tr>
  **  <tr>
- **    <td></td>
- **    <td>@c no_dups</td>
- **    <td>@c true (1)</td>
- **    <td>::vl_mser_set_no_dups()</td>
+ **    <td>@f$d_+@f$</td>
+ **    <td>@c min_diversity</td>
+ **    <td>0.2</td>
+ **    <td>::vl_mser_set_min_diversity()</td>
  **  </tr>
  ** </table>
  **
@@ -329,11 +321,10 @@ vl_mser_new (int ndims, int const* dims)
 
   /* other parameters */
   f-> delta         = 5 ;
-  f-> epsilon       = 0.2 ;
   f-> max_area      = 0.75 ;
   f-> min_area      = 3.0 / f-> nel ;
-  f-> max_var       = 0.25 ;
-  f-> no_dups       = 1 ;
+  f-> max_variation = 0.25 ;
+  f-> min_diversity = 0.2 ;
 
   return f ;
 }
@@ -394,7 +385,6 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   VlMserExtrReg *er      = f-> er ;
   vl_uint       *mer     = f-> mer ;
   int            delta   = f-> delta ;
-  vl_single      epsilon = f-> epsilon ;
 
   int njoins = 0 ;
   int ner    = 0 ;
@@ -576,12 +566,12 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
             r [nr_idx] .parent   = r_idx ;
             r [nr_idx] .shortcut = r_idx ;
             r [r_idx]  .area    += r [nr_idx] .area ;
-            r [r_idx]  .height   = VL_MAX(hgt, n_hgt+1) ;
+            r [r_idx]  .height   = VL_MAX(hgt, n_hgt + 1) ;
 
             joins [njoins++] = nr_idx ; 
 
             /* count if extremal */
-            if(nr_val != val) ++ ner ;
+            if (nr_val != val) ++ ner ;
 
           } /* check b vs c */
         } /* check a vs b or c */        
@@ -603,7 +593,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   /* save back */
   f-> njoins = njoins ;
 
-  f->stats .num_extremal = ner ;
+  f-> stats. num_extremal = ner ;
 
   /* -----------------------------------------------------------------
    *                                          Extract extremal regions
@@ -670,22 +660,19 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     vl_uint idx = er [i] .index ;
 
     do {
-      idx = r [idx] .parent ;
-    } while ( r [idx] .shortcut == VL_MSER_VOID_NODE ) ;
+      idx = r[idx] .parent ;
+    } while (r[idx] .shortcut == VL_MSER_VOID_NODE) ;
 
-    er [i] .parent   = r [idx] .shortcut ;
-    er [i] .shortcut = i ;
+    er[i] .parent   = r[idx] .shortcut ;
+    er[i] .shortcut = i ;
   }
 
   /* -----------------------------------------------------------------
    *                            Compute variability of +DELTA branches
    * -------------------------------------------------------------- */
-
-  /* 
-     For each extremal region Xi of value VAL we look for the biggest
-     parent that has value not greater than VAL+DELTA. This is dubbed
-     the top parent.
-  */
+  /* For each extremal region Xi of value VAL we look for the biggest
+   * parent that has value not greater than VAL+DELTA. This is dubbed
+   * the top parent. */
 
   for(i = 0 ; i < ner ; ++i) {
 
@@ -698,14 +685,12 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
       int next     = er [top]  .parent ;
       int next_val = er [next] .value ;
       
-      /* break if there is no node above the top */
-      if (next == top) 
-        break ;
-      
-      /* break if the next node is above the top value */
-      if (next_val > top_val)
-        break ;
-      
+      /* Break if:
+       * - there is no node above the top or
+       * - the next node is above the top value. 
+       */
+      if (next == top || next_val > top_val) break ;
+            
       /* so next could be the top */
       top = next ;
     }
@@ -718,14 +703,12 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
       er [i] .max_stable = 1 ;
     }
         
-    /*
-      shortcut: since extremal regions are processed by increasing
-      intensity, all next extremal regions being processed have value
-      at least equal to the one of Xi. If any of them has parent the
-      parent of Xi (this comprises the parent itself), we can safely
-      skip most intermediate node along the branch and skip directly
-      to the top to start our search.
-    */
+    /* shortcut: since extremal regions are processed by increasing
+     * intensity, all next extremal regions being processed have value
+     * at least equal to the one of Xi. If any of them has parent the
+     * parent of Xi (this comprises the parent itself), we can safely
+     * skip most intermediate node along the branch and skip directly
+     * to the top to start our search. */
     {
       int parent = er [i] .parent ;
       int curr   = er [parent] .shortcut ;
@@ -739,25 +722,18 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     
   nmer = ner ;
   for(i = 0 ; i < ner ; ++i) {
-    vl_uint     parent = er [i]      .parent ;
-    vl_single     var  = er [i]      .variation ;
-    vl_mser_pix   val  = er [i]      .value ;
-    vl_mser_pix p_val  = er[parent] .value ;
-    vl_single   p_var  = er [parent] .variation ;
-    int          area  = er [i]      .area ;
-    int        p_area  = er [parent] .area ;
-    vl_single   change = (vl_single) (p_area - area) / area ;
+    vl_uint    parent = er [i     ] .parent ;
+    vl_mser_pix   val = er [i     ] .value ;
+    vl_single     var = er [i     ] .variation ;
+    vl_mser_pix p_val = er [parent] .value ;
+    vl_single   p_var = er [parent] .variation ;
     vl_uint     loser ;
     
     /* 
-       Test wether |R_{l+1} - R_l| / |R_l| < epsilon. Notice that
-       R_parent = R_{l+1} only if p_val = val + 1. If not, this and
-       the parent region coincide and there is nothing to do.
-
-       As an exception to this rule, we still run selection if the parent
-       does not differ much in term of area.
+       Notice that R_parent = R_{l+1} only if p_val = val + 1. If not,
+       this and the parent region coincide and there is nothing to do.
     */
-    if(p_val > val + 1 && change > epsilon) continue ;
+    if(p_val > val + 1) continue ;
 
     /* decide which one to keep and put that in loser */
     if(var < p_var) loser = parent ; else loser = i ;
@@ -769,39 +745,36 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     }
   }
   
-  f->stats . num_unstable = ner - nmer ;
+  f-> stats. num_unstable = ner - nmer ;
 
   /* -----------------------------------------------------------------
    *                                                 Further filtering
    * -------------------------------------------------------------- */
-
-  /* 
-     It is critical for correct duplicate detection to remove regions
-     from the bottom (smallest one first).
-  */
+  /* It is critical for correct duplicate detection to remove regions
+   * from the bottom (smallest one first).                          */
   {
     vl_single max_area = (vl_single) f-> max_area * nel ;
     vl_single min_area = (vl_single) f-> min_area * nel ;
-    vl_single max_var  = (vl_single) f-> max_var ;
-    vl_single epsilon  = (vl_single) f-> epsilon ;
+    vl_single max_var  = (vl_single) f-> max_variation ;
+    vl_single min_div  = (vl_single) f-> min_diversity ;
 
-    /* scann all extremal regions from bottom */
-    for(i = 0L ; i < ner ; ++i) {
+    /* scann all extremal regions (intensity value order) */
+    for(i = ner-1 ; i >= 0L  ; --i) {
       
       /* process only maximally stable extremal regions */
       if (! er [i] .max_stable) continue ;
       
-      if (er [i] .variation >= max_var ) { ++ nbad ;   goto remove_this_region ; }
-      if (er [i] .area      >  max_area) { ++ nbig ;   goto remove_this_region ; }
-      if (er [i] .area      <  min_area) { ++ nsmall ; goto remove_this_region ; }
+      if (er [i] .variation >= max_var ) { ++ nbad ;   goto remove ; }
+      if (er [i] .area      >  max_area) { ++ nbig ;   goto remove ; }
+      if (er [i] .area      <  min_area) { ++ nsmall ; goto remove ; }
       
       /* 
        * Remove duplicates 
        */
-      if (f-> no_dups) {
+      if (min_div < 1.0) {
         vl_uint   parent = er [i] .parent ;
         int       area, p_area ;
-        vl_single change ;
+        vl_single div ;
         
         /* check all but the root mser */
         if(parent != i) {
@@ -813,30 +786,26 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
             parent = next ;
           }
           
-          /* compare with the parent region; if the current and parent
-             regions are too similar, keep only the parent */
+          /* Compare with the parent region; if the current and parent
+           * regions are too similar, keep only the parent. */
           area    = er [i]      .area ;
           p_area  = er [parent] .area ;
-          change  = (vl_single) (p_area - area) / (vl_single) p_area ;
+          div     = (vl_single) (p_area - area) / (vl_single) p_area ;
+          
+          if (div < min_div) { ++ ndup ; goto remove ; }
+        } /* remove dups end */
 
-          /*          printf("%d %g\n", er[i].value,change) ;*/
-
-          if(change < epsilon)  {
-            ++ ndup ;
-            goto remove_this_region ;
-          }          
-        } /* drop duplicates */ 
       }
       continue ;
-    remove_this_region :
+    remove :
       er [i] .max_stable = 0 ;
       -- nmer ;      
-    } /* next region to cleanup */
+    } /* check next region */
 
-    f->stats . num_too_big      = nbig ;
-    f->stats . num_too_small    = nsmall ;
-    f->stats . num_abs_unstable = nbad ;
-    f->stats . num_duplicates   = nbad ;
+    f-> stats .num_abs_unstable = nbad ;
+    f-> stats .num_too_big      = nbig ;
+    f-> stats .num_too_small    = nsmall ;
+    f-> stats .num_duplicates   = ndup ;
   }
   /* -----------------------------------------------------------------
    *                                                   Save the result

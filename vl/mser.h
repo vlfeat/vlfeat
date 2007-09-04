@@ -79,25 +79,22 @@ static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *filt) ;
 /** @name Retrieving parameters
  ** @{
  **/
-static vl_mser_pix      vl_mser_get_delta        (VlMserFilt const *filt) ;
-static double           vl_mser_get_epsilon      (VlMserFilt const *filt) ;
-static vl_bool          vl_mser_get_no_dups      (VlMserFilt const *filt) ;
-static double           vl_mser_get_min_area     (VlMserFilt const *filt) ;
-static double           vl_mser_get_max_area     (VlMserFilt const *filt) ;
-static double           vl_mser_get_max_var      (VlMserFilt const *filt) ;
+static vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *filt) ;
+static double       vl_mser_get_min_area       (VlMserFilt const *filt) ;
+static double       vl_mser_get_max_area       (VlMserFilt const *filt) ;
+static double       vl_mser_get_max_variration (VlMserFilt const *filt) 
+;static double      vl_mser_get_min_diversity  (VlMserFilt const *filt) ;
 /** @} */
 
 /** @name Setting parameters
  ** @{
  **/
-static void  vl_mser_set_epsilon   (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_delta     (VlMserFilt *filt, vl_mser_pix x) ;
-static void  vl_mser_set_no_dups   (VlMserFilt *filt, vl_bool     x) ;
-static void  vl_mser_set_min_area  (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_max_area  (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_max_var   (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_delta           (VlMserFilt *filt, vl_mser_pix x) ;
+static void  vl_mser_set_min_area        (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_area        (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_max_variation   (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_min_diversity   (VlMserFilt *filt, double      x) ;
 /** @} */
-
 
 /* ====================================================================
  *                                                   INLINE DEFINITIONS
@@ -235,11 +232,10 @@ struct _VlMserFilt
   /*@{*/
   vl_bool   verbose ;          /**< be verbose                             */
   int       delta ;            /**< delta filter paramter                  */
-  double    epsilon ;          /**< epsilon filter parameter               */
-  double    max_area ;         /** badness test parameter                  */
-  double    min_area ;         /** badness test parameter                  */
-  double    max_var ;          /** badness test parameter                  */
-  vl_bool   no_dups  ;         /** badness test parameter                  */
+  double    max_area ;         /**< badness test parameter                 */
+  double    min_area ;         /**< badness test parameter                 */
+  double    max_variation ;    /**< badness test parameter                 */
+  double    min_diversity ;    /**< minmium diversity                      */
   /*@}*/
 
   VlMserStats stats ;          /** run statistic                           */
@@ -267,24 +263,24 @@ vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
 }
 
 /* ----------------------------------------------------------------- */
-/** @brief Get epsilon
+/** @brief Get minimum diversity
  ** @param  f MSER filter.
- ** @return value of @c epsilon.
+ ** @return value of @c minimum diversity.
  **/
 static VL_INLINE double
-vl_mser_get_epsilon (VlMserFilt const *f) 
+vl_mser_get_min_diversity (VlMserFilt const *f) 
 {
-  return f-> epsilon ;
+  return f-> min_diversity ;
 }
 
-/** @brief Get epsilon
+/** @brief Set minimum diversity
  ** @param f MSER filter.
- ** @param x value of @c epsilon.
+ ** @param x value of @c minimum diversity.
  **/
 static VL_INLINE void
-vl_mser_set_epsilon (VlMserFilt *f, double x) 
+vl_mser_set_min_diversity (VlMserFilt *f, double x) 
 {
-  f-> epsilon = x ;
+  f-> min_diversity = x ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -346,9 +342,9 @@ vl_mser_set_min_area (VlMserFilt *f, double x)
  ** @return maximum region variation.
  **/
 static VL_INLINE double
-vl_mser_get_max_var (VlMserFilt const *f) 
+vl_mser_get_max_variation (VlMserFilt const *f) 
 {
-  return f-> max_var ;
+  return f-> max_variation ;
 }
 
 /** @brief Set maximum region variation
@@ -356,9 +352,9 @@ vl_mser_get_max_var (VlMserFilt const *f)
  ** @param x maximum region variation.
  **/
 static VL_INLINE void
-vl_mser_set_max_var (VlMserFilt *f, double x) 
+vl_mser_set_max_variation (VlMserFilt *f, double x) 
 {
-  f-> max_var = x ;
+  f-> max_variation = x ;
 }
 
 /* ----------------------------------------------------------------- */
@@ -380,27 +376,6 @@ static VL_INLINE vl_uint
 vl_mser_get_regions_num (VlMserFilt const* f)
 {
   return f-> nmer ;
-}
-
-/* ----------------------------------------------------------------- */
-/** @brief Get remove duplicates switch
- ** @param f MSER filter.
- ** @return duplicates switch.
- **/
-static VL_INLINE vl_bool 
-vl_mser_get_no_dups (VlMserFilt const* f)
-{
-  return f-> no_dups ;
-}
-
-/** @brief Set duplicates switch
- ** @param f MSER filter.
- ** @param x duplicates switch.
- **/
-static VL_INLINE void
-vl_mser_set_no_dups (VlMserFilt *f, vl_bool x)
-{
-  f-> no_dups = x  ;
 }
 
 /* ----------------------------------------------------------------- */

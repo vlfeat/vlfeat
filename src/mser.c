@@ -25,11 +25,9 @@
 char const help_message [] =
   "Usage: %s [options] files ...\n"
   "\n"
-  "Where options include:\n"
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
-  " --output -o     Specify output file\n"
-  " --pivots        Specify pivots file\n"
+  " --seeds         Specify seeds file\n"
   " --frames        Specify frames file\n"
   " --meta          Specify meta file\n"
   " --delta -d      Specify MSER delta paramter\n"
@@ -44,36 +42,31 @@ char const help_message [] =
 /* ----------------------------------------------------------------- */
 /* long options codes */
 enum { 
-  opt_pivot    = 1000, 
+  opt_seed    = 1000, 
   opt_frame,
   opt_meta, 
-  opt_version,
-  opt_no_dups,
-  opt_dups,
   opt_max_area,
   opt_min_area,
-  opt_max_var
+  opt_max_variation,
+  opt_min_diversity
 } ;
 
 /* short options */
-char const opts [] = "vhd:e:" ;
+char const opts [] = "vhd" ;
 
 /* long options */
 struct option const longopts [] = {
-  { "verbose",         no_argument,            0,          'v'          },
-  { "help",            no_argument,            0,          'h'          },
-  { "delta",           required_argument,      0,          'd'          },
-  { "epsilon",         required_argument,      0,          'e'          },
-  { "pivots",          optional_argument,      0,          opt_pivot    },
-  { "frames",          optional_argument,      0,          opt_frame    },
-  { "meta",            optional_argument,      0,          opt_meta     },
-  { "version",         no_argument,            0,          opt_version  },
-  { "no-dups",         no_argument,            0,          opt_no_dups  },
-  { "dups",            no_argument,            0,          opt_dups     },
-  { "max-area",        required_argument,      0,          opt_max_area },
-  { "min-area",        required_argument,      0,          opt_min_area },
-  { "max-variation",   required_argument,      0,          opt_max_var  },
-  { 0,                 0,                      0,          0            }
+  { "verbose",         no_argument,            0,          'v'               },
+  { "help",            no_argument,            0,          'h'               },
+  { "delta",           required_argument,      0,          'd'               },
+  { "seeds",           optional_argument,      0,          opt_seed          },
+  { "frames",          optional_argument,      0,          opt_frame         },
+  { "meta",            optional_argument,      0,          opt_meta          },
+  { "max-area",        required_argument,      0,          opt_max_area      },
+  { "min-area",        required_argument,      0,          opt_min_area      },
+  { "max-variation",   required_argument,      0,          opt_max_variation },
+  { "min-diversity",   required_argument,      0,          opt_min_diversity },
+  { 0,                 0,                      0,          0                 }
 } ;
 
 
@@ -84,12 +77,11 @@ int
 main(int argc, char **argv)
 {  
   /* algorithm parameters */ 
-  double   delta    = -1 ;
-  double   epsilon  = -1 ;
-  int      no_dups  = -1 ;
-  double   max_area = -1 ;
-  double   min_area = -1 ;
-  double   max_var  = -1 ;
+  double   delta         = -1 ;
+  double   max_area      = -1 ;
+  double   min_area      = -1 ;
+  double   max_variation = -1 ;
+  double   min_diversity = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
   char     err_msg [1024] ;
@@ -98,13 +90,13 @@ main(int argc, char **argv)
   int      verbose = 0 ;
 
   VlFileMeta frm  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
-  VlFileMeta piv  = {0, "%.piv",   VL_PROT_ASCII, "", 0} ;
+  VlFileMeta piv  = {0, "%.mser",  VL_PROT_ASCII, "", 0} ;
   VlFileMeta met  = {0, "%.meta",  VL_PROT_ASCII, "", 0} ;
   
-#define ERR(...) {                                          \
-    err = VL_ERR_BAD_ARG ;                                      \
+#define ERR(...) {                                                     \
+    err = VL_ERR_BAD_ARG ;                                             \
     snprintf(err_msg, sizeof(err_msg), __VA_ARGS__) ;                  \
-    break ;                                                     \
+    break ;                                                            \
   }
   
   /* ------------------------------------------------------------------
@@ -131,6 +123,12 @@ main(int argc, char **argv)
       
     case 'h' :
       printf (help_message, argv [0]) ;
+      printf ("Default MSER   filespec: `%s'\n", piv.pattern) ;
+      printf ("Default frames filespec: `%s'\n", frm.pattern) ;
+      printf ("Default frames filespec: `%s'\n", met.pattern) ;
+      printf ("Version: driver %s; libvl %s\n", 
+              VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
+              vl_get_version_string()) ;
       exit (0) ;
       break ;
 
@@ -138,24 +136,10 @@ main(int argc, char **argv)
       ++ verbose ;
       break ;
 
-    case opt_version :
-      printf ("sift: driver %s; libvl %s\n", 
-              VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
-              vl_get_version_string()) ;
-      exit(0) ;
-      break ;
-
       /* .......................................................... */
     case 'd' :      
       n = sscanf (optarg, "%lf", &delta) ;
       if (n == 0 || delta < 0)
-        ERR("The argument of '%s' must be a non-negative number.",
-            argv [optind - 1]) ;
-      break ;
-
-    case 'e' :
-      n = sscanf (optarg, "%lf", &epsilon) ;
-      if (n == 0 || epsilon < 0)
         ERR("The argument of '%s' must be a non-negative number.",
             argv [optind - 1]) ;
       break ;
@@ -173,21 +157,18 @@ main(int argc, char **argv)
         ERR("min-area argument must be in the [0,1] range.") ;
       break ;
 
-    case opt_max_var :
-      n = sscanf (optarg, "%lf", &max_var) ;
-      if (n == 0 || max_var < 0 || max_var > 1)
+    case opt_max_variation :
+      n = sscanf (optarg, "%lf", &max_variation) ;
+      if (n == 0 || max_variation < 0) 
         ERR("max-variation argument must be non-negative.") ;
       break ;      
-      
-      /* ........................................................... */
-    case opt_no_dups :
-      no_dups = 1 ;
+
+    case opt_min_diversity :
+      n = sscanf (optarg, "%lf", &min_diversity) ;
+      if (n == 0 || min_diversity < 0 || min_diversity > 1)
+        ERR("min-diversity argument must be in the [0,1] rang.") ;
       break ;
-      
-    case opt_dups :
-      no_dups = 0 ;
-      break ;
-      
+
       /* ........................................................... */
     case opt_frame :
       err = vl_file_meta_parse (&frm, optarg) ;
@@ -195,7 +176,7 @@ main(int argc, char **argv)
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
-    case opt_pivot :
+    case opt_seed :
       err = vl_file_meta_parse (&piv, optarg) ;
       if (err) 
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
@@ -240,7 +221,7 @@ main(int argc, char **argv)
     printf("mser:    active   %d\n",  frm.active ) ;
     printf("mser:    pattern  %s\n",  frm.pattern) ;
     printf("mser:    protocol %s\n",  vl_string_protocol_name (frm.protocol)) ;
-    printf("mser: pivots output\n") ;
+    printf("mser: seeds output\n") ;
     printf("mser:    active   %d\n",  piv.active ) ;
     printf("mser:    pattern  %s\n",  piv.pattern) ;
     printf("mser:    protocol %s\n",  vl_string_protocol_name (piv.protocol)) ;
@@ -314,8 +295,8 @@ main(int argc, char **argv)
     err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name) ;
 
     if (verbose > 1) {
-      if (piv.active) printf("mser:  writing pivots to '%s'\n", piv.name); 
-      if (frm.active) printf("mser:  writing pivots to '%s'\n", frm.name); 
+      if (piv.active) printf("mser:  writing seeds to '%s'\n", piv.name); 
+      if (frm.active) printf("mser:  writing seeds to '%s'\n", frm.name); 
       if (met.active) printf("mser:  writign metat  to '%s'\n", met.name);
     }
     
@@ -363,25 +344,23 @@ main(int argc, char **argv)
     
     if (!filt) {
       snprintf(err_msg, sizeof(err_msg), 
-              "Could not initialize MSER filter.") ;
+              "Could not create an MSER filter.") ;
       goto done ;
     }
 
-    if (delta    >= 0) vl_mser_set_delta         (filt, (vl_mser_pix) delta   ) ;
-    if (epsilon  >= 0) vl_mser_set_epsilon       (filt, epsilon ) ;
-    if (max_area >= 0) vl_mser_set_max_area      (filt, max_area) ;
-    if (min_area >= 0) vl_mser_set_min_area      (filt, min_area) ;
-    if (max_var  >= 0) vl_mser_set_max_var       (filt, max_var ) ;
-    if (no_dups  >= 0) vl_mser_set_no_dups       (filt, no_dups ) ;
+    if (delta         >= 0) vl_mser_set_delta          (filt, (vl_mser_pix) delta) ;
+    if (max_area      >= 0) vl_mser_set_max_area       (filt, max_area) ;
+    if (min_area      >= 0) vl_mser_set_min_area       (filt, min_area) ;
+    if (max_variation >= 0) vl_mser_set_max_variation  (filt, max_variation) ;
+    if (min_diversity >= 0) vl_mser_set_min_diversity  (filt, min_diversity) ;
 
     if (verbose) {
-      printf("mser: filter settings:\n") ;
-      printf("mser:  delta    = %d\n", vl_mser_get_delta    (filt) ) ;
-      printf("mser:  epsilon  = %g\n", vl_mser_get_epsilon  (filt) ) ;
-      printf("mser:  max_area = %g\n", vl_mser_get_max_area (filt) ) ;
-      printf("mser:  min_area = %g\n", vl_mser_get_min_area (filt) ) ;
-      printf("mser:  max_var  = %g\n", vl_mser_get_max_var  (filt) ) ;
-      printf("mser:  no_dups  = %d\n", vl_mser_get_no_dups  (filt) ) ;
+      printf("mser: parameters:\n") ;
+      printf("mser:   delta         = %d\n", vl_mser_get_delta         (filt)) ;
+      printf("mser:   max_area      = %g\n", vl_mser_get_max_area      (filt)) ;
+      printf("mser:   min_area      = %g\n", vl_mser_get_min_area      (filt)) ;
+      printf("mser:   max_variation = %g\n", vl_mser_get_max_variation (filt)) ;
+      printf("mser:   min_diversity = %g\n", vl_mser_get_min_diversity (filt)) ;
     }
 
     vl_mser_process (filt, (vl_mser_pix*) data) ;
@@ -414,7 +393,7 @@ main(int argc, char **argv)
       fprintf(met.file, "<mser\n") ;
       fprintf(met.file, "  input = '%s'\n", name) ;
       if (piv.active) {
-        fprintf(met.file, "  pivots = '%s'\n", piv.name) ;
+        fprintf(met.file, "  seeds = '%s'\n", piv.name) ;
       }
       if (frm.active) {
         fprintf(met.file,"  frames = '%s'\n", frm.name) ;

@@ -29,7 +29,7 @@ char const help_message [] =
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
   " --version       Print version information\n"
-  " --output -      Specify outout file\n"
+  " --output -o     Specify outout file\n"
   " --frames        Specify frames file\n"
   " --descriptors   Specify descriptors file\n"
   " --meta          Specify meta file\n"

@@ -1,0 +1,81 @@
+.TH VLFEAT 1 "" "VLFeat" "VLFeat"
+.\" ------------------------------------------------------------------
+.SH NAME
+.\" ------------------------------------------------------------------
+VLFeat \- VisionLab Features Library
+.\" ------------------------------------------------------------------
+.SH DESCRIPTION
+.\" ------------------------------------------------------------------
+.B VLFeat
+is a collection of computer vision algorithms with a special focus on
+image features such as SIFT and MSER. 
+.P
+The functionalities offered by the library can be accessed either
+through its API, or by means of command line and MATLAB programs.  See
+the
+.B SEE ALSO
+section for a list of the related command line programs and for a
+pointer to the general documentation of the library.
+.
+.P 
+.
+.\" ------------------------------------------------------------------
+.SH "FILE SPECIFIERS (FILESPEC)"
+.\" ------------------------------------------------------------------
+Some commands in
+.B VLFeat
+make use of `file specifiers' to associate to one or more input files
+the appropriate output/auxiliary files. A file specifier is a string
+such as `ascii://%.txt' and contains two pieces of information:
+.IP \(bu 4
+The 
+.B file format 
+(in this case
+.IR ascii ).
+The supported formats depend on the particular application. Two common
+formats are
+.I ascii 
+and
+.IR bin (ary).
+.
+.IP \(bu 4
+A 
+.B name transformation rule 
+(in this case
+.IR %.txt ). 
+This is used to transform the name an input file into the name of the
+corresponding output/auxiliary file. The transformed name is comput by
+extracting the basename of the input file substituting it to all
+occurences of the wildcard characer `%' in the transformation rule
+(`%%') passes the wildcard character untouched.
+.P
+Recall that the basename of a file name is obtained by stripping the
+directory prefix (everything from the beginning up to the last `/' or
+`\\' character) and extension (everything from the last `.'
+characeter (excluding the prefix) to the end).
+.P
+For instance, the filespec `ascii://%.txt' and the input file
+`test.data' specify a file named `test.txt' in ascii (text) format.
+.
+.SS "Partial file specifiers"
+.
+Normally, a program provides default values for its file
+specifiers. In this case, partial file specifier (with only the
+file format or the name transformation rule are acceptable).
+.
+.SS  "File specifiers equivalent to a file name"
+.
+A partial specifier such as `file.txt' is in effect equivalent to the
+file name `file.txt'. If the specifier is used in conjunction with
+multiple input files, this causes the same file to be accessed multile
+times.
+
+.\" ------------------------------------------------------------------
+.SH SEE ALSO
+.\" ------------------------------------------------------------------
+.BR sift (1),
+.BR mser (1)
+.P
+A. Vedaldi and B. Fulkerson.
+VLFeat Library.
+.IR http://vision.ucla.edu/~vedaldi/code/vlfeat/vlfeat.html
