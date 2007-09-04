@@ -25,15 +25,14 @@
 char const help_message [] =
   "Usage: %s [options] files ...\n"
   "\n"
-  "Where options include:\n"
+  "Options include:\n"
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
-  " --version       Print version information\n"
-  " --output -o     Specify outout file\n"
+  " --output -o     Specify output file\n"
   " --frames        Specify frames file\n"
   " --descriptors   Specify descriptors file\n"
   " --meta          Specify meta file\n"
-  " --gss           Specify Gaussian scale space file\n"
+  " --gss           Specify Gaussian scale space files\n"
   " --octaves -O    Number of octaves\n"
   " --levels -S     Number of levels per octave\n"
   " --first-octave  Index of the first octave\n"
@@ -46,8 +45,7 @@ char const help_message [] =
 /* ----------------------------------------------------------------- */
 /* long options codes */
 enum { 
-  opt_version = 1000, 
-  opt_meta,
+  opt_meta = 1000,
   opt_frames, 
   opt_descriptors,
   opt_gss,
@@ -68,7 +66,6 @@ struct option const longopts [] = {
   { "octaves",         required_argument,      0,          'O'              },
   { "levels",          required_argument,      0,          'S'              },
   { "output",          optional_argument,      0,          'o'              },
-  { "version",         no_argument,            0,          opt_version      },
   { "meta",            optional_argument,      0,          opt_meta         },
   { "frames",          optional_argument,      0,          opt_frames       },
   { "descriptors",     optional_argument,      0,          opt_descriptors  },
@@ -222,6 +219,15 @@ main(int argc, char **argv)
     case 'h' :
       /* --help ................................................... */
       printf (help_message, argv [0]) ;
+      printf ("Default SIFT         filespec: `%s'\n", out.pattern) ;
+      printf ("Default frames       filespec: `%s'\n", frm.pattern) ;
+      printf ("Default descriptros  filespec: `%s'\n", dsc.pattern) ;
+      printf ("Default meta         filespec: `%s'\n", met.pattern) ;
+      printf ("Default GSS          filespec: '%s'\n", gss.pattern) ;
+      printf ("Default read frames  filespec: '%s'\n", ifr.pattern) ;
+      printf ("Version: driver %s; libvl %s\n", 
+              VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
+              vl_get_version_string()) ;
       exit (0) ;
       break ;
 
@@ -229,14 +235,6 @@ main(int argc, char **argv)
       /* --verbose ................................................ */
       ++ verbose ;
       break ;
-
-    case opt_version :
-      printf ("sift: driver %s; libvl %s\n", 
-              VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
-              vl_get_version_string()) ;
-      exit(0) ;
-      break ;
-
 
     case 'o' :
       /* --output  ................................................ */

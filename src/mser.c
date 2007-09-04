@@ -25,6 +25,7 @@
 char const help_message [] =
   "Usage: %s [options] files ...\n"
   "\n"
+  "Options include:\n"
   " --verbose -v    Be verbose\n"
   " --help -h       Print this help message\n"
   " --seeds         Specify seeds file\n"
@@ -123,9 +124,9 @@ main(int argc, char **argv)
       
     case 'h' :
       printf (help_message, argv [0]) ;
-      printf ("Default MSER   filespec: `%s'\n", piv.pattern) ;
+      printf ("Default MSERs  filespec: `%s'\n", piv.pattern) ;
       printf ("Default frames filespec: `%s'\n", frm.pattern) ;
-      printf ("Default frames filespec: `%s'\n", met.pattern) ;
+      printf ("Default meta   filespec: `%s'\n", met.pattern) ;
       printf ("Version: driver %s; libvl %s\n", 
               VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
               vl_get_version_string()) ;
