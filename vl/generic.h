@@ -75,10 +75,11 @@ typedef int       unsigned  vl_uint32 ;  /**< unsigned 32-bit integer. */
 typedef short     unsigned  vl_uint16 ;  /**< unsigned 16-bit integer. */
 typedef char      unsigned  vl_uint8 ;   /**< unsigned  8-bit integer. */
 
-typedef int                 vl_int ;     /**< integer.                */
-typedef unsigned int        vl_uint ;    /**< unsigned integer.       */
-typedef float               vl_single ;  /**< single precision float. */
-typedef double              vl_double ;  /**< double precision float. */
+typedef int                 vl_int ;     /**< integer.                 */
+typedef unsigned int        vl_uint ;    /**< unsigned integer.        */
+typedef float               vl_single ;  /**< single precision float.  */
+typedef double              vl_double ;  /**< double precision float.  */
+typedef unsigned int        vl_uidx ;    /**< unsigned index data type.*/
 
 typedef int                 vl_bool ;    /**< boolean */
 /** @} */

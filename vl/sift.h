@@ -1,7 +1,6 @@
 /** @file     sift.h
  ** @author   Andrea Vedaldi
  ** @brief    Scale invariant feature transform (SIFT) - Declaration
- **
  **/
  
 /* AUTORIGHTS */
@@ -241,7 +240,7 @@ vl_sift_get_keypoints (VlSiftFilt const *f)
 /* ----------------------------------------------------------------- */
 /** @brief Get peaks treashold
  ** @param f SIFT filter.
- ** @param t treshold.
+ ** @return treshold ;
  **/
 static VL_INLINE double
 vl_sift_get_peak_tresh (VlSiftFilt const *f)
@@ -252,7 +251,7 @@ vl_sift_get_peak_tresh (VlSiftFilt const *f)
 /* ----------------------------------------------------------------- */
 /** @brief Get edges treshold
  ** @param f SIFT filter.
- ** @param t treshold.
+ ** @return treshold.
  **/
 static VL_INLINE double
 vl_sift_get_edge_tresh (VlSiftFilt const *f) 

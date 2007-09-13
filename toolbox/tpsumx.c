@@ -21,7 +21,7 @@ mexFunction(int nout, mxArray *out[],
   enum { X=0,Y } ;
   enum { U } ;
   
-  int MP, NP, MCP, NCP ;
+  int NP, NCP ;
   int i,j ;
   double *X_pt, *Y_pt, *U_pt ;  
   const double small = 2.220446049250313e-16 ;

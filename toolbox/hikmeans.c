@@ -83,8 +83,8 @@ mxArray *  hkmtree_to_matlab(VlHIKMTree * tree)
 /* driver */
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-    acc_t *centers_pt;
-    data_t *data_pt;
+    vl_int32 *centers_pt;
+    vl_uint8 *data_pt;
 
     /*  mxClassID data_class = mxINT8_CLASS ; */
     enum
@@ -95,7 +95,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     int K = 0;
     int nleaves;
     int verbose = 1;
-    idx_t npasses = 200;
+    vl_uint npasses = 200;
 
   /** -----------------------------------------------------------------
    **                                               Check the arguments
@@ -136,13 +136,13 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         mexErrMsgTxt ("Numeber of clusters cannot be less than data.");
     }
 
-    data_pt = (data_t *) mxGetPr (in[IN_DATA]);
+    data_pt = (vl_uint8 *) mxGetPr (in[IN_DATA]);
 
     /* K is the number of clusters */
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
     VlHIKMTree * tree = vl_hikm(data_pt, M, N, K, nleaves);
-    idx_t * ids       = vl_hikm_push(tree, data_pt, N);
+    vl_uint * ids       = vl_hikm_push(tree, data_pt, N);
     int depth = tree->depth;
 
     /* copy the tree to matlab */
@@ -156,7 +156,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         int j;
         for (j = 0 ; j < N*depth ; j++) ids[j]++;
     }
-    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(idx_t)*depth*N);
+    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint)*depth*N);
     free(ids);
     
 }

@@ -29,7 +29,6 @@ struct _VlFileMeta
   FILE *  file ;            /**< Current file stream */
 } ;
 
-
 /** @brief File meta information type
  ** @see ::_VlFileMeta
  **/

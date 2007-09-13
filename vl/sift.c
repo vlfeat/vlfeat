@@ -218,7 +218,7 @@
  ** establishes the convention for expressing the angle @e th of a
  ** vector @e v (here @e v could be either the gradient of the image
  ** or the direction of the keypoint). To slightly complicate the
- ** matter, however, the index @e th of the descrptor
+ ** matter, however, the index @e th of the descriptor
  ** <em>h(th,x,y)</em> follows the opposite convention (this is for
  ** compatibility with Lowe's original SIFT implementation), as shown
  ** by the figure:
@@ -1336,7 +1336,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  ** @param f     SIFT filter.
  ** @param k     SIFT keypoint (output).
  ** @param x     x coordinate of the center.
- ** @peram y     y coordinate of the center.
+ ** @param y     y coordinate of the center.
  ** @param sigma scale.
  **
  ** The function initializes the structure @a k from the

@@ -43,8 +43,8 @@ VlHIKMNode *  matlab_to_hkmnode(mxArray * centers, mxArray * sub)
     int M = mxGetM(centers);
     int K = mxGetN(centers);
     node->K = K;
-    node->centers = malloc(sizeof(acc_t)*M*K);
-    memcpy(node->centers, mxGetPr(centers), sizeof(acc_t)*M*K);
+    node->centers = malloc(sizeof(vl_int32)*M*K);
+    memcpy(node->centers, mxGetPr(centers), sizeof(vl_int32)*M*K);
 
     node->children = malloc(sizeof(VlHIKMNode *)*K);
     int i;
@@ -84,7 +84,7 @@ VlHIKMTree *  matlab_to_hkmtree(mxArray * mtree)
 /* driver */
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-    data_t *data_pt;
+    vl_uint8 *data_pt;
 
     /*  mxClassID data_class = mxINT8_CLASS ; */
     enum
@@ -110,13 +110,13 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
     N = mxGetN (in[IN_DATA]);   /* n of elements */
 
-    data_pt = (data_t *) mxGetPr (in[IN_DATA]);
+    data_pt = (vl_uint8 *) mxGetPr (in[IN_DATA]);
 
     /* K is the number of clusters */
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
     VlHIKMTree * tree = matlab_to_hkmtree(in[IN_TREE]);
-    idx_t * ids       = vl_hikm_push(tree, data_pt, N);
+    vl_uint * ids       = vl_hikm_push(tree, data_pt, N);
     int depth = tree->depth;
 
     vl_hikm_delete(tree);
@@ -128,7 +128,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         int j;
         for (j = 0 ; j < N*depth ; j++) ids[j]++;
     }
-    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(idx_t)*depth*N);
+    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint)*depth*N);
     free(ids);
     
 }

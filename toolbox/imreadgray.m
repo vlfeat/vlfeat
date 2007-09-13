@@ -11,7 +11,7 @@ function I = imreadgray(file,varargin)
 % AUTORIGHTS
 
 I = imread(file) ;
-I = rgb2double(I) ;
+I = im2double(I) ;
 
 if(size(I,3) > 1)
   I = rgb2gray(I) ;

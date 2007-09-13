@@ -54,46 +54,46 @@ struct _VlMserStats
  ** @{
  **/
 VlMserFilt*      vl_mser_new     (int ndims, int const* dims) ;
-void             vl_mser_delete  (VlMserFilt *filt) ;
+void             vl_mser_delete  (VlMserFilt *f) ;
 /** @} */
 
 /** @name Processing 
  ** @{
  **/
-void             vl_mser_process (VlMserFilt *filt, 
+void             vl_mser_process (VlMserFilt *f, 
                                   vl_mser_pix const *im) ;
-void             vl_mser_ell_fit (VlMserFilt *filt) ;
+void             vl_mser_ell_fit (VlMserFilt *f) ;
 /** @} */
 
 /** @name Retrieving data
  ** @{
  **/
-static vl_uint          vl_mser_get_regions_num  (VlMserFilt const *filt) ;
-static vl_uint const*   vl_mser_get_regions      (VlMserFilt const *filt) ;
-static vl_single const* vl_mser_get_ell          (VlMserFilt const *filt) ;
-static vl_uint          vl_mser_get_ell_num      (VlMserFilt const *filt) ;
-static vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *filt) ;
-static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *filt) ;
+static vl_uint          vl_mser_get_regions_num  (VlMserFilt const *f) ;
+static vl_uint const*   vl_mser_get_regions      (VlMserFilt const *f) ;
+static vl_single const* vl_mser_get_ell          (VlMserFilt const *f) ;
+static vl_uint          vl_mser_get_ell_num      (VlMserFilt const *f) ;
+static vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *f) ;
+static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;
 /** @} */
 
 /** @name Retrieving parameters
  ** @{
  **/
-static vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *filt) ;
-static double       vl_mser_get_min_area       (VlMserFilt const *filt) ;
-static double       vl_mser_get_max_area       (VlMserFilt const *filt) ;
-static double       vl_mser_get_max_variration (VlMserFilt const *filt) 
-;static double      vl_mser_get_min_diversity  (VlMserFilt const *filt) ;
+static vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *f) ;
+static double       vl_mser_get_min_area       (VlMserFilt const *f) ;
+static double       vl_mser_get_max_area       (VlMserFilt const *f) ;
+static double       vl_mser_get_max_variration (VlMserFilt const *f) 
+;static double      vl_mser_get_min_diversity  (VlMserFilt const *f) ;
 /** @} */
 
 /** @name Setting parameters
  ** @{
  **/
-static void  vl_mser_set_delta           (VlMserFilt *filt, vl_mser_pix x) ;
-static void  vl_mser_set_min_area        (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_max_area        (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_max_variation   (VlMserFilt *filt, double      x) ;
-static void  vl_mser_set_min_diversity   (VlMserFilt *filt, double      x) ;
+static void  vl_mser_set_delta           (VlMserFilt *f, vl_mser_pix x) ;
+static void  vl_mser_set_min_area        (VlMserFilt *f, double      x) ;
+static void  vl_mser_set_max_area        (VlMserFilt *f, double      x) ;
+static void  vl_mser_set_max_variation   (VlMserFilt *f, double      x) ;
+static void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
 /** @} */
 
 /* ====================================================================

@@ -1,4 +1,4 @@
-/** @file    rodirgues.h
+/** @file    rodrigues.h
  ** @author  Andrea Vedaldi
  ** @brief   Rodrigues formulas - Declaration
  **

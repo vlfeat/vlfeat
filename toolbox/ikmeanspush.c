@@ -20,13 +20,13 @@ void
 mexFunction(int nout, mxArray *out[],
         int nin, const mxArray *in[])
 {
-    idx_t*    asgn_pt ;
-    acc_t*    centers_pt ;
-    data_t*   data_pt ;
+    vl_uint*  asgn ;
+    vl_int32* centers ;
+    vl_uint8* data ;
     /*  mxClassID data_class = mxINT8_CLASS ;*/
     enum {IN_DATA=0,IN_CENTERS} ;
     enum {OUT_ASGN} ;
-    int M,N ;
+    int M,N,j ;
     int K=0 ;
 
     /** -----------------------------------------------------------------
@@ -39,11 +39,11 @@ mexFunction(int nout, mxArray *out[],
     }
 
     if(mxGetClassID(in[IN_DATA]) != mxUINT8_CLASS) {
-        mexErrMsgTxt("DATA must be of class uint8") ;
+        mexErrMsgTxt("X must be of class UINT8") ;
     }
 
     if(mxGetClassID(in[IN_CENTERS]) != mxINT32_CLASS) {
-        mexErrMsgTxt("DATA must be of class int32") ;
+        mexErrMsgTxt("C must be of class INT32") ;
     }
 
     M = mxGetM(in[IN_DATA]) ;     /* n of components */
@@ -56,18 +56,12 @@ mexFunction(int nout, mxArray *out[],
 
     out[OUT_ASGN] = mxCreateNumericMatrix(1,N,mxUINT32_CLASS,mxREAL);
 
-    data_pt    = (data_t*) mxGetPr(in[IN_DATA]) ;
-    centers_pt = (acc_t*)  mxGetPr(in[IN_CENTERS]) ;
+    data    = (vl_uint8*) mxGetPr(in[IN_DATA]) ;
+    centers = (vl_int32*) mxGetPr(in[IN_CENTERS]) ;
+    asgn    = (vl_uint*)  mxGetPr(out[OUT_ASGN]);
 
-    asgn_pt = vl_ikmeans_push(centers_pt, K, data_pt, M, N);
-    memcpy(mxGetPr(out[OUT_ASGN]), asgn_pt, N*sizeof(vl_uint32));
-    free(asgn_pt);
-    asgn_pt = (idx_t *) mxGetPr(out[OUT_ASGN]);
+    vl_ikmeans_push (asgn, centers, K, data, M, N);
 
-
-    /* 1 based indexing for matlab  */
-    {
-      int j;
-      for(j = 0 ; j < N ; ++j) ++ asgn_pt[j] ;
-    }
+    /* adjust for MATLAB indexing */
+    for(j = 0 ; j < N ; ++j) ++ asgn[j] ;
 }

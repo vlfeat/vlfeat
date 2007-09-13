@@ -1,8 +1,8 @@
 function J=rgb2xyz(I,ws)
 % RGB2XYZ  Color space conversion
 %   J=RGB2XYZ(I) converts the RGB image I into CIE XYZ format.  The
-%   RGB image I can be either of class 'uint8', 'uint16' or
-%   'double'. The output image is always of class 'double'
+%   RGB image I can be either of class UINT8, UINT16 or
+%   DOUBLE. The output image is always of class DOUBLE.
 %
 %   RGB2XYZ(I,WS) uses the specified RGB working space WS. The
 %   function supports the following RGB working spaces:
@@ -12,26 +12,9 @@ function J=rgb2xyz(I,ws)
 %
 %   The default workspace is CIE.
 %
-%   See also XYZ2RGB(), RGB2DOUBLE().
+%   See also XYZ2RGB().
 
 % AUTORIGHTS
-% Copyright (C) 2006 Andrea Vedaldi
-%       
-% This file is part of VLUtil.
-% 
-% VLUtil is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2, or (at your option)
-% any later version.
-% 
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-% 
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software Foundation,
-% Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 [M,N,K] = size(I) ;
 
@@ -39,7 +22,7 @@ if K~=3
 	error('I must be a MxNx3 array.') ;
 end
 
-I=rgb2double(I) ;
+I=im2double(I) ;
 
 if(nargin < 2) 
   workspace = 'CIE' ;
@@ -70,5 +53,3 @@ end
 I = reshape(I.^gamma, M*N, K) ;
 J = A*I' ;
 J = reshape(J', M, N, K) ;
-
-
