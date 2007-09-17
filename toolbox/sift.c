@@ -10,7 +10,6 @@
 #include <math.h>
 #include <assert.h>
 
-
 enum {
   opt_octaves = 0,
   opt_levels,
