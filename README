@@ -86,5 +86,6 @@ APPENDIX
   - varadic macro support
 
 CHANGES
+  beta-3     Completions to the ikmeans code.
   beta-2     Many completions.
   beta-1     Initial public release.

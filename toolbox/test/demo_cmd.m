@@ -12,6 +12,9 @@ switch mexext
   case 'dll' 
     arch = 'win32' ;
     ext = '.exe' ;
+  case 'mexw32'
+    arch = 'win32' ;
+    ext ='.exe' ;
 end
 
 cmd = fullfile(vlfeat_root,'bin',arch,[name ext]) ;

@@ -925,6 +925,8 @@ vl_sift_detect (VlSiftFilt * f)
  **
  ** The function makes sure that the gradient buffer is up-to-date
  ** with the current GSS data.
+ **
+ ** @remark The minimum octave size is 2x2xS.
  **/
 
 static void
@@ -944,31 +946,78 @@ update_gradient (VlSiftFilt *f)
   for (s  = s_min + 1 ; 
        s <= s_max - 2 ; ++ s) {    
 
-    for (y = 1 ; 
-         y < h - 1 ; ++ y) {
+    vl_sift_pix *src, *end, *grad, gx, gy ;
 
-      vl_sift_pix *src, *end, *grad, gx, gy, mod, ang ;
+#define SAVE_BACK                                                       \
+    *grad++ = vl_fast_sqrt_f (gx*gx + gy*gy) ;                          \
+    *grad++ = vl_mod_2pi_f   (vl_fast_atan2_f (gy, gx) + 2*VL_PI) ;     \
+    ++src ;                                                             \
+    
+    src  = vl_sift_get_octave (f,s) ;
+    grad = f->grad + 2 * so * (s - s_min -1) ;
+    
+    /* first first row */
+    gx = src[+xo] - src[0] ;
+    gy = src[+yo] - src[0] ;
+    SAVE_BACK ;
 
-      src  = vl_sift_get_octave (f, s) + xo + yo * y ; 
-      end  = src + w - 1 ;
-      grad = f->grad + 2 * (xo + yo*y + so*(s - s_min - 1)) ;
-
-      while(src != end) {
-        gx = 0.5 * (*(src + xo) - *(src - xo)) ;
-        gy = 0.5 * (*(src + yo) - *(src - yo)) ;
-        mod = vl_fast_sqrt_f (gx*gx + gy*gy) ;
-        ang = vl_mod_2pi_f   (vl_fast_atan2_f (gy, gx) + 2*VL_PI) ;
-        *grad++ = mod ;
-        *grad++ = ang ;
-        ++src ;
-      }
+    /* middle first row */
+    end = (src - 1) + w - 1 ;
+    while (src < end) {
+      gx = 0.5 * (src[+xo] - src[-xo]) ;
+      gy =        src[+yo] - src[0] ;
+      SAVE_BACK ;
     }
+    
+    /* first first row */
+    gx = src[0]   - src[-xo] ;
+    gy = src[+yo] - src[0] ;
+    SAVE_BACK ;
+    
+    for (y = 1 ; y < h -1 ; ++y) {
+
+      /* first middle row */
+      gx =        src[+xo] - src[0] ;
+      gy = 0.5 * (src[+yo] - src[-yo]) ;
+      SAVE_BACK ;
+
+      /* middle middle row */
+      end = (src - 1) + w - 1 ;
+      while (src < end) {
+        gx = 0.5 * (src[+xo] - src[-xo]) ;
+        gy = 0.5 * (src[+yo] - src[-yo]) ;
+        SAVE_BACK ;
+      }
+      
+      /* last middle row */
+      gx =        src[0]   - src[-xo] ;
+      gy = 0.5 * (src[+yo] - src[-yo]) ;
+      SAVE_BACK ;
+    }
+
+    /* first last row */
+    gx = src[+xo] - src[0] ;
+    gy = src[  0] - src[-yo] ;
+    SAVE_BACK ;
+    
+    /* middle last row */
+    end = (src - 1) + w - 1 ;
+    while (src < end) {
+      gx = 0.5 * (src[+xo] - src[-xo]) ;
+      gy =        src[0]   - src[-yo] ;
+      SAVE_BACK ;
+    }
+    
+    /* last last row */
+    gx = src[0]   - src[-xo] ;
+    gy = src[0]   - src[-yo] ;
+    SAVE_BACK ;
   }  
   f->grad_o = f->o_cur ;
 }
 
 /** ---------------------------------------------------------------- */
-/** @brief Compute the orientation(s) of a keypoint
+/** @brief Calculate the keypoint orientation(s)
  **
  ** @param f        SIFT filter.
  ** @param angles   orientations (output).
@@ -995,26 +1044,26 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
                                     double angles [4],
                                     VlSiftKeypoint const *k)
 {
-  double const winf        = 1.5 ;
-  double       xper        = pow (2.0, f->o_cur) ;
+  double const winf   = 1.5 ;
+  double       xper   = pow (2.0, f->o_cur) ;
 
-  int          w           = f-> octave_width ;
-  int          h           = f-> octave_height ;
-  int const    xo          = 2 ;         /* x-stride */
-  int const    yo          = 2 * w ;     /* y-stride */
-  int const    so          = 2 * w * h ; /* s-stride */
-  double       x           = k-> x     / xper ;
-  double       y           = k-> y     / xper ;
-  double       sigma       = k-> sigma / xper ;
+  int          w      = f-> octave_width ;
+  int          h      = f-> octave_height ;
+  int const    xo     = 2 ;         /* x-stride */
+  int const    yo     = 2 * w ;     /* y-stride */
+  int const    so     = 2 * w * h ; /* s-stride */
+  double       x      = k-> x     / xper ;
+  double       y      = k-> y     / xper ;
+  double       sigma  = k-> sigma / xper ;
 
-  int          xi          = (int) (x + 0.5) ; 
-  int          yi          = (int) (y + 0.5) ;
-  int          si          = k-> is ;
+  int          xi     = (int) (x + 0.5) ; 
+  int          yi     = (int) (y + 0.5) ;
+  int          si     = k-> is ;
 
-  double const sigmaw      = winf * sigma ;
-  int          W           = floor (3.0 * sigmaw) ;
+  double const sigmaw = winf * sigma ;
+  int          W      = VL_MAX(floor (3.0 * sigmaw), 1) ;
 
-  int          nangles     = 0 ;
+  int          nangles= 0 ;
 
   enum {nbins = 36} ;
 
@@ -1048,11 +1097,19 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 #undef  at
 #define at(dx,dy) (*(pt + xo * (dx) + yo * (dy)))
 
+  /*
   for(ys  =  VL_MAX (- W - 1, 1 - yi    ) ; 
       ys <=  VL_MIN (+ W + 1, h - 2 - yi) ; ++ys) {
     
     for(xs  = VL_MAX (- W - 1, 1 - xi    ) ; 
-        xs <= VL_MIN (+ W + 1, w - 2 - xi) ; ++xs) {
+    xs <= VL_MIN (+ W + 1, w - 2 - xi) ; ++xs) {*/
+
+  for(ys  =  VL_MAX (- W,       - yi) ; 
+      ys <=  VL_MIN (+ W, h - 1 - yi) ; ++ys) {
+    
+    for(xs  = VL_MAX (- W,       - xi) ; 
+        xs <= VL_MIN (+ W, w - 1 - xi) ; ++xs) {
+
       
       double dx = (double)(xi + xs) - x;
       double dy = (double)(yi + ys) - y;
@@ -1331,7 +1388,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
 
 
 /* ---------------------------------------------------------------- */
-/** @brief Get keypoint from position and scale
+/** @brief Initialize a keypoint from its position and scale
  **
  ** @param f     SIFT filter.
  ** @param k     SIFT keypoint (output).
@@ -1339,8 +1396,8 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  ** @param y     y coordinate of the center.
  ** @param sigma scale.
  **
- ** The function initializes the structure @a k from the
- ** location @a x and @a y and scale @a sigma of the keypoint.
+ ** The function initializes the structure @a k from the location @a x
+ ** and @a y and scale @a sigma of the keypoint.
  **/
 void
 vl_sift_keypoint_init (VlSiftFilt const *f,

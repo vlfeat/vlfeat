@@ -52,3 +52,19 @@ h2   = plotframe(f) ; set(h2,'color','k','linewidth',1) ;
 h3   = plotsiftdescriptor(d,f) ;  set(h3,'color','g') ;
 
 demo_print('sift_basic_4') ;
+
+% --------------------------------------------------------------------
+%                                   Custom keypoints with orientations
+% --------------------------------------------------------------------
+
+fc = [100;100;10;pi/8] ;
+[f,d] = sift(I,'frames',fc,'orientations') ;
+
+delete([h1 h2 h3]) ;
+
+h1   = plotframe(f) ; set(h1,'color','y','linewidth',3) ;
+h2   = plotframe(f) ; set(h2,'color','k','linewidth',1) ;
+h3   = plotsiftdescriptor(d,f) ;  set(h3,'color','g') ;
+
+demo_print('sift_basic_5') ;
+

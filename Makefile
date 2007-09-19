@@ -3,7 +3,7 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := beta-2
+VER                := beta-3
 DIST                = $(NAME)-$(VER)
 BINDIST             = $(DIST)-$(ARCH)
 

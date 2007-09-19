@@ -214,7 +214,6 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("siftmx: will force orientations? %s\n",
                 force_orientations ? "yes" : "no") ;      
     }
-
     
     /* ...............................................................
      *                                             process each octave
@@ -316,8 +315,8 @@ mexFunction(int nout, mxArray *out[],
             }
           }
 
-          /* Save back with MATLAB conventions. Notice tha the input image was
-           * the transpose of the actual image. */
+          /* Save back with MATLAB conventions. Notice tha the input
+           * image was the transpose of the actual image. */
           frames [4 * nframes + 0] = k -> y + 1 ;
           frames [4 * nframes + 1] = k -> x + 1 ;
           frames [4 * nframes + 2] = k -> sigma ;
@@ -345,7 +344,7 @@ mexFunction(int nout, mxArray *out[],
       /* empty array */
       dims [0] = 0 ;
       dims [1] = 0 ;      
-      out[OUT_FRAMES]       = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL) ;
+      out[OUT_FRAMES] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL) ;
       if (nout > 1)
         out[OUT_DESCRIPTORS]= mxCreateNumericArray(2, dims, mxUINT8_CLASS,  mxREAL) ;
 

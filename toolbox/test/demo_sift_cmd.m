@@ -1,4 +1,4 @@
-% DEMO_SIFT_CMD Demo: SIFT: command line utility
+% DEMO_SIFT_CMD Demo: SIFT: test command line utility
 
 p_img = fullfile(vlfeat_root,'data','box.pgm') ;
 p_low = fullfile(vlfeat_root,'data','box.sift') ;
@@ -13,11 +13,9 @@ I = single(I) ;
 % --------------------------------------------------------------------
 %                                                        Test detector
 % --------------------------------------------------------------------
+
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
                    ' --peak-tresh=3.4 --edge-tresh=10']) ;
-%                                       ' --peak-tresh=0
-%                                       --edge-tresh=100']) ;
-
 if (err), error(msg) ; end
 
 data      = load(p_txt,'-ASCII') ;
@@ -106,7 +104,3 @@ legend('MATLAB','command line','original SIFT') ;
 
 axis equal ; axis off ; axis tight ;
 demo_print('sift_cmd_4') ;
-
-
-
-

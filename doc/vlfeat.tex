@@ -2,18 +2,14 @@
 % description:  An introduction to the VisionLab Features Library
 % author:       Andrea Vedaldi
 
-%\documentclass[9.5pt,journal,final,finalsubmission]{IEEEtran}
 \documentclass[9.5pt]{article}
 \usepackage{times}
-\usepackage[margin=1cm]{geometry}
-
+\usepackage[margin=1.5cm]{geometry}
 
 \usepackage{graphicx,amsmath,amssymb,color}
-
 \usepackage{subfig}
 \usepackage{xspace}
 \usepackage{ifpdf}
-%\usepackage{visionlab}
 
 \ifpdf
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
@@ -43,32 +39,40 @@
 % --------------------------------------------------------------------
 
 \VLFeat (VisionLab Features Library) is a collection of computer
-vision algorithms with a special focus on image features such as 
-SIFT and MSER. The most important algorithms are implemented
-in a lightweight and portable C (C-90) library (this library is documented
-elsewhere and not covered by this article) and are made
-accessible through the library API, command line programs, and MATLAB programs.
+vision algorithms with a special focus on image features such as SIFT
+and MSER. The core algorithms are implemented in a lightweight and
+portable C library (the library is documented elsewhere and not
+covered by this article) and are made accessible through the library
+API, command line programs, and MATLAB programs. The library also
+bundels a number of MATLAB utility programs.
 
-This article is an introduction and a tutorial to
-\VLFeat. Here we focus on the MATLAB interface to \VLFeat, as the most simple and useful one, and we mention briefly the command line interface. There are tree pieces of documentation
-for \VLFeat:
+There are tree sources of documentation for \VLFeat:
 \begin{itemize}\raggedright
 \item The built-in help of the MATLAB programs (\verb$help <PROGRAM>$).
-\item The Unix MAN pages of the command line programs (\verb$man <PROGRAM>$).
+\item The Unix MAN pages of the command line programs
+  (\verb$man <PROGRAM>$).
 \item The documentation of the core C library \cite{}.
 \end{itemize}
-The documentation of the C library is very useful even if only the MATLAB or command line interfaces are used because it contains the authoritative descriptions of the main algorithms.
+The documentation of the C library is very useful even for the MATLAB
+or command line user as it explains the techinical details of the
+algorithm implementations.  This article is an introduction and a
+tutorial to \VLFeat and focuses on the MATLAB interface.
+
 
 % --------------------------------------------------------------------
 \section{SIFT}\label{sift}
 % --------------------------------------------------------------------
 
-The {\em Scale-Invariant Feature Transform (SIFT)}~\cite{lowe04distinctive} bundles a feature detector
-and a feature descriptor. A {\em feature detecto}r takes and image $I$ and selects a number of {\em frames} (``keypoints'', ``interest points'', ``regions''), which
-are stable image regions. Here ``stable'' means that the same regions
-are selected up to a prescribed set of image transformations (due to noise, viewpoint changes, illumination changes and so on). A {\em feature
-descriptor} computes, from the local appearance of a frame, a {\em
-  descriptors}, a distinctive label that helps identify the frame.
+The {\em Scale-Invariant Feature Transform
+  (SIFT)}~\cite{lowe04distinctive} bundles a feature detector and a
+feature descriptor. A {\em feature detecto}r takes and image $I$ and
+selects a number of {\em frames} (``keypoints'', ``interest points'',
+``regions''), which are stable image regions. Here ``stable'' means
+that the same regions are selected up to a prescribed set of image
+transformations (due to noise, viewpoint changes, illumination changes
+and so on). A {\em feature descriptor} computes, from the local
+appearance of a frame, a {\em descriptors}, a distinctive label that
+helps identify the frame.
 
 \begin{figure*}
 \subfloat[]{
@@ -89,9 +93,9 @@ descriptor} computes, from the local appearance of a frame, a {\em
 \end{figure*}
 
 Both the detector and descriptor are accessible by a single MATLAB
-program called \cmd{sift} (there is a similar command line utility). To
-demonstrate the usage of \cmd{sift}, we open MATLAB and we load a
-test image (Fig.~\ref{fig:sift-intro-a}):
+program called \cmd{sift} (there is a similar command line
+utility). To demonstrate the usage of \cmd{sift}, we open MATLAB and
+we load a test image (Fig.~\ref{fig:sift-intro-a}):
 \begin{verbatim}
 pfx = fullfile(vlfeat_root,'data','a.jpg') ;
 I = imread(pfx) ;
@@ -148,7 +152,7 @@ I = single(255 * I) ;
 \end{verbatim}
 We run the detector with peak treshold \verb$x$ by
 \begin{verbatim}
-f = sift(I, 'peaktresh', x) ;
+f = sift(I, 'PeakTresh', x) ;
 \end{verbatim}
 obtaining less and less features (Fig.~\ref{fig:sift-peak-tresh}).
 
@@ -179,7 +183,7 @@ I = single(255 * I) ;
 \end{verbatim}
 We run the detector with edge treshold \verb$x$ by
 \begin{verbatim}
-f = sift(I, 'peaktresh', x) ;
+f = sift(I, 'EdgeTresh', x) ;
 \end{verbatim}
 obtaining more and more features (Fig.~\ref{fig:sift-edge-tresh}).
 
@@ -203,20 +207,24 @@ obtaining more and more features (Fig.~\ref{fig:sift-edge-tresh}).
 % --------------------------------------------------------------------
 
 The MATLAB command \cmd{sift} (and the command line utility) can
-bypass the detector and run the descriptor on custom frames.
+bypass the detector and run the descriptor on custom frames by means
+of the \param{Frames} option.
 
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=0.7\columnwidth]{figures/demo/sift_basic_4}
-%\end{center}
-%\caption{{\em SIFT: custom frames.} The descriptor computed at a
-%  custom frame.}
-%\label{fig:sift-custom}
-%\end{figure}
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=0.6\columnwidth]{figures/demo/sift_or}
+\end{center}
+\caption{{\em SIFT: custom frames with computed orientations.}  The
+  SIFT detector can be bypassed by specified custom frames (in this
+  case on a grid).  Even with custom frames, it is still possible to
+  compute the orientations. A kepoint can have multiple orientations,
+  and even none if the corresponding image region is flat.  }
+\label{fig:sift-custom-or}
+\end{figure}
 
 For instance, we can compute the descriptor of a SIFT frame centered
 at position $(x,y)=(100,100)$, of scale $\sigma=10$ and orientation
-$\theta=\pi/2$ by
+$\theta=\pi/8$ by
 \begin{verbatim}
 fc = [100;100;10;pi/8] ;
 [f,d] = sift(I,'frames',fc) ;
@@ -225,8 +233,17 @@ Mutiple frames \verb$fc$ an be specified as well. In this case they
 are re-ordered by increasing scale.\footnote{The sorting anglorithm is
   stable, so the natural correspondence custom frames descriptors can
   be preserved by making sure to pass to the function a set of
-  pre-predered frames.}
-
+  pre-predered frames.} The \param{Orientations} option insturcts the
+program to use the custom position and scale but to compute the
+keypoint orientations, as in
+\begin{verbatim}
+fc = [100;100;10;0] ;
+[f,d] = sift(I,'frames',fc,'orientations') ;
+\end{verbatim}
+Notice that, depending on the local appearance, a keypoint cmay have
+{\em multiple} orientations.  Moreover, a keypoint computed on a
+constant image region (such as one big as one pixel) has no
+orientations (Fig.~\ref{fig:sift-custom-or})!
 
 % --------------------------------------------------------------------
 \subsection{Conventions}\label{sift.conventions}
@@ -236,9 +253,9 @@ Our implementation SIFT frames are expressed in the standard image
 reference.  The only difference between the command line and MATLAB
 version is that the latter assumes that the image origin (top-left
 corner) has coordinate $(1,1)$ as opposed to $(0,0)$. Lowe's original
-implementation uses a different reference system, so if the two implementations
-are to be compared the necessary conversion needs to be performed.
-The details are illustrated in Fig.~\ref{fig:sift-conv}
+implementation uses a different reference system, so if the two
+implementations are to be compared the necessary conversion needs to
+be performed.  The details are illustrated in Fig.~\ref{fig:sift-conv}
 
 \begin{figure}
 \begin{center}
@@ -246,17 +263,18 @@ The details are illustrated in Fig.~\ref{fig:sift-conv}
 \end{center}
 \caption{{\em SIFT: conventions.} {\bf Top.} Our implementation uses
   the standard image reference systesm, with the $y$ axis pointing
-  donward. The frame orientation $\theta$ and descriptor are expressed
-  in the same reference system (i.e. a small positive rotation of $x$
-  moves it towards $y$). Recall that each descriptor elment is a bin
+  downard. The frame orientation $\theta$ and descriptor use the same
+  reference system (i.e. a small positive rotation of the $x$ moves it
+  towards the $y$ axis). Recall that each descriptor elment is a bin
   indexed by $(\theta,x,y)$; the histogram is vectorized in such a way
-  that $\theta$ is the most quickly varying index and $y$ the
-  slowest. {\bf Bottom.} Lowe's implementation uses a slightly
-  different convention: frames centers are expressed relative to the
-  standard image reference system, but the frame orientation and the
-  descriptor assume that the $y$ axis points upward. Consequently,
+  that $\theta$ is the fastest varying index and $y$ the slowest. {\bf
+    Bottom.} D. Lowe's implementation~\cite{lowe07sift} uses a
+  slightly different convention: Frames centers are expressed
+  relatively to the standard image reference system, but the frames
+  orientation and the descriptor assume that the $y$ axis points
+  upward. Consequently, to map from our to D. Lowe's convention,
   frames orientations need to be transformed ($\theta'=-\theta$) and
-  descriptor elements re-arranged.}
+  the descriptor elements must be re-arranged.}
 \label{fig:sift-conv}
 \end{figure}
 
@@ -265,11 +283,13 @@ The details are illustrated in Fig.~\ref{fig:sift-conv}
 % --------------------------------------------------------------------
 
 Our implementation produces SIFT frames and descriptors that are
-almost identical to Lowe's original implementation~\cite{lowe07sift}
+almost identical to D. Lowe's original
+implementation~\cite{lowe07sift}
 (Fig.~\ref{fig:sift-conformity}). Small differences are due to
 numerical errors, a minor difference in the computation of the
-orientation (we eliminated a small bias introduce by Lowe's original implementation). 
-The most significant difference is that a minority of the frames are detected by one implementation but not the other.
+orientation (we eliminated a small bias introduce by Lowe's original
+implementation).  The most significant difference is that a minority
+of the frames are detected by one implementation but not the other.
 
 \begin{figure}
 \begin{center}
@@ -297,8 +317,13 @@ The most significant difference is that a minority of the frames are detected by
 \section{MSER}\label{mser}
 % --------------------------------------------------------------------
 
-{\em Maximally Stable Extremal Regions (MSER)} is a feature detector; Analogously to
-the SIFT detector (see Sect.~\ref{sift}), the MSER algorithm takes and image $I$ and extracts a number of feature frames (Fig.~\ref{fig:mser-intro}). Frames are either the MSERs or ellipsoids fitted to them. An MSER is a {\em stable} connected component of some level sets $\{x:I(y)\leq\gamma\}, \gamma\in\real$ of the image $I$.
+{\em Maximally Stable Extremal Regions (MSER)}~\cite{matas03robust} is
+a feature detector; Analogously to the SIFT detector (see
+Sect.~\ref{sift}), the MSER algorithm takes and image $I$ and extracts
+a number of feature frames (Fig.~\ref{fig:mser-intro}). Frames are
+either the MSERs or ellipsoids fitted to them. An MSER is a {\em
+  stable} connected component of some level sets
+$\{x:I(y)\leq\gamma\}, \gamma\in\real$ of the image $I$.
 
 \begin{figure*}[t]
 \subfloat[]{
@@ -312,14 +337,19 @@ the SIFT detector (see Sect.~\ref{sift}), the MSER algorithm takes and image $I$
 \subfloat[]{
 \includegraphics[width=0.32\textwidth]{figures/demo/mser_basic_2}
 \label{fig:mser-intro-c}}
-\caption{{\em MSER: frames} \protect\subref{fig:sift-intro-a}
-  a test image, \protect\subref{fig:sift-intro-b} detected MSERs (positive and negative), \protect\subref{fig:sift-intro-c} MSERs as fitted ellipses.}
+\caption{{\em MSER: frames} \protect\subref{fig:sift-intro-a} a test
+  image, \protect\subref{fig:sift-intro-b} detected MSERs (positive
+  and negative), \protect\subref{fig:sift-intro-c} MSERs as fitted
+  ellipses.}
 \label{fig:mser-intro}
 \end{figure*}
 
 A single pixel $x$ ({\em seed}) is sufficient to identify any MSER as
-the connected component of the level set of intensity $\gamma=I(x)$ which contains the
-pixel $x$. MSERs, as identified by {\em seeds}, have arbitrary shape (Fig.~\ref{fig:mser-intro-b}). Usually their shape is simplified by fitting ellipsoids, as exemplified in (Fig.~\ref{fig:mser-intro-c}).
+the connected component of the level set of intensity $\gamma=I(x)$
+which contains the pixel $x$. MSERs, as identified by {\em seeds},
+have arbitrary shape (Fig.~\ref{fig:mser-intro-b}). Usually their
+shape is simplified by fitting ellipsoids, as exemplified in
+(Fig.~\ref{fig:mser-intro-c}).
 
 To demonstrate the usage of \cmd{mser}, we open MATLAB and we load a
 test image (Fig.~\ref{fig:sift-intro-a}):
@@ -327,13 +357,16 @@ test image (Fig.~\ref{fig:sift-intro-a}):
 pfx = fullfile(vlfeat_root,'data','spots.jpg') ;
 I = imread(pfx) ;image(I) ; 
 \end{verbatim}
-We then convert the image to a format that is suitable for the \cmd{mser} command.
+We then convert the image to a format that is suitable for the
+\cmd{mser} command.
 \begin{verbatim}
 I = uint8(rgb2gray(I)) ;
 \end{verbatim}
 We compute the region seeds and frames by
 \begin{verbatim}
-[r,f] = mser(I,'MinDiversity',0.7,'MaxVariation',0.2,'Delta',10) ;
+[r,f] = mser(I,'MinDiversity',0.7,...
+               'MaxVariation',0.2,...
+               'Delta',10) ;
 \end{verbatim}
 We plot the region frames by
 \begin{verbatim}
@@ -342,19 +375,30 @@ hold on ;
 f = ertr(f) ;
 plotframe(f) ;
 \end{verbatim}
-The \cmd{ertr} transposes the elliptical frame and is needed because the \cmd{mser} code assumes that the row index is the first index, but the normal image convention assumes that this is the $x$ (column) index.
+The \cmd{ertr} transposes the elliptical frame and is needed because
+the \cmd{mser} code assumes that the row index is the first index, but
+the normal image convention assumes that this is the $x$ (column)
+index.
 
-Plotting the MSERs themselves is a bit more involved as they have arbitrary shape.
-To this end, we exploit two functions: \cmd{erfill}, which, given an image and a region seed,  returns a list of the pixels belonging to that region, and MATLAB built-in \cmd{contourn}, which draws the contour lines of a function. We start by
+Plotting the MSERs themselves is a bit more involved as they have
+arbitrary shape.  To this end, we exploit two functions: \cmd{erfill},
+which, given an image and a region seed, returns a list of the pixels
+belonging to that region, and MATLAB built-in \cmd{contourn}, which
+draws the contour lines of a function. We start by
 \begin{verbatim}
-M = zeros(size(I)) ;for x=r'  s = erfill(I,x) ;  M(s) = M(s) + 1;end
+M = zeros(size(I)) ;
+for x=r'
+ s = erfill(I,x) ;
+ M(s) = M(s) + 1;
+end
 \end{verbatim}
-which computes a matrix \verb$M$ whose value are equal to the number of overlapping extremal
-regions. Next, we use \verb$M$ and \cmd{contour} to display the region boundaries:
+which computes a matrix \verb$M$ whose value are equal to the number
+of overlapping extremal regions. Next, we use \verb$M$ and
+\cmd{contourn} to display the region boundaries:
 \begin{verbatim}
 clf ; imagesc(I) ;
 hold on ;
-[c,h]=contour(M,(0:max(M(:)))+.5) ;
+[c,h]=contourn(M,(0:max(M(:)))+.5) ;
 \end{verbatim}
 
 
@@ -362,23 +406,41 @@ hold on ;
 \subsection{MSER parameters}\label{mser.parameters}
 % --------------------------------------------------------------------
 
-In~\cite{matas03robust}, MSERs are controlled by a single parameter $\Delta$. In practice, this implementation uses a few more parameters to refine even more the selection of the
-useful extremal regions.
+In~\cite{matas03robust}, MSERs are controlled by a single parameter
+$\Delta$. Our implementation uses a few more parameters to refine even
+more the selection of the useful extremal regions.
 
-Understanding the parameters require to know how the stability of the
-extremal regions is evaluated. The stability of an extremal region $R$ is inversely proportional to the relative area variation of $R$ when the intensity level is increased by $\Delta$. Formally, the variation is defined as $|R_{+\Delta} - R|/|R|$, where $|R|$ denotes the area of the extremal region $R$, $R_{+\Delta}$ is the extremal region $+\Delta$ levels up which contains $R$ and $R_{+\Delta} - R$ is the set difference of the two regions. If the score is small, then there is a small area variation and the region is deemed stable.
+Understanding the parameters requires to know how ``stability'' of an
+extremal region is defined. The stability of an extremal region $R$ is
+the inverse of the relative area variation of the region $R$ when the
+intensity level is increased by $\Delta$. Formally, the area variation
+is defined as $|R_{+\Delta} - R|/|R|$, where $|R|$ denotes the area of
+the extremal region $R$, $R_{+\Delta}$ is the extremal region
+$+\Delta$ levels up which contains $R$ and $R_{+\Delta} - R$ is the
+set difference of the two regions. If the are variation is small, then
+the region is deemed stable.
 
-Based on the stability score, the algorithm keeps the extremal regions which are maximally stable, meaning that they have minimum variation compared to the extremal region one intensity level below and one intensity level up\footnote{Due to the discrete nature of the image, the region below/up may be coincident with the actual region, in which case the region is still deemed maximal.}. Even if an extremal region is maximally stable, it might be rejected if
+Based on the stability score, the algorithm keeps the extremal regions
+which are maximally stable, meaning that they have minimum variation
+compared to the extremal region one intensity level below and one
+intensity level up\footnote{Due to the discrete nature of the image,
+  the region below/up may be coincident with the actual region, in
+  which case the region is still deemed maximal.}. Even if an extremal
+region is maximally stable, it might be rejected if
 \begin{itemize}
 \raggedright
-\item it is too big (see the parameter \verb$MaxArea$);
-\item it is too small (see the parameter \verb$MinArea$);
-\item it is too unstable (see the parameter \verb$MaxVariation$);
-\item it is too similar to another MSER (see the paramter \verb$MinDiversity$).
+\item it is too big (see the parameter \param{MaxArea});
+\item it is too small (see the parameter \param{MinArea});
+\item it is too unstable (see the parameter \param{MaxVariation});
+\item it is too similar to another MSER (see the
+  paramter \param{MinDiversity}).
 \end{itemize}
 
-The interpretation of the parameters \verb$MaxArea$ and \verb$MinArea$. The parameter \verb$MaxVariation$ removes regions that are too unstable (even if they might be maximally stable in the local). The interaction of \verb$MaxVariation$ and \verb$Detla$ is illustrated in 
-Fig.~\ref{fig:mser-delta}.
+The interpretation of the parameters \param{MaxArea}
+and \param{MinArea}. The parameter \verb$MaxVariation$ removes regions
+that are too unstable (even if they might be maximally stable in the
+local). The interaction of \verb$MaxVariation$ and \verb$Detla$ is
+illustrated in Fig.~\ref{fig:mser-delta}.
 
 \begin{figure}
 \begin{center}
@@ -394,14 +456,30 @@ have heights equal to $32,64,96,128$ and $160$ intensity levels. {\bf Other rows
 \label{fig:mser-delta}
 \end{figure}
 
-While the concept of local stability is simple to grasp, there is a complication that we did not address yet, i.e. how to define ``locality'' in the comparison of extremal regions. In a senseFor instance, one could define neighbors of an extremal region $R$ the parent extremal region $R_{+1}$ at level e would compare the region $R$ with the region $R_{+1}$ and 
+While the concept of local stability is simple to grasp, there is a
+complication that we did not address yet, i.e. how to define
+``locality'' in the comparison of extremal regions. In a senseFor
+instance, one could define neighbors of an extremal region $R$ the
+parent extremal region $R_{+1}$ at level e would compare the region
+$R$ with the region $R_{+1}$ and
 
+% --------------------------------------------------------------------
+\subsection{Conformity}\label{mser.conformity}
+% --------------------------------------------------------------------
+
+The specification of the MSER algorithm~\cite{matas03robust} leaves
+some details on how the stability score is computed unspecified. This
+implementation uses a slightly simplified version of the stability
+score and introduces some additional parameters to control the
+selection of the useful MSER. The details are illustrated
+in~\cite{vedaldi07vlfeat-dox}.
 
 % --------------------------------------------------------------------
 \section{MATLAB utility programs}\label{other}
 % --------------------------------------------------------------------
 This is a list of other useful MATLAB programs bundled with \VLFeat:
 \begin{itemize}
+\raggedright
 \item \cmd{imsmooth} smoothes an image by a Gaussian kernel (simple but very useful as it is generally much faster than MATLAB general purpose smoothing functions).
 \item \cmd{plotframe} plots a variety of feature frame kinds.
 \item \cmd{binsum} performs binned summations, useful as a building block for
