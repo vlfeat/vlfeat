@@ -3,24 +3,32 @@ function H = tightsubplot(varargin)
 %   H = TIGHTSUBPLOT(K,P) returns an handle to the P-th axis in a
 %   regular grid of K axes. The K axes are numbered from left to right
 %   and from top to bottom.  The function operates similarly to
-%   SUBPLOT(), but by default it does not put any margin between axes.
+%   SUBPLOT(), but by default it does not put any margin between
+%   axes. This is done by tiling the axes inner box rather than the
+%   axes outer box.
+%   
 %
 %   H = TIGHTSUBPLOT(M,N,P) retursn an handle to the P-th axes in a
 %   regular subdivision with M rows and N columns.
 %
 %   The function accepts the following option-value pairs:
 %
-%   'Spacing' [0]
+%   Margin       [0]
+%   MarginLeft   [0]
+%   MarginRight  [0]
+%   MarginTop    [0]
+%   MarginBottom [0]
+%     Set the axes inner box margin, either uniformly in all
+%     directions, or specifically to the left, right, top or bottom.
+%
+%   Box ['inner'] (** ONLY >R14 **)
+%     If set to 'outer', tile the axes outer box, thus protecting
+%     title and labels. Unfortunately this usually produces
+%     unnecesarily large margins.
+%
+%   Spacing [0] (legacy option)
 %     Set extra spacing between axes.  The space is added between the
 %     inner or outer boxes, depending on the setting below.
-%
-%   'Box' ['inner'] (** ONLY >R14 **)
-%     If set to 'outer', the function displaces the axes by their
-%     outer box, thus protecting title and labels. Unfortunately
-%     MATLAB typically picks unnecessarily large insets, so that a bit
-%     of space is wasted in this case.  If set to 'inner', the
-%     function uses the inner box. This causes the instets of nearby
-%     axes to overlap, but it is very space conservative.
 %
 %   REMARK. While SUBPLOT kills any pre-existing axes that overalps a
 %   new one, this function does not.
@@ -28,32 +36,20 @@ function H = tightsubplot(varargin)
 %   See also SUBPLOT().
 
 % AUTORIGHTS
-% Copyright (C) 2006 Andrea Vedaldi
-%       
-% This file is part of VLUtil.
-% 
-% VLUtil is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2, or (at your option)
-% any later version.
-% 
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-% 
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software Foundation,
-% Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-sp=0.0 ;
+% margins
+ml = 0 ;
+mr = 0 ;
+mt = 0 ;
+mb = 0 ;
+
 use_outer=0 ;
 
 % --------------------------------------------------------------------
 %                                                      Parse arguments
 % --------------------------------------------------------------------
-K=varargin{1} ;
-p=varargin{2} ;
+K = varargin{1} ;
+p = varargin{2} ;
 N = ceil(sqrt(K)) ;
 M = ceil(K/N) ;
 
@@ -72,19 +68,37 @@ if NA > 2
 end
 
 for a=a:2:NA
-  switch varargin{a}
-    case 'Spacing'
-      sp=varargin{a+1} ;
-    case 'Box'      
-      switch varargin{a+1}
+  opt=lower(varargin{a}) ;
+  arg=varargin{a+1} ;
+  switch opt
+    case 'margin'
+      mt = arg ;
+      mb = arg ;
+      ml = arg ;
+      mr = arg ;
+    case 'marginleft'
+      ml = arg ;      
+    case 'marginright'
+      mr = arg ;      
+    case 'margintop'
+      mt = arg ;      
+    case 'marginbottom'
+      mb = arg ;            
+    case 'spacing'
+      mt = arg/2 ;
+      mb = arg/2 ;
+      ml = arg/2 ;
+      mr = arg/2 ;
+    case 'box'      
+      switch lower(arg)
         case 'inner'
           use_outer = 0 ;
         case 'outer'
-	if ~strcmp(version('-release'), '14')
-          %warning(['Box option supported only on MATALB 14']) ;
-	  continue;
-	end
-        use_outer = 1 ;
+          if ~strcmp(version('-release'), '14')
+            %warning(['Box option supported only on MATALB 14']) ;
+            continue;
+          end
+          use_outer = 1 ;
         otherwise
           error(['Box is either ''inner'' or ''outer''']) ;
       end
@@ -101,15 +115,10 @@ end
 i=i-1 ;
 j=j-1 ;
 
-dt = sp/2 ;
-db = sp/2 ;
-dl = sp/2 ;
-dr = sp/2 ;
-
-pos = [  j*1/N+dl,...
-       1-i*1/M-1/M+dt,...
-       1/N-dl-dr,...
-       1/M-dt-db] ;
+pos = [    j * 1/N       + ml,...
+       1 - i * 1/M - 1/M + mb,...
+       1/N - ml - mr, ...
+       1/M - mt - mb] ;
 
 switch use_outer
   case 0

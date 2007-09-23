@@ -30,9 +30,10 @@
  **   - @ref imop.h      "Image operations"
  **   - @ref rodrigues.h "Rodrigues formuals"
  ** - Main functionalities
- **   - @ref sift.h    "Scale Invariant Feature Transform (SIFT)"
- **   - @ref mser.h    "Maximally Stable Extremal Regions (MSER)"
- **   - @ref ikmeans.h "Integer K-means"
+ **   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
+ **   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
+ **   - @ref ikmeans.h  "Integer K-means (IKM)"
+ **   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
  **
  ** @section main-design Library design
  **

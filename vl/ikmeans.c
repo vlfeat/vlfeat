@@ -51,14 +51,14 @@ int cmp_pair (void const *a, void const *b)
  ** @param asgn       data to clusters assignments (output).
  ** @param data       data.
  ** @param M          data dimensionality.
- ** @param N          number of data.
- ** @param K          number of clusters.
+ ** @param N          number of data (@a N &ge; 1).
+ ** @param K          number of clusters (1 &le; @a K &le; @a N).
  ** @param max_passes maximum number of passes.
  **
  ** The function clusters the N D-dimensional data in K partitions and
- ** fills a MxK matrix with the cluster centers.  If @a asgn is not @c
- ** NULL, the function also writes to @a asgn the cluster index of
- ** each datum.
+ ** fills a \f$M\times K\f$ matrix with the cluster centers.  If @a
+ ** asgn is not @c NULL, the function also writes to @a asgn the
+ ** cluster index of each datum.
  **
  ** @return -1 if an overflow may have occured.
  **/
@@ -204,7 +204,6 @@ vl_ikmeans_push_one (vl_int32  *centers, int K, vl_uint8* data, int M)
   }
   return best;
 }
-
 
 /** @brief Project data on integer K-means clusters
  **

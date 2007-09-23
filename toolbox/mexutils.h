@@ -15,6 +15,49 @@
 #endif
 
 /** ---------------------------------------------------------------- */
+/** @brief Is the array a numeric scalar?
+ **
+ ** @param A array to test.
+ **
+ ** An array is <em>numeric and scalar</em> if:
+ ** - It is numeric.
+ ** - It as only one element.
+ **
+ ** @return test result.
+ **/
+static int
+uIsScalar(const mxArray* A)
+{
+  return 
+    mxIsNumeric (A) && mxGetNumberOfElements(A) == 1 ;
+}
+
+/** ---------------------------------------------------------------- */
+/** @brief Is the array a numeric matrix?
+ **
+ ** @param A array to test.
+ ** @param M number of rows.
+ ** @param N number of columns.
+ **
+ ** The array @a A satisfies the test if:
+ ** - It is numeric.
+ ** - It as two dimensions.
+ ** - @a M < 0 or the number of rows is equal to @a M.
+ ** - @a N < 0 or the number of columns is equal to @a N.
+ **
+ ** @return test result.
+ **/
+static int
+uIsMatrix (const mxArray* A, int M, int N)
+{
+  return
+    mxIsNumeric(A) &&
+    mxGetNumberOfDimensions(A) == 2 &&
+    (M < 0 || mxGetM(A) == M) &&
+    (N < 0 || mxGetN(A) == N) ;   
+}
+
+/** ---------------------------------------------------------------- */
 /** @brief Is the array real?
  **
  ** @param A array to test.
@@ -26,7 +69,7 @@
  ** @return test result.
  **/
 static int
-uIsReal(const mxArray* A)
+uIsReal (const mxArray* A)
 {
   return 
     mxIsDouble(A) && 
