@@ -39,7 +39,7 @@ mci_MEX_CFLAGS   :=
 mci_MEX_SUFFIX   := mexmaci
 
 glx_BINDIR       := bin/glx
-glx_CFLAGS       := -D__LITTLE_ENDIAN__
+glx_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   :=
 glx_MEX_SUFFIX   := mexglx
@@ -52,9 +52,14 @@ BINDIR           := $($(ARCH)_BINDIR)
 BINDIST          := $(DIST)-bin
 
 .PHONY : all
-all : all-lib all-bin all-mex
+all : all-dir all-lib all-bin all-mex
 
-# this creates the directory hiearchy 
+# this creates auxiliary directories
+.PHONY: all-dir
+all-dir:
+	mkdir -p results doc/figures/demo
+
+# this creates binary  directory hiearchy 
 $(BINDIR) $(BINDIR)/objs $(BINDIR)/objs/.stamp:
 	mkdir -p $(BINDIR)/objs
 	touch $@
@@ -131,7 +136,6 @@ doc:
 	make -C doc all
 
 docdeep: all
-	mkdir -p results
 	cd toolbox ; \
 	matlab -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 

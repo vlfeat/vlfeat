@@ -5,3 +5,6 @@ function path = vlfeat_setup
 root=vlfeat_root ;
 addpath(fullfile(root,'toolbox')) ;
 addpath(fullfile(root,'toolbox','test')) ;
+
+fprintf('Welcome to VLFeat!\n') ;
+
