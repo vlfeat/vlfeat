@@ -20,9 +20,12 @@ mxArray *
 fill_subtree (VlHIKMNode * node, int M)
 {
   int i, K = node->K ;
-  mwSize dims[2] = {1,K};
+  mwSize dims [2] ;
   const char * field_names[] = {"centers", "sub" } ;
   mxArray *subtree, *child ;
+
+  dims[0] = 1 ;
+  dims[1] = K ;
 
   /* Base case: this node does not have any childern (leaf). 
    * In this case the node is empty.
@@ -159,26 +162,28 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     /* K is the number of clusters */
     /* M is the dimension of each datapoint */
     /* N is the number of data points */
-
-    VlHIKMTree * tree = vl_hikm (data, M, N, K, nleaves) ;
-    vl_uint * ids     = vl_hikm_push (tree, data, N) ;
-    int depth         = tree->depth;
-
-    /* copy the tree to matlab */
-    out[OUT_TREE] = hkmtree_to_matlab (tree) ;
-    vl_hikm_delete (tree) ;
-
-    /* copy the assignments to matlab */
-    out [OUT_ASGN] = mxCreateNumericMatrix 
-      (depth, N, mxUINT32_CLASS, mxREAL) ;
     {
-      int j ;
-      for (j = 0 ; j < N * depth ; ++j) ids[j]++ ;
-    }
-    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint) * depth * N) ;
-    free(ids) ;
-
-    if (verbose) {
-      mexPrintf("hikmeans: done.\n") ;
+      VlHIKMTree * tree = vl_hikm (data, M, N, K, nleaves) ;
+      vl_uint * ids     = vl_hikm_push (tree, data, N) ;
+      int depth         = tree->depth;
+      
+      /* copy the tree to matlab */
+      out[OUT_TREE] = hkmtree_to_matlab (tree) ;
+      vl_hikm_delete (tree) ;
+      
+      /* copy the assignments to matlab */
+      out [OUT_ASGN] = mxCreateNumericMatrix 
+        (depth, N, mxUINT32_CLASS, mxREAL) ;
+      {
+        int j ;
+        for (j = 0 ; j < N * depth ; ++j) ids[j]++ ;
+      }
+      memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint) * depth * N) ;
+      free(ids) ;
+      
+      if (verbose) {
+        mexPrintf("hikmeans: done.\n") ;
+      }
     }
 }
+

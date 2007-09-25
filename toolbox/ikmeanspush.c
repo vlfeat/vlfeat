@@ -20,12 +20,11 @@ void
 mexFunction(int nout, mxArray *out[],
         int nin, const mxArray *in[])
 {
+    enum {IN_X=0,IN_C} ;
+    enum {OUT_ASGN=0} ;
     vl_uint*  asgn ;
     vl_int32* centers ;
     vl_uint8* data ;
-    /*  mxClassID data_class = mxINT8_CLASS ;*/
-    enum {IN_DATA=0,IN_CENTERS} ;
-    enum {OUT_ASGN} ;
     int M,N,j ;
     int K=0 ;
 
@@ -38,26 +37,26 @@ mexFunction(int nout, mxArray *out[],
         mexErrMsgTxt("Too many output arguments.") ;
     }
 
-    if(mxGetClassID(in[IN_DATA]) != mxUINT8_CLASS) {
+    if(mxGetClassID(in[IN_X]) != mxUINT8_CLASS) {
         mexErrMsgTxt("X must be of class UINT8") ;
     }
 
-    if(mxGetClassID(in[IN_CENTERS]) != mxINT32_CLASS) {
+    if(mxGetClassID(in[IN_C]) != mxINT32_CLASS) {
         mexErrMsgTxt("C must be of class INT32") ;
     }
 
-    M = mxGetM(in[IN_DATA]) ;     /* n of components */
-    N = mxGetN(in[IN_DATA]) ;     /* n of elements */
-    K = mxGetN(in[IN_CENTERS]) ;  /* n of centers */
+    M = mxGetM(in[IN_X]) ;     /* n of components */
+    N = mxGetN(in[IN_X]) ;     /* n of elements */
+    K = mxGetN(in[IN_C]) ;  /* n of centers */
 
-    if( mxGetM(in[IN_CENTERS]) != M ) {
+    if( mxGetM(in[IN_C]) != M ) {
         mexErrMsgTxt("DATA and CENTERS must have the same number of columns.") ;
     }
 
     out[OUT_ASGN] = mxCreateNumericMatrix(1,N,mxUINT32_CLASS,mxREAL);
 
-    data    = (vl_uint8*) mxGetPr(in[IN_DATA]) ;
-    centers = (vl_int32*) mxGetPr(in[IN_CENTERS]) ;
+    data    = (vl_uint8*) mxGetPr(in[IN_X]) ;
+    centers = (vl_int32*) mxGetPr(in[IN_C]) ;
     asgn    = (vl_uint*)  mxGetPr(out[OUT_ASGN]);
 
     vl_ikmeans_push (asgn, centers, K, data, M, N);

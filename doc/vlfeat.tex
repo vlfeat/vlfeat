@@ -2,14 +2,16 @@
 % description:  An introduction to the VisionLab Features Library
 % author:       Andrea Vedaldi
 
-\documentclass[9.5pt]{article}
+\documentclass[9pt]{article}
 \usepackage{times}
 \usepackage[margin=1.5cm]{geometry}
 
-\usepackage{graphicx,amsmath,amssymb,color}
+\usepackage{graphicx,amsmath,amssymb,color,pdfsync}
 \usepackage{subfig}
 \usepackage{xspace}
 \usepackage{ifpdf}
+\usepackage{fancyvrb}
+
 
 \ifpdf
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
@@ -25,6 +27,8 @@
 \newcommand{\real}{\ensuremath{\mathbb{R}}}
 \title{An Introduction to the\\ VisionLab Features Library} 
 \author{A. Vedaldi, B. Fulkerson}
+
+\CustomVerbatimEnvironment{verbcode}{Verbatim}{formatcom=\small}
 
 % --------------------------------------------------------------------
 \begin{document}
@@ -249,13 +253,12 @@ orientations (Fig.~\ref{fig:sift-custom-or})!
 \subsection{Conventions}\label{sift.conventions}
 % --------------------------------------------------------------------
 
-Our implementation SIFT frames are expressed in the standard image
+In our implementation SIFT frames are expressed in the standard image
 reference.  The only difference between the command line and MATLAB
-version is that the latter assumes that the image origin (top-left
+drivers is that the latter assumes that the image origin (top-left
 corner) has coordinate $(1,1)$ as opposed to $(0,0)$. Lowe's original
-implementation uses a different reference system, so if the two
-implementations are to be compared the necessary conversion needs to
-be performed.  The details are illustrated in Fig.~\ref{fig:sift-conv}
+implementation uses a different reference system. The details are
+illustrated in Fig.~\ref{fig:sift-conv}
 
 \begin{figure}
 \begin{center}
@@ -286,10 +289,10 @@ Our implementation produces SIFT frames and descriptors that are
 almost identical to D. Lowe's original
 implementation~\cite{lowe07sift}
 (Fig.~\ref{fig:sift-conformity}). Small differences are due to
-numerical errors, a minor difference in the computation of the
-orientation (we eliminated a small bias introduce by Lowe's original
-implementation).  The most significant difference is that a minority
-of the frames are detected by one implementation but not the other.
+numerical errors and a minor difference in the computation of the
+frames orientations (we eliminated a small bias introduce by Lowe's
+original implementation). The only known issue is that a small number
+of frames are detected by one implementation but not the other.
 
 \begin{figure}
 \begin{center}
@@ -302,14 +305,14 @@ of the frames are detected by one implementation but not the other.
 \label{fig:sift-custom.b}
 }\\
 \end{center}
-\caption{ {\em SIFT: comparison to Lowe's original implementation.}
+\caption{{\em SIFT: comparison to Lowe's original implementation.}
   \protect\subref{fig:sift-custom.a} SIFT frames detected by our
   implementation (both through the MATLAB and command line interfaces)
   and the original Lowe's implementation: there is a very good
-  correspondence (up to numerical errors).  Noice however that a few
-  frames are detected by one implementation but not the other.
-  \protect\subref{fig:sift-custom.b} The same for the sift descriptors of some
-  of the frames: again the correspondence is very good.}
+  correspondence (up to numerical errors).  Notice that a few frames
+  are detected by one implementation but not the other.
+  \protect\subref{fig:sift-custom.b} The same for the SIFT descriptors
+  of some of the frames: again the correspondence is very good.}
 \label{fig:sift-conformity}
 \end{figure}
 
@@ -401,7 +404,6 @@ hold on ;
 [c,h]=contourn(M,(0:max(M(:)))+.5) ;
 \end{verbatim}
 
-
 % --------------------------------------------------------------------
 \subsection{MSER parameters}\label{mser.parameters}
 % --------------------------------------------------------------------
@@ -464,6 +466,53 @@ parent extremal region $R_{+1}$ at level e would compare the region
 $R$ with the region $R_{+1}$ and
 
 % --------------------------------------------------------------------
+\subsection{Conventions}\label{mser.command}
+% --------------------------------------------------------------------
+
+As mentioned in the introduction, the \cmd{mser} uses the matrix
+indeces as image coordinates. Compared to the usual MATLAB convention
+for images, this means that the $x$ and $y$ axis are swapped (this has
+been done to make the convention consistent with images with three or
+more dimensions). Thus the frames computed by the program may need to
+be ``transposed'' as in:
+\begin{verbatim}
+[r,f] = mser(I) ;
+f = ertr(f) ;
+\end{verbatim}
+On the other hand, the region seeds \verb$r$ are already in row
+major format, which is how MATLAB standard format for  pixel indeces.
+
+Instead of transposing the frames, one can start by transoposing the
+image. In this case, the frames \verb$f$ have the standard image
+convention, but the region seeds are in column-major format and may
+need to be ``transopsed'' as in:
+\begin{verbatim}
+[r,f] = mser(I') ;
+[i,j] = sub2ind(size(I'),r) ;
+r  = ind2sub(size(I),j,i) ; 
+\end{verbatim}
+
+The command line utility \cmd{mser} uses the normal image convention
+(because images are rasterized in column-major order). Therefore the
+image frames are in the standard format, and the region seeds are in
+column major format.
+
+In order to convert from the command line utility convention and the
+MATLAB convention one needs also to recall that MATLAB coordinates 
+starts from $(1,1)$, but the command line utility uses the more common
+convention $(0,0)$. For instance, let the files \verb$image.frame$ and
+\verb$image.seed$ contain the feature frames and seeds in ASII format
+as generated by the command line utility. Then 
+\begin{verbatim}
+r_ = load('image.seed')' + 1 ;
+f_ = load('image.frame')' ; 
+f_(1:2,:) = f_(1:2,:) + 1 ;
+[r,f] = mser(I') ; % notice the transpose
+\end{verbatim}
+produces identical (up to numerical noise) region seeds \verb$r$ and
+\verb$r_$ and frames \verb$f$ and \verb$f_$.
+
+% --------------------------------------------------------------------
 \subsection{Conformity}\label{mser.conformity}
 % --------------------------------------------------------------------
 
@@ -475,24 +524,173 @@ selection of the useful MSER. The details are illustrated
 in~\cite{vedaldi07vlfeat-dox}.
 
 % --------------------------------------------------------------------
+\section{Integer K-means}\label{ikmeans}
+% --------------------------------------------------------------------
+
+\VLFeat includes a basic implementation of $K$-means clustering and
+hierarchical $K$-means clustering. They are designed to be lightweight
+in order to work on large dataset. In particular, they assume that the
+data are vectors of usigned chars (one byte). While this is limiting
+for some application, works well for clustering image descriptors,
+where usually very high precision is unnecessary.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.6\columnwidth]{figures/demo/ikmeans}\\
+\end{center}
+\caption{{\em Integer K-means}. We show clusters of 2-D points
+  obtained by integer K-means.  There are $K=3$ clusters represented
+  with different colors. The clusters have been estimated from 1000
+  points (displayed as dots). Then other 10000 points have been
+  projected on the same clusters (displayed as crosses). The three big
+  markers represent the cluster centers.}
+\label{fig:ikmeans}
+\end{figure}
+
+Integer K-means (IKM) is run by the command \cmd{ikmeans}. In order to
+demonstrate the usage of this command, we sample 10000 random points
+in the $[0,255]^2$ integer square and launch the \cmd{ikmeans} to get
+$K=3$ clusters:
+\begin{verbatim}
+K = 3 ;
+data = uint8(rand(2,10000) * 255) ;
+[C,A] = ikmeans(data,K) ;
+\end{verbatim}
+The program returns both the cluster centers \verb$C$ and the
+data-to-cluster assignments $A$. By means of the cluster centers
+\verb$C$ we can project more data on the same clusers
+\begin{verbatim}
+datat = uint8(rand(2,100000) * 255) ;
+AT = ikmeanspush(datat,C) ;
+\end{verbatim}
+In order to visualize the results, we associate to each cluster a
+color and we plot the points:
+\begin{verbcode}
+cl = get(gca,'ColorOrder') ;
+ncl = size(cl,1) ;
+for k=1:K
+  sel  = find(A  == k) ;
+  selt = find(AT == k) ;
+  plot(data(1,sel),  data(2,sel),  '.',...
+       'Color',cl(mod(k,ncl)+1,:)) ;
+  plot(datat(1,selt),datat(2,selt),'+',...
+       'Color',cl(mod(k,ncl)+1,:)) ;  
+end
+\end{verbcode}
+The results are shown in Fig.~\ref{fig:ikmeans}.
+
+
+% --------------------------------------------------------------------
+\subsection{Hierarchical IKM}\label{ikmeans.hierarchical}
+% --------------------------------------------------------------------
+
+\VLFeat also offers a hierarchical version of integer K-means, which
+recusively apply \cmd{ikmeans} to compute finer and finer partitions.
+We demonstrates this by:
+\begin{verbatim}
+K        = 3 ;
+nleaves  = 100 ;
+data     = uint8(rand(2,10000) * 255) ;
+datat    = uint8(rand(2,100000)* 255) ;
+[tree,A] = hikmeans(data,K,nleaves) ;
+AT       = hikmeanspush(tree,datat) ;
+\end{verbatim}
+Here \verb$nleaves$ is the desired number of leaf clusters. This is
+obtained by subdividing recursively each cluster in $K$
+sub-clusters. Therefore $\mathtt{depth} = \lfloor \log_K
+\mathtt{nleaves} \rfloor$ recursive subdivisons are sufficient and the
+algorithm terminates with clusters arranged in a $K$-tree of of depth
+\verb$depth$ which has at least \verb$nleaves$ leaves (but it may have
+more).
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.4\columnwidth]{figures/demo/hikmeans-tree}\hfill
+\includegraphics[width=0.4\columnwidth]{figures/demo/hikmeans-clusters}\\
+\end{center}
+\caption{{\em Hierarchical integer K-means}. {\bf Left.} A depiction
+  of the rescursive clsuters. Each node is a cluster center. The root
+  note is not depicted (its center would be the mean of the dataset).
+  {\bf Right}. Clusters are represented as different colors (here are
+  more thatn 100 clusters, but only tree colors are used).}
+\label{fig:hikmeans}
+\end{figure}
+
+The output \verb$tree$ is a MATLAB structure representing the tree of
+clusters:
+\begin{verbatim}
+> tree
+tree =
+ 
+          K: 3
+      depth: 5
+    centers: [2x3 int32]
+        sub: [1x3 struct]
+\end{verbatim}
+The field \verb$centers$ is the matrix of the cluster centers at the
+root node.  If the depth of the tree is larger than 1, then the field
+\verb$sub$ is a structure array with one entry for each cluster. Each
+element is in turn a structure such as
+\begin{verbatim}
+> tree.sub
+ans = 
+
+1x3 struct array with fields:
+    centers
+    sub
+\end{verbatim}
+with teh cluster centers for that recusrive parittions and a field
+\verb$sub$ for the recursive children. When there are no childrent,
+this field is equal to the empty matrix
+\begin{verbatim}
+K>> tree.sub(1).sub(1).sub(1).sub(1)
+
+ans = 
+
+    centers: [2x3 int32]
+        sub: []
+\end{verbatim}
+Fig.~\ref{fig:hikmeans} illustrates the recusrive partitons obtained
+for the 2-D points data.
+
+
+
+
+% --------------------------------------------------------------------
 \section{MATLAB utility programs}\label{other}
 % --------------------------------------------------------------------
 This is a list of other useful MATLAB programs bundled with \VLFeat:
 \begin{itemize}
 \raggedright
-\item \cmd{imsmooth} smoothes an image by a Gaussian kernel (simple but very useful as it is generally much faster than MATLAB general purpose smoothing functions).
+\item \cmd{imsmooth} smoothes an image by a Gaussian kernel (simple
+  but very useful as it is generally much faster than MATLAB general
+  purpose smoothing functions).
 \item \cmd{plotframe} plots a variety of feature frame kinds.
-\item \cmd{binsum} performs binned summations, useful as a building block for
-the fast computation of histograms. \cmd{whistc} computed weighed histograms.
-\item \cmd{imarray} and \cmd{imarraysc} arrange and visualize multiple images in a grid; \cmd{imsc} scales the image range; \cmd{tightsubplot} is similar to built-in \cmd{subplot}, but 
-produces narrower margins.
+\item \cmd{binsum} performs binned summations, useful as a building
+  block for the fast computation of histograms. \cmd{whistc} computed
+  weighed histograms.
+\item \cmd{imarray} and \cmd{imarraysc} arrange and visualize multiple
+  images in a grid; \cmd{imsc} scales the image range;
+  \cmd{tightsubplot} is similar to built-in \cmd{subplot}, but
+  produces narrower margins.
 \item \cmd{cf} copies a figure.
-\item \cmd{rord} and \cmd{irodr} compute the Rodrigues' formula and its inverse.
-\item \cmd{override} overrides members of a structure with members of another strucutre.
-\item \cmd{imwbackward} warps an image by the inverse mapping method (generally much faster than MATLAB general purpose warping functions).
-\item \cmd{waffine} computes the affine warp of a set of points. \cmd{tps}, \cmd{tpsu}, \cmd{wtps} compute the thin-plate spline warp of a set of points. \cmd{witps} computes the inverse thin plate warp of a set of point (by numerically inverting the transformation). They may me used in combination with \cmd{imwbackward}.
-\item \cmd{xyz2lab}, \cmd{xyz2luv}, \cmd{xyz2rgb}, \cmd{rgb2xyz} convert color spaces.
-\item \cmd{rcos}, \cmd{gaussian}, \cmd{dgaussian}, \cmd{ddgaussian} compute some basic functions.
+\item \cmd{rord} and \cmd{irodr} compute the Rodrigues' formula and
+  its inverse.
+\item \cmd{override} overrides members of a structure with members of
+  another strucutre.
+\item \cmd{imwbackward} warps an image by the inverse mapping method
+  (generally much faster than MATLAB general purpose warping
+  functions).
+\item \cmd{waffine} computes the affine warp of a set of
+  points. \cmd{tps}, \cmd{tpsu}, \cmd{wtps} compute the thin-plate
+  spline warp of a set of points. \cmd{witps} computes the inverse
+  thin plate warp of a set of point (by numerically inverting the
+  transformation). They may me used in combination with
+  \cmd{imwbackward}.
+\item \cmd{xyz2lab}, \cmd{xyz2luv}, \cmd{xyz2rgb}, \cmd{rgb2xyz}
+  convert color spaces.
+\item \cmd{rcos}, \cmd{gaussian}, \cmd{dgaussian}, \cmd{ddgaussian}
+  compute some basic functions.
 \end{itemize}
 
 % --------------------------------------------------------------------

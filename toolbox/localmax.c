@@ -1,27 +1,9 @@
-/* file:        localmax.c
-** author:      Andrea Vedaldi
-** description: Find local maximizer of multi-dimensional array.
-**/
+/** file:        localmax.c
+ ** author:      Andrea Vedaldi
+ ** description: Find local maximizer of multi-dimensional array.
+ **/
 
-/* AUTORIGHTS
-Copyright (C) 2006 Andrea Vedaldi
-      
-This file is part of VLUtil.
-
-VLUtil is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software Foundation,
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*/
+/* AUTORIGHTS */
 
 #include "mexutils.h"
 
@@ -85,8 +67,8 @@ mexFunction(int nout, mxArray *out[],
        we need to adjust dims[].
     */
     int d ;
-    dims = mxMalloc(sizeof(int)*ndims) ;
     const int* const_dims = mxGetDimensions(in[F]) ;
+    dims = mxMalloc(sizeof(int)*ndims) ;
     for(d=0 ; d < ndims ; ++d) dims[d] = const_dims[d] ;
   }
   M = dims[0] ;
@@ -186,6 +168,8 @@ mexFunction(int nout, mxArray *out[],
       if(dims[h] < 3) goto end ;
     
     while(true) {
+      double v ;
+      bool is_greater; 
 
       /* Propagate carry along multi index midx */
       h = 0 ;
@@ -204,8 +188,8 @@ mexFunction(int nout, mxArray *out[],
       */
       
       /*  Scan neighbors */
-      double v = *pt ;
-      bool is_greater = (v >= threshold) ;
+      v = *pt ;
+      is_greater = (v >= threshold) ;
       i = 0  ;
       while(is_greater && i < nneighbors)
         is_greater &= v > *(pt + neighbors[i++]) ;

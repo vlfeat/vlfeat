@@ -12,8 +12,9 @@ BINDIST             = $(DIST)-$(ARCH)
 # --------------------------------------------------------------------
 
 # generic flags
-CFLAGS           += -I. -pedantic -Wall -std=c99 -g -O0
-CFLAGS           += -Wno-variadic-macros -Wno-unused-function
+CFLAGS           += -I. -pedantic -Wall -std=c89 -g -O0
+#CFLAGS           += -Wno-overlength-strings
+CFLAGS           += -Wno-variadic-macros -Wno-unused-function -Wno-long-long
 LDFLAGS          +=
 MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl
 

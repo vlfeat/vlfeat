@@ -1,7 +1,8 @@
-/** file:        hikmeans.c
- ** description: MEX hierarchical ikmeans.
- ** author:      Brian Fulkerson
- ** author:      Andrea Vedaldi
+/** @internal
+ ** @file    hikmeanspush.c
+ ** @brief   vl_hikm_push - MEX driver
+ ** @author  Brian Fulkerson
+ ** @author  Andrea Vedaldi
  **/
 
 /* AUTORIGHTS */
@@ -19,8 +20,8 @@
 #define NFIELDS(field_names) (sizeof(field_names)/sizeof(*field_names))
 
 /* ---------------------------------------------------------------- */
-/** @brief Convert MATLAB structure to HIKM node */
-
+/** @brief Delete HIKM tree
+ **/
 void
 xdel_tree (VlHIKMNode *node) 
 {
@@ -40,6 +41,9 @@ xdel_tree (VlHIKMNode *node)
   }
 }
 
+/* ---------------------------------------------------------------- */
+/** @brief Delete HIKM tree node
+ **/
 void
 del_tree (VlHIKMTree *tree)
 {
@@ -50,7 +54,8 @@ del_tree (VlHIKMTree *tree)
 }
 
 /* ---------------------------------------------------------------- */
-/** @brief Convert MATLAB structure to HIKM node */
+/** @brief Convert MATLAB structure to HIKM node
+ **/
 VlHIKMNode * 
 matlab_to_hkmnode (VlHIKMTree *tree, mxArray const *mnode, int i)
 {
@@ -143,48 +148,54 @@ matlab_to_hkmtree (mxArray const *mtree)
   return tree;
 }
 
-/* driver */
+/* ---------------------------------------------------------------- */
+/** @brief MEX driver entry point 
+ **/
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-    vl_uint8 *data_pt;
-
-    enum {IN_TREE = 0, IN_DATA} ;
-    enum {OUT_ASGN = 0} ;
-    int N = 0 ;
-    int verbose = 1 ;
-
-  /** -----------------------------------------------------------------
-   **                                               Check the arguments
-   ** -------------------------------------------------------------- */
-    if (nin != 2)
-        mexErrMsgTxt ("Two arguments required.");
-    else if (nout > 1)
-        mexErrMsgTxt ("Too many output arguments.");
-
-    if (mxGetClassID (in[IN_DATA]) != mxUINT8_CLASS)
+  enum {IN_TREE = 0, IN_DATA} ;
+  enum {OUT_ASGN = 0} ;
+  vl_uint8 *data_pt; 
+  int N = 0 ;
+  
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
+  if (nin != 2)
+    mexErrMsgTxt ("Two arguments required.");
+  else if (nout > 1)
+    mexErrMsgTxt ("Too many output arguments.");
+  
+  if (mxGetClassID (in[IN_DATA]) != mxUINT8_CLASS)
     {
-        mexErrMsgTxt ("DATA must be of class UINT8");
+      mexErrMsgTxt ("DATA must be of class UINT8");
     }
+  
+  N = mxGetN (in[IN_DATA]);   /* n of elements */
 
-    N = mxGetN (in[IN_DATA]);   /* n of elements */
+  data_pt = (vl_uint8 *) mxGetPr (in[IN_DATA]);
 
-    data_pt = (vl_uint8 *) mxGetPr (in[IN_DATA]);
+  /* -----------------------------------------------------------------
+   *                                                        Do the job
+   * -------------------------------------------------------------- */
 
-    /* K is the number of clusters */
-    /* M is the dimension of each datapoint */
-    /* N is the number of data points */
+  /* K is the number of clusters */
+  /* M is the dimension of each datapoint */
+  /* N is the number of data points */
+  {
     VlHIKMTree *tree = matlab_to_hkmtree (in[IN_TREE]) ;
     vl_uint  *ids    = vl_hikm_push (tree, data_pt, N) ;
     int depth        = tree -> depth ;
-
+    
     del_tree (tree) ;
-
+    
     /* copy the assignments to matlab */
     out[OUT_ASGN] = mxCreateNumericMatrix (depth, N, mxUINT32_CLASS, mxREAL);
     {
       int j;
       for (j = 0 ; j < N*depth ; j++) ids[j]++;
     }
-    memcpy(mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint)*depth*N);
-    free(ids);
+    memcpy (mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint) * depth * N);
+    free (ids);
+  }
 }

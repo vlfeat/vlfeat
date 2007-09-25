@@ -1,44 +1,33 @@
 function test_hikmeans
-% TEST_HIKMEANS Test IKMEANS and HIKMEANS
+% TEST_HIKMEANS Test HIKMEANS function
 
-K       = 3 ;
-nleaves = 100 ;
-data    = uint8(rand(2,10000) * 255) ;
-datat   = uint8(rand(2,100000)* 255) ;
+K        = 3 ;
+nleaves  = 100 ;
+data     = uint8(rand(2,1000) * 255) ;
+datat    = uint8(rand(2,10000)* 255) ;
+[tree,A] = hikmeans(data,K,nleaves) ;
+AT       = hikmeanspush(tree,datat) ;
 
-[centers,asgn] = ikmeans(data,K) ;
-asgnt = ikmeanspush(datat,centers) ;
-
-figure(1000) ; clf ; hold on ;
-hold on ;
-colors = get(gca,'ColorOrder') ;
-ncolors = size(colors,1) ;
-for k=1:10
-  sel=find(asgn==k) ;  
-  plot(data(1,sel),data(2,sel),'.','Color',colors(mod(k,ncolors)+1,:)) ;
-  sel=find(asgnt==k) ;
-  plot(datat(1,sel),datat(2,sel),'+','Color',colors(mod(k,ncolors)+1,:)) ;  
-end
-plot(centers(1,:),centers(2,:),'ro') ;
-
-[tree,asgn] = hikmeans(data,K,nleaves) ;
-[asgnt]     = hikmeanspush(tree,datat) ;
-
-figure(1001) ; clf ; 
+figure(1) ; clf ; 
 plottree(tree) ;
+axis off ; axis equal ; xlim([0 255]) ; ylim([0 255]) ;
+demo_print('hikmeans-tree') ;
  
-figure(1002) ; clf ; hold on ;
+figure(2) ; clf ; hold on ;
 hold on ;
-colors = get(gca,'ColorOrder') ;
-ncolors = size(colors,1) ;
-for k=1:10
-  sel=find(asgn(end,:)==k) ;  
-  plot(data(1,sel),data(2,sel),'.','Color',colors(mod(k,ncolors)+1,:)) ;
-  sel=find(asgnt(end,:)==k) ;
-  plot(datat(1,sel),datat(2,sel),'+','Color',colors(mod(k,ncolors)+1,:)) ;  
+cl = get(gca,'ColorOrder') ;
+ncl = size(cl,1) ;
+for k=1:K*K
+  sel=find(A(end,:)==k) ;  
+  plot(data(1,sel),data(2,sel),  '.','Color',cl(mod(k,ncl)+1,:)) ;
+  sel=find(AT(end,:)==k) ;
+  plot(datat(1,sel),datat(2,sel),'+','Color',cl(mod(k,ncl)+1,:)) ;  
 end
 h=plottree(tree) ;
 set(h,'LineWidth',4) ;
+
+axis off ; axis equal ; xlim([0 255]) ; ylim([0 255]) ;
+demo_print('hikmeans-clusters') ;
 
 % --------------------------------------------------------------------
 function h=plottree(tree)
@@ -78,4 +67,3 @@ if ~isempty(tree.sub)
     x2 = [x2 x2p] ;
   end
 end
-

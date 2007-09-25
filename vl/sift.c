@@ -380,7 +380,6 @@ vl_sift_new (int width, int height,
              int o_min)
 {
   VlSiftFilt *f = malloc (sizeof(VlSiftFilt)) ;
-
   int w   = VL_SHIFT_LEFT (width,  -o_min) ;
   int h   = VL_SHIFT_LEFT (height, -o_min) ;
   int nel = w * h ;

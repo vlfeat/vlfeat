@@ -1,14 +1,13 @@
-/** @file     aib.mex.c
+/** @internal
+ ** @file     aib.c
  ** @author   Brian Fulkerson
  ** @brief    AIB MEX driver
- ** @internal
  **/
 
 #include "mexutils.h"
 #include <vl/mathop.h>
 #include <vl/aib.h>
 #include <assert.h>
-
 
 /** @brief MEX entry point */
 void
@@ -18,11 +17,12 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_PIC=0} ;
   enum {OUT_PARENTS=0} ;
 
-  vl_prob * P = mxGetPr(in[IN_PIC]);
-  vl_node rows = mxGetM(in[IN_PIC]);
-  vl_node cols = mxGetN(in[IN_PIC]);
-  vl_prob * Pic = malloc(sizeof(vl_prob)*rows*cols);
-  int r,c;
+  vl_prob   *P = mxGetPr (in[IN_PIC]);
+  vl_node rows = mxGetM  (in[IN_PIC]);
+  vl_node cols = mxGetN  (in[IN_PIC]);
+  vl_prob *Pic = malloc  (sizeof(vl_prob)*rows*cols);
+  int r, c ;
+
   fprintf(stderr, "transposing\n");
   for(r=0; r<rows; r++)
       for(c=0; c<cols; c++)

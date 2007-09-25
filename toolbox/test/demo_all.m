@@ -7,3 +7,5 @@ demo_sift_or ;
 
 demo_mser_basic ;
 demo_mser_delta ;
+demo_mser_cmd ;
+

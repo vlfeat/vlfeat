@@ -34,6 +34,7 @@
  **   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
  **   - @ref ikmeans.h  "Integer K-means (IKM)"
  **   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
+ **   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
  **
  ** @section main-design Library design
  **
@@ -72,6 +73,37 @@
  ** but through appropriate functions. This improves robustness (as it
  ** limits the operations that can be mande) and compatibility with
  ** future versions.
+ **/
+
+/** @file generich.h
+ **
+ ** This modules provides basic facilities such as basic types, error
+ ** handling, endianness detection and serialization.
+ **
+ ** @section generic-error Error handling
+ **
+ ** Error handling uses the same style of the standard C library. Most
+ ** functions return 0 when they succeed and -1 when they fail, and
+ ** set the global variable ::vl_err_no with a code identifying the
+ ** error occurred. This variable is never set on success and should
+ ** be examinated right after an error occurred.
+ **
+ ** @section generic-endian Endinanness detection and conversions
+ **
+ ** An architecture is big endiand or little endian depending how
+ ** multi-btye data are stored in memory:
+ **
+ ** - <em>big endian</em> (big end first - Network order) if it
+ **   stores the most significant byte has the smaller memory address.
+ ** - <em>little endian</em> (small end first - Intel format) if it
+ **   stores the lesser significant byte at the smaller memory address.
+ **
+ ** Use the function ::vl_get_endianness() to detect endianness.  To
+ ** serialize/deserialize data in big endian (network) order, call the
+ ** functions ::vl_adapt_endianness_8(), ::vl_adapt_endianness_4(),
+ ** ::vl_adapt_endianness_2() after reading and before writing (the
+ ** functions change edinanness only if the architecture is little
+ ** endian and do nothing otherwise).
  **/
 
 #include "generic.h"

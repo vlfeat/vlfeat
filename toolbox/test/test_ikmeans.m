@@ -1,24 +1,24 @@
 % TEST_IKMEANS Test IKMEANS function
 
-K=3;
-[u,v]=meshgrid(0:5:255,0:5:255) ;
-X = uint8([u(:)';v(:)']) ;
-perm=randperm(size(X,2));
-Y = X(:,perm(51:end)) ;
-X = X(:,perm(1:51)) ;
-[C,L]=ikmeans(X,K) ;
-Q=ikmeanspush(Y,C) ;
+K       = 3 ;
+data    = uint8(rand(2,1000) * 255) ;
+datat   = uint8(rand(2,10000)* 255) ;
 
-figure(100) ; clf ; set(gcf,'color','w') ;
-cl = {'r','g','b','k','y'} ;
+[C,A] = ikmeans(data,K) ;
+[AT]  = ikmeanspush(datat,C) ;
+
+figure(1) ; clf ; hold on ;
+
+cl = get(gca,'ColorOrder') ;
+ncl = size(cl,1) ;
 for k=1:K
-  s = find(L==k) ;
-  q = find(Q==k) ; 
-  plotframe(X(:,s),'linestyle','*','color',cl{k}) ;  hold on ;  
-  plotframe(X(:,s),'linestyle','o','color','k') ;
-  plotframe(Y(:,q),'linestyle','.','color',cl{k}) ;
+  sel  = find(A  == k) ;
+  selt = find(AT == k) ;
+  plot(data(1,sel),  data(2,sel),  '.','Color',cl(mod(k,ncl)+1,:)) ;
+  plot(datat(1,selt),datat(2,selt),'+','Color',cl(mod(k,ncl)+1,:)) ;  
 end
-plotframe(C,'color','k','linestyle','o','markersize',10,'linewidth',5) ;
-plotframe(C,'color','y','linestyle','o','markersize',10) ;
-title('ikmeans partitions') ;
-axis equal ; axis tight ; axis off ;
+plot(C(1,:),C(2,:),'ko','markersize',10','linewidth',6) ;
+plot(C(1,:),C(2,:),'yo','markersize',10','linewidth',1) ;
+
+axis off ; axis equal ;
+demo_print('ikmeans') ;

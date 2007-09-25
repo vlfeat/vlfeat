@@ -35,7 +35,7 @@ int main()
     printf("];\n");
 
     printf("AIB starting\n");
-    // parents always has size 2*nrows-1
+    /*  parents always has size 2*nrows-1 */
     {
       vl_node * parents = vl_aib(Pic, nrows, ncols);
       for(r=0; r<2*nrows-1; r++)
