@@ -722,14 +722,15 @@ main(int argc, char **argv)
           if (dsc.active) {
             int l ;
             for (l = 0 ; l < 128 ; ++l) {
-              vl_file_meta_put_uint8 (&dsc, (vl_uint8) (512.0 * descr [l])) ;
+              double x = 512.0 * descr[l] ;
+              x = (x < 255.0) ? x : 255.0 ;
+              vl_file_meta_put_uint8 (&dsc, (vl_uint8) (x)) ;
             }
             if (dsc.protocol == VL_PROT_ASCII) fprintf(dsc.file, "\n") ;
           }
         }
       }
     }
-
 
     /* ...............................................................
      *                                                       Finish up

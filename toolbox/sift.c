@@ -1,15 +1,17 @@
-/** @file     sift.c
+/** @internal
+ ** @file     sift.c
  ** @author   Andrea Vedaldi
- ** @brief    SIFT MEX driver
- ** @internal
+ ** @brief    Scale Invariant Feature Transform (SIFT) - MEX
  **/
 
 #include "mexutils.h"
 #include <vl/mathop.h>
 #include <vl/sift.h>
+
 #include <math.h>
 #include <assert.h>
 
+/* option codes */
 enum {
   opt_octaves = 0,
   opt_levels,
@@ -21,6 +23,7 @@ enum {
   opt_verbose 
 } ;
 
+/* options */
 uMexOption options [] = {
   {"Octaves",      1,   opt_octaves       },
   {"Levels",       1,   opt_levels        },
@@ -33,8 +36,9 @@ uMexOption options [] = {
   {0,              0,   0                 }
 } ;
 
-/** @brief Transpose desriptor
+/** ------------------------------------------------------------------
  ** @internal
+ ** @brief Transpose desriptor
  **
  ** @param dst destination buffer.
  ** @param src source buffer.
@@ -44,11 +48,12 @@ uMexOption options [] = {
  ** obtains from computing the normal descriptor on the transposed
  ** image.
  **/
-static VL_INLINE void
+
+static VL_INLINE void 
 transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
 {
-  int BO = 8 ;
-  int BP = 4 ;
+  int const BO = 8 ;  /* number of orientation bins */
+  int const BP = 4 ;  /* number of spatial bins     */
   int i, j, t ;
   
   for (j = 0 ; j < BP ; ++j) {
@@ -63,10 +68,16 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
   }
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Keypoint ordering
+/** -------------------------------------------------------------------
  ** @internal
+ ** @brief Ordering of tuples by increasing scale
+ ** 
+ ** @param a tuple.
+ ** @param b tuble.
+ **
+ ** @return @c a[2] < b[2]
  **/
+
 int
 korder (void const* a, void const* b) {
   double x = ((double*) a) [2] - ((double*) b) [2] ;
@@ -75,8 +86,10 @@ korder (void const* a, void const* b) {
   return 0 ;
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief MEX entry point */
+/** ------------------------------------------------------------------
+ ** @brief MEX entry point
+ **/
+
 void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
@@ -104,17 +117,18 @@ mexFunction(int nout, mxArray *out[],
   int                nikeys = -1 ;
   vl_bool            force_orientations = 0 ;
 
-  /** -----------------------------------------------------------------
-   **                                               Check the arguments
-   ** -------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
+
   if (nin < 1) {
     mexErrMsgTxt("One argument required.") ;
   } else if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
   
-  if (mxGetNumberOfDimensions (in[IN_I]) != 2             ||
-      mxGetClassID            (in[IN_I]) != mxSINGLE_CLASS) {
+  if (mxGetNumberOfDimensions (in[IN_I]) != 2              ||
+      mxGetClassID            (in[IN_I]) != mxSINGLE_CLASS  ) {
     mexErrMsgTxt("I must be a matrix of class SINGLE") ;
   }
   
@@ -181,7 +195,7 @@ mexFunction(int nout, mxArray *out[],
   }
   
   /* -----------------------------------------------------------------
-   *                                                     Run algorithm
+   *                                                            Do job
    * -------------------------------------------------------------- */
   {
     VlSiftFilt        *filt ;    
@@ -216,7 +230,7 @@ mexFunction(int nout, mxArray *out[],
     }
     
     /* ...............................................................
-     *                                             process each octave
+     *                                             Process each octave
      * ............................................................ */
     i     = 0 ;
     first = 1 ;
@@ -230,7 +244,7 @@ mexFunction(int nout, mxArray *out[],
                    vl_sift_get_octave_index (filt)) ;
       }
 
-      /* calculate the GSS for the next octave .................... */
+      /* Calculate the GSS for the next octave .................... */
       if (first) {
         err   = vl_sift_process_first_octave (filt, data) ;
         first = 0 ;
@@ -245,7 +259,7 @@ mexFunction(int nout, mxArray *out[],
                vl_sift_get_octave_index (filt));
       }
 
-      /* run detector ............................................. */
+      /* Run detector ............................................. */
       if (nikeys < 0) {
         vl_sift_detect (filt) ;
         
@@ -260,14 +274,14 @@ mexFunction(int nout, mxArray *out[],
         nkeys = nikeys ;
       }
 
-      /* for each keypoint ........................................ */
+      /* For each keypoint ........................................ */
       for (; i < nkeys ; ++i) {
         double                angles [4] ;
         int                   nangles ;
         VlSiftKeypoint        ik ;
         VlSiftKeypoint const *k ;
 
-        /* obtain keypoint orientations ........................... */
+        /* Obtain keypoint orientations ........................... */
         if (nikeys >= 0) {
           vl_sift_keypoint_init (filt, &ik, 
                                  ikeys [4 * i + 1] - 1,
@@ -294,7 +308,7 @@ mexFunction(int nout, mxArray *out[],
             (filt, angles, k) ;
         }
 
-        /* for each orientation ................................... */
+        /* For each orientation ................................... */
         for (q = 0 ; q < nangles ; ++q) {
           vl_sift_pix  buf [128] ;
           vl_sift_pix rbuf [128] ;
@@ -324,7 +338,9 @@ mexFunction(int nout, mxArray *out[],
           
           if (nout > 1) {
             for (j = 0 ; j < 128 ; ++j) {
-              descr [128 * nframes + j] = (vl_uint8) (512.0 * rbuf [j]) ;
+              double x = 512.0 * rbuf [j] ;
+              x = (x < 255.0) ? x : 255.0 ;
+              descr [128 * nframes + j] = (vl_uint8) (x) ;
             }
           }
 
@@ -336,25 +352,35 @@ mexFunction(int nout, mxArray *out[],
     if (verbose) {
       mexPrintf ("siftmx: found %d keypoints\n", nframes) ;
     }
-    
-    /* save back */
+
+    /* ...............................................................
+     *                                                       Save back
+     * ............................................................ */
+
     {
       int dims [2] ;
       
-      /* empty array */
+      /* create an empty array */
       dims [0] = 0 ;
       dims [1] = 0 ;      
-      out[OUT_FRAMES] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL) ;
-      if (nout > 1)
-        out[OUT_DESCRIPTORS]= mxCreateNumericArray(2, dims, mxUINT8_CLASS,  mxREAL) ;
+      out[OUT_FRAMES] = mxCreateNumericArray 
+        (2, dims, mxDOUBLE_CLASS, mxREAL) ;
 
-      /* set to our stuff */
+      /* set array content to be our buffer */
       dims [0] = 4 ;
       dims [1] = nframes ;
-      mxSetDimensions (out[OUT_FRAMES],      dims, 2) ;
-      mxSetPr         (out[OUT_FRAMES],      frames) ;
-
+      mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
+      mxSetPr         (out[OUT_FRAMES], frames) ;
+      
       if (nout > 1) {
+        
+        /* create an empty array */
+        dims [0] = 0 ;
+        dims [1] = 0 ;
+        out[OUT_DESCRIPTORS]= mxCreateNumericArray 
+          (2, dims, mxUINT8_CLASS,  mxREAL) ;
+        
+        /* set array content to be our buffer */
         dims [0] = 128 ;
         dims [1] = nframes ;
         mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
@@ -365,6 +391,8 @@ mexFunction(int nout, mxArray *out[],
     /* cleanup */
     vl_sift_delete (filt) ;
     
-    if (ikeys_array) mxDestroyArray(ikeys_array) ;
-  }
+    if (ikeys_array) 
+      mxDestroyArray(ikeys_array) ;
+
+  } /* do job */
 }

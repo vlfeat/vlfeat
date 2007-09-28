@@ -5,28 +5,31 @@
  **/
 
 /** @file aib.h
- **
- ** This provides an implementation of Agglomerative Information
- ** Bottleneck (AIB) as first described in:
- ** 
- ** <em>N. Slonim and N. Tishby. Agglomerative information bottleneck.
- ** In Proc. NIPS, 1999</em>
- **
- ** While our implemention provides identical results as the one
- ** described in [Slonim], we have added some speedups which allow us
- ** to handle much larger datasets.
- ** 
- ** The key idea is that we maintain a list of the best possible merge
- ** and the corresponding decrease in information and at each
- ** iteration and after a merge, we only update those nodes whose
- ** minimum value could have changed.
- **
- ** Suppose that L is the number of rows which will be merged and C is
- ** the number of columns (typically, L >> C). This speedup allows our
- ** algorithm to use O(L^2) time in many cases and O((C+2)*L) space
- ** (as opposed to [Slonim] which takes O(L^3)) time and O(L^2)
- ** space).
- **/
+ ** @author Brian Fulkerson
+ ** @author Andrea Vedaldi
+ ** @brief  Agglomerative Information Bottleneck
+
+ This provides an implementation of Agglomerative Information
+ Bottleneck (AIB) as first described in:
+ 
+ <em>N. Slonim and N. Tishby. Agglomerative information bottleneck.
+ In Proc. NIPS, 1999</em>
+ 
+ While our implemention provides identical results as the one
+ described in [Slonim], we have added some speedups which allow us to
+ handle much larger datasets.
+ 
+ The key idea is that we maintain a list of the best possible merge
+ and the corresponding decrease in information and at each iteration
+ and after a merge, we only update those nodes whose minimum value
+ could have changed.
+ 
+ Suppose that L is the number of rows which will be merged and C is
+ the number of columns (typically, L >> C). This speedup allows our
+ algorithm to use O(L^2) time in many cases and O((C+2)*L) space (as
+ opposed to [Slonim] which takes O(L^3)) time and O(L^2) space).
+
+**/
 
 #include "aib.h"
 
@@ -231,75 +234,79 @@ void vl_aib_merge_nodes(VlAIB * aib, vl_node i, vl_node j, vl_node new)
 
 }
 
-
-/** ---------------------------------------------------------------- */
-/** @internal @brief Updates aib->beta and aib->bidx according to aib->which
+/** ------------------------------------------------------------------
+ ** @internal 
+ ** @brief Updates aib->beta and aib->bidx according to aib->which
  **
- ** @param aib      A pointer to the internal data structure
+ ** @param aib A pointer to the internal data structure
  **
- ** Calculates new @a beta values for the nodes listed in @a aib->which. 
- ** @a beta is the loss of mutual information caused by merging two nodes.
+ ** Calculates new @a beta values for the nodes listed in @a
+ ** aib->which.  @a beta is the loss of mutual information caused by
+ ** merging two nodes.
  **
- ** More concretely, for @a (i,j), where X corresponds to the rows of Pic,
- ** Y corresponds to the columns of Pic and M corresponds to the rows of Pic 
- ** after a merge, @a beta is: 
+ ** More concretely, for @a (i,j), where X corresponds to the rows of
+ ** Pic, Y corresponds to the columns of Pic and M corresponds to the
+ ** rows of Pic after a merge, @a beta is:
  **
  ** @a beta = I(@a X, @a Y) - I(@a M, @a Y)
  **/
-#define PLOGP(x) (x)*log((x))
-void vl_aib_update_beta(VlAIB * aib)
+
+void 
+vl_aib_update_beta (VlAIB * aib)
 {
-    vl_node i;
-    vl_prob * Pi  = aib->Pi;
-    vl_prob * Pic = aib->Pic;
 
-    fprintf(stderr, "Considering: ");
-    for(i=0; i<aib->nwhich; i++)
-        fprintf(stderr, "%d ", aib->which[i]);
-    fprintf(stderr, "\n");
-
-    for(i=0; i<aib->nwhich; i++)
+#define PLOGP(x) (x)*log((x))
+  vl_node i;
+  vl_prob * Pi  = aib->Pi;
+  vl_prob * Pic = aib->Pic;
+  
+  fprintf(stderr, "Considering: ");
+  for(i=0; i<aib->nwhich; i++)
+    fprintf(stderr, "%d ", aib->which[i]);
+  fprintf(stderr, "\n");
+  
+  for(i=0; i<aib->nwhich; i++)
     {
-        vl_node a = aib->which[i];
-        vl_node b;
-        for(b=0; b<aib->nnodes; b++)
+      vl_node a = aib->which[i];
+      vl_node b;
+      for(b=0; b<aib->nnodes; b++)
         {
-            vl_double C1 = 0;
-            vl_node c;
+          vl_double C1 = 0;
+          vl_node c;
+          
+          if(a==b) continue;
+          
+          if (Pi [a] == 0 || Pi [b] == 0) continue;
 
-            if(a==b) continue;
+          C1 =  - PLOGP ((Pi[a] + Pi[b])) ;
 
-            if (Pi [a] == 0 || Pi [b] == 0) continue;
+          for (c = 0 ; c < aib->ncols; ++ c) {
+            vl_double Pac = Pic [a*aib->ncols + c] ;
+            vl_double Pbc = Pic [b*aib->ncols + c] ;
 
-            C1 =  - PLOGP ((Pi[a] + Pi[b])) ;
+            if(Pac != 0)
+              C1 += -Pac*log(Pac/Pi[a]); /* tmpa */
+            if(Pbc != 0)
+              C1 += -Pbc*log(Pbc/Pi[b]); /* tmpb */
 
-            for (c = 0 ; c < aib->ncols; ++ c) {
-                vl_double Pac = Pic [a*aib->ncols + c] ;
-                vl_double Pbc = Pic [b*aib->ncols + c] ;
+            if (Pac == 0 && Pbc == 0) continue;
+            C1 += PLOGP ((Pac + Pbc)) ;
+          }
 
-                if(Pac != 0)
-                    C1 += -Pac*log(Pac/Pi[a]); /* tmpa */
-                if(Pbc != 0)
-                    C1 += -Pbc*log(Pbc/Pi[b]); /* tmpb */
-
-                if (Pac == 0 && Pbc == 0) continue;
-                C1 += PLOGP ((Pac + Pbc)) ;
-            }
-
-            {
-              vl_double beta = -C1;
+          {
+            vl_double beta = -C1;
               
-              if (beta < aib->beta[a])
-                {
-                  aib->beta[a] = beta;
-                  aib->bidx[a] = b;
-                }
-              if (beta < aib->beta[b])
-                {
-                  aib->beta[b] = beta;
-                  aib->bidx[b] = a;
-                }
-            }
+            if (beta < aib->beta[a])
+              {
+                aib->beta[a] = beta;
+                aib->bidx[a] = b;
+              }
+            if (beta < aib->beta[b])
+              {
+                aib->beta[b] = beta;
+                aib->bidx[b] = a;
+              }
+          }
         }
     }
 }
