@@ -9,6 +9,10 @@ function I = imreadgray(file,varargin)
 %   See RGB2DOUBLE().
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 I = imread(file) ;
 I = im2double(I) ;

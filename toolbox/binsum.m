@@ -15,3 +15,7 @@
 %            BINSUM([0 0; 0 0], [1 1], [1 2], 1) = [1 0; 0 1]
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.

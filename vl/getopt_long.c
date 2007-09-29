@@ -3,7 +3,12 @@
  ** @brief   getopt_long - Definition
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #include <stdlib.h>
 #include <string.h>

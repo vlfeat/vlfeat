@@ -3,7 +3,12 @@
  ** @brief    MSER MEX driver
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #include "mexutils.h"
 #include <vl/mser.h>

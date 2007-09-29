@@ -4,7 +4,12 @@
  ** @brief    Scale Invariant Feature Transform (SIFT) - Driver
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #define VL_SIFT_DRIVER_VERSION 0.1
 

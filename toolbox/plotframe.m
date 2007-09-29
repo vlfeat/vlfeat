@@ -36,6 +36,10 @@ function h=plotframe(frames,varargin)
 %  plot function.
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 % number of vertices drawn for each frame
 np        = 40 ;

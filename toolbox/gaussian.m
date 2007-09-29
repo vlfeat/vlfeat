@@ -10,6 +10,10 @@ function y = gaussian(x)
 %   See also DGAUSSIAN(), DDGAUSSIAN().
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 y = 1/sqrt(2*pi)*exp(-0.5*x.^2) ;
 

@@ -208,7 +208,8 @@ autorights: distclean
 	autorights \
 	  . \
 	  --recursive    \
-	  --template gpl \
+	  --verbose \
+	  --template copylet.txt \
 	  --years 2007   \
 	  --authors "Andrea Vedaldi and Brian Fulkerson" \
 	  --holders "Andrea Vedaldi and Brian Fulkerson" \

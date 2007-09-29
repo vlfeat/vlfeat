@@ -5,6 +5,10 @@ function h=cf(h0) ;
 %   H=CF(H0) creates a duplicate of the figure whose handle is H0.
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 if nargin < 1
   h0 = gcf ;
