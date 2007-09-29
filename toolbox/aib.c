@@ -17,10 +17,10 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_PIC=0} ;
   enum {OUT_PARENTS=0} ;
 
-  vl_prob   *P = mxGetPr (in[IN_PIC]);
-  vl_node rows = mxGetM  (in[IN_PIC]);
-  vl_node cols = mxGetN  (in[IN_PIC]);
-  vl_prob *Pic = malloc  (sizeof(vl_prob)*rows*cols);
+  vl_prob   *P = mxGetPr (in[IN_PIC]) ;
+  vl_node rows = mxGetM  (in[IN_PIC]) ;
+  vl_node cols = mxGetN  (in[IN_PIC]) ;
+  vl_prob *Pic = malloc  (sizeof(vl_prob) * rows * cols) ;
   int r, c ;
 
   fprintf(stderr, "transposing\n");

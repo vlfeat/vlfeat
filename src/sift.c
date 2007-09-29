@@ -1,7 +1,7 @@
-/** @file     sift.c
+/** @internal
+ ** @file     sift.c
  ** @author   Andrea Vedaldi
- ** @brief    SIFT command line driver - Definition
- ** @internal
+ ** @brief    Scale Invariant Feature Transform (SIFT) - Driver
  **/
 
 /* AUTORIGHTS */
@@ -795,4 +795,3 @@ main(int argc, char **argv)
   /* quit */
   return exit_code ;
 }
-
