@@ -4,9 +4,12 @@
  ** @brief    AIB MEX driver
  **/
 
+/* AUTORIGHTS */
+
 #include "mexutils.h"
 #include <vl/mathop.h>
 #include <vl/aib.h>
+
 #include <assert.h>
 
 /** @brief MEX entry point */
@@ -14,53 +17,34 @@ void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {
-  enum {IN_PIC=0} ;
-  enum {OUT_PARENTS=0} ;
+  enum {IN_PCX = 0} ;
+  enum {OUT_PARENTS = 0} ;
 
-  vl_prob   *P = mxGetPr (in[IN_PIC]) ;
-  vl_node rows = mxGetM  (in[IN_PIC]) ;
-  vl_node cols = mxGetN  (in[IN_PIC]) ;
-  vl_prob *Pic = malloc  (sizeof(vl_prob) * rows * cols) ;
-  int r, c ;
+  vl_aib_prob    *Pcx     = mxGetPr (in[IN_PCX]) ;
+  vl_aib_node     nlabels = mxGetM  (in[IN_PCX]) ;
+  vl_aib_node     nvalues = mxGetN  (in[IN_PCX]) ;
 
-  fprintf(stderr, "transposing\n");
-  for(r=0; r<rows; r++)
-      for(c=0; c<cols; c++)
-          Pic[r*cols+c] = P[c*rows+r];
-
-  /*
-  fprintf(stderr, "dumping Pic\n");
-  for(r=0; r<rows; r++)
-  {
-      for(c=0; c<cols; c++)
-      {
-          fprintf(stderr, "%f ", Pic[r*cols+c]);
-      }
-      fprintf(stderr, "\n");
+  if (!uIsRealMatrix(in[IN_PCX], -1, -1)) {
+    mexErrMsgTxt("PCX must be a real matrix.") ;
   }
-  */
 
-  {
-    vl_node *parents = vl_aib(Pic, rows, cols);
-    vl_node *mexparents ;
+  { 
+    vl_aib_node *parents = vl_aib(Pcx, nlabels, nvalues);
+    vl_aib_node *mexparents ;
     int dims [2], n ;
-    /* Create an empty array */
-    dims[0] = 2*rows-1;
-    dims[1] = 1;
-    out[OUT_PARENTS] = mxCreateNumericArray(2, dims, mxUINT32_CLASS, mxREAL);
-    mexparents = (vl_node *)mxGetData(out[OUT_PARENTS]);
+
+    dims[0] = 2 * nvalues - 1 ;
+    dims[1] = 1 ;
+    out[OUT_PARENTS] = mxCreateNumericArray (2, dims, mxUINT32_CLASS, mxREAL) ;
+    mexparents = (vl_aib_node *) mxGetData(out[OUT_PARENTS]) ;
     
-    for(n=0; n<2*rows-1; n++)
-      if(parents[n] == 2*rows)
-        mexparents[n] = 0;
-      else
-        mexparents[n] = parents[n]+1; /* parents + 1 for matlab indexing */
-    
-    /* Fill it with our stuff
-       dims[0] = rows*2-1;
-       dims[1] = 1;
-       mxSetDimensions(out[OUT_PARENTS], dims, 2);
-       mxSetData(out[OUT_PARENTS], parents);
-    */
+    for (n = 0 ; n < 2 * nvalues - 1 ; n++) {
+      if (parents[n] > 2* nvalues - 1) {
+        mexparents[n] = 0 ;
+      } else {
+        /* parents + 1 for matlab indexing */    
+        mexparents[n] = parents[n] + 1 ; 
+      }
+    }
   }
 }

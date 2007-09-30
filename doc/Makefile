@@ -25,9 +25,9 @@ vlfeat.pdf : vlfeat.tex aux/vlfeat.tex
 	cd aux ; pdflatex -shell-escape $<
 	cat < aux/vlfeat.pdf > vlfeat.pdf
 
-.PHONY: fig
-fig:
-	make -C ../figures all
+.PHONY: figures
+figures:
+	make -C figures all
 
 .PHONY: clean
 clean:

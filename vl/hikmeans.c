@@ -62,7 +62,7 @@ vl_hikm_delete_node (VlHIKMNode * node)
  ** @param N     Number of indeces.
  ** @param M     Data dimensionality. 
  ** @param id    Label of data to copy.
- ** @paran N2    Number of data copied (out).
+ ** @param N2    Number of data copied (out).
  **
  ** @return a new buffer with a copy of the selected data.
  **/

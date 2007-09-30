@@ -653,8 +653,47 @@ ans =
 Fig.~\ref{fig:hikmeans} illustrates the recusrive partitons obtained
 for the 2-D points data.
 
+% --------------------------------------------------------------------
+\section{Agglomerative Information Bottleneck }\label{ikmeans}
+% --------------------------------------------------------------------
 
+See Fig.~\ref{fig:aib}.
 
+\begin{figure*}[ht]
+\begin{center}
+\subfloat[data]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_data}
+\label{fig:aib-data}}
+\subfloat[]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_clust_1}
+\label{fig:aib-a}}\hfill
+\subfloat[]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_clust_2}
+\label{fig:aib-b}}\hfill
+\subfloat[]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_clust_3}
+\label{fig:aib-c}}\hfill
+\subfloat[]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_clust_4}
+\label{fig:aib-d}}\hfill
+\subfloat[]{
+\includegraphics[width=0.15\textwidth]{figures/demo/aib_basic_clust_5}
+\label{fig:aib-e}}
+\end{center}
+\caption{{\em Agglomerative Information Bottleneck (AIB)}. We test AIB
+  on the problem of finding an discriminatively optimal quantization
+  of a mixure of Gaussian. \subref{fig:aib-data}~misxture of three
+  Gaussians. The 2-D values are uniformly quantized in $20\times 20$
+  bins. \subref{fig:aib-a}, \subref{fig:aib-e}, \subref{fig:aib-c},
+  \subref{fig:aib-d}, \subref{fig:aib-e}: AIB clusterings.  The grayed
+  areas correspond to feature values (bins) that did not collect any
+  evidence and so remains unassigned. AIB then merges bins by
+  preserving as much a spossible the information about the
+  corresponding Gaussian blob identity. The full tree is sown
+  in~\subref{fig:aib-d} When there are tree clusters, the algorithm
+  clearly finds clusters that correspond to the Haussian blobs.}
+\label{fig:aib}
+\end{figure*}
 
 % --------------------------------------------------------------------
 \section{MATLAB utility programs}\label{other}

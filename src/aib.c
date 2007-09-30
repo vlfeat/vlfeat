@@ -4,9 +4,9 @@
 
 int main()
 {
-    vl_node nrows = 10;
-    vl_node ncols = 3;
-    vl_prob Pic[3*10] = {     
+    vl_aib_node nrows = 10;
+    vl_aib_node ncols = 3;
+    vl_aib_prob Pic[3*10] = {     
     0.6813,    0.3028,    0.8216,
     0.3795,    0.5417,    0.6449,
     0.8318,    0.1509,    0.8180,
@@ -37,7 +37,7 @@ int main()
     printf("AIB starting\n");
     /*  parents always has size 2*nrows-1 */
     {
-      vl_node * parents = vl_aib(Pic, nrows, ncols);
+      vl_aib_node * parents = vl_aib(Pic, nrows, ncols);
       for(r=0; r<2*nrows-1; r++)
         printf("%d => %d\n", r, parents[r]);      
       free(parents);

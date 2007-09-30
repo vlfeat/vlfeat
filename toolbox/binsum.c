@@ -1,6 +1,7 @@
-/** file:        binsum.c
- ** author:      Andrea Vedaldi
- ** description: MEX implementation of binsum.m
+/** @internal
+ ** @file     binsum.c
+ ** @author   Andrea Vedaldi
+ ** @brief    BINSUM - MEX
  **/
 
 /* AUTORIGHTS
@@ -30,17 +31,17 @@ mexFunction(int nout, mxArray *out[],
   double *R_pt ;
   
   if( nin < 3 ) {
-    mexErrMsgTxt("At least three arguments required") ;
+    mexErrMsgTxt("At least three arguments required.") ;
   } else if( nin > 4 ) {
-    mexErrMsgTxt("At most four arguments") ;
+    mexErrMsgTxt("At most four arguments.") ;
   } else if (nout > 1) {
-    mexErrMsgTxt("At most one output argument") ;
+    mexErrMsgTxt("At most one output argument.") ;
   }
   
   if(! uIsReal(in[IN_H]) ||
      ! uIsReal(in[IN_X]) ||
      ! uIsReal(in[IN_B]) )
-    mexErrMsgTxt("Illegal arguments") ;
+    mexErrMsgTxt("All arguments must be real.") ;
   
   KH = mxGetNumberOfElements(in[IN_H]) ;
   KX = mxGetNumberOfElements(in[IN_X]) ;
@@ -56,19 +57,19 @@ mexFunction(int nout, mxArray *out[],
   R_pt   = mxGetPr(out[0]) ;
   
   if( KX != KB ) {
-    mexErrMsgTxt("X and B must have the same number of elements") ;
+    mexErrMsgTxt("X and B must have the same number of elements.") ;
   }
   
   /* All dimensions mode ------------------------------------------- */
   if( nin == 3 ) {
-
+    
     while( X_pt < X_end ) { 
       j = (int)(*B_pt++) - 1;
       if(j < 0 || j >= KH) {
         char str [256] ;
         snprintf(str, 256, 
                  "Index out of bounds "
-                 "(B(%d)=%d)",
+                 "(B(%d)=%d).",
                  B_pt-mxGetPr(in[IN_B]),j) ;
         mexErrMsgTxt(str) ;
       }
@@ -96,7 +97,7 @@ mexFunction(int nout, mxArray *out[],
 
     /* We need to check a few more details about the matrices */
     if( d >= HD ) {
-      mexErrMsgTxt("DIM out of bound") ;
+      mexErrMsgTxt("DIM out of bound.") ;
     }
 
     /* Here either B,X have the same number of dimensions of H, or B,X
@@ -108,7 +109,7 @@ mexFunction(int nout, mxArray *out[],
        
     if( HD != XD || HD != BD ) {
       if( !( d == HD-1 && XD == BD && XD == HD-1) ) { 
-        mexErrMsgTxt("H, X and B must have the same number of dimensions") ;
+        mexErrMsgTxt("H, X and B must have the same number of dimensions.") ;
       }
     }
    
@@ -119,10 +120,10 @@ mexFunction(int nout, mxArray *out[],
 
     for(k = 0 ; k < XD ; ++k) {
       if( Xdims[k] != Bdims[k] ) {
-        mexErrMsgTxt("X and B have incompatible dimensions") ;
+        mexErrMsgTxt("X and B have incompatible dimensions.") ;
       }
       if( k != d && (Xdims[k] != Hdims[k]) ) {
-        mexErrMsgTxt("H, X and B have incompatible dimensions") ;
+        mexErrMsgTxt("H, X and B have incompatible dimensions.") ;
       }
       if( k < d ) {
         srd = srd * Xdims[k] ;
@@ -149,7 +150,7 @@ mexFunction(int nout, mxArray *out[],
         char str [256] ;
         snprintf(str, 256, 
                  "Index out of bounds "
-                 "(B(%d)=%d)",
+                 "(B(%d)=%d).",
                  B_pt-mxGetPr(in[IN_B]),j) ;
         mexErrMsgTxt(str) ;
       }
