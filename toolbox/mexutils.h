@@ -14,8 +14,19 @@
 #define snprintf _snprintf
 #endif
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array a numeric scalar?
+/** ------------------------------------------------------------------
+ ** @brief Let VLFeat use MATLAB memory allocation/logging facilities
+ **
+ ** This makes VLFeat use MATLAB version of the memory allocation and
+ ** logging functions.
+ **
+ **/
+#define VL_USE_MATLAB_ENV                                       \
+  vl_set_alloc_func (mxMalloc, mxRealloc, mxCalloc, mxFree) ;   \
+  vl_set_printf_func (mexPrintf) ;
+
+/** ------------------------------------------------------------------
+ ** @brief Is the array a numeric scalar?
  **
  ** @param A array to test.
  **
@@ -32,8 +43,8 @@ uIsScalar(const mxArray* A)
     mxIsNumeric (A) && mxGetNumberOfElements(A) == 1 ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array a numeric matrix?
+/** ------------------------------------------------------------------
+ ** @brief Is the array a numeric matrix?
  **
  ** @param A array to test.
  ** @param M number of rows.

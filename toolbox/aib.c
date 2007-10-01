@@ -24,6 +24,8 @@ mexFunction(int nout, mxArray *out[],
   vl_aib_node     nlabels = mxGetM  (in[IN_PCX]) ;
   vl_aib_node     nvalues = mxGetN  (in[IN_PCX]) ;
 
+  VL_USE_MATLAB_ENV
+
   if (!uIsRealMatrix(in[IN_PCX], -1, -1)) {
     mexErrMsgTxt("PCX must be a real matrix.") ;
   }

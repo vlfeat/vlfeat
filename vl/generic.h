@@ -9,6 +9,8 @@
 #ifndef VL_GENERIC_H
 #define VL_GENERIC_H
 
+#include <stddef.h>
+
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.1"
 
@@ -33,8 +35,8 @@
  **/
 #define VL_STRINGIFY(x) VL_STRINGIFY_(x)
 
-/** ---------------------------------------------------------------- */
-/** @name Atomic data types
+/** ------------------------------------------------------------------
+ ** @name Atomic data types
  ** @{
  **/
 
@@ -53,6 +55,7 @@ typedef unsigned int        vl_uint ;    /**< unsigned integer.        */
 typedef float               vl_single ;  /**< single precision float.  */
 typedef double              vl_double ;  /**< double precision float.  */
 typedef unsigned int        vl_uidx ;    /**< unsigned index data type.*/
+typedef size_t              vl_size ;    /**< size data type.          */
 
 typedef int                 vl_bool ;    /**< boolean */
 /** @} */
@@ -113,8 +116,49 @@ static union { vl_uint64 raw ; vl_double value ; }
 #define isnan _isnan
 #endif
 
-/** ---------------------------------------------------------------- */
-/** @name Error handling 
+/** ------------------------------------------------------------------
+ ** @name Logging
+ ** @{ 
+ **/
+
+
+
+
+
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Heap allocation
+ ** @{ 
+ **/
+
+void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
+                        void *(*realloc_func) (void*,vl_size),
+                        void *(*calloc_func)  (vl_size, vl_size),
+                        void  (*free_func)    (void*)) ;
+static VL_INLINE void *vl_malloc  (vl_size n) ;
+static VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
+static VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
+static VL_INLINE void  vl_free    (void* ptr) ;
+
+void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
+
+/** @brief Call customizable @c printf function
+ **
+ ** @param format format string.
+ ** @param ... @c printf variable arguments.
+ **
+ ** The function calls the user customizable @c printf.
+ **
+ ** @return results of @c printf.
+ **/
+#define VL_PRINTF(format, ...) \
+  ((*vl_printf_func)((format), __VA_ARGS__))
+
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Error handling 
  ** @{ 
  **/
 
@@ -140,8 +184,8 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
 
 /** @} */
 
-/** ---------------------------------------------------------------- */
-/** @name Common operations
+/** ------------------------------------------------------------------
+ ** @name Common operations
  ** @{
  **/
 
@@ -171,7 +215,8 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
 /* @} */
 
-/** ---------------------------------------------------------------- */
+/** ------------------------------------------------------------------
+ **/
 
 char const * vl_get_version_string () ;
 
@@ -206,8 +251,8 @@ static VL_INLINE void vl_adapt_endianness_4 (void *dst, void* src) ;
 static VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
 /** @} */
 
-/** ---------------------------------------------------------------- */
-/** @brief Get endianness
+/** ------------------------------------------------------------------
+ ** @brief Get endianness
  ** @return @c ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN depending on the
  ** host endianness.
  ** @sa @ref generic-endian
@@ -219,8 +264,8 @@ vl_get_endianness ()
   return VL_ENDIANNESS ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Change endianness of 8-byte value if required
+/** ------------------------------------------------------------------
+ ** @brief Change endianness of 8-byte value if required
  **
  ** @param dst destination 8-byte buffer.
  ** @param src source 8-byte bufffer.
@@ -253,8 +298,8 @@ vl_adapt_endianness_8 (void *dst, void* src)
 #endif
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Change endianness of 4-byte value if required
+/** ------------------------------------------------------------------
+ ** @brief Change endianness of 4-byte value if required
  **
  ** @param dst destination 4-byte buffer.
  ** @param src source 4-byte bufffer.
@@ -279,8 +324,8 @@ vl_adapt_endianness_4 (void *dst, void* src)
 #endif
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Change endianness of 2-byte value if required
+/** ------------------------------------------------------------------
+ ** @brief Change endianness of 2-byte value if required
  **
  ** @param dst destination 2-byte buffer.
  ** @param src source 2-byte bufffer.
@@ -300,6 +345,81 @@ vl_adapt_endianness_2 (void *dst, void* src)
     dst_ [1] = src_ [0] ;
 #endif
 }
+
+extern int   (*vl_printf_func)  (char const * format, ...) ;
+extern void *(*vl_malloc_func)  (vl_size) ;
+extern void *(*vl_realloc_func) (void*,vl_size) ;
+extern void *(*vl_calloc_func)  (vl_size, vl_size) ;
+extern void  (*vl_free_func)    (void*) ;          
+
+/** ------------------------------------------------------------------
+ ** @brief Call customizable @c malloc function
+ ** @param n number of bytes to allocate.
+ **
+ ** The function calls the user customizable @c malloc.
+ **
+ ** @return result of @c malloc
+ **/
+
+static VL_INLINE 
+void*
+vl_malloc (vl_size n)
+{
+  return (*vl_malloc_func)(n) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Call customizable @c resize function
+ **
+ ** @param ptr buffer to reallocate.
+ ** @param n number of bytes to allocate.
+ **
+ ** The function calls the user customizable @c realloc.
+ **
+ ** @return result of @c realloc
+ **/
+
+static VL_INLINE 
+void*
+vl_realloc (void* ptr, vl_size n)
+{
+  return (*vl_realloc_func)(ptr, n) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Call customizable @c calloc function
+ **
+ ** @param n size of each element in byte.
+ ** @param n number of elements to allocate.
+ **
+ ** The function calls the user customizable @c calloc.
+ **
+ ** @return result of @c calloc
+ **/
+
+static VL_INLINE 
+void*
+vl_calloc (vl_size n, vl_size size)
+{
+  return (*vl_calloc_func)(n, size) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Call customizable @c free function
+ **
+ ** @param ptr buffer to free.
+ **
+ ** The function calls the user customizable @c free.
+ **/
+
+static VL_INLINE 
+void
+vl_free (void *ptr)
+{
+  (*vl_free_func)(ptr) ;
+}
+
+
 
 /* VL_GENERIC_H */
 #endif

@@ -126,10 +126,9 @@ vl_hikm_xmeans (VlHIKMTree *hikm,
   
   if (depth != 1)
     {
-      /* find data assignments to children */
-      /* for each child
-       *      partition the data
-       *      recurse with this partition to get the node
+      /* For each child
+       * - partition the data
+       * - recurse with this partition to get the node
        */
       int c ;
       for (c = 0 ; c < K ; c ++)
