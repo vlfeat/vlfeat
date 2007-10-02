@@ -675,7 +675,15 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
                  I,
                  H,
                  aib->nwhich) ;
-    }    
+    }
+
+    /* fill ignored entries with NaNs */
+    for(; i < nvalues - 1 ; i++) {
+      if (cost && *cost) {
+        (*cost) [i] = VL_NAN_D ;
+      }
+    }
+
     vl_aib_delete_aib(aib) ;
   }  
   return parents ;

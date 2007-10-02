@@ -21,7 +21,6 @@ ylim([-4 4]);
 axis off ;
 rectangle('position',D*[-1 -1 2 2]) 
 
-
 demo_print('aib_basic_data', .4) ;
 
 C   = 1:K*K ;
@@ -37,7 +36,9 @@ Pcx(3,:) = binsum(Pcx(3,:), ones(size(f3)), f3) ;
 
 Pcx = Pcx / sum(Pcx(:)) ;
 
-parents = aib(Pcx) ;
+[parents, cost] = aib(Pcx) ;
+
+keyboard
 
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
