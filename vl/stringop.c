@@ -3,11 +3,41 @@
  ** @brief   Strin Operations - Definition
  **/
 
-#include "stringop.h"
-#include <string.h>
+/* AUTORIGHTS */
 
-/** ---------------------------------------------------------------- */
-/** @brief Parse string prefix for file protocol
+/** @file   stringop.h
+ ** @author Andrea Vedaldi
+ ** @brief  String Operations
+
+This module impelements common strings operations. All functions that
+write to strings use range checking, which makes them safer and more
+robust than standard POSIX equivalent (see @ref vl-stringop-err).
+
+@section vl-stringop-err Detecting overflow
+
+Functions of this module may write a string as a result of their
+operation.  The string is written to a buffer passed to the function
+along with its length @c n and is @c NUL terminated. The function
+never writes more than @c n characters, thus preventing overflow (this
+includes the @c NUL character terminating the string). The function
+also returns the total number @c r of chatarcters that would have been
+written if the buffer was big enough (not counting the terminating @c
+NUL). Thus:
+
+- overflow errors are be detected by testing whether @c r &gt;= @c n; 
+- @c r can be used to re-allocate a sufficiently large buffer and repeat the operation;
+- as long as @a n &gt;= 0 the result is always @c NUL terminated;
+- if @a n = 0 nothing is actually written.
+  
+**/
+
+#include "stringop.h"
+
+#include <string.h>
+#include <ctype.h>
+
+/** ------------------------------------------------------------------
+ ** @brief Parse string prefix for file protocol
  **
  ** @param str  string.
  ** @param prot protocol code (output).
@@ -55,8 +85,8 @@ vl_string_parse_protocol (char const *str, int *prot)
   return (char*) cpt ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Get protocol name.
+/** ------------------------------------------------------------------
+ ** @brief Get protocol name.
  **
  ** @param prot protocol id.
  **
@@ -83,8 +113,8 @@ vl_string_protocol_name (int prot)
 }
 
 
-/** ---------------------------------------------------------------- */
-/** @brief Extract base of file name.
+/** ------------------------------------------------------------------
+ ** @brief Extract base of file name.
  **
  ** @param dst   destination buffer.
  ** @param n     size of destination buffer.
@@ -129,8 +159,8 @@ vl_string_basename (char *dst, int n, char const *src, int n_ext)
   return vl_string_copy_sub (dst, n, src + beg, src + end) ; 
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Replace wildcard by string
+/** -------------------------------------------------------------------
+ ** @brief Replace wildcard by string
  **
  ** @param dst   output buffer.
  ** @param n     size of output buffer.
@@ -193,8 +223,8 @@ vl_string_replace_wildcard (char *dst, int n,
   return  k ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Copy string
+/** -------------------------------------------------------------------
+ ** @brief Copy string
  **
  ** @param dst output buffer.
  ** @param n   size of output buffer.
@@ -224,8 +254,8 @@ vl_string_copy (char *dst, int n, char const *src)
   return  k ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Copy substring
+/** -------------------------------------------------------------------
+ ** @brief Copy substring
  **
  ** @param dst output buffer.
  ** @param n   size of output buffer.
@@ -259,8 +289,8 @@ vl_string_copy_sub (char *dst, int n,
   return  k ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Search character reversed
+/** ------------------------------------------------------------------
+ ** @brief Search character in reversed order
  **
  ** @param beg substring beginning.
  ** @param end substring ending.
@@ -283,8 +313,8 @@ vl_string_find_char_rev (char const *beg, char const* end, char c)
 }
 
 
-/** ---------------------------------------------------------------- */
-/** @brief Calculate string length
+/** -------------------------------------------------------------------
+ ** @brief Calculate string length
  **
  ** @param str string.
  ** @return string length.
@@ -296,4 +326,30 @@ vl_string_length (char const *str)
   int i ;
   for(i = 0 ; str [i] ; ++i) ;
   return i ;
+}
+
+/** -------------------------------------------------------------------
+ ** @brief Compare strings case-insensitive
+ **
+ ** @param s1 fisrt string.
+ ** @param s2 second string.
+ **
+ ** @return 0 if the strings are equal, >0 if the first string is
+ ** greater (in lexicographical order) and <0 otherwise.
+ **/
+
+int
+vl_string_casei_cmp (const char *s1, const char *s2)
+{
+  while (tolower((unsigned char)*s1) == 
+         tolower((unsigned char)*s2))
+  {
+    if (*s1 == 0)
+      return 0;
+    s1++;
+    s2++;
+  }
+  return 
+    (int)tolower((unsigned char)*s1) - 
+    (int)tolower((unsigned char)*s2) ;
 }

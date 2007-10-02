@@ -35,6 +35,7 @@ category detection, object and category recognition.</em>
   - @ref stringop.h  "String operations"
   - @ref imop.h      "Image operations"
   - @ref rodrigues.h "Rodrigues formuals"
+  - @ref mexutils.h  "MATLAB MEX helper functions"
 - Algorithms
   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"

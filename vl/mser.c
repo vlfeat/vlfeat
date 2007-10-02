@@ -186,8 +186,8 @@ General Public License version 2.
 #include<string.h>
 #include<assert.h>
 
-/* ----------------------------------------------------------------- */
-/** @brief Advance N-dimensional subscript
+/** -------------------------------------------------------------------
+ ** @brief Advance N-dimensional subscript
  **
  ** The function increments by one the subscript @a subs indexing an
  ** array the @a ndims dimensions @a dims.
@@ -207,8 +207,8 @@ adv(int ndims, int const *dims, int *subs)
   }
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Climb the region forest to reach aa root 
+/** -------------------------------------------------------------------
+ ** @brief Climb the region forest to reach aa root 
  **
  ** The function climbs the regions forest @a r starring from the node
  ** @a idx to the correspoding root.
@@ -268,8 +268,8 @@ climb (VlMserReg* r, vl_uint idx)
   return root_idx ;
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Create a new MSER filter
+/** -------------------------------------------------------------------
+ ** @brief Create a new MSER filter
  **
  ** Initializes a new MSER filter for images of the specified
  ** dimensions. Images are @a ndims -dimensional arrays of dimensions
@@ -287,10 +287,10 @@ vl_mser_new (int ndims, int const* dims)
   f = calloc(sizeof(VlMserFilt), 1) ;
 
   f-> ndims   = ndims ;
-  f-> dims    = malloc (sizeof(int) * ndims) ;
-  f-> subs    = malloc (sizeof(int) * ndims) ;
-  f-> dsubs   = malloc (sizeof(int) * ndims) ;
-  f-> strides = malloc (sizeof(int) * ndims) ;
+  f-> dims    = vl_malloc (sizeof(int) * ndims) ;
+  f-> subs    = vl_malloc (sizeof(int) * ndims) ;
+  f-> dsubs   = vl_malloc (sizeof(int) * ndims) ;
+  f-> strides = vl_malloc (sizeof(int) * ndims) ;
 
   /* shortcuts */
   strides = f-> strides ;
@@ -313,9 +313,9 @@ vl_mser_new (int ndims, int const* dims)
   f-> dof = ndims * (ndims + 1) / 2 + ndims ;
 
   /* more buffers */
-  f-> perm   = malloc (sizeof(vl_uint)   * f-> nel) ;
-  f-> joins  = malloc (sizeof(vl_uint)   * f-> nel) ;
-  f-> r      = malloc (sizeof(VlMserReg) * f-> nel) ;
+  f-> perm   = vl_malloc (sizeof(vl_uint)   * f-> nel) ;
+  f-> joins  = vl_malloc (sizeof(vl_uint)   * f-> nel) ;
+  f-> r      = vl_malloc (sizeof(VlMserReg) * f-> nel) ;
 
   f-> er     = 0 ;
   f-> rer    = 0 ;
@@ -334,8 +334,8 @@ vl_mser_new (int ndims, int const* dims)
   return f ;
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Delete MSER filter
+/** -------------------------------------------------------------------
+ ** @brief Delete MSER filter
  **
  ** The function releases the MSER filter @a f and all its resources.
  **
@@ -345,25 +345,25 @@ void
 vl_mser_delete (VlMserFilt* f)
 {
   if(f) {
-    if(f-> acc   )  free( f-> acc    ) ;
-    if(f-> ell   )  free( f-> ell    ) ;
+    if(f-> acc   )  vl_free( f-> acc    ) ;
+    if(f-> ell   )  vl_free( f-> ell    ) ;
 
-    if(f-> er    )  free( f-> er     ) ;
-    if(f-> r     )  free( f-> r      ) ;
-    if(f-> joins )  free( f-> joins  ) ;
-    if(f-> perm  )  free( f-> perm   ) ;
+    if(f-> er    )  vl_free( f-> er     ) ;
+    if(f-> r     )  vl_free( f-> r      ) ;
+    if(f-> joins )  vl_free( f-> joins  ) ;
+    if(f-> perm  )  vl_free( f-> perm   ) ;
     
-    if(f-> strides) free( f-> strides) ;
-    if(f-> dsubs  ) free( f-> dsubs  ) ;
-    if(f-> subs   ) free( f-> subs   ) ;
-    if(f-> dims   ) free( f-> dims   ) ;
-    free(f) ;
+    if(f-> strides) vl_free( f-> strides) ;
+    if(f-> dsubs  ) vl_free( f-> dsubs  ) ;
+    if(f-> subs   ) vl_free( f-> subs   ) ;
+    if(f-> dims   ) vl_free( f-> dims   ) ;
+    vl_free(f) ;
   }
 }
 
 
-/* ----------------------------------------------------------------- */
-/** @brief Process image
+/** -------------------------------------------------------------------
+ ** @brief Process image
  ** 
  ** The functions calculates the Maximally Stable Extremal Regions
  ** (MSERs) of image @a im using the MSER filter @a f.
@@ -613,8 +613,8 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
  
   /* make room */
   if (f-> rer < ner) {
-    if (er) free (er) ;
-    f->er  = er = malloc (sizeof(VlMserExtrReg) * ner) ;
+    if (er) vl_free (er) ;
+    f->er  = er = vl_malloc (sizeof(VlMserExtrReg) * ner) ;
     f->rer = ner ;      
   } ;
 
@@ -818,8 +818,8 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
 
   /* make room */
   if (f-> rmer < nmer) {
-    if (mer) free (mer) ;
-    f->mer  = mer = malloc( sizeof(vl_uint) * nmer) ;
+    if (mer) vl_free (mer) ;
+    f->mer  = mer = vl_malloc( sizeof(vl_uint) * nmer) ;
     f->rmer = nmer ;      
   }
 
@@ -832,8 +832,8 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   }
 }
 
-/* ----------------------------------------------------------------- */
-/** @brief Fit ellipsoids
+/** -------------------------------------------------------------------
+ ** @brief Fit ellipsoids
  **
  ** @param f MSER filter.
  **
@@ -864,13 +864,13 @@ vl_mser_ell_fit (VlMserFilt* f)
   
   /* make room */
   if (f->rell < f->nmer) {
-    if (f->ell) free (f->ell) ;
-    f->ell  = malloc(sizeof(vl_single) * f->nmer * f->dof) ;
+    if (f->ell) vl_free (f->ell) ;
+    f->ell  = vl_malloc (sizeof(vl_single) * f->nmer * f->dof) ;
     f->rell = f-> nmer ;
   }
 
   if (f->acc == 0) {
-    f->acc = malloc(sizeof(vl_single) * f->nel) ;
+    f->acc = vl_malloc (sizeof(vl_single) * f->nel) ;
   }
  
   acc = f-> acc ;

@@ -63,10 +63,10 @@ labels = parents ;
 
 if n > 1
   mu = max(parents) - n + 1 ;
-  stop = [find(labels(1:mu) > mu) ; 0] ;
+  stop = [find(labels(1:mu) > mu) 0] ;
 else
   mu   = max(parents) ;
-  stop = [mu ; 0] ;
+  stop = [mu 0] ;
 end
 
 while 1

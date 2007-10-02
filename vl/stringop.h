@@ -1,28 +1,6 @@
 /** @file   stringop.h
  ** @author Andrea Vedaldi
- ** @brief  String Operatons - Declaration
- **
- ** This module supports common strings operations. All functions that
- ** write to strings use range checking, which makes them safer and
- ** more robust than standard POSIX equivalent (see @ref
- ** vl-stringop-err).
- **
- ** @section vl-stringop-err Detecting overflow
- **
- ** Functions of this module may write a string as a result of their
- ** operation.  The string is written to a buffer passed to the
- ** function along with its length @c n and is @c NUL terminated. The
- ** function never writes more than @c n characters, thus preventing
- ** overflow (this includes the @c NUL character terminating the
- ** string). The function also returns the total number @c r of
- ** chatarcters that would have been written if the buffer was big
- ** enough (not counting the terminating @c NUL). Thus:
- ** 
- ** - overflow errors are be detected by testing whether @c r &gt;= @c n; 
- ** - @c r can be used to re-allocate a sufficiently large buffer and repeat the operation;
- ** - as long as @a n &gt;= 0 the result is always @c NUL terminated;
- ** - if @a n = 0 nothing is actually written.
- **   
+ ** @brief  String Operations
  **/
 
 #ifndef VL_STRINGOP_H
@@ -56,6 +34,7 @@ int    vl_string_basename         (char *dst, int n, char const *src, int n_ext)
 int    vl_string_replace_wildcard (char *dst, int n, char const *src, char wild, char esc, char const* repl) ;
 char*  vl_string_find_char_rev    (char const *beg, char const* end, char c) ;
 int    vl_string_length           (char const *str) ;
+int    vl_string_casei_cmp        (const char *s1, const char *s2) ;
 
 /* VL_STRINGOP_H */
 #endif

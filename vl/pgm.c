@@ -16,8 +16,8 @@ General Public License version 2.
 #include <stdlib.h>
 #include <string.h>
 
-/** ---------------------------------------------------------------- */
-/** @internal
+/** -------------------------------------------------------------------
+ ** @internal
  ** @brief Reremove all characters to the next new-line
  ** @param f file to strip.
  ** @return number of characted removed.
@@ -46,8 +46,8 @@ remove_line(FILE* f)
   return count ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @internal
+/** -------------------------------------------------------------------
+ ** @internal
  ** @brief Reremove white-spaces and comments
  ** @param f file to strip.
  ** @return number of characted removed.
@@ -85,8 +85,8 @@ remove_blanks(FILE* f)
   return count ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Get PGM image data size
+/** -------------------------------------------------------------------
+ ** @brief Get PGM image data size
  **
  ** @param im PGM image descriptor.
  **
@@ -105,8 +105,8 @@ vl_pgm_get_data_size (VlPgmImage const *im)
   return im->width * im->height ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Get PGM image bytes per pixel
+/** -------------------------------------------------------------------
+ ** @brief Get PGM image bytes per pixel
  **
  ** @param im PGM image descriptor.
  **
@@ -230,8 +230,8 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   return 0 ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Read PGM data
+/** -------------------------------------------------------------------
+ ** @brief Read PGM data
  **
  ** @param f    input file.
  ** @param im   PGM image descriptor.
@@ -310,8 +310,8 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
   return 0 ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Write a PGM image
+/** -------------------------------------------------------------------
+ ** @brief Write a PGM image
  **
  ** @param f output file.
  ** @param im   PGM image meta-data.

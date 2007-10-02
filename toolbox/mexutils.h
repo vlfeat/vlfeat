@@ -1,8 +1,8 @@
 /** @file   mexutils.h
  ** @author Andrea Vedaldi
- ** @brief  MEX driver support - Declaration
+ ** @brief  MEX helper functions
  **
- ** This module provides a set of helper functionalities for writing MEX files.
+ ** This module provides helper functions for MATLAB MEX files.
  **/
 
 /* AUTORIGHTS */
@@ -26,6 +26,71 @@
   vl_set_printf_func (mexPrintf) ;
 
 /** ------------------------------------------------------------------
+ ** @brief Create array with pre-allocated data
+ **
+ ** @param number of dimensions.
+ ** @param dimensions.
+ ** @param storage class ID.
+ ** @param pre-allocated data.
+ **
+ ** If @a data is set to NULL, the data is allocated from the heap.
+ ** If @a data is a buffer allocated by @a mxMalloc, then this buffer
+ ** is used as data.
+ **
+ ** @return new array.
+ **/
+
+static mxArray *
+uCreateNumericArray (mwSize ndim, const mwSize * dims, mxClassID classid, void * data)
+{
+  mxArray *A ;
+
+  if  (data) {
+    mwSize dims_ [2] = {0, 0} ;
+    A = mxCreateNumericArray (2, dims_, classid, mxREAL) ;
+    mxSetData (A, data) ;
+    mxSetDimensions (A, dims, ndim) ;
+  } else {
+    A = mxCreateNumericArray (ndim, dims, classid, mxREAL) ;
+  }
+  
+  return A ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Create array with pre-allocated data
+ **
+ ** @param M number of rows.
+ ** @param N number of columns.
+ ** @param storage class ID.
+ ** @param pre-allocated data.
+ **
+ ** If @a data is set to NULL, the data is allocated from the heap.
+ ** If @a data is a buffer allocated by @a mxMalloc, then this buffer
+ ** is used as data.
+ **
+ ** @return new array.
+ **/
+
+static mxArray *
+uCreateNumericMatrix (int M, int N, mxClassID classid, void * data)
+{
+  mxArray *A ;
+
+  if  (data) {
+    A = mxCreateNumericMatrix (0, 0, classid, mxREAL) ;
+    mxSetData (A, data) ;
+    mxSetM(A, M) ;
+    mxSetN(A, N) ;
+  } else {
+    A = mxCreateNumericMatrix (M, N, classid, mxREAL) ;
+  }
+
+  return A ;
+}
+
+
+/** ------------------------------------------------------------------
  ** @brief Is the array a numeric scalar?
  **
  ** @param A array to test.
@@ -36,6 +101,7 @@
  **
  ** @return test result.
  **/
+
 static int
 uIsScalar(const mxArray* A)
 {
@@ -58,6 +124,7 @@ uIsScalar(const mxArray* A)
  **
  ** @return test result.
  **/
+
 static int
 uIsMatrix (const mxArray* A, int M, int N)
 {
@@ -68,8 +135,8 @@ uIsMatrix (const mxArray* A, int M, int N)
     (N < 0 || mxGetN(A) == N) ;   
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array real?
+/** ------------------------------------------------------------------
+ ** @brief Is the array real?
  **
  ** @param A array to test.
  **
@@ -87,8 +154,8 @@ uIsReal (const mxArray* A)
     !mxIsComplex(A) ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array real and scalar?
+/** ------------------------------------------------------------------
+ ** @brief Is the array real and scalar?
  **
  ** @param A array to test.
  **
@@ -105,8 +172,8 @@ uIsRealScalar(const mxArray* A)
     uIsReal (A) && mxGetNumberOfElements(A) == 1 ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array a real matrix?
+/** ------------------------------------------------------------------
+ ** @brief Is the array a real matrix?
  **
  ** @param A array to test.
  ** @param M number of rows.
@@ -131,8 +198,8 @@ uIsRealMatrix(const mxArray* A, int M, int N)
     (N < 0 || mxGetN(A) == N) ;   
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array a real vector?
+/** ------------------------------------------------------------------
+ ** @brief Is the array a real vector?
  **
  ** @param A array to test.
  ** @param N number of elements.
@@ -152,8 +219,8 @@ uIsRealVector(const mxArray* A, int N)
 }
 
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array real with specified dimensions?
+/** ------------------------------------------------------------------
+ ** @brief Is the array real with specified dimensions?
  **
  ** @param A array to check.
  ** @param D number of dimensions.
@@ -167,6 +234,7 @@ uIsRealVector(const mxArray* A, int N)
  **
  ** @return test result.
  **/
+
 static int
 uIsRealArray(const mxArray* A, int D, const int* dims)
 {
@@ -192,8 +260,8 @@ uIsRealArray(const mxArray* A, int D, const int* dims)
   return true ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Is the array a string?
+/** ------------------------------------------------------------------
+ ** @brief Is the array a string?
  **
  ** @param A array to test.
  ** @param L string length.
@@ -206,6 +274,7 @@ uIsRealArray(const mxArray* A, int D, const int* dims)
  **
  ** @return test result.
  **/
+
 static int
 uIsString(const mxArray* A, int L)
 {
@@ -220,8 +289,10 @@ uIsString(const mxArray* A, int L)
 }
 
 
-/** ---------------------------------------------------------------- */
-/** @brief MEX option */
+/** -------------------------------------------------------------------
+ ** @brief MEX option 
+ **/
+
 struct _uMexOption
 {
   const char *name ; /**< option name */
@@ -234,8 +305,8 @@ struct _uMexOption
  **/
 typedef struct _uMexOption uMexOption ;
 
-/** ---------------------------------------------------------------- */
-/** @brief Case insensitive string comparison
+/** ------------------------------------------------------------------
+ ** @brief Case insensitive string comparison
  **
  ** @param s1 fisrt string.
  ** @param s2 second string.
@@ -243,8 +314,9 @@ typedef struct _uMexOption uMexOption ;
  ** @return 0 if the strings are equal, >0 if the first string is
  ** greater (in lexicographical order) and <0 otherwise.
  **/
-int
-ustricmp(const char *s1, const char *s2)
+
+static int
+uStrICmp(const char *s1, const char *s2)
 {
   while (tolower((unsigned char)*s1) == 
          tolower((unsigned char)*s2))
@@ -259,8 +331,8 @@ ustricmp(const char *s1, const char *s2)
     (int)tolower((unsigned char)*s2) ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Process next option
+/** ------------------------------------------------------------------
+ ** @brief Process next option
  **
  ** @param args     MEX argument array.
  ** @param nargs    MEX argument array length.
@@ -268,8 +340,8 @@ ustricmp(const char *s1, const char *s2)
  ** @param next     Pointer to the next option (in and out).
  ** @param optarg   Pointer to the option optional argument (out).
  **
- ** The function scans the MEX driver arguments array @a args of @a nargs elements
- ** for the next option starting at location @a next.
+ ** The function scans the MEX driver arguments array @a args of @a
+ ** nargs elements for the next option starting at location @a next.
  **
  ** This argument is suppsed to be the name of an option (case
  ** insensitive). The option is looked up in the option table @a
@@ -282,6 +354,7 @@ ustricmp(const char *s1, const char *s2)
  ** exhausetd. In case of an error (e.g. unkown option) the function
  ** prints an error message and quits the MEX file.
  **/
+
 static int uNextOption(mxArray const *args[], int nargs, 
                        uMexOption const *options, 
                        int *next, 
@@ -318,7 +391,7 @@ static int uNextOption(mxArray const *args[], int nargs,
         
   /* now lookup the string in the option table */
   for (i = 0 ; options[i].name != 0 ; ++i) {    
-    if (ustricmp(name, options[i].name) == 0) {
+    if (uStrICmp(name, options[i].name) == 0) {
       opt = options[i].val ;
       break ;
     }

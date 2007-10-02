@@ -585,6 +585,7 @@ vl_aib_delete_aib (VlAIB * aib)
  ** @param Pcx     joint probability table (column major).
  ** @param nlabels number of rows in @a Pcx (number of labels).
  ** @param nvalues number of columns in @a Pcx (number of feature values).
+ ** @param cost    cost of each node (out).
  **
  ** The function runs Agglomerative Information Bottleneck (AIB) on
  ** the joint probabilit talbe @a Pcx which has labels along the
@@ -607,13 +608,18 @@ vl_aib_delete_aib (VlAIB * aib)
  ** Feature values with null probability are ignored by the algorithm
  ** and their nodes have parents indexing a non-existant tree node (a
  ** value bigger than @c 2*nvalues-1).
+ **
+ ** If @a cost is not equal to NULL, then the function will also
+ ** return a vector with the information level after each merge. There
+ ** are @c nvalues-1 merges.
  ** 
  ** @return the array of parents representing the tree. The array has
  ** @c 2*nvalues-1 elements.
  **/ 
 
 vl_aib_node *
-vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues)
+vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
+        double ** cost)
 {
   vl_aib_node * parents = vl_malloc(sizeof(vl_aib_node)*(nvalues*2-1));
   vl_aib_node n;
@@ -621,6 +627,9 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues)
   /* Initially, all parents point to a nonexistant node */
   for (n = 0 ; n < 2 * nvalues - 1 ; n++)
     parents [n] = 2 * nvalues ; 
+
+  /* Allocate cost outut vector */
+  if (cost) *cost = vl_malloc (sizeof(double) * (nvalues - 1)) ;
   
   {
     VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
@@ -653,6 +662,10 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues)
       /* Merge the nodes which produced the minimum beta */
       vl_aib_merge_nodes (aib, besti, bestj, newnode) ;
       vl_aib_calculate_information (aib, &I, &H) ;
+
+      if (cost && *cost) {
+        (*cost) [i] = I ;
+      }
       
       VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n", 
                  aib->nodes[besti], 
