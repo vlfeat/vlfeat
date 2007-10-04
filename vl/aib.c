@@ -409,16 +409,25 @@ vl_aib_update_beta (VlAIB * aib)
   vl_aib_node i;
   vl_aib_prob * Px  = aib->Px;
   vl_aib_prob * Pcx = aib->Pcx;
+  vl_aib_prob * tmp = vl_malloc(sizeof(vl_aib_prob)*aib->nentries);
+
+  vl_aib_node a,b,c;
+  for (a = 0; a < aib->nentries; a++) {
+    tmp[a] = 0;
+    for (c = 0; c < aib->nlabels; c++) {
+        vl_double Pac = Pcx [a*aib->nlabels + c] ;
+        
+        if(Pac != 0) tmp[a] += Pac * log (Pac / Px[a]) ;  /* + A  */
+    }
+  }
   
   /* for each entry listed in which */
   for (i = 0 ; i < aib->nwhich; i++) {    
-    vl_aib_node a = aib->which[i];
-    vl_aib_node b ;
+    a = aib->which[i];
 
     /* for each other entry */
     for(b = 0 ; b < aib->nentries ; b++) {
       vl_double T1 = 0 ;
-      vl_aib_node c ;
       
       if (a == b || Px [a] == 0 || Px [b] == 0) continue ;
 
@@ -435,13 +444,16 @@ vl_aib_update_beta (VlAIB * aib)
        */
 
       T1 = PLOGP ((Px[a] + Px[b])) ;                  /* - C2 */
-      
+      T1 += tmp[a] + tmp[b];
+
       for (c = 0 ; c < aib->nlabels; ++ c) {
         vl_double Pac = Pcx [a*aib->nlabels + c] ;
         vl_double Pbc = Pcx [b*aib->nlabels + c] ;
         
+#if 0
         if(Pac != 0) T1 += Pac * log (Pac / Px[a]) ;  /* + A  */
         if(Pbc != 0) T1 += Pbc * log (Pbc / Px[b]) ;  /* + B  */
+#endif
         
         if (Pac == 0 && Pbc == 0) continue;
         T1 += - PLOGP ((Pac + Pbc)) ;                 /* - C1 */
@@ -467,6 +479,7 @@ vl_aib_update_beta (VlAIB * aib)
       }
     }
   }
+  vl_free(tmp);
 }
 
 /** ------------------------------------------------------------------
@@ -657,7 +670,7 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
 
       parents [aib->nodes[besti]] = newnode ;
       parents [aib->nodes[bestj]] = newnode ;
-      parents [newnode]           = newnode ;
+      parents [newnode]           = 0 ;
       
       /* Merge the nodes which produced the minimum beta */
       vl_aib_merge_nodes (aib, besti, bestj, newnode) ;

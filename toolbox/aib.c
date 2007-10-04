@@ -50,8 +50,8 @@ mexFunction(int nout, mxArray *out[],
   vl_aib_node    nlabels ;
   vl_aib_node    nvalues ;
 
-  VL_USE_MATLAB_ENV ;
-  
+  VL_USE_MATLAB_ENV ; 
+
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -66,11 +66,11 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("PCX must be a real matrix.") ;
   }
 
-  Pcx     = mxGetPr (in[IN_PCX]) ;
+  mxArray * Pcx_array = mxDuplicateArray(in[IN_PCX]);
+  Pcx     = mxGetPr (Pcx_array) ;
   nlabels = mxGetM  (in[IN_PCX]) ;
   nvalues = mxGetN  (in[IN_PCX]) ;
-
-
+  
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     char buf [1024] ;
     
@@ -127,7 +127,7 @@ mexFunction(int nout, mxArray *out[],
         ++ parents [n]  ;
       }
     }
-    
+
     out[OUT_PARENTS] = uCreateNumericMatrix 
       (1, 2 * nvalues - 1, mxUINT32_CLASS, parents) ;
     
@@ -136,4 +136,6 @@ mexFunction(int nout, mxArray *out[],
         (1, nvalues - 1, mxDOUBLE_CLASS, cost) ;
     }
   }
+
+  mxDestroyArray(Pcx_array);
 }
