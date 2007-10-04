@@ -232,6 +232,12 @@ as shown by the figure:
 
 @image html sift-angle.png
 
+@section sift-ack Acknowledgments
+
+- Thanks to Wei Dong for finding a memory leak.
+- Thanks to Brian, Loic, Giuseppe, Liu, Erwin, P. Ivanov, Q.S. Luo for
+  finding bugs in old versions of this program.
+
 **/
 
 #include "sift.h"
@@ -451,6 +457,7 @@ void
 vl_sift_delete (VlSiftFilt* f)
 {
   if(f) {
+    if(f-> keys   ) free (f-> keys   ) ;
     if(f-> grad   ) free (f-> grad   ) ;
     if(f-> dog    ) free (f-> dog    ) ;
     if(f-> octave ) free (f-> octave ) ;

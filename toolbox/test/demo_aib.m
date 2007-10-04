@@ -38,8 +38,6 @@ Pcx = Pcx / sum(Pcx(:)) ;
 
 [parents, cost] = aib(Pcx) ;
 
-keyboard
-
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
   

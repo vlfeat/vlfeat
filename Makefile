@@ -56,12 +56,12 @@ all : all-dir all-lib all-bin all-mex
 
 # this creates auxiliary directories
 .PHONY: all-dir
-all-dir:
-	mkdir -p results doc/figures/demo
+all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 
-# this creates binary  directory hiearchy 
-$(BINDIR) $(BINDIR)/objs $(BINDIR)/objs/.stamp:
-	mkdir -p $(BINDIR)/objs
+# this is to make directories
+.PRECIOUS: %/.dirstamp
+%/.dirstamp :	
+	mkdir -p $(dir $@)
 	touch $@
 
 # --------------------------------------------------------------------
@@ -79,11 +79,11 @@ lib_dep := $(lib_obj:.o=.d)
 .PHONY: all-lib
 all-lib: $(BINDIR)/libvl.a
 
-$(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.stamp
+$(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   CC '$<' ==> '$@'"
 	@cc $(CFLAGS) -c $< -o $@
 
-$(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.stamp
+$(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   D  '$<' ==> '$@'"
 	@cc -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d' $< -MF $@
 

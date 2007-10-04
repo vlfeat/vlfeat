@@ -3,7 +3,12 @@
  ** @brief   Strin Operations - Definition
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 /** @file   stringop.h
  ** @author Andrea Vedaldi

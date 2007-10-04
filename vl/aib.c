@@ -5,7 +5,12 @@
  ** @brief    Agglomerative Information Bottleneck (AIB) - Definition
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 /** @file aib.h
  ** @author Brian Fulkerson
@@ -35,7 +40,7 @@
  and a category label @f$c = 1,\dots,C@f$ with joint probability
  @f$p(x,c)@f$, AIB computes a compressed feature @f$[x]_{ij}@f$ by
  merging two values @f$x_i@f$ and @f$x_j@f$.  Among all the pairs
- @f$ij@f$, AIB chooses the one that yields the least variation in the
+ @f$ij@f$, AIB chooses the one that yields the smallest loss in the
  mutual information
 
  @f[
@@ -405,19 +410,32 @@ void
 vl_aib_update_beta (VlAIB * aib)
 {
 
-#define PLOGP(x) (x)*log((x))
+#define PLOGP(x) ((x)*log((x)))
+
   vl_aib_node i;
   vl_aib_prob * Px  = aib->Px;
   vl_aib_prob * Pcx = aib->Pcx;
   vl_aib_prob * tmp = vl_malloc(sizeof(vl_aib_prob)*aib->nentries);
-
-  vl_aib_node a,b,c;
+  vl_aib_node a, b, c ; 
+  
+  /* 
+   * T1 = I(x,c) - I([x]_ij) = A + B - C
+   *
+   * A  = \sum_c p(xa,c)           \log ( p(xa,c)          /  p(xa)       ) 
+   * B  = \sum_c p(xb,c)           \log ( p(xb,c)          /  p(xb)       ) 
+   * C  = \sum_c (p(xa,c)+p(xb,c)) \log ((p(xa,c)+p(xb,c)) / (p(xa)+p(xb)))
+   *
+   * C  = C1 + C2
+   * C1 = \sum_c (p(xa,c)+p(xb,c)) \log (p(xa,c)+p(xb,c))
+   * C2 = - (p(xa)+p(xb) \log (p(xa)+p(xb))
+   */
+ 
+  /* precalculate A and B */
   for (a = 0; a < aib->nentries; a++) {
     tmp[a] = 0;
     for (c = 0; c < aib->nlabels; c++) {
-        vl_double Pac = Pcx [a*aib->nlabels + c] ;
-        
-        if(Pac != 0) tmp[a] += Pac * log (Pac / Px[a]) ;  /* + A  */
+        vl_double Pac = Pcx [a*aib->nlabels + c] ;       
+        if(Pac != 0) tmp[a] += Pac * log (Pac / Px[a]) ;
     }
   }
   
@@ -431,30 +449,13 @@ vl_aib_update_beta (VlAIB * aib)
       
       if (a == b || Px [a] == 0 || Px [b] == 0) continue ;
 
-      /* 
-       * T1 = I(x,c) - I([x]_ij) = A + B - C
-       *
-       * A  = \sum_c p(xa,c)           \log ( p(xa,c)          /  p(xa)       ) 
-       * B  = \sum_c p(xb,c)           \log ( p(xb,c)          /  p(xb)       ) 
-       * C  = \sum_c (p(xa,c)+p(xb,c)) \log ((p(xa,c)+p(xb,c)) / (p(xa)+p(xb)))
-       *
-       * C  = C1 + C2
-       * C1 = \sum_c (p(xa,c)+p(xb,c)) \log (p(xa,c)+p(xb,c))
-       * C2 = - (p(xa)+p(xb) \log (p(xa)+p(xb))
-       */
 
       T1 = PLOGP ((Px[a] + Px[b])) ;                  /* - C2 */
-      T1 += tmp[a] + tmp[b];
+      T1 += tmp[a] + tmp[b] ;                         /* + A + B */
 
       for (c = 0 ; c < aib->nlabels; ++ c) {
         vl_double Pac = Pcx [a*aib->nlabels + c] ;
         vl_double Pbc = Pcx [b*aib->nlabels + c] ;
-        
-#if 0
-        if(Pac != 0) T1 += Pac * log (Pac / Px[a]) ;  /* + A  */
-        if(Pbc != 0) T1 += Pbc * log (Pbc / Px[b]) ;  /* + B  */
-#endif
-        
         if (Pac == 0 && Pbc == 0) continue;
         T1 += - PLOGP ((Pac + Pbc)) ;                 /* - C1 */
       }
@@ -615,8 +616,8 @@ vl_aib_delete_aib (VlAIB * aib)
  ** original feature values.  In total there are @c 2*nvalues-1 nodes.
  **
  ** The function returns an array whit one element per tree node. Each
- ** element is the index the parent node. The root parent points to
- ** the root.
+ ** element is the index the parent node. The root parent is equal to
+ ** zero.
  **
  ** Feature values with null probability are ignored by the algorithm
  ** and their nodes have parents indexing a non-existant tree node (a

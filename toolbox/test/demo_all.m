@@ -11,3 +11,6 @@ demo_mser_cmd ;
 
 test_hikmeans ;
 test_ikmeans ;
+
+demo_aib ;
+

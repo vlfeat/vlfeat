@@ -5,7 +5,12 @@
  ** @brief    AIB MEX driver
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #include "mexutils.h"
 #include <vl/mathop.h>
@@ -22,9 +27,9 @@ enum {
 
 /* options */
 uMexOption options [] = {
-  {"Cost",      1,   opt_cost },
-  {"Verbose",         0,   opt_verbose    },
-  {0,                 0,   0              }
+  {"Cost",      1,   opt_cost       },
+  {"Verbose",   0,   opt_verbose    },
+  {0,           0,   0              }
 } ;
 
 
@@ -50,6 +55,8 @@ mexFunction(int nout, mxArray *out[],
   vl_aib_node    nlabels ;
   vl_aib_node    nvalues ;
 
+  mxArray *Pcx_cpy ;
+
   VL_USE_MATLAB_ENV ; 
 
   /* -----------------------------------------------------------------
@@ -66,8 +73,8 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("PCX must be a real matrix.") ;
   }
 
-  mxArray * Pcx_array = mxDuplicateArray(in[IN_PCX]);
-  Pcx     = mxGetPr (Pcx_array) ;
+  Pcx_cpy = mxDuplicateArray(in[IN_PCX]);
+  Pcx     = mxGetPr (Pcx_cpy) ;
   nlabels = mxGetM  (in[IN_PCX]) ;
   nvalues = mxGetN  (in[IN_PCX]) ;
   
@@ -136,6 +143,5 @@ mexFunction(int nout, mxArray *out[],
         (1, nvalues - 1, mxDOUBLE_CLASS, cost) ;
     }
   }
-
-  mxDestroyArray(Pcx_array);
+  mxDestroyArray(Pcx_cpy);
 }
