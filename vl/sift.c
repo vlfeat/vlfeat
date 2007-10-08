@@ -533,9 +533,9 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
     /* double more */
     for(o = -1 ; o > o_min ; --o) {
       copy_and_upsample_rows (temp, octave, 
-                              width << -o,      height << -o  ) ; 
+                              width << -o,      height << -o ) ; 
       copy_and_upsample_rows (octave, temp,   
-                              width << -o, 2 * (height << -o) ) ; 
+                              width << -o, 2 * (height << -o)) ; 
     }        
   } 
   else if (o_min > 0) {
@@ -617,7 +617,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   w      = vl_sift_get_octave_width  (f) ;
   h      = vl_sift_get_octave_height (f) ;
   pt     = vl_sift_get_octave        (f, s_best) ;
-  octave = vl_sift_get_octave (f, s_min) ;
+  octave = vl_sift_get_octave        (f, s_min) ;
 
   /* next octave */
   copy_and_downsample (octave, pt, w, h, 1) ;
@@ -907,17 +907,17 @@ vl_sift_detect (VlSiftFilt * f)
       double sn = s + b[2] ;
 
       vl_bool good = 
-        vl_abs_d (val)  > tp                                 &&
-        score           < (te+1)*(te+1)/te                   &&          
-        score           >= 0                                 &&
-        vl_abs_d (b[0]) <  1.5                               &&         
-        vl_abs_d (b[1]) <  1.5                               &&         
-        vl_abs_d (b[2]) <  1.5                               &&
-        xn              >= 0                                 &&         
-        xn              <= w - 1                             &&         
-        yn              >= 0                                 &&         
-        yn              <= h - 1                             &&         
-        sn              >= s_min                             &&     
+        vl_abs_d (val)  > tp                  &&
+        score           < (te+1)*(te+1)/te    &&          
+        score           >= 0                  &&
+        vl_abs_d (b[0]) <  1.5                &&         
+        vl_abs_d (b[1]) <  1.5                &&         
+        vl_abs_d (b[2]) <  1.5                &&
+        xn              >= 0                  &&         
+        xn              <= w - 1              &&         
+        yn              >= 0                  &&         
+        yn              <= h - 1              &&         
+        sn              >= s_min              &&     
         sn              <= s_max ;
 
       if (good) {                       
@@ -1207,12 +1207,13 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 }
 
 
-/** ---------------------------------------------------------------- */
-/** @internal 
+/** ------------------------------------------------------------------
+ ** @internal 
  ** @brief Normalizes in norm L_2 a descriptor
  ** @param begin begin of histogram.
  ** @param end   end of histogram.
  **/
+
 static VL_INLINE
 void
 normalize_histogram 
@@ -1230,8 +1231,8 @@ normalize_histogram
     *iter /= norm ;
 }
 
-/** ---------------------------------------------------------------- */
-/** @brief Compute the descriptor of a keypoint
+/** ------------------------------------------------------------------
+ ** @brief Compute the descriptor of a keypoint
  **
  ** @param f        SIFT filter.
  ** @param descr    SIFT descriptor (output)
@@ -1411,8 +1412,8 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
 }
 
 
-/* ---------------------------------------------------------------- */
-/** @brief Initialize a keypoint from its position and scale
+/** ------------------------------------------------------------------
+ ** @brief Initialize a keypoint from its position and scale
  **
  ** @param f     SIFT filter.
  ** @param k     SIFT keypoint (output).
@@ -1423,6 +1424,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  ** The function initializes the structure @a k from the location @a x
  ** and @a y and scale @a sigma of the keypoint.
  **/
+
 void
 vl_sift_keypoint_init (VlSiftFilt const *f,
                        VlSiftKeypoint *k, 

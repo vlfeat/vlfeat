@@ -163,7 +163,7 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt ("X must be numeric") ;
   }
   
-  if (nin >= 1 && mxIsNumeric(in[IN_S2])) {
+  if (nin >= 2 && mxIsNumeric(in[IN_S2])) {
     self = 0 ;
     next = 2 ;
   }
