@@ -646,7 +646,7 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
   
   {
     VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
-    vl_aib_node i, besti, bestj, newnode;
+    vl_aib_node i, besti, bestj, newnode, nodei, nodej;
     vl_double minbeta;
 
     /* Initially which = all */
@@ -667,9 +667,11 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
       
       /* Add the parent pointers for the new node */
       newnode = nvalues + i ;
+      nodei = aib->nodes[besti];
+      nodej = aib->nodes[bestj];
 
-      parents [aib->nodes[besti]] = newnode ;
-      parents [aib->nodes[bestj]] = newnode ;
+      parents [nodei] = newnode ;
+      parents [nodej] = newnode ;
       parents [newnode]           = 0 ;
       
       /* Merge the nodes which produced the minimum beta */
@@ -681,8 +683,8 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
       }
       
       VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n", 
-                 aib->nodes[besti], 
-                 aib->nodes[bestj], 
+                 nodei, 
+                 nodej, 
                  newnode,                  
                  minbeta,
                  I,
