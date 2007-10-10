@@ -83,10 +83,10 @@ General Public License version 2.
 
  Blha
 
- @section aib-computation Computation
+ @section aib-algorithm Algorithm details
 
- Computing \f$D_{ij}\f$ye requires \f$O(C)\f$ operations. For example,
- in standard AIB the formula is
+ Computing \f$D_{ij}\f$ requires \f$O(C)\f$ operations. For example,
+ in standard AIB we need to calculate
  @f[
     D_{ij} = I(x,c) - I([x]_{ij},c) = 
     \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   +
@@ -95,10 +95,11 @@ General Public License version 2.
  @f]
 
  Thus in a basic implementation of AIB, finding the optimal pair
- \f$ij\f$ of feature values to join requires \f$O(CN^2)\f$ operations
- in total. In order to join all the \f$N\f$ values, we repeat this
- procedure \f$O(N)\f$ times, for a grand total of \f$O(N^3 C)\f$ and
- \f$O(1)\f$ space (not counting the space required to store the input).
+ \f$ij\f$ of feature values requires \f$O(CN^2)\f$ operations in
+ total. In order to join all the \f$N\f$ values, we repeat this
+ procedure \f$O(N)\f$ times, yielding \f$O(N^3 C)\f$ time and
+ \f$O(1)\f$ space complexity (this does not account for the space need
+ to store the input).
 
  The complexity can be improved by reusing computations. For instance,
  we can store the matrix \f$D = [ D_{ij} ]\f$ (which requires
@@ -106,10 +107,10 @@ General Public License version 2.
  <em>D</em> except the rows and columns (the matrix is symmetric) of
  indexes <em>i</em> and <em>j</em> is unchanged. These two rows and
  columns are deleted and a new row and column, whose computation
- requires \f$O(NC)\f$ operations, are added for the joint value
- \$x_{ij}\$.  Finding the minimal element of the matrix still requires
+ requires \f$O(NC)\f$ operations, are added for the merged value
+ \f$x_{ij}\f$.  Finding the minimal element of the matrix still requires
  \f$O(N^2)\f$ operations, so the complexity of this algorithm is
- \f$(N^2C + N^3)\f$ time and \f$O(N^2)\f$ space.
+ \f$O(N^2C + N^3)\f$ time and \f$O(N^2)\f$ space.
 
  We can obtain a much better expected complexity as follows. First,
  instead of storing the whole matrix <em>D</em>, we store the smallest
@@ -124,13 +125,15 @@ General Public License version 2.
  - A new entry \f$(q_{ij},D_{ij})\f$ for the joint value \f$x_{ij}\f$
    is added. This requires \f$O(CN)\f$ operations.
  - We test which among the other entries \f$(q_{k},D_{k})\f$ need to
-   be updated. Recall that \f$(q_{k},D_{k})\f$ means that the value
-   closest to \f$x_k\f$ was \f$x_{q_k}\f$. Then
+   be updated. Recall that \f$(q_{k},D_{k})\f$ means that, before the
+   merge, the value
+   closest to \f$x_k\f$ was \f$x_{q_k}\f$ at a distance \f$D_k\f$. Then
    - If \f$q_k \not = i\f$, \f$q_k \not = j\f$ and \f$D_{k,ij} \geq D_k\f$, then
      \f$q_k\f$ is still the closest element and we do not do anything.
-   - If \f$q_k \not = i\f$, \f$q_k \not = j\f$ and \f$D_{k,ij} < D_k\f$, then the
-     closest element is \f$ij\f$ and we update the entry in constant time.
-   - If \f$q_k \not = i\f$ or \f$q_k \not = j\f$, then we need to re-compute
+   - If \f$q_k \not = i\f$, \f$q_k \not = j\f$ and \f$D_{k,ij} <
+     D_k\f$, then the closest element is \f$ij\f$ and we update the
+     entry in constant time.
+   - If \f$q_k = i\f$ or \f$q_k = j\f$, then we need to re-compute
      the closest element in \f$O(CN)\f$ operations.
 
   This algorithm requires only \f$O(N)\f$ space and \f$O(\gamma(N) C
