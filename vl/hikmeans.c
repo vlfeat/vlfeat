@@ -45,13 +45,13 @@ vl_hikm_delete_node (VlHIKMNode * node)
         {
           for(c = 0 ; c < node->K ; ++c)
             vl_hikm_delete_node (node->children[c]) ;
-          free (node->children) ;
+          vl_free (node->children) ;
         }
       
       if (node->centers) 
-        free (node->centers);
+        vl_free (node->centers);
       
-      free(node);
+      vl_free(node);
     }
 }
 
@@ -82,7 +82,7 @@ vl_hikm_copy_subset (vl_uint8 * data,
   
   /* copy each datum to the buffer */
   {
-    vl_uint8 * new_data = malloc(sizeof(vl_uint8) * M * count);    
+    vl_uint8 * new_data = vl_malloc (sizeof(vl_uint8) * M * count);    
     count = 0;
     for (i = 0 ; i < N ; i ++)
       if (ids[i] == id)
@@ -113,12 +113,12 @@ vl_hikm_xmeans (VlHIKMTree *hikm,
                 vl_uint8 *data, 
                 int N, int K, int depth)
 {
-  VlHIKMNode *node = malloc (sizeof(VlHIKMNode)) ;
-  vl_uint     *ids = malloc (sizeof(vl_uint) * N) ;
+  VlHIKMNode *node = vl_malloc (sizeof(VlHIKMNode)) ;
+  vl_uint     *ids = vl_malloc (sizeof(vl_uint) * N) ;
 
-  node-> centers  = malloc(sizeof(vl_int32) * hikm->M * N) ;
+  node-> centers  = vl_malloc (sizeof(vl_int32) * hikm->M * N) ;
   node-> K        = K ;
-  node-> children = (depth == 1) ? 0 : malloc(sizeof(VlHIKMNode*) * K) ;
+  node-> children = (depth == 1) ? 0 : vl_malloc (sizeof(VlHIKMNode*) * K) ;
 
   vl_ikmeans (node->centers, ids, 
               data, hikm->M, N, K,
@@ -140,10 +140,10 @@ vl_hikm_xmeans (VlHIKMTree *hikm,
           node->children[c] = (VlHIKMNode *) vl_hikm_xmeans
             (hikm, new_data, N2, VL_MIN(K, N2), depth - 1) ;
 
-          free (new_data);
+          vl_free (new_data);
         }
     }
-  free(ids) ;
+  vl_free(ids) ;
   
   return node ;
 }
@@ -161,7 +161,7 @@ vl_hikm_xmeans (VlHIKMTree *hikm,
 VlHIKMTree * 
 vl_hikm (vl_uint8 * data, int M, int N, int K, int nleaves)
 {
-  VlHIKMTree * hikm = malloc(sizeof(VlHIKMTree)) ;
+  VlHIKMTree * hikm = vl_malloc (sizeof(VlHIKMTree)) ;
 
   /* Make the tree deep enough to get at least the target number of
    * leaves. x*/
@@ -179,7 +179,7 @@ vl_hikm (vl_uint8 * data, int M, int N, int K, int nleaves)
 void vl_hikm_delete(VlHIKMTree *hikm)
 {
   vl_hikm_delete_node (hikm->root) ;  
-  free(hikm);
+  vl_free(hikm);
 }
 
 /** @biref Project data down HIKM tree
@@ -195,7 +195,7 @@ vl_hikm_push (VlHIKMTree *hikm, vl_uint8 *data, int N)
 {
   int M         = hikm->M ;
   int depth     = hikm->depth ;
-  vl_uint * ids = malloc(sizeof(vl_uint) * depth * N) ;
+  vl_uint * ids = vl_malloc (sizeof(vl_uint) * depth * N) ;
   int i, d ;
   
   /* for each datum */
@@ -215,6 +215,6 @@ vl_hikm_push (VlHIKMTree *hikm, vl_uint8 *data, int N)
           node = node->children [best] ;
         }
     }
- 
+  
   return ids ;
 }

@@ -19,17 +19,19 @@ General Public License version 2.
 #include <string.h>
 #include <math.h>
 
-/* Compute the integral image J of image I, defined as:
- * J(x,y) = \sum_{x} \sum_{y} I(x,y)
- * J(x,y) = J(x,y-1) + J(x-1,y) + I(x,y) - J(x-1,y-1)
- * where:
- * J(0,0) = I(0,0)
- * J(0,y) = J(0,y-1) + I(0,y)
- * J(x,0) = J(x-1,0) + I(x,y)
- * The sum of any window in I starting after x1,y1 ending at x2,y2 =
- * J(x1,y1) + J(x2,y2) - ( J(x1,y2) + J(x2,y1) )
- *
- */
+/** @internal
+ ** @brief Compute the integral image J of image I
+ ** 
+ ** The integral image is defined as:
+ ** J(x,y) = \sum_{x} \sum_{y} I(x,y)
+ ** J(x,y) = J(x,y-1) + J(x-1,y) + I(x,y) - J(x-1,y-1)
+ ** where:
+ ** J(0,0) = I(0,0)
+ ** J(0,y) = J(0,y-1) + I(0,y)
+ ** J(x,0) = J(x-1,0) + I(x,y)
+ ** The sum of any window in I starting after x1,y1 ending at x2,y2 =
+ ** J(x1,y1) + J(x2,y2) - ( J(x1,y2) + J(x2,y1) )
+ **/
 void integral(double *I, double *J, int M, int N)
 {
     int row,col;

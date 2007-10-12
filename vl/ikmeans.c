@@ -75,12 +75,12 @@ vl_ikmeans (vl_int32 *centers, vl_uint* asgn,
   /* random permutation */
   int err = 0 ;
   vl_uint i, j, k, pass;
-  vl_int32 *counts = malloc (sizeof (vl_int32) * K);
-  pair_t   *pairs     = (pair_t *) malloc (sizeof(pair_t) * N);
+  vl_int32 *counts = vl_malloc (sizeof (vl_int32) * K);
+  pair_t   *pairs     = (pair_t *) vl_malloc (sizeof(pair_t) * N);
   
   /* we need this buffer anyways */
   vl_bool own_asgn = (asgn == NULL) ;
-  if (own_asgn) asgn = malloc(sizeof(vl_uint)*N);
+  if (own_asgn) asgn = vl_malloc (sizeof(vl_uint) * N);
 
   /* -----------------------------------------------------------------
    *                                         Randomized initialization
@@ -98,14 +98,13 @@ vl_ikmeans (vl_int32 *centers, vl_uint* asgn,
     for (i = 0; i < M; ++i)
       centers[k * M + i] = data[pairs[k].j * M + i];
 
-  /* -----------------------------------------------------------------
-   *                                                  Calc. assigments
-   * -------------------------------------------------------------- */
-
   for (pass = 0; 1; ++pass) {
     vl_bool done = 1 ;
-    
-    /* assign data to centers */
+
+    /* ---------------------------------------------------------------
+     *                                                Calc. assigments
+     * ------------------------------------------------------------ */
+
     for (j = 0; j < N; ++j) {
       vl_int32 best_dist = 0 ;
       vl_uint  best = (vl_uint)-1 ;
@@ -163,9 +162,9 @@ vl_ikmeans (vl_int32 *centers, vl_uint* asgn,
       }
     }
   }
-  free (pairs) ;
-  free (counts) ;
-  if (own_asgn) free(asgn) ;
+  vl_free (pairs) ;
+  vl_free (counts) ;
+  if (own_asgn) vl_free (asgn) ;
   return err ;
 }
 

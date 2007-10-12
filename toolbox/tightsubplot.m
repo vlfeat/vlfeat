@@ -98,10 +98,6 @@ for a=a:2:NA
         case 'inner'
           use_outer = 0 ;
         case 'outer'
-          if ~strcmp(version('-release'), '14')
-            %warning(['Box option supported only on MATALB 14']) ;
-            continue;
-          end
           use_outer = 1 ;
         otherwise
           error(['Box is either ''inner'' or ''outer''']) ;
