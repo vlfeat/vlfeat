@@ -74,7 +74,7 @@ mexFunction(int nout, mxArray *out[],
         snprintf(str, 256, 
                  "Index out of bounds "
                  "(B(%d)=%d).",
-                 B_pt - mxGetPr(in[IN_B]), j) ;
+                 B_pt - mxGetPr(in[IN_B]), j + 1) ;
         mexErrMsgTxt(str) ;
       }
 
@@ -197,7 +197,7 @@ mexFunction(int nout, mxArray *out[],
         snprintf(str, 256, 
                  "Index out of bounds "
                  "(B(%d)=%d).",
-                 B_pt-mxGetPr(in[IN_B]),j) ;
+                 B_pt-mxGetPr(in[IN_B]),j + 1) ;
         mexErrMsgTxt (str) ;
       }
       

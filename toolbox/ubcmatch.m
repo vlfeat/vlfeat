@@ -18,7 +18,7 @@
 %       `Distinctive image features from scale-invariant keypoints,'
 %       IJCV, vol. 2, no. 60, pp. 91–110, 2004.
 %
-%   See also SIFT(), SIFTDESCRIPTOR().
+%   See also SIFT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
