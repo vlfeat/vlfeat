@@ -41,7 +41,7 @@ Pcx = Pcx / sum(Pcx(:)) ;
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
   
-  labels=cut(parents,cutsize(i)) ; 
+  labels=aibcut(parents,cutsize(i)) ; 
   C=labels(1:K*K+1) ; [drop1,drop2,C]=unique(C) ;
   
   figure(i+1) ; clf ;
@@ -52,27 +52,6 @@ for i=1:length(cutsize)
   title(sprintf('%d feature values', cutsize(i))) ;
   
   demo_print(sprintf('aib_basic_clust_%d',i),.6) ;
-end
-
-% --------------------------------------------------------------------
-function labels = cut(parents,n)
-% --------------------------------------------------------------------
-
-labels = parents ;
-
-if n > 1
-  mu = max(parents) - n + 1 ;
-  stop = [find(labels(1:mu) > mu) 0] ;
-else
-  mu   = max(parents) ;
-  stop = [mu 0] ;
-end
-
-while 1
-  [drop,sel] = setdiff(labels(1:mu), stop)  ;
-  sel = setdiff(sel, stop) ;
-  if isempty(sel), break ; end
-  labels(sel) = labels(labels(sel))  ;
 end
 
 % --------------------------------------------------------------------
