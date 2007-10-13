@@ -658,7 +658,7 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
 
     /* Caluclate initial value of cost functiion */
     vl_aib_calculate_information (aib, &I, &H) ;
-    if (cost) (*cost)[i] = I ;
+    if (cost) (*cost)[0] = I ;
     
     /* Initially which = all */
     
@@ -705,7 +705,7 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
     /* fill ignored entries with NaNs */
     for(; i < nvalues - 1 ; i++) {
       if (cost && *cost) {
-        (*cost) [i] = VL_NAN_D ;
+        (*cost) [i+1] = VL_NAN_D ;
       }
     }
 
