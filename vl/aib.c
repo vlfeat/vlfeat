@@ -649,21 +649,21 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
 
   /* Allocate cost outut vector */
   if (cost) *cost = vl_malloc (sizeof(double) * (nvalues - 1 + 1)) ;
-
-  /* Caluclate initial value of cost functiion */
-  vl_aib_calculate_information (aib, &I, &H) ;
-  if (cost) (*cost)[i] = I ;
   
   {
     VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
     vl_aib_node i, besti, bestj, newnode, nodei, nodej;
+    vl_aib_prob I, H;
     vl_double minbeta;
 
+    /* Caluclate initial value of cost functiion */
+    vl_aib_calculate_information (aib, &I, &H) ;
+    if (cost) (*cost)[i] = I ;
+    
     /* Initially which = all */
     
     /* For each merge */
     for(i = 0 ; i < nvalues - 1 ; i++) {
-      vl_aib_prob I, H;
       
       /* update entries in aib-> which */
       vl_aib_update_beta(aib);
