@@ -32,6 +32,7 @@ figures:
 .PHONY: clean
 clean:
 	make -C figures clean
+	rm -f vlfeat.log vlfeat.aux vlfeat.pdfsync vlfeat.toc
 	rm -rf aux
 
 .PHONY: distclean
