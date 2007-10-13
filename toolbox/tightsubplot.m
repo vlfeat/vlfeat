@@ -7,7 +7,6 @@ function H = tightsubplot(varargin)
 %   axes. This is done by tiling the axes inner box rather than the
 %   axes outer box.
 %   
-%
 %   H = TIGHTSUBPLOT(M,N,P) retursn an handle to the P-th axes in a
 %   regular subdivision with M rows and N columns.
 %
@@ -52,6 +51,7 @@ use_outer=0 ;
 % --------------------------------------------------------------------
 %                                                      Parse arguments
 % --------------------------------------------------------------------
+
 K = varargin{1} ;
 p = varargin{2} ;
 N = ceil(sqrt(K)) ;

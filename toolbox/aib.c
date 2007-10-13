@@ -140,7 +140,7 @@ mexFunction(int nout, mxArray *out[],
     
     if (nout > 0) {
       out[OUT_COST] = uCreateNumericMatrix 
-        (1, nvalues - 1, mxDOUBLE_CLASS, cost) ;
+        (1, nvalues, mxDOUBLE_CLASS, cost) ;
     }
   }
   mxDestroyArray(Pcx_cpy);

@@ -627,8 +627,10 @@ vl_aib_delete_aib (VlAIB * aib)
  ** value bigger than @c 2*nvalues-1).
  **
  ** If @a cost is not equal to NULL, then the function will also
- ** return a vector with the information level after each merge. There
- ** are @c nvalues-1 merges.
+ ** return a vector with the information level after each merge. @a
+ ** cost has @c nvalues entries: The first is the value of the cost
+ ** funcitonal before any merge, and the other are the cost after the
+ ** @c nvalues-1 merges.
  ** 
  ** @return the array of parents representing the tree. The array has
  ** @c 2*nvalues-1 elements.
@@ -646,7 +648,11 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
     parents [n] = 2 * nvalues ; 
 
   /* Allocate cost outut vector */
-  if (cost) *cost = vl_malloc (sizeof(double) * (nvalues - 1)) ;
+  if (cost) *cost = vl_malloc (sizeof(double) * (nvalues - 1 + 1)) ;
+
+  /* Caluclate initial value of cost functiion */
+  vl_aib_calculate_information (aib, &I, &H) ;
+  if (cost) (*cost)[i] = I ;
   
   {
     VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
@@ -676,14 +682,14 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
 
       parents [nodei] = newnode ;
       parents [nodej] = newnode ;
-      parents [newnode]           = 0 ;
+      parents [newnode] = 0 ;
       
       /* Merge the nodes which produced the minimum beta */
       vl_aib_merge_nodes (aib, besti, bestj, newnode) ;
       vl_aib_calculate_information (aib, &I, &H) ;
 
       if (cost && *cost) {
-        (*cost) [i] = I ;
+        (*cost) [i+1] = I ;
       }
       
       VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n", 
