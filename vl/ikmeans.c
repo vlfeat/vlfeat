@@ -13,10 +13,9 @@ General Public License version 2.
 
 /** @file ikmeans.h
  ** 
- ** Integer K-means is a basic implementation of K-means clustering on
- ** integer data. The main application is partitioning large visual
- ** features spaces, for which it is usually more important to proess
- ** a large amount of data (even if the data has lower accuracy).
+ ** Integer K-means is an implementation of K-means clustering on
+ ** integer data. This is especially useful when clustering large
+ ** datasets of visual featrues.
  **
  ** The function ::vl_ikmeans() computes the clusters given some data,
  ** the function ::vl_ikmeans_push_one() projects a new datum on its
@@ -35,154 +34,113 @@ General Public License version 2.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h> /* memset */
+#include "assert.h"
 
-/* pairs are used to generate random permutations of data */
-typedef struct
-{
-  int w;
-  int j;
-} pair_t;
+static void    vl_ikm_init_lloyd      (VlIKMFilt*) ;
+static void    vl_ikm_init_elkan      (VlIKMFilt*) ;
+static int     vl_ikm_train_lloyd     (VlIKMFilt*, vl_ikm_data const*, int) ;
+static int     vl_ikm_train_elkan     (VlIKMFilt*, vl_ikm_data const*, int) ;
+static void    vl_ikm_push_lloyd      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
+static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
 
-int cmp_pair (void const *a, void const *b)
+/** @brief Create a new IKM Filter
+ **
+ ** @param method  Clustering method.
+ **
+ ** @return new IKM filter.
+ **/
+
+VlIKMFilt *vl_ikm_new (int method)
 {
-  pair_t *pa = (pair_t *) a;
-  pair_t *pb = (pair_t *) b;
-  return pa->w - pb->w;
+  VlIKMFilt *f =  vl_malloc (sizeof(VlIKMFilt)) ;
+  f -> centers = 0 ;
+  f -> inter_dist = 0 ;
+
+  f -> M = 0 ;
+  f -> K = 0 ;
+  f -> method     = method ;
+  f -> max_niters = 200 ;
+  f -> verb       = 0 ;
+
+  return f ;
 }
 
-/** @brief Integer K-means clusering
+/** @brief Delete IKM filter 
  **
- ** @param centers    cluster centers (output).
- ** @param asgn       data to clusters assignments (output).
+ ** @param f IKM filter.
+ **/
+
+void vl_ikm_delete (VlIKMFilt* f)
+{
+  if (f) {
+    if (f-> centers)    vl_free (f-> centers) ;
+    if (f-> inter_dist) vl_free (f-> inter_dist) ;
+    vl_free (f) ;
+  }
+}
+
+/** @brief Train clusters
+ **
+ ** @param f       IKM filter.
  ** @param data       data.
- ** @param M          data dimensionality.
  ** @param N          number of data (@a N &ge; 1).
- ** @param K          number of clusters (1 &le; @a K &le; @a N).
- ** @param max_passes maximum number of passes.
- **
- ** The function clusters the N D-dimensional data in K partitions and
- ** fills a \f$M\times K\f$ matrix with the cluster centers.  If @a
- ** asgn is not @c NULL, the function also writes to @a asgn the
- ** cluster index of each datum.
  **
  ** @return -1 if an overflow may have occured.
  **/
-int 
-vl_ikmeans (vl_int32 *centers, vl_uint* asgn, 
-            vl_uint8 *data, int M, int N, int K,
-            int max_passes)
-{  
-  /* random permutation */
-  int err = 0 ;
-  vl_uint i, j, k, pass;
-  vl_int32 *counts = vl_malloc (sizeof (vl_int32) * K);
-  pair_t   *pairs     = (pair_t *) vl_malloc (sizeof(pair_t) * N);
+
+int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
+{ 
+  int err ;
   
-  /* we need this buffer anyways */
-  vl_bool own_asgn = (asgn == NULL) ;
-  if (own_asgn) asgn = vl_malloc (sizeof(vl_uint) * N);
-
-  /* -----------------------------------------------------------------
-   *                                         Randomized initialization
-   * -------------------------------------------------------------- */
-
-  /* permute the data randomly */
-  for (j = 0 ; j < N ; ++j) {
-    pairs[j].j = j ;
-    pairs[j].w = rand () ;
+  if (f-> verb) {
+    VL_PRINTF ("ikm: training with %d data\n",  N) ;
   }
-  qsort (pairs, N, sizeof(pair_t), cmp_pair);
-
-  /* initialize centers from random data points */
-  for (k = 0; k < K; ++k)
-    for (i = 0; i < M; ++i)
-      centers[k * M + i] = data[pairs[k].j * M + i];
-
-  for (pass = 0; 1; ++pass) {
-    vl_bool done = 1 ;
-
-    /* ---------------------------------------------------------------
-     *                                                Calc. assigments
-     * ------------------------------------------------------------ */
-
-    for (j = 0; j < N; ++j) {
-      vl_int32 best_dist = 0 ;
-      vl_uint  best = (vl_uint)-1 ;
-      
-      for (k = 0; k < K; ++k) {
-          vl_int32 dist = 0;
-          
-          /* compute distance with this center */
-          for (i = 0; i < M; ++i) {
-            vl_int32 delta =
-              data [j * M + i] - centers [k * M + i] ;
-            dist += delta * delta ;
-          }
-          
-          /* compare with current best */
-          if (best == (vl_uint)-1 || dist < best_dist) {
-            best = k ;
-            best_dist = dist ;
-          }
-      }
-      if (asgn[j] != best) {
-        asgn[j] = best ;
-        done = 0 ;
-      }
-    }
-    
-    /* stopping condition */
-    if (done || pass == max_passes) break ;
-
-  /* -----------------------------------------------------------------
-   *                                                     Calc. centers
-   * -------------------------------------------------------------- */
-    
-    /* re-compute centers */
-    memset (centers, 0, sizeof (vl_int32) * M * K);
-    memset (counts,  0, sizeof (vl_int32) * K);
-    for (j = 0; j < N; ++j) {
-      int this_center = asgn [j] ;      
-      ++ counts [this_center] ;      
-      for (i = 0; i < M; ++i)
-        centers [this_center * M + i] += data[j * M + i];
-    }
-    
-    for (k = 0; k < K; ++k) {
-      vl_int32 n = counts [k];
-      if (n > 0xffffff) {
-        err = 1 ;
-      }
-      if (n > 0) {
-        for (i = 0; i < M; ++i)
-          centers [k * M + i] /= n;
-      } else {
-        for (i = 0; i < M; ++i)
-          centers [k * M + i] = data [pairs[k].j * M + i];
-      }
-    }
+  
+  switch (f -> method) {
+  case VL_IKM_LLOYD : err = vl_ikm_train_lloyd (f, data, N) ; break ;
+  case VL_IKM_ELKAN : err = vl_ikm_train_elkan (f, data, N) ; break ;
+  default :
+    assert (0) ;
   }
-  vl_free (pairs) ;
-  vl_free (counts) ;
-  if (own_asgn) vl_free (asgn) ;
   return err ;
 }
 
-/** @brief Project one datum on integer K-means clusters
+/** @brief Push data to cluster
  **
- ** @param centers cluser centers.
- ** @param K       number of centers.
+ ** @param f     IKM filter.
+ ** @param asgn  Assigments (out).
+ ** @param data  data.
+ ** @param N     number of data (@a N &ge; 1).
+ **
+ ** The function projects the data on the integer K-kmeans clusters
+ ** specified by the centers.
+ **/
+
+void
+vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
+  switch (f -> method) {
+  case VL_IKM_LLOYD : vl_ikm_push_lloyd (f, asgn, data, N) ; break ;
+  case VL_IKM_ELKAN : vl_ikm_push_elkan (f, asgn, data, N) ; break ;
+  default :
+    assert (0) ;
+  }
+}
+
+/** @brief Push one datum to clusters
+ **
+ ** @param centers centers.
  ** @param data    datum to project.
- ** @param M       dimensionality of the datum
+ ** @param K       number of centers.
+ ** @param M       dimensionality of the datum.
  **
  ** The function projects the datum on the integer K-kmeans clusters
  ** specified by the centers.
  **
  ** @return the cluster index.
  **/
-VL_INLINE
+
 vl_uint
-vl_ikmeans_push_one (vl_int32  *centers, int K, vl_uint8* data, int M)
+vl_ikm_push_one (vl_ikm_acc const *centers, vl_ikm_data const *data, int M, int K)
 {
   int i,k ;
   
@@ -209,25 +167,6 @@ vl_ikmeans_push_one (vl_int32  *centers, int K, vl_uint8* data, int M)
   return best;
 }
 
-/** @brief Project data on integer K-means clusters
- **
- ** @param asgn    data to clusters assignments (output).
- ** @param centers cluser centers.
- ** @param K       number of centers.
- ** @param data    data to project.
- ** @param M       dimensionality of the data.
- ** @param N       number of data.
- **
- ** The function projects the data on the integer K-kmeans clusters
- ** specified by the centers.
- **/
-
-void
-vl_ikmeans_push (vl_uint *asgn,
-                 vl_int32 *centers, int K, vl_uint8* data, int M, int N)
-{
-  int j ;
-  for(j=0 ; j < N ; ++j) {
-    asgn[j] = vl_ikmeans_push_one(centers, K, &data[j*M], M);
-  }
-}
+#include "ikmeans_init.tc"
+#include "ikmeans_lloyd.tc"
+#include "ikmeans_elkan.tc"

@@ -68,32 +68,32 @@ void             vl_mser_ell_fit (VlMserFilt *f) ;
 /** @name Retrieving data
  ** @{
  **/
-static vl_uint          vl_mser_get_regions_num  (VlMserFilt const *f) ;
-static vl_uint const*   vl_mser_get_regions      (VlMserFilt const *f) ;
-static vl_single const* vl_mser_get_ell          (VlMserFilt const *f) ;
-static vl_uint          vl_mser_get_ell_num      (VlMserFilt const *f) ;
-static vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *f) ;
-static VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;
+VL_INLINE vl_uint          vl_mser_get_regions_num  (VlMserFilt const *f) ;
+VL_INLINE vl_uint const*   vl_mser_get_regions      (VlMserFilt const *f) ;
+VL_INLINE vl_single const* vl_mser_get_ell          (VlMserFilt const *f) ;
+VL_INLINE vl_uint          vl_mser_get_ell_num      (VlMserFilt const *f) ;
+VL_INLINE vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *f) ;
+VL_INLINE VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;
 /** @} */
 
 /** @name Retrieving parameters
  ** @{
  **/
-static vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *f) ;
-static double       vl_mser_get_min_area       (VlMserFilt const *f) ;
-static double       vl_mser_get_max_area       (VlMserFilt const *f) ;
-static double       vl_mser_get_max_variration (VlMserFilt const *f) 
-;static double      vl_mser_get_min_diversity  (VlMserFilt const *f) ;
+VL_INLINE vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *f) ;
+VL_INLINE double       vl_mser_get_min_area       (VlMserFilt const *f) ;
+VL_INLINE double       vl_mser_get_max_area       (VlMserFilt const *f) ;
+VL_INLINE double       vl_mser_get_max_variration (VlMserFilt const *f) 
+;VL_INLINE double      vl_mser_get_min_diversity  (VlMserFilt const *f) ;
 /** @} */
 
 /** @name Setting parameters
  ** @{
  **/
-static void  vl_mser_set_delta           (VlMserFilt *f, vl_mser_pix x) ;
-static void  vl_mser_set_min_area        (VlMserFilt *f, double      x) ;
-static void  vl_mser_set_max_area        (VlMserFilt *f, double      x) ;
-static void  vl_mser_set_max_variation   (VlMserFilt *f, double      x) ;
-static void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
+VL_INLINE void  vl_mser_set_delta           (VlMserFilt *f, vl_mser_pix x) ;
+VL_INLINE void  vl_mser_set_min_area        (VlMserFilt *f, double      x) ;
+VL_INLINE void  vl_mser_set_max_area        (VlMserFilt *f, double      x) ;
+VL_INLINE void  vl_mser_set_max_variation   (VlMserFilt *f, double      x) ;
+VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
 /** @} */
 
 /* ====================================================================
@@ -246,7 +246,7 @@ struct _VlMserFilt
  ** @param f MSER filter.
  ** @return value of @c delta.
  **/
-static VL_INLINE vl_mser_pix
+VL_INLINE vl_mser_pix
 vl_mser_get_delta (VlMserFilt const *f) 
 {
   return f-> delta ;
@@ -256,7 +256,7 @@ vl_mser_get_delta (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @param x value of @c delta.
  **/
-static VL_INLINE void
+VL_INLINE void
 vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
 {
   f-> delta = x ;
@@ -267,7 +267,7 @@ vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
  ** @param  f MSER filter.
  ** @return value of @c minimum diversity.
  **/
-static VL_INLINE double
+VL_INLINE double
 vl_mser_get_min_diversity (VlMserFilt const *f) 
 {
   return f-> min_diversity ;
@@ -277,7 +277,7 @@ vl_mser_get_min_diversity (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @param x value of @c minimum diversity.
  **/
-static VL_INLINE void
+VL_INLINE void
 vl_mser_set_min_diversity (VlMserFilt *f, double x) 
 {
   f-> min_diversity = x ;
@@ -288,7 +288,7 @@ vl_mser_set_min_diversity (VlMserFilt *f, double x)
  ** @param f MSER filter.
  ** @return statistics.
  **/
-static VL_INLINE VlMserStats const*
+VL_INLINE VlMserStats const*
 vl_mser_get_stats (VlMserFilt const *f) 
 {
   return & f-> stats ;
@@ -299,7 +299,7 @@ vl_mser_get_stats (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @return maximum region area.
  **/
-static VL_INLINE double
+VL_INLINE double
 vl_mser_get_max_area (VlMserFilt const *f) 
 {
   return f-> max_area ;
@@ -309,7 +309,7 @@ vl_mser_get_max_area (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @param x maximum region area.
  **/
-static VL_INLINE void
+VL_INLINE void
 vl_mser_set_max_area (VlMserFilt *f, double x) 
 {
   f-> max_area = x ;
@@ -320,7 +320,7 @@ vl_mser_set_max_area (VlMserFilt *f, double x)
  ** @param f MSER filter.
  ** @return minimum region area.
  **/
-static VL_INLINE double
+VL_INLINE double
 vl_mser_get_min_area (VlMserFilt const *f) 
 {
   return f-> min_area ;
@@ -330,7 +330,7 @@ vl_mser_get_min_area (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @param x minimum region area.
  **/
-static VL_INLINE void
+VL_INLINE void
 vl_mser_set_min_area (VlMserFilt *f, double x) 
 {
   f-> min_area = x ;
@@ -341,7 +341,7 @@ vl_mser_set_min_area (VlMserFilt *f, double x)
  ** @param f MSER filter.
  ** @return maximum region variation.
  **/
-static VL_INLINE double
+VL_INLINE double
 vl_mser_get_max_variation (VlMserFilt const *f) 
 {
   return f-> max_variation ;
@@ -351,7 +351,7 @@ vl_mser_get_max_variation (VlMserFilt const *f)
  ** @param f MSER filter.
  ** @param x maximum region variation.
  **/
-static VL_INLINE void
+VL_INLINE void
 vl_mser_set_max_variation (VlMserFilt *f, double x) 
 {
   f-> max_variation = x ;
@@ -362,7 +362,7 @@ vl_mser_set_max_variation (VlMserFilt *f, double x)
  ** @param f MSER filter.
  ** @return array of MSER pivots.
  **/
-static VL_INLINE vl_uint const *
+VL_INLINE vl_uint const *
 vl_mser_get_regions (VlMserFilt const* f)
 {
   return f-> mer ;
@@ -372,7 +372,7 @@ vl_mser_get_regions (VlMserFilt const* f)
  ** @param f MSER filter.
  ** @return number of MSERs.
  **/
-static VL_INLINE vl_uint
+VL_INLINE vl_uint
 vl_mser_get_regions_num (VlMserFilt const* f)
 {
   return f-> nmer ;
@@ -383,7 +383,7 @@ vl_mser_get_regions_num (VlMserFilt const* f)
  ** @param f MSER filter.
  ** @return ellipsoids.
  **/
-static VL_INLINE vl_single const *
+VL_INLINE vl_single const *
 vl_mser_get_ell (VlMserFilt const* f)
 {
   return f-> ell ;
@@ -393,7 +393,7 @@ vl_mser_get_ell (VlMserFilt const* f)
  ** @param f MSER filter.
  ** @return number of degrees of freedom.
  **/
-static VL_INLINE vl_uint
+VL_INLINE vl_uint
 vl_mser_get_ell_dof (VlMserFilt const* f)
 {
   return f-> dof ;
@@ -403,7 +403,7 @@ vl_mser_get_ell_dof (VlMserFilt const* f)
  ** @param f MSER filter.
  ** @return number of ellipsoids
  **/
-static VL_INLINE vl_uint
+VL_INLINE vl_uint
 vl_mser_get_ell_num (VlMserFilt const* f)
 {
   return f-> nell ;

@@ -22,51 +22,31 @@ General Public License version 2.
 #include <vl/hikmeans.h>
 #include <vl/generic.h>
 
+enum {
+  opt_method,
+  opt_verbose
+} ;
+
+uMexOption options [] = {
+  {"Method",       1,   opt_method      },
+  {"Verbose",      0,   opt_verbose     },
+  {0,              0,   0               }
+} ;
+
 #define NFIELDS(field_names) (sizeof(field_names)/sizeof(*field_names))
 
-/* ---------------------------------------------------------------- */
-/** @brief Delete HIKM tree
- **/
-void
-xdel_tree (VlHIKMNode *node) 
-{
-  if (node) {
-    int c ;
-    if (node -> children) {
-      for (c = 0 ; c < node-> K ; ++c) {
-        xdel_tree (node -> children [c]) ;        
-      }
-      mxFree (node-> children) ;
-    }
-    
-    if (node-> centers) {
-      mxFree (node -> centers) ;
-    }    
-    mxFree(node) ;
-  }
-}
 
-/* ---------------------------------------------------------------- */
-/** @brief Delete HIKM tree node
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Convert MATLAB structure to HIKM node
  **/
-void
-del_tree (VlHIKMTree *tree)
-{
-  if(tree) {
-    xdel_tree (tree->root) ;
-    mxFree(tree) ;
-  }  
-}
 
-/* ---------------------------------------------------------------- */
-/** @brief Convert MATLAB structure to HIKM node
- **/
-VlHIKMNode * 
-matlab_to_hkmnode (VlHIKMTree *tree, mxArray const *mnode, int i)
+static VlHIKMNode * 
+xcreate (VlHIKMTree *tree, mxArray const *mnode, int i)
 {
-  mxArray *mcenters, *msub ;
-  VlHIKMNode * node ;
-  int M, K ;
+  mxArray const *mcenters, *msub ;
+  VlHIKMNode *node ;
+  int M, node_K, k ;
 
   /* sanity checks */
   mcenters = mxGetField(mnode, i, "centers") ;
@@ -78,58 +58,62 @@ matlab_to_hkmnode (VlHIKMTree *tree, mxArray const *mnode, int i)
     mexErrMsgTxt("NODE.CENTERS must be a INT32 matrix.") ;
   }
 
-  M = mxGetM (mcenters) ;
-  K = mxGetN (mcenters) ;
-  
-  if (K > tree->K) {
+  M      = mxGetM (mcenters) ;
+  node_K = mxGetN (mcenters) ;
+
+  if (node_K > tree->K) {
     mexErrMsgTxt("A node has more clusters than TREE.K.") ;
   }
 
   if (tree->M < 0) {
     tree->M = M ;
   } else if (M != tree->M) {
-    mexErrMsgTxt("A node centers have inconsistent dimensionality.") ;
+    mexErrMsgTxt("A node CENTERS field has inconsistent dimensionality.") ;
   }
   
-  node          = mxMalloc (sizeof(VlHIKMNode)) ;  
-  node->K       = K ;
-  node->centers = mxMalloc (sizeof(vl_int32) * M * K) ;
-  node->children= 0 ;
-  memcpy (node->centers, mxGetPr(mcenters), sizeof(vl_int32) * M * K) ; 
-  
+  node           = mxMalloc (sizeof(VlHIKMNode)) ;    
+  node->filter   = vl_ikm_new (tree->method) ;
+  node->children = 0 ;
+
+  vl_ikm_init (node->filter, mxGetData(mcenters), M, node_K) ;
+    
   /* has any childer? */
   if (msub) {
-    /* sanity checks */
 
+    /* sanity checks */
     if (mxGetClassID (msub) != mxSTRUCT_CLASS) {
       mexErrMsgTxt("NODE.SUB must be a MATLAB structure array.") ;
     }    
-    if (mxGetNumberOfElements (msub) != K) {
+    if (mxGetNumberOfElements (msub) != node_K) {
       mexErrMsgTxt("NODE.SUB size must correspond to NODE.CENTERS.") ;
     }
     
-    node-> children = mxMalloc (sizeof(VlHIKMNode *) * K) ;
-    for(i = 0 ; i < K ; i++) {
-      node-> children [i] = matlab_to_hkmnode (tree, msub, i) ;
+    node-> children = mxMalloc (sizeof(VlHIKMNode *) * node_K) ;
+    for(k = 0 ; k < node_K ; ++ k) {
+      node-> children [k] = xcreate (tree, msub, k) ;
     }    
   }
-
   return node ;
 }
 
-/* ---------------------------------------------------------------- */
-/** @brief Convert MATLAB structure to HIKM tree */
-VlHIKMTree*  
-matlab_to_hkmtree (mxArray const *mtree)
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Convert MATLAB structure to HIKM tree 
+ **/
+
+static VlHIKMTree*  
+matlab_to_hikm (mxArray const *mtree, int method_type)
 {
   VlHIKMTree *tree ;
   mxArray *mK, *mdepth ;
   int K = 0, depth = 0;
 
+  VL_USE_MATLAB_ENV ;
+
   if (mxGetClassID (mtree) != mxSTRUCT_CLASS) {
     mexErrMsgTxt("TREE must be a MATLAB structure.") ;
   }
-
+  
   mK       = mxGetField(mtree, 0, "K") ;
   mdepth   = mxGetField(mtree, 0, "depth") ;
   
@@ -149,8 +133,9 @@ matlab_to_hkmtree (mxArray const *mtree)
   tree-> depth = depth ;
   tree-> K     = K ;
   tree-> M     = -1 ; /* to be initialized later */
-  tree-> root  = matlab_to_hkmnode (tree, mtree, 0) ;
-  return tree;
+  tree-> method= method_type ;
+  tree-> root  = xcreate (tree, mtree, 0) ;
+  return tree ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -158,49 +143,91 @@ matlab_to_hkmtree (mxArray const *mtree)
  **/
 void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-  enum {IN_TREE = 0, IN_DATA} ;
+  enum {IN_TREE = 0, IN_DATA, IN_END} ;
   enum {OUT_ASGN = 0} ;
-  vl_uint8 *data_pt; 
+  vl_ikm_data const *data; 
+
+  int             opt ;
+  int             next = IN_END ;
+  mxArray const  *optarg ;
+  
   int N = 0 ;
+  int method_type = VL_IKM_LLOYD ;
+  int verb = 0 ;
   
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
-  if (nin != 2)
-    mexErrMsgTxt ("Two arguments required.");
+  if (nin < 2)
+    mexErrMsgTxt ("At least two arguments required.");
   else if (nout > 1)
     mexErrMsgTxt ("Too many output arguments.");
   
-  if (mxGetClassID (in[IN_DATA]) != mxUINT8_CLASS)
-    {
-      mexErrMsgTxt ("DATA must be of class UINT8");
-    }
+  if (mxGetClassID (in[IN_DATA]) != mxUINT8_CLASS) {
+    mexErrMsgTxt ("DATA must be of class UINT8");
+  }
   
   N = mxGetN (in[IN_DATA]);   /* n of elements */
-
-  data_pt = (vl_uint8 *) mxGetPr (in[IN_DATA]);
+  data = (vl_uint8 *) mxGetPr (in[IN_DATA]);
+  
+  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+    char buf [1024] ;
+    
+    switch (opt) {
+      
+    case opt_verbose :
+      ++ verb ;
+      break ;
+      
+    case opt_method :
+      if (!uIsString (optarg, -1)) {
+        mexErrMsgTxt("'Method' must be a string.") ;        
+      }
+      if (mxGetString (optarg, buf, sizeof(buf))) {
+        mexErrMsgTxt("Option argument too long.") ;
+      }
+      if (strcmp("lloyd", buf) == 0) {
+        method_type = VL_IKM_LLOYD ;
+      } else if (strcmp("elkan", buf) == 0) {
+        method_type = VL_IKM_ELKAN ;
+      } else {
+        mexErrMsgTxt("Unknown cost type.") ;
+      }
+      
+      break ;
+      
+    default :
+      assert(0) ;
+      break ;
+    }
+  }
 
   /* -----------------------------------------------------------------
    *                                                        Do the job
    * -------------------------------------------------------------- */
 
-  /* K is the number of clusters */
-  /* M is the dimension of each datapoint */
-  /* N is the number of data points */
   {
-    VlHIKMTree *tree = matlab_to_hkmtree (in[IN_TREE]) ;
-    vl_uint  *ids    = vl_hikm_push (tree, data_pt, N) ;
-    int depth        = tree -> depth ;
-    
-    del_tree (tree) ;
-    
-    /* copy the assignments to matlab */
-    out[OUT_ASGN] = mxCreateNumericMatrix (depth, N, mxUINT32_CLASS, mxREAL);
-    {
-      int j;
-      for (j = 0 ; j < N*depth ; j++) ids[j]++;
+    VlHIKMTree *tree ;
+    vl_uint  *ids  ;
+    int j;
+    int depth ;
+
+    tree  = matlab_to_hikm (in[IN_TREE], method_type) ;
+    depth = vl_hikm_get_depth (tree) ;
+
+    if (verb) {
+      mexPrintf("hikmeanspush: ndims: %d K: %d depth: %d\n",
+                vl_hikm_get_ndims (tree), 
+                vl_hikm_get_K (tree),
+                depth) ;
     }
-    memcpy (mxGetPr(out[OUT_ASGN]), ids, sizeof(vl_uint) * depth * N);
-    free (ids);
+    
+    out[OUT_ASGN] = mxCreateNumericMatrix (depth, N, mxUINT32_CLASS, mxREAL) ;
+    ids = mxGetData (out[OUT_ASGN]) ;
+
+    vl_hikm_push   (tree, ids, data, N) ;    
+    vl_hikm_delete (tree) ;
+    
+    for (j = 0 ; j < N*depth ; j++) ids [j] ++ ;
   }
 }

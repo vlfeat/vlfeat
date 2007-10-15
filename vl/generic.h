@@ -15,7 +15,7 @@
 #define VL_VERSION_STRING "0.1"
 
 /** @brief Inline function declaration */
-#define VL_INLINE __inline__
+#define VL_INLINE static __inline__
 
 /** @internal @brief Stringify argument helper
  ** @see ::VL_STRINGIFY
@@ -136,10 +136,10 @@ void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
                         void *(*realloc_func) (void*,vl_size),
                         void *(*calloc_func)  (vl_size, vl_size),
                         void  (*free_func)    (void*)) ;
-static VL_INLINE void *vl_malloc  (vl_size n) ;
-static VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
-static VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
-static VL_INLINE void  vl_free    (void* ptr) ;
+VL_INLINE void *vl_malloc  (vl_size n) ;
+VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
+VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
+VL_INLINE void  vl_free    (void* ptr) ;
 
 void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
@@ -245,10 +245,10 @@ char const * vl_get_version_string () ;
 #define VL_ENDIANNESS VL_BIG_ENDIAN
 #endif
 
-static VL_INLINE int  vl_get_endianness () ;
-static VL_INLINE void vl_adapt_endianness_8 (void *dst, void* src) ;
-static VL_INLINE void vl_adapt_endianness_4 (void *dst, void* src) ;
-static VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
+VL_INLINE int  vl_get_endianness () ;
+VL_INLINE void vl_adapt_endianness_8 (void *dst, void* src) ;
+VL_INLINE void vl_adapt_endianness_4 (void *dst, void* src) ;
+VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -258,7 +258,7 @@ static VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
  ** @sa @ref generic-endian
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_get_endianness () 
 {
   return VL_ENDIANNESS ;
@@ -272,7 +272,7 @@ vl_get_endianness ()
  ** @see @ref generic-endian.
  **/
 
-static VL_INLINE void
+VL_INLINE void
 vl_adapt_endianness_8 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
@@ -306,7 +306,7 @@ vl_adapt_endianness_8 (void *dst, void* src)
  ** @sa @ref generic-endian
  **/
 
-static VL_INLINE void
+VL_INLINE void
 vl_adapt_endianness_4 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
@@ -332,7 +332,7 @@ vl_adapt_endianness_4 (void *dst, void* src)
  ** @see generic-endianness.
  **/
 
-static VL_INLINE void
+VL_INLINE void
 vl_adapt_endianness_2 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
@@ -361,7 +361,7 @@ extern void  (*vl_free_func)    (void*) ;
  ** @return result of @c malloc
  **/
 
-static VL_INLINE 
+VL_INLINE 
 void*
 vl_malloc (vl_size n)
 {
@@ -379,7 +379,7 @@ vl_malloc (vl_size n)
  ** @return result of @c realloc
  **/
 
-static VL_INLINE 
+VL_INLINE 
 void*
 vl_realloc (void* ptr, vl_size n)
 {
@@ -397,7 +397,7 @@ vl_realloc (void* ptr, vl_size n)
  ** @return result of @c calloc
  **/
 
-static VL_INLINE 
+VL_INLINE 
 void*
 vl_calloc (vl_size n, vl_size size)
 {
@@ -412,7 +412,7 @@ vl_calloc (vl_size n, vl_size size)
  ** The function calls the user customizable @c free.
  **/
 
-static VL_INLINE 
+VL_INLINE 
 void
 vl_free (void *ptr)
 {

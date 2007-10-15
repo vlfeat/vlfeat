@@ -1,0 +1,69 @@
+/** @internal
+ ** @file   ikmeans_elkan.c
+ ** @author Andrea Vedaldi
+ ** @brief  Integer K-Means - Elkan Algorithm - Definition
+ **/         
+
+/** @internal
+ ** @brief Helper function to initialize filter for Triangle algorithm
+ ** @param f filter.
+ **/
+
+static void 
+vl_ikm_init_elkan (VlIKMFilt *f)
+{
+  int 
+    i, k, kp,
+    K = f-> K,
+    M = f-> M ;
+  vl_ikm_acc dist, delta ;
+  
+  
+  if (f-> inter_dist) {
+    vl_free (f->  inter_dist) ;
+  }
+  f-> inter_dist = vl_malloc (sizeof(vl_ikm_acc) * K * K) ;  
+  
+  /* inter cluster distances */
+  for(k = 0 ; k < K ; ++ k) {
+    for(kp = 0 ; kp < K ; ++ kp) {
+      dist = 0 ;
+      if (k != kp) {
+        for(i = 0 ; i < M ; ++i) {
+          delta  = f->centers [kp*M + i] - f->centers [k*M + i] ;
+          dist  += delta * delta ;
+        }
+      }          
+      f->inter_dist [k*K + kp] = f->inter_dist [kp*K + k] = dist >> 2 ;
+    }
+  }
+}
+
+
+/** @internal
+ ** @brief Elkan algorithm
+ ** @param data
+ ** @param N
+ **/
+
+static int
+vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
+{
+  return 0 ;
+
+}
+
+/** @internal
+ ** @brief Elkan algorithm
+ ** @param asgn (out) 
+ ** @param data
+ ** @param N
+ **/
+
+static void 
+vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N)
+{
+
+}
+
+/* -*- mode: C -*- */   

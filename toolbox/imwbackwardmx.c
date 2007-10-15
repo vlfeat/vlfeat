@@ -23,8 +23,7 @@
 #define getN(arg) mxGetN(in[arg])
 #define getPr(arg) mxGetPr(in[arg])
 
-static VL_INLINE
-int
+VL_INLINE int
 findNeighbor(double x, const double* X, int K) {
   int i = 0 ;
   int j = K - 1 ;

@@ -156,7 +156,7 @@ vl_file_meta_close (VlFileMeta * fm)
  ** datum cannot be written.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_file_meta_put_double (VlFileMeta * fm, double x)
 {
   int err ;
@@ -193,7 +193,7 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
  ** datum cannot be written.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
 {
   size_t n ;
@@ -230,7 +230,7 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
  ** malformed.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_file_meta_get_double (VlFileMeta *fm, double *x)
 {
   int err ;

@@ -20,13 +20,16 @@
 %   parent is equal to 1.
 %
 %   Feature values with null probability are ignored by the algorithm
-%   and their nodes have parents set to 0.
+%   and their nodes have parents set to 0. In this case, there are
+%   less than M-1 merges so the last portion of the PARENTS vector is
+%   also set to 0.
 %
 %   [PARENTS, COST] = AIB(...) returns the values cost of the COST
-%   function being optimizied, one for each node in PARENTS. The first
-%   element of COST is the inital value of the cost function, while
-%   the other are the values of the cost function after each of the
-%   M-1 merges.
+%   function being optimizied, one for each node in PARENTS. COST has
+%   M column. The first column is the inital value of the cost
+%   function. The others correspond to the cost after each of the
+%   M-1 merges. If less than M-1 merges are performed, the rest of
+%   the vector is filled with NaNs.
 %
 %   See also AIBCUT().
 

@@ -49,7 +49,7 @@ uMexOption options [] = {
  ** image.
  **/
 
-static VL_INLINE void 
+VL_INLINE void 
 transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
 {
   int const BO = 8 ;  /* number of orientation bins */

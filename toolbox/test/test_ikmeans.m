@@ -4,8 +4,8 @@ K       = 3 ;
 data    = uint8(rand(2,1000) * 255) ;
 datat   = uint8(rand(2,10000)* 255) ;
 
-[C,A] = ikmeans(data,K) ;
-[AT]  = ikmeanspush(datat,C) ;
+[C,A] = ikmeans(data,K,'verbose') ;
+[AT]  = ikmeanspush(datat,C,'verbose') ;
 
 figure(1) ; clf ; hold on ;
 

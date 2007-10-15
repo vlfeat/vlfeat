@@ -236,7 +236,7 @@ as shown by the figure:
 
 - Thanks to Wei Dong for finding a memory leak.
 - Thanks to Brian, Loic, Giuseppe, Liu, Erwin, P. Ivanov, Q.S. Luo for
-  finding bugs in old versions of this program.
+finding bugs in old versions of this program.
 
 **/
 
@@ -270,7 +270,7 @@ double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
  ** @return approximation of @f$exp(-x)@f$.
  **/
 
-static VL_INLINE double
+VL_INLINE double
 fast_expn (double x)
 {
   double a,b,r ;
@@ -290,7 +290,7 @@ fast_expn (double x)
  ** @brief Initialize tables for ::fast_expn
  **/
 
-static VL_INLINE void
+VL_INLINE void
 fast_expn_init ()
 {
   int k  ;
@@ -1214,8 +1214,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
  ** @param end   end of histogram.
  **/
 
-static VL_INLINE
-void
+VL_INLINE void
 normalize_histogram 
 (vl_sift_pix *begin, vl_sift_pix *end)
 {

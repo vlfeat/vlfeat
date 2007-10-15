@@ -36,7 +36,7 @@
  **
  ** @return @c mod(x, 2 * VL_PI)
  **/
-static VL_INLINE
+VL_INLINE
 vl_single vl_mod_2pi_f (vl_single x)
 {
   while (x < 0.0      ) x += (vl_single) (2 * VL_PI);
@@ -44,7 +44,7 @@ vl_single vl_mod_2pi_f (vl_single x)
   return x ;
 }
 
-static VL_INLINE
+VL_INLINE
 vl_double vl_mod_2pi_d (vl_double x)
 {
   while (x < 0.0      ) x += 2 * VL_PI ;
@@ -59,7 +59,7 @@ vl_double vl_mod_2pi_d (vl_double x)
  ** @param x argument.
  ** @return @c (int) floor(x)
  **/
-static VL_INLINE
+VL_INLINE
 int
 vl_floor_f (vl_single x)
 {
@@ -68,7 +68,7 @@ vl_floor_f (vl_single x)
   else return xi - 1 ;
 }
 
-static VL_INLINE
+VL_INLINE
 int
 vl_floor_d (vl_double x)
 {
@@ -85,14 +85,14 @@ vl_floor_d (vl_double x)
  ** @param x argument.
  ** @return @c abs(x)
  **/
-static VL_INLINE
+VL_INLINE
 vl_single
 vl_abs_f (vl_single x)
 {
   return (x >= 0) ? x : -x ;
 }
 
-static VL_INLINE
+VL_INLINE
 vl_double
 vl_abs_d (vl_double x)
 {
@@ -108,7 +108,7 @@ vl_abs_d (vl_double x)
  ** @return Approximation of @c atan2(x).
  **/
 
-static VL_INLINE
+VL_INLINE
 vl_single
 vl_fast_atan2_f (vl_single y, vl_single x)
 {
@@ -150,7 +150,7 @@ vl_fast_atan2_f (vl_single y, vl_single x)
   return (y < 0) ? - angle : angle ;
 }
 
-static VL_INLINE
+VL_INLINE
 vl_double
 vl_fast_atan2_d (vl_double y, vl_double x)
 {
@@ -179,7 +179,7 @@ vl_fast_atan2_d (vl_double y, vl_double x)
  ** @return Approximation to @c resqrt(x).
  **/
 
-static VL_INLINE
+VL_INLINE
 vl_single
 vl_fast_resqrt_f (vl_single x)
 {
@@ -204,7 +204,7 @@ vl_fast_resqrt_f (vl_single x)
   return u.x ;
 }
 
-static VL_INLINE
+VL_INLINE
 vl_double
 vl_fast_resqrt_d (vl_double x)
 {
@@ -236,14 +236,14 @@ vl_fast_resqrt_d (vl_double x)
  ** @param x argument.
  ** @return Approximation to @c sqrt(x).
  **/
-static VL_INLINE
+VL_INLINE
 vl_single
 vl_fast_sqrt_f (vl_single x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_f (x) ;
 }
 
-static VL_INLINE
+VL_INLINE
 vl_double
 vl_fast_sqrt_d (vl_double x)
 {

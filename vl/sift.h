@@ -107,25 +107,25 @@ void  vl_sift_keypoint_init              (VlSiftFilt const *f,
 /** @name Retrieve data and parameters
  ** @{
  **/
-static int    vl_sift_get_octave_index   (VlSiftFilt const *f) ;
-static int    vl_sift_get_octave_num     (VlSiftFilt const *f) ;
-static int    vl_sift_get_octave_first   (VlSiftFilt const *f) ;
-static int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
-static int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
-static int    vl_sift_get_level_num      (VlSiftFilt const *f) ;
-static int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
-static double vl_sift_get_peak_tresh     (VlSiftFilt const *f) ;
-static double vl_sift_get_edge_tresh     (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_octave_index   (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_octave_num     (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_octave_first   (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_level_num      (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
+VL_INLINE double vl_sift_get_peak_tresh     (VlSiftFilt const *f) ;
+VL_INLINE double vl_sift_get_edge_tresh     (VlSiftFilt const *f) ;
 
-static vl_sift_pix *vl_sift_get_octave  (VlSiftFilt const *f, int s) ;
-static VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
+VL_INLINE vl_sift_pix *vl_sift_get_octave  (VlSiftFilt const *f, int s) ;
+VL_INLINE VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
 /** @} */
 
 /** @name Set parameters
  ** @{
  **/
-static void vl_sift_set_peak_tresh (VlSiftFilt *f, double t) ;
-static void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
+VL_INLINE void vl_sift_set_peak_tresh (VlSiftFilt *f, double t) ;
+VL_INLINE void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -138,7 +138,7 @@ static void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
  ** @return index of the current octave.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_sift_get_octave_index (VlSiftFilt const *f) 
 {
   return f-> o_cur ;
@@ -150,7 +150,7 @@ vl_sift_get_octave_index (VlSiftFilt const *f)
  ** @return number of octaves.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_sift_get_octave_num (VlSiftFilt const *f) 
 {
   return f-> O ;
@@ -162,7 +162,7 @@ vl_sift_get_octave_num (VlSiftFilt const *f)
  ** @return index of the first octave.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_sift_get_octave_first (VlSiftFilt const *f) 
 {
   return f-> o_min ;
@@ -174,7 +174,7 @@ vl_sift_get_octave_first (VlSiftFilt const *f)
  ** @return current octave width.
  **/
 
-static VL_INLINE int 
+VL_INLINE int 
 vl_sift_get_octave_width (VlSiftFilt const *f) 
 {
   return f-> octave_width ; 
@@ -186,7 +186,7 @@ vl_sift_get_octave_width (VlSiftFilt const *f)
  ** @return current octave height.
  **/
 
-static VL_INLINE int 
+VL_INLINE int 
 vl_sift_get_octave_height (VlSiftFilt const *f) 
 {
   return f-> octave_height ;
@@ -204,7 +204,7 @@ vl_sift_get_octave_height (VlSiftFilt const *f)
  ** @return pointer to the octave data for level @a s.
  **/
 
-static VL_INLINE vl_sift_pix *
+VL_INLINE vl_sift_pix *
 vl_sift_get_octave (VlSiftFilt const *f, int s) 
 {
   int w = vl_sift_get_octave_width  (f) ;
@@ -218,7 +218,7 @@ vl_sift_get_octave (VlSiftFilt const *f, int s)
  ** @return number of leves per octave.
  **/
 
-static VL_INLINE int
+VL_INLINE int
 vl_sift_get_level_num (VlSiftFilt const *f) 
 {
   return f-> S ;
@@ -231,7 +231,7 @@ vl_sift_get_level_num (VlSiftFilt const *f)
  ** @return number of keypoints.
  **/
 
-static VL_INLINE int 
+VL_INLINE int 
 vl_sift_get_keypoints_num (VlSiftFilt const *f) 
 {
   return f-> nkeys ;
@@ -243,7 +243,7 @@ vl_sift_get_keypoints_num (VlSiftFilt const *f)
  ** @return pointer to the keypoints list.
  **/
 
-static VL_INLINE VlSiftKeypoint const *
+VL_INLINE VlSiftKeypoint const *
 vl_sift_get_keypoints (VlSiftFilt const *f) 
 {
   return f-> keys ;
@@ -255,7 +255,7 @@ vl_sift_get_keypoints (VlSiftFilt const *f)
  ** @return treshold ;
  **/
 
-static VL_INLINE double
+VL_INLINE double
 vl_sift_get_peak_tresh (VlSiftFilt const *f)
 {
   return f -> peak_tresh ;
@@ -267,7 +267,7 @@ vl_sift_get_peak_tresh (VlSiftFilt const *f)
  ** @return treshold.
  **/
 
-static VL_INLINE double
+VL_INLINE double
 vl_sift_get_edge_tresh (VlSiftFilt const *f) 
 {
   return f -> edge_tresh ;
@@ -279,7 +279,7 @@ vl_sift_get_edge_tresh (VlSiftFilt const *f)
  ** @param t treshold.
  **/
 
-static VL_INLINE void
+VL_INLINE void
 vl_sift_set_peak_tresh (VlSiftFilt *f, double t) 
 {
   f -> peak_tresh = t ;
@@ -291,7 +291,7 @@ vl_sift_set_peak_tresh (VlSiftFilt *f, double t)
  ** @param t treshold.
  **/
 
-static VL_INLINE void
+VL_INLINE void
 vl_sift_set_edge_tresh (VlSiftFilt *f, double t) 
 {
   f -> edge_tresh = t ;

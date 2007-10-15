@@ -14,12 +14,14 @@
 #include <vl/generic.h>
 
 enum {
-  opt_max_passes,
+  opt_max_niters,
+  opt_method,
   opt_verbose
 } ;
 
 uMexOption options [] = {
-  {"MaxPasses",    1,   opt_max_passes  },
+  {"MaxIters",     1,   opt_max_niters  },
+  {"Method",       1,   opt_method      },
   {"Verbose",      0,   opt_verbose     },
   {0,              0,   0               }
 } ;
@@ -31,19 +33,25 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   enum {IN_X = 0, IN_K, IN_END} ;  
   enum {OUT_C = 0, OUT_I} ;
   
-  int             verbose = 0 ;
   int             opt ;
   int             next = IN_END ;
   mxArray const  *optarg ;
   
   int M, N, K = 0 ;
-  int max_passes = 200 ;
   int err = 0 ;
 
-  vl_uint  *asgn = NULL;
-  vl_int32 *centers;
-  vl_uint8 *data;
+  vl_uint     *asgn = 0 ;
+  vl_ikm_acc  *centers = 0 ;
+  vl_ikm_data *data ;
   
+  int method_type = VL_IKM_LLOYD ;
+  int max_niters  = 200 ;
+  int verb = 0 ;
+
+  VlIKMFilt *ikmf ;  
+
+  VL_USE_MATLAB_ENV ;
+
   /* ------------------------------------------------------------------
    *                                                Check the arguments
    * --------------------------------------------------------------- */
@@ -67,16 +75,35 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
   
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+    char buf [1024] ;
+
     switch (opt) {
       
     case opt_verbose :
-      ++ verbose ;
+      ++ verb ;
       break ;
       
-    case opt_max_passes :
-      if (!uIsRealScalar(optarg) || (max_passes = (int) *mxGetPr(optarg)) < 1) {
-        mexErrMsgTxt("MaxPasses must be not smaller than 1.") ;
+    case opt_max_niters :
+      if (!uIsRealScalar(optarg) || (max_niters = (int) *mxGetPr(optarg)) < 1) {
+        mexErrMsgTxt("MaxNiters must be not smaller than 1.") ;
       }
+      break ;
+
+    case opt_method :
+      if (!uIsString (optarg, -1)) {
+        mexErrMsgTxt("'Method' must be a string.") ;        
+      }
+      if (mxGetString (optarg, buf, sizeof(buf))) {
+        mexErrMsgTxt("Option argument too long.") ;
+      }
+      if (strcmp("lloyd", buf) == 0) {
+        method_type = VL_IKM_LLOYD ;
+      } else if (strcmp("elkan", buf) == 0) {
+        method_type = VL_IKM_ELKAN ;
+      } else {
+        mexErrMsgTxt("Unknown cost type.") ;
+      }
+
       break ;
       
     default :
@@ -89,34 +116,52 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    *                                                         Do the job
    * --------------------------------------------------------------- */
   
-  if (verbose > 1) {
-    mexPrintf("ikmeans: MaxPasses = %d\n", max_passes) ;
+  if (verb) {
+    char const * method_name = 0 ;
+    switch (method_type) {
+    case VL_IKM_LLOYD: method_name = "Lloyd" ; break ;
+    case VL_IKM_ELKAN: method_name = "Elkan" ; break ;
+    default :
+      assert (0) ;
+    }    
+    mexPrintf("ikmeans: MaxInters = %d\n", max_niters) ;
+    mexPrintf("ikmeans: Method    = %s\n", method_name) ;
   }
 
-  out[OUT_C] = mxCreateNumericMatrix (M, K, mxINT32_CLASS, mxREAL) ;  
-  data       = mxGetData (in[IN_X]);
-  centers    = mxGetData (out[OUT_C]) ;
+  data = (vl_ikm_data*) mxGetPr(in[IN_X]) ;
+  ikmf = vl_ikm_new (method_type) ;
   
-  if (nout > 1) {
-    out[OUT_I] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
-    asgn       = mxGetData (out[OUT_I]) ;
-  }
+  vl_ikm_set_verbosity  (ikmf, verb) ;
+  vl_ikm_set_max_niters (ikmf, max_niters) ;
+  vl_ikm_init_rand_data (ikmf, data, M, N, K) ;
   
-  /* K is the number of clusters */
-  /* M is the dimension of each datapoint */
-  /* N is the number of data points */
-  err = vl_ikmeans (centers, asgn, data, M, N, K, max_passes);
-
+  err = vl_ikm_train (ikmf, data, N) ;
   if (err) mexWarnMsgTxt("ikmeans: possible overflow!") ;
   
-  /* adjust indeces base */
-  if (asgn) {
+  /* ------------------------------------------------------------------
+ *                                                       Return results
+   * --------------------------------------------------------------- */
+  
+  {
+    out[OUT_C] = mxCreateNumericMatrix (M, K, mxINT32_CLASS, mxREAL) ;  
+    centers    = mxGetData (out[OUT_C]) ;
+    memcpy (centers, vl_ikm_get_centers (ikmf), sizeof(vl_ikm_acc) * M * K) ;
+  }
+  
+  if (nout > 1) {
     int j ;
+    out[OUT_I] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
+    asgn       = mxGetData (out[OUT_I]) ;
+
+    vl_ikm_push (ikmf, asgn, data, N) ;
+
     for (j = 0 ; j < N ; ++j)
       ++ asgn [j] ;
   }
   
-  if (verbose) {
-    mexPrintf("ikmeans: done\n", max_passes) ;
+  vl_ikm_delete (ikmf) ;
+  
+  if (verb) {
+    mexPrintf("ikmeans: done\n") ;
   }
 }

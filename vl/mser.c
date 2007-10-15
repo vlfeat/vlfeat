@@ -197,7 +197,7 @@ General Public License version 2.
  ** @param subs subscript to advance.
  **/
 
-static VL_INLINE void
+VL_INLINE void
 adv(int ndims, int const *dims, int *subs)
 {
   int d = 0 ;
@@ -222,7 +222,7 @@ adv(int ndims, int const *dims, int *subs)
  ** @return index of the reached root.
  **/
 
-static VL_INLINE vl_uint
+VL_INLINE vl_uint
 climb (VlMserReg* r, vl_uint idx) 
 {
   

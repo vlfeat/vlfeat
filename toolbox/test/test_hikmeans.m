@@ -5,8 +5,11 @@ K        = 3 ;
 nleaves  = 100 ;
 data     = uint8(rand(2,1000) * 255) ;
 datat    = uint8(rand(2,10000)* 255) ;
-[tree,A] = hikmeans(data,K,nleaves) ;
-AT       = hikmeanspush(tree,datat) ;
+
+[tree,A] = hikmeans(data,K,nleaves,'verbose', 'verbose') ;
+AT       = hikmeanspush(tree,datat,'verbose','verbose') ;
+
+keyboard
 
 figure(1) ; clf ; 
 plottree(tree) ;

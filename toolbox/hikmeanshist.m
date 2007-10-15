@@ -19,13 +19,16 @@ function h = hikmeanshist(tree,path)
 
 % AUTORIGHTS
 
-% PATH(:,k) is colum of subscripts i1 i2 ... id identifying a path
-% in the tree. In a bread first enumeration of the tree nodes, the
-% node of subscripts i1,i2,...id has index
+% PATH(:,k) is colum of subscripts i1 i2 ... id identifying a path in
+% the tree. In a bread first enumeration of the tree nodes (starting
+% from one and not counting the root), the node of subscripts
+% i1,i2,...id has index
 %
 % idx = i1 K^{d-1} + i2 K^{d-2} + ... + id
 %
-% where we assumed the indeces i1,i2,... start from 1.
+% where we assumed the indeces i1,i2,... start from 1. This formula
+% can be easily computed recursively. Since we also have a root
+% node, we need to add one.
 
 K = tree.K ;
 D = tree.depth ;
@@ -34,7 +37,9 @@ M = (K^(D+1) - 1) / (K - 1) ;
 h = zeros(M, 1) ;
 p = zeros(1,size(path,2)) ;
 
+p(1) = size(path,2) ;
+
 for d=1:D
   p = p * K + double(path(d,:))  ;
-  h = binsum(h, 1, p) ;
+  h = binsum(h, 1, p + 1) ;
 end

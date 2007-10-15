@@ -134,7 +134,7 @@ mexFunction(int nout, mxArray *out[],
         ++ parents [n]  ;
       }
     }
-
+    
     out[OUT_PARENTS] = uCreateNumericMatrix 
       (1, 2 * nvalues - 1, mxUINT32_CLASS, parents) ;
     

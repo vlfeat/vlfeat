@@ -122,3 +122,5 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
                        height, width, filt_width,
                        VL_CONV_CONT) ;
 }
+
+/** -*- mode: C -*- */
