@@ -14,7 +14,7 @@ BINDIST             = $(DIST)-$(ARCH)
 # generic flags
 CFLAGS           += -I. -pedantic -Wall -std=c89 -g -O0
 #CFLAGS           += -Wno-overlength-strings
-#CFLAGS           += -Wno-variadic-macros -Wno-unused-function -Wno-long-long
+CFLAGS           += -Wno-variadic-macros -Wno-unused-function -Wno-long-long
 LDFLAGS          +=
 MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl
 
@@ -22,14 +22,13 @@ MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl
 Darwin_PPC_ARCH    := mac
 Darwin_i386_ARCH   := mci
 Linux_i386_ARCH    := glx
-Linux_i686_ARCH    := glx
 Linux_unknown_ARCH := glx
 
 ARCH             := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
-mac_CFLAGS       := -D__BIG_ENDIAN__
-mac_LDFLAGS      := 
+mac_CFLAGS       :=
+mac_LDFLAGS      := -D__BIG_ENDIAN__
 mac_MEX_CFLAGS   := 
 mac_MEX_SUFFIX   := mexmac
 
@@ -63,7 +62,7 @@ all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 .PRECIOUS: %/.dirstamp
 %/.dirstamp :	
 	mkdir -p $(dir $@)
-	echo "I'm here" > $@
+	touch $@
 
 # --------------------------------------------------------------------
 #                                                        Build libvl.a
@@ -79,8 +78,6 @@ lib_dep := $(lib_obj:.o=.d)
 # create library libvl.a
 .PHONY: all-lib
 all-lib: $(BINDIR)/libvl.a
-
-.PRECIOUS: $(BINDIR)/objs/%.d
 
 $(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   CC '$<' ==> '$@'"
@@ -112,7 +109,7 @@ all-bin : $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 	@echo "   CC '$<' ==> '$@'"
-	@cc $(CFLAGS) $(LDFLAGS) $< $(BINDIR)/libvl.a -o $@
+	@cc $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
