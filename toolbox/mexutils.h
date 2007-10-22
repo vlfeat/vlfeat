@@ -14,11 +14,6 @@
 #define snprintf _snprintf
 #endif
 
-#if (MX_API_VER < 0x07030000)
-typedef int mwSize ;
-typedef int mwIndex ;
-#endif
-
 /** ------------------------------------------------------------------
  ** @brief Let VLFeat use MATLAB memory allocation/logging facilities
  **
@@ -46,8 +41,7 @@ typedef int mwIndex ;
  **/
 
 static mxArray *
-uCreateNumericArray (mwSize ndim, const mwSize * dims, 
-                     mxClassID classid, void * data)
+uCreateNumericArray (mwSize ndim, const mwSize * dims, mxClassID classid, void * data)
 {
   mxArray *A ;
 
