@@ -4,9 +4,9 @@ function config = override(config,update,warn)
 %   the structure UPDATE to the corresponding fields of the struture
 %   CONFIG.
 %
-%   While CONFIG and UPDATE can be any structure, typicall CONFIG
-%   is used to store the default configration of some object, and
-%   UPDATE is used to update only a specific subset of it.
+%   While CONFIG and UPDATE can be any structure, typicall CONFIG is
+%   used to store the default configration of some object, and UPDATE
+%   is used to update only a specific subset of it.
 %
 %   OVERRIDE(...,1) will print a warning message whenever 
 
