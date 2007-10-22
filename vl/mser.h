@@ -82,8 +82,8 @@ VL_INLINE VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;
 VL_INLINE vl_mser_pix  vl_mser_get_delta          (VlMserFilt const *f) ;
 VL_INLINE double       vl_mser_get_min_area       (VlMserFilt const *f) ;
 VL_INLINE double       vl_mser_get_max_area       (VlMserFilt const *f) ;
-VL_INLINE double       vl_mser_get_max_variration (VlMserFilt const *f) 
-;VL_INLINE double      vl_mser_get_min_diversity  (VlMserFilt const *f) ;
+VL_INLINE double       vl_mser_get_max_variation  (VlMserFilt const *f) ;
+VL_INLINE double       vl_mser_get_min_diversity  (VlMserFilt const *f) ;
 /** @} */
 
 /** @name Setting parameters
