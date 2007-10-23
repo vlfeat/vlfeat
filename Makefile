@@ -30,13 +30,13 @@ Linux_unknown_ARCH := glx
 ARCH             := $($(shell echo `uname -sp` | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
-mac_CFLAGS       := -D__BIG_ENDIAN__
+mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
 mac_LDFLAGS      := 
 mac_MEX_CFLAGS   := 
 mac_MEX_SUFFIX   := mexmac
 
 mci_BINDIR       := bin/maci
-mci_CFLAGS       := -D__LITTLE_ENDIAN__
+mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__
 mci_LDFLAGS      :=
 mci_MEX_CFLAGS   :=
 mci_MEX_SUFFIX   := mexmaci

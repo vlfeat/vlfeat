@@ -155,6 +155,21 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 #define VL_PRINTF(format, ...) \
   ((*vl_printf_func)((format), __VA_ARGS__))
 
+/** @brief Call customizable @c printf function (no varargs)
+ **
+ ** @param format format string.
+ **
+ ** The function calls the user customizable @c printf.
+ **
+ ** This macro is the same as ::VL_PRINTF() and should
+ ** be used when the list of variable arguments is empty.
+ **
+ ** @return results of @c printf.
+ **/
+#define VL_PRINT(string) \
+  ((*vl_printf_func)(string))
+
+
 /** @} */
 
 /** ------------------------------------------------------------------
