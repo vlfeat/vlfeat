@@ -37,7 +37,7 @@ M = (K^(D+1) - 1) / (K - 1) ;
 h = zeros(M, 1) ;
 p = zeros(1,size(path,2)) ;
 
-p(1) = size(path,2) ;
+h(1) = size(path,2) ;
 
 for d=1:D
   p = p * K + double(path(d,:))  ;
