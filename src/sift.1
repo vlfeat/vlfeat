@@ -37,11 +37,11 @@ Enable/specify meta output.
 .BI \-\^\-first-octave \fR=\fPINTEGER
 Specifiy the index of the first octave of the GSS.
 .TP
-.BI \-\^\-edge-tresh \fR=\fPREAL
-Specify the edge treshold.
+.BI \-\^\-edge-thresh \fR=\fPREAL
+Specify the edge threshold.
 .TP
-.BI \-\^\-peak-tresh \fR=\fPREAL
-Specify the peak treshold.
+.BI \-\^\-peak-thresh \fR=\fPREAL
+Specify the peak threshold.
 .TP
 .BI \-\^\-read-frames \fR[=\fPFILESPEC\fR]\fP
 Enable/specify reading the frames from a file.
@@ -124,10 +124,10 @@ endian order.
 .SH EXAMPLES
 .\" ------------------------------------------------------------------
 .TP
-sift test.pgm --peak-tresh=0.03
+sift test.pgm --peak-thresh=0.03
 Caluclates the SIFT frames and descriptors of image
 .I /tmp/myimage.pgm
-with peak treshold equal to 0.03
+with peak threshold equal to 0.03
 and save them back to
 .I test.sift 
 in ascii format.

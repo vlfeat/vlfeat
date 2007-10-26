@@ -65,8 +65,8 @@ typedef struct _VlSiftFilt
   int nkeys ;           /**< number of detected keypoints. */
   int keys_res ;        /**< size of the keys buffer. */
 
-  double peak_tresh ;   /**< peak treshold. */
-  double edge_tresh ;   /**< edge treshold. */
+  double peak_thresh ;  /**< peak threshold. */
+  double edge_thresh ;  /**< edge threshold. */
 
   vl_sift_pix *grad ;   /**< GSS gradient data. */
   int grad_o ;          /**< GSS gradient data octave. */
@@ -114,8 +114,8 @@ VL_INLINE int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_level_num      (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
-VL_INLINE double vl_sift_get_peak_tresh     (VlSiftFilt const *f) ;
-VL_INLINE double vl_sift_get_edge_tresh     (VlSiftFilt const *f) ;
+VL_INLINE double vl_sift_get_peak_thresh    (VlSiftFilt const *f) ;
+VL_INLINE double vl_sift_get_edge_thresh    (VlSiftFilt const *f) ;
 
 VL_INLINE vl_sift_pix *vl_sift_get_octave  (VlSiftFilt const *f, int s) ;
 VL_INLINE VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
@@ -124,8 +124,8 @@ VL_INLINE VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
 /** @name Set parameters
  ** @{
  **/
-VL_INLINE void vl_sift_set_peak_tresh (VlSiftFilt *f, double t) ;
-VL_INLINE void vl_sift_set_edge_tresh (VlSiftFilt *f, double t) ;
+VL_INLINE void vl_sift_set_peak_thresh (VlSiftFilt *f, double t) ;
+VL_INLINE void vl_sift_set_edge_thresh (VlSiftFilt *f, double t) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -252,47 +252,47 @@ vl_sift_get_keypoints (VlSiftFilt const *f)
 /** ------------------------------------------------------------------
  ** @brief Get peaks treashold
  ** @param f SIFT filter.
- ** @return treshold ;
+ ** @return threshold ;
  **/
 
 VL_INLINE double
-vl_sift_get_peak_tresh (VlSiftFilt const *f)
+vl_sift_get_peak_thresh (VlSiftFilt const *f)
 {
-  return f -> peak_tresh ;
+  return f -> peak_thresh ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get edges treshold
+ ** @brief Get edges threshold
  ** @param f SIFT filter.
- ** @return treshold.
+ ** @return threshold.
  **/
 
 VL_INLINE double
-vl_sift_get_edge_tresh (VlSiftFilt const *f) 
+vl_sift_get_edge_thresh (VlSiftFilt const *f) 
 {
-  return f -> edge_tresh ;
+  return f -> edge_thresh ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Set peaks treshold
+ ** @brief Set peaks threshold
  ** @param f SIFT filter.
- ** @param t treshold.
+ ** @param t threshold.
  **/
 
 VL_INLINE void
-vl_sift_set_peak_tresh (VlSiftFilt *f, double t) 
+vl_sift_set_peak_thresh (VlSiftFilt *f, double t) 
 {
-  f -> peak_tresh = t ;
+  f -> peak_thresh = t ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Set edges treshold
+ ** @brief Set edges threshold
  ** @param f SIFT filter.
- ** @param t treshold.
+ ** @param t threshold.
  **/
 
 VL_INLINE void
-vl_sift_set_edge_tresh (VlSiftFilt *f, double t) 
+vl_sift_set_edge_thresh (VlSiftFilt *f, double t) 
 {
-  f -> edge_tresh = t ;
+  f -> edge_thresh = t ;
 }

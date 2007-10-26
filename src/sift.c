@@ -41,8 +41,8 @@ char const help_message [] =
   " --octaves -O    Number of octaves\n"
   " --levels -S     Number of levels per octave\n"
   " --first-octave  Index of the first octave\n"
-  " --edge-tresh    Edge treshold\n"
-  " --peak-tresh    Peak treshold\n"
+  " --edge-thresh   Edge threshold\n"
+  " --peak-thresh   Peak threshold\n"
   " --read-frames   Specify a file from which to read frames\n"
   " --orientations  Force the computation of the oriantations\n"
   "\n" ;
@@ -55,8 +55,8 @@ enum {
   opt_descriptors,
   opt_gss,
   opt_first_octave,
-  opt_edge_tresh,
-  opt_peak_tresh,
+  opt_edge_thresh,
+  opt_peak_thresh,
   opt_read_frames,
   opt_orientations
 } ;
@@ -76,8 +76,8 @@ struct option const longopts [] = {
   { "descriptors",     optional_argument,      0,          opt_descriptors  },
   { "gss",             optional_argument,      0,          opt_gss          },
   { "first-octave",    required_argument,      0,          opt_first_octave },
-  { "edge-tresh",      required_argument,      0,          opt_edge_tresh   },
-  { "peak-tresh",      required_argument,      0,          opt_peak_tresh   },
+  { "edge-thresh",     required_argument,      0,          opt_edge_thresh  },
+  { "peak-thresh",     required_argument,      0,          opt_peak_thresh  },
   { "read-frames",     required_argument,      0,          opt_read_frames  },
   { "orientations",    no_argument,            0,          opt_orientations },
   { 0,                 0,                      0,          0                }
@@ -173,8 +173,8 @@ int
 main(int argc, char **argv)
 {  
   /* algorithm parameters */ 
-  double   edge_tresh  = -1 ;  
-  double   peak_tresh  = -1 ;  
+  double   edge_thresh  = -1 ;  
+  double   peak_thresh  = -1 ;  
   int      O = -1, S = 3, omin = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
@@ -315,18 +315,18 @@ main(int argc, char **argv)
       
 
 
-    case opt_edge_tresh :
-      /* --edge-tresh ........................................... */
-      n = sscanf (optarg, "%lf", &edge_tresh) ;
-      if (n == 0 || edge_tresh < 1)
+    case opt_edge_thresh :
+      /* --edge-thresh ........................................... */
+      n = sscanf (optarg, "%lf", &edge_thresh) ;
+      if (n == 0 || edge_thresh < 1)
         ERR("The argument of '%s' must be not smaller than 1.",
             argv [optind - 1]) ;
       break ;
 
-    case opt_peak_tresh :
-      /* --edge-tresh ........................................... */
-      n = sscanf (optarg, "%lf", &peak_tresh) ;
-      if (n == 0 || peak_tresh < 0)
+    case opt_peak_thresh :
+      /* --edge-thresh ........................................... */
+      n = sscanf (optarg, "%lf", &peak_thresh) ;
+      if (n == 0 || peak_thresh < 0)
         ERR("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
@@ -580,8 +580,8 @@ main(int argc, char **argv)
 
     filt = vl_sift_new (pim.width, pim.height, O, S, omin) ;
 
-    if (edge_tresh >= 0) vl_sift_set_edge_tresh (filt, edge_tresh) ;
-    if (peak_tresh >= 0) vl_sift_set_peak_tresh (filt, peak_tresh) ;
+    if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
+    if (peak_thresh >= 0) vl_sift_set_peak_thresh (filt, peak_thresh) ;
 
     if (!filt) {
       snprintf (err_msg, sizeof(err_msg), 
@@ -598,10 +598,10 @@ main(int argc, char **argv)
               vl_sift_get_level_num    (filt)) ;
       printf ("sift:   first octave (o_min) = %d\n", 
               vl_sift_get_octave_first (filt)) ;
-      printf ("sift:   edge tresh           = %g\n",
-              vl_sift_get_edge_tresh   (filt)) ;
-      printf ("sift:   peak tresh           = %g\n",
-              vl_sift_get_peak_tresh   (filt)) ;
+      printf ("sift:   edge thresh           = %g\n",
+              vl_sift_get_edge_thresh  (filt)) ;
+      printf ("sift:   peak thresh           = %g\n",
+              vl_sift_get_peak_thresh  (filt)) ;
       printf ("sift: will source frames? %s\n",
               ikeys ? "yes" : "no") ;
       printf ("sift: will force orientations? %s\n",

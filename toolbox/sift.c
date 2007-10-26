@@ -17,8 +17,8 @@ enum {
   opt_levels,
   opt_first_octave,
   opt_frames,
-  opt_edge_tresh,
-  opt_peak_tresh,
+  opt_edge_thresh,
+  opt_peak_thresh,
   opt_orientations,
   opt_verbose 
 } ;
@@ -29,8 +29,8 @@ uMexOption options [] = {
   {"Levels",       1,   opt_levels        },
   {"FirstOctave",  1,   opt_first_octave  },
   {"Frames",       1,   opt_frames        },
-  {"PeakTresh",    1,   opt_peak_tresh    },
-  {"EdgeTresh",    1,   opt_edge_tresh    },
+  {"PeakThresh",   1,   opt_peak_thresh    },
+  {"EdgeThresh",   1,   opt_edge_thresh    },
   {"Orientations", 0,   opt_orientations  },
   {"Verbose",      0,   opt_verbose       },
   {0,              0,   0                 }
@@ -109,8 +109,8 @@ mexFunction(int nout, mxArray *out[],
   int                S     =   3 ;
   int                o_min =   0 ; 
 
-  double             edge_tresh = -1 ;
-  double             peak_tresh = -1 ;
+  double             edge_thresh = -1 ;
+  double             peak_thresh = -1 ;
 
   mxArray           *ikeys_array = 0 ;
   double            *ikeys = 0 ;
@@ -162,15 +162,15 @@ mexFunction(int nout, mxArray *out[],
       o_min = (int) *mxGetPr(optarg) ;
       break ;
 
-    case opt_edge_tresh :
-      if (!uIsRealScalar(optarg) || (edge_tresh = *mxGetPr(optarg)) < 1) {
-        mexErrMsgTxt("'EdgeTresh' must be not smaller than 1.") ;
+    case opt_edge_thresh :
+      if (!uIsRealScalar(optarg) || (edge_thresh = *mxGetPr(optarg)) < 1) {
+        mexErrMsgTxt("'EdgeThresh' must be not smaller than 1.") ;
       }
       break ;
 
-    case opt_peak_tresh :
-      if (!uIsRealScalar(optarg) || (peak_tresh = *mxGetPr(optarg)) < 0) {
-        mexErrMsgTxt("'PeakTresh' must be a non-negative real.") ;
+    case opt_peak_thresh :
+      if (!uIsRealScalar(optarg) || (peak_thresh = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'PeakThresh' must be a non-negative real.") ;
       }
       break ;
 
@@ -207,8 +207,8 @@ mexFunction(int nout, mxArray *out[],
     /* create a filter to process the image */
     filt = vl_sift_new (M, N, O, S, o_min) ;
 
-    if (peak_tresh >= 0) vl_sift_set_peak_tresh (filt, peak_tresh) ;
-    if (edge_tresh >= 0) vl_sift_set_edge_tresh (filt, edge_tresh) ;
+    if (peak_thresh >= 0) vl_sift_set_peak_thresh (filt, peak_thresh) ;
+    if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
     
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
@@ -218,10 +218,10 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_level_num    (filt)) ;
       mexPrintf("siftmx:   first octave (o_min) = %d\n", 
                 vl_sift_get_octave_first (filt)) ;
-      mexPrintf("siftmx:   edge tresh           = %g\n",
-                vl_sift_get_edge_tresh   (filt)) ;
-      mexPrintf("siftmx:   peak tresh           = %g\n",
-                vl_sift_get_peak_tresh   (filt)) ;
+      mexPrintf("siftmx:   edge thresh           = %g\n",
+                vl_sift_get_edge_thresh   (filt)) ;
+      mexPrintf("siftmx:   peak thresh           = %g\n",
+                vl_sift_get_peak_thresh   (filt)) ;
       mexPrintf((nikeys >= 0) ? 
                 "siftmx: will source frames? yes (%d)\n" :
                 "siftmx: will source frames? no\n", nikeys) ;

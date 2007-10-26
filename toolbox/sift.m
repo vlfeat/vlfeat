@@ -20,11 +20,11 @@
 %   FirstOctave
 %       Set the index of the first octave of the DoG scale space.
 %
-%   PeakTresh
-%       Set the peak selection treshold.
+%   PeakThresh
+%       Set the peak selection threshold.
 %
-%   EdgeTresh
-%       Set the non-edge selection treshold.
+%   EdgeThresh
+%       Set the non-edge selection threshold.
 %
 %   Frames
 %       Set the frames to use (bypass the detector).
