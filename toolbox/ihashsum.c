@@ -136,7 +136,7 @@ mexFunction(int nout, mxArray *out[],
   x    = mxGetData(in[IN_X]) ;
 
   /* search for last occupied slot */
-  last = K ;
+  last = res ;
   for (i = 0 ; i < res ; ++i) last = VL_MAX(last, next [i]) ;
   
   if (K > res) {
@@ -145,6 +145,8 @@ mexFunction(int nout, mxArray *out[],
   if (last > res) {
     mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
   }
+
+  mexPrintf("last:%d\n",last) ;
 
   /* -----------------------------------------------------------------
    *                                                            Do job
