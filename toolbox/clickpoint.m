@@ -56,7 +56,7 @@ hold on ;
 sel = [] ;
 h = [] ;
 for n=1:N 
-  P=click 
+  P=click ;
   if ~isempty( P )
     d = (V(1,:)-P(1)).^2 + (V(2,:)-P(2)).^2;
     [drop,v]=min(d(:)) ;   

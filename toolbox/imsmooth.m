@@ -4,5 +4,5 @@
 %   doubles. IF the array is three dimensional, the third dimension is
 %   assumed to span different channels (e.g. R,G,B). In this case,
 %   each channel is convolved independently.
-%     
-%  See also OVERVIEW_VLUTIL().
+
+% AUTORIGHTS

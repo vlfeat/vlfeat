@@ -15,13 +15,13 @@ I = single(I) ;
 % --------------------------------------------------------------------
 
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
-                   ' --peak-tresh=3.4 --edge-tresh=10']) ;
+                   ' --peak-thresh=3.4 --edge-thresh=10']) ;
 if (err), error(msg) ; end
 
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;
 d1        = uint8(data(:,5:end)') ;
-[f,d]     = sift(I,'FirstOctave',-1,'edgetresh',10,'peaktresh',3.4) ;
+[f,d]     = sift(I,'FirstOctave',-1,'edgethresh',10,'peakthresh',3.4) ;
 
 disp(msg) ;
 

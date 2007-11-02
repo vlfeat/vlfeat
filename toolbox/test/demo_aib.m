@@ -41,12 +41,13 @@ Pcx = Pcx / sum(Pcx(:)) ;
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
   
-  labels=aibcut(parents,cutsize(i)) ; 
-  C=labels(1:K*K+1) ; [drop1,drop2,C]=unique(C) ;
+  cut = aibcut(parents, cutsize(i)) ; 
+  parents_cut(cut > 0) = parents(cut(cut > 0)) ;
+  C = cut(1:K*K+1) ; [drop1,drop2,C] = unique(C) ;
   
   figure(i+1) ; clf ;
   plotquantization(D,K,C) ; hold on ;
-  plottree(D,K,labels) ;
+  plottree(D,K,parents_cut) ;
   axis equal ;
   axis off ;
   title(sprintf('%d feature values', cutsize(i))) ;

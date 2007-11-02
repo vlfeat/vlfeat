@@ -224,7 +224,6 @@ vl_sift_get_level_num (VlSiftFilt const *f)
   return f-> S ;
 }
 
-
 /** ------------------------------------------------------------------
  ** @brief Get number of keypoints.
  ** @param f SIFT filter.
