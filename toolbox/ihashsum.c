@@ -146,7 +146,7 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
   }
 
-  mexPrintf("last:%d\n",last) ;
+  /*  mexPrintf("last:%d\n",last) ;*/
 
   /* -----------------------------------------------------------------
    *                                                            Do job
