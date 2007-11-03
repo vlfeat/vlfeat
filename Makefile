@@ -25,9 +25,10 @@ Darwin_PPC_ARCH    := mac
 Darwin_i386_ARCH   := mci
 Linux_i386_ARCH    := glx
 Linux_i686_ARCH    := glx
+Linux_x86_64_ARCH  := g64
 Linux_unknown_ARCH := glx
 
-ARCH             := $($(shell echo `uname -sp` | tr \  _)_ARCH)
+ARCH             := $($(shell echo `uname -sm` | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
 mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
@@ -46,6 +47,12 @@ glx_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   :=
 glx_MEX_SUFFIX   := mexglx
+
+g64_BINDIR       := bin/g64
+g64_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
+g64_LDFLAGS      := -lm
+g64_MEX_CFLAGS   :=
+g64_MEX_SUFFIX   := mexa64
 
 CFLAGS           += $($(ARCH)_CFLAGS)
 LDFLAGS          += $($(ARCH)_LDFLAGS)
