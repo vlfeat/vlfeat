@@ -138,6 +138,8 @@ mexFunction(int nout, mxArray *out[],
   /* search for last occupied slot */
   last = res ;
   for (i = 0 ; i < res ; ++i) last = VL_MAX(last, next [i]) ;
+
+  /* REMARK: last and next are 1 based */
   
   if (K > res) {
     mexErrMsgTxt("K cannot be larger then the size of H") ;

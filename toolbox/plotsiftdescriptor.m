@@ -1,4 +1,4 @@
-function h=plotsiftdescriptor(d,f)
+function h=plotsiftdescriptor(d,f,varargin)
 % PLOTSIFTDESCRIPTOR   Plot SIFT descriptor
 %   PLOTSIFTDESCRIPTOR(D) plots the SIFT descriptors D, stored as
 %   columns of the matrix D. D has the same format used by SIFT().
@@ -10,8 +10,20 @@ function h=plotsiftdescriptor(d,f)
 %   H=PLOTSIFTDESCRIPTOR(...) returns the handle H to the line drawing
 %   representing the descriptors.
 %
-%   REMARK. Currently the function supports only descriptors with 4x4
+%   REMARK. By default, the function assumes descriptors with 4x4
 %   spatial bins and 8 orientation bins (Lowe's default.)
+%
+%   The function supports the following options
+%
+%   NumSpatialBins [4]
+%       Number of spatial bins in each spatial direction.
+%
+%   NumOrientBins [8]
+%       Number of orientation bis.
+%
+%   Magnif [3.0]
+%       Frame scale magnification to obtain the radius of the
+%       keypoint.
 %
 %   See also PLOTFRAME().
 
@@ -21,36 +33,56 @@ function h=plotsiftdescriptor(d,f)
 % This file is part of VLFeat, available in the terms of the GNU
 % General Public License version 2.
 
-lowe_compatible = 1 ;
+maginf = 3.0 ;
+NBP    = 4 ;
+NBO    = 8 ;
+
+if nargin > 1
+  if ~ isnumeric(f)
+    error('F must be a numeric type (use [] to leave it unspecified)') ;
+  end
+end
+
+for k=1:2:length(varargin)
+  opt=lower(varargin{k}) ;
+  arg=varargin{k+1} ;
+  switch opt
+    case 'numspatialbins'
+      NBP = arg ;
+    case 'numorientbins'
+      NBO = arg ;
+    case 'magnif'
+      maginf = arg ;
+    otherwise
+      error(sprintf('Unknown option ''%s''', opt)) ;     
+  end
+end
 
 % --------------------------------------------------------------------
 %                                                  Check the arguments
 % --------------------------------------------------------------------
 
-if(size(d,1) ~= 128)
-  error('D should be a 128xK matrix (only standard descriptors accepted)') ;
+if(size(d,1) ~= NBP*NBP*NBO)
+  error('The number of rows of D does not match the geometry of the descriptor') ;
 end
 
 if nargin > 1
-  if(size(f,1) ~= 4)
-    error('F should be a 4xK matrix');
+  if (~isempty(f) & size(f,1) ~= 4)
+    error('F should be a 4xK matrix or the empty matrix');
   end
   
-  if(size(f,2) ~= size(f,2))
-    error('D and F must have the same number of columns') ;
+  if(~isempty(f) & size(f,2) ~= size(f,2))
+    error('D and F have incompatible dimension') ;    
   end
 end
 
 % Descriptors are often non-double numeric arrays
 d = double(d) ;
 K = size(d,2) ;
-if nargin < 2
+
+if nargin < 2 | isempty(f)
   f = repmat([0;0;1;0],1,K) ;
 end
-
-maginf = 3.0 ;
-NBP=4 ;
-NBO=8 ;
 
 % --------------------------------------------------------------------
 %                                                           Do the job
@@ -65,7 +97,7 @@ for k=1:K
   c=cos(th) ;
   s=sin(th) ;
 
-  [x,y] = render_descr(d(:,k)) ;
+  [x,y] = render_descr(d(:,k), NBP, NBO) ;
   xall = [xall SBP*(c*x-s*y)+f(1,k)] ;
   yall = [yall SBP*(s*x+c*y)+f(2,k)] ;
 end
@@ -74,17 +106,13 @@ h=line(xall,yall) ;
 
 
 % --------------------------------------------------------------------
-function [x,y] = render_descr(d)
+function [x,y] = render_descr(d, BP, BO)
 % --------------------------------------------------------------------
-
-lowe_compatible=0; 
-BP = 4 ;
-BO = 8 ;
 
 [x,y] = meshgrid(-BP/2:BP/2,-BP/2:BP/2) ;
 
 % Rescale d so that the biggest peak fits inside the bin diagram
-d = 0.4 * d / max(d(:)) ;
+d = 0.4 * d / max(d(:)+eps) ;
 
 % We have BP*BP bins to plot. Here are the centers:
 xc = x(1:end-1,1:end-1) + 0.5 ;
@@ -102,13 +130,8 @@ yc = repmat(yc(:)',BO,1) ;
 % Do the stars 
 th=linspace(0,2*pi,BO+1) ;
 th=th(1:end-1) ;
-if lowe_compatible
-  xd = repmat(cos(-th), 1, BP*BP) ;
-  yd = repmat(sin(-th), 1, BP*BP) ;
-else
-  xd = repmat(cos(th), 1, BP*BP) ;
-  yd = repmat(sin(th), 1, BP*BP) ;
-end
+xd = repmat(cos(th), 1, BP*BP) ;
+yd = repmat(sin(th), 1, BP*BP) ;
 xd = xd .* d(:)' ;
 yd = yd .* d(:)' ;
 
