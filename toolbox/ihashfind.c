@@ -1,9 +1,9 @@
 /** @internal
- ** @file     ihashsum.c
+ ** @file     ihashfind.c
  ** @author   Andrea Vedaldi
  ** @brief    BINSUM - MEX
  **/
-
+ 
 /* AUTORIGHTS
 Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
 
@@ -70,16 +70,13 @@ void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {  
-  enum { IN_H, IN_ID, IN_NEXT, IN_K, IN_X } ;
-  enum { OUT_H, OUT_ID, OUT_NEXT} ;
-
-  mxArray *h_,  *id_, *next_ ;
-
-  vl_uint32 * h ;
-  vl_uint32 * next ;
-
-  vl_uint8       * id ;
-  vl_uint8 const * x ;
+  enum { IN_ID, IN_NEXT, IN_K, IN_X } ;
+  enum { OUT_SEL } ;
+    
+  vl_uint32 const * next ;
+  vl_uint32       * sel ;
+  vl_uint8 const  * id ;
+  vl_uint8 const  * x ;
   
   unsigned int K, i, N, res, last, ndims ;
 
@@ -87,24 +84,22 @@ mexFunction(int nout, mxArray *out[],
    *                                                   Check arguments
    * -------------------------------------------------------------- */
   
-  if( nin != 5 ) {
-    mexErrMsgTxt("Five arguments required") ;
-  } else if (nout > 3) {
-    mexErrMsgTxt("At most three output argument.") ;
+  if( nin != 4 ) {
+    mexErrMsgTxt("Four arguments required") ;
+  } else if (nout > 1) {
+    mexErrMsgTxt("At most one output argument.") ;
   }
   
-  if(! mxIsNumeric(in[IN_H])   || mxGetClassID(in[IN_H]   )!= mxUINT32_CLASS ||
-     ! mxIsNumeric(in[IN_NEXT])|| mxGetClassID(in[IN_NEXT])!= mxUINT32_CLASS) {
-    mexErrMsgTxt("H, NEXT must be UINT32.") ;
+  if(! mxIsNumeric(in[IN_NEXT])|| mxGetClassID(in[IN_NEXT])!= mxUINT32_CLASS) {
+    mexErrMsgTxt("NEXT must be UINT32.") ;
   }
   
   if(! mxIsNumeric(in[IN_X])   || mxGetClassID(in[IN_X])   != mxUINT8_CLASS) {
     mexErrMsgTxt("X must be UINT8") ;
   }
 
-  if (mxGetM(in[IN_H])    != 1 ||
-      mxGetM(in[IN_NEXT]) != 1) {
-    mexErrMsgTxt("H, NEXT must be row vectors") ;
+  if (mxGetM(in[IN_NEXT]) != 1) {
+    mexErrMsgTxt("NEXT must be a row vector") ;
   }
   
   if(! mxIsNumeric(in[IN_ID])  || mxGetClassID(in[IN_ID])!= mxUINT8_CLASS) {
@@ -112,11 +107,10 @@ mexFunction(int nout, mxArray *out[],
   }
   
   ndims = mxGetM(in[IN_ID]) ;
-  res   = mxGetN(in[IN_H]) ;
+  res   = mxGetN(in[IN_ID]) ;
 
-  if(res != mxGetN(in[IN_ID]) ||
-     res != mxGetN(in[IN_NEXT])) {
-    mexErrMsgTxt("H, ID, NEXT must have the same number of columns") ;
+  if(res != mxGetN(in[IN_NEXT])) {
+    mexErrMsgTxt("ID, NEXT must have the same number of columns") ;
   }
   
   if(ndims != mxGetM(in[IN_X])) {
@@ -128,27 +122,15 @@ mexFunction(int nout, mxArray *out[],
   }
   K     = (unsigned int) *mxGetPr(in[IN_K]) ;  
 
-  h_    = mxDuplicateArray(in[IN_H]) ;
-  id_   = mxDuplicateArray(in[IN_ID]) ;
-  next_ = mxDuplicateArray(in[IN_NEXT]) ;
-
   N    = mxGetN(in[IN_X]) ;
-
-  h    = mxGetData(h_   ) ;
-  id   = mxGetData(id_  ) ;
-  next = mxGetData(next_) ;
+  id   = mxGetData(in[IN_ID]) ;
+  next = mxGetData(in[IN_NEXT]) ;
   x    = mxGetData(in[IN_X]) ;
 
-  /* 
-     Temporary remove mxArray pointers to these buffer as we will
-     mxRealloc them and if the user presses Ctrl-C matlab will attempt
-     to free unvalid memory
-  */
-
-  mxSetData(h_,    0) ;
-  mxSetData(id_,   0) ;
-  mxSetData(next_, 0) ;
-
+  out[OUT_SEL] = mxCreateNumericMatrix
+    (1, N, mxUINT32_CLASS, mxREAL) ;
+  
+  sel = mxGetData (out[OUT_SEL]) ;
   /* search for last occupied slot */
   last = res ;
   for (i = 0 ; i < res ; ++i) last = VL_MAX(last, next [i]) ;
@@ -162,11 +144,10 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
   }
 
-  /*  mexPrintf("last:%d\n",last) ;*/
-
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
+
   for (i = 0 ; i < N ; ++i) {
     /* hash */
     unsigned int h1, h2 ;
@@ -183,49 +164,20 @@ mexFunction(int nout, mxArray *out[],
       h1 += h2 ;
       p = h1 % K ;
     }
-       
-    /* search or make a free slot in the bucket */
+
+    /* handle extended table */
     while (! is_null (id + p * ndims,                ndims) && 
            ! is_equal(id + p * ndims, x + i * ndims, ndims)) {
-      if (next [p] > res) {
-        mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
-      }
-      /* append */
-      if (next [p] == 0) {        
-        if (last >= res) {
-          vl_size res_ = res + VL_MAX(res / 2, 2) ;
-          h    = mxRealloc(h,    res_ * sizeof(vl_uint32)       ) ;
-          next = mxRealloc(next, res_ * sizeof(vl_uint32)       ) ;
-          id   = mxRealloc(id,   res_ * sizeof(vl_uint8) * ndims) ;
-          memset (h    + res,         0, (res_ - res) * sizeof(vl_uint32)       ) ;
-          memset (next + res,         0, (res_ - res) * sizeof(vl_uint32)       ) ;
-          memset (id   + res * ndims, 0, (res_ - res) * sizeof(vl_uint8) * ndims) ;
-          res = res_ ;
-        }
-        next [p] = ++ last ;
-      }
-      p = next [p] - 1 ;
+      p = next [p] - 1 ;      
     }
-    
-    /* accumulate */
-    h  [p] += 1 ;
-    /*    mexPrintf("p %d dims %d i %d N %d\n ", p, ndims, i, N) ;*/
-    cpy(id + p * ndims, x + i * ndims, ndims) ;
-  }
-
-  mxSetData(h_,    mxRealloc(h,    last * sizeof(vl_uint32)        )) ;
-  mxSetData(next_, mxRealloc(next, last * sizeof(vl_uint32)        )) ;
-  mxSetData(id_,   mxRealloc(id,   last * sizeof(vl_uint8 ) * ndims)) ;
-
-  mxSetN(h_,    last) ;
-  mxSetN(id_,   last) ;
-  mxSetN(next_, last) ;
-
-  mxSetM(h_,    1) ;
-  mxSetM(next_, 1) ;
-  mxSetM(id_,   ndims) ;
-
-  out[OUT_H]    = h_ ;
-  out[OUT_ID]   = id_ ;
-  out[OUT_NEXT] = next_ ;
+        
+    /* found or not ? */
+    if (is_equal(id + p * ndims, x + i * ndims, ndims)) {
+      /* found */
+      *sel++ = p + 1 ;
+    } else {
+      /* not found */
+      *sel++ = 0 ;
+    }
+  } /* next guy to search for */
 }

@@ -20,4 +20,13 @@ disp(h)
 disp(h)
 [h,id,next] = ihashsum(h,id,next,K, uint8([1;3])) ;
 disp(h)
+[h,id,next] = ihashsum(h,id,next,K, uint8([7;1])) ;
+disp(h)
+[h,id,next] = ihashsum(h,id,next,K, uint8([1;3])) ;
+disp(h)
+
+for i=1:size(id,2)
+  disp(ihashfind(id,next,K, id(:,i)));
+end
+
 
