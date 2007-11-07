@@ -21,9 +21,9 @@ function h=plotsiftdescriptor(d,f,varargin)
 %   NumOrientBins [8]
 %       Number of orientation bis.
 %
-%   Magnif [3.0]
-%       Frame scale magnification to obtain the radius of the
-%       keypoint.
+%   Magnif [6.0]
+%       Frame scale magnification to obtain the edge length of the
+%       keypoint bounding box.
 %
 %   See also PLOTFRAME().
 
@@ -33,7 +33,7 @@ function h=plotsiftdescriptor(d,f,varargin)
 % This file is part of VLFeat, available in the terms of the GNU
 % General Public License version 2.
 
-maginf = 3.0 ;
+magnif = 3.0 ;
 NBP    = 4 ;
 NBO    = 8 ;
 
@@ -52,7 +52,7 @@ for k=1:2:length(varargin)
     case 'numorientbins'
       NBO = arg ;
     case 'magnif'
-      maginf = arg ;
+      magnif = arg ;
     otherwise
       error(sprintf('Unknown option ''%s''', opt)) ;     
   end
@@ -92,7 +92,7 @@ xall=[] ;
 yall=[] ;
 
 for k=1:K
-  SBP = maginf * f(3,k) ;
+  SBP = 2 * magnif * f(3,k) / NBP ;
   th=f(4,k) ;
   c=cos(th) ;
   s=sin(th) ;
