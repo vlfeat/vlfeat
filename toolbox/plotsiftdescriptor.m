@@ -36,6 +36,7 @@ function h=plotsiftdescriptor(d,f,varargin)
 magnif = 3.0 ;
 NBP    = 4 ;
 NBO    = 8 ;
+maxv   = 0 ;
 
 if nargin > 1
   if ~ isnumeric(f)
@@ -53,6 +54,8 @@ for k=1:2:length(varargin)
       NBO = arg ;
     case 'magnif'
       magnif = arg ;
+    case 'maxv'
+      maxv = arg ;
     otherwise
       error(sprintf('Unknown option ''%s''', opt)) ;     
   end
@@ -97,7 +100,7 @@ for k=1:K
   c=cos(th) ;
   s=sin(th) ;
 
-  [x,y] = render_descr(d(:,k), NBP, NBO) ;
+  [x,y] = render_descr(d(:,k), NBP, NBO, maxv) ;
   xall = [xall SBP*(c*x-s*y)+f(1,k)] ;
   yall = [yall SBP*(s*x+c*y)+f(2,k)] ;
 end
@@ -106,13 +109,17 @@ h=line(xall,yall) ;
 
 
 % --------------------------------------------------------------------
-function [x,y] = render_descr(d, BP, BO)
+function [x,y] = render_descr(d, BP, BO, maxv)
 % --------------------------------------------------------------------
 
 [x,y] = meshgrid(-BP/2:BP/2,-BP/2:BP/2) ;
 
 % Rescale d so that the biggest peak fits inside the bin diagram
-d = 0.4 * d / max(d(:)+eps) ;
+if maxv
+    d = 0.4 * d / maxv ;
+else
+    d = 0.4 * d / max(d(:)+eps) ;
+end
 
 % We have BP*BP bins to plot. Here are the centers:
 xc = x(1:end-1,1:end-1) + 0.5 ;
