@@ -396,7 +396,7 @@ vl_sift_new (int width, int height,
              int O, int S,
              int o_min)
 {
-  VlSiftFilt *f = malloc (sizeof(VlSiftFilt)) ;
+  VlSiftFilt *f = vl_malloc (sizeof(VlSiftFilt)) ;
   int w   = VL_SHIFT_LEFT (width,  -o_min) ;
   int h   = VL_SHIFT_LEFT (height, -o_min) ;
   int nel = w * h ;
@@ -415,12 +415,12 @@ vl_sift_new (int width, int height,
   f-> s_max   = S + 1 ;
   f-> o_cur   = o_min ;
 
-  f-> temp    = malloc (sizeof(vl_sift_pix) * nel    ) ;
-  f-> octave  = malloc (sizeof(vl_sift_pix) * nel 
+  f-> temp    = vl_malloc (sizeof(vl_sift_pix) * nel    ) ;
+  f-> octave  = vl_malloc (sizeof(vl_sift_pix) * nel 
                         * (f->s_max - f->s_min + 1)  ) ;
-  f-> dog     = malloc (sizeof(vl_sift_pix) * nel 
+  f-> dog     = vl_malloc (sizeof(vl_sift_pix) * nel 
                         * (f->s_max - f->s_min    )  ) ;
-  f-> grad    = malloc (sizeof(vl_sift_pix) * nel * 2 
+  f-> grad    = vl_malloc (sizeof(vl_sift_pix) * nel * 2 
                         * (f->s_max - f->s_min    )  ) ;
 
   f-> sigman  = 0.5 ;
@@ -457,12 +457,12 @@ void
 vl_sift_delete (VlSiftFilt* f)
 {
   if(f) {
-    if(f-> keys   ) free (f-> keys   ) ;
-    if(f-> grad   ) free (f-> grad   ) ;
-    if(f-> dog    ) free (f-> dog    ) ;
-    if(f-> octave ) free (f-> octave ) ;
-    if(f-> temp   ) free (f-> temp   ) ;
-    free (f) ;
+    if(f-> keys   ) vl_free (f-> keys   ) ;
+    if(f-> grad   ) vl_free (f-> grad   ) ;
+    if(f-> dog    ) vl_free (f-> dog    ) ;
+    if(f-> octave ) vl_free (f-> octave ) ;
+    if(f-> temp   ) vl_free (f-> temp   ) ;
+    vl_free (f) ;
   }
 }
 
@@ -744,12 +744,12 @@ vl_sift_detect (VlSiftFilt * f)
           if (f->nkeys >= f->keys_res) {
             f->keys_res += 500 ;
             if (f->keys) {
-              f->keys = realloc (f->keys,
-                                 f->keys_res * 
-                                 sizeof(VlSiftKeypoint)) ;
+              f->keys = vl_realloc (f->keys,
+                                    f->keys_res * 
+                                    sizeof(VlSiftKeypoint)) ;
             } else {
-              f->keys = malloc (f->keys_res * 
-                                sizeof(VlSiftKeypoint)) ;
+              f->keys = vl_malloc (f->keys_res * 
+                                   sizeof(VlSiftKeypoint)) ;
             }
           }
 

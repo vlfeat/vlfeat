@@ -336,7 +336,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
   /* take care of endianness */
   if (bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN) {
     int i ;
-    vl_uint8* temp = malloc (2 * data_size) ;
+    vl_uint8* temp = vl_malloc (2 * data_size) ;
     memcpy(temp, data, 2 * data_size) ;
     for(i = 0 ; i < 2 * data_size ; i += 2) {
       vl_uint8 tmp = temp [i] ;
@@ -344,7 +344,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
       temp [i+1] = tmp ;
     }
     c = fwrite(temp, 2, data_size, f) ;
-    free(temp) ;
+    vl_free (temp) ;
   }
   else {
     c = fwrite(data, bpp, data_size, f) ;

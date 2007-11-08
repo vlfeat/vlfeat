@@ -98,8 +98,8 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
     filt_width = ceil (4.0 * sigma) ;
     if (filt_res < filt_width) {
       filt_res = filt_width ;
-      if (filt) free (filt) ;
-      filt = malloc(sizeof(PIX) * (2*filt_res+1)) ;
+      if (filt) vl_free (filt) ;
+      filt = vl_malloc (sizeof(PIX) * (2*filt_res+1)) ;
     }
 
     for (j = 0 ; j < 2 * filt_width + 1 ; ++j) {
