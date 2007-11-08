@@ -126,14 +126,14 @@ mexFunction(int nout, mxArray *out[],
       assert (0) ;
     }
     mexPrintf("ikmeanspush: Method = %s\n", method_name) ;
-    mexPrintf("ikmeanspush: ndata = %d\n", N) ;
+    mexPrintf("ikmeanspush: ndata  = %d\n", N) ;
   }
 
-  out[OUT_ASGN] = mxCreateNumericMatrix(1,N,mxUINT32_CLASS,mxREAL);
+  out[OUT_ASGN] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
 
   data    = (vl_ikm_data*) mxGetData (in[IN_X]) ;
   centers = (vl_ikm_acc*)  mxGetData (in[IN_C]) ;
-  asgn    = (vl_uint*)     mxGetPr(out[OUT_ASGN]);
+  asgn    = (vl_uint*)     mxGetData (out[OUT_ASGN]) ;
   ikmf    = vl_ikm_new (method_type) ;
   
   vl_ikm_set_verbosity  (ikmf, verb) ;
