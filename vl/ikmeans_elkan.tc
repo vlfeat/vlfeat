@@ -375,4 +375,7 @@ vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N)
   }
 }
 
-/* -*- mode: C -*- */   
+/* Local Variables: **
+ * mode: C **
+ * End: **
+ */

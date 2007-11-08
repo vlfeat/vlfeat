@@ -49,25 +49,23 @@ category detection, object and category recognition.</em>
 
 The goal of the VLFeat core library is to provide solid
 implementations a small set of useful computer vision algorithms. The
-library attempts to be as enjoyable as possible by researcherers by
-achieving:
+libary targets are computer vision researchers. The library aims to
+be:
 
-- <b>Accuracy</b>. Algorithms should be accurately defined. When
-  appropriate, they should be close to the description/implementation
-  provided by the original authors.
+- <b>Accurate</b>. Algorithms should be well defined and (when
+  possible) close to the description/implementation of the original
+  authors.
  
-- <b>Usability</b>. The code should be easy to compile and link. The
-  user interface should be simple and flexible. The documentation
-  should be clear and complete.
+- <b>Easy to use</b>. The library should be easy to compile and
+  setup. The user interface should be simple and flexible. The
+  documentation should be clear and complete.
  
-- <b>Openess</b>. The code should be easy to understand and modify.
-  It should also be easy to isolate each algorithm from the rest of
-  the library.
+- <b>Open</b>. The code should be easy to read, understand and modify.
+  It should also be easy to extract from the library a particular
+  algorithm.
 
-Other characteristic, such as extensiveness or speed, are regarded as
-less important. This does not mean that the algorithms implementations
-are particularly slow. It just means that they are not necessarily the
-fastest implementations possible.
+Speed is not our main concern, even if we are happier with fast
+implementations.
 
 @subsection main-design-guidelines Guidelines
 
@@ -91,6 +89,32 @@ written according to the following guidelins:
   descriptions of each algorithm.
 
 @subsection main-design-style Coding style
+
+This section describes the coding style we use for the libary.
+
+
+@subsection main-design-style Memory management
+
+Memory is allocated and freed by means of ::vl_malloc(), vl_free(),
+::vl_realloc() functions, which are stubs pointing to the actual
+function to use. So when the library is linked to a MATLAB MEX file,
+it is possible to use MATLAB memory allocation functions instead of the
+operating system ones. The advantage is that MATLAB memory handler
+will free the allocated buffers in the case a MEX file is interrupted
+(Ctl-C).
+
+This also requires a bit of care to work as intended:
+
+- The library must be thread safe.
+
+- Objects must have allocation and de-allocation methods. Garbage collection 
+  (e.g. MATLAB exiting a MEX file) can be performed only after 
+  all objects have been deleted. So in effect garbage collection is useful
+  only to clean-up after an interrupted computation.
+
+- Static objects are not safe as they would violate the garbage collection rule.
+  For instance, one should not alocate static buffers in functions, as
+  the buffer could be stealed by sucessive garbage collection.
 
 @section main-glossary Glossary
 

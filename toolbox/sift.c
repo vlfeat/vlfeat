@@ -29,8 +29,8 @@ uMexOption options [] = {
   {"Levels",       1,   opt_levels        },
   {"FirstOctave",  1,   opt_first_octave  },
   {"Frames",       1,   opt_frames        },
-  {"PeakThresh",   1,   opt_peak_thresh    },
-  {"EdgeThresh",   1,   opt_edge_thresh    },
+  {"PeakThresh",   1,   opt_peak_thresh   },
+  {"EdgeThresh",   1,   opt_edge_thresh   },
   {"Orientations", 0,   opt_orientations  },
   {"Verbose",      0,   opt_verbose       },
   {0,              0,   0                 }
@@ -117,6 +117,8 @@ mexFunction(int nout, mxArray *out[],
   int                nikeys = -1 ;
   vl_bool            force_orientations = 0 ;
 
+  VL_USE_MATLAB_ENV ;
+ 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -320,7 +322,7 @@ mexFunction(int nout, mxArray *out[],
             transpose_descriptor (rbuf, buf) ;
           }
 
-          /* make enough room for all these keypoints */
+          /* make enough room for all these keypoints and more */
           if (reserved < nframes + 1) {
             reserved += 2 * nkeys ;
             frames = mxRealloc (frames, 4 * sizeof(double) * reserved) ;
@@ -366,7 +368,7 @@ mexFunction(int nout, mxArray *out[],
       out[OUT_FRAMES] = mxCreateNumericArray 
         (2, dims, mxDOUBLE_CLASS, mxREAL) ;
 
-      /* set array content to be our buffer */
+      /* set array content to be the frames buffer */
       dims [0] = 4 ;
       dims [1] = nframes ;
       mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
@@ -380,7 +382,7 @@ mexFunction(int nout, mxArray *out[],
         out[OUT_DESCRIPTORS]= mxCreateNumericArray 
           (2, dims, mxUINT8_CLASS,  mxREAL) ;
         
-        /* set array content to be our buffer */
+        /* set array content to be the descriptors buffer */
         dims [0] = 128 ;
         dims [1] = nframes ;
         mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
@@ -394,5 +396,5 @@ mexFunction(int nout, mxArray *out[],
     if (ikeys_array) 
       mxDestroyArray(ikeys_array) ;
 
-  } /* do job */
+  } /* end: do job */
 }

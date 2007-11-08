@@ -79,10 +79,13 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
                   PIX  const *src,
                   int width, int height, double sigma)
 {
+  /* We use either a static buffer or, if the variance is very big, a
+   * new buffer. This is efficient and robust to buffer stealing. */
   static PIX   *filt       = 0 ;
-  static int    filt_res   = -1 ;
   static int    filt_width = -1 ;
-  static double filt_sigma = -1.0 ;
+  static double filt_static_sigma = -1.0 ;  
+  enum          { filt_static_res = 1024 } ;
+  static PIX    filt_static [2 * filt_static_res + 1] ;
 
   int j ;
 
@@ -91,29 +94,34 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
     return ;
   }                       
 
-  /* setup filter */
-  if (filt_sigma != sigma) {
+  /* window width */
+  filt_width = ceil (4.0 * sigma) ;
+
+  /* setup filter only if not available from previous iteration*/
+  if (filt_static_sigma != sigma) {
     PIX acc = 0.0 ;
 
-    filt_width = ceil (4.0 * sigma) ;
-    if (filt_res < filt_width) {
-      filt_res = filt_width ;
-      if (filt) vl_free (filt) ;
-      filt = vl_malloc (sizeof(PIX) * (2*filt_res+1)) ;
+    if (filt_width <= filt_static_res) {
+      /* use static buffer */
+      filt = filt_static ;
+      filt_static_sigma = sigma ;
+    } else {
+      /* dynamically allocate a larger buffer */
+      filt = vl_malloc  (sizeof(PIX) * (2*filt_width+1)) ;
     }
-
+    
     for (j = 0 ; j < 2 * filt_width + 1 ; ++j) {
       PIX  d = (PIX)(j - filt_width) / (PIX)(sigma) ;
       filt [j] = exp (- 0.5 * d * d) ;
       acc += filt [j] ;
     }
-
+    
     /* normalize */
     for (j = 0 ; j < 2 * filt_width + 1 ; ++j) {
       filt [j] /= acc ;
     }
   }
-
+  
   /* convolve */
   VL_CONVTRANSP_(SFX) (temp, src, filt,
                        width, height, filt_width,
@@ -121,6 +129,11 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
   VL_CONVTRANSP_(SFX) (dst, temp, filt,
                        height, width, filt_width,
                        VL_CONV_CONT) ;
+
+  /* free buffer? */
+  if (filt_static_sigma != sigma) {
+    vl_free (filt) ;
+  }
 }
 
 /** -*- mode: C -*- */

@@ -60,6 +60,8 @@ mexFunction(int nout, mxArray *out[],
   int const* dims ; 
      
   vl_mser_pix const *data ; 
+
+  VL_USE_MATLAB_ENV ;
   
   /** -----------------------------------------------------------------
    **                                               Check the arguments
