@@ -8,6 +8,16 @@ DIST                = $(NAME)-$(VER)
 BINDIST             = $(DIST)-$(ARCH)
 
 # --------------------------------------------------------------------
+#                                                       Error messages
+# --------------------------------------------------------------------
+
+err_no_arch  =
+err_no_arch +=$(shell echo "** Unknown host architecture '$(UNAME)'. This identifier"   1>&2)
+err_no_arch +=$(shell echo "** was obtained by running 'uname -sp'. Edit the Makefile " 1>&2)
+err_no_arch +=$(shell echo "** to add the appropriate configuration."                   1>&2)
+err_no_arch +=Configuration failed
+
+# --------------------------------------------------------------------
 #                                                                Flags
 # --------------------------------------------------------------------
 
@@ -28,7 +38,8 @@ Linux_i686_ARCH    := glx
 Linux_x86_64_ARCH  := g64
 Linux_unknown_ARCH := glx
 
-ARCH             := $($(shell echo `uname -sm` | tr \  _)_ARCH)
+UNAME             := $(shell uname -sp)
+ARCH              := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
 mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
@@ -60,6 +71,10 @@ MEX_SUFFIX       := $($(ARCH)_MEX_SUFFIX)
 MEX_CFLAGS       += $($(ARCH)_MEX_CFLAGS)
 BINDIR           := $($(ARCH)_BINDIR)
 BINDIST          := $(DIST)-bin
+
+ifeq ($(ARCH),)
+die:=$(error $(err_no_arch))
+endif
 
 .PHONY : all
 all : all-dir all-lib all-bin all-mex
@@ -139,7 +154,7 @@ toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	@mex $(MEX_CFLAGS) $< -outdir 'toolbox'
 
 # --------------------------------------------------------------------
-#                                                                  Doc
+#                                                  Build documentation
 # --------------------------------------------------------------------
 
 .PHONY: doc dox docdeep
