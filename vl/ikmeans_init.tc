@@ -122,4 +122,8 @@ vl_ikm_init_rand_data (VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int 
   vl_ikm_init_helper (f) ;
 }
 
-/* -*- mode: C -*- */
+/* 
+ * Local Variables: *
+ * mode: C *
+ * End: *
+ */

@@ -428,6 +428,11 @@ vl_sift_new (int width, int height,
   f-> sigmak  =       pow (2.0, 1.0 / S) ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak)) ;
 
+  /*
+  VL_PRINTF ("sigman = %g\n", f-> sigman) ;
+  VL_PRINTF ("sigma0 = %g\n", f-> sigma0) ;
+  */
+
   f-> octave_width  = 0 ;
   f-> octave_height = 0 ;
 
@@ -1314,6 +1319,8 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   /* syncrhonize gradient buffer */
   update_gradient (f) ;
 
+  /* VL_PRINTF("W = %d ; magnif = %g ; SBP = %g\n", W,magnif,SBP) ; */
+
   /* clear descriptor */
   memset (descr, 0, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
 
@@ -1517,4 +1524,16 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   k -> s = s ;
   
   k->sigma = sigma ;
+  
+  /*
+  VL_PRINTF ("k.ix     = %d\n", ix) ;
+  VL_PRINTF ("k.iy     = %d\n", iy) ;
+  VL_PRINTF ("k.is     = %d\n", is) ;
+  VL_PRINTF ("k.o      = %d\n", o ) ;
+  VL_PRINTF ("k.s      = %g\n", s ) ;
+  VL_PRINTF ("k.x      = %g\n", x ) ;
+  VL_PRINTF ("k.y      = %g\n", y ) ;
+  VL_PRINTF ("k.sigma  = %g\n", sigma) ;
+  */
+
 }

@@ -1,4 +1,6 @@
 function [f d] = siftrandom(I, nfeatures, minsigma, orient)
+% SIFTRANDOM  SIFT on random patches ?
+
 if nargin < 4
     % By default, do not compute orientation, assume to be 0
     orient = 0;
