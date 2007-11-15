@@ -94,6 +94,7 @@ int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
   
   if (f-> verb) {
     VL_PRINTF ("ikm: training with %d data\n",  N) ;
+    VL_PRINTF ("ikm: %d clusters\n",  f -> K) ;
   }
   
   switch (f -> method) {
@@ -140,7 +141,9 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
  **/
 
 vl_uint
-vl_ikm_push_one (vl_ikm_acc const *centers, vl_ikm_data const *data, int M, int K)
+vl_ikm_push_one (vl_ikm_acc const *centers, 
+		 vl_ikm_data const *data, 
+		 int M, int K)
 {
   int i,k ;
   
@@ -152,11 +155,10 @@ vl_ikm_push_one (vl_ikm_acc const *centers, vl_ikm_data const *data, int M, int 
     vl_int32 dist = 0 ;
     
     /* compute distance with this center */
-    for(i = 0 ; i < M ; ++i)
-      {
-        vl_int32 delta = data[i] - centers[k*M + i] ;
-        dist += delta*delta ;
-      }
+    for(i = 0 ; i < M ; ++i) {
+      vl_int32 delta = data[i] - centers[k*M + i] ;
+      dist += delta * delta ;
+    }
     
     /* compare with current best */
     if (best == (vl_uint)-1 || dist < best_dist) {

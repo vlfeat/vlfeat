@@ -32,5 +32,9 @@ switch n
     I = 255 * imreadbw(fullfile(vlfeat_root,'data','a.jpg')) ;
     
   case 102
-    I = 255 * imreadbw(fullfile(vlfeat_root,'data','box.pgm')) ;   
+	 I = 255 * imreadbw(fullfile(vlfeat_root,'data','box.pgm')) ;   
+		
+ case 'cone'
+	I = sqrt(u.^2+v.^2) ;
+	
 end
