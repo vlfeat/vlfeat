@@ -18,7 +18,7 @@ err_no_arch +=$(shell echo "** to add the appropriate configuration."           
 err_no_arch +=Configuration failed
 
 # --------------------------------------------------------------------
-#                                                                Flags
+#                                                        Configuration
 # --------------------------------------------------------------------
 
 # generic flags

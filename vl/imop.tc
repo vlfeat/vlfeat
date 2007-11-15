@@ -136,4 +136,8 @@ VL_IMSMOOTH_(SFX)(PIX        *dst,
   }
 }
 
-/** -*- mode: C -*- */
+/* 
+ * Local Variables: *
+ * mode: C *
+ * End: *
+ */
