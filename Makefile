@@ -13,7 +13,7 @@ BINDIST             = $(DIST)-$(ARCH)
 
 err_no_arch  =
 err_no_arch +=$(shell echo "** Unknown host architecture '$(UNAME)'. This identifier"   1>&2)
-err_no_arch +=$(shell echo "** was obtained by running 'uname -sp'. Edit the Makefile " 1>&2)
+err_no_arch +=$(shell echo "** was obtained by running 'uname -sm'. Edit the Makefile " 1>&2)
 err_no_arch +=$(shell echo "** to add the appropriate configuration."                   1>&2)
 err_no_arch +=Configuration failed
 
@@ -38,7 +38,7 @@ Linux_i686_ARCH    := glx
 Linux_x86_64_ARCH  := g64
 Linux_unknown_ARCH := glx
 
-UNAME             := $(shell uname -sp)
+UNAME             := $(shell uname -sm)
 ARCH              := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 mac_BINDIR       := bin/mac
