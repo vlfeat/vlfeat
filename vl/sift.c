@@ -239,7 +239,7 @@ as shown by the figure:
 finding bugs in old versions of this program.
 
 **/
-
+  
 #include "sift.h"
 #include "imop.h"
 #include "mathop.h"
@@ -470,8 +470,6 @@ vl_sift_delete (VlSiftFilt* f)
     vl_free (f) ;
   }
 }
-
-#include<stdio.h>
 
 /** ------------------------------------------------------------------
  ** @brief Start processing a new image
@@ -1535,5 +1533,4 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   VL_PRINTF ("k.y      = %g\n", y ) ;
   VL_PRINTF ("k.sigma  = %g\n", sigma) ;
   */
-
 }
