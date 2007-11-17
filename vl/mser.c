@@ -284,7 +284,7 @@ vl_mser_new (int ndims, int const* dims)
   VlMserFilt* f ;
   int *strides, k ;
 
-  f = calloc(sizeof(VlMserFilt), 1) ;
+  f = vl_calloc (sizeof(VlMserFilt), 1) ;
 
   f-> ndims   = ndims ;
   f-> dims    = vl_malloc (sizeof(int) * ndims) ;
@@ -357,7 +357,7 @@ vl_mser_delete (VlMserFilt* f)
     if(f-> dsubs  ) vl_free( f-> dsubs  ) ;
     if(f-> subs   ) vl_free( f-> subs   ) ;
     if(f-> dims   ) vl_free( f-> dims   ) ;
-    vl_free(f) ;
+    vl_free (f) ;
   }
 }
 
