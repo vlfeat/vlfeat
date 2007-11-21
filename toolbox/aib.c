@@ -22,15 +22,89 @@ General Public License version 2.
 /* option codes */
 enum {
   opt_cost = 0,
+  opt_cluster_null,
   opt_verbose 
 } ;
 
 /* options */
 uMexOption options [] = {
-  {"Cost",      1,   opt_cost       },
-  {"Verbose",   0,   opt_verbose    },
-  {0,           0,   0              }
+  {"Cost",       1,   opt_cost       },
+  {"ClusterNull",0,   opt_cluster_null}, 
+  {"Verbose",    0,   opt_verbose    },
+  {0,            0,   0              }
 } ;
+
+#define CLUSTER_NULL_NODES 1
+
+/** ------------------------------------------------------------------
+ **
+ ** Null nodes are nodes with null probability and are not merged by AIB.
+ ** It is convenient, however, to treat them as follows:
+ ** 
+ ** - we pretend that AIB merged those nodes at the very beginning into a
+ **   single cluster (as they, after hall, yield zero information drop).
+ **
+ ** - we attach this cluster to the root as the very last step (as we
+ **   do not want to change other nodes.
+ **
+ ** In this way, 
+ **/
+
+static void
+cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
+{
+  int nnull = 0 ;
+  int count = 0 ;
+  int free_slot = nvalues ;
+  int n ;
+
+  cost = 0 ;
+
+  /* count null nodes so far */
+  for (n = 0 ; n < nvalues ; ++ n) {
+    if (parents[n] >= 2 * nvalues - 1) {
+      ++ nnull ;
+    }
+  }
+
+  /* Move all internal nodes nnull places to the right. To do this, we
+   * need to update all the parents pointer of the nodes (except the
+   * root) and to physically move the internal nodes to the right (the root will
+   * to, so that it will be moved to 2 * nvalues -1 -1).
+   */
+     
+  for (n = 0 ; n < 2 * nvalues - 1 - nnull  -1 ; ++ n) {
+    if (parents[n] < 2 * nvalues - 1) parents[n] += nnull ;
+  }
+  
+  for (n = 2 * nvalues - 1 - 1 ; n > nvalues - 1 + nnull ; --n) {
+    parents [n] = parents [n - nnull] ;
+    if (cost) {
+      cost [n - nvalues] = cost [n - nvalues - nnull] ;
+    }
+  }
+
+  if (cost) {
+    for (n = nvalues ; n < nvalues + nnull ; ++ n){
+      cost [n] = cost [nvalues - nvalues + nnull] ;
+    }    
+  }
+  
+  /* Now chain the null nodes */
+  for (n = 0 ; n < nvalues ; ++ n) {
+    if (parents[n] >= 2 * nvalues - 1) {
+      ++ count ;
+      if (count < nnull) {
+        parents [n]         = free_slot ;
+        parents [free_slot] = free_slot + 1 ;
+        ++ free_slot ;
+      } else {
+        parents [n]         = free_slot ;
+        parents [free_slot] = 2 * nvalues - 1 - 1 ;
+      }
+    }
+  }
+}
 
 
 /** ------------------------------------------------------------------
@@ -50,6 +124,7 @@ mexFunction(int nout, mxArray *out[],
   int            next = IN_END ;
   mxArray const *optarg ;
   int            cost_type = INFORMATION ;
+  int            cluster_null = 0 ;
 
   vl_aib_prob   *Pcx     ;
   vl_aib_node    nlabels ;
@@ -87,6 +162,10 @@ mexFunction(int nout, mxArray *out[],
       ++ verbose ;
       break ;
 
+    case opt_cluster_null :
+      cluster_null = 1 ;
+      break ;
+      
     case opt_cost :
       if (!uIsString (optarg, -1)) {
         mexErrMsgTxt("'Cost' must be a string.") ;        
@@ -102,6 +181,16 @@ mexFunction(int nout, mxArray *out[],
         mexErrMsgTxt("Unknown cost type.") ;
       }
     }
+  }
+
+  if (verbose) {
+    char const * cost_name = 0 ;
+    switch (cost_type) {
+    case INFORMATION: cost_name = "information" ; break ;
+    case EC:          cost_name = "entropy-constrained information" ; break ;
+    }
+    mexPrintf("aib: signal null:    %d", cluster_null) ;
+    mexPrintf("aib: cost minimized: %s", cost_name) ;    
   }
   
   /* -----------------------------------------------------------------
@@ -124,6 +213,10 @@ mexFunction(int nout, mxArray *out[],
       assert (0) ;
     }
     
+    if (cluster_null) {
+      cluster_null_nodes (parents, nvalues, (nout == 0) ? 0 : cost) ;
+    }
+
     /* save back parents */
     for (n = 0 ; n < 2 * nvalues - 1 ; ++n) {
       if (parents [n] > 2 * nvalues - 1) {

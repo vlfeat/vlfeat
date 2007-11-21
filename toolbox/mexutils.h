@@ -142,6 +142,27 @@ uIsMatrix (const mxArray* A, int M, int N)
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Is the array a vector?
+ **
+ ** @param A array to test.
+ ** @param N number of elements.
+ **
+ ** The array @a A satisfies the test if
+ ** - It is a matrix (see ::uIsMatrix()).
+ ** - It has a singleton dimension.
+ ** - @c N < 0 or the other dimension is equal to @c N.
+ **
+ ** @return test result.
+ **/
+
+static int
+uIsVector(const mxArray* A, int N)
+{
+  return  
+    uIsMatrix(A, 1, N) || uIsMatrix(A, N, 1) ;
+}
+
+/** ------------------------------------------------------------------
  ** @brief Is the array real?
  **
  ** @param A array to test.
@@ -152,6 +173,7 @@ uIsMatrix (const mxArray* A, int M, int N)
  **
  ** @return test result.
  **/
+
 static int
 uIsReal (const mxArray* A)
 {
@@ -171,6 +193,7 @@ uIsReal (const mxArray* A)
  **
  ** @return test result.
  **/
+
 static int
 uIsRealScalar(const mxArray* A)
 {
@@ -193,6 +216,7 @@ uIsRealScalar(const mxArray* A)
  **
  ** @return test result.
  **/
+
 static int
 uIsRealMatrix(const mxArray* A, int M, int N)
 {
@@ -217,6 +241,7 @@ uIsRealMatrix(const mxArray* A, int M, int N)
  **
  ** @return test result.
  **/
+
 static int
 uIsRealVector(const mxArray* A, int N)
 {
