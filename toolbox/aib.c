@@ -54,11 +54,12 @@ static void
 cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
 {
   int nnull = 0 ;
-  int count = 0 ;
-  int free_slot = nvalues ;
   int n ;
+  int first ;
+  int last_intermed ;
 
-  cost = 0 ;
+  int a, b, c, d, e ;
+  int dp, ep ;
 
   /* count null nodes so far */
   for (n = 0 ; n < nvalues ; ++ n) {
@@ -66,46 +67,109 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
       ++ nnull ;
     }
   }
-
-  /* Move all internal nodes nnull places to the right. To do this, we
-   * need to update all the parents pointer of the nodes (except the
-   * root) and to physically move the internal nodes to the right (the root will
-   * to, so that it will be moved to 2 * nvalues -1 -1).
+  
+  if (nnull == 0) return ;
+  
+  /* = : leaves
+   * 0 : null leaves
+   * i : internal node
+   * * : padding
+   * x : intermediate nodes to link null nodes
+   *
+   * Input:
+   *
+   * ====== 0000 ======= iiiiiii ****
+   * |                   |     |
+   * 0                   dp    ep
+   *
+   *
+   * Output:
+   *
+   * ====== ==== ======= xxxx iiiiiii
+   * |                   | || |     |
+   * 0                   a bc d     e
    */
-     
-  for (n = 0 ; n < 2 * nvalues - 1 - nnull  -1 ; ++ n) {
-    if (parents[n] < 2 * nvalues - 1) parents[n] += nnull ;
-  }
   
-  for (n = 2 * nvalues - 1 - 1 ; n > nvalues - 1 + nnull ; --n) {
-    parents [n] = parents [n - nnull] ;
-    if (cost) {
-      cost [n - nvalues] = cost [n - nvalues - nnull] ;
-    }
-  }
+  a = nvalues ;
+  b = nvalues + nnull - 1 - 1 ;
+  c = b + 1 ;
+  d = c + 1 ;
+  e = 2 * nvalues - 2 ;
 
-  if (cost) {
-    for (n = nvalues ; n < nvalues + nnull ; ++ n){
-      cost [n] = cost [nvalues - nvalues + nnull] ;
-    }    
-  }
-  
-  /* Now chain the null nodes */
-  for (n = 0 ; n < nvalues ; ++ n) {
-    if (parents[n] >= 2 * nvalues - 1) {
-      ++ count ;
-      if (count < nnull) {
-        parents [n]         = free_slot ;
-        parents [free_slot] = free_slot + 1 ;
-        ++ free_slot ;
-      } else {
-        parents [n]         = free_slot ;
-        parents [free_slot] = 2 * nvalues - 1 - 1 ;
+  dp = nvalues ;
+  ep = 2 * nvalues - 2 - nnull ; 
+
+  mexPrintf("a:%d b:%d c:%d d:%d e:%d dp:%d ep:%d\n",
+            a,b,c,d,e,dp,ep) ;
+
+  /* search first leaf that has been merged */
+  {
+    int first_parent = 0 ;
+    first = 0 ;
+    for (n = 0 ; n < nvalues ; ++ n) {
+      if (parents[n] <= e) {
+        if (first_parent < parents [n]) {
+          first_parent = parents [n] ;
+          first = n ;
+        }
       }
     }
   }
-}
 
+  mexPrintf("nnull:%d\n",nnull) ;
+  mexPrintf("nvalues:%d\n",nvalues) ;
+  mexPrintf("first:%d\n",first) ;
+    
+  /* move internal node block [dp:ep] to [d:e] */
+  for (n = 0 ; n < e ; ++ n) {
+    if ((parents [n] <= e) & (parents [n] != 0)) {
+      parents [n] += (e - ep) ;
+    }
+  }
+  for (n = e ; n >= d ; -- n) {
+    parents [n] = parents [n - (e - ep)] ;
+  }
+ 
+  /* find first null node and connect it to a */
+  last_intermed = a ;
+  for (n = 0 ; n < a ; ++ n) {
+    if (parents[n] > e) {
+      parents [n] = last_intermed ;
+      break ;
+    }
+  }
+  
+  mexPrintf("last_intermed:%d\n", last_intermed)  ;
+
+  /* chain rest of intermediate nodes */
+  for (; n < a ; ++ n) {
+    if (parents[n] > e) {
+      parents [n] = last_intermed ;
+      parents [last_intermed] = last_intermed + 1 ;
+      ++ last_intermed ;
+    }
+  }
+
+  mexPrintf("last_intermed:%d\n", last_intermed)  ;
+
+  /* make last_intermed point to d */
+  parents [last_intermed] = d ;
+  
+  /* change parent of first to be last_intermed */
+  parents [first] = last_intermed ;
+
+  /* fix cost too (reall that the fist entry is the cost before
+   any merge) */
+  if (cost) {
+    cost -= nvalues - 1 ;
+    for (n = e ; n >= d ; --n) {
+      cost [n] = cost [n - (e - ep)] ;
+    }
+    for (n = c ; n >= a ; --n) {
+      cost [n] = cost [d] ;
+    }
+  }
+}
 
 /** ------------------------------------------------------------------
  ** @brief MEX entry point

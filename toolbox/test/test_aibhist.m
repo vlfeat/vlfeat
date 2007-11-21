@@ -24,19 +24,26 @@ Pcx(3,:) = binsum(Pcx(3,:), ones(size(f3)), f3) ;
 
 Pcx = Pcx / sum(Pcx(:)) ;
 
-%[parents_, cost_] = aib(Pcx) ;
-%[parents,  cost ] = aib(Pcx,'clusternull') ;
+[parents_, cost_] = aib(Pcx) ;
+[parents,  cost ] = aib(Pcx,'clusternull') ;
 
-[parents_] = aib(Pcx) ;
-[parents] = aib(Pcx,'clusternull') ;
+keyboard
+
+%[parents_] = aib(Pcx) ;
+%[parents] = aib(Pcx,'clusternull') ;
 
 % find a null node for testing purposes
 anull = min(find(parents_==0)) ;
 f1 = [f1 repmat(anull,1,10)] ;
 
-figure(100);  clf ; hold on ;
-plot(parents_, 'r') ;
+figure(100);  clf ;
+subplot(1,2,1) ; hold on ;
+plot(parents_, 'r.-') ;
 plot(parents,  'g') ;
+legend('signal null', 'cluster null') ;
+subplot(1,2,2) ; hold on ;
+plot(cost_, 'r.-') ;
+plot(cost,  'g') ;
 legend('signal null', 'cluster null') ;
 
 range = [1 10 K*K-10 K*K] ;
