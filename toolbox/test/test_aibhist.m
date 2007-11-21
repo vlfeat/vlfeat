@@ -32,42 +32,41 @@ Pcx = Pcx / sum(Pcx(:)) ;
 
 % find a null node for testing purposes
 anull = min(find(parents_==0)) ;
+f1 = [f1 repmat(anull,1,10)] ;
 
 figure(100);  clf ; hold on ;
 plot(parents_, 'r') ;
 plot(parents,  'g') ;
 legend('signal null', 'cluster null') ;
 
-f1 = [f1 repmat(anull,1,10)] ;
-
-% compare two methods of getting the same cut histogram
-[cut_,map_]  = aibcut(parents_, 10) ;
-hist_        = aibcuthist(cut_, map_, f1) ;
-histtree_    = aibhist(parents_, f1) ;
-thist_       = histtree_(cut_) ;
-
-[cut,map]    = aibcut(parents, 10) ;
-hist         = aibcuthist(cut, map, f1) ;
-histtree     = aibhist(parents, f1) ;
-thist        = histtree(cut) ;
-
-figure(101) ; clf ;
-subplot(2,2,1) ; hold on ; plot(hist_,'g') ; plot(thist_,'r') ;
-legend('cut+cuthist', 'hist+cut') ;
-title('aibcuthist vs aibhist');
-subplot(2,2,2) ; hold on ; plot(histtree_) ; title('aibtree') ;
-
-subplot(2,2,3) ; hold on ; plot(hist,'g') ; plot(thist,'r') ;
-legend('cut+cuthist', 'hist+cut') ;
-title('aibcuthist vs aibhist (clust null)');
-subplot(2,2,4) ; hold on ; plot(histtree) ; title('aibtree (clustnull)') ;
-
-keyboard
-
-%cut = aibcut(parents, cutsize(i)) ; 
-%  parents_cut(cut > 0) = parents(cut(cut > 0)) ;
-%  C = cut(1:K*K+1) ; [drop1,drop2,C] = unique(C) ;
+range = [1 10 K*K-10 K*K] ;
+for c=1:length(range)
+    
+  cut_size = range(c) ;
   
+  % compare two methods of getting the same cut histogram
+  [cut_,map_]  = aibcut(parents_, cut_size) ;
+  hist_        = aibcuthist(cut_, map_, f1) ;
+  histtree_    = aibhist(parents_, f1) ;
+  thist_       = histtree_(cut_) ;
+  
+  [cut,map]    = aibcut(parents, cut_size) ;
+  hist         = aibcuthist(cut, map, f1) ;
+  histtree     = aibhist(parents, f1) ;
+  thist        = histtree(cut) ;
+  
+  figure(100 + c) ; clf ;
+  subplot(2,2,1) ; hold on ; plot(hist_,'g.-') ; plot(thist_,'r') ;
+  legend('cut+cuthist', 'hist+cut') ;
+  title('aibcuthist vs aibhist');
+  subplot(2,2,2) ; hold on ; plot(histtree_) ; title('aibtree') ;
+  
+  subplot(2,2,3) ; hold on ; plot(hist,'g.-') ; plot(thist,'r') ;
+  legend('cut+cuthist', 'hist+cut') ;
+  title('aibcuthist vs aibhist (clust null)');
+  subplot(2,2,4) ; hold on ; plot(histtree) ; title('aibtree (clust null)') ;  
+end
+
 % --------------------------------------------------------------------
 function f = quantize(X,D,K)
 % --------------------------------------------------------------------

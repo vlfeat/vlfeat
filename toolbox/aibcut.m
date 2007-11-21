@@ -9,30 +9,54 @@ function [cut, map] = aibcut(parents, n)
 %  The function returns a vector CUT with the list of nodes of the
 %  AIB tree belonging to the cut.
 %
+%  Node that in PARENTS are conneted to the null node may be added to
+%  the cut if no enugh proper nodes are sufficient to fill the
+%  requested cut.
+%
 %  [CUT, MAP] = AIBCUT(...) returns also a vector MAP which
-%  short-circuits nodesa below the cut to nodes of the cut.
-%  Nodes above or in the cut are short-circutited to themselves.
-%  Nodes that where connected to the null node are short-circuited
-%  to zero.
+%  short-circuits nodes below the cut to nodes of the cut.  Nodes
+%  above or in the cut are short-circutited to themselves.  Nodes that
+%  where connected to the null node are short-circuited to zero.
+%  Nodes that where connected to the null but are also in the cut are
+%  short circutied to themselves.
 %
 %  See also AIB(), AIBHIST(), AIBCUTHIST().
 
 % AUTORIGHTS
 
 
-%
-%  The function returns a vector CUT that short-circuits nodes of the
-%  AIB tree to their parent in the cut. Nodes in or above the cut are
-%  short-cricutited to themselves. Nodes with null parent are
-%  short-circuitied to zero.
-%
-%  See also AIB().
-
-% AUTORIGHTS
-
 if n > 1
-  mu   = max(parents) - n + 1 ;
+  root    = max(parents) ;
+  
+  % count number of null nodes
+  z = sum(parents(1:root) == 0) ;
+  
+  % determine number of leves
+  nleaves = (root - z + 1) / 2 ;
+  
+  % find first node of the cut
+  mu   = root - min(n, nleaves) + 1 ;
+    
+  % correction for presence of null nodes
+  nz   = find(parents(1:mu) > 0) ;
+  mu   = nz(end) ;
+  
+  % find node belnoging to the cut
   cut  = find(parents(1:mu) > mu) ;
+  
+  % In the presence of null nodes, the cut size might exceed
+  % nleaves, which is the maximum cut size we can obtain with the
+  % specified tree. The additional nodes have to be picked up from
+  % the null nodes.
+
+  if length(cut) < n
+    sel_z = find(parents == 0) ;
+    cut = [sel_z(1:n-length(cut)) cut] ;
+  end
+  
+  % aesthetic reasons only
+  cut = sort(cut) ;
+  
 else
   mu   = max(parents) ;
   cut  = mu ;
@@ -49,5 +73,5 @@ if nargout > 1
     map(sel) = parents(map(sel))  ;
   end
   
-  map(find(parents == 0)) = 0 ;
+  map(setdiff(find(parents == 0), cut)) = 0 ;
 end
