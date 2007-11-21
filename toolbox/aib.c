@@ -104,11 +104,11 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
 
   /* search first leaf that has been merged */
   {
-    int first_parent = 0 ;
+    int first_parent = e ;
     first = 0 ;
     for (n = 0 ; n < nvalues ; ++ n) {
-      if (parents[n] <= e) {
-        if (first_parent < parents [n]) {
+      if (parents[n] <= e & parents[n] != 1) {
+        if (first_parent >= parents [n]) {
           first_parent = parents [n] ;
           first = n ;
         }
@@ -139,7 +139,9 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     }
   }
   
-  mexPrintf("last_intermed:%d\n", last_intermed)  ;
+  mexPrintf("first null %d parent seto to last_intermed:%d\n", 
+            n,
+            last_intermed)  ;
 
   /* chain rest of intermediate nodes */
   for (; n < a ; ++ n) {
@@ -150,13 +152,15 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     }
   }
 
-  mexPrintf("last_intermed:%d\n", last_intermed)  ;
+  mexPrintf("after chaining other nulls last_intermed:%d\n", last_intermed)  ;
 
   /* make last_intermed point to d */
   parents [last_intermed] = d ;
   
   /* change parent of first to be last_intermed */
+  mexPrintf("parent of %d (first) was %d\n", first, parents[first]) ;
   parents [first] = last_intermed ;
+  mexPrintf("parent of %d (first) is now %d\n", first, parents[first]) ;
 
   /* fix cost too (reall that the fist entry is the cost before
    any merge) */
