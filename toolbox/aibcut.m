@@ -1,4 +1,4 @@
-function [cut, map] = aibcut(parents, n)
+function [cut, map, short] = aibcut(parents, n)
 % AIBCUT  Cut AIB tree
 %  CUT = AIBCUT(PARENTS, N) cuts the AIB tree PARENTS to get a cut of
 %  N nodes. PARENTS defines the AIB tree (see AIB()).
@@ -9,11 +9,17 @@ function [cut, map] = aibcut(parents, n)
 %  The function returns a vector CUT with the list of nodes of the
 %  AIB tree belonging to the cut.
 %
-%  Node that in PARENTS are conneted to the null node may be added to
-%  the cut if no enugh proper nodes are sufficient to fill the
-%  requested cut.
+%  Nodes with null parent (as defined by PARENTS) are comprised in the
+%  cut if the other nodes are not enough to fill a cut of N elements.
 %
-%  [CUT, MAP] = AIBCUT(...) returns also a vector MAP which
+%  [CUT, MAP] = AIBCUT(...) returns a vector MAP with the same size as
+%  PARENTS. Each element of the map re-assign each node below or in
+%  the cut to the corresponding CUT element and each element above the
+%  cut or with null parent to 0. MAP can be used to re-quantize AIB
+%  leaves in one step, or by means of AIBCUTPUSH() (which also deals
+%  with nodes with null parent).
+%
+%  [CUT, MAP, SHORT] = AIBCUT(...) returns also a vector SHORT which
 %  short-circuits nodes below the cut to nodes of the cut.  Nodes
 %  above or in the cut are short-circutited to themselves.  Nodes that
 %  where connected to the null node are short-circuited to zero.
@@ -24,6 +30,9 @@ function [cut, map] = aibcut(parents, n)
 
 % AUTORIGHTS
 
+% --------------------------------------------------------------------
+%                                           Determine nodes in the cut
+% --------------------------------------------------------------------
 
 if n > 1
   root    = max(parents) ;
@@ -62,16 +71,27 @@ else
   cut  = mu ;
 end
 
-if nargout > 1
-  stop = [cut find(parents == 0)] ;
-  map = 1:length(parents) ;
-  
-  while 1
-    [drop,sel] = setdiff(map(1:mu), stop)  ;
-    sel = setdiff(sel, stop) ;
-    if isempty(sel), break ; end
-    map(sel) = parents(map(sel))  ;
-  end
-  
-  map(setdiff(find(parents == 0), cut)) = 0 ;
+% --------------------------------------------------------------------
+%                                       Short-circuit nodes to the cut
+% --------------------------------------------------------------------
+
+stop = [cut find(parents == 0)] ;
+short = 1:length(parents) ;
+
+while 1
+  [drop,sel] = setdiff(short(1:mu), stop)  ;
+  sel = setdiff(sel, stop) ;
+  if isempty(sel), break ; end
+  short(sel) = parents(short(sel))  ;
 end
+
+short(setdiff(find(parents == 0), cut)) = 0 ;
+
+% --------------------------------------------------------------------
+%                                                  Build quantizer map
+% --------------------------------------------------------------------
+
+map             = 1:numel(parents) ;
+map(cut)        = 1:n ;
+map(short >  0) = map(short(short > 0)) ;
+map(short == 0) = 0 ; 

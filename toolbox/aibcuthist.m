@@ -1,37 +1,62 @@
-function hist = aibcuthist(cut, map, x)
+function hist = aibcuthist(map, x, varargin)
 % AIBCUTHIST  Compute histogram over AIB cut
-%  H = AIBCUTHIST(CUT, MAP, X) computes the histogram of the data X
-%  over the specified AIB cut. CUT and MAP define (as returned by
-%  AIBCUT()) define the cut. Each element of hist counts how many
-%  elements of X are projected in the corresponding cut node.
+%  HIST = AIBCUTHIST(MAP, X) computes the histogram of the data X over
+%  the specified AIB cut MAP (as returned by AIBCUT()).  Each element
+%  of hist counts how many elements of X are projected in the
+%  corresponding cut node.
 %
-%  X must contain nodes that are below or in the cut (normally
-%  leaves).
+%  Data are mapped to bins as specified by AIBCUTPUSH(). Data mapped
+%  to the null node are dropped.
 %
-%  If the original AIB tree cointained a null node, then some of
-%  the data might be fall off the cut and be projected to this
-%  node. In this case, an extra bin is appendend at the end of HIST
-%  to count for such occurences.
+%  Options:
+%    Nulls [drop]
+%      What to do of null nodes: drop ('drop'), accumulate to an
+%      extra bin at the end of HIST ('append'), or accumulate to
+%      the first bin ('first')
 
 % AUTORIGHTS
 
-% enumerate cut nodes
-cut_size = length(cut) ;
-colors = zeros(size(map)) ;
-colors(cut) = 1:cut_size ;
+mode = 'drop' ;
 
-% assign a color to all nodes of the map except the null ones
-sel_nz = find(map > 0) ;
-colors(sel_nz) = colors(map(sel_nz)) ;
+for k=1:2:length(varargin)
+  opt=varargin{k} ;
+  arg=varargin{k+1} ;
+  switch lower(opt)
+    case 'nulls'
+      switch lower(arg)
+        case 'drop'
+          mode = 'drop' ;
+        case 'append'
+          mode = 'append' ;
+        case 'first'
+          mode = 'first' ;
+        otherwise
+          error(sprintf('Illegal argument ''%s'' for ''Nulls''', arg)) ;
+      end
+    otherwise
+      error(sprintf('Unknown option ''%''', opt)) ;
+  end
+end
 
-% assign a color to the null ones too
-sel_z = find(map == 0) ;
-if ~isempty(sel_z)
-  cut_size = cut_size + 1 ;
-  colors(sel_z) = cut_size ;
+% determine cut size
+cut_size = max(map) ;
+
+% relabel data
+y = aibcutpush(map, x) ;
+
+% null?
+if any(y == 0)
+  switch mode
+    case 'drop'
+      y = y(y ~= 0) ;
+    case 'append'
+      cut_size = cut_size + 1 ;
+      y(y == 0) = cut_size ;
+    case 'first'
+      y(y == 0) = 1 ;
+  end
 end
 
 % Now we have the nodes of the cut. Accumulate.
 hist = zeros(1, cut_size) ;
-hist = binsum(hist, ones(size(x)), colors(x)) ;
-
+hist = binsum(hist, ones(size(y)), y) ;

@@ -41,9 +41,9 @@ Pcx = Pcx / sum(Pcx(:)) ;
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
   
-  [cut,map] = aibcut(parents, cutsize(i)) ; 
-  parents_cut(map > 0) = parents(map(map > 0)) ;
-  C = map(1:K*K+1) ; [drop1,drop2,C] = unique(C) ;
+  [cut,map,short] = aibcut(parents, cutsize(i)) ; 
+  parents_cut(short > 0) = parents(short(short > 0)) ;
+  C = short(1:K*K+1) ; [drop1,drop2,C] = unique(C) ;
   
   figure(i+1) ; clf ;
   plotquantization(D,K,C) ; hold on ;

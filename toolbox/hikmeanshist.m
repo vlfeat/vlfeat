@@ -8,7 +8,7 @@ function h = hikmeanshist(tree,path)
 %  The tree has K = TREE.K nodes and depth D = TREE.DEPTH.  Therefore
 %  there are M = (K^(D+1) - 1) / (K - 1) nodes in the tree (not
 %  counting the root which carries no information). Nodes are stacked
-%  into a vector of bins in bread frist order.
+%  into a vector of bins in breadth frist order.
 %
 %  Example: H(1)   = # of paths such that PATH(1,:) = 1
 %           H(K)   = # of paths such that PATH(1,:) = K

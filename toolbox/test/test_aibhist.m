@@ -1,4 +1,4 @@
-% TEST_AIBPUSH
+% TEST_AIBHIST
 function test_aibhist
  
 D   = 4 ;
@@ -27,8 +27,6 @@ Pcx = Pcx / sum(Pcx(:)) ;
 [parents_, cost_] = aib(Pcx) ;
 [parents,  cost ] = aib(Pcx,'clusternull') ;
 
-keyboard
-
 %[parents_] = aib(Pcx) ;
 %[parents] = aib(Pcx,'clusternull') ;
 
@@ -50,18 +48,18 @@ range = [1 10 K*K-10 K*K] ;
 for c=1:length(range)
     
   cut_size = range(c) ;
-  
+    
   % compare two methods of getting the same cut histogram
   [cut_,map_]  = aibcut(parents_, cut_size) ;
-  hist_        = aibcuthist(cut_, map_, f1) ;
+  hist_        = aibcuthist(map_, f1, 'nulls', 'append') ;
   histtree_    = aibhist(parents_, f1) ;
   thist_       = histtree_(cut_) ;
   
   [cut,map]    = aibcut(parents, cut_size) ;
-  hist         = aibcuthist(cut, map, f1) ;
+  hist         = aibcuthist(map, f1, 'nulls', 'append') ;
   histtree     = aibhist(parents, f1) ;
   thist        = histtree(cut) ;
-  
+    
   figure(100 + c) ; clf ;
   subplot(2,2,1) ; hold on ; plot(hist_,'g.-') ; plot(thist_,'r') ;
   legend('cut+cuthist', 'hist+cut') ;
