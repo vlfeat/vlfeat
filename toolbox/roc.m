@@ -12,7 +12,7 @@ function [tp,tn,info] = roc(y, score)
 %  informations:
 %
 %  INFO.EER       Equal error rate.
-%  INFO.AREA      Area under the ROC (AUC).
+%  INFO.AUC       Area under the ROC (AUC).
 %  INFO.UR        Uniform prior best op point rate.
 %  INFO.UT        Uniform prior best op point threhsold. 
 %  INFO.NR        Natural prior best op point rate.
@@ -96,8 +96,11 @@ tn = [0 tn] ;
 
 if nargout > 0 | nargout == 0
   % equal error rate
-  i = max(find(tp > tn)) ;
-  eer = (tp(i) + tn(i)) / 2 ;
+  i1 = max(find(tp >= tn)) ;
+  i2 = min(find(tn >= tp)) ;
+%  eer = (tp(i) + tn(i)) / 2 ;
+  eer = max(tn(i1), tp(i2)) ;
+  
   
   % uniform prior and natural prior operating points
   [drop, upoint] = max(tp + tn) ;	
@@ -113,8 +116,8 @@ if nargout > 0 | nargout == 0
   area = sum((tp(1:end-1)+tp(2:end)) .* diff(tn))/2 ;
   
   % save
-  info.eer = eer ;
-  info.area = area ;
+  info.eer  = eer ;
+  info.auc  = area ;
   info.ut   = ut ;
   info.ur   = ur ;
   info.nt   = nt ;
@@ -142,6 +145,7 @@ if nargout == 0
 			 tn(npoint) * [1 1 0], ...
 			 'color','b', 'linestyle', '--', 'linewidth', 1) ;
 	line([0 1], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
+  line([0 1], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
 
 	axis square ;
 	xlim([0 1]) ; xlabel('true positve') ;

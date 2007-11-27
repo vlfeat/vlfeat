@@ -24,7 +24,8 @@ enum {
   opt_L2,
   opt_LINF,
   opt_MIN,
-  opt_CHI2
+  opt_CHI2,
+  opt_KCHI2
 } ;
 
 uMexOption options [] = {
@@ -34,6 +35,7 @@ uMexOption options [] = {
   {"l0",           0,   opt_L0            },  
   {"min",          0,   opt_MIN           },  
   {"chi2",         0,   opt_CHI2          },
+  {"kchi2",        0,   opt_KCHI2         },
   {0,              0,   0                 }
 } ;
 
@@ -111,19 +113,28 @@ uMexOption options [] = {
 #define  F_MIN(AC,x,y)  { acc += MIN(x,y) ; }
 #define  F_CHI2(AC,x,y)                                  \
   {                                                      \
-    AC ## _t mean = ((x) + (y)) / 2 ;                    \
-    if (mean != 0) {                                     \
+    AC ## _t  meant2 = ((x) + (y))  ;                    \
+    if (meant2 != 0) {                                   \
       AC ## _t tmp  = ABS_DIFF(x,y) ;                    \
-      acc += tmp * tmp / mean ;                          \
+      acc += tmp * tmp / meant2 ;                        \
+    }                                                    \
+  }
+#define  F_KCHI2(AC,x,y)                                 \
+  {                                                      \
+    AC ## _t  mean = ((x) + (y)) / 2  ;                  \
+    if (mean != 0) {                                     \
+      AC ## _t tmp  = (x) * (y) ;                        \
+      acc += tmp / mean ;                                \
     }                                                    \
   }
 
-DEF_CLASS (L0,   F_L0  )
-DEF_CLASS (L1,   F_L1  )
-DEF_CLASS (L2,   F_L2  )
-DEF_CLASS (LINF, F_LINF)
-DEF_CLASS (MIN, F_MIN)
-DEF_CLASS (CHI2, F_CHI2)
+DEF_CLASS (L0,    F_L0   )
+DEF_CLASS (L1,    F_L1   )
+DEF_CLASS (L2,    F_L2   )
+DEF_CLASS (LINF,  F_LINF )
+DEF_CLASS (MIN,   F_MIN  )
+DEF_CLASS (CHI2,  F_CHI2 )
+DEF_CLASS (KCHI2, F_KCHI2)
 
 /* driver */
 void
@@ -149,7 +160,6 @@ mexFunction(int nout, mxArray *out[],
   int            opt ;
   int            next = 1 ;
   mxArray const *optarg ;
-
 
   /** -----------------------------------------------------------------
    **                                               Check the arguments
@@ -177,6 +187,7 @@ mexFunction(int nout, mxArray *out[],
     case opt_L0   : case opt_L1   :
     case opt_L2   : case opt_LINF :
     case opt_MIN  : case opt_CHI2 :
+    case opt_KCHI2:
       norm = opt ;
       break ;
     default: 
@@ -232,12 +243,13 @@ mexFunction(int nout, mxArray *out[],
   break ;
   
   switch (norm) {
-    DISPATCH_NORM(L0  ) ;
-    DISPATCH_NORM(L1  ) ;
-    DISPATCH_NORM(L2  ) ;
-    DISPATCH_NORM(LINF) ;
-    DISPATCH_NORM(MIN ) ;
-    DISPATCH_NORM(CHI2) ;
+    DISPATCH_NORM(L0   ) ;
+    DISPATCH_NORM(L1   ) ;
+    DISPATCH_NORM(L2   ) ;
+    DISPATCH_NORM(LINF ) ;
+    DISPATCH_NORM(MIN  ) ;
+    DISPATCH_NORM(CHI2 ) ;
+    DISPATCH_NORM(KCHI2) ;
   default:
     assert(0) ;
   }

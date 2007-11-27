@@ -2,24 +2,34 @@
 %  D = ALLDIST2(X,Y) returns the pairwise distance matrix D of the
 %  columns of S1 and S2, yielding
 %
-%    D(i,j) = || X(:,i) - Y(:,j) ||_2^2 for all i,j
-%
-%  where || . ||_2^2 denotes the squared L2 norm.
+%    D(i,j) = sum (X(:,i) - Y(:,j)).^2
 %
 %  ALLDIST2(X) returns the pairwise distance matrix fo the columns of
 %  S, yielding
 %
-%    D(i,j) = || X(:,i) - X(:,j) ) ||_2^2 for all i,j.
+%    D(i,j) = sum (X(:,i) - X(:,j)).^2
 %
 %  ALLDIST2(...,'<norm>') changes the computed norm. Supported values
 %  for <norm> are
 %
-%  <norm> norm type    D(i,j)
-%  ------------------------------------------
-%    l0   l0 norm      sum_k (Xki \not= Ykj)
-%    l1   l1 norm      sum_k |Xki - Ykj|
-%    l2   l2 norm      sum_k (Xki - Ykj)^2
-%    linf l_inf norm   max_k |Xki - Xkj|
+%  <norm>  D(i,j)
+%  ------------------------------
+%    l0    sum (X(:,i) ~= Y(:,j))
+%    l1    sum |X(:,i)  - Y(:,j)|
+%    l2    sum (X(:,i)  - Y(:,j)).^2
+%    linf  max |X(:,i)  - X(:,j)|
+%
+%  ALLDIST2(...,'chi2') computes the chi2 "distance"
+%
+%     D(i,j) = sum (X(:,i) - Y(:,j)).^2 ./ (X(:,i) + Y(:,j)).
+%
+%  (Notice that often the definition of chi2 is equal to D(i,j)/2).
+%
+%  ALLDIST2(...,'kchi2') computes the chi2 kernel
+%
+%     K(i,j) = 2 * sum (X(:,i) .* Y(:,j) ./ (X(:,i) + Y(:,j))).
+%
+%  Notice that D(i,j) = K(i,i) + K(j,j) - 2 K(i,j).
 %
 %  ALLDIST2() supports directly most data types. X and Y must have the
 %  same storage class. The sotrage class of D is promoted to reduce
