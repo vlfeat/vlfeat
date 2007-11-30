@@ -26,6 +26,9 @@
 %   EdgeThresh
 %       Set the non-edge selection threshold.
 %
+%   NormThresh
+%       Set the minimum l2-norm of the descriptor before normalization.
+%
 %   Frames
 %       Set the frames to use (bypass the detector).
 %

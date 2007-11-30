@@ -1,4 +1,4 @@
-function [f d] = siftreg(I, spacing, patchwidth, orient, scales);
+function [f d] = siftreg(I, spacing, patchwidth, orient, scales, normthresh);
 % spacing and patchwidth are both in pixels
 
 if nargin < 4
@@ -7,6 +7,9 @@ if nargin < 4
 end
 if nargin < 5
     scales = 1;
+end
+if nargin < 6
+    normthresh = 0;
 end
 
 I = im2double(I);
@@ -34,7 +37,7 @@ f = f';
 
 % SIFT features
 if orient
-    [f,d] =  sift(single(I), 'frames', f, 'orientations') ;
+    [f,d] =  sift(single(I), 'frames', f, 'orientations', 'normthresh', normthresh) ;
 else
-    [f,d] =  sift(single(I), 'frames', f) ;
+    [f,d] =  sift(single(I), 'frames', f, 'normthresh', normthresh) ;
 end
