@@ -33,7 +33,8 @@ function h=plotframe(frames,varargin)
 %  faster than calling PLOTFRAME() for each frame.
 %
 %  PLOTFRAME(FRAMES,...) passes any extra argument to the underlying
-%  plot function.
+%  plot function. The first optional argument can be a line
+%  specification string such as the one used by PLOT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -43,6 +44,12 @@ function h=plotframe(frames,varargin)
 
 % number of vertices drawn for each frame
 np        = 40 ;
+
+lineprop = {} ;
+if length(varargin) > 0 
+  lineprop = linespec2prop(varargin{1}) ;
+  lineprop = {lineprop{:}, varargin{2:end}} ;
+end
 
 % --------------------------------------------------------------------
 %                                         Handle various frame classes
@@ -58,7 +65,7 @@ zero_dimensional = D==2 ;
 
 % just points?
 if zero_dimensional
-  h = plot(frames(1,:),frames(2,:),'g.',varargin{:}) ;
+  h = plot(frames(1,:),frames(2,:),'g.',lineprop{:}) ;
   return ;
 end
 
@@ -116,11 +123,11 @@ if do_arrows
   h = line([allx nan allxf], ...
            [ally nan allyf], ...
            'Color','g','LineWidth',3, ...
-           varargin{:}) ;
+           lineprop{:}) ;
 else
   h = line(allx, ally, ...
            'Color','g','LineWidth',3, ...
-           varargin{:}) ;
+           lineprop{:}) ;
 end
 
 

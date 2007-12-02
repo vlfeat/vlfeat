@@ -27,10 +27,12 @@
 %       Set the non-edge selection threshold.
 %
 %   NormThresh
-%       Set the minimum l2-norm of the descriptor before normalization.
+%       Set the minimum l2-norm of the descriptor before
+%       normalization. Descriptors below the threshold are set to zero.
 %
 %   Frames
-%       Set the frames to use (bypass the detector).
+%       Set the frames to use (bypass the detector). If frames are not
+%       passed in order of increasing scale, they are re-orderded.
 %
 %   Orientations
 %       Force the computation of the oritentations of the frames

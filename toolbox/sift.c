@@ -88,6 +88,29 @@ korder (void const* a, void const* b) {
   return 0 ;
 }
 
+/** -------------------------------------------------------------------
+ ** @internal
+ ** @brief Check for sorted keypoints
+ ** 
+ ** @param keys keypoint list to check
+ ** @param nkeys size of the list.
+ **
+ ** @return 1 if the keypoints are storted.
+ **/
+
+int
+check_sorted (double const * keys, int unsigned nkeys) 
+{
+  int k ;
+  for (k = 0 ; k < nkeys-1 ; ++ k) {
+    if (korder(keys, keys + 4) > 0) {
+      return 0 ;
+    }
+    keys += 4 ;
+  }
+  return 1 ;
+}
+
 /** ------------------------------------------------------------------
  ** @brief MEX entry point
  **/
@@ -192,7 +215,9 @@ mexFunction(int nout, mxArray *out[],
       ikeys_array = mxDuplicateArray (optarg) ;
       nikeys      = mxGetN (optarg) ;
       ikeys       = mxGetPr (ikeys_array) ;
-      qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;
+      if (! check_sorted (ikeys, nikeys)) {
+        qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;
+      }
       break ;
       
     case opt_orientations :
