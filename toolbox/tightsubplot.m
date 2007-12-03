@@ -20,7 +20,7 @@ function H = tightsubplot(varargin)
 %     Set the axes inner box margin, either uniformly in all
 %     directions, or specifically to the left, right, top or bottom.
 %
-%   Box ['inner'] (** ONLY >R14 **)
+%   Box ['inner']
 %     If set to 'outer', tile the axes outer box, thus protecting
 %     title and labels. Unfortunately this usually produces
 %     unnecesarily large margins.

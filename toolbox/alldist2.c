@@ -25,7 +25,8 @@ enum {
   opt_LINF,
   opt_MIN,
   opt_CHI2,
-  opt_KCHI2
+  opt_KCHI2,
+  opt_KL1
 } ;
 
 uMexOption options [] = {
@@ -36,6 +37,7 @@ uMexOption options [] = {
   {"min",          0,   opt_MIN           },  
   {"chi2",         0,   opt_CHI2          },
   {"kchi2",        0,   opt_KCHI2         },
+  {"kl1",          0,   opt_KL1           },
   {0,              0,   0                 }
 } ;
 
@@ -119,6 +121,7 @@ uMexOption options [] = {
       acc += tmp * tmp / meant2 ;                        \
     }                                                    \
   }
+#define  F_KL1(AC,x,y)  { acc += MIN(x,y) ; }
 #define  F_KCHI2(AC,x,y)                                 \
   {                                                      \
     AC ## _t  mean = ((x) + (y)) / 2  ;                  \
@@ -134,6 +137,7 @@ DEF_CLASS (L2,    F_L2   )
 DEF_CLASS (LINF,  F_LINF )
 DEF_CLASS (MIN,   F_MIN  )
 DEF_CLASS (CHI2,  F_CHI2 )
+DEF_CLASS (KL1,   F_KL1  )
 DEF_CLASS (KCHI2, F_KCHI2)
 
 /* driver */
@@ -187,7 +191,7 @@ mexFunction(int nout, mxArray *out[],
     case opt_L0   : case opt_L1   :
     case opt_L2   : case opt_LINF :
     case opt_MIN  : case opt_CHI2 :
-    case opt_KCHI2:
+    case opt_KCHI2: case opt_KL1  :
       norm = opt ;
       break ;
     default: 
@@ -249,6 +253,7 @@ mexFunction(int nout, mxArray *out[],
     DISPATCH_NORM(LINF ) ;
     DISPATCH_NORM(MIN  ) ;
     DISPATCH_NORM(CHI2 ) ;
+    DISPATCH_NORM(KL1  ) ;
     DISPATCH_NORM(KCHI2) ;
   default:
     assert(0) ;

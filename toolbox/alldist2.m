@@ -9,27 +9,30 @@
 %
 %    D(i,j) = sum (X(:,i) - X(:,j)).^2
 %
-%  ALLDIST2(...,'<norm>') changes the computed norm. Supported values
-%  for <norm> are
+%  ALLDIST2(...,'<norm>') changes the computed distance. Supported values
+%  for <dist> are
 %
-%  <norm>  D(i,j)
-%  ------------------------------
-%    l0    sum (X(:,i) ~= Y(:,j))
-%    l1    sum |X(:,i)  - Y(:,j)|
-%    l2    sum (X(:,i)  - Y(:,j)).^2
-%    linf  max |X(:,i)  - X(:,j)|
+%  <dist>  D(i,j)
+%  --------------------------------------------------------
+%   l0     sum (X(:,i) ~= Y(:,j))
+%   l1     sum |X(:,i)  - Y(:,j)|
+%   l2     sum (X(:,i)  - Y(:,j)).^2
+%   linf   max |X(:,i)  - X(:,j)|
+%   chi2   sum (X(:,i) - Y(:,j)).^2 ./ (X(:,i) + Y(:,j))
 %
-%  ALLDIST2(...,'chi2') computes the chi2 "distance"
+%  (Notice that the standard definition of chi2 is half of what is
+%  computed here).
 %
-%     D(i,j) = sum (X(:,i) - Y(:,j)).^2 ./ (X(:,i) + Y(:,j)).
+%  ALLDIST2(...,'<ker>') computes the following 'kernels' K:
 %
-%  (Notice that often the definition of chi2 is equal to D(i,j)/2).
+%  <ker>   K(i,j)
+%  ---------------------------------------------------------
+%   kl1    sum (min(X(:,i),Y(:,j)))
+%   kchi2  2 * sum (X(:,i) .* Y(:,j) ./ (X(:,i) + Y(:,j)))
 %
-%  ALLDIST2(...,'kchi2') computes the chi2 kernel
-%
-%     K(i,j) = 2 * sum (X(:,i) .* Y(:,j) ./ (X(:,i) + Y(:,j))).
-%
-%  Notice that D(i,j) = K(i,i) + K(j,j) - 2 K(i,j).
+%  The constant are chosen so that D(i,j) = K(i,i) + K(j,j) - 2 K(i,j)
+%  where D is the distance corresponding to the kenrel (if the
+%  arguments are non-negative vectors).
 %
 %  ALLDIST2() supports directly most data types. X and Y must have the
 %  same storage class. The sotrage class of D is promoted to reduce
