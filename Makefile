@@ -3,7 +3,7 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := beta-3
+VER                := beta-4
 DIST                = $(NAME)-$(VER)
 BINDIST             = $(DIST)-$(ARCH)
 
@@ -20,6 +20,10 @@ err_no_arch +=Configuration failed
 # --------------------------------------------------------------------
 #                                                        Configuration
 # --------------------------------------------------------------------
+
+# executables
+MEX              ?= mex
+CC               ?= cc
 
 # generic flags
 CFLAGS           += -I. -pedantic -Wall -std=c89 -g -O0
@@ -48,7 +52,7 @@ mac_MEX_CFLAGS   :=
 mac_MEX_SUFFIX   := mexmac
 
 mci_BINDIR       := bin/maci
-mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__
+mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
 mci_LDFLAGS      :=
 mci_MEX_CFLAGS   :=
 mci_MEX_SUFFIX   := mexmaci
@@ -79,11 +83,11 @@ endif
 .PHONY : all
 all : all-dir all-lib all-bin all-mex
 
-# this creates auxiliary directories
+# create auxiliary directories
 .PHONY: all-dir
 all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 
-# this is to make directories
+# trick to make directories
 .PRECIOUS: %/.dirstamp
 %/.dirstamp :	
 	mkdir -p $(dir $@)
@@ -108,11 +112,11 @@ all-lib: $(BINDIR)/libvl.a
 
 $(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   CC '$<' ==> '$@'"
-	@cc $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   D  '$<' ==> '$@'"
-	@cc -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d' $< -MF $@
+	@$(CC) -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d' $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
 	@echo "   A  '$@'"
@@ -136,7 +140,7 @@ all-bin : $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 	@echo "   CC '$<' ==> '$@'"
-	@cc $(CFLAGS) $(LDFLAGS) $< $(BINDIR)/libvl.a -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) $< $(BINDIR)/libvl.a -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -151,7 +155,7 @@ all-mex : $(mex_tgt)
 
 toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	@echo "   MX '$<' ==> '$@'"
-	@mex $(MEX_CFLAGS) $< -outdir 'toolbox'
+	@$(MEX) $(MEX_CFLAGS) $< -outdir 'toolbox'
 
 # --------------------------------------------------------------------
 #                                                  Build documentation

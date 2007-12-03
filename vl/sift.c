@@ -125,6 +125,13 @@ threshold</b>. Notice that this quantity has a minimum equal to 4
 when @f$t_e=1@f$ and grows thereafter. Therefore the range of the
 edge threshold is @f$[1,\infty)@f$.
 
+@subsection sift-detector-norm Norm threshold
+
+Near-uniform patches do not yield stable features. By default, all 
+descriptors will be computed, but when this option is set, 
+descriptors who have a small norm before scaling will be set
+explicitly to zero.
+    
 @subsection sift-detector-orientation Orientations
 
 A peak in the DoG scale space fixes 3 parameters of the keypoints,
@@ -442,6 +449,7 @@ vl_sift_new (int width, int height,
 
   f-> peak_thresh = 0.0 ;
   f-> edge_thresh = 10.0 ;
+  f-> norm_thresh = 0.0 ;
 
   f-> grad_o  = o_min - 1 ;
 
@@ -1217,7 +1225,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
  ** @param end   end of histogram.
  **/
 
-VL_INLINE void
+VL_INLINE vl_sift_pix
 normalize_histogram 
 (vl_sift_pix *begin, vl_sift_pix *end)
 {
@@ -1231,6 +1239,8 @@ normalize_histogram
 
   for (iter = begin; iter != end ; ++ iter)
     *iter /= norm ;
+
+  return norm;
 }
 
 /** ------------------------------------------------------------------
@@ -1402,15 +1412,23 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   if(1) {
 
     /* Normalize the histogram to L2 unit length. */        
-    normalize_histogram (descr, descr + NBO*NBP*NBP) ;
-    
-    /* Truncate at 0.2. */
-    for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
-      if (descr [bin] > 0.2) descr [bin] = 0.2;
+    vl_sift_pix norm = normalize_histogram (descr, descr + NBO*NBP*NBP) ;
+
+    /* Set the descriptor to zero if it is lower than our norm_threshold */
+    if(f-> norm_thresh && norm < f-> norm_thresh) {
+        for(bin = 0; bin < NBO*NBP*NBP ; ++ bin)
+            descr [bin] = 0;
     }
+    else {
     
-    /* Normalize again. */
-    normalize_histogram (descr, descr + NBO*NBP*NBP) ;
+      /* Truncate at 0.2. */
+      for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
+        if (descr [bin] > 0.2) descr [bin] = 0.2;
+      }
+    
+      /* Normalize again. */
+      normalize_histogram (descr, descr + NBO*NBP*NBP) ;
+    }
   }
 
 }
