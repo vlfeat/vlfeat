@@ -1,21 +1,49 @@
-function [f d] = siftreg(I, spacing, patchwidth, orient, scales, normthresh);
+function [f d] = siftreg(I, spacing, patchwidth, varargin);
 % spacing and patchwidth are both in pixels
 
-if nargin < 4
-    % By default, do not compute orientation, assume to be 0
-    orient = 0;
-end
-if nargin < 5
-    scales = 1;
-end
-if nargin < 6
-    normthresh = 0;
+orient = 0;
+scales = 1;
+normthresh = 0;
+colorspace = 'gray';
+
+for k=1:2:length(varargin)
+    opt = lower(varargin{k}) ;
+    arg = varargin{k+1} ;
+
+    switch opt
+        case 'orient'
+            orient = arg;
+
+        case 'scales'
+            scales = arg;
+
+        case 'normthresh'
+            normthresh = arg;
+
+        case 'colorspace'
+            colorspace = arg;    
+
+        otherwise
+            error(['Uknown parameter ''', varargin{a}, '''.']) ;
+    end      
 end
 
 I = im2double(I);
-if size(I,3) > 1
+if size(I,3) > 1 && strcmp(colorspace, 'gray')
     I = rgb2gray(I) ;
+elseif size(I,3) == 1 && ~strcmp(colorspace, 'gray')
+    if strcmp(colorspace, 'normrgb')
+        error('normrgb will not work with grayscale images');
+    end
+    I = cat(3,I,I,I);
 end
+
+if strcmp(colorspace, 'normrgb')
+    RGB = sum(I,3);
+    I = I ./ cat(3,RGB,RGB,RGB);
+    I = I(:,:,1:2); % B channel is redundant now
+end
+
 M = size(I,1);
 N = size(I,2);
 
@@ -35,9 +63,17 @@ end
 
 f = f';
 
-% SIFT features
-if orient
-    [f,d] =  sift(single(I), 'frames', f, 'orientations', 'normthresh', normthresh) ;
-else
-    [f,d] =  sift(single(I), 'frames', f, 'normthresh', normthresh) ;
+allf = [];
+alld = [];
+for c = 1:size(I,3)
+    % SIFT features
+    if orient
+        [f,d] =  sift(single(I(:,:,c)), 'frames', f, 'orientations', 'normthresh', normthresh) ;
+    else
+        [f,d] =  sift(single(I(:,:,c)), 'frames', f, 'normthresh', normthresh) ;
+    end
+    allf = f;
+    alld = [alld; d];
 end
+f = allf;
+d = alld;
