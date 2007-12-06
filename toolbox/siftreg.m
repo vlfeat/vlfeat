@@ -39,7 +39,7 @@ elseif size(I,3) == 1 && ~strcmp(colorspace, 'gray')
 end
 
 if strcmp(colorspace, 'normrgb')
-    RGB = sum(I,3);
+    RGB = (sum(I,3) + eps);
     I = I ./ cat(3,RGB,RGB,RGB);
     I = I(:,:,1:2); % B channel is redundant now
 end
