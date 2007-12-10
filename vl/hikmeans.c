@@ -82,7 +82,9 @@ vl_hikm_copy_subset (vl_ikm_data const * data,
  ** @param data   Data to cluster.
  ** @param N      Number of data points.
  ** @param K      Number of clusters for this node.
- ** @param depth  Tree depth.
+ ** @param height Tree height.
+ **
+ ** @remark height cannot be smller than 1.
  **
  ** @return a new HIKM node representing a sub-clustering.
  **/
@@ -201,12 +203,18 @@ vl_hikm_delete (VlHIKMTree *f)
  ** @param K     Number of clusters per node.
  ** @param depth Tree depth.
  **
+ ** @remark @a depth cannot be smaller than 1.
+ **
  ** @return a new HIKM tree representing the clustering.
  **/
 
 void
 vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
 {
+  assert(depth > 0) ;
+  assert(M     > 0) ;
+  assert(K     > 0) ;
+  
   xdelete (f -> root) ;
   f -> root = 0;
   

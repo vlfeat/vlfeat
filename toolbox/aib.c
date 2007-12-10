@@ -107,7 +107,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     int first_parent = e ;
     first = 0 ;
     for (n = 0 ; n < nvalues ; ++ n) {
-      if (parents[n] <= e & parents[n] != 1) {
+      if ((parents[n] <= e) & (parents[n] != 1)) {
         if (first_parent >= parents [n]) {
           first_parent = parents [n] ;
           first = n ;

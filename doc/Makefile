@@ -16,7 +16,7 @@ html/vlfeat.html : vlfeat.tex aux/vlfeat.tex vl.cfg
 	mkdir -p html
 	cd aux ; htlatex $< "vl,html,2" "" "-d../html/"
 	mkdir -p html/figures
-	rsync figures/*.png html/figures
+	rsync figures/*.png html/figures/
 
 vlfeat.pdf : vlfeat.tex aux/vlfeat.tex
 	make -C figures all

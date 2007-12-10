@@ -10,6 +10,7 @@
 #define VL_GENERIC_H
 
 #include <stddef.h>
+#include <assert.h>
 
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.1"

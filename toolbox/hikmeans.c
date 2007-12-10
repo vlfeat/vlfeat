@@ -33,7 +33,7 @@ uMexOption options [] = {
  ** @brief Copy HIKM tree node to a MATLAB structure 
  **/
 
-void
+static void
 xcreate (mxArray *mnode, int i, VlHIKMNode *node)
 {
   int node_K                = vl_ikm_get_K (node->filter) ;
@@ -83,7 +83,7 @@ hikm_to_matlab (VlHIKMTree * tree)
     (2, dims, NFIELDS(field_names), field_names) ;
   mxSetField (mtree, 0, "K",      mxCreateDoubleScalar (K)) ;
   mxSetField (mtree, 0, "depth",  mxCreateDoubleScalar (depth)) ;  
-  xcreate (mtree, 0, tree->root) ;  
+  if (tree->root) xcreate (mtree, 0, tree->root) ;  
   return mtree;
 }
 
@@ -186,7 +186,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    *                                                      Do the job
    * ------------------------------------------------------------ */
   
-  depth = VL_MAX(0, ceil ((int) log (nleaves) / log(K))) ;
+  depth = VL_MAX(1, ceil (log (nleaves) / log(K))) ;
   tree  = vl_hikm_new  (method_type) ;
 
   if (verb) {
