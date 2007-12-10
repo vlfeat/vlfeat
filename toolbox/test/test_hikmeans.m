@@ -1,6 +1,13 @@
 function test_hikmeans
 % TEST_HIKMEANS Test HIKMEANS function
 
+K        = 2;
+nleaves  = 2;
+data     = uint8(rand(2,100)*255);
+[tree,A] = hikmeans(data,K,nleaves,'verbose','verbose');
+
+%keyboard;
+
 K        = 3 ;
 nleaves  = 100 ;
 data     = uint8(rand(2,1000) * 255) ;
