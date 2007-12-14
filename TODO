@@ -1,0 +1,140 @@
+                            DOCUMENTATION
+
+1 - tutorial
+2 - vl/doxygen documentation
+3 - src/manpages
+4 - toolbox/embedded matlab comments + extractor
+
+
+
+                               TOOLBOX
+
+overview_vlfeat.m
+vlfeat_root.m
+vlfeat_setup.m
+
+AGGLOMERATIVE INFO BOTTLENECK
+aib.c
+aib.m
+aibcut.m
+aibcuthist.m
+aibhist.c
+aibhist.m
+
+MISCELLANEOUS STUFF
+alldist2.c
+alldist2.m
+override.m
+binsum.c
+binsum.m
+whistc.c
+whistc.m
+localmax.c
+localmax.m
+numder.m ?
+numder2.m ?
+
+SPECIAL FUNCTIONS
+ddgaussian.m
+dgaussian.m
+dsigmoid.m
+gaussian.m
+sigmoid.m
+rcos.m
+
+MSER
+erfill.c
+erfill.m
+erfill.mexmaci
+ertr.m
+mser.c
+mser.m
+
+HARRIS
+harris.m
+
+GEOMETRY
+hat.m
+ihat.m
+irodr.c
+irodr.m
+rodr.c
+rodr.m
+
+K-MEANS
+hikmeans.c
+hikmeans.m
+hikmeanshist.m
+hikmeanspush.c
+hikmeanspush.m
+ikmeans.c
+ikmeans.m
+ikmeanshist.m
+ikmeanspush.c
+ikmeanspush.m
+
+HASH
+ihashfind.c
+ihashfind.m
+ihashsum.c
+ihashsum.m
+ishashfind.m
+
+IMAGE OPERATIONS
+imarray.m
+imarraysc.m
+imintegral.c
+imintegral.m
+imdown.m
+imgrad.m
+imreadbw.m
+imreadgray.m
+imsc.m
+imsmooth.c
+imsmooth.m
+imup.m
+imwbackward.m
+imwbackwardmx.c
+imwhiten.m
+rgb2xyz.m
+xyz2lab.m
+xyz2luv.m
+xyz2rgb.m
+waffine.m
+dwaffine.m
+witps.m
+wtps.m
+tps.m
+tpsu.m
+tpsumx.c
+
+
+
+mexutils.h
+
+
+
+PLOTS (IN/OUT)
+cf.m
+click.m
+clickpoint.m
+clicksegment.m
+roc.m
+linespec2prop.m
+plotframe.m
+plotgrid.m
+plotpoint.m
+plotsiftdescriptor.m
+tightsubplot.m
+
+SIFT
+sift.c
+sift.m
+siftmatch.m
+siftrandom.m
+siftreg.m
+ubcmatch.c
+ubcmatch.m
+ubcread.m
+
+
