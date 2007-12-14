@@ -16,7 +16,7 @@ datat    = uint8(rand(2,10000)* 255) ;
 [tree,A] = hikmeans(data,K,nleaves,'verbose', 'verbose') ;
 AT       = hikmeanspush(tree,datat,'verbose','verbose') ;
 
-keyboard
+%keyboard
 
 figure(1) ; clf ; 
 plottree(tree) ;

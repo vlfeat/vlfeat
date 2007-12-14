@@ -3,7 +3,7 @@
 ** description: Compute the matrix U for a TPS.
 **/
 
-#include "mexutils.h"
+#include <mexutils.h>
 
 #include <stdlib.h>
 #include <math.h>

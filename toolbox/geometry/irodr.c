@@ -3,7 +3,8 @@
 ** description: Inverse rodrigues formula
 **/
 
-#include "mexutils.h"
+#include <mexutils.h>
+
 #include <vl/rodrigues.h>
 
 enum {

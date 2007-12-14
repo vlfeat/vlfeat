@@ -18,8 +18,7 @@ General Public License version 2.
  ** @brief HISTC MEX function implementation.
  **/
 
-#include "mexutils.h"
-
+#include <mexutils.h>
 #include <vl/generic.h>
 
 #include <stdlib.h>

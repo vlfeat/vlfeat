@@ -9,7 +9,7 @@
  */
 
 
-#include "mexutils.h"
+#include <mexutils.h>
 
 #include <vl/generic.h>
 

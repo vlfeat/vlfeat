@@ -4,7 +4,7 @@
  ** @brief    Scale Invariant Feature Transform (SIFT) - MEX
  **/
 
-#include "mexutils.h"
+#include <mexutils.h>
 #include <vl/mathop.h>
 #include <vl/sift.h>
 

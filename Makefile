@@ -32,7 +32,7 @@ CFLAGS           += -I. -pedantic -Wall -std=c89 -g -O0
 CFLAGS           += -Wno-unused-function 
 CFLAGS           += -Wno-long-long
 LDFLAGS          +=
-MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl
+MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl -Itoolbox
 
 # Determine on the flight the system we are running on
 Darwin_PPC_ARCH    := mac
@@ -147,15 +147,15 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # --------------------------------------------------------------------
 # We place the MEX files in toolbox/.
 
-mex_src := $(notdir $(basename $(basename $(wildcard toolbox/*.c))))
-mex_tgt := $(addprefix toolbox/, $(addsuffix .$(MEX_SUFFIX), $(mex_src)))
+mex_src := $(shell find toolbox -name "*.c")
+mex_tgt := $(mex_src:.c=.$(MEX_SUFFIX))
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
 toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 	@echo "   MX '$<' ==> '$@'"
-	@$(MEX) $(MEX_CFLAGS) $< -outdir 'toolbox'
+	@$(MEX) $(MEX_CFLAGS) $< -outdir $(dir $(@))
 
 # --------------------------------------------------------------------
 #                                                  Build documentation

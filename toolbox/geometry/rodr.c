@@ -3,7 +3,7 @@
 ** description: Rodrigues formula
 **/
 
-#include "mexutils.h"
+#include <mexutils.h>
 
 #include <vl/generic.h>
 #include <vl/rodrigues.h>

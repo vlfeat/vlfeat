@@ -11,8 +11,8 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-#include "mexutils.h"
-#include "vl/generic.h"
+#include <mexutils.h>
+#include <vl/generic.h>
 
 #include <string.h>
 

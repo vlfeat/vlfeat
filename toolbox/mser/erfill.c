@@ -14,7 +14,7 @@ General Public License version 2.
  ** @brief Maximally Stable Extremal Regions - MEX implementation
  **/
 
-#include "mexutils.h"
+#include <mexutils.h>
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -10,7 +10,7 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-#include "mexutils.h"
+#include <mexutils.h>
 
 #include<stdio.h>
 #include<stdlib.h>
