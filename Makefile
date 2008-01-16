@@ -161,7 +161,9 @@ toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
 #                                                  Build documentation
 # --------------------------------------------------------------------
 
-.PHONY: doc dox docdeep
+m_src := $(shell find toolbox -name "*.m")
+
+.PHONY: doc dox docdeep mdoc
 
 doc:
 	make -C doc all
@@ -174,6 +176,12 @@ dox:
 	make -C doc/figures all
 	(test -e dox || mkdir dox)
 	doxygen doxygen.conf
+
+.PHONY: modc
+mdoc:	doc/toolbox.html
+
+doc/toolbox.html : $(m_src)
+	perl mdoc.pl -o doc/toolbox.html toolbox
 
 # --------------------------------------------------------------------
 #                                                       Clean and dist
@@ -197,6 +205,7 @@ distclean: clean
 	make -C doc distclean
 	rm -rf bin
 	rm -rf dox
+	rm -f  doc/toolbox.html
 	rm -f  toolbox/*.mexmac
 	rm -f  toolbox/*.mexmaci
 	rm -f  toolbox/*.mexglx

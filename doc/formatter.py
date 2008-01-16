@@ -1,0 +1,437 @@
+#!/usr/bin/python
+
+import xml.dom.minidom
+import sys
+import os
+import re
+
+debug = 1 ;
+
+# --------------------------------------------------------------------
+#                                                 Pretty ASCII -> HTML
+# --------------------------------------------------------------------
+
+# MDOC fromats the embedded M-file documentation according to a simple
+# set of rules. Pharagraph,s verbatim sections, lists and other
+# structure on are automatically created by looking at blank linkes,
+# indentation and a few decoration symbols.
+#
+# The documentation starts at a conventional indentation level N (by
+# default 2). A block of non-epmty lines prefixed by N characters is
+# considered a paragraph. For instance
+#
+#  |  Bla bla bla
+#  |  bla bla bla.
+#  |
+#  |  Bla bla.
+#
+# generates two pharagraps. If there are more than N white spaces,
+# then the block is taken verbatim instead (and rendered in <pre> HTML
+# tags). For instance
+#
+#  |  Bla bla bla
+#  |   Code Code Code
+#  |
+#  |   Code Code Code
+#
+# generates one paragraph followed by one verbatim section.
+# 
+
+# terminal
+class Terminal:
+    def isa(self, classinfo):
+        return isinstance(self, classinfo)
+
+# empty terminal
+class E (Terminal):
+    pass
+
+# blank line
+class B (Terminal):
+    content = ""
+
+# non-blank line
+class L (Terminal):
+    indent  = 0
+
+# regular line
+class PL (L):
+    pass
+
+# line with bullet
+class BL (L):
+    bullet       = None
+    inner_indent = 0
+    
+# line with description
+class DL (L):
+    pass
+
+# --------------------------------------------------------------------
+def lex(line):
+# --------------------------------------------------------------------
+    "Parse LINE to a terminal symbol."
+
+    match = re.match(r"\s*\n?$", line) ;
+    if match: return B()
+    
+    match = re.match(r"(\s*)(.*)::\s*\n?$", line) 
+    if match:
+        x = DL()
+        x.indent  = len(match.group(1))
+        x.content = match.group(2)
+        return x
+
+    match = re.match(r"(\s*)(-\s*)(\S.*)\n?$", line)
+    if match:
+        x = BL()
+        x.indent        = len(match.group(1))
+        x.inner_content = match.group(3)
+        x.bullet        = match.group(2)
+        x.inner_indent  = x.indent + len(x.bullet)
+        x.content       = x.bullet + x.inner_content
+        return x
+
+    match = re.match(r"(\s*)(\S.*)\n?$", line)
+    if match:
+        x = PL()
+        x.indent  = len(match.group(1))
+        x.content = match.group(2)
+        return x
+    
+# --------------------------------------------------------------------
+class Lexer(object):
+# --------------------------------------------------------------------
+    """
+    l = Lexer(LINES) parses the array of strings LINES.
+
+    l.next() advances the head and fetches the next terminal.
+    l.back() move back the head.
+    l.getpos() returns the head position.
+    l.seek(POS) set the head position to POS.
+    """
+    def __init__(self, lines):
+        self.tokens = []
+        self.pos    = -1
+        for line in lines:
+            self.tokens.append(lex(line))
+            
+    def next(self):
+        self.pos = self.pos + 1
+        if self.pos >= len(self.tokens):
+            return E()
+        else:
+            return self.tokens [self.pos]
+
+    def seek(self, pos):
+        self.pos = pos
+        
+    def back(self):
+        if self.pos >=0: self.pos -= 1
+
+    def getpos(self):
+        return self.pos
+
+    def __str__(self):
+        str = ""
+        for i,t in enumerate(self.tokens):
+             str += "%5d) %s %s\n" % (i, t.__class__.__name__,t.content)
+        return str
+
+# --------------------------------------------------------------------
+class Formatter:
+# --------------------------------------------------------------------
+    """
+    f = Formatter(LINES) parse the array of text lines LINES.
+    
+    f = Formatter(LINES, FUNCS) takes the dictionary of functions
+    FUNCS.  Function names must be uppercase. The dictionary entries
+    are used to embed links in the documentation.
+
+    f.toDOM() process the data to construct an XML (HTML) representation
+    of them.
+    """
+    def __init__ (self, lines, funcs=None):
+        self.tokens = Lexer(lines)
+        self.xmldoc = xml.dom.minidom.Document()
+        self.funcs  = funcs
+        #print self.tokens
+
+    def toTextNode(self,s):
+        return self.xmldoc.createTextNode(unicode(s, 'iso-8859-1'))
+
+    def addAttr(self, tag, attr, val):
+        x = self.xmldoc.createAttribute(attr)
+        t = self.toTextNode(val)
+        x.appendChild(t)
+        tag.setAttributeNode(x)
+
+    def addText(self, tag, s):
+        txt = self.toTextNode(s)
+        tag.appendChild(txt)
+
+    def addFancyText(self, tag, s):
+        xs = []
+        iter = re.finditer('([A-Z][A-Z0-9]*)\(.*\)', s)
+        last = -1
+
+        for i in iter:
+            func_name = i.group(1)
+
+            # lookup function name in dictionary
+            if self.funcs.has_key(func_name):
+                # retrieve function HTML location
+                func_href = self.funcs[func_name]
+                
+                # add text so far
+                xs.append(self.toTextNode(s[last+1:i.start()]))
+
+                # add link to function
+                atag = self.xmldoc.createElement(u"a")
+                self.addText(atag, i.group(1))
+                atag.setAttribute(u"href", func_href)
+                xs.append(atag)
+
+                # set head
+                last = i.start()+len(i.group(1))-1
+
+        xs.append(self.toTextNode(s[last+1:]))
+        for x in xs:
+            tag.appendChild(x)
+            
+    # ................................................................        
+    # E, B, L, PL, BL, DL, ...
+    def parse_Terminal(self, T):
+        pos = self.tokens.getpos()
+        t = self.tokens.next()
+        if t.isa(T):
+            return t
+        self.tokens.seek(pos)
+        return None
+
+    # ................................................................
+    # DIV(N) -> (B | P(N) | BL(N) | DL(N) | V(N))+
+    def parse_DIV(self, indent):
+        pos = self.tokens.getpos()
+        xs = []
+        while True:
+            x = self.parse_Terminal(B)
+            if x: continue
+            
+            x = self.parse_P(indent)
+            if x:
+                xs.append(x)
+                continue
+
+            x = self.parse_V(indent)
+            if x:
+                xs.append(x)
+                continue
+
+            x = self.parse_UL(indent)
+            if x:
+                xs.append(x)
+                continue
+
+            x = self.parse_DL(indent)
+            if x:
+                xs.append(x)
+                continue
+
+            break
+        if len(xs) == 0: return None
+        return xs
+    
+    # ................................................................        
+    # P(N) -> PL(N) L(N)*
+    def parse_P(self, indent):
+        content = "\n"
+        good = False 
+        pos = self.tokens.getpos()
+
+        # Introduced by PL
+        x = self.parse_Terminal(PL)
+        if x:
+            if x.indent == indent:
+                content += x.content + "\n"
+                good = True
+            else:
+                self.tokens.back()
+        if not good:
+            return None
+
+        # Continued by zero or more L
+        while True:
+            x = self.parse_Terminal(L)
+            if x:
+                if x.indent == indent:
+                    content += x.content + "\n"
+                    good = True
+                    continue
+                else:
+                    self.tokens.back()
+            break
+
+        ptag = self.xmldoc.createElement("p")
+        self.addFancyText(ptag, content)
+        return ptag
+
+    # ................................................................        
+    # V(N) -> L(M)+, M > N
+    def parse_V(self, indent):
+        content = "\n"
+        good = False
+        pos = self.tokens.getpos()
+        while True:
+            x = self.parse_Terminal(L)
+            if x:
+                if x.indent > indent:
+                    content += " "*(x.indent - indent) + x.content + "\n"
+                    good = True
+                    continue
+                else:
+                    self.tokens.back()                
+            x = self.parse_Terminal(B)
+            if x:
+                content += "\n"
+                continue
+            break
+        if good:
+            ptag = self.xmldoc.createElement("pre")
+            self.addText(ptag, content)
+            return ptag
+        self.tokens.seek(pos)
+        return None
+
+    # ................................................................
+    # UL(N) -> ULI(N)+
+    def parse_UL(self, indent):
+        xs = []
+        while True:
+            x = self.parse_ULI(indent)
+            if x:
+                xs.append(x)
+                continue
+            break
+        if len(xs) == 0: return None
+        ultag = self.xmldoc.createElement("ul")
+        for x in xs:
+            ultag.appendChild(x)
+        return ultag
+
+    # ................................................................
+    # ULI(N) -> UL(N,M) L(M)* DIV(M), M > N
+    def parse_ULI(self, indent):
+        content = "\n"
+        good = False 
+        pos = self.tokens.getpos()
+
+        # Introduced by UL
+        x = self.parse_Terminal(BL)
+        if x:
+            if x.indent == indent:
+                content += x.inner_content + "\n"
+                indent   = x.inner_indent
+                good = True
+            else:
+                self.tokens.back()
+        if not good:
+            return None
+
+        # Continued by zero or more L
+        while True:
+            x = self.parse_Terminal(L)
+            if x:
+                if x.indent == indent:
+                    content += x.content + "\n"
+                    good = True
+                    continue
+                else:
+                    self.tokens.back()
+            break
+        litag = self.xmldoc.createElement(u"li")
+        ptag  = self.xmldoc.createElement(u"p")
+        self.addText(ptag, content)
+        litag.appendChild(ptag)
+
+        # Continued by DIV
+        xs = self.parse_DIV(indent)
+        if xs:
+            for x in xs:
+                litag.appendChild(x)
+
+        return litag
+
+
+    # ................................................................
+    # DL(N) -> DI(N)+
+    def parse_DL(self, indent):
+        xs = []
+        while True:
+            x = self.parse_DI(indent)
+            if x:
+                xs += x
+                continue
+            break
+        if len(xs) == 0: return None
+        dltag = self.xmldoc.createElement(u"dl")
+        for x in xs:
+            dltag.appendChild(x)
+        return dltag
+
+    # ................................................................
+    # DI(N) -> DL(N) DIV(M), M > N
+    def parse_DI(self, indent):
+        content = "\n"
+        good   = False 
+        pos    = self.tokens.getpos()
+        xs     = []
+
+        # Introduced by DL
+        x = self.parse_Terminal(DL)
+        if x:
+            if x.indent == indent:
+                content += x.content + "\n"
+                good = True
+            else:
+                self.tokens.back()
+        if not good:
+            return None
+        dttag = self.xmldoc.createElement(u"dt")
+        dttxt = self.toTextNode(content)
+        dttag.appendChild(dttxt)
+        xs.append(dttag)
+
+        # Continued by DIV
+        t = self.tokens.next()
+        self.tokens.back()
+        if t.isa(L) and t.indent > indent:
+            xs_ = self.parse_DIV(t.indent)
+            if len(xs_) > 0:
+                ddtag = self.xmldoc.createElement(u"dd")
+                for x in xs_:
+                    ddtag.appendChild(x)
+                xs.append(ddtag)
+
+        return xs
+
+    # ................................................................
+    def toDOM(self):
+        # write <mfile></mfile>
+        xmf = self.xmldoc.createElement("html")
+        self.xmldoc.appendChild(xmf)
+
+        # parse documentation
+        xs = self.parse_DIV(1)
+        for x in xs: xmf.appendChild(x)
+        
+        return self.xmldoc
+
+
+if __name__ == '__main__':
+    path = sys.argv[1]
+    file = open(path, 'r')
+    lines = file.readlines()
+    formatter = Formatter(lines, {'BL':u'http://www.google.com'})
+
+    print formatter.toDOM().toxml("UTF-8")
