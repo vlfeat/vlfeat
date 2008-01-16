@@ -1,41 +1,44 @@
 #!/usr/bin/python
 
+"""
+MDOC fromats the embedded M-file documentation according to a simple
+set of rules. Pharagraph,s verbatim sections, lists and other
+structure on are automatically created by looking at blank linkes,
+indentation and a few decoration symbols.
+
+The documentation starts at a conventional indentation level N (by
+default 2). A block of non-epmty lines prefixed by N characters is
+considered a paragraph. For instance
+
+ |  Bla bla bla
+ |  bla bla bla.
+ |
+ |  Bla bla.
+
+generates two pharagraps. If there are more than N white spaces,
+then the block is taken verbatim instead (and rendered in <pre> HTML
+tags). For instance
+
+ |  Bla bla bla
+ |   Code Code Code
+ |
+ |   Code Code Code
+
+generates one paragraph followed by one verbatim section.
+"""
+
 import xml.dom.minidom
 import sys
 import os
 import re
 
-debug = 1 ;
-
-# --------------------------------------------------------------------
-#                                                 Pretty ASCII -> HTML
-# --------------------------------------------------------------------
-
-# MDOC fromats the embedded M-file documentation according to a simple
-# set of rules. Pharagraph,s verbatim sections, lists and other
-# structure on are automatically created by looking at blank linkes,
-# indentation and a few decoration symbols.
-#
-# The documentation starts at a conventional indentation level N (by
-# default 2). A block of non-epmty lines prefixed by N characters is
-# considered a paragraph. For instance
-#
-#  |  Bla bla bla
-#  |  bla bla bla.
-#  |
-#  |  Bla bla.
-#
-# generates two pharagraps. If there are more than N white spaces,
-# then the block is taken verbatim instead (and rendered in <pre> HTML
-# tags). For instance
-#
-#  |  Bla bla bla
-#  |   Code Code Code
-#  |
-#  |   Code Code Code
-#
-# generates one paragraph followed by one verbatim section.
-# 
+__mpname__           = 'MDocFormatter'
+__version__          = '0.1'
+__date__             = '2008-01-01'
+__description__      = 'MDoc formatting module'
+__long_description__ = __doc__
+__license__          = 'GPL'
+__author__           = 'Andrea Vedaldi'
 
 # terminal
 class Terminal:
