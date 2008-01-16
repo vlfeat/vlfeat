@@ -429,9 +429,82 @@ class Formatter:
 
 
 if __name__ == '__main__':
-    path = sys.argv[1]
-    file = open(path, 'r')
-    lines = file.readlines()
-    formatter = Formatter(lines, {'BL':u'http://www.google.com'})
+    text="""
+ Lorem Ipsum is simply dummy text of the printing and typesetting
+ industry. Lorem Ipsum has been the industry's standard dummy text
+ ever since the 1500s, when an unknown printer took a galley of type
+ and scrambled it to make a type specimen book. It has survived not
+ only five centuries, but also the leap into electronic typesetting,
+ remaining essentially unchanged. It was popularised in the 1960s with
+ the release of Letraset sheets containing Lorem Ipsum passages, and
+ more recently with desktop publishing software like Aldus PageMaker
+ including versions of Lorem Ipsum.
 
+ These are links BL(), BL(A,B) and BLA(A,A) (as long as the dictionary
+ cites them).
+
+ Mimamama
+   verbatim1
+   verbatim2
+   verbatim3
+ 
+   verbatim4
+   verbatim5
+ Lorem Ipsum is simply dummy text of the printing and typesetting
+ industry. Lorem Ipsum has been the industry's standard dummy text
+ ever since the 1500s, when an unknown printer took a galley of type
+ and scrambled it to make a type specimen book. It has survived not
+ only five centuries, but also the leap into electronic typesetting,
+ remaining essentially unchanged. It was popularised in the 1960s with
+ the release of Letraset sheets containing Lorem Ipsum passages, and
+ more recently with desktop publishing software like Aldus PageMaker
+ including versions of Lorem Ipsum.
+
+ - outer1 /
+   outer1 line 2 /
+   outer1 line 3 /
+
+   outer1 new paragarph
+   
+   - inner1
+   - inner2
+   - inner3
+     continued on next line
+       continued with verbatim
+       
+       more verbatim after blank
+   - inner4
+ - outer again
+ - outer   
+ bla
+
+ - list2
+ - list4 
+
+ Test descrition::
+     Lorem Ipsum is simply dummy text of the printing
+     and typesetting industry. Lorem Ipsum has been the industry's
+     standard dummy text ever since the 1500s, when an unknown printer
+     took a galley of type and scrambled it to make a type specimen
+     book. It has survived not only five centuries, but also the leap
+     into electronic typesetting, remaining essentially unchanged. It
+     was popularised in the 1960s with the release of Letraset sheets
+     containing Lorem Ipsum passages, and more recently with desktop
+     publishing software like Aldus PageMaker including versions of
+     Lorem Ipsum.
+
+ Ancora::
+     Bli bli bli
+     Blu blu blu
+     
+     - list
+     - lust
+     - last
+
+     Bli bla
+
+  Verbatimmo
+"""
+    lines = text.splitlines()
+    formatter = Formatter(lines, {'BL':u'http://www.google.com'})
     print formatter.toDOM().toxml("UTF-8")
