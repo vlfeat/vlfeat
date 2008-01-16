@@ -172,7 +172,7 @@ class Formatter:
 
     def addFancyText(self, tag, s):
         xs = []
-        iter = re.finditer('([A-Z][A-Z0-9]*)\(.*\)', s)
+        iter = re.finditer('([A-Z][A-Z0-9]*)\([^\)]*\)', s)
         last = -1
 
         for i in iter:
@@ -351,7 +351,7 @@ class Formatter:
             break
         litag = self.xmldoc.createElement(u"li")
         ptag  = self.xmldoc.createElement(u"p")
-        self.addText(ptag, content)
+        self.addFancyText(ptag, content)
         litag.appendChild(ptag)
 
         # Continued by DIV
@@ -480,6 +480,8 @@ if __name__ == '__main__':
 
  - list2
  - list4 
+ - BL()
+ - BL(A,B)
 
  Test descrition::
      Lorem Ipsum is simply dummy text of the printing
