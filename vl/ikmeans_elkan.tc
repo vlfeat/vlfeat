@@ -11,7 +11,8 @@
  ** 
  ** @author Jim Ulery
  **/
-unsigned int 
+
+static unsigned int
 isqrt(unsigned long val) {
   unsigned long temp, g=0, b = 0x8000, bshft = 15;
   do {
@@ -28,6 +29,7 @@ isqrt(unsigned long val) {
  **
  ** Update inter cluster distance table.
  **/
+
 static void
 vl_ikm_elkan_update_inter_dist (VlIKMFilt *f)
 {
@@ -97,10 +99,6 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
   int done = 0 ;
   
   /* do passes */
-  if (f-> verb) {
-    /*  VL_PRINT("ikm: elkan: passes: ") ;*/
-  }
-  
   vl_ikm_elkan_update_inter_dist (f) ;
   
   /* init */    
@@ -150,10 +148,6 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
    * ------------------------------------------------------------------ */
   
   for( pass = 0 ; 1 ; ++pass ) {
-    
-    if (f-> verb) { 
-      VL_PRINTF (" %d", pass + 1) ;
-    }
     
     /* ------------------------------------------------------------------
      *                                                 Re-calculate means
@@ -313,7 +307,6 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
       
       /* stopping condition */
     if(done || pass == f->max_niters) {
-      if (f-> verb) VL_PRINT("\n") ;
       break ;
     }     
   }
@@ -327,7 +320,8 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
   vl_free (m_pt) ;
   
   if (f-> verb) {
-    VL_PRINTF ("ikm: elkan: distance calculations=%d (speedup=%.2f)\n",
+    VL_PRINTF ("ikm: Elkan algorithm: total iterations: %d\n", pass) ;
+    VL_PRINTF ("ikm: Elkan algorithm: distance calculations: %d (speedup: %.2f)\n",
                dist_calc, (float)N*K*(pass+2) / dist_calc -1) ;    
   }
   return 0 ;

@@ -11,3 +11,4 @@ end
 
 pfx = fullfile(vlfeat_root,'doc','figures','demo',[name '.eps']) ;
 print('-depsc',pfx) ;
+fprintf('Printed picture ''%s''\n', pfx)
