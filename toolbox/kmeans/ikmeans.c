@@ -72,7 +72,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   if (!uIsRealScalar (in[IN_K])          ||
       (K = (int) *mxGetPr(in[IN_K])) < 1 ||
       K > N                               ) { 
-    mexErrMsgTxt ("K must be a positive integer smaller than the number of data.");
+    mexErrMsgTxt ("K must be a positive integer not greater than the number of data.");
   }
   
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
@@ -102,7 +102,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       } else if (strcmp("elkan", buf) == 0) {
         method_type = VL_IKM_ELKAN ;
       } else {
-        mexErrMsgTxt("Unknown cost type.") ;
+        mexErrMsgTxt("Unknown method type.") ;
       }
 
       break ;
