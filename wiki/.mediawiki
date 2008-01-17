@@ -1,0 +1,14 @@
+$VAR1 = {
+          'protocol' => 'http',
+          'language_code' => 'en',
+          'escape_filenames' => 0,
+          'space_substitute' => '_',
+          'username' => 'WikiDoc',
+          'host' => 'vision.ucla.edu',
+          'site_url' => 'http://vision.ucla.edu',
+          'password' => 'Va9uVuch',
+          'minor_edit' => -1,
+          'watch' => -1,
+          'wiki_path' => 'vlfeat/wiki/',
+          'encoding' => 'UTF-8'
+        };
