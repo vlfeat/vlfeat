@@ -154,7 +154,7 @@ class Formatter:
     f.toDOM() process the data to construct an XML (HTML) representation
     of them.
     """
-    def __init__ (self, lines, funcs=None):
+    def __init__ (self, lines, funcs={}):
         self.tokens = Lexer(lines)
         self.xmldoc = xml.dom.minidom.Document()
         self.funcs  = funcs
@@ -421,11 +421,13 @@ class Formatter:
     # ................................................................
     def toDOM(self):
         # write <mfile></mfile>
-        xmf = self.xmldoc.createElement("html")
+        xmf = self.xmldoc.createElement("div")
+        xmf.setAttribute(u"class", u"documentation")
+        
         self.xmldoc.appendChild(xmf)
 
         # parse documentation
-        xs = self.parse_DIV(1)
+        xs = self.parse_DIV(2)
         for x in xs: xmf.appendChild(x)
         
         return self.xmldoc
