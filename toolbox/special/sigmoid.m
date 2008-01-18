@@ -4,7 +4,7 @@ function y = sigmoid(x)
 %
 %   Y = 1 ./ (1 + EXP(X)) ;
 %
-%  REMAKRS. It is useful to recall that
+%  REMARKS. It is useful to recall that
 %
 %  *   1 - SIGMOID(X) = SIGMOID(-X)
 %  *   Centered sigmoid: 2 * SIGMOID(X) - 1 ;

@@ -27,36 +27,36 @@
 %
 %   MSER(I,'Option'[,Value]...) accepts the following options
 %
-%   Delta
+%   Delta::
 %       Set the DELTA parameter of the MSER algorithm. Roughly
 %       speaking, the stability of a region is the relative variation
 %       of the region area when the intensity is changed of +/-
 %       Delta/2.
 %
-%   Epsilon
+%   Epsilon::
 %       Set the EPSILON parameter of the MSER algorithm. When the
 %       relative area variation of two nested regions is below
 %       this treshold, then only the most stable one is selected.
 %
-%   MaxArea
+%   MaxArea::
 %       Set the maximum area (volume) of the regions relative to
 %       the image domain area (volume).
 %
-%   MinArea
+%   MinArea::
 %       Set the minimum area (volume) of the regions relative to 
 %       the image domain area (volume).
 %
-%   MaxVariation
+%   MaxVariation::
 %       Set the maximum variation (absolute stability score) of the
 %       regions.
 %
-%   Dups
+%   Dups::
 %       Activate dupliate regions removal.
 %
-%   NoDups
+%   NoDups::
 %       Deactivate duplcate regions removal.
 %
-%   Verbose
+%   Verbose::
 %       Be verbose.
 %
 %   REFERENCES

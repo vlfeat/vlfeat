@@ -2,4 +2,4 @@
 %   I = IKMEANSPUSH(X,C) projects the data X to the integer K-meanns
 %   clusters of centers C returning the cluster indeces I.
 %
-%   See also IKEMANS().
+%   See also IKMEANS().

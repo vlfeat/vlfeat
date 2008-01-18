@@ -9,17 +9,17 @@ function J = imarray(A,varargin)
 %
 %   The function accepts the following option-value pairs:
 %
-%   'Spacing' [0]
+%   'Spacing' [0]::
 %     Orlates the images with a null border of the specified width.
 %
-%   'Layout' [[]]
+%   'Layout' [[]]::
 %     Specify a vector [TM TN] with the number of rows and columns of
 %     the tiling. If equal to [] the layout is computed automatically.
 %
-%   'Movie' [0]
+%   'Movie' [0]::
 %     Display/returns a movie rather than generating a tyling.
 %
-%   'CMap' [[]].
+%   'CMap' [[]]::
 %     Specify a colormap for indexed images and movies.
 %
 %   IMARRAYSC(A, 'Spacing', spacing) is another way of specifying the

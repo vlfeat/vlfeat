@@ -44,10 +44,10 @@
 %
 %   Options:
 %
-%   Verbose
+%   Verbose::
 %     Increase verbosity level.
 %
-%   CLusterNull
+%   CLusterNull::
 %     Do not signal null nodes; instead cluster them.
 %
 %   See also AIBCUT().

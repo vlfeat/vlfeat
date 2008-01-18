@@ -15,13 +15,13 @@ function h=plotsiftdescriptor(d,f,varargin)
 %
 %   The function supports the following options
 %
-%   NumSpatialBins [4]
+%   NumSpatialBins [4]::
 %       Number of spatial bins in each spatial direction.
 %
-%   NumOrientBins [8]
+%   NumOrientBins [8]::
 %       Number of orientation bis.
 %
-%   Magnif [6.0]
+%   Magnif [6.0]::
 %       Frame scale magnification to obtain the edge length of the
 %       keypoint bounding box.
 %

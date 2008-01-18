@@ -12,20 +12,20 @@ function H = tightsubplot(varargin)
 %
 %   The function accepts the following option-value pairs:
 %
-%   Margin       [0]
-%   MarginLeft   [0]
-%   MarginRight  [0]
-%   MarginTop    [0]
-%   MarginBottom [0]
+%   Margin       [0]::
+%   MarginLeft   [0]::
+%   MarginRight  [0]::
+%   MarginTop    [0]::
+%   MarginBottom [0]::
 %     Set the axes inner box margin, either uniformly in all
 %     directions, or specifically to the left, right, top or bottom.
 %
-%   Box ['inner']
+%   Box ['inner']::
 %     If set to 'outer', tile the axes outer box, thus protecting
 %     title and labels. Unfortunately this usually produces
 %     unnecesarily large margins.
 %
-%   Spacing [0] (legacy option)
+%   Spacing [0] (legacy option)::
 %     Set extra spacing between axes.  The space is added between the
 %     inner or outer boxes, depending on the setting below.
 %

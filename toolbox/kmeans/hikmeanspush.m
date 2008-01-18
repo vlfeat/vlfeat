@@ -6,8 +6,8 @@
 %   represents the corresponding root-to-leaf path.
 %
 %   Example: PATH(:,1) = [2 1 4] means that the first datum follows
-%            the branches number 2, 1 and 4 starting from the root of
-%            the HIKM tree ending to a leaf.
+%   the branches number 2, 1 and 4 starting from the root of
+%   the HIKM tree ending to a leaf.
 %
 %   See also HIKMEANS().
 

@@ -5,25 +5,25 @@ function h=plotframe(frames,varargin)
 %  frame is a vector of D=2,3,..,6 real numbers, depending on its
 %  class. PLOTFRAME() supports the following classes:
 %
-%    * POINTS
-%      + FRAME(1:2)   coordinates
+%   * POINTS
+%     + FRAME(1:2)   coordinates
 %
-%    * CIRCLES
-%      + FRAME(1:2)   center
-%      + FRAME(3)     radius
+%   * CIRCLES
+%     + FRAME(1:2)   center
+%     + FRAME(3)     radius
 %
-%    * ORIENTED CIRCLES
-%      + FRAME(1:2)   center
-%      + FRAME(3)     radius
-%      + FRAME(4)     orientation
+%   * ORIENTED CIRCLES
+%     + FRAME(1:2)   center
+%     + FRAME(3)     radius
+%     + FRAME(4)     orientation
 %
-%    * ELLIPSES
-%      + FRAME(1:2)   center
-%      + FRAME(3:5)   S11, S12, S22 of x' inv(S) x = 1.
+%   * ELLIPSES
+%     + FRAME(1:2)   center
+%     + FRAME(3:5)   S11, S12, S22 of x' inv(S) x = 1.
 %
-%    * ORIENTED ELLIPSES
-%      + FRAME(1:2)   center
-%      + FRAME(3:6)   A(:) of ELLIPSE = A UNIT_CIRCLE
+%   * ORIENTED ELLIPSES
+%     + FRAME(1:2)   center
+%     + FRAME(3:6)   A(:) of ELLIPSE = A UNIT_CIRCLE
 %
 %  H=PLOTFRAME(...) returns the handle of the graphical object
 %  representing the frames.

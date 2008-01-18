@@ -10,7 +10,7 @@ function P = click(N,varargin) ;
 %
 %  CLICK(V,N,'Opt',val,...) accepts the following options:
 %
-%    'PlotMarker' [0]
+%    'PlotMarker' [0]::
 %      Put a marker as points are selected. The markers are
 %      deleted on exiting the function.
 %

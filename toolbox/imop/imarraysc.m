@@ -11,7 +11,7 @@ function J = imarraysc(A, varargin)
 %   In addition to the option-value paris accepted by IMARRAY(),
 %   the function accepts also:
 %
-%   'CLim' [[]] 
+%   'CLim' [[]]:: 
 %     If not empty, use the specified intensity range.
 %
 %   See also IMARRAY().

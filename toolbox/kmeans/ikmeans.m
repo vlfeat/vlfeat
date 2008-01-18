@@ -7,12 +7,12 @@
 %
 %   IKMEANS(...,options...) accepts the following options
 %
-%   MaxPasses [200]
+%   MaxPasses [200]::
 %     Maximum number of iterations before giving up (the algorithm
 %     stops as soon as there is no change in the data to cluster
 %     associations).
 %
-%   Verbose
+%   Verbose::
 %     Increase the verbosity level.
 
 % AUTORIGHTS

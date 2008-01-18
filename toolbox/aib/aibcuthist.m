@@ -9,7 +9,7 @@ function hist = aibcuthist(map, x, varargin)
 %  to the null node are dropped.
 %
 %  Options:
-%    Nulls [drop]
+%    Nulls [drop]::
 %      What to do of null nodes: drop ('drop'), accumulate to an
 %      extra bin at the end of HIST ('append'), or accumulate to
 %      the first bin ('first')
