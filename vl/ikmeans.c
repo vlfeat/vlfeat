@@ -13,20 +13,66 @@ General Public License version 2.
 
 /** @file ikmeans.h
  ** 
- ** Integer K-means is an implementation of K-means clustering on
- ** integer data. This is especially useful when clustering large
- ** datasets of visual featrues.
+ ** Integer K-means (IKM) is an implementation of K-means clustering
+ ** (or vector quantization, VQ) for integer data. This is
+ ** particuarlry useful for clustering large collections of visual
+ ** descriptors.
  **
- ** The function ::vl_ikmeans() computes the clusters given some data,
- ** the function ::vl_ikmeans_push_one() projects a new datum on its
- ** cluster and the functon ::vl_ikmeans_push() does the same for
- ** multiple data.
+ ** Use the function ::vl_ikm_new() to create a IKM
+ ** quantizer. Initialize the IKM quantizer with @c K clusters by
+ ** ::vl_ikm_init() or similar function. Use ::vl_ikm_train() to train
+ ** the quantizer. Use ::vl_ikm_push() or ::vl_ikm_push_one() to
+ ** quantize new data.
  **
- ** The K-means algorithm is straightforward: Starting from K randomly
- ** chosen data point, the algorithm alternatively estimates the
- ** associations of each datum to the closest cluster center (in L2
- ** norm) and then the cluster centers as the mean of the data
- ** associated to them.
+ ** Given data @f$x_1,\dots,x_N\in R^d@f$ and an a number of clusters
+ ** @f$K@f$, the goal is to find assigments @f$a_i\in\{1,\dots,K\},@f$
+ ** and centers @f$c_1,\dots,c_K\in R^d@f$ so that the <em>expected
+ ** distortion</em>
+ ** 
+ ** @f[
+ **   E(\{a_{i}, c_j\}) = \frac{1}{N} \sum_{i=1}^N d(x_i, c_{a_i})
+ ** @f]
+ **
+ ** is minimized. Here @f$d(x_i, c_{a_i})@f$ is the
+ ** <em>distortion</em>, i.e. the cost we pay for representing @f$ x_i
+ ** @f$ by @f$ c_{a_i} @f$. IKM uses the squared distortion
+ ** @f$d(x,y)=\|x-y\|^2_2@f$.
+ **
+ ** @section ikmeans-algo Algorithms
+ **
+ ** @subsection ikmeans-alg-init Initialization
+ **
+ ** Most K-means algorithms are iterative and needs an initalization
+ ** in the form of an initial choice of the centers
+ ** @f$c_1,\dots,c_K@f$. We include the following options:
+ **
+ ** - User specified centers (::vl_ikm_init);
+ ** - Random centers (::vl_ikm_init_rand);
+ ** - Centers from @c K randomly selected data points (::vl_ikm_init_rand_data).
+ **
+ ** @subsection ikmeans-alg-lloyd Lloyd
+ **
+ ** The Lloyd (also known as Lloyd-Max and LBG) algorithm iteratively:
+ ** 
+ ** - Fixes the centers, optimizing the assignments (minmizing by
+ **   exhastive search the association of each data point to the
+ **   centers);
+ ** - Fixes the assignments and optimizes the centers (by descending
+ **   the distortion error function). For the squared distortion, this
+ **   step is in closed form.
+ ** 
+ ** This algorithm is not particularly efficient because all data
+ ** points need to be compared to all centers, for a complexity
+ ** @f$O(dNKT)@f$, where <em>T</em> is the total number of iterations.
+ **
+ ** @subsection ikmeans-alg-elkan Elkan
+ **
+ ** Elkan algorithm is an optimized variant of Lloyd. By making use of
+ ** the triangle inequality, many comparisons of data points and
+ ** centers are avoided, especially at later iterations. Usually 4-5
+ ** times less comparisons than Lloyd are preformed, determining a
+ ** similar speedup in the execution time.
+ **
  **/
 
 #include "ikmeans.h"
@@ -43,14 +89,20 @@ static int     vl_ikm_train_elkan     (VlIKMFilt*, vl_ikm_data const*, int) ;
 static void    vl_ikm_push_lloyd      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
 static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
 
-/** @brief Create a new IKM Filter
+/** @brief Create a new IKM quantizer
  **
- ** @param method  Clustering method.
+ ** @param method Clustering algorithm.
  **
- ** @return new IKM filter.
+ ** The function allocates initializes a new IKM quantizer to
+ ** operate based algorithm @a method.
+ **
+ ** @a method has values in the enumerations ::VlIKMAlgorithms.
+ ** 
+ ** @return new IKM qunatizer.
  **/
 
-VlIKMFilt *vl_ikm_new (int method)
+VlIKMFilt *
+vl_ikm_new (int method)
 {
   VlIKMFilt *f =  vl_malloc (sizeof(VlIKMFilt)) ;
   f -> centers = 0 ;
@@ -65,9 +117,9 @@ VlIKMFilt *vl_ikm_new (int method)
   return f ;
 }
 
-/** @brief Delete IKM filter 
+/** @brief Delete IKM qunatizer 
  **
- ** @param f IKM filter.
+ ** @param f IKM qunatizer.
  **/
 
 void vl_ikm_delete (VlIKMFilt* f)
@@ -81,9 +133,9 @@ void vl_ikm_delete (VlIKMFilt* f)
 
 /** @brief Train clusters
  **
- ** @param f       IKM filter.
- ** @param data       data.
- ** @param N          number of data (@a N &ge; 1).
+ ** @param f     IKM qunatizer.
+ ** @param data  data.
+ ** @param N     number of data (@a N @c >= 1).
  **
  ** @return -1 if an overflow may have occured.
  **/
@@ -106,15 +158,16 @@ int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
   return err ;
 }
 
-/** @brief Push data to cluster
+/** @brief Project data to clusters
  **
- ** @param f     IKM filter.
+ ** @param f     IKM qunatizer.
  ** @param asgn  Assigments (out).
  ** @param data  data.
- ** @param N     number of data (@a N &ge; 1).
+ ** @param N     number of data (@a N @c >= 1).
  **
- ** The function projects the data on the integer K-kmeans clusters
- ** specified by the centers.
+ ** The function projects the data @a data on the integer K-kmeans
+ ** clusters specified by the IKM quantizer @a f. Notice that the
+ ** quantizer must be initialized.
  **/
 
 void
@@ -127,15 +180,15 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
   }
 }
 
-/** @brief Push one datum to clusters
+/** @brief Project one datum to clusters
  **
  ** @param centers centers.
  ** @param data    datum to project.
  ** @param K       number of centers.
  ** @param M       dimensionality of the datum.
  **
- ** The function projects the datum on the integer K-kmeans clusters
- ** specified by the centers.
+ ** The function projects the specified datum @a data on the clusters
+ ** specified by the centers @a centers.
  **
  ** @return the cluster index.
  **/

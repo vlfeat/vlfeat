@@ -158,7 +158,7 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
 /** @brief Call customizable @c printf function (no varargs)
  **
- ** @param format format string.
+ ** @param string format string.
  **
  ** The function calls the user customizable @c printf.
  **

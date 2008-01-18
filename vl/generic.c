@@ -245,7 +245,7 @@ void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
 /** ------------------------------------------------------------------
  ** @brief Set printf function
  ** @param printf_func  pointer to @c printf.
- ** Pass NULL to disable printf.
+ ** Set @c print_func to NULL to disable printf≈.
  **/
 
 void 

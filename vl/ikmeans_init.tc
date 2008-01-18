@@ -19,8 +19,8 @@ int cmp_pair (void const *a, void const *b)
 }
 
 /** @internal
- ** @brief Helper function to allocate memory for an IKM filter
- ** @param f filter.
+ ** @brief Helper function to allocate memory for an IKM quantizer
+ ** @param f quantizer.
  ** @param M data dimensionality.
  ** @param K number of clusters.
  **/
@@ -34,8 +34,8 @@ static void alloc (VlIKMFilt *f, int M, int K)
 }
 
 
-/** @brief Helper function to initialize the filter
- ** @param f IKM filter.
+/** @brief Helper function to initialize the quantizer
+ ** @param f IKM quantizer.
  **/
 
 static
@@ -47,11 +47,11 @@ void vl_ikm_init_helper (VlIKMFilt *f)
   }
 }
 
-/** @brief Inintialize filter with centers
- ** @param f IKM filter
- ** @param data data.
- ** @param M data dimensionality.
- ** @param K number of clusters.
+/** @brief Inintialize quantizer with centers
+ ** @param f       IKM quantizer.
+ ** @param centers centers.
+ ** @param M       data dimensionality.
+ ** @param K       number of clusters.
  **/
 
 void
@@ -64,8 +64,8 @@ vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
   vl_ikm_init_helper (f) ;
 }
 
-/** @brief Inintialize filter with random centers
- ** @param f IKM filter
+/** @brief Inintialize quantizer with random centers
+ ** @param f IKM quantizer.
  ** @param M data dimensionality.
  ** @param K number of clusters.
  **/
@@ -87,7 +87,7 @@ vl_ikm_init_rand (VlIKMFilt* f, int M, int K)
 }
 
 /** @brief Inintialize with centers from random data
- ** @param f IKM filter
+ ** @param f IKM quantizer.
  ** @param data data.
  ** @param M data dimensionality.
  ** @param N number of data.

@@ -33,10 +33,10 @@ typedef int mwIndex ;
 /** ------------------------------------------------------------------
  ** @brief Create array with pre-allocated data
  **
- ** @param number of dimensions.
- ** @param dimensions.
- ** @param storage class ID.
- ** @param pre-allocated data.
+ ** @param ndim    number of dimensions.
+ ** @param dims    dimensions.
+ ** @param classid storage class ID.
+ ** @param data    pre-allocated data.
  **
  ** If @a data is set to NULL, the data is allocated from the heap.
  ** If @a data is a buffer allocated by @a mxMalloc, then this buffer
@@ -66,10 +66,10 @@ uCreateNumericArray (mwSize ndim, const mwSize * dims,
 /** ------------------------------------------------------------------
  ** @brief Create array with pre-allocated data
  **
- ** @param M number of rows.
- ** @param N number of columns.
- ** @param storage class ID.
- ** @param pre-allocated data.
+ ** @param M       number of rows.
+ ** @param N       number of columns.
+ ** @param classid class ID.
+ ** @param data    pre-allocated data.
  **
  ** If @a data is set to NULL, the data is allocated from the heap.
  ** If @a data is a buffer allocated by @a mxMalloc, then this buffer

@@ -30,7 +30,7 @@ typedef vl_uint8 vl_mser_pix ;
  ** The MSER filter computes the Maximally Stable Extremal Regions of
  ** an image.
  **
- ** This structure is @ref main-design-opaque "opaque".
+ ** This structure is @ref main-glossary "opaque".
  **
  ** @sa @ref mser
  **/

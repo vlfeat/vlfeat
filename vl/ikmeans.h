@@ -16,9 +16,9 @@ typedef vl_uint8 vl_ikm_data ; /**< IKM data type */
  ** @brief IKM algorithms 
  **/
 
-enum {
-  VL_IKM_LLOYD,       /**< Lloyd algorithm (EM) */
-  VL_IKM_ELKAN        /**< Accelerated Lloyd algorithm */
+enum VlIKMAlgorithms {
+  VL_IKM_LLOYD,       /**< Lloyd algorithm */
+  VL_IKM_ELKAN        /**< Elkan algorithm */
 } ;
   
 /** ------------------------------------------------------------------
@@ -89,9 +89,9 @@ vl_ikm_get_ndims (VlIKMFilt const* f)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get K
+ ** @brief Get the number of centers K
  ** @param f IKM filter.
- ** @return K.
+ ** @return number of centers K.
  **/
  
 VL_INLINE int

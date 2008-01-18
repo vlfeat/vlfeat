@@ -11,34 +11,34 @@
 %
 %   MSER(I,'Option'[,Value]...) accepts the following options
 %
-%   Octaves
+%   Octaves::
 %       Set the number of octave of the DoG scale space.
 %
-%   Levels
+%   Levels::
 %       Set the number of levels per octave of the DoG scale space.
 %
-%   FirstOctave
+%   FirstOctave::
 %       Set the index of the first octave of the DoG scale space.
 %
-%   PeakThresh
+%   PeakThresh::
 %       Set the peak selection threshold.
 %
-%   EdgeThresh
+%   EdgeThresh::
 %       Set the non-edge selection threshold.
 %
-%   NormThresh
+%   NormThresh::
 %       Set the minimum l2-norm of the descriptor before
 %       normalization. Descriptors below the threshold are set to zero.
 %
-%   Frames
+%   Frames::
 %       Set the frames to use (bypass the detector). If frames are not
 %       passed in order of increasing scale, they are re-orderded.
 %
-%   Orientations
+%   Orientations::
 %       Force the computation of the oritentations of the frames
 %       even if the option 'Frames' is being used.
 %
-%   Verbose
+%   Verbose::
 %       Be verbose (may be repeated).
 
 % AUTORIGHTS
