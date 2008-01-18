@@ -10,6 +10,7 @@ def usage():
 
 def m2ascii(mfile):
     ascii = []
+    header = ""
     seenfunction = False
     seenpercent  = False
     for l in open(mfile):
@@ -26,14 +27,17 @@ def m2ascii(mfile):
                 continue
         line = line[1:] # Remove leading %
         ascii.append('%s\n' % line)
-    return ascii
+    if len(ascii) > 0:
+        header = ascii[0].strip()
+        ascii = ascii[1:]
+    return (ascii, header)
 
 def convertfile(mfile, afile):
     f = open(afile, 'w')
-    ascii = m2ascii(mfile)
-    ascii = ascii[1:]
+    (ascii, header) = m2ascii(mfile)
     f.writelines(ascii)
     f.close()
+    return header
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

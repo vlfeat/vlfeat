@@ -154,10 +154,17 @@ class Formatter:
     f.toDOM() process the data to construct an XML (HTML) representation
     of them.
     """
-    def __init__ (self, lines, funcs={}):
+    def __init__ (self, lines, funcs={}, linktype='a'):
+        self.indentinit = 0
+        lineone = lines[0]
+        while lineone.startswith(' '):
+            lineone = lineone[1:]
+            self.indentinit += 1
+
         self.tokens = Lexer(lines)
         self.xmldoc = xml.dom.minidom.Document()
         self.funcs  = funcs
+        self.linktype = linktype
         #print self.tokens
 
     def toTextNode(self,s):
@@ -189,11 +196,15 @@ class Formatter:
                 # add text so far
                 xs.append(self.toTextNode(s[last+1:i.start()]))
 
-                # add link to function
-                atag = self.xmldoc.createElement(u"a")
-                self.addText(atag, i.group(1))
-                atag.setAttribute(u"href", func_href)
-                xs.append(atag)
+                if self.linktype == 'a':
+                    # add link to function
+                    atag = self.xmldoc.createElement(u"a")
+                    self.addText(atag, i.group(1))
+                    atag.setAttribute(u"href", u"%s" % (func_href))
+                    xs.append(atag)
+                elif self.linktype == 'wiki':
+                    linktxt = "[[%s|%s]]" % (func_href, i.group(1))
+                    xs.append(self.toTextNode(linktxt))
 
                 # set head
                 last = i.start()+len(i.group(1))-1
@@ -427,7 +438,7 @@ class Formatter:
         self.xmldoc.appendChild(xmf)
 
         # parse documentation
-        xs = self.parse_DIV(2)
+        xs = self.parse_DIV(self.indentinit)
         for x in xs: xmf.appendChild(x)
         
         return self.xmldoc
@@ -513,5 +524,5 @@ if __name__ == '__main__':
   Verbatimmo
 """
     lines = text.splitlines()
-    formatter = Formatter(lines, {'BL':u'http://www.google.com'})
+    formatter = Formatter(lines, {'BL':'http://www.google.com'}, 'a')
     print formatter.toDOM().toxml("UTF-8")

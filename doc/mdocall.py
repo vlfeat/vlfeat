@@ -34,8 +34,8 @@ def getmfiles(basedir, docdir):
                 funcname = os.path.basename(basename)
 
                 htmlname = os.path.join(docdir, basename + '.html')
-                parts = basename.split(os.path.sep)
-                parts = [p.capitalize() for p in parts]
+                #parts = basename.split(os.path.sep)
+                #parts = [p.capitalize() for p in parts]
                 #linkname = "Doc" + os.path.basename(basename).capitalize()
                 linkname = "Doc_" + basename.replace(os.path.sep, '_')
 
@@ -50,6 +50,28 @@ def getmfiles(basedir, docdir):
 
     return mfiles
 
+def overviewpage(pages, mfiles, indent):
+    keys = pages.keys()
+    keys.sort()
+    pagelines = []
+    for k in keys:
+        if pages[k] == 0:
+            (mname, htmlname, linkname, shortdesc) = mfiles[k]
+            if indent == "":
+                pagelines.append("[[%s|%s]] %s<br>\n" % (linkname, k, shortdesc))
+            else:
+                pagelines.append("%s [[%s|%s]] %s\n" % (indent, linkname, k,
+                    shortdesc))
+
+    for k in keys:
+        if pages[k] != 0:
+            if indent == "":
+                pagelines.append("=== %s ===\n" % (k))
+            else:
+                pagelines.append(indent + k + ":\n")
+            pagelines.extend(overviewpage(pages[k], mfiles, indent + '*'))
+    return pagelines
+
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         usage()
@@ -59,8 +81,14 @@ if __name__ == '__main__':
     # Add trailing slash
     if not basedir.endswith('/'): basedir = basedir + "/"
     docdir  = sys.argv[2]
-    
+
+    # build a dictionary of links for ascii doc
     mfiles = getmfiles(basedir, docdir)
+    linkdict = {}
+    for funcname in mfiles:
+        (mname, htmlname, linkname) = mfiles[funcname]
+        #linkdict[funcname.upper()] = "[[%s|%s]]" % (linkname, file)
+        linkdict[funcname.upper()] = "%s" % (linkname)
 
     # convert to txt, then run ascii doc
     for funcname in mfiles:
@@ -68,14 +96,15 @@ if __name__ == '__main__':
         (txtname, ext) = os.path.splitext(htmlname)
         txtname += '.txt'
         print mname, txtname
-        convertfile(mname, txtname)
+        shortdesc = convertfile(mname, txtname)
+        mfiles[funcname] += (shortdesc,)
         f = open(txtname)
         lines = f.readlines()
         f.close()
        
         content = ''
         if len(lines) > 0:
-            formatter = Formatter(lines)
+            formatter = Formatter(lines, linkdict, 'wiki')
 
             content = formatter.toDOM().toxml("UTF-8")
             contentlines = content.splitlines()
@@ -85,18 +114,42 @@ if __name__ == '__main__':
         f = open(htmlname, 'w')
         f.write(content)
         f.close()
-        #cmd = "asciidoc -s -o %s %s" % (htmlname, txtname)
-        #print cmd
-        #try:
-        #    runcmd(cmd)
-        #except (KeyboardInterrupt, SystemExit):
-        #    sys.exit(1)
         os.remove(txtname)
 
-    # checkin files to wiki
-    #os.system("mvs login -d vision.ucla.edu -w 'vlfeat/wiki/' -u wikidoc -p 'wikidoc'")
+    # make summary page
+    pagegroups = {}
     for funcname in mfiles:
-        (mname, htmlname, linkname) = mfiles[funcname]
+        (mname, htmlname, linkname, shortdesc) = mfiles[funcname]
+        patharray = htmlname[len(docdir):].split(os.path.sep)
+
+        path = pagegroups
+        # walk the path and create a dictionary list of files
+        for i in range(len(patharray)-1):
+            p = patharray[i]
+            if not p in path:
+                path[p] = {}
+            path = path[p]
+        path[funcname] = 0
+
+    overviewname = os.path.join(docdir, "index.html")
+    pagelines = overviewpage(pagegroups, mfiles, '')
+    pagelines.insert(0, "== Documentation ==\n")
+    wikiname = "Doc_index.wiki"
+    f = open(overviewname, 'w')
+    f.writelines(pagelines)
+    f.close()
+
+    try:
+        runcmd("mvs update %s" % wikiname)
+        print "Converting", overviewname, "to", wikiname
+        wikidoc(wikiname, overviewname)
+        runcmd("mvs commit -M -m 'Documentation update' %s" % wikiname)
+    except (KeyboardInterrupt, SystemExit):
+        sys.exit(1)
+
+    # checkin files to wiki
+    for funcname in mfiles:
+        (mname, htmlname, linkname, shortdesc) = mfiles[funcname]
         wikiname = linkname + ".wiki"
         try:
             runcmd("mvs update %s" % wikiname)
@@ -106,5 +159,3 @@ if __name__ == '__main__':
             # possibly add -M for minor revision
         except (KeyboardInterrupt, SystemExit):
             sys.exit(1)
-
-    print "Done"
