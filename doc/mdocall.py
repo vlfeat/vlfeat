@@ -57,6 +57,10 @@ def overviewpage(pages, mfiles, indent):
     for k in keys:
         if pages[k] == 0:
             (mname, htmlname, linkname, shortdesc) = mfiles[k]
+            ind = shortdesc.find(" ")
+            if ind == -1: shortdesc = ""
+            else:         shortdesc = shortdesc[ind+1:]
+
             if indent == "":
                 pagelines.append("[[%s|%s]] %s<br>\n" % (linkname, k, shortdesc))
             else:
