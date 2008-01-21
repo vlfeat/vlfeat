@@ -76,9 +76,9 @@ vl_hikm_copy_subset (vl_ikm_data const * data,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Compute hierarchical integer K-means clustering.
+ ** @brief Compute HIKM clustering.
  **
- ** @param hikm   HIKM tree to fill.
+ ** @param tree   HIKM tree to initialize.
  ** @param data   Data to cluster.
  ** @param N      Number of data points.
  ** @param K      Number of clusters for this node.
@@ -163,7 +163,7 @@ xdelete (VlHIKMNode *node)
 
 /** ------------------------------------------------------------------
  ** @brief New HIKM tree
- ** @param mehtod clustering method.
+ ** @param method clustering method.
  ** @return new HIKM tree.
  **/
 
@@ -225,7 +225,7 @@ vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
 
 /** ------------------------------------------------------------------
  ** @brief Train HIKM tree
- **
+ ** @param f       HIKM tree.
  ** @param data    Data to cluster.
  ** @param N       Number of data.
  **/ 
@@ -237,14 +237,19 @@ vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N)
 }
 
 /** ------------------------------------------------------------------
- ** @biref Project data down HIKM tree
+ ** @brief Project data down HIKM tree
  **
- ** @param hikm HIKM tree.
+ ** @param f    HIKM tree.
+ ** @param asgn Path down the tree (out).
  ** @param data Data to project.
  ** @param N    Number of data.
  **
- ** @return a new vector with the data to node assignments.
+ ** The function writes to @a asgn the path of the data @a data
+ ** down the HIKM tree @a f. The paramter @a asgn must point to
+ ** an array of @c M by @c N elements, where @c M is the depth of
+ ** the HIKM tree and @c N is the number of data point to process.
  **/
+
 void
 vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_ikm_data const *data, int N)
 {

@@ -1,6 +1,6 @@
 /** @file    stringop.c
  ** @author  Andrea Vedaldi
- ** @brief   Strin Operations - Definition
+ ** @brief   String Operations - Definition
  **/
 
 /* AUTORIGHTS

@@ -1,5 +1,5 @@
 /** @file     mser.h
- ** @brief    Maximally Stable Extremal Regions (MSER) - Declaration
+ ** @brief    Maximally Stable Extremal Regions (MSER)
  ** @author   Andrea Vedaldi
  ** 
  **/

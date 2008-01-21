@@ -1,6 +1,6 @@
 /** @file   hikmeans.h
  ** @author Brian Fulkerson
- ** @brief  Heirachical Integer K-Means Clustering - Declaration
+ ** @brief  Heirachical Integer K-Means Clustering
  **/
 #ifndef VL_HIKMEANS_H
 #define VL_HIKMEANS_H
@@ -34,7 +34,7 @@ typedef struct _VlHIKMTree {
   VlHIKMNode * root;    /**< Tree root node */
 } VlHIKMTree ;
 
-/** @param Create and destroy
+/** @name Create and destroy
  ** @{
  **/ 
 VlHIKMTree  *vl_hikm_new    (int method) ;
@@ -59,7 +59,7 @@ VL_INLINE void vl_hikm_set_verbosity  (VlHIKMTree *f, int verb) ;
 VL_INLINE void vl_hikm_set_max_niters (VlHIKMTree *f, int max_niters) ;
 /** @} */
 
-/** @param Process data
+/** @name Process data
  ** @{
  **/
 void vl_hikm_init  (VlHIKMTree *f, int M, int K, int depth) ;

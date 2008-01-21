@@ -1,6 +1,6 @@
 /** @file    pgm.h
  ** @author  Andrea Vedaldi
- ** @brief   Portable graymap format (PGM) parser - Declaration
+ ** @brief   Portable graymap format (PGM) parser
  **
  ** To read a PGM image, first call ::vl_pgm_extract_head() to extract
  ** the image meta data (size and bit-depth). Then allocate the

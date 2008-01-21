@@ -1,5 +1,5 @@
 /** @internal
- ** @file   ikmeans_elkan.c
+ ** @file   ikmeans_elkan.tc
  ** @author Andrea Vedaldi
  ** @brief  Integer K-Means - Elkan Algorithm - Definition
  **/         
@@ -72,8 +72,9 @@ vl_ikm_init_elkan (VlIKMFilt *f)
 
 /** @internal
  ** @brief Elkan algorithm
- ** @param data
- ** @param N
+ ** @param f     IKM quantizer.
+ ** @param data  Data to quantize.
+ ** @param N     Number of data elements.
  **/
 
 static int
@@ -329,9 +330,10 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
 
 /** @internal
  ** @brief Elkan algorithm
- ** @param asgn (out) 
- ** @param data
- ** @param N
+ ** @param f    IKM quantizer.
+ ** @param asgn Assignment of data to centers (out).
+ ** @param data Data to quantize.
+ ** @param N    Number of data.
  **/
 
 static void 

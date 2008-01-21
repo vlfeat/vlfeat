@@ -1,7 +1,6 @@
 /** @file    generic.h
  ** @author  Andrea Vedaldi
- ** @brief   Generic - Declaration
- **
+ ** @brief   Generic
  **/
 
 /* AUTORIGHTS */
@@ -144,28 +143,28 @@ VL_INLINE void  vl_free    (void* ptr) ;
 
 void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
-/** @brief Call customizable @c printf function
+/** @def VL_PRINTF
+ ** @brief Call user-customizable @c printf function
  **
  ** @param format format string.
  ** @param ... @c printf variable arguments.
  **
  ** The function calls the user customizable @c printf.
  **
- ** @return results of @c printf.
+ ** @return results of the user-customizable @c printf.
  **/
 #define VL_PRINTF(format, ...) \
   ((*vl_printf_func)((format), __VA_ARGS__))
 
-/** @brief Call customizable @c printf function (no varargs)
+/** @def VL_PRINT
+ ** @brief Call user-customizable @c printf function (no varags)
  **
- ** @param string format string.
- **
- ** The function calls the user customizable @c printf.
+ ** @param string string to print.
  **
  ** This macro is the same as ::VL_PRINTF() and should
- ** be used when the list of variable arguments is empty.
+ ** be used when the variable list of arguments is empty.
  **
- ** @return results of @c printf.
+ ** @return results of the user-customizable @c printf.
  **/
 #define VL_PRINT(string) \
   ((*vl_printf_func)(string))
@@ -388,11 +387,11 @@ vl_malloc (vl_size n)
  ** @brief Call customizable @c resize function
  **
  ** @param ptr buffer to reallocate.
- ** @param n number of bytes to allocate.
+ ** @param n   number of bytes to allocate.
  **
- ** The function calls the user customizable @c realloc.
+ ** The function calls the user-customizable @c realloc.
  **
- ** @return result of @c realloc
+ ** @return result of the user-customizable @c realloc.
  **/
 
 VL_INLINE 
@@ -405,12 +404,12 @@ vl_realloc (void* ptr, vl_size n)
 /** ------------------------------------------------------------------
  ** @brief Call customizable @c calloc function
  **
- ** @param n size of each element in byte.
- ** @param n number of elements to allocate.
+ ** @param n    size of each element in byte.
+ ** @param size size of the array to allocate (number of elements).
  **
- ** The function calls the user customizable @c calloc.
+ ** The function calls the user-customizable @c calloc.
  **
- ** @return result of @c calloc
+ ** @return result of the user-customizable @c calloc.
  **/
 
 VL_INLINE 

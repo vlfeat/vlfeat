@@ -1,6 +1,6 @@
 /** @file    getopt_long.h
  ** @author  Andrea Vedaldi
- ** @brief   getopt_long - Declaration
+ ** @brief   getopt_long
  **
  ** This is a re-implementation of GNU getopt_long meant to be used on
  ** platforms that do not support such function.

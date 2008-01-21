@@ -3,7 +3,7 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := beta-4
+VER                := 0.9
 DIST                = $(NAME)-$(VER)
 BINDIST             = $(DIST)-$(ARCH)
 
@@ -172,7 +172,7 @@ docdeep: all
 	cd toolbox ; \
 	matlab -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
-dox:
+dox: VERSION
 	make -C doc/figures all
 	(test -e dox || mkdir dox)
 	doxygen doxygen.conf
@@ -190,6 +190,9 @@ doc/toolbox.html : $(m_src)
 TIMESTAMP:
 	echo "Version $(VER)"            > TIMESTAMP
 	echo "Archive created on `date`" >>TIMESTAMP
+
+VERSION:
+	echo "$(VER)" > VERSION
 
 .PHONY: clean
 clean:
@@ -281,3 +284,14 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
+	
+# --------------------------------------------------------------------
+#                                                       X-Code Support
+# --------------------------------------------------------------------
+
+.PHONY: dox-
+dox- : dox
+
+.PHONY: dox-clean
+dox-clean:
+

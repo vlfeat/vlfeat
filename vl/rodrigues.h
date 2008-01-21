@@ -1,6 +1,6 @@
 /** @file    rodrigues.h
  ** @author  Andrea Vedaldi
- ** @brief   Rodrigues formulas - Declaration
+ ** @brief   Rodrigues formulas
  **
  ** @section rodrigues Rodrigues formulas
  **

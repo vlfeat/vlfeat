@@ -1,6 +1,6 @@
 /** @file    imop.h
  ** @author  Andrea Vedaldi
- ** @brief   Image operations - Declaration
+ ** @brief   Image operations
  **/
 
 /* AUTORIGHTS */

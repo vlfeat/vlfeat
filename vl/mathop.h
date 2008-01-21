@@ -1,6 +1,6 @@
 /** @file    mathop.h
  ** @author  Andrea Vedaldi
- ** @brief   Math operations - Declaration
+ ** @brief   Math operations
  **/
 
 /* AUTORIGHTS */
