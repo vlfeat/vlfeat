@@ -29,6 +29,10 @@ function [cut, map, short] = aibcut(parents, n)
 %  See also AIB(), AIBHIST(), AIBCUTHIST().
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 % --------------------------------------------------------------------
 %                                           Determine nodes in the cut
