@@ -43,7 +43,6 @@
 		2D732E970CF8C2E40099B03C /* sift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sift.h; sourceTree = "<group>"; };
 		2D732E980CF8C2E40099B03C /* stringop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stringop.c; sourceTree = "<group>"; };
 		2D732E990CF8C2E40099B03C /* stringop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringop.h; sourceTree = "<group>"; };
-		2DAB13670D4547AB009BEE66 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = doxygen.conf; sourceTree = "<group>"; };
 		2DAB13D30D454A81009BEE66 /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aib.c; path = toolbox/aib/aib.c; sourceTree = "<group>"; };
 		2DAB13D40D454A81009BEE66 /* aibhist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aibhist.c; path = toolbox/aib/aibhist.c; sourceTree = "<group>"; };
 		2DAB13D50D454A81009BEE66 /* alldist2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alldist2.c; path = toolbox/misc/alldist2.c; sourceTree = "<group>"; };
@@ -66,6 +65,7 @@
 		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
 		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
 		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
+		2DCC82710D4581840017C716 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doxygen.conf; path = doc/doxygen.conf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -76,7 +76,7 @@
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
-				2DAB13670D4547AB009BEE66 /* doxygen.conf */,
+				2DCC82710D4581840017C716 /* doxygen.conf */,
 			);
 			name = vlfeat;
 			sourceTree = "<group>";
