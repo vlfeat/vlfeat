@@ -4,6 +4,13 @@
  ** @brief  Integer K-Means - Initialization - Definition
  **/
 
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
+
 /* pairs are used to generate random permutations of data */
 typedef struct
 {

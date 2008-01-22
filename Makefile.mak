@@ -38,6 +38,7 @@ MATLABROOT = C:\MATLAB7
 # MEX_CFLAGS
 #   /D_WINDLL          : Signal DLL code
 #   /DMATLAB_MEX_FILE  : Signal MATLAB MEX code
+#   /Itoolbox          : Add toolbox to inc
 #
 # MEX_LFLAGS
 #  /DLL                : Produce a DLL
@@ -60,6 +61,7 @@ LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
 MEX_RC     = $(MATLABROOT)\extern\include\mexversion.rc
 
 MEX_CFLAGS = $(CFLAGS) /I$(MATLABROOT)\extern\include \
+             /Itoolbox \
              /DMATLAB_MEX_FILE /D_WINDLL
 
 MEX_LFLAGS = $(LFLAGS) \
@@ -69,17 +71,18 @@ MEX_LFLAGS = $(LFLAGS) \
              libmx.lib libmex.lib libmat.lib  
 
 libsrc =            	\
+ vl\aib.c               \
  vl\generic.c           \
  vl\getopt_long.c       \
+ vl\hikmeans.c          \
+ vl\ikmeans.c           \
  vl\imop.c              \
  vl\mathop.c            \
- vl\stringop.c          \
- vl\pgm.c               \
- vl\sift.c              \
  vl\mser.c              \
+ vl\pgm.c               \
  vl\rodrigues.c         \
- vl\aib.c               \
- vl\ikmeans.c
+ vl\sift.c              \
+ vl\stringop.c
 
 cmdsrc =                \
  src\sift.c             \
@@ -89,22 +92,35 @@ cmdsrc =                \
  src\test_stringop.c    \
  src\test_nan.c
 
-mexsrc =                \
- toolbox\sift.c         \
- toolbox\mser.c         \
- toolbox\erfill.c       \
- toolbox\imsmooth.c     \
- toolbox\rodr.c         \
- toolbox\irodr.c        \
- toolbox\imwbackwardmx.c\
- toolbox\ikmeans.c      \
- toolbox\ikmeanspush.c  \
- toolbox\tpsumx.c       \
- toolbox\whistc.c       \
- toolbox\binsum.c       \
- toolbox\alldist2.c     \
- toolbox\aib.c          \
- toolbox\ubcmatch.c
+mexsrc =                       \
+ toolbox\sift\sift.c           \
+ toolbox\sift\ubcmatch.c       \
+ \
+ toolbox\mser\mser.c           \
+ toolbox\mser\erfill.c         \
+ \
+ toolbox\imop\imsmooth.c       \
+ toolbox\imop\imintegral.c     \
+ toolbox\imop\imwbackwardmx.c  \
+ toolbox\imop\tpsumx.c         \
+ \
+ toolbox\geometry\rodr.c       \
+ toolbox\geometry\irodr.c      \
+ \
+ toolbox\kmeans\ikmeans.c      \
+ toolbox\kmeans\ikmeanspush.c  \
+ toolbox\kmeans\hikmeans.c     \
+ toolbox\kmeans\hikmeanspush.c \
+ \
+ toolbox\misc\alldist2.c       \
+ toolbox\misc\binsum.c         \
+ toolbox\misc\ihashfind.c      \
+ toolbox\misc\ihashsum.c       \
+ toolbox\misc\localmax.c       \
+ toolbox\misc\whistc.c         \
+ \
+ toolbox\aib\aib.c             \
+ toolbox\aib\aibhist.c
 
 libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)
@@ -168,7 +184,7 @@ $(objdir) :
 	@-del "$(@R).obj"
 
 # toolbox\*.c -> tooblox\*.dll
-{toolbox}.c{toolbox}.dll:
+.c.dll:
 	@echo CC  $(<) ===^> $(@R).dll
 	@$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
 	@RC /fo"$(@R).res" $(MEX_RC)

@@ -241,6 +241,11 @@ bindist: $(NAME) all doc
 	    --exclude "objs"                                          \
 			$(NAME)
 
+.PHONY: post
+post:
+	scp $(DIST).tar.gz $(BINDIST).tar.gz \
+	   ganesh.cs.ucla.edu:/var/www/vlfeat/download
+
 .PHONY: autorights
 autorights: distclean
 	autorights \
@@ -281,7 +286,7 @@ info :
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
 	
 # --------------------------------------------------------------------
-#                                                       X-Code Support
+#                                                        Xcode Support
 # --------------------------------------------------------------------
 
 .PHONY: dox-

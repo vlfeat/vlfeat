@@ -4,6 +4,13 @@
  ** @brief  Integer K-Means clustering
  **/
 
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
+
 #ifndef VL_IKMEANS_H
 #define VL_IKMEANS_H
 
@@ -22,7 +29,7 @@ enum VlIKMAlgorithms {
 } ;
   
 /** ------------------------------------------------------------------
- ** @brief Integer K-Means filter
+ ** @brief IKM quantizer
  **/
 
 typedef struct _VlIKMFilt

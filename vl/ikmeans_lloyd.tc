@@ -5,6 +5,13 @@
  ** @brief  Integer K-Means - LLoyd Algorithm - Definition
  **/
 
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
+
 /** @internal
  ** @brief Helper function to initialie filter for Lloyd algorithm
  **
