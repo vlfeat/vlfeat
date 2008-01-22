@@ -244,7 +244,7 @@ bindist: $(NAME) all doc
 .PHONY: autorights
 autorights: distclean
 	autorights \
-	  . \
+	  tooblox vl \
 	  --recursive    \
 	  --verbose \
 	  --template doc/copylet.txt \
