@@ -33,6 +33,7 @@ CFLAGS           += -Wno-unused-function
 CFLAGS           += -Wno-long-long
 LDFLAGS          +=
 MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl -Itoolbox
+TAR_CREAT         =
 
 # Determine on the flight the system we are running on
 Darwin_PPC_ARCH    := mac
@@ -50,29 +51,34 @@ mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
 mac_LDFLAGS      := 
 mac_MEX_CFLAGS   := 
 mac_MEX_SUFFIX   := mexmac
+mac_TAR_CREAT    := -X
 
 mci_BINDIR       := bin/maci
 mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
 mci_LDFLAGS      :=
 mci_MEX_CFLAGS   :=
 mci_MEX_SUFFIX   := mexmaci
+mci_TAR_CREAT    := -X
 
 glx_BINDIR       := bin/glx
 glx_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   :=
 glx_MEX_SUFFIX   := mexglx
+glx_TAR_CREAT    :=
 
 g64_BINDIR       := bin/g64
 g64_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
 g64_LDFLAGS      := -lm
 g64_MEX_CFLAGS   :=
 g64_MEX_SUFFIX   := mexa64
+g64_TAR_CREAT    :=
 
 CFLAGS           += $($(ARCH)_CFLAGS)
 LDFLAGS          += $($(ARCH)_LDFLAGS)
 MEX_SUFFIX       := $($(ARCH)_MEX_SUFFIX)
 MEX_CFLAGS       += $($(ARCH)_MEX_CFLAGS)
+TAR_CREAT        := $($(ARCH)_TAR_CREAT)
 BINDIR           := $($(ARCH)_BINDIR)
 BINDIST          := $(DIST)-bin
 
@@ -201,6 +207,7 @@ clean:
 	rm -f  `find . -name '*~'`
 	rm -f  `find . -name '.DS_Store'`
 	rm -f  `find . -name '.gdb_history'`
+	rm -f  `find . -name '._*'`
 	rm -rf  ./results
 
 .PHONY: distclean
@@ -218,33 +225,41 @@ distclean: clean
 	rm -f  $(NAME)-*.tar.gz
 
 .PHONY: dist
-dist: d := $(notdir $(CURDIR)) 
-dist: clean TIMESTAMP 
-	tar chzvf $(DIST).tar.gz ../$(d)    	                      \
-	  --exclude '.git'                                            \
-	  --exclude 'bin'                                             \
-	  --exclude 'dox'                                             \
-	  --exclude 'results'                                         \
-	  --exclude 'toolbox/*.mexmac'                                \
-	  --exclude 'toolbox/*.mexmaci'                               \
-	  --exclude 'toolbox/*.mexglx'                                \
-	  --exclude 'toolbox/*.mexw32'                                \
-	  --exclude 'toolbox/*.dll'                                   \
-	  --exclude 'toolbox/*.pdb'                                   \
-	  --exclude 'figures/*.png'                                   \
-	  --exclude '$(DIST)-*'                                       \
-	  --exclude '$(BINDIST)-*'
+dist: d :=../$(notdir $(CURDIR)) 
+dist: clean TIMESTAMP VERSION
+	COPYFILE_DISABLE=1						                                \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	tar czvf $(DIST).tar.gz				              									\
+	  --exclude ".git"                                            \
+	  --exclude "bin"                                             \
+	  --exclude "dox"                                             \
+	  --exclude "results"                                         \		
+	  --exclude "*.build"                                         \
+	  --exclude "*.mexmac"                                        \
+	  --exclude "*.mexmaci"                                       \
+	  --exclude "*.mexglx"                                        \
+	  --exclude "*.mexw32"                                        \
+	  --exclude "*.dll"                                           \
+	  --exclude "*.pdb"                                           \
+	  --exclude "figures/*.png"                                   \
+	  --exclude "$(DIST)-*"                                       \
+	  --exclude "$(BINDIST)-*"                                    \
+		--exclude "vlfeat.xcodeproj"                                \
+	$(d)
 
 .PHONY: bindist
-bindist: d := $(notdir $(CURDIR)) 
+bindist: d :=../$(notdir $(CURDIR)) 
 bindist: all doc clean TIMESTAMP
-	tar chzvf $(BINDIST).tar.gz ../$(d)                           \
+	COPYFILE_DISABLE=1						                                \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	tar $(TAR_CREAT) czvf $(BINDIST).tar.gz                       \
 	  --exclude '.git'                                            \
 	  --exclude 'results'                                         \
 	  --exclude 'doc/figures/demo/*.eps'                          \
 	  --exclude '*.pdb'                                           \
 	  --exclude '$(DIST)-*'                                       \
-	  --exclude '$(BINDIST)-*'
+	  --exclude '$(BINDIST)-*'                                    \
+		$(d)
 
 .PHONY: autorights
 autorights: distclean
@@ -284,6 +299,7 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
+	@echo "TAR_CREAT    = $(TAR_CREAT)"
 	
 # --------------------------------------------------------------------
 #                                                       X-Code Support
