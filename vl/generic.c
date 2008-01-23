@@ -11,9 +11,10 @@ General Public License version 2.
 */
 
 /** @mainpage VisionLab Features Library
- ** @version 0.1
- ** @author Andrea Vedaldi (mailto:vedaldi@cs.ucla.edu)
- ** @author Brian Fulkerson (mailto:brian@cs.ucla.edu)
+
+@version __VLFEAT_VERSION__
+@author Andrea Vedaldi  (mailto:vedaldi@cs.ucla.edu)
+@author Brian Fulkerson (mailto:brian@cs.ucla.edu)
 
 @par Copyright &copy; 2007 Andrea Vedaldi and Brian Fulkerson
 
@@ -24,11 +25,10 @@ category detection, object and category recognition.</em>
 
 @section main-contents Contents
 
-- @ref main-design "Library Design"
-  - @ref main-design-goals      "Goals"
-  - @ref main-design-guidelines "Guidelines"
-  - @ref main-design-style      "Coding style"
-- @ref main-glossary  "Glossary"
+- @ref main                "Overview"
+- @ref main-style          "Coding style"
+  - @ref main-style-memory "Memory management" 
+- @ref main-glossary "Glossary"
 - Support functionalities
   - @ref generic.h   "Atomic data types, errors, and others"
   - @ref mathop.h    "Math operations"
@@ -43,57 +43,46 @@ category detection, object and category recognition.</em>
   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
 
-@section main-design Library design
+@section main Overview
 
-@subsection main-design-goals Goals
-
-The goal of the VLFeat core library is to provide solid
-implementations a small set of useful computer vision algorithms. The
-libary targets are computer vision researchers. The library aims to
+We want VLFeat C library to provide solid implementations a small 
+set of useful computer vision algorithms. Our 
+target users are other computer vision researchers. The library aims to
 be:
 
 - <b>Accurate</b>. Algorithms should be well defined and (when
   possible) close to the description/implementation of the original
-  authors.
- 
+  authors. 
 - <b>Easy to use</b>. The library should be easy to compile and
   setup. The user interface should be simple and flexible. The
   documentation should be clear and complete.
- 
 - <b>Open</b>. The code should be easy to read, understand and modify.
   It should also be easy to extract from the library a particular
   algorithm.
 
-Speed is not our main concern, even if we are happier with fast
-implementations.
+We think that the best way of achieving many of these results is to keep the library
+ as simple and fruible as possible. The library is therefore designed to be:
 
-@subsection main-design-guidelines Guidelines
-
-In order to obtain an accurate, usable and open library, the code is
-written according to the following guidelins:
-
-- <b>Minimality</b>. The core library includes only the fundamental
-  algorithms. Additional functionalities are either included in the
-  MATLAB toolbox (part of VLFeat) or left to the user. This redueces
-  clutter and makes the library manageable by the authors.
-- <b>Flatness</b>. The intra-dependencies among library modules are
-  not deep.  In most cases, an algorithm implementation depends only
-  on a few basic modules (such as IO or math operations), but is
-  otherwise largely independent from other algorithms. This simplifies
-  isolating an algorithm from the library.
-- <b>Portability</b>. The library is in standard C (fundamentally
-  C-89, with a few exceptions) and has no external dependencies except for
-  the basic ones. This also makes easier to compile the library.
-- <b>Slef-documented</b>. Documentation is embedded in the source code
-  in Doxygen format. The documentation includes exhaustive
+- <b>Minimal</b>. The VLFeat C library implements only the core algorithms. 
+  This reduce clutter, ease maintenance and make it possible to produce
+  high quality code for the parts that really matter.
+- <b>Flat</b>. The intra-dependencies among library modules are
+  not deep.  Preferably, each algorithm depends only on the basic
+  modules (IO, math, ...). This simplifies understanding and maintaining
+  each algorithm, and make it possible to "copy and paste" code from
+  the library to other projcets.
+- <b>Portable</b>. The library adheres to the commom C standars 
+  (mostly  C-89, with a few exceptions) and has no external dependencies.
+  This makes much easier for new users to compile and modify the library.
+- <b>Slef-documenting</b>. Documentation is embedded in the source code
+  in Doxygen format. The documentation includes accurate
   descriptions of each algorithm.
 
-@subsection main-design-style Coding style
+@section main-style Coding conventions and style
 
-This section describes the coding style we use for the libary.
+This section describes the coding conventions that the library uses.
 
-
-@subsection main-design-style Memory management
+@subsection main-style-memory Memory management
 
 Memory is allocated and freed by means of ::vl_malloc(), vl_free(),
 ::vl_realloc() functions, which are stubs pointing to the actual
@@ -123,13 +112,11 @@ stacked with column-major order as the sequence \f$(A_{11}, A_{21},
 \dots, A_{12}, \dots)\f$. More in general, when stacking a multi
 dimensional array this indicates that the first index is the one
 varying most quickly, with the other followed in the natural order.
-
 - <b>Opaque structure.</b> A structure is opaque if its fields are not
 meant to be accessed directly but by means of appropriate interface
 functions. This techniuqe improves robustness and and isolates the
 implementation from the interface, much in the spirit of
 object-oriented programming.
-
 - <b>Row-major.</b> A <em>M x N </em> matrix <em>A</em> is
 stacked with row-major order as the sequence \f$(A_{11}, A_{12},
 \dots, A_{21}, \dots)\f$. More in general, when stacking a multi
@@ -138,7 +125,7 @@ varying most quickly, with the other followed in reverse order.
 
 **/
 
-/** @file   generich.h
+/** @file   generic.h
  ** @author Andrea Vedaldi
  ** @brief  Generic
 
@@ -245,7 +232,7 @@ void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
 /** ------------------------------------------------------------------
  ** @brief Set printf function
  ** @param printf_func  pointer to @c printf.
- ** Set @c print_func to NULL to disable printf≈.
+ ** Let @c print_func be NULL to disable printf.
  **/
 
 void 

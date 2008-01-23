@@ -1,9 +1,16 @@
 /** @internal
- ** @file   ikmeans_lloyd.c
- ** @auhtor Brian Fulkerson
+ ** @file   ikmeans_lloyd.tc
+ ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
  ** @brief  Integer K-Means - LLoyd Algorithm - Definition
  **/
+
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 /** @internal
  ** @brief Helper function to initialie filter for Lloyd algorithm
@@ -17,8 +24,9 @@ vl_ikm_init_lloyd (VlIKMFilt *f)
 
 /** @internal
  ** @brief LLoyd algorithm
- ** @param data
- ** @param N
+ ** @param f     IKM quantizer.
+ ** @param data  Training data.
+ ** @param N     Number of traning data.
  **/
 
 static int
@@ -107,9 +115,10 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_ikm_data const* data, int N)
 
 /** @internal
  ** @brief LLoyd algorithm
- ** @param asgn (out)
- ** @param data
- ** @param N
+ ** @param f     IKM quantizer.
+ ** @param asgn  Assignemnts (out).
+ ** @param data  Data to quantize.
+ ** @param N     Number of data.
  **/
 
 static void 

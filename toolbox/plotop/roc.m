@@ -66,6 +66,10 @@ function [tp,tn,info] = roc(y, score)
 %  of uniform labels prior.
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 [score, perm] = sort(score) ;
 

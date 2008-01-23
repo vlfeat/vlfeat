@@ -1,10 +1,15 @@
 /** @file     mser.h
- ** @brief    Maximally Stable Extremal Regions (MSER) - Declaration
+ ** @brief    Maximally Stable Extremal Regions (MSER)
  ** @author   Andrea Vedaldi
  ** 
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #ifndef VL_MSER
 #define VL_MSER

@@ -3,9 +3,8 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := beta-4
+VER                := 0.9
 DIST                = $(NAME)-$(VER)
-BINDIST             = $(DIST)-$(ARCH)
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -172,10 +171,10 @@ docdeep: all
 	cd toolbox ; \
 	matlab -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
-dox:
+dox: VERSION
 	make -C doc/figures all
 	(test -e dox || mkdir dox)
-	doxygen doxygen.conf
+	doxygen doc/doxygen.conf
 
 .PHONY: modc
 mdoc:	doc/toolbox.html
@@ -191,6 +190,9 @@ TIMESTAMP:
 	echo "Version $(VER)"            > TIMESTAMP
 	echo "Archive created on `date`" >>TIMESTAMP
 
+VERSION:
+	echo "$(VER)" > VERSION
+
 .PHONY: clean
 clean:
 	make -C doc clean
@@ -198,58 +200,59 @@ clean:
 	rm -f  `find . -name '*~'`
 	rm -f  `find . -name '.DS_Store'`
 	rm -f  `find . -name '.gdb_history'`
+	rm -f  `find . -name '._*'`
 	rm -rf  ./results
+	rm -rf $(NAME)
 
 .PHONY: distclean
 distclean: clean
 	make -C doc distclean
-	rm -rf bin
-	rm -rf dox
+	rm -rf bin dox
 	rm -f  doc/toolbox.html
-	rm -f  toolbox/*.mexmac
-	rm -f  toolbox/*.mexmaci
-	rm -f  toolbox/*.mexglx
-	rm -f  toolbox/*.mexw32
-	rm -f  toolbox/*.dll
-	rm -f  toolbox/*.pdb
+	for i in mexmac mexmaci mexglx mexw32 dll pdb ;             \
+	do                                                          \
+		rm -f `find toolbox -name "*.$${i}"` ;                    \
+	done
 	rm -f  $(NAME)-*.tar.gz
 
-.PHONY: dist
-dist: d := $(notdir $(CURDIR)) 
-dist: clean TIMESTAMP 
-	tar chzvf $(DIST).tar.gz ../$(d)    	                      \
-	  --exclude '.git'                                            \
-	  --exclude 'bin'                                             \
-	  --exclude 'dox'                                             \
-	  --exclude 'results'                                         \
-	  --exclude 'toolbox/*.mexmac'                                \
-	  --exclude 'toolbox/*.mexmaci'                               \
-	  --exclude 'toolbox/*.mexglx'                                \
-	  --exclude 'toolbox/*.mexw32'                                \
-	  --exclude 'toolbox/*.dll'                                   \
-	  --exclude 'toolbox/*.pdb'                                   \
-	  --exclude 'figures/*.png'                                   \
-	  --exclude '$(DIST)-*'                                       \
-	  --exclude '$(BINDIST)-*'
+.PHONY: $(NAME), dist, bindist
 
-.PHONY: bindist
-bindist: d := $(notdir $(CURDIR)) 
-bindist: all doc clean TIMESTAMP
-	tar chzvf $(BINDIST).tar.gz ../$(d)                           \
-	  --exclude '.git'                                            \
-	  --exclude 'results'                                         \
-	  --exclude 'doc/figures/demo/*.eps'                          \
-	  --exclude '*.pdb'                                           \
-	  --exclude '$(DIST)-*'                                       \
-	  --exclude '$(BINDIST)-*'
+$(NAME): TIMESTAMP VERSION
+	rm -rf $(NAME)
+	git archive --prefix=$(NAME)/ HEAD | tar xvf -
+	cp TIMESTAMP $(NAME)
+	cp VERSION $(NAME)
+		
+dist: $(NAME)
+	COPYFILE_DISABLE=1						                                \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	tar czvf $(DIST).tar.gz $(NAME)
+	
+bindist: $(NAME) all doc
+	cp -rp bin $(NAME)
+	cp -rp doc $(NAME)
+	for i in mexmaci mexmac mexw32 mexglx mexg64 dll ;            \
+	do                                                            \
+		find toolbox -name "*.$${i}" -exec cp -p "{}" "$(NAME)/{}" \; ;\
+	done
+	COPYFILE_DISABLE=1						                                \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	tar czvf $(BINDIST).tar.gz                                    \
+	    --exclude "objs"                                          \
+			$(NAME)
+
+.PHONY: post
+post:
+	scp $(DIST).tar.gz $(BINDIST).tar.gz \
+	   ganesh.cs.ucla.edu:/var/www/vlfeat/download
 
 .PHONY: autorights
 autorights: distclean
 	autorights \
-	  . \
+	  tooblox vl \
 	  --recursive    \
 	  --verbose \
-	  --template copylet.txt \
+	  --template doc/copylet.txt \
 	  --years 2007   \
 	  --authors "Andrea Vedaldi and Brian Fulkerson" \
 	  --holders "Andrea Vedaldi and Brian Fulkerson" \
@@ -281,3 +284,14 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
+	
+# --------------------------------------------------------------------
+#                                                        Xcode Support
+# --------------------------------------------------------------------
+
+.PHONY: dox-
+dox- : dox
+
+.PHONY: dox-clean
+dox-clean:
+

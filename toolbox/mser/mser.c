@@ -1,4 +1,4 @@
-/** @file     mser.mser.c
+/** @file     mser.c
  ** @author   Andrea Vedaldi
  ** @brief    MSER MEX driver
  **/

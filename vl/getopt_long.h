@@ -1,12 +1,17 @@
 /** @file    getopt_long.h
  ** @author  Andrea Vedaldi
- ** @brief   getopt_long - Declaration
+ ** @brief   getopt_long
  **
  ** This is a re-implementation of GNU getopt_long meant to be used on
  ** platforms that do not support such function.
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #ifndef VL_GETOPT_LONG_H
 #define VL_GETOPT_LONG_H

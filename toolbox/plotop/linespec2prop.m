@@ -9,6 +9,10 @@ function prop=linespec2prop(spec)
 %  See also PLOT(), VLFEAT.
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 prop = {} ;
 

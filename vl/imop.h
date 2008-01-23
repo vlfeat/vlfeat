@@ -1,9 +1,14 @@
 /** @file    imop.h
  ** @author  Andrea Vedaldi
- ** @brief   Image operations - Declaration
+ ** @brief   Image operations
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #ifndef VL_IMOP
 #define VL_IMOP

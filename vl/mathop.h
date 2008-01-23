@@ -1,9 +1,14 @@
 /** @file    mathop.h
  ** @author  Andrea Vedaldi
- ** @brief   Math operations - Declaration
+ ** @brief   Math operations
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
 
 #ifndef VL_MATHOP
 #define VL_MATHOP
