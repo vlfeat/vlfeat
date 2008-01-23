@@ -5,7 +5,6 @@
 NAME               := vlfeat
 VER                := 0.9
 DIST                = $(NAME)-$(VER)
-BINDIST             = $(DIST)-$(ARCH)
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -33,7 +32,6 @@ CFLAGS           += -Wno-unused-function
 CFLAGS           += -Wno-long-long
 LDFLAGS          +=
 MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl -Itoolbox
-TAR_CREAT         =
 
 # Determine on the flight the system we are running on
 Darwin_PPC_ARCH    := mac
@@ -51,34 +49,29 @@ mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
 mac_LDFLAGS      := 
 mac_MEX_CFLAGS   := 
 mac_MEX_SUFFIX   := mexmac
-mac_TAR_CREAT    := -X
 
 mci_BINDIR       := bin/maci
 mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
 mci_LDFLAGS      :=
 mci_MEX_CFLAGS   :=
 mci_MEX_SUFFIX   := mexmaci
-mci_TAR_CREAT    := -X
 
 glx_BINDIR       := bin/glx
 glx_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS      := -lm
 glx_MEX_CFLAGS   :=
 glx_MEX_SUFFIX   := mexglx
-glx_TAR_CREAT    :=
 
 g64_BINDIR       := bin/g64
 g64_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
 g64_LDFLAGS      := -lm
 g64_MEX_CFLAGS   :=
 g64_MEX_SUFFIX   := mexa64
-g64_TAR_CREAT    :=
 
 CFLAGS           += $($(ARCH)_CFLAGS)
 LDFLAGS          += $($(ARCH)_LDFLAGS)
 MEX_SUFFIX       := $($(ARCH)_MEX_SUFFIX)
 MEX_CFLAGS       += $($(ARCH)_MEX_CFLAGS)
-TAR_CREAT        := $($(ARCH)_TAR_CREAT)
 BINDIR           := $($(ARCH)_BINDIR)
 BINDIST          := $(DIST)-bin
 
@@ -181,7 +174,7 @@ docdeep: all
 dox: VERSION
 	make -C doc/figures all
 	(test -e dox || mkdir dox)
-	doxygen doxygen.conf
+	doxygen doc/doxygen.conf
 
 .PHONY: modc
 mdoc:	doc/toolbox.html
@@ -209,65 +202,57 @@ clean:
 	rm -f  `find . -name '.gdb_history'`
 	rm -f  `find . -name '._*'`
 	rm -rf  ./results
+	rm -rf $(NAME)
 
 .PHONY: distclean
 distclean: clean
 	make -C doc distclean
-	rm -rf bin
-	rm -rf dox
+	rm -rf bin dox
 	rm -f  doc/toolbox.html
-	rm -f  toolbox/*.mexmac
-	rm -f  toolbox/*.mexmaci
-	rm -f  toolbox/*.mexglx
-	rm -f  toolbox/*.mexw32
-	rm -f  toolbox/*.dll
-	rm -f  toolbox/*.pdb
+	for i in mexmac mexmaci mexglx mexw32 dll pdb ;             \
+	do                                                          \
+		rm -f `find toolbox -name "*.$${i}"` ;                    \
+	done
 	rm -f  $(NAME)-*.tar.gz
 
-.PHONY: dist
-dist: d :=../$(notdir $(CURDIR)) 
-dist: clean TIMESTAMP VERSION
-	COPYFILE_DISABLE=1						                                \
-	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
-	tar czvf $(DIST).tar.gz				              									\
-	  --exclude ".git"                                            \
-	  --exclude "bin"                                             \
-	  --exclude "dox"                                             \
-	  --exclude "results"                                         \		
-	  --exclude "*.build"                                         \
-	  --exclude "*.mexmac"                                        \
-	  --exclude "*.mexmaci"                                       \
-	  --exclude "*.mexglx"                                        \
-	  --exclude "*.mexw32"                                        \
-	  --exclude "*.dll"                                           \
-	  --exclude "*.pdb"                                           \
-	  --exclude "figures/*.png"                                   \
-	  --exclude "$(DIST)-*"                                       \
-	  --exclude "$(BINDIST)-*"                                    \
-		--exclude "vlfeat.xcodeproj"                                \
-	$(d)
+.PHONY: $(NAME), dist, bindist
 
-.PHONY: bindist
-bindist: d :=../$(notdir $(CURDIR)) 
-bindist: all doc clean TIMESTAMP
+$(NAME): TIMESTAMP VERSION
+	rm -rf $(NAME)
+	git archive --prefix=$(NAME)/ HEAD | tar xvf -
+	cp TIMESTAMP $(NAME)
+	cp VERSION $(NAME)
+		
+dist: $(NAME)
 	COPYFILE_DISABLE=1						                                \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
-	tar $(TAR_CREAT) czvf $(BINDIST).tar.gz                       \
-	  --exclude '.git'                                            \
-	  --exclude 'results'                                         \
-	  --exclude 'doc/figures/demo/*.eps'                          \
-	  --exclude '*.pdb'                                           \
-	  --exclude '$(DIST)-*'                                       \
-	  --exclude '$(BINDIST)-*'                                    \
-		$(d)
+	tar czvf $(DIST).tar.gz $(NAME)
+	
+bindist: $(NAME) all doc
+	cp -rp bin $(NAME)
+	cp -rp doc $(NAME)
+	for i in mexmaci mexmac mexw32 mexglx mexg64 dll ;            \
+	do                                                            \
+		find toolbox -name "*.$${i}" -exec cp -p "{}" "$(NAME)/{}" \; ;\
+	done
+	COPYFILE_DISABLE=1						                                \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	tar czvf $(BINDIST).tar.gz                                    \
+	    --exclude "objs"                                          \
+			$(NAME)
+
+.PHONY: post
+post:
+	scp $(DIST).tar.gz $(BINDIST).tar.gz \
+	   ganesh.cs.ucla.edu:/var/www/vlfeat/download
 
 .PHONY: autorights
 autorights: distclean
 	autorights \
-	  . \
+	  tooblox vl \
 	  --recursive    \
 	  --verbose \
-	  --template copylet.txt \
+	  --template doc/copylet.txt \
 	  --years 2007   \
 	  --authors "Andrea Vedaldi and Brian Fulkerson" \
 	  --holders "Andrea Vedaldi and Brian Fulkerson" \
@@ -299,10 +284,9 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
-	@echo "TAR_CREAT    = $(TAR_CREAT)"
 	
 # --------------------------------------------------------------------
-#                                                       X-Code Support
+#                                                        Xcode Support
 # --------------------------------------------------------------------
 
 .PHONY: dox-

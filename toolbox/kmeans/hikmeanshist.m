@@ -18,6 +18,10 @@ function h = hikmeanshist(tree,path)
 %  See also HIKMEANSPUSH().
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 % PATH(:,k) is colum of subscripts i1 i2 ... id identifying a path in
 % the tree. In a bread first enumeration of the tree nodes (starting

@@ -6,6 +6,10 @@ function h = ikmeanshist(K,asgn)
 %  See also IKMEANSPUSH().
 
 % AUTORIGHTS
+% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% 
+% This file is part of VLFeat, available in the terms of the GNU
+% General Public License version 2.
 
 h = zeros(K,1) ;
 h = binsum(h, 1, double(asgn)) ;
