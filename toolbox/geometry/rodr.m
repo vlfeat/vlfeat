@@ -18,4 +18,4 @@
 %   function is very similar, except for the format of the derivative,
 %   which differs by a permutation of the elements.
 %
-%   See also IRODR(), PDF:RODRIGUES.
+%   See also IRODR().

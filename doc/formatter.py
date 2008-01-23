@@ -2,8 +2,8 @@
 
 """
 MDOC fromats the embedded M-file documentation according to a simple
-set of rules. Pharagraph,s verbatim sections, lists and other
-structure on are automatically created by looking at blank linkes,
+set of rules. Pharagraphs, verbatim sections, lists and other
+structures are automatically instantiated by looking at blank lines,
 indentation and a few decoration symbols.
 
 The documentation starts at a conventional indentation level N (by
@@ -73,7 +73,10 @@ class DL (L):
 # --------------------------------------------------------------------
 def lex(line):
 # --------------------------------------------------------------------
-    "Parse LINE to a terminal symbol."
+    """
+    Parse LINE to a terminal symbol. Note that each line corresponds to
+    exactlly one terminal type, but types are organized hierarchically.
+    """
 
     match = re.match(r"\s*\n?$", line) ;
     if match: return B()
@@ -85,7 +88,7 @@ def lex(line):
         x.content = match.group(2)
         return x
 
-    match = re.match(r"(\s*)(-\s*)(\S.*)\n?$", line)
+    match = re.match(r"(\s*)([-\*#]\s*)(\S.*)\n?$", line)
     if match:
         x = BL()
         x.indent        = len(match.group(1))
@@ -312,6 +315,9 @@ class Formatter:
             break
         if good:
             ptag = self.xmldoc.createElement("pre")
+            # remove potential blank line at the end
+            if content[-2:] == "\n\n":
+                content= content[:-2]
             self.addText(ptag, content)
             return ptag
         self.tokens.seek(pos)
