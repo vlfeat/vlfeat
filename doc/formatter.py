@@ -317,7 +317,7 @@ class Formatter:
             ptag = self.xmldoc.createElement("pre")
             # remove potential blank line at the end
             if content[-2:] == "\n\n":
-                content= content[:-2]
+                content= content[:-1]
             self.addText(ptag, content)
             return ptag
         self.tokens.seek(pos)
