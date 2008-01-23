@@ -36,8 +36,11 @@ def getmfiles(basedir, docdir):
                 htmlname = os.path.join(docdir, basename + '.html')
                 #parts = basename.split(os.path.sep)
                 #parts = [p.capitalize() for p in parts]
-                #linkname = "Doc" + os.path.basename(basename).capitalize()
-                linkname = "Doc_" + basename.replace(os.path.sep, '_')
+                #linkname = "MDoc" + os.path.basename(basename).capitalize()
+                linkname = "MDoc_" + basename.replace(os.path.sep, '_').upper()
+                if linkname.find('DEMO') != -1 or linkname.find('TEST') != -1:
+                    print "Skipping:", linkname
+                    continue
 
                 if not os.path.isdir(os.path.dirname(htmlname)):
                     os.makedirs(os.path.dirname(htmlname))
@@ -62,17 +65,18 @@ def overviewpage(pages, mfiles, indent):
             else:         shortdesc = shortdesc[ind+1:]
 
             if indent == "":
-                pagelines.append("[[%s|%s]] %s<br>\n" % (linkname, k, shortdesc))
-            else:
-                pagelines.append("%s [[%s|%s]] %s\n" % (indent, linkname, k,
+                pagelines.append("[[%s|%s]] %s<br>\n" % (linkname, k.upper(), 
                     shortdesc))
+            else:
+                pagelines.append("%s [[%s|%s]] %s\n" % (indent, linkname,
+                    k.upper(), shortdesc))
 
     for k in keys:
         if pages[k] != 0:
             if indent == "":
-                pagelines.append("=== %s ===\n" % (k))
+                pagelines.append("=== %s ===\n" % (k.upper()))
             else:
-                pagelines.append(indent + k + ":\n")
+                pagelines.append(indent + k.upper() + ":\n")
             pagelines.extend(overviewpage(pages[k], mfiles, indent + '*'))
     return pagelines
 
@@ -138,7 +142,7 @@ if __name__ == '__main__':
     overviewname = os.path.join(docdir, "index.html")
     pagelines = overviewpage(pagegroups, mfiles, '')
     pagelines.insert(0, "== Documentation ==\n")
-    wikiname = "Doc_index.wiki"
+    wikiname = "MDoc.wiki"
     f = open(overviewname, 'w')
     f.writelines(pagelines)
     f.close()
