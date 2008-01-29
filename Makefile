@@ -241,10 +241,17 @@ bindist: $(NAME) all doc
 	    --exclude "objs"                                          \
 			$(NAME)
 
-.PHONY: post
+.PHONY: post, post-doc
+
+HOST:=ganesh.cs.ucla.edu:/var/www/vlfeat/
 post:
 	scp $(DIST).tar.gz $(BINDIST).tar.gz \
-	   ganesh.cs.ucla.edu:/var/www/vlfeat/download
+	   $(HOST)/download
+
+post-doc: doc
+	rsync -rv doc/vlfeat-dox -e "ssh" \
+	   $(HOST)
+
 
 .PHONY: autorights
 autorights: distclean
