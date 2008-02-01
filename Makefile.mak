@@ -129,19 +129,10 @@ cmdexe = $(cmdsrc:src\=bin\win32\)
 cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
 
-
-mexdll = $(mexsrc:.c=.dll)
-mexdll = $(mesdll:toolbox\=)
-mexdll = $(mesdll:sift\=)
-mexdll = $(mesdll:mser\=)
-mexdll = $(mesdll:imop\=)
-mexdll = $(mesdll:mathop\=)
-mexdll = $(mesdll:geometry\=)
-mexdll = $(mesdll:misc\=)
-mexdll = $(mesdll:aib\=)
-
-mexres = $(mexdll:.c=.res)
-mexpdb = $(mexdll:.c=.pdb)
+mexx=dadsds
+mexdll=asdsda
+mexres = $(mexdll:.dll=.res)
+mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
 all: $(objdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
@@ -163,6 +154,7 @@ distclean: clean
 	-del $(cmdexe)
 	-del $(mexdll)
 info:
+	@echo $(mexx)
 	@echo ** bindir     = $(bindir)
 	@echo ** mexdir     = $(mexdir)
 	@echo ** objdir     = $(objdir)
