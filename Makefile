@@ -62,7 +62,7 @@ CFLAGS             += -Wno-long-long
 
 LDFLAGS            +=
 
-MEX_FLAGS           = -L$(BINDIR) -Itoolbox -v
+MEX_FLAGS           = -Itoolbox -L$(BINDIR) -lvl -v
 MEX_CFLAGS          = $(CFLAGS)
 MEX_LDFLAGS         =
 
@@ -86,11 +86,14 @@ mac_MEX_SUFFIX     := mexmac
 
 # Mac OS X on Intel processor
 mci_BINDIR          := bin/maci
-mci_CFLAGS          := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
-mci_LDFLAGS         :=
+mci_MEX_BINDIR      := toolbox/mexmaci
 mci_DLL_SUFFIX      := dylib
-mci_MEX_CFLAGS      :=
 mci_MEX_SUFFIX      := mexmaci
+mci_CFLAGS          := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
+mci_LDFLAGS         := -lm
+mci_MEX_FLAGS       := -lm
+mci_MEX_CFLAGS      := 
+mci_MEX_LDFLAGS     := 
 
 # Linux-32
 glx_BINDIR          := bin/glx
@@ -210,14 +213,15 @@ mex_tgt := $(addprefix $(MEX_BINDIR)/, \
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-vpath $(MEX_BINDIR)/%.(MEX_SUFFIX) $(shell find toolbox -type d)
-vpath $(shell find toolbox -type d)
-vpath toolbox toolbox/geometry
+vpath %.c $(shell find toolbox -type d)
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c toolbox/mexutils.h \
   $(BINDIR)/libvl.$(DLL_SUFFIX)
 	@echo "   MX '$<' ==> '$@'"
-	@$(MEX) $(MEX_CFLAGS) $< -outdir $(dir $(@))
+	@$(MEX) CLFAGS='$$CFLAGS  $(MEX_CFLAGS)'   \
+		LDFAGS='$$LDFLAGS $(MEX_LDFLAGS)'  \
+	        $(MEX_FLAGS)                       \
+	        $< -outdir $(dir $(@))
 
 # --------------------------------------------------------------------
 #                                                  Build documentation

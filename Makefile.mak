@@ -129,13 +129,19 @@ cmdexe = $(cmdsrc:src\=bin\win32\)
 cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
 
-mexx=dadsds
-mexdll=asdsda
+mexdll = $(mexsrc:.c=.dll) 
+mexdll = $(mexdll:toolbox\sift=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\mser=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\imop=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\geometry=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\kmeans=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\misc=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\aib=toolbox\mexwin)
 mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
 !ELSE
 all: $(objdir) $(bindir)\vl.lib $(cmdexe)
 !ENDIF
@@ -192,7 +198,7 @@ $(mexdir) :
 	@-del "$(@R).obj"
 
 # toolbox\*.c -> tooblox\*.dll
-{toolbox\mexwin}.c.{toolbox\geometry}.dll:
+{toolbox\sift;toolbox\geometry}.c.{toolbox\mexwin}.dll:
 	@echo CC  $(<) ===^> $(@R).dll
 	@$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
 	@RC /fo"$(@R).res" $(MEX_RC)
