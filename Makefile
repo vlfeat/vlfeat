@@ -103,15 +103,17 @@ glx_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS         := -lm
 glx_MEX_FLAGS       := -lm
 glx_MEX_CFLAGS      := 
-glx_MEX_LDFLAGS     := -Wl,--rpath,.
+glx_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
 
 # Linux-64
 g64_BINDIR          := bin/g64
+g64_MEX_SUFFIX      := mexa64
+g64_DLL_SUFFIX      := so
 g64_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
 g64_LDFLAGS         := -lm
-g64_DLL_SUFFIX      := so
-g64_MEX_CFLAGS      :=
-g64_MEX_SUFFIX      := mexa64
+g64_MEX_FLAGS       := -lm
+g64_MEX_CFLAGS      := 
+g64_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
 
 BINDIR              := $($(ARCH)_BINDIR)
 DLL_SUFFIX          := $($(ARCH)_DLL_SUFFIX)
@@ -215,10 +217,13 @@ all-mex : $(mex_tgt)
 
 vpath %.c $(shell find toolbox -type d)
 
+$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) : $(BINDIR)/libvl.$(DLL_SUFFIX)
+	ln -s ../../$(BINDIR)/$(notdir $<) $@
+
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c toolbox/mexutils.h \
-  $(BINDIR)/libvl.$(DLL_SUFFIX)
+  $(MEX_BINDIR)/libvl.$(DLL_SUFFIX)
 	@echo "   MX '$<' ==> '$@'"
-	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'    \
+	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'     \
 		LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'  \
 	        $(MEX_FLAGS)                        \
 	        $< -outdir $(dir $(@))
@@ -276,9 +281,9 @@ distclean: clean
 	make -C doc distclean
 	rm -rf bin dox
 	rm -f  doc/toolbox.html
-	for i in mexmac mexmaci mexglx mexw32 dll pdb ;             \
+	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;      \
 	do                                                          \
-		rm -f `find toolbox -name "*.$${i}"` ;                    \
+		rm -rf "toolbox/$${i}"                              \
 	done
 	rm -f  $(NAME)-*.tar.gz
 
@@ -298,7 +303,7 @@ dist: $(NAME)
 bindist: $(NAME) all doc
 	cp -rp bin $(NAME)
 	cp -rp doc $(NAME)
-	for i in mexmaci mexmac mexw32 mexglx mexg64 dll ;            \
+	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;            \
 	do                                                            \
 		find toolbox -name "*.$${i}" -exec cp -p "{}" "$(NAME)/{}" \; ;\
 	done
@@ -350,7 +355,8 @@ info :
 	@echo "bin_src ="
 	@echo $(bin_src) 
 	@echo "bin_tgt ="
-	@echo $(bin_tgt) 
+	@echo $(bin_tgt)
+	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"
 	@echo "MEX_BINDIR   = $(MEX_BINDIR)"
@@ -360,7 +366,7 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MEX_FLAGS    = $(MEX_FLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
-	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
+	@echo 'MEX_LDFLAGS  = $(MEX_LDFLAGS)'
 
 # --------------------------------------------------------------------
 #                                                        Xcode Support
