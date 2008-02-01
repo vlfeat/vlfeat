@@ -18,11 +18,10 @@ General Public License version 2.
 /** @name Setting and reading the state
  **
  ** @{ */
-void  vl_rand_set_state (vl_uint32 const init_key [625]) ;
-void  vl_rand_get_state (vl_uint32 *key) ;
-void  vl_rand_seed (vl_uint32 s) ;
-
-void  vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length) ;
+void vl_rand_set_state (vl_uint32 const state [625]) ;
+void vl_rand_get_state (vl_uint32 *state) ;
+void vl_rand_seed (vl_uint32 s) ;
+void vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length) ;
 /** @} */
 
 /** @name Generate random numbers

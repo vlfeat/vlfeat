@@ -11,6 +11,8 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
+#include <vl/random.h>
+
 /* pairs are used to generate random permutations of data */
 typedef struct
 {
@@ -78,7 +80,8 @@ vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
  **/
 
 void
-vl_ikm_init_rand (VlIKMFilt* f, int M, int K)
+vl_ikm_init_rand 
+(VlIKMFilt* f, int M, int K)
 {
   int k, i ;
 
@@ -86,7 +89,7 @@ vl_ikm_init_rand (VlIKMFilt* f, int M, int K)
   
   for (k = 0 ; k < K ; ++ k) {
     for (i = 0 ; i < M ; ++ i) {
-      f-> centers [k * M + i] = (vl_ikm_acc) ((vl_ikm_data) rand ()) ;
+      f-> centers [k * M + i] = (vl_ikm_acc) (vl_rand_uint32 ()) ;
     }
   }
   
@@ -102,7 +105,8 @@ vl_ikm_init_rand (VlIKMFilt* f, int M, int K)
  **/
 
 void
-vl_ikm_init_rand_data (VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int K)
+vl_ikm_init_rand_data 
+(VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int K)
 {
   int i, j, k ;
   pair_t  *pairs = (pair_t *) vl_malloc (sizeof(pair_t) * N);
@@ -112,7 +116,7 @@ vl_ikm_init_rand_data (VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int 
   /* permute the data randomly */
   for (j = 0 ; j < N ; ++j) {
     pairs[j].j = j ;
-    pairs[j].w = rand () ;
+    pairs[j].w = vl_rand_uint32 () ;
   }
   
   qsort (pairs, N, sizeof(pair_t), cmp_pair);

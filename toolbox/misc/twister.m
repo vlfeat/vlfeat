@@ -9,7 +9,9 @@
 %    equivalent to RAND('TWISTER', X)). The state can be read by
 %    TWISTER('STATE') (equivalent to RAND('TWISTER')) and set by
 %    TWISTER('STATE', STATE) (equivalent to RAND('TWISTER',
-%    STATE)). Here STATE is a vector of 625 elements of class UINT32.
+%    STATE)). Here STATE is a vector of 625 elements of class
+%    UINT32. Finally TWISTER('STATE',KEY) seeds the generator by a
+%    vector of DOUBLE of length not greather than 624.
 %
 %    TWISTER() is slightly faster than RAND(). Moreover it can be used
 %    to control the state of the random number gnerator of VLFEAT
