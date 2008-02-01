@@ -218,9 +218,9 @@ vpath %.c $(shell find toolbox -type d)
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c toolbox/mexutils.h \
   $(BINDIR)/libvl.$(DLL_SUFFIX)
 	@echo "   MX '$<' ==> '$@'"
-	@$(MEX) CLFAGS='$$CFLAGS  $(MEX_CFLAGS)'   \
-		LDFAGS='$$LDFLAGS $(MEX_LDFLAGS)'  \
-	        $(MEX_FLAGS)                       \
+	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'    \
+		LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'  \
+	        $(MEX_FLAGS)                        \
 	        $< -outdir $(dir $(@))
 
 # --------------------------------------------------------------------
