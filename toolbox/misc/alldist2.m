@@ -49,6 +49,9 @@
 %    INT32            INT32   
 %   SINGLE           SINGLE   
 %   DOUBLE           DOUBLE   
+%
+%  Warning: Both chi2 and kchi2 use integer math when presented with integer
+%  data types. This can easily result in zeros where you did not expect them.
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
