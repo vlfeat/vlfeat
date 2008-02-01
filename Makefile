@@ -5,7 +5,7 @@
 NAME               := vlfeat
 VER                := 0.9
 DIST                = $(NAME)-$(VER)
-DEBUG              := yes
+#DEBUG              := yes
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -84,7 +84,7 @@ MEX_LDFLAGS          =
 UNAME               := $(shell uname -sm)
 ARCH                := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
-# Mac OS X on PPC
+# Mac OS X on PPC processor
 mac_BINDIR          := bin/mac
 mac_DLL_SUFFIX      := dylib
 mac_MEX_SUFFIX      := mexmac
@@ -418,4 +418,3 @@ dox- : dox
 
 .PHONY: dox-clean
 dox-clean:
-
