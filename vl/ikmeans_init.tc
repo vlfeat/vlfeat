@@ -16,15 +16,18 @@ General Public License version 2.
 /* pairs are used to generate random permutations of data */
 typedef struct
 {
-  int w;
-  int j;
+  vl_int32 w;
+  vl_int32 j;
 } pair_t;
 
 int cmp_pair (void const *a, void const *b)
 {
   pair_t *pa = (pair_t *) a;
   pair_t *pb = (pair_t *) b;
-  return pa->w - pb->w;
+  vl_int32 d = pa->w - pb->w ;
+  if (d) return d ;
+  /* break ties (qsort not stable) */
+  return pa->j - pb->j;
 }
 
 /** @internal
@@ -116,7 +119,7 @@ vl_ikm_init_rand_data
   /* permute the data randomly */
   for (j = 0 ; j < N ; ++j) {
     pairs[j].j = j ;
-    pairs[j].w = vl_rand_uint32 () ;
+    pairs[j].w = ((vl_int32) vl_rand_uint32 ()) >> 2 ;
   }
   
   qsort (pairs, N, sizeof(pair_t), cmp_pair);

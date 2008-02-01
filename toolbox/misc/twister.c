@@ -22,13 +22,13 @@ void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {
-  VL_USE_MATLAB_ENV ;
-  
   enum {
     MANIP_STATE,
     RUN_GENERATOR
   } mode ;
 
+  VL_USE_MATLAB_ENV ;  
+  
   /** -----------------------------------------------------------------
    **                                               Check the arguments
    ** -------------------------------------------------------------- */
