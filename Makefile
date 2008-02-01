@@ -217,7 +217,9 @@ all-mex : $(mex_tgt)
 
 vpath %.c $(shell find toolbox -type d)
 
-$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) : $(BINDIR)/libvl.$(DLL_SUFFIX)
+$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) : \
+   $(BINDIR)/libvl.$(DLL_SUFFIX) \
+   $(MEX_BINDIR)/.dirstamp
 	ln -s ../../$(BINDIR)/$(notdir $<) $@
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c toolbox/mexutils.h \
@@ -283,7 +285,7 @@ distclean: clean
 	rm -f  doc/toolbox.html
 	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;      \
 	do                                                          \
-		rm -rf "toolbox/$${i}"                              \
+		rm -rf "toolbox/$${i}" ;                            \
 	done
 	rm -f  $(NAME)-*.tar.gz
 
