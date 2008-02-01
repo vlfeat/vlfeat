@@ -35,6 +35,7 @@ err_no_arch +=Configuration failed
 #
 # == MEX FILES ==
 #
+# MEX_BINDIR:  where to put mex files.
 # MEX_FLAGS:   flags passed to $(MEX)
 # MEX_CFLAGS:  flags added to the CLFAGS variable of $(MEX)
 # MEX_LDFLAGS: flags added to the LDFLAGS variable of $(MEX)
@@ -86,7 +87,6 @@ mac_MEX_SUFFIX     := mexmac
 
 # Mac OS X on Intel processor
 mci_BINDIR          := bin/maci
-mci_MEX_BINDIR      := toolbox/mexmaci
 mci_DLL_SUFFIX      := dylib
 mci_MEX_SUFFIX      := mexmaci
 mci_CFLAGS          := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
@@ -97,14 +97,13 @@ mci_MEX_LDFLAGS     :=
 
 # Linux-32
 glx_BINDIR          := bin/glx
-glx_MEX_BINDIR      := toolbox/mexglx
-glx_DLL_SUFFIX      := so
 glx_MEX_SUFFIX      := mexglx
+glx_DLL_SUFFIX      := so
 glx_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99
 glx_LDFLAGS         := -lm
 glx_MEX_FLAGS       := -lm
 glx_MEX_CFLAGS      := 
-glx_MEX_LDFLAGS     := 
+glx_MEX_LDFLAGS     := -Wl,--rpath,.
 
 # Linux-64
 g64_BINDIR          := bin/g64
@@ -114,9 +113,7 @@ g64_DLL_SUFFIX      := so
 g64_MEX_CFLAGS      :=
 g64_MEX_SUFFIX      := mexa64
 
-BINDIST             := $(DIST)-bin
 BINDIR              := $($(ARCH)_BINDIR)
-MEX_BINDIR          := $($(ARCH)_MEX_BINDIR)
 DLL_SUFFIX          := $($(ARCH)_DLL_SUFFIX)
 MEX_SUFFIX          := $($(ARCH)_MEX_SUFFIX)
 
@@ -125,6 +122,9 @@ LDFLAGS             += $($(ARCH)_LDFLAGS)
 MEX_FLAGS           += $($(ARCH)_MEX_FLAGS)
 MEX_CFLAGS          += $($(ARCH)_MEX_CFLAGS)
 MEX_LDFLAGS         += $($(ARCH)_MEX_LDFLAGS)
+
+BINDIST             := $(DIST)-bin
+MEX_BINDIR          := toolbox/$(MEX_SUFFIX)
 
 # Print an error message if the architecture was not recognized.
 ifeq ($(ARCH),)
