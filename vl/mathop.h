@@ -254,6 +254,22 @@ vl_fast_sqrt_d (vl_double x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_d (x) ;
 }
+
+
+VL_INLINE
+vl_uint32
+vl_fast_sqrt_i(vl_uint32 x) 
+{
+  vl_uint32 temp, g=0, b = 0x8000, bshft = 15 ;
+  do {
+    if (x >= (temp = (((g << 1) + b)<<bshft--))) {
+      g += b;
+      x -= temp;
+    }
+  } while (b >>= 1);
+  return g;
+}
+
 /* @} */
 
 /* VL_MATHOP */

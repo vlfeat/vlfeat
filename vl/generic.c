@@ -32,6 +32,7 @@ category detection, object and category recognition.</em>
 - Support functionalities
   - @ref generic.h   "Atomic data types, errors, and others"
   - @ref mathop.h    "Math operations"
+  - @ref random.h    "Random number generator"
   - @ref stringop.h  "String operations"
   - @ref imop.h      "Image operations"
   - @ref rodrigues.h "Rodrigues formuals"
@@ -129,8 +130,17 @@ varying most quickly, with the other followed in reverse order.
  ** @author Andrea Vedaldi
  ** @brief  Generic
 
-This module provides basic facilities such as atomi types definitions,
-error handling, endianness detection, serialization, logging.
+This module provides basic functionalities:
+
+- @ref generic-error  
+- @ref generic-heap
+- @ref generic-logging
+- @ref generic-data-model
+
+
+@warning Currently <code>generic.h</code> works correctly only with
+ILP32 (all 32 bit), LP64 (UNIX-64) and LLP64 (Windows-64)
+architectures.
 
 @section generic-error Error handling
 
@@ -138,24 +148,123 @@ Error handling uses the same style of the standard C library. Most
 functions return 0 when they succeed and -1 when they fail, and
 set the global variable ::vl_err_no with a code identifying the
 error occurred. This variable is never set on success and should
-be examinated right after an error occurred.
+be examinated right after an error had occurred.
 
-@section generic-endian Endinanness detection and conversions
+@section generic-heap Heap allocation
+
+VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
+::vl_free() functions to allocate the heap. Normally these functions
+are mapped to the underlying standar C library implementations. However
+::vl_set_alloc_func() can be used to map them to other implementations.
+For instance, in MATALB MEX files these functions are mapped to 
+the MATLAB equivalent, with the benefits of garbage collection 
+in case of interrupted execution.
+
+@section generic-logging Logging
+
+VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
+debug informations. These functions are normally mapped to the @c
+printf function of the underlying standard C library. However
+::vl_set_printf_func() can be used to map it to a different
+implementation. For instance, in MATLAB MEX files this function is
+mapped to @c mexPrintf. Setting the function to @c NULL disables
+logging.
+
+@section generic-data-model Data models
+
+VLFeat main target is to support common UNIX and Windows
+architectures. The data model of these architectures difffer mainly
+in:
+
+- <em>endianness</em> and
+- <em>size of the atomic data types</em>.
 
 An architecture is big endiand or little endian depending how
-multi-btye data are stored in memory:
+multi-byte data are stored in memory:
 
-- <em>big endian</em> (big end first - Network order) if it
+- <em>big endian</em> (big end first, also known as network order) if it
   stores the most significant byte has the smaller memory address.
-- <em>little endian</em> (small end first - Intel format) if it
+- <em>little endian</em> (small end first, used by x86 processors) if it
   stores the lesser significant byte at the smaller memory address.
 
 Use the function ::vl_get_endianness() to detect endianness.  To
 serialize/deserialize data in big endian (network) order, call the
 functions ::vl_adapt_endianness_8(), ::vl_adapt_endianness_4(),
 ::vl_adapt_endianness_2() after reading and before writing (the
-functions change edinanness only if the architecture is little
-endian and do nothing otherwise).
+functions change edinanness only if the architecture is little endian
+and do nothing otherwise).
+
+Architecture differ also by the size of the atomic data type (such as
+@c short, @c int, @c long and so on):
+
+ <table><caption>32-bit and 64-bit data models</caption>
+ <tr style="font-weight:bold;">
+   <td>Data model</td>
+   <td >short</td>
+   <td>int</td>
+   <td>long</td>
+   <td>long long</td>
+   <td>pointers</td>
+   <td>architecture</td>
+  </tr>
+ <tr>
+   <td>ILP32</td>
+   <td style="background-color:#ffa;">16</td>
+   <td style="background-color:#afa;">32</td>
+   <td style="background-color:#afa;">32</td>
+   <td >64</td>
+   <td style="background-color:#afa;">32</td>
+   <td>common 32 bit architectures</td>
+ </tr>
+ <tr>
+   <td>LP64</td>
+   <td style="background-color:#ffa;">16</td>
+   <td style="background-color:#afa;">32</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>UNIX-64 (Linux, Mac OS X)</td>
+ </tr>
+ <tr>
+   <td>ILP64</td>
+   <td style="background-color:#ffa;">16</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>Alpha, Cray</td>
+ </tr>
+ <tr>
+   <td>SLIP64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td>64</td>
+   <td></td>
+ </tr>
+ <tr>
+   <td>LLP64</td>
+   <td style="background-color:#ffa;">16</td>
+   <td style="background-color:#afa;">32</td>
+   <td style="background-color:#afa;">32</td>
+   <td>64</td>
+   <td>64</td>
+   <td>Windows-64</td>
+ </tr>
+ </table>
+
+For uniformity, VLFeat introduces appropriate atomic data types of
+fixed width.  Notice that in C-99 the <code>stdint.h</code> header
+could be used for this purpose instead, but unfortunately it is not
+(yet) supported by Microsoft Visual C/C++.
+
+Most 32-bit architectures are equivalent for what concerns the size of
+the atomic data types.  64-bit vary more; for the atomic data types
+defined by VLFEat, the only important difference between architectures
+is in practice limited the size of <code>long</code>. Relatively to
+the 32 bit architectures, the other important difference is the size
+of the pointers.
 
 **/
 

@@ -45,6 +45,7 @@ MATLABROOT = C:\MATLAB7
 #  /EXPORT:mexFunction : Export MEX file entry point
 
 bindir     = bin\win32
+mexdir     = toolbox\mexwin
 objdir     = $(bindir)\objs
 
 CFLAGS     = /nologo /TC /MT \
@@ -127,12 +128,20 @@ libobj = $(libobj:.c=.obj)
 cmdexe = $(cmdsrc:src\=bin\win32\)
 cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
-mexdll = $(mexsrc:.c=.dll)
-mexres = $(mexsrc:.c=.res)
-mexpdb = $(mexsrc:.c=.pdb)
+
+mexdll = $(mexsrc:.c=.dll) 
+mexdll = $(mexdll:toolbox\sift=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\mser=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\imop=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\geometry=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\kmeans=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\misc=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\aib=toolbox\mexwin)
+mexres = $(mexdll:.dll=.res)
+mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
 !ELSE
 all: $(objdir) $(bindir)\vl.lib $(cmdexe)
 !ENDIF
@@ -151,7 +160,9 @@ distclean: clean
 	-del $(cmdexe)
 	-del $(mexdll)
 info:
+	@echo $(mexx)
 	@echo ** bindir     = $(bindir)
+	@echo ** mexdir     = $(mexdir)
 	@echo ** objdir     = $(objdir)
 	@echo ** libsrc     = $(libsrc)
 	@echo ** libobj     = $(libobj)
@@ -172,6 +183,9 @@ info:
 $(objdir) :
 	mkdir $(objdir)
 
+$(mexdir) :
+	mkdir $(mexdir)
+
 # vl\*.c -> $objdir\*.obj
 {vl}.c{$(objdir)}.obj:
 	@echo CC  $(<) ===^> $(@)
@@ -184,7 +198,7 @@ $(objdir) :
 	@-del "$(@R).obj"
 
 # toolbox\*.c -> tooblox\*.dll
-.c.dll:
+{toolbox\sift;toolbox\geometry}.c.{toolbox\mexwin}.dll:
 	@echo CC  $(<) ===^> $(@R).dll
 	@$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
 	@RC /fo"$(@R).res" $(MEX_RC)

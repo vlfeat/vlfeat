@@ -5,6 +5,7 @@
 NAME               := vlfeat
 VER                := 0.9
 DIST                = $(NAME)-$(VER)
+DEBUG              := yes
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -20,20 +21,52 @@ err_no_arch +=Configuration failed
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-# executables
-MEX              ?= mex
-CC               ?= cc
+# == PROGRAMS ==
+#
+# CC:          C compiler (e.g. gcc).
+# MEX:         MEX compiler (e.g mex).
+# PYTHON:      Python interpreter (e.g. python)
+#
+# == LIBVL STATIC AND SHARED LIBRARY AND EXECUTABLE ==
+#
+# CLFAGS:      flags passed to $(CC) to compile an object file (*)
+# EXE_LDFLAGS: flags passed to $(CC) to create an executable file
+# DLL_LDFLAGS: flags passed to $(CC) to create a DLL
+#
+# == MEX FILES ==
+#
+# MEX_BINDIR:  where to put mex files.
+# MEX_FLAGS:   flags passed to $(MEX)
+# MEX_CFLAGS:  flags added to the CLFAGS variable of $(MEX)
+# MEX_LDFLAGS: flags added to the LDFLAGS variable of $(MEX)
+#
+# == AUTOMATIC CONFIGURATION ==
+#
+# BINDIR:         where to put the executable files.
+# MEX_BINDIR:     where to put the MEX files.
+# *_DLL_SUFFIX:   suffix of a DLL library (.dylib, .so, ...)
+# *_MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
+#
+# *_CFLAGS:       flags added to CLFAGS
+# *_LDFLAGS:      flags added to LDFLAGS
+# *_MEX_FLAGS:    flags added to MEX_FLAGS
+# *_MEX_CFLAGS:   flags added to MEX_CLFAGS
+# *_MEX_LDFLAGS:  flags added to MEX_LDFLAGS
 
-# generic flags
-CFLAGS           += -I. -pedantic -Wall -std=c89 -g -O0
-#CFLAGS           += -Wno-overlength-strings
-#CFLAGS           += -Wno-variadic-macros
-CFLAGS           += -Wno-unused-function 
-CFLAGS           += -Wno-long-long
-LDFLAGS          +=
-MEX_CFLAGS        = CFLAGS='$$CFLAGS $(CFLAGS)' -L$(BINDIR) -lvl -Itoolbox
+MEX                ?= mex
+CC                 ?= cc
+PYTHON             ?= python
 
-# Determine on the flight the system we are running on
+CFLAGS             += -I. -pedantic -Wall -std=c89 -g -O0
+CFLAGS             += -Wno-unused-function 
+CFLAGS             += -Wno-long-long
+
+LDFLAGS            +=
+
+MEX_FLAGS           = -Itoolbox -L$(BINDIR) -lvl -v
+MEX_CFLAGS          = $(CFLAGS)
+MEX_LDFLAGS         =
+
 Darwin_PPC_ARCH    := mac
 Darwin_i386_ARCH   := mci
 Linux_i386_ARCH    := glx
@@ -41,40 +74,61 @@ Linux_i686_ARCH    := glx
 Linux_x86_64_ARCH  := g64
 Linux_unknown_ARCH := glx
 
-UNAME             := $(shell uname -sm)
-ARCH              := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+UNAME              := $(shell uname -sm)
+ARCH               := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
-mac_BINDIR       := bin/mac
-mac_CFLAGS       := -Wno-variadic-macros -D__BIG_ENDIAN__
-mac_LDFLAGS      := 
-mac_MEX_CFLAGS   := 
-mac_MEX_SUFFIX   := mexmac
+# Mac OS X on PPC processor
+mac_BINDIR         := bin/mac
+mac_CFLAGS         := -Wno-variadic-macros -D__BIG_ENDIAN__
+mac_LDFLAGS        :=
+mac_DLL_SUFFIX     := dylib 
+mac_MEX_CFLAGS     := 
+mac_MEX_SUFFIX     := mexmac
 
-mci_BINDIR       := bin/maci
-mci_CFLAGS       := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
-mci_LDFLAGS      :=
-mci_MEX_CFLAGS   :=
-mci_MEX_SUFFIX   := mexmaci
+# Mac OS X on Intel processor
+mci_BINDIR          := bin/maci
+mci_DLL_SUFFIX      := dylib
+mci_MEX_SUFFIX      := mexmaci
+mci_CFLAGS          := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
+mci_LDFLAGS         := -lm
+mci_MEX_FLAGS       := -lm
+mci_MEX_CFLAGS      := 
+mci_MEX_LDFLAGS     := 
 
-glx_BINDIR       := bin/glx
-glx_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99
-glx_LDFLAGS      := -lm
-glx_MEX_CFLAGS   :=
-glx_MEX_SUFFIX   := mexglx
+# Linux-32
+glx_BINDIR          := bin/glx
+glx_MEX_SUFFIX      := mexglx
+glx_DLL_SUFFIX      := so
+glx_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99
+glx_LDFLAGS         := -lm
+glx_MEX_FLAGS       := -lm
+glx_MEX_CFLAGS      := 
+glx_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
 
-g64_BINDIR       := bin/g64
-g64_CFLAGS       := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
-g64_LDFLAGS      := -lm
-g64_MEX_CFLAGS   :=
-g64_MEX_SUFFIX   := mexa64
+# Linux-64
+g64_BINDIR          := bin/g64
+g64_MEX_SUFFIX      := mexa64
+g64_DLL_SUFFIX      := so
+g64_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
+g64_LDFLAGS         := -lm
+g64_MEX_FLAGS       := -lm
+g64_MEX_CFLAGS      := 
+g64_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
 
-CFLAGS           += $($(ARCH)_CFLAGS)
-LDFLAGS          += $($(ARCH)_LDFLAGS)
-MEX_SUFFIX       := $($(ARCH)_MEX_SUFFIX)
-MEX_CFLAGS       += $($(ARCH)_MEX_CFLAGS)
-BINDIR           := $($(ARCH)_BINDIR)
-BINDIST          := $(DIST)-bin
+BINDIR              := $($(ARCH)_BINDIR)
+DLL_SUFFIX          := $($(ARCH)_DLL_SUFFIX)
+MEX_SUFFIX          := $($(ARCH)_MEX_SUFFIX)
 
+CFLAGS              += $($(ARCH)_CFLAGS)
+LDFLAGS             += $($(ARCH)_LDFLAGS)
+MEX_FLAGS           += $($(ARCH)_MEX_FLAGS)
+MEX_CFLAGS          += $($(ARCH)_MEX_CFLAGS)
+MEX_LDFLAGS         += $($(ARCH)_MEX_LDFLAGS)
+
+BINDIST             := $(DIST)-bin
+MEX_BINDIR          := toolbox/$(MEX_SUFFIX)
+
+# Print an error message if the architecture was not recognized.
 ifeq ($(ARCH),)
 die:=$(error $(err_no_arch))
 endif
@@ -90,10 +144,10 @@ all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 .PRECIOUS: %/.dirstamp
 %/.dirstamp :	
 	mkdir -p $(dir $@)
-	echo "I'm here" > $@
+	echo "Directory generated by make." > $@
 
 # --------------------------------------------------------------------
-#                                                        Build libvl.a
+#                                           Build libvl.a and libvl DLL
 # --------------------------------------------------------------------
 # We place the object and dependency files in $(BINDIR)/objs/ and
 # the library in $(BINDIR)/libvl.a.
@@ -105,7 +159,7 @@ lib_dep := $(lib_obj:.o=.d)
 
 # create library libvl.a
 .PHONY: all-lib
-all-lib: $(BINDIR)/libvl.a
+all-lib: $(BINDIR)/libvl.a $(BINDIR)/libvl.$(DLL_SUFFIX)
 
 .PRECIOUS: $(BINDIR)/objs/%.d
 
@@ -120,6 +174,14 @@ $(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.dirstamp
 $(BINDIR)/libvl.a : $(lib_obj)
 	@echo "   A  '$@'"
 	@ar rcs $@ $^
+
+$(BINDIR)/libvl.dylib : $(lib_obj)
+	@echo "DYLIB '$@'"
+	@$(CC) $(CFLAGS) -dynamiclib $^ -o $@
+
+$(BINDIR)/libvl.so : $(lib_obj)
+	@echo "   SO '$@'"
+	@$(CC) $(CFLAGS) -shared $^ -o $@
 
 ifeq ($(filter doc dox clean distclean info, $(MAKECMDGOALS)),)
 include $(lib_dep) 
@@ -147,14 +209,26 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # We place the MEX files in toolbox/.
 
 mex_src := $(shell find toolbox -name "*.c")
-mex_tgt := $(mex_src:.c=.$(MEX_SUFFIX))
+mex_tgt := $(addprefix $(MEX_BINDIR)/, \
+	               $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-toolbox/%.$(MEX_SUFFIX) : toolbox/%.c toolbox/mexutils.h $(BINDIR)/libvl.a
+vpath %.c $(shell find toolbox -type d)
+
+$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) : \
+   $(BINDIR)/libvl.$(DLL_SUFFIX) \
+   $(MEX_BINDIR)/.dirstamp
+	ln -s ../../$(BINDIR)/$(notdir $<) $@
+
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c toolbox/mexutils.h \
+  $(MEX_BINDIR)/libvl.$(DLL_SUFFIX)
 	@echo "   MX '$<' ==> '$@'"
-	@$(MEX) $(MEX_CFLAGS) $< -outdir $(dir $(@))
+	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'     \
+		LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'  \
+	        $(MEX_FLAGS)                        \
+	        $< -outdir $(dir $(@))
 
 # --------------------------------------------------------------------
 #                                                  Build documentation
@@ -209,9 +283,9 @@ distclean: clean
 	make -C doc distclean
 	rm -rf bin dox
 	rm -f  doc/toolbox.html
-	for i in mexmac mexmaci mexglx mexw32 dll pdb ;             \
+	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;      \
 	do                                                          \
-		rm -f `find toolbox -name "*.$${i}"` ;                    \
+		rm -rf "toolbox/$${i}" ;                            \
 	done
 	rm -f  $(NAME)-*.tar.gz
 
@@ -222,16 +296,16 @@ $(NAME): TIMESTAMP VERSION
 	git archive --prefix=$(NAME)/ HEAD | tar xvf -
 	cp TIMESTAMP $(NAME)
 	cp VERSION $(NAME)
-		
+
 dist: $(NAME)
 	COPYFILE_DISABLE=1						                                \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
 	tar czvf $(DIST).tar.gz $(NAME)
-	
+
 bindist: $(NAME) all doc
 	cp -rp bin $(NAME)
 	cp -rp doc $(NAME)
-	for i in mexmaci mexmac mexw32 mexglx mexg64 dll ;            \
+	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;            \
 	do                                                            \
 		find toolbox -name "*.$${i}" -exec cp -p "{}" "$(NAME)/{}" \; ;\
 	done
@@ -252,7 +326,6 @@ post-doc: doc
 	rsync -rv doc/vlfeat-dox -e "ssh" \
 	   $(HOST)
 
-
 .PHONY: autorights
 autorights: distclean
 	autorights \
@@ -272,26 +345,31 @@ autorights: distclean
 .PHONY: info
 info :
 	@echo "lib_src ="
-	@echo $(lib_src) | rs -j
+	@echo $(lib_src) 
 	@echo "lib_obj ="
-	@echo $(lib_obj) | rs -j
+	@echo $(lib_obj) 
 	@echo "lib_dep ="
-	@echo $(lib_dep) | rs -j
+	@echo $(lib_dep) 
 	@echo "mex_src ="
-	@echo $(mex_src) | rs -j
+	@echo $(mex_src) 
 	@echo "mex_tgt ="
-	@echo $(mex_tgt) | rs -j
+	@echo $(mex_tgt) 
 	@echo "bin_src ="
-	@echo $(bin_src) | rs -j
+	@echo $(bin_src) 
 	@echo "bin_tgt ="
-	@echo $(bin_tgt) | rs -j
+	@echo $(bin_tgt)
+	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"
+	@echo "MEX_BINDIR   = $(MEX_BINDIR)"
+	@echo "DLL_SUFFIX   = $(DLL_SUFFIX)"
+	@echo "MEX_SUFFIX   = $(MEX_SUFFIX)"
 	@echo "CFLAGS       = $(CFLAGS)"
 	@echo "LDFLAGS      = $(LDFLAGS)"
+	@echo "MEX_FLAGS    = $(MEX_FLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
-	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
-	
+	@echo 'MEX_LDFLAGS  = $(MEX_LDFLAGS)'
+
 # --------------------------------------------------------------------
 #                                                        Xcode Support
 # --------------------------------------------------------------------

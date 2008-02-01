@@ -42,6 +42,7 @@ General Public License version 2.
 
 /** ------------------------------------------------------------------
  ** @name Atomic data types
+ **
  ** @{
  **/
 
@@ -55,14 +56,32 @@ typedef int       unsigned  vl_uint32 ;  /**< unsigned 32-bit integer. */
 typedef short     unsigned  vl_uint16 ;  /**< unsigned 16-bit integer. */
 typedef char      unsigned  vl_uint8 ;   /**< unsigned  8-bit integer. */
 
-typedef int                 vl_int ;     /**< integer.                 */
-typedef unsigned int        vl_uint ;    /**< unsigned integer.        */
+typedef int                 vl_int ;     /**< @c int.                  */
+typedef unsigned int        vl_uint ;    /**< @c unsigned @c int.      */
 typedef float               vl_single ;  /**< single precision float.  */
 typedef double              vl_double ;  /**< double precision float.  */
 typedef unsigned int        vl_uidx ;    /**< unsigned index data type.*/
 typedef size_t              vl_size ;    /**< size data type.          */
 
 typedef int                 vl_bool ;    /**< boolean */
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Format strings for @c printf
+ **
+ ** @{
+ **/
+
+/** @def VL_FL_INT64 @brief @c prinf length flag for ::vl_int64, ::vl_uint64. */
+/** @def VL_FL_INT32 @brief @c prinf length flag for ::vl_int32, ::vl_uint32. */
+/** @def VL_FL_INT16 @brief @c prinf length flag for ::vl_int16, ::vl_uint16. */
+/** @def VL_FL_INT8  @brief @c prinf length flag for ::vl_int8,  ::vl_uint8.  */
+
+#define VL_FL_INT64  "ll"
+#define VL_FL_INT32  ""
+#define VL_FL_INT16  "h"
+#define VL_FL_INT8   "hh"
+
 /** @} */
 
 /** @brief Big integer */

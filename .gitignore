@@ -1,0 +1,23 @@
+# MEX files
+*.mexglx
+*.mexmac
+*.mexmaci
+*.mexa64
+
+# Python complied files
+*.pyc
+
+# Generated figure files
+doc/figures/*.eps
+doc/figures/*.pdf
+doc/figures/*.png
+doc/figures/demo
+
+# Emacs backups
+*~
+
+# Wiki pages
+*.wiki
+wiki/.mediawiki.errors
+wiki/.mediawiki_cookies.dat
+

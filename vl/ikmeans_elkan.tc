@@ -153,12 +153,12 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
    *                                                               Passes
    * ------------------------------------------------------------------ */
   
-  for( pass = 0 ; 1 ; ++pass ) {
+  for (pass = 0 ; 1 ; ++ pass) {
     
     /* ------------------------------------------------------------------
      *                                                 Re-calculate means
      * ---------------------------------------------------------------- */
-    memset(m_pt,       0, sizeof(vl_ikm_acc) * M * K) ;
+    memset(m_pt,    0, sizeof(vl_ikm_acc) * M * K) ;
     memset(counts,  0, sizeof(vl_ikm_acc)     * K) ;
     
     /* accumulate */
