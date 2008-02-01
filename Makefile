@@ -177,7 +177,10 @@ $(BINDIR)/libvl.a : $(lib_obj)
 
 $(BINDIR)/libvl.dylib : $(lib_obj)
 	@echo "DYLIB '$@'"
-	@$(CC) $(CFLAGS) -dynamiclib $^ -o $@
+#	@$(CC) $(CFLAGS) -dynamiclib $^ -o $@
+	libtool -dynamic -flat_namespace -install_name @load_path/ \
+	  -compatibility_version 1.0 -current_version 1.0 \
+	  -o $@ $^
 
 $(BINDIR)/libvl.so : $(lib_obj)
 	@echo "   SO '$@'"
