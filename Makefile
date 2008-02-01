@@ -17,6 +17,19 @@ err_no_arch +=$(shell echo "** was obtained by running 'uname -sm'. Edit the Mak
 err_no_arch +=$(shell echo "** to add the appropriate configuration."                   1>&2)
 err_no_arch +=Configuration failed
 
+
+# --------------------------------------------------------------------
+#                                  Architecture Identification Strings
+# --------------------------------------------------------------------
+
+Darwin_PPC_ARCH             := mac
+Darwin_Power_Macintosh_ARCH := mac
+Darwin_i386_ARCH            := mci
+Linux_i386_ARCH             := glx
+Linux_i686_ARCH             := glx
+Linux_unknown_ARCH          := glx
+Linux_x86_64_ARCH           := g64
+
 # --------------------------------------------------------------------
 #                                                        Configuration
 # --------------------------------------------------------------------
@@ -53,30 +66,23 @@ err_no_arch +=Configuration failed
 # *_MEX_CFLAGS:   flags added to MEX_CLFAGS
 # *_MEX_LDFLAGS:  flags added to MEX_LDFLAGS
 
-MEX                ?= mex
-CC                 ?= cc
-LIBTOOL            ?= libtool
-PYTHON             ?= python
+MEX                 ?= mex
+CC                  ?= cc
+LIBTOOL             ?= libtool
+PYTHON              ?= python
 
-CFLAGS             += -I. -pedantic -Wall -std=c89 -g -O0
-CFLAGS             += -Wno-unused-function 
-CFLAGS             += -Wno-long-long
+CFLAGS              += -I. -pedantic -Wall -std=c89 -g -O0
+CFLAGS              += -Wno-unused-function 
+CFLAGS              += -Wno-long-long
 
-LDFLAGS            +=
+LDFLAGS             +=
 
-MEX_FLAGS           = -Itoolbox -L$(BINDIR) -lvl
-MEX_CFLAGS          = $(CFLAGS)
-MEX_LDFLAGS         =
+MEX_FLAGS            = -Itoolbox -L$(BINDIR) -lvl
+MEX_CFLAGS           = $(CFLAGS)
+MEX_LDFLAGS          =
 
-Darwin_PPC_ARCH    := mac
-Darwin_i386_ARCH   := mci
-Linux_i386_ARCH    := glx
-Linux_i686_ARCH    := glx
-Linux_x86_64_ARCH  := g64
-Linux_unknown_ARCH := glx
-
-UNAME              := $(shell uname -sm)
-ARCH               := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+UNAME               := $(shell uname -sm)
+ARCH                := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 # Mac OS X on PPC
 mac_BINDIR          := bin/mac
@@ -84,7 +90,7 @@ mac_DLL_SUFFIX      := dylib
 mac_MEX_SUFFIX      := mexmac
 mac_CFLAGS          := -Wno-variadic-macros -D__BIG_ENDIAN__ -gstabs+
 mac_LDFLAGS         := -lm
-mac_MEX_FLAGS       := -lm
+mac_MEX_FLAGS       := -lm CC='gcc' CXX='g++' LD='gcc'
 mac_MEX_CFLAGS      := 
 mac_MEX_LDFLAGS     := 
 
@@ -153,12 +159,15 @@ all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 #                                   Build static and dynamic libraries
 # --------------------------------------------------------------------
 #
-# Objects are placed in the $(BINDIR)/objs/ directory. We create a
-# static and a dynamic version of the library.
+# Objects are placed in the $(BINDIR)/objs/ directory. The makefile
+# creates a static and a dynamic version of the library. Depending on
+# the architecture, one or more of the following files are produced:
 #
-# $(OBJDIR)/libvl.a       static library  
+# $(OBJDIR)/libvl.a       Static library (UNIX)
 # $(OBJDIR)/libvl.so      ELF dynamic library (Linux)
-# $(OBJDIR)/libvl.dylib   Mach-O dynamic library (Mac)
+# $(OBJDIR)/libvl.dylib   Mach-O dynamic library (Mac OS X)
+#
+# == Note on Mac OS X ==
 #
 # On Mac we set the install name of the library to look in
 # @loader_path/.  This means that any binary linked (either an
@@ -197,8 +206,8 @@ $(BINDIR)/libvl.dylib : $(lib_obj)
 	@$(LIBTOOL) -dynamic                                  \
                     -flat_namespace                           \
                     -install_name @loader_path/libvl.dylib    \
-	            -compatibility_version 1.0                \
-                    -current_version 1.0                      \
+	            -compatibility_version $(VER)             \
+                    -current_version $(VER)                   \
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/libvl.so : $(lib_obj)
@@ -249,7 +258,7 @@ vpath %.c $(shell find toolbox -type d)
 $(MEX_BINDIR)/libvl.$(DLL_SUFFIX) :                   \
                  $(BINDIR)/libvl.$(DLL_SUFFIX)        \
                  $(MEX_BINDIR)/.dirstamp
-	ln -s ../../$(BINDIR)/$(notdir $<) $@
+	@test -h $@ || ln -sf ../../$(BINDIR)/$(notdir $<) $@
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) :                       \
                  %.c toolbox/mexutils.h               \
