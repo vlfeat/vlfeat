@@ -5,7 +5,7 @@
 NAME               := vlfeat
 VER                := 0.9
 DIST                = $(NAME)-$(VER)
-DEBUG              := yes
+#DEBUG              := yes
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -58,7 +58,7 @@ CC                 ?= cc
 LIBTOOL            ?= libtool
 PYTHON             ?= python
 
-CFLAGS             += -I. -pedantic -Wall -std=c89 -g -O0
+CFLAGS             += -I. -pedantic -Wall -std=c89 -O3
 CFLAGS             += -Wno-unused-function 
 CFLAGS             += -Wno-long-long
 
@@ -67,6 +67,11 @@ LDFLAGS            +=
 MEX_FLAGS           = -Itoolbox -L$(BINDIR) -lvl
 MEX_CFLAGS          = $(CFLAGS)
 MEX_LDFLAGS         =
+
+ifdef DEBUG
+CLFAGS             += -O0 -g
+MEX_FLAGS          += -g
+endif
 
 Darwin_PPC_ARCH    := mac
 Darwin_i386_ARCH   := mci
