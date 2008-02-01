@@ -12,6 +12,8 @@ General Public License version 2.
 
 #include <mexutils.h>
 
+#include <vl/mathop.h>
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
@@ -19,25 +21,35 @@ General Public License version 2.
 #include<assert.h>
 
 enum {
-  opt_L0,
-  opt_L1,
-  opt_L2,
   opt_LINF,
-  opt_MIN,
+  opt_L2,
+  opt_L1,
+  opt_L0,
   opt_CHI2,
+  opt_HELL,
+
+  opt_KL2,
+  opt_KL1,
   opt_KCHI2,
-  opt_KL1
+  opt_KHELL,
+
+  opt_MIN
 } ;
 
 uMexOption options [] = {
+  {"linf",         0,   opt_LINF          },
   {"l2",           0,   opt_L2            },
   {"l1",           0,   opt_L1            },
-  {"linf",         0,   opt_LINF          },
   {"l0",           0,   opt_L0            },  
-  {"min",          0,   opt_MIN           },  
   {"chi2",         0,   opt_CHI2          },
-  {"kchi2",        0,   opt_KCHI2         },
+  {"hell",         0,   opt_HELL          },
+
+  {"kl2",          0,   opt_KL2           },
   {"kl1",          0,   opt_KL1           },
+  {"kchi2",        0,   opt_KCHI2         },
+  {"khell",        0,   opt_KHELL         },
+
+  {"min",          0,   opt_MIN           },  
   {0,              0,   0                 }
 } ;
 
@@ -112,7 +124,6 @@ uMexOption options [] = {
 #define  F_L1(AC,x,y)   { acc += ABS_DIFF(x,y) ; }
 #define  F_L2(AC,x,y)   { AC ## _t tmp = ABS_DIFF(x,y) ; acc += tmp * tmp ; }
 #define  F_LINF(AC,x,y) { acc = MAX(acc, ABS_DIFF(x,y)) ; }
-#define  F_MIN(AC,x,y)  { acc += MIN(x,y) ; }
 #define  F_CHI2(AC,x,y)                                  \
   {                                                      \
     AC ## _t  meant2 = ((x) + (y))  ;                    \
@@ -121,7 +132,19 @@ uMexOption options [] = {
       acc += tmp * tmp / meant2 ;                        \
     }                                                    \
   }
+#define F_HELL_SINGLE(x,y) { acc += x + y - 2 * sqrtf (x * y) ; }
+#define F_HELL_DOUBLE(x,y) { acc += x + y - 2 * sqrt  (x * y) ; }
+#define F_HELL_UINT32(x,y) { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_INT32(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_UINT16(x,y) { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_INT16(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_UINT8(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_INT8(x,y)   { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL(AC,x,y) F_HELL_ ## AC (x,y)
+
+#define  F_KL2(AC,x,y)  { acc += (x*y) ; }
 #define  F_KL1(AC,x,y)  { acc += MIN(x,y) ; }
+#define  F_MIN(AC,x,y)  { acc += MIN(x,y) ; }
 #define  F_KCHI2(AC,x,y)                                 \
   {                                                      \
     AC ## _t  mean = ((x) + (y)) / 2  ;                  \
@@ -130,15 +153,29 @@ uMexOption options [] = {
       acc += tmp / mean ;                                \
     }                                                    \
   }
+#define F_KHELL_SINGLE(x,y) { acc += sqrtf (x * y) ; }
+#define F_KHELL_DOUBLE(x,y) { acc += sqrt  (x * y) ; }
+#define F_KHELL_UINT32(x,y) { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_INT32(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_UINT16(x,y) { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_INT16(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_UINT8(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_INT8(x,y)   { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL(AC,x,y) F_KHELL_ ## AC (x,y)
 
-DEF_CLASS (L0,    F_L0   )
-DEF_CLASS (L1,    F_L1   )
-DEF_CLASS (L2,    F_L2   )
 DEF_CLASS (LINF,  F_LINF )
-DEF_CLASS (MIN,   F_MIN  )
+DEF_CLASS (L2,    F_L2   )
+DEF_CLASS (L1,    F_L1   )
+DEF_CLASS (L0,    F_L0   )
 DEF_CLASS (CHI2,  F_CHI2 )
+DEF_CLASS (HELL,  F_HELL )
+
+DEF_CLASS (KL2,   F_KL2  )
 DEF_CLASS (KL1,   F_KL1  )
 DEF_CLASS (KCHI2, F_KCHI2)
+DEF_CLASS (KHELL, F_KHELL)
+
+DEF_CLASS (MIN,   F_MIN  )
 
 /* driver */
 void
@@ -188,12 +225,22 @@ mexFunction(int nout, mxArray *out[],
 
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
-    case opt_L0   : case opt_L1   :
-    case opt_L2   : case opt_LINF :
-    case opt_MIN  : case opt_CHI2 :
-    case opt_KCHI2: case opt_KL1  :
+    case opt_LINF :
+    case opt_L2 :
+    case opt_L1 :
+    case opt_L0 :
+    case opt_CHI2 :
+    case opt_HELL :
+
+    case opt_KL2 :
+    case opt_KL1 :
+    case opt_KCHI2 :
+    case opt_KHELL :
+
+    case opt_MIN :
       norm = opt ;
       break ;
+
     default: 
       assert(0) ;
     }
@@ -247,14 +294,19 @@ mexFunction(int nout, mxArray *out[],
   break ;
   
   switch (norm) {
-    DISPATCH_NORM(L0   ) ;
-    DISPATCH_NORM(L1   ) ;
-    DISPATCH_NORM(L2   ) ;
     DISPATCH_NORM(LINF ) ;
-    DISPATCH_NORM(MIN  ) ;
+    DISPATCH_NORM(L2   ) ;
+    DISPATCH_NORM(L1   ) ;
+    DISPATCH_NORM(L0   ) ;
     DISPATCH_NORM(CHI2 ) ;
+    DISPATCH_NORM(HELL ) ;
+
+    DISPATCH_NORM(KL2  ) ;
     DISPATCH_NORM(KL1  ) ;
     DISPATCH_NORM(KCHI2) ;
+    DISPATCH_NORM(KHELL) ;    
+
+    DISPATCH_NORM(MIN  ) ;
   default:
     assert(0) ;
   }

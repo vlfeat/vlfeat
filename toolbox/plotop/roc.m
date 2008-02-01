@@ -1,9 +1,9 @@
 function [tp,tn,info] = roc(y, score)
 % ROC Compute ROC curve
 %  [TP,TN] = ROC(Y, SCORE) computes the ROC curve of the specified
-%  data. Y are the labels (values +1 or -1) and SCORE is the data
-%  score, as assigned by some classifier. The function assumes that
-%  high value of SCORE predict positive labels and vice-versa.
+%  data. Y are the ground thruth labels (+1 or -1) and SCORE is the
+%  discriminant score associated to the data by a classifier (high
+%  scores correspond to positive labels).
 %
 %  [TP,TN] are the true positive and true negative rates for
 %  incereasing values of the decision threshold.
@@ -20,12 +20,12 @@ function [tp,tn,info] = roc(y, score)
 %
 %  ROC(...) plots the ROC diagram in the current axis.
 %
-%  USING THE ROC CURVE
+%  READING THE ROC CURVE
 %
-%  We construct a classifer by choosing a threshold t and predicting
-%  as poistive the labels with score above the threshold (and negative
-%  the others). The ROC curve represent the performance of such
-%  classifier as the threshold is changed. Define
+%  Define a classifier by predicting as positve the data Y whose SCORE
+%  is greater than a threshold T. The ROC curve represent the
+%  performance of such classifier as the threshold T is
+%  varied. Define:
 %
 %    Np,       Nn      = num of pos/neg labels,
 %    Np_t(t),  Nn_t(t) = num of pos/neg labels with true prediction,
@@ -73,12 +73,15 @@ function [tp,tn,info] = roc(y, score)
 
 [score, perm] = sort(score) ;
 
+% important for the flipping below
+perm = perm(:)' ;
+
 Np = sum(y==+1) ;
 Nn = sum(y==-1) ;
 N  = Np + Nn ;
 
 if N < length(y)
-  error('Y must be a vector of -1,+1 values')
+  error('Y must be a vector of -1 and +1')
 end
 
 % true positive rate
@@ -99,12 +102,12 @@ tn = [0 tn] ;
 % --------------------------------------------------------------------
 
 if nargout > 0 | nargout == 0
+
   % equal error rate
   i1 = max(find(tp >= tn)) ;
   i2 = min(find(tn >= tp)) ;
 %  eer = (tp(i) + tn(i)) / 2 ;
   eer = max(tn(i1), tp(i2)) ;
-  
   
   % uniform prior and natural prior operating points
   [drop, upoint] = max(tp + tn) ;	

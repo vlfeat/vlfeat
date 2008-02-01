@@ -9,35 +9,40 @@
 %
 %    D(i,j) = sum (X(:,i) - X(:,j)).^2
 %
-%  ALLDIST2(...,'<norm>') changes the computed distance. Supported values
-%  for <dist> are
+%  ALLDIST2(...,'METRIC') changes the computed distance. Supported values
+%  for METRIC are
 %
-%  <dist>  D(i,j)
+%  METRIC  D(i,j)
 %  --------------------------------------------------------
-%   l0     sum (X(:,i) ~= Y(:,j))
-%   l1     sum |X(:,i)  - Y(:,j)|
-%   l2     sum (X(:,i)  - Y(:,j)).^2
-%   linf   max |X(:,i)  - X(:,j)|
-%   chi2   sum (X(:,i) - Y(:,j)).^2 ./ (X(:,i) + Y(:,j))
+%   LINF   max |X  - Y|
+%   L2     sum (X  - Y).^2
+%   L1     sum |X  - Y|
+%   L0     sum (X ~= Y)
+%   CHI2   sum (X  - Y).^2 ./ (X + Y)
+%   HELL   sum (X^.5 + Y^.5) .^ 2
 %
 %  (Notice that the standard definition of chi2 is half of what is
 %  computed here).
 %
-%  ALLDIST2(...,'<ker>') computes the following 'kernels' K:
+%  ALLDIST2(...,'KERNEL') computes the following 'kernels' K:
 %
-%  <ker>   K(i,j)
+%  KERNEL  K(i,j)
 %  ---------------------------------------------------------
-%   kl1    sum (min(X(:,i),Y(:,j)))
-%   kchi2  2 * sum (X(:,i) .* Y(:,j) ./ (X(:,i) + Y(:,j)))
+%   KL2    sum X .* Y
+%   KL1    sum min (X, Y)
+%   KCHI2  2 * sum (X .* Y) ./ (X + Y)
+%   KHELL  (X .* Y) .^ 0.5
 %
 %  The constant are chosen so that D(i,j) = K(i,i) + K(j,j) - 2 K(i,j)
-%  where D is the distance corresponding to the kenrel (if the
-%  arguments are non-negative vectors).
+%  where D is the metric corresponding to the kenrel (if the arguments
+%  are non-negative vectors). Each kernel can be interpreted as the
+%  inner product inducing the corresponding metric in an embedding of
+%  the real space into an approrpiate reproducing Kenrel Hilbert
+%  space.
 %
-%  ALLDIST2() supports directly most data types. X and Y must have the
+%  ALLDIST2() supports several storage classes. X and Y must have the
 %  same storage class. The sotrage class of D is promoted to reduce
-%  the chance of overvlow, but no check is perfomed to prevent this
-%  from happening (saturation math is NOT used).
+%  the chance of overvlow, but this is not checked.
 %
 %   X & Y class      D class  
 %  ---------------------------
