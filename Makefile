@@ -3,7 +3,7 @@
 # description: Build everything
 
 NAME               := vlfeat
-VER                := 0.9
+VER                := 0.9.1
 DIST                = $(NAME)-$(VER)
 #DEBUG              := yes
 
@@ -71,7 +71,7 @@ CC                  ?= cc
 LIBTOOL             ?= libtool
 PYTHON              ?= python
 
-CFLAGS              += -I. -pedantic -Wall -std=c89 -g -O0
+CFLAGS              += -I$(CURDIR) -pedantic -Wall -std=c89 -g -O0
 CFLAGS              += -Wno-unused-function 
 CFLAGS              += -Wno-long-long
 

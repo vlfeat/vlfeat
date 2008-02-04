@@ -3,7 +3,7 @@ function J = imarraysc(A, varargin)
 %   J = IMARRAYSC(A) behaves as IMARRAY(A), but scales the range of
 %   each image to span the current colormap.
 %
-%   IMARRAYSC(...) displays the resultint image rather than
+%   IMARRAYSC(...) displays the resulting image rather than
 %   returing it.
 %
 %   IMARRAYSC() works only with indexed (or gray-scale) images.
