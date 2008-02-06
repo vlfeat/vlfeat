@@ -53,10 +53,12 @@ CFLAGS     = /nologo /TC /MT \
              /D"__LITTLE_ENDIAN__" \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /I. \
-             /W1 /Wp64 /Z7 /Zp8 /O2 /arch:SSE2
+             /W1 /Z7 /Zp8 /O2 /arch:SSE2
+
+DLL_CFLAGS = /D"VL_BUILD_DLL"
 
 LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
-             /LIBPATH:$(bindir) vl.lib \
+             /LIBPATH:$(bindir) vl_dll.lib \
              /DEBUG
 
 MEX_RC     = $(MATLABROOT)\extern\include\mexversion.rc
@@ -81,6 +83,7 @@ libsrc =            	\
  vl\mathop.c            \
  vl\mser.c              \
  vl\pgm.c               \
+ vl\random.c		    \
  vl\rodrigues.c         \
  vl\sift.c              \
  vl\stringop.c
@@ -141,10 +144,16 @@ mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(mexdir) $(bindir)\vl.lib $(cmdexe) $(mexdll)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll)
 !ELSE
-all: $(objdir) $(bindir)\vl.lib $(cmdexe)
+all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe)
 !ENDIF
+
+BUILD_DLL=@echo CC  $(<) ]===} $(@R).dll && \
+	$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)" && \
+	RC /fo"$(@R).res" $(MEX_RC) && \
+	LINK $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@) && \
+	del "$(@R).obj" "$(@R).exp" "$(@R).lib" "$(@R).res" 
 
 # --------------------------------------------------------------------
 #                                                    Maintenance rules
@@ -155,6 +164,8 @@ clean:
 	-del /Q $(objdir)
 	-del $(cmdpdb)
 	-del $(mexpdb)
+	-del bin\win32\vl.dll
+	-del bin\win32\vl_dll.lib
 
 distclean: clean
 	-del $(cmdexe)
@@ -172,7 +183,9 @@ info:
 	@echo ** mexdll     = $(mexdll)
 	@echo ** CC         = $(CC)
 	@echo ** CFLAGS     = $(CFLAGS)
+	@echo ** DLL_CFLAGS = $(DLL_CFLAGS)
 	@echo ** MEX_CFLAGS = $(MEX_CFLAGS)
+	@echo ** BUILD_DLL  = $(BUILD_DLL)
 	@echo ** MEX_LFLAGS = $(MEX_LFLAGS)
 
 # --------------------------------------------------------------------
@@ -189,7 +202,7 @@ $(mexdir) :
 # vl\*.c -> $objdir\*.obj
 {vl}.c{$(objdir)}.obj:
 	@echo CC  $(<) ===^> $(@)
-	@$(CC) $(CFLAGS) /c /Fo"$(@)" "$(<)"
+	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /c /Fo"$(@)" "$(<)"
 
 # src\*.c -> $bindir\*.exe
 {src}.c{$(bindir)}.exe:
@@ -197,18 +210,38 @@ $(mexdir) :
 	@$(CC) $(CFLAGS) /Fe"$(@)" /Fo"$(@R).obj" "$(<)" /link $(LFLAGS)
 	@-del "$(@R).obj"
 
-# toolbox\*.c -> tooblox\*.dll
-{toolbox\sift;toolbox\geometry}.c.{toolbox\mexwin}.dll:
-	@echo CC  $(<) ===^> $(@R).dll
-	@$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)"
-	@RC /fo"$(@R).res" $(MEX_RC)
-	@LINK $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@)
-	@-del "$(@R).obj"
-	@-del "$(@R).exp"
-	@-del "$(@R).lib"
-	@-del "$(@R).res"
+# toolbox\*.c -> toolbox\*.dll
+{toolbox\sift}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\mser}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\imop}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\geometry}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\kmeans}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\aib}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+{toolbox\misc}.c{$(mexdir)}.dll:
+	$(BUILD_DLL)
+
+$(bindir)\vl.dll : $(libobj)
+	@echo LINK ^*.obj ===^> $(@R).dll
+	link /DLL $(**) /OUT:"$(@)" /IMPlIB:"$(@R)_dll.lib" /NOLOGO
 
 # *.obj -> *.lib
 $(bindir)\vl.lib : $(libobj)
-	@echo LIB ^*.obj ===^> $(@R).dll
+	@echo LIB ^*.obj ===^> $(@R).lib
 	@lib $(**) /OUT:"$(@)" /NOLOGO
+
+# vl.lib => mexwin/vl.lib
+$(mexdir)\vl.dll : $(bindir)\vl.dll
+	copy "$(**)" "$(@)"
+
