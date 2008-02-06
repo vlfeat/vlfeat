@@ -23,6 +23,7 @@ typedef vl_uint8 vl_ikm_data ; /**< IKM data type */
  ** @brief IKM algorithms 
  **/
 
+VL_EXPORT 
 enum VlIKMAlgorithms {
   VL_IKM_LLOYD,       /**< Lloyd algorithm */
   VL_IKM_ELKAN        /**< Elkan algorithm */
@@ -48,19 +49,20 @@ typedef struct _VlIKMFilt
 /** @name Create and destroy
  ** @{
  **/ 
-VlIKMFilt *vl_ikm_new    (int method) ;
-void       vl_ikm_delete (VlIKMFilt *f) ;
+VL_EXPORT VlIKMFilt *vl_ikm_new    (int method) ;
+VL_EXPORT void       vl_ikm_delete (VlIKMFilt *f) ;
 /** @} */
 
 /** @name Process data
  ** @{
  **/
-void vl_ikm_init           (VlIKMFilt *f, vl_ikm_acc const *centers, int M, int K) ;
-void vl_ikm_init_rand      (VlIKMFilt *f, int M, int K) ;
-void vl_ikm_init_rand_data (VlIKMFilt *f, vl_ikm_data const *data, int M, int N, int K) ;
-int  vl_ikm_train          (VlIKMFilt *f, vl_ikm_data const *data, int N) ;
-void vl_ikm_push           (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) ;
+VL_EXPORT void vl_ikm_init           (VlIKMFilt *f, vl_ikm_acc const *centers, int M, int K) ;
+VL_EXPORT void vl_ikm_init_rand      (VlIKMFilt *f, int M, int K) ;
+VL_EXPORT void vl_ikm_init_rand_data (VlIKMFilt *f, vl_ikm_data const *data, int M, int N, int K) ;
+VL_EXPORT int  vl_ikm_train          (VlIKMFilt *f, vl_ikm_data const *data, int N) ;
+VL_EXPORT void vl_ikm_push           (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) ;
 
+VL_EXPORT
 vl_uint  vl_ikm_push_one   (vl_ikm_acc const *centers, 
                             vl_ikm_data const *data,
                             int M, int K) ;

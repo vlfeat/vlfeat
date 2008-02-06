@@ -14,13 +14,14 @@ General Public License version 2.
 #include <string.h>
 #include <stdio.h>
 
+#include "generic.h"
 #include "getopt_long.h"
 
-int    opterr = 1 ;
-int    optind = 1 ; 
-int    optopt ; 
-char * optarg ; 
-int    optreset;
+VL_EXPORT int    opterr = 1 ;
+VL_EXPORT int    optind = 1 ; 
+VL_EXPORT int    optopt ; 
+VL_EXPORT char * optarg ; 
+VL_EXPORT int    optreset;
 
 #define BADCH	'?'
 #define BADARG	':'
@@ -60,6 +61,7 @@ int    optreset;
 
  **/
 
+VL_EXPORT
 int
 getopt_long(int argc, char *const argv[],
             const char *optstring,

@@ -167,6 +167,7 @@ xdelete (VlHIKMNode *node)
  ** @return new HIKM tree.
  **/
 
+VL_EXPORT
 VlHIKMTree *
 vl_hikm_new (int method)
 {
@@ -186,6 +187,7 @@ vl_hikm_new (int method)
  ** @param f HIKM tree.
  **/
 
+VL_EXPORT
 void
 vl_hikm_delete (VlHIKMTree *f)
 {
@@ -208,6 +210,7 @@ vl_hikm_delete (VlHIKMTree *f)
  ** @return a new HIKM tree representing the clustering.
  **/
 
+VL_EXPORT
 void
 vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
 {
@@ -230,6 +233,7 @@ vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
  ** @param N       Number of data.
  **/ 
 
+VL_EXPORT
 void
 vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N)
 {
@@ -250,6 +254,7 @@ vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N)
  ** the HIKM tree and @c N is the number of data point to process.
  **/
 
+VL_EXPORT
 void
 vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_ikm_data const *data, int N)
 {

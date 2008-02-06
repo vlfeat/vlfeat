@@ -274,14 +274,15 @@ of the pointers.
 #include <stdlib.h>
 #include <math.h>
 
-int vl_err_no = 0 ;
-char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
+VL_EXPORT int vl_err_no = 0 ;
+VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
 
 /** ------------------------------------------------------------------
  ** @brief Get version string
  ** @return library version string
  **/
 
+VL_EXPORT
 char const *
 vl_get_version_string ()
 {
@@ -327,6 +328,7 @@ int   (*vl_printf_func)  (char const *, ...)= do_nothing_printf ;
  ** @param free_func    pointer to @c free.
  **/
 
+VL_EXPORT
 void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
                         void *(*realloc_func) (void*, vl_size),
                         void *(*calloc_func)  (vl_size, vl_size),
@@ -344,6 +346,7 @@ void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
  ** Let @c print_func be NULL to disable printf.
  **/
 
+VL_EXPORT
 void 
 vl_set_printf_func (int(*printf_func) (char const *format, ...))
 {

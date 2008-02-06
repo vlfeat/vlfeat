@@ -21,6 +21,7 @@ General Public License version 2.
  ** @param dR_pt 9x3 matrix - array of 27 double (in).
  ** @param om_pt 3   vector - array of 3 dobule (out).
  **/
+VL_EXPORT
 void 
 vl_rodrigues(double* R_pt, double* dR_pt, const double* om_pt)
 {
@@ -173,6 +174,7 @@ vl_rodrigues(double* R_pt, double* dR_pt, const double* om_pt)
  ** and stored into the matrix @a dR_pt.
  **/
 
+VL_EXPORT
 void vl_irodrigues(double* om_pt, double* dom_pt, const double* R_pt)
 {
   /*

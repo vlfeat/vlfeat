@@ -83,26 +83,34 @@ typedef struct _VlSiftFilt
 /** @name Create and destroy
  ** @{
  **/
+VL_EXPORT
 VlSiftFilt*  vl_sift_new    (int width, int height,
                              int O, int S,
                              int o_min) ;
+VL_EXPORT
 void         vl_sift_delete (VlSiftFilt *f) ;
 /** @} */
 
 /** @name Process data
  ** @{
  **/
+VL_EXPORT
 int   vl_sift_process_first_octave       (VlSiftFilt *f, 
                                           vl_sift_pix const *im) ;
+VL_EXPORT
 int   vl_sift_process_next_octave        (VlSiftFilt *f) ;
+VL_EXPORT
 void  vl_sift_detect                     (VlSiftFilt *f) ;
+VL_EXPORT
 int   vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
                                           double angles [4],
                                           VlSiftKeypoint const*k);
+VL_EXPORT
 void  vl_sift_calc_keypoint_descriptor   (VlSiftFilt *f,
                                           vl_sift_pix *descr,
                                           VlSiftKeypoint const* k,
                                           double angle) ;
+VL_EXPORT
 void  vl_sift_keypoint_init              (VlSiftFilt const *f,
                                           VlSiftKeypoint *k, 
                                           double x,

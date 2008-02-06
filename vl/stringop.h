@@ -33,15 +33,15 @@ enum {
 } ;
 
 
-int    vl_string_copy             (char *dst, int n, char const *src) ;
-int    vl_string_copy_sub         (char *dst, int n, char const *beg, char const *end) ;
-char*  vl_string_parse_protocol   (char const *str, int *prot) ;
-char const* vl_string_protocol_name (int prot) ;
-int    vl_string_basename         (char *dst, int n, char const *src, int n_ext) ;
-int    vl_string_replace_wildcard (char *dst, int n, char const *src, char wild, char esc, char const* repl) ;
-char*  vl_string_find_char_rev    (char const *beg, char const* end, char c) ;
-int    vl_string_length           (char const *str) ;
-int    vl_string_casei_cmp        (const char *s1, const char *s2) ;
+VL_EXPORT int    vl_string_copy             (char *dst, int n, char const *src) ;
+VL_EXPORT int    vl_string_copy_sub         (char *dst, int n, char const *beg, char const *end) ;
+VL_EXPORT char*  vl_string_parse_protocol   (char const *str, int *prot) ;
+VL_EXPORT char const* vl_string_protocol_name (int prot) ;
+VL_EXPORT int    vl_string_basename         (char *dst, int n, char const *src, int n_ext) ;
+VL_EXPORT int    vl_string_replace_wildcard (char *dst, int n, char const *src, char wild, char esc, char const* repl) ;
+VL_EXPORT char*  vl_string_find_char_rev    (char const *beg, char const* end, char c) ;
+VL_EXPORT int    vl_string_length           (char const *str) ;
+VL_EXPORT int    vl_string_casei_cmp        (const char *s1, const char *s2) ;
 
 /* VL_STRINGOP_H */
 #endif

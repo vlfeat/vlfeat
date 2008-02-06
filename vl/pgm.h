@@ -50,13 +50,13 @@ struct _VlPgmImage
  **/
 typedef struct  _VlPgmImage  VlPgmImage ;
 
-int vl_pgm_extract_head  (FILE *f, VlPgmImage       *im) ;
-int vl_pgm_extract_data  (FILE *f, VlPgmImage const *im, void *data) ;
-int vl_pgm_insert        (FILE *f, 
-                          VlPgmImage const *im, 
-                          void *data ) ;
-int vl_pgm_get_data_size (VlPgmImage const *im) ;
-int vl_pgm_get_bpp       (VlPgmImage const *im) ;
+VL_EXPORT int vl_pgm_extract_head  (FILE *f, VlPgmImage       *im) ;
+VL_EXPORT int vl_pgm_extract_data  (FILE *f, VlPgmImage const *im, void *data) ;
+VL_EXPORT int vl_pgm_insert        (FILE *f, 
+                                    VlPgmImage const *im, 
+                                    void *data ) ;
+VL_EXPORT int vl_pgm_get_data_size (VlPgmImage const *im) ;
+VL_EXPORT int vl_pgm_get_bpp       (VlPgmImage const *im) ;
 
 /* VL_PGM */
 #endif

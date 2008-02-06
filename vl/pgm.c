@@ -99,6 +99,7 @@ remove_blanks(FILE* f)
  ** @return number of pixels of the image.
  **/
 
+VL_EXPORT
 int
 vl_pgm_get_data_size (VlPgmImage const *im)
 {
@@ -116,6 +117,7 @@ vl_pgm_get_data_size (VlPgmImage const *im)
  ** @return number of bytes per pixel.
  **/
 
+VL_EXPORT
 int
 vl_pgm_get_bpp (VlPgmImage const *im)
 {
@@ -137,6 +139,7 @@ vl_pgm_get_bpp (VlPgmImage const *im)
  ** occurred in decoding the header or meta section of the PGM file.
  **/
 
+VL_EXPORT
 int
 vl_pgm_extract_head (FILE* f, VlPgmImage *im)
 {
@@ -243,7 +246,8 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
  **
  ** @return error code.
  **/
-  
+
+VL_EXPORT
 int
 vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 {
@@ -319,6 +323,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
  ** @return error code.
  **/
 
+VL_EXPORT
 int
 vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
 {

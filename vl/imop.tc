@@ -20,6 +20,7 @@ General Public License version 2.
 #define VL_CONVTRANSP(SFX)  vl_convtransp_ ## SFX
 #define VL_CONVTRANSP_(SFX) VL_CONVTRANSP(SFX)
 
+VL_EXPORT
 void
 VL_CONVTRANSP_(SFX) (PIX       *dst,
                      PIX const *src,
@@ -78,6 +79,7 @@ VL_CONVTRANSP_(SFX) (PIX       *dst,
   }
 }
 
+VL_EXPORT
 void
 VL_IMSMOOTH_(SFX)(PIX        *dst,
                   PIX        *temp,

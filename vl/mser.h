@@ -58,16 +58,16 @@ struct _VlMserStats
 /** @name Construction and Destruction
  ** @{
  **/
-VlMserFilt*      vl_mser_new     (int ndims, int const* dims) ;
-void             vl_mser_delete  (VlMserFilt *f) ;
+VL_EXPORT VlMserFilt*      vl_mser_new     (int ndims, int const* dims) ;
+VL_EXPORT void             vl_mser_delete  (VlMserFilt *f) ;
 /** @} */
 
 /** @name Processing 
  ** @{
  **/
-void             vl_mser_process (VlMserFilt *f, 
-                                  vl_mser_pix const *im) ;
-void             vl_mser_ell_fit (VlMserFilt *f) ;
+VL_EXPORT void             vl_mser_process (VlMserFilt *f, 
+                                            vl_mser_pix const *im) ;
+VL_EXPORT void             vl_mser_ell_fit (VlMserFilt *f) ;
 /** @} */
 
 /** @name Retrieving data

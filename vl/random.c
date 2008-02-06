@@ -81,6 +81,7 @@ static int mti=N+1; /* mti==N+1 means mt[N] is not initialized */
  ** @param state pointer to an array of 625 numbers.
  **/
 
+VL_EXPORT
 void vl_rand_get_state (vl_uint32 state [625])
 {
   int k ;
@@ -92,6 +93,7 @@ void vl_rand_get_state (vl_uint32 state [625])
  ** @param state pointer to an array of 625 numbers.
  **/
 
+VL_EXPORT
 void vl_rand_set_state (vl_uint32 const state [625])
 {
   int k ;
@@ -104,6 +106,7 @@ void vl_rand_set_state (vl_uint32 const state [625])
  ** @param s seed.
  **/
 
+VL_EXPORT
 void vl_rand_seed (vl_uint32 s)
 {
   mt[0]= s & 0xffffffffUL;
@@ -125,6 +128,7 @@ void vl_rand_seed (vl_uint32 s)
  ** @param key_length  length of the array.
  **/
 
+VL_EXPORT
 void vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length)
 {
   int i, j, k;
@@ -154,6 +158,7 @@ void vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length)
  ** @return a random number in [0, 0xffffffff]. 
  **/
 
+VL_EXPORT
 vl_uint32 vl_rand_uint32 ()
 {
   unsigned long y;
@@ -195,6 +200,7 @@ vl_uint32 vl_rand_uint32 ()
  ** @return a random number in [0, 0x7fffffff].
  **/
 
+VL_EXPORT
 vl_int32 vl_rand_int31 ()
 {
   return (vl_int32)(vl_rand_uint32()>>1);
@@ -204,6 +210,7 @@ vl_int32 vl_rand_int31 ()
  ** @return a random number.
  **/
 
+VL_EXPORT
 double vl_rand_real1 ()
 {
   return vl_rand_uint32()*(1.0/4294967295.0); 
@@ -214,6 +221,7 @@ double vl_rand_real1 ()
  ** @return a random number.
  **/
 
+VL_EXPORT
 double vl_rand_real2 ()
 {
   return vl_rand_uint32()*(1.0/4294967296.0); 
@@ -224,6 +232,7 @@ double vl_rand_real2 ()
  ** @return a random number.
  **/
 
+VL_EXPORT
 double vl_rand_real3 ()
 {
   return (((double)vl_rand_uint32()) + 0.5)*(1.0/4294967296.0); 
@@ -234,6 +243,7 @@ double vl_rand_real3 ()
  ** @return a random number. 
  **/
 
+VL_EXPORT
 double vl_rand_res53 () 
 { 
   vl_uint32 

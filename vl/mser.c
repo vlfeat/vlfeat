@@ -278,6 +278,7 @@ climb (VlMserReg* r, vl_uint idx)
  ** @param ndims number of dimensions.
  ** @param dims  dimensions.
  **/
+VL_EXPORT
 VlMserFilt*
 vl_mser_new (int ndims, int const* dims)
 {
@@ -341,6 +342,7 @@ vl_mser_new (int ndims, int const* dims)
  **
  ** @param f MSER filter to be deleted.
  **/
+VL_EXPORT
 void
 vl_mser_delete (VlMserFilt* f)
 {
@@ -374,6 +376,7 @@ vl_mser_delete (VlMserFilt* f)
  ** @param f MSER filter.
  ** @param im image data.
  **/
+VL_EXPORT
 void
 vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
 {
@@ -840,6 +843,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
  ** @sa @ref mser-ell
  **/
 
+VL_EXPORT
 void
 vl_mser_ell_fit (VlMserFilt* f)
 {

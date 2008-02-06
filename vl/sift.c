@@ -398,6 +398,7 @@ copy_and_downsample
  ** @sa ::vl_sift_delete().
  **/
 
+VL_EXPORT
 VlSiftFilt *
 vl_sift_new (int width, int height,
              int O, int S,
@@ -466,6 +467,7 @@ vl_sift_new (int width, int height,
  **
  ** The function frees the resources allocated by ::vl_sift_new().
  **/
+VL_EXPORT
 void
 vl_sift_delete (VlSiftFilt* f)
 {
@@ -495,6 +497,7 @@ vl_sift_delete (VlSiftFilt* f)
  ** @sa ::vl_sift_process_next_octave().
  **/
 
+VL_EXPORT
 int
 vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 {
@@ -600,6 +603,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
  ** @sa ::vl_sift_process_first_octave().
  **/
 
+VL_EXPORT
 int
 vl_sift_process_next_octave (VlSiftFilt *f)
 {
@@ -669,6 +673,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
  ** @param f SIFT filter.
  **/
 
+VL_EXPORT
 void
 vl_sift_detect (VlSiftFilt * f)
 {  
@@ -1074,6 +1079,7 @@ update_gradient (VlSiftFilt *f)
  ** @return number of orientations found.
  **/
 
+VL_EXPORT
 int
 vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
                                     double angles [4],
@@ -1259,6 +1265,7 @@ normalize_histogram
  ** If not, it does not do anything.
  **/
 
+VL_EXPORT
 void               
 vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
                                  vl_sift_pix *descr,
@@ -1447,6 +1454,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  ** and @a y and scale @a sigma of the keypoint.
  **/
 
+VL_EXPORT
 void
 vl_sift_keypoint_init (VlSiftFilt const *f,
                        VlSiftKeypoint *k, 

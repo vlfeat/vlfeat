@@ -101,6 +101,7 @@ static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_ikm_data const*,
  ** @return new IKM qunatizer.
  **/
 
+VL_EXPORT
 VlIKMFilt *
 vl_ikm_new (int method)
 {
@@ -140,6 +141,7 @@ void vl_ikm_delete (VlIKMFilt* f)
  ** @return -1 if an overflow may have occured.
  **/
 
+VL_EXPORT
 int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
 { 
   int err ;
@@ -170,6 +172,7 @@ int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
  ** quantizer must be initialized.
  **/
 
+VL_EXPORT
 void
 vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
   switch (f -> method) {
@@ -193,6 +196,7 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
  ** @return the cluster index.
  **/
 
+VL_EXPORT
 vl_uint
 vl_ikm_push_one (vl_ikm_acc const *centers, 
 		 vl_ikm_data const *data, 

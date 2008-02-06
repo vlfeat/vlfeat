@@ -58,6 +58,7 @@ NUL). Thus:
  ** suffix but it cannot be recognized.
  **/
 
+VL_EXPORT
 char*  
 vl_string_parse_protocol (char const *str, int *prot)
 {
@@ -102,6 +103,7 @@ vl_string_parse_protocol (char const *str, int *prot)
  ** pointer if the protocol code is unknown.
  **/
 
+VL_EXPORT
 char const*  
 vl_string_protocol_name (int prot)
 {
@@ -138,6 +140,7 @@ vl_string_protocol_name (int prot)
  ** @sa vl-stringop-err.
  **/
 
+VL_EXPORT
 int
 vl_string_basename (char *dst, int n, char const *src, int n_ext)
 {
@@ -187,6 +190,7 @@ vl_string_basename (char *dst, int n, char const *src, int n_ext)
  ** @sa @ref vl-stringop-err.
  **/
 
+VL_EXPORT
 int
 vl_string_replace_wildcard (char *dst, int n, 
                             char const *src, 
@@ -242,6 +246,7 @@ vl_string_replace_wildcard (char *dst, int n,
  ** @sa vl-stringop-err.
  **/
 
+VL_EXPORT
 int
 vl_string_copy (char *dst, int n, char const *src)
 {
@@ -276,6 +281,7 @@ vl_string_copy (char *dst, int n, char const *src)
  ** @sa vl-stringop-err.
  **/
 
+VL_EXPORT
 int
 vl_string_copy_sub (char *dst, int n, 
                     char const *beg,
@@ -307,6 +313,7 @@ vl_string_copy_sub (char *dst, int n,
  ** @return pointer to last occurrence of @a c, or 0 if none.
  **/
 
+VL_EXPORT
 char *
 vl_string_find_char_rev (char const *beg, char const* end, char c)
 {
@@ -325,6 +332,7 @@ vl_string_find_char_rev (char const *beg, char const* end, char c)
  ** @return string length.
  **/
 
+VL_EXPORT
 int
 vl_string_length (char const *str)
 {
@@ -343,6 +351,7 @@ vl_string_length (char const *str)
  ** greater (in lexicographical order) and <0 otherwise.
  **/
 
+VL_EXPORT
 int
 vl_string_casei_cmp (const char *s1, const char *s2)
 {

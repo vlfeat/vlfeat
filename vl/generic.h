@@ -22,6 +22,15 @@ General Public License version 2.
 /** @brief Inline function declaration */
 #define VL_INLINE static __inline__
 
+/** @brief Exported functions should be prepended with this */
+#ifdef VL_BUILD_DLL
+#define VL_EXPORT __declspec(dllexport)
+#elif WIN32
+#define VL_EXPORT __declspec(dllimport)
+#else
+#define VL_EXPORT   
+#endif
+
 /** @internal @brief Stringify argument helper
  ** @see ::VL_STRINGIFY
  **/
@@ -135,7 +144,7 @@ static union { vl_uint64 raw ; vl_double value ; }
 #ifdef __VISUALC__
 #undef VL_INLINE
 #define VL_INLINE __inline
-#define fscanf fscanf_s
+/*#define fscanf fscanf_s*/
 #define snprintf _snprintf
 #define isnan _isnan
 #endif
@@ -156,6 +165,7 @@ static union { vl_uint64 raw ; vl_double value ; }
  ** @{ 
  **/
 
+VL_EXPORT
 void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
                         void *(*realloc_func) (void*,vl_size),
                         void *(*calloc_func)  (vl_size, vl_size),
@@ -165,6 +175,7 @@ VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
 VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
 VL_INLINE void  vl_free    (void* ptr) ;
 
+VL_EXPORT
 void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
 /** @def VL_PRINTF
@@ -202,7 +213,7 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
  **/
 
 /** @brief Last error code */
-extern int vl_err_no ;
+extern VL_EXPORT int vl_err_no ;
 
 /** @brief Error description maximum length 
  **
@@ -211,7 +222,7 @@ extern int vl_err_no ;
 #define VL_ERR_MSG_LEN 1024
 
 /** @brief Last error description */
-extern char vl_err_msg [VL_ERR_MSG_LEN] ;
+extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] ;
 
 #define VL_ERR_OK       0  /**< No error */
 #define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
@@ -257,6 +268,7 @@ extern char vl_err_msg [VL_ERR_MSG_LEN] ;
 /** ------------------------------------------------------------------
  **/
 
+VL_EXPORT
 char const * vl_get_version_string () ;
 
 /** @name Endianness detection and conversions

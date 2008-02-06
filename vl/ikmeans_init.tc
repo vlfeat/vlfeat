@@ -66,6 +66,7 @@ void vl_ikm_init_helper (VlIKMFilt *f)
  ** @param K       number of clusters.
  **/
 
+VL_EXPORT
 void
 vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
 {
@@ -82,6 +83,7 @@ vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
  ** @param K number of clusters.
  **/
 
+VL_EXPORT
 void
 vl_ikm_init_rand 
 (VlIKMFilt* f, int M, int K)
@@ -107,6 +109,7 @@ vl_ikm_init_rand
  ** @param K number of clusters.
  **/
 
+VL_EXPORT
 void
 vl_ikm_init_rand_data 
 (VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int K)

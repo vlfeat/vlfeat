@@ -636,6 +636,7 @@ vl_aib_delete_aib (VlAIB * aib)
  ** @c 2*nvalues-1 elements.
  **/ 
 
+VL_EXPORT
 vl_aib_node *
 vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
         double ** cost)
