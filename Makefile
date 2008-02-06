@@ -5,7 +5,8 @@
 NAME               := vlfeat
 VER                := 0.9.1
 DIST                = $(NAME)-$(VER)
-#DEBUG              := yes
+HOST               := ganesh.cs.ucla.edu:/var/www/vlfeat/
+#NDEBUG             :=
 
 # --------------------------------------------------------------------
 #                                                       Error messages
@@ -15,8 +16,10 @@ err_no_arch  =
 err_no_arch +=$(shell echo "** Unknown host architecture '$(UNAME)'. This identifier"   1>&2)
 err_no_arch +=$(shell echo "** was obtained by running 'uname -sm'. Edit the Makefile " 1>&2)
 err_no_arch +=$(shell echo "** to add the appropriate configuration."                   1>&2)
-err_no_arch +=Configuration failed
+err_no_arch +=config
 
+err_internal  =$(shell echo Internal error)
+err_internal +=internal
 
 # --------------------------------------------------------------------
 #                                  Architecture Identification Strings
@@ -34,6 +37,13 @@ Linux_x86_64_ARCH           := g64
 #                                                        Configuration
 # --------------------------------------------------------------------
 
+# == DISTRIBUTION AND VERSION ==
+#
+# VER:
+# DIST:
+# BINDIST:
+# NDEBUG:
+#
 # == PROGRAMS ==
 #
 # CC:          C compiler (e.g. gcc).
@@ -41,105 +51,111 @@ Linux_x86_64_ARCH           := g64
 # LIBTOOL      libtool (used only under Mac)
 # PYTHON:      Python interpreter (e.g. python)
 #
-# == LIBVL STATIC AND SHARED LIBRARY AND EXECUTABLE ==
+# == EXECUTABLES ==
 #
-# CLFAGS:      flags passed to $(CC) to compile an object file (*)
-# LDFLAGS:     flags passed to $(CC) to create an executable file
+# BINDIR:      where to put the exec (and libraries)
+# CLFAGS:      flags passed to $(CC) to compile a C source
+# LDFLAGS:     flags passed to $(CC) to link C objects into an exec
+#
+# == LIBRARY ==
+#
+# DLL_CLFAGS:  flags passed to $(CC) to compile a DLL C source
+# DLL_SUFFIX:  suffix of a DLL (.so, .dylib)
 #
 # == MEX FILES ==
 #
 # MEX_BINDIR:  where to put mex files.
+# MEX_SUFFIX:  suffix of a MEX file (.mexglx, .mexmac, ...)
 # MEX_FLAGS:   flags passed to $(MEX)
 # MEX_CFLAGS:  flags added to the CLFAGS variable of $(MEX)
 # MEX_LDFLAGS: flags added to the LDFLAGS variable of $(MEX)
-#
-# == AUTOMATIC CONFIGURATION ==
-#
-# BINDIR:         where to put the executable files.
-# MEX_BINDIR:     where to put the MEX files.
-# *_DLL_SUFFIX:   suffix of a DLL library (.dylib, .so, ...)
-# *_MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
-#
-# *_CFLAGS:       flags added to CLFAGS
-# *_LDFLAGS:      flags added to LDFLAGS
-# *_MEX_FLAGS:    flags added to MEX_FLAGS
-# *_MEX_CFLAGS:   flags added to MEX_CLFAGS
-# *_MEX_LDFLAGS:  flags added to MEX_LDFLAGS
 
-MEX                 ?= mex
-CC                  ?= cc
-LIBTOOL             ?= libtool
-PYTHON              ?= python
+ifndef NDEBUG
+DEBUG=yes
+endif
 
-CFLAGS              += -I$(CURDIR) -pedantic -Wall -std=c89 -g -O0
-CFLAGS              += -Wno-unused-function 
-CFLAGS              += -Wno-long-long
+MEX             ?= mex
+CC              ?= cc
+LIBTOOL         ?= libtool
+PYTHON          ?= python
+AR              ?= ar
 
-LDFLAGS             +=
+CFLAGS          += -I$(CURDIR) -pedantic -Wall -std=c89 -O3
+CFLAGS          += -Wno-unused-function 
+CFLAGS          += -Wno-long-long
+CFLAGS          += $(if $(DEBUG), -O0 -g)
 
-MEX_FLAGS            = -Itoolbox -L$(BINDIR) -lvl
-MEX_CFLAGS           = $(CFLAGS)
-MEX_LDFLAGS          =
+LDFLAGS         += $(BINDIR)/libvl.a
 
-UNAME               := $(shell uname -sm)
-ARCH                := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
+MEX_FLAGS        = -Itoolbox -L$(BINDIR) -lvl
+MEX_CFLAGS       = $(CFLAGS)
+MEX_LDFLAGS      =
+
+UNAME           := $(shell uname -sm)
+ARCH            := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 # Mac OS X on PPC processor
-mac_BINDIR          := bin/mac
-mac_DLL_SUFFIX      := dylib
-mac_MEX_SUFFIX      := mexmac
-mac_CFLAGS          := -Wno-variadic-macros -D__BIG_ENDIAN__ -gstabs+
-mac_LDFLAGS         := -lm
-mac_MEX_FLAGS       := -lm CC='gcc' CXX='g++' LD='gcc'
-mac_MEX_CFLAGS      := 
-mac_MEX_LDFLAGS     := 
+ifeq ($(ARCH),mac)
+BINDIR          := bin/mac
+DLL_SUFFIX      := dylib
+MEX_SUFFIX      := mexmac
+CFLAGS          += -Wno-variadic-macros -D__BIG_ENDIAN__ -gstabs+
+LDFLAGS         += -lm
+DLL_CFLAGS      += -fvisibility=hidden
+MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
+MEX_CFLAGS      += 
+MEX_LDFLAGS     +=
+endif
 
 # Mac OS X on Intel processor
-mci_BINDIR          := bin/maci
-mci_DLL_SUFFIX      := dylib
-mci_MEX_SUFFIX      := mexmaci
-mci_CFLAGS          := -Wno-variadic-macros -D__LITTLE_ENDIAN__ -gstabs+
-mci_LDFLAGS         := -lm
-mci_MEX_FLAGS       := -lm
-mci_MEX_CFLAGS      := 
-mci_MEX_LDFLAGS     := 
+ifeq ($(ARCH),mci)
+BINDIR          := bin/maci
+DLL_SUFFIX      := dylib
+MEX_SUFFIX      := mexmaci
+CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
+CFLAGS          += $(if $(DEBUG), -gstabs+)
+LDFLAGS         += -lm
+MEX_FLAGS       += -lm
+MEX_CFLAGS      += 
+MEX_LDFLAGS     += 
+endif
 
 # Linux-32
-glx_BINDIR          := bin/glx
-glx_MEX_SUFFIX      := mexglx
-glx_DLL_SUFFIX      := so
-glx_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99
-glx_LDFLAGS         := -lm
-glx_MEX_FLAGS       := -lm
-glx_MEX_CFLAGS      := 
-glx_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
+ifeq ($(ARCH),glx)
+BINDIR          := bin/glx
+MEX_SUFFIX      := mexglx
+DLL_SUFFIX      := so
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+LDFLAGS         += -lm
+MEX_FLAGS       += -lm
+MEX_CFLAGS      += 
+MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
+endif
 
 # Linux-64
-g64_BINDIR          := bin/g64
-g64_MEX_SUFFIX      := mexa64
-g64_DLL_SUFFIX      := so
-g64_CFLAGS          := -D__LITTLE_ENDIAN__ -std=c99 -fPIC
-g64_LDFLAGS         := -lm
-g64_MEX_FLAGS       := -lm
-g64_MEX_CFLAGS      := 
-g64_MEX_LDFLAGS     := -Wl,--rpath,\\\$$ORIGIN/
+ifeq ($(ARCH),g64)
+BINDIR          := bin/g64
+MEX_SUFFIX      := mexa64
+DLL_SUFFIX      := so
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+LDFLAGS         += -lm
+MEX_FLAGS       += -lm
+MEX_CFLAGS      += 
+MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
+endif
 
-BINDIR              := $($(ARCH)_BINDIR)
-DLL_SUFFIX          := $($(ARCH)_DLL_SUFFIX)
-MEX_SUFFIX          := $($(ARCH)_MEX_SUFFIX)
-
-CFLAGS              += $($(ARCH)_CFLAGS)
-LDFLAGS             += $($(ARCH)_LDFLAGS)
-MEX_FLAGS           += $($(ARCH)_MEX_FLAGS)
-MEX_CFLAGS          += $($(ARCH)_MEX_CFLAGS)
-MEX_LDFLAGS         += $($(ARCH)_MEX_LDFLAGS)
-
-BINDIST             := $(DIST)-bin
-MEX_BINDIR          := toolbox/$(MEX_SUFFIX)
+BINDIST         := $(DIST)-bin
+MEX_BINDIR      := toolbox/$(MEX_SUFFIX)
 
 # Print an error message if the architecture was not recognized.
 ifeq ($(ARCH),)
 die:=$(error $(err_no_arch))
+endif
+
+# Sanity check
+ifeq ($(DLL_SUFFIX),)
+die:=$(error $(err_internal))
 endif
 
 .PHONY : all
@@ -163,7 +179,7 @@ all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 # creates a static and a dynamic version of the library. Depending on
 # the architecture, one or more of the following files are produced:
 #
-# $(OBJDIR)/libvl.a       Static library (UNIX)
+# $(OBJDIR)/libvl.a       Static library
 # $(OBJDIR)/libvl.so      ELF dynamic library (Linux)
 # $(OBJDIR)/libvl.dylib   Mach-O dynamic library (Mac OS X)
 #
@@ -179,8 +195,7 @@ all-dir: results/.dirstamp doc/figures/demo/.dirstamp
 # the library in $(BINDIR)/libvl.a.
 
 lib_src := $(wildcard vl/*.c)
-lib_obj := $(notdir $(lib_src))
-lib_obj := $(addprefix $(BINDIR)/objs/, $(lib_obj:.c=.o))
+lib_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(lib_src:.c=.o)))
 lib_dep := $(lib_obj:.o=.d)
 
 # create library libvl.a
@@ -191,28 +206,30 @@ all-lib: $(BINDIR)/libvl.a $(BINDIR)/libvl.$(DLL_SUFFIX)
 
 $(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   CC '$<' ==> '$@'"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(DLL_CFLAGS) -c $< -o $@
 
 $(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   D  '$<' ==> '$@'"
-	@$(CC) -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d' $< -MF $@
+	@$(CC) $(DLL_CFLAGS)                                         \
+	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
+	       $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
 	@echo "   A  '$@'"
-	@ar rcs $@ $^
+	@$(AR) rcs $@ $^
 
 $(BINDIR)/libvl.dylib : $(lib_obj)
 	@echo "DYLIB '$@'"
-	@$(LIBTOOL) -dynamic                                  \
-                    -flat_namespace                           \
-                    -install_name @loader_path/libvl.dylib    \
-	            -compatibility_version $(VER)             \
-                    -current_version $(VER)                   \
+	@$(LIBTOOL) -dynamic                                        \
+                    -flat_namespace                                 \
+                    -install_name @loader_path/libvl.dylib          \
+	            -compatibility_version $(VER)                   \
+                    -current_version $(VER)                         \
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/libvl.so : $(lib_obj)
 	@echo "   SO '$@'"
-	@$(CC) $(CFLAGS) -shared $^ -o $@
+	@$(CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
 
 ifeq ($(filter doc dox clean distclean info, $(MAKECMDGOALS)),)
 include $(lib_dep) 
@@ -232,7 +249,7 @@ all-bin : $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 	@echo "   CC '$<' ==> '$@'"
-	@$(CC) $(CFLAGS) $(LDFLAGS) $< $(BINDIR)/libvl.a -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -247,26 +264,27 @@ $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 # has install_name relative to @loader_path/.
 
 mex_src := $(shell find toolbox -name "*.c")
-mex_tgt := $(addprefix $(MEX_BINDIR)/, \
+mex_tgt := $(addprefix $(MEX_BINDIR)/,                               \
 	               $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
+
+vpath %.c $(shell find toolbox -type d)
+
 
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-vpath %.c $(shell find toolbox -type d)
-
-$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) :                   \
-                 $(BINDIR)/libvl.$(DLL_SUFFIX)        \
+$(MEX_BINDIR)/libvl.$(DLL_SUFFIX) :                                  \
+                 $(BINDIR)/libvl.$(DLL_SUFFIX)                       \
                  $(MEX_BINDIR)/.dirstamp
 	@test -h $@ || ln -sf ../../$(BINDIR)/$(notdir $<) $@
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) :                       \
-                 %.c toolbox/mexutils.h               \
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) :                                      \
+                 %.c toolbox/mexutils.h                              \
                   $(MEX_BINDIR)/libvl.$(DLL_SUFFIX)
 	@echo "   MX '$<' ==> '$@'"
-	@$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'      \
-		LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'    \
-	        $(MEX_FLAGS)                          \
+	@$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'                     \
+		LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                   \
+	        $(MEX_FLAGS)                                         \
 	        $< -outdir $(dir $(@))
 
 # --------------------------------------------------------------------
@@ -299,6 +317,10 @@ doc/toolbox.html : $(m_src)
 #                                                       Clean and dist
 # --------------------------------------------------------------------
 
+.PHONY: $(NAME) 
+.PHONY: dist, bindist, clean, distclean
+.PHONY: post, post-doc, autorights
+
 TIMESTAMP:
 	echo "Version $(VER)"            > TIMESTAMP
 	echo "Archive created on `date`" >>TIMESTAMP
@@ -306,7 +328,6 @@ TIMESTAMP:
 VERSION:
 	echo "$(VER)" > VERSION
 
-.PHONY: clean
 clean:
 	make -C doc clean
 	rm -rf `find ./bin -name 'objs' -type d`
@@ -317,18 +338,15 @@ clean:
 	rm -rf  ./results
 	rm -rf $(NAME)
 
-.PHONY: distclean
 distclean: clean
 	make -C doc distclean
 	rm -rf bin dox
 	rm -f  doc/toolbox.html
-	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;      \
-	do                                                          \
-		rm -rf "toolbox/$${i}" ;                            \
+	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
+	do                                                           \
+	   rm -rf "toolbox/$${i}" ;                                  \
 	done
 	rm -f  $(NAME)-*.tar.gz
-
-.PHONY: $(NAME), dist, bindist
 
 $(NAME): TIMESTAMP VERSION
 	rm -rf $(NAME)
@@ -337,44 +355,41 @@ $(NAME): TIMESTAMP VERSION
 	cp VERSION $(NAME)
 
 dist: $(NAME)
-	COPYFILE_DISABLE=1						                                \
-	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
+	COPYFILE_DISABLE=1                                           \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \
 	tar czvf $(DIST).tar.gz $(NAME)
 
 bindist: $(NAME) all doc
 	cp -rp bin $(NAME)
 	cp -rp doc $(NAME)
-	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;            \
-	do                                                            \
-		find toolbox -name "*.$${i}" -exec cp -p "{}" "$(NAME)/{}" \; ;\
+	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;           \
+	do                                                           \
+	  find toolbox                                               \
+               -name "*.$${i}"                                       \
+               -exec cp -p "{}" "$(NAME)/{}" \; ;                    \
 	done
-	COPYFILE_DISABLE=1						                                \
-	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                            \
-	tar czvf $(BINDIST).tar.gz                                    \
-	    --exclude "objs"                                          \
-			$(NAME)
+	COPYFILE_DISABLE=1                                           \
+	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \
+	tar czvf $(BINDIST).tar.gz                                   \
+	    --exclude "objs"                                         \
+	    $(NAME)
 
-.PHONY: post, post-doc
-
-HOST:=ganesh.cs.ucla.edu:/var/www/vlfeat/
 post:
-	scp $(DIST).tar.gz $(BINDIST).tar.gz \
-	   $(HOST)/download
+	scp $(DIST).tar.gz $(BINDIST).tar.gz                         \
+	    $(HOST)/download
 
 post-doc: doc
-	rsync -rv doc/vlfeat-dox -e "ssh" \
-	   $(HOST)
+	rsync -rv doc/vlfeat-dox -e "ssh" $(HOST)
 
-.PHONY: autorights
 autorights: distclean
-	autorights \
-	  tooblox vl \
-	  --recursive    \
-	  --verbose \
-	  --template doc/copylet.txt \
-	  --years 2007   \
-	  --authors "Andrea Vedaldi and Brian Fulkerson" \
-	  --holders "Andrea Vedaldi and Brian Fulkerson" \
+	autorights                                                   \
+	  tooblox vl                                                 \
+	  --recursive                                                \
+	  --verbose                                                  \
+	  --template doc/copylet.txt                                 \
+	  --years 2007                                               \
+	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
+	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
 	  --program "VLFeat"
 
 # --------------------------------------------------------------------

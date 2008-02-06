@@ -13,3 +13,4 @@ clean:
 .PHONY: distclean
 distclean: clean
 	make -C figures distclean
+	rm -rf vlfeat-dox

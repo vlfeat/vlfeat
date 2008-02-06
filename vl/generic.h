@@ -17,18 +17,36 @@ General Public License version 2.
 #include <assert.h>
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.1"
+#define VL_VERSION_STRING "0.9.1"
 
 /** @brief Inline function declaration */
 #define VL_INLINE static __inline__
 
 /** @brief Exported functions should be prepended with this */
+#ifdef WIN32
+
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __declspec(dllexport)
-#elif WIN32
-#define VL_EXPORT __declspec(dllimport)
 #else
-#define VL_EXPORT   
+#define VL_EXPORT __declspec(dllimport)
+#endif
+
+#else
+
+#ifdef VL_BUILD_DLL
+#define VL_EXPORT __attribute__((visibility ("default")))
+#else
+#define VL_EXPORT
+#endif
+
+#endif
+
+#ifdef __VISUALC__
+#undef VL_INLINE
+#define VL_INLINE __inline
+/*#define fscanf fscanf_s*/
+#define snprintf _snprintf
+#define isnan _isnan
 #endif
 
 /** @internal @brief Stringify argument helper
@@ -141,13 +159,6 @@ static union { vl_uint64 raw ; vl_double value ; }
 /** @brief Double Infinity (not signaling) */
 #define VL_INFINITY_D (vl_infinity_d.value)
 
-#ifdef __VISUALC__
-#undef VL_INLINE
-#define VL_INLINE __inline
-/*#define fscanf fscanf_s*/
-#define snprintf _snprintf
-#define isnan _isnan
-#endif
 
 /** ------------------------------------------------------------------
  ** @name Logging
