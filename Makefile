@@ -46,29 +46,29 @@ Linux_x86_64_ARCH           := g64
 #
 # == PROGRAMS ==
 #
-# CC:          C compiler (e.g. gcc).
-# MEX:         MEX compiler (e.g mex).
-# LIBTOOL      libtool (used only under Mac)
-# PYTHON:      Python interpreter (e.g. python)
+# CC:           C compiler (e.g. gcc).
+# MEX:          MEX compiler (e.g mex).
+# LIBTOOL       libtool (used only under Mac)
+# PYTHON:       Python interpreter (e.g. python)
 #
 # == EXECUTABLES ==
 #
-# BINDIR:      where to put the exec (and libraries)
-# CLFAGS:      flags passed to $(CC) to compile a C source
-# LDFLAGS:     flags passed to $(CC) to link C objects into an exec
+# BINDIR:       where to put the exec (and libraries)
+# CLFAGS:       flags passed to $(CC) to compile a C source
+# LDFLAGS:      flags passed to $(CC) to link C objects into an exec
 #
 # == LIBRARY ==
 #
-# DLL_CLFAGS:  flags passed to $(CC) to compile a DLL C source
-# DLL_SUFFIX:  suffix of a DLL (.so, .dylib)
+# DLL_CLFAGS:   flags passed to $(CC) to compile a DLL C source
+# DLL_SUFFIX:   suffix of a DLL (.so, .dylib)
 #
 # == MEX FILES ==
 #
-# MEX_BINDIR:  where to put mex files.
-# MEX_SUFFIX:  suffix of a MEX file (.mexglx, .mexmac, ...)
-# MEX_FLAGS:   flags passed to $(MEX)
-# MEX_CFLAGS:  flags added to the CLFAGS variable of $(MEX)
-# MEX_LDFLAGS: flags added to the LDFLAGS variable of $(MEX)
+# MEX_BINDIR:   where to put mex files
+# MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
+# MEX_FLAGS:    flags passed to $(MEX)
+# MEX_CFLAGS:   flags added to the CLFAGS variable of $(MEX)
+# MEX_LDFLAGS:  flags added to the LDFLAGS variable of $(MEX)
 
 ifndef NDEBUG
 DEBUG=yes
