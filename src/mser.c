@@ -301,9 +301,9 @@ main(int argc, char **argv)
     err = vl_file_meta_open (&met, basename, "w") ; WERR(met.name) ;
 
     if (verbose > 1) {
-      if (piv.active) printf("mser:  writing seeds to '%s'\n", piv.name); 
-      if (frm.active) printf("mser:  writing seeds to '%s'\n", frm.name); 
-      if (met.active) printf("mser:  writign metat  to '%s'\n", met.name);
+      if (piv.active) printf("mser:  writing seeds  to '%s'\n", piv.name); 
+      if (frm.active) printf("mser:  writing frames to '%s'\n", frm.name); 
+      if (met.active) printf("mser:  writing meta   to '%s'\n", met.name);
     }
     
     /* Read image data -------------------------------------------- */
