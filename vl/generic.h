@@ -23,6 +23,7 @@ General Public License version 2.
 #define VL_INLINE static __inline__
 
 /** @brief Exported functions should be prepended with this */
+ds
 #ifdef WIN32
 
 #ifdef VL_BUILD_DLL
@@ -43,7 +44,7 @@ General Public License version 2.
 
 #ifdef __VISUALC__
 #undef VL_INLINE
-#define VL_INLINE __inline
+#define VL_INLINE static __inline
 /*#define fscanf fscanf_s*/
 #define snprintf _snprintf
 #define isnan _isnan
