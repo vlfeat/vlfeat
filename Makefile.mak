@@ -48,7 +48,7 @@ bindir     = bin\win32
 mexdir     = toolbox\mexwin
 objdir     = $(bindir)\objs
 
-CFLAGS     = /nologo /TC /MT \
+CFLAGS     = /nologo /TC /MD \
              /D"__VISUALC__" /D"WIN32" \
              /D"__LITTLE_ENDIAN__" \
              /D"_CRT_SECURE_NO_DEPRECATE" \

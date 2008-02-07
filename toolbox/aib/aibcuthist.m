@@ -2,7 +2,7 @@ function hist = aibcuthist(map, x, varargin)
 % AIBCUTHIST  Compute histogram over AIB cut
 %  HIST = AIBCUTHIST(MAP, X) computes the histogram of the data X over
 %  the specified AIB cut MAP (as returned by AIBCUT()).  Each element
-%  of hist counts how many elements of X are projected in the
+%  of HIST counts how many elements of X are projected in the
 %  corresponding cut node.
 %
 %  Data are mapped to bins as specified by AIBCUTPUSH(). Data mapped

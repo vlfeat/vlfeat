@@ -12,6 +12,7 @@ General Public License version 2.
 
 #include <mexutils.h>
 #include <vl/mser.h>
+#include <vl/mathop.h>
 #include <assert.h>
 
 enum {
@@ -161,7 +162,7 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("mser:   max_area      = %g\n", vl_mser_get_max_area      (filt)) ;
       mexPrintf("mser:   min_area      = %g\n", vl_mser_get_min_area      (filt)) ;
       mexPrintf("mser:   max_variation = %g\n", vl_mser_get_max_variation (filt)) ;
-      mexPrintf("mser:   min_diversity = %d\n", vl_mser_get_min_diversity (filt)) ;
+      mexPrintf("mser:   min_diversity = %g\n", vl_mser_get_min_diversity (filt)) ;
     }
     
     /* process the image */
@@ -207,7 +208,7 @@ mexFunction(int nout, mxArray *out[],
 
 #define REMAIN(test,num)                                                \
       mexPrintf("mser:  %5d (%7.3g %% of previous) " test "\n",         \
-                tot-(num),100.0*(double)(tot-(num))/tot) ;              \
+                tot-(num),100.0*(double)(tot-(num))/(tot+VL_DOUBLE_EPSILON)) ; \
       tot -= (num) ;
       
       REMAIN("maximally stable,", s-> num_unstable    ) ;
