@@ -23,7 +23,6 @@ General Public License version 2.
 #define VL_INLINE static __inline__
 
 /** @brief Exported functions should be prepended with this */
-ds
 #ifdef WIN32
 
 #ifdef VL_BUILD_DLL
