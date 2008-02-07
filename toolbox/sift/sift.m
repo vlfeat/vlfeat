@@ -1,9 +1,9 @@
 % SIFT  Scale-invariant feature transform
-%   F = SIFT(I) where computes the SIFT frames (keypoints) F of the
-%   image I. I is a gray-scale image in single precision. Each column
-%   of F is a feature frame and has the format [X;Y;S;TH], where X,Y
-%   is the (fractional) center of the frame, S is the scale and TH is
-%   the orientation (in radians).
+%   F = SIFT(I) computes the SIFT frames (keypoints) F of the image
+%   I. I is a gray-scale image in single precision. Each column of F
+%   is a feature frame and has the format [X;Y;S;TH], where X,Y is the
+%   (fractional) center of the frame, S is the scale and TH is the
+%   orientation (in radians).
 %
 %   [F,D] = SIFT(I) computes in addition the SIFT descriptors D. Each
 %   column of D is the descriptor of the corresponding frame in F. A
@@ -23,6 +23,9 @@
 %   PeakThresh::
 %       Set the peak selection threshold.
 %
+%   Magnif::
+%       Set the descriptor magnification factor.
+%
 %   EdgeThresh::
 %       Set the non-edge selection threshold.
 %
@@ -40,6 +43,8 @@
 %
 %   Verbose::
 %       Be verbose (may be repeated).
+%
+%  See also VLFeat, UBCMATCH().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

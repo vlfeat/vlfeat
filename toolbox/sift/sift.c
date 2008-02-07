@@ -20,6 +20,7 @@ enum {
   opt_edge_thresh,
   opt_peak_thresh,
   opt_norm_thresh,
+  opt_magnif,
   opt_orientations,
   opt_verbose 
 } ;
@@ -33,6 +34,7 @@ uMexOption options [] = {
   {"PeakThresh",   1,   opt_peak_thresh   },
   {"EdgeThresh",   1,   opt_edge_thresh   },
   {"NormThresh",   1,   opt_norm_thresh   },
+  {"Magnif",       1,   opt_magnif        },
   {"Orientations", 0,   opt_orientations  },
   {"Verbose",      0,   opt_verbose       },
   {0,              0,   0                 }
@@ -137,6 +139,7 @@ mexFunction(int nout, mxArray *out[],
   double             edge_thresh = -1 ;
   double             peak_thresh = -1 ;
   double             norm_thresh = -1 ;
+  double             magnif      = -1 ;
 
   mxArray           *ikeys_array = 0 ;
   double            *ikeys = 0 ;
@@ -208,6 +211,11 @@ mexFunction(int nout, mxArray *out[],
       }
       break ;
 
+    case opt_magnif :
+      if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
+      }
+
     case opt_frames :
       if (!uIsRealMatrix(optarg, 4, -1)) {
         mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
@@ -246,6 +254,7 @@ mexFunction(int nout, mxArray *out[],
     if (peak_thresh >= 0) vl_sift_set_peak_thresh (filt, peak_thresh) ;
     if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
     if (norm_thresh >= 0) vl_sift_set_norm_thresh (filt, norm_thresh) ;
+    if (magnif      >= 0) vl_sift_set_magnif      (filt, magnif) ;
     
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
@@ -261,6 +270,9 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_peak_thresh   (filt)) ;
       mexPrintf("siftmx:   norm thresh           = %g\n",
                 vl_sift_get_norm_thresh   (filt)) ;
+      mexPrintf("siftmx:   magnif                = %g\n",
+                vl_sift_get_magnif        (filt)) ;
+
       mexPrintf((nikeys >= 0) ? 
                 "siftmx: will source frames? yes (%d)\n" :
                 "siftmx: will source frames? no\n", nikeys) ;

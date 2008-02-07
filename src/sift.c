@@ -41,8 +41,9 @@ char const help_message [] =
   " --octaves -O    Number of octaves\n"
   " --levels -S     Number of levels per octave\n"
   " --first-octave  Index of the first octave\n"
-  " --edge-thresh   Edge threshold\n"
-  " --peak-thresh   Peak threshold\n"
+  " --edge-thresh   Specify the edge threshold\n"
+  " --peak-thresh   Specift the peak threshold\n"
+  " --magnif        Specify the magnification factor\n"
   " --read-frames   Specify a file from which to read frames\n"
   " --orientations  Force the computation of the oriantations\n"
   "\n" ;
@@ -57,6 +58,7 @@ enum {
   opt_first_octave,
   opt_edge_thresh,
   opt_peak_thresh,
+  opt_magnif,
   opt_read_frames,
   opt_orientations
 } ;
@@ -78,6 +80,7 @@ struct option const longopts [] = {
   { "first-octave",    required_argument,      0,          opt_first_octave },
   { "edge-thresh",     required_argument,      0,          opt_edge_thresh  },
   { "peak-thresh",     required_argument,      0,          opt_peak_thresh  },
+  { "magnif",          required_argument,      0,          opt_magnif       },
   { "read-frames",     required_argument,      0,          opt_read_frames  },
   { "orientations",    no_argument,            0,          opt_orientations },
   { 0,                 0,                      0,          0                }
@@ -175,6 +178,7 @@ main(int argc, char **argv)
   /* algorithm parameters */ 
   double   edge_thresh  = -1 ;  
   double   peak_thresh  = -1 ;  
+  double   magnif       = -1 ;  
   int      O = -1, S = 3, omin = -1 ;
 
   vl_bool  err    = VL_ERR_OK ;
@@ -330,6 +334,15 @@ main(int argc, char **argv)
         ERR("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
+
+    case opt_magnif :
+      /* --magnif  .............................................. */
+      n = sscanf (optarg, "%lf", &magnif) ;
+      if (n == 0 || magnif < 1)
+        ERR("The argument of '%s' must ve a non-negative float.",
+            argv [optind - 1]) ;
+      break ;
+
 
     case opt_orientations :
       /* --orientations ......................................... */
@@ -582,6 +595,7 @@ main(int argc, char **argv)
 
     if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
     if (peak_thresh >= 0) vl_sift_set_peak_thresh (filt, peak_thresh) ;
+    if (magnif      >= 0) vl_sift_set_magnif      (filt, magnif) ;
 
     if (!filt) {
       snprintf (err_msg, sizeof(err_msg), 
@@ -602,6 +616,8 @@ main(int argc, char **argv)
               vl_sift_get_edge_thresh  (filt)) ;
       printf ("sift:   peak thresh           = %g\n",
               vl_sift_get_peak_thresh  (filt)) ;
+      printf ("sift:   magnif                = %g\n",
+              vl_sift_get_magnif       (filt)) ;
       printf ("sift: will source frames? %s\n",
               ikeys ? "yes" : "no") ;
       printf ("sift: will force orientations? %s\n",
