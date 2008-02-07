@@ -12,6 +12,9 @@
 %     stops as soon as there is no change in the data to cluster
 %     associations).
 %
+%   Method ['Lloyd']::
+%     Algorithm to use (Lloyd, Elkan).
+%
 %   Verbose::
 %     Increase the verbosity level.
 

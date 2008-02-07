@@ -4,7 +4,6 @@
 
 NAME               := vlfeat
 VER                := 0.9.1
-DIST                = $(NAME)-$(VER)
 HOST               := ganesh.cs.ucla.edu:/var/www/vlfeat/
 #NDEBUG             :=
 
@@ -100,7 +99,8 @@ ifeq ($(ARCH),mac)
 BINDIR          := bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
-CFLAGS          += -Wno-variadic-macros -D__BIG_ENDIAN__ -gstabs+
+CFLAGS          += -D__BIG_ENDIAN__ -Wno-variadic-macros 
+CLFAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 DLL_CFLAGS      += -fvisibility=hidden
 MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
@@ -145,6 +145,7 @@ MEX_CFLAGS      +=
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
+DIST            := $(NAME)-$(VER)
 BINDIST         := $(DIST)-bin
 MEX_BINDIR      := toolbox/$(MEX_SUFFIX)
 
@@ -198,7 +199,7 @@ lib_src := $(wildcard vl/*.c)
 lib_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(lib_src:.c=.o)))
 lib_dep := $(lib_obj:.o=.d)
 
-# create library libvl.a
+
 .PHONY: all-lib
 all-lib: $(BINDIR)/libvl.a $(BINDIR)/libvl.$(DLL_SUFFIX)
 
@@ -206,12 +207,12 @@ all-lib: $(BINDIR)/libvl.a $(BINDIR)/libvl.$(DLL_SUFFIX)
 
 $(BINDIR)/objs/%.o : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   CC '$<' ==> '$@'"
-	$(CC) $(DLL_CFLAGS) -c $< -o $@
+	@$(CC) $(DLL_CFLAGS) -c $< -o $@
 
 $(BINDIR)/objs/%.d : vl/%.c $(BINDIR)/objs/.dirstamp
 	@echo "   D  '$<' ==> '$@'"
-	@$(CC) $(DLL_CFLAGS)                                         \
-	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
+	@$(CC) $(DLL_CFLAGS)                                           \
+	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'        \
 	       $< -MF $@
 
 $(BINDIR)/libvl.a : $(lib_obj)
@@ -220,11 +221,11 @@ $(BINDIR)/libvl.a : $(lib_obj)
 
 $(BINDIR)/libvl.dylib : $(lib_obj)
 	@echo "DYLIB '$@'"
-	@$(LIBTOOL) -dynamic                                        \
-                    -flat_namespace                                 \
-                    -install_name @loader_path/libvl.dylib          \
-	            -compatibility_version $(VER)                   \
-                    -current_version $(VER)                         \
+	@$(LIBTOOL) -dynamic                                          \
+                    -flat_namespace                                   \
+                    -install_name @loader_path/libvl.dylib            \
+	            -compatibility_version $(VER)                     \
+                    -current_version $(VER)                           \
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/libvl.so : $(lib_obj)
@@ -236,7 +237,7 @@ include $(lib_dep)
 endif
 
 # --------------------------------------------------------------------
-#                                                       Build binaries
+#                                                          Build execs
 # --------------------------------------------------------------------
 # We place the exacutables in $(BINDIR).
 
@@ -249,7 +250,7 @@ all-bin : $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(BINDIR)/libvl.a src/generic-driver.h
 	@echo "   CC '$<' ==> '$@'"
-	@$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	@$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -291,9 +292,9 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) :                                      \
 #                                                  Build documentation
 # --------------------------------------------------------------------
 
-m_src := $(shell find toolbox -name "*.m")
-
 .PHONY: doc dox docdeep mdoc
+
+m_src := $(shell find toolbox -name "*.m")
 
 doc:
 	make -C doc all

@@ -354,7 +354,7 @@ vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N)
   /* assign data to centers */
   for(x=0 ; x < N ; ++x) {
     best_dist = VL_BIG_INT ;
-    cx = (vl_uint)-1 ;
+    cx = 0 ;
     
     for(c = 0 ; c < K ; ++c) {
       if(d_pt[K*cx+c] < best_dist) {
