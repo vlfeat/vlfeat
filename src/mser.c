@@ -287,7 +287,7 @@ main(int argc, char **argv)
     }
 
     /* open input file */
-    in = fopen (name, "r") ;
+    in = fopen (name, "rb") ;
     if (!in) {
       err = VL_ERR_IO ;
       snprintf(err_msg, sizeof(err_msg), 
