@@ -1,10 +1,12 @@
 function [dWx,dWy] = dwaffine(x,y)
-% DWAFFINE  Derivative of affine warp
+% DWAFFINE  Derivative of an affine warp
 %   [DWX,DWY]=DWAFFINE(X,Y) returns the derivative of the 2-D affine
 %   warp [WX; WY] = [A T] [X; Y] with respect to the parameters A,T
 %   computed at points X,Y.
 %
-%   See also WAFFINE().
+%   See also HELP_VLFEAT(), WAFFINE().
+
+% AUTORIGHTS
 
 % dW = [ kron(x',I) I ]
 %    | 

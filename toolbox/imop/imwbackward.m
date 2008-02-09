@@ -10,13 +10,15 @@ function [wI,wIx,wIy] = imwbackward(varargin)
 %
 %   By default, IMWBACKWARD assumes that the image I uses the standard
 %   coordinate system (see WARP_OVERVIEW). IMWBACKWARD(XR,YR,I,X,Y)
-%   assumes instead that I is defined on a rectangular grid
-%   specified by the vectors XR and YR.
+%   assumes instead that I is defined on a rectangular grid specified
+%   by the vectors XR and YR.
 %
-%   ALGORITHM. What IMWBACKWARD is less general than the MATLAB native
-%   function INTERP2, but significantly faster.
+%   IMWBACKWARD is less general than the MATLAB native function
+%   INTERP2, but significantly faster.
 %
-%   See also WARP_OVERVIEW, IMWFORWARD, INTERP2.
+%   See also HELP_VLFEAT(), IMWFORWARD(), INTERP2().
+
+% AUTORIGHTS
 
 if nargin < 5
   I = varargin{1} ;

@@ -25,7 +25,7 @@ function J = imarray(A,varargin)
 %   IMARRAYSC(A, 'Spacing', spacing) is another way of specifying the
 %   spacing.
 %
-%   See also IMARRAYSC().
+%   See also HELP_VLFEAT(), IMARRAYSC().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

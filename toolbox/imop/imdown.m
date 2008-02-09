@@ -7,7 +7,7 @@ function J = imdown(I,method)
 %
 %   The image is always converted to double format.
 %   
-%   See also IMUP().
+%   See also HELP_VLFEAT(), IMUP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -1,12 +1,11 @@
-function J=xyz2lab(I)
-% XYZ2LAB  Convert XYZ to LAB
+function J=xyz2lab(I,il)
+% XYZ2LAB  Convert XYZ color space to LAB
 %   J = XYZ2LAB(I) converts the image from XYZ format to LAB format.
 %
-%   XYZ2LAB(I,'illuminant') uses the specified illuminant. The
-%   following illuminant are supported: 'A', 'B', 'C', 'E', 'D50',
-%   'D55', 'D65', 'D75', 'D93'. By default, 'E' is usedd.
+%   XYZ2LAB(I,IL) uses one of the illuminants A, B, C, E, D50, D55,
+%   D65, D75, D93. The default illuminatn is E.
 %
-%   See also XYZ2LUV().
+%   See also HELP_VLFEAT(), XYZ2LUV().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -15,35 +14,35 @@ function J=xyz2lab(I)
 % General Public License version 2.
 
 if nargin < 2
-  illuminant='E' ;
+  il='E' ;
 end
 
-switch illuminant
-  case 'A'
+switch lower(il)
+  case 'a'
     xw = 0.4476 ;
     yw = 0.4074 ;  
-  case 'B'
+  case 'b'
     xw = 0.3324 ;
     yw = 0.3474 ;
-  case 'C' 
+  case 'c' 
     xw = 0.3101 ;
     yw = 0.3162 ;
-  case 'E'
+  case 'e'
     xw = 1/3 ;
     yw = 1/3 ;
-  case 'D50'
+  case 'd50'
     xw = 0.3457 ;
     yw = 0.3585 ;
-  case 'D55'
+  case 'd55'
     xw = 0.3324 ;
     yw = 0.3474 ;
-  case 'D65'
+  case 'd65'
     xw = 0.312713 ;
     yw = 0.329016 ;
-  case 'D75'
+  case 'd75'
     xw = 0.299 ;
     yw = 0.3149 ;
-  case 'D93'
+  case 'd93'
     xw = 0.2848 ;
     yw = 0.2932 ;
 end
@@ -72,7 +71,9 @@ b = 200*(f(y) - f(z)) ;
 
 J = cat(3,L,a,b) ;
 
+% --------------------------------------------------------------------
 function b=f(a)
+% --------------------------------------------------------------------
 sp = find(a  > 0.00856) ;
 sm = find(a <= 0.00856) ;
 k = 903.3 ; 

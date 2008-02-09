@@ -1,8 +1,7 @@
 function J=rgb2xyz(I,ws)
-% RGB2XYZ  Color space conversion
-%   J=RGB2XYZ(I) converts the RGB image I into CIE XYZ format.  The
-%   RGB image I can be either of class UINT8, UINT16 or
-%   DOUBLE. The output image is always of class DOUBLE.
+% RGB2XYZ  Convert RGB color space to XYZ
+%   J=RGB2XYZ(I) converts the RGB image I to the image J in CIE XYZ
+%   format.
 %
 %   RGB2XYZ(I,WS) uses the specified RGB working space WS. The
 %   function supports the following RGB working spaces:
@@ -12,7 +11,7 @@ function J=rgb2xyz(I,ws)
 %
 %   The default workspace is CIE.
 %
-%   See also XYZ2RGB().
+%   See also HELP_VLFEAT(), XYZ2RGB().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

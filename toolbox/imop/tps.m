@@ -16,7 +16,7 @@ function [phi,S] = tps(x1,x2,Y)
 %   [PHI,S] = TPS(X1,X2,Y) additionally returns the stiffness matrix S
 %   of the TPS.
 %
-%   See also WTPS.
+%   See also HELP_VLFEAT(), WTPS()
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
