@@ -21,7 +21,7 @@ function [cut, map, short] = aibcut(parents, n)
 %
 %  [CUT, MAP, SHORT] = AIBCUT(...) returns also a vector SHORT which
 %  short-circuits nodes below the cut to nodes of the cut.  Nodes
-%  above or in the cut are short-circutited to themselves.  Nodes that
+%  above or in the cut are short-circuited to themselves.  Nodes that
 %  where connected to the null node are short-circuited to zero.
 %  Nodes that where connected to the null but are also in the cut are
 %  short circutied to themselves.
