@@ -15,9 +15,10 @@ function [xp1,xp2]=wtps(phi,Yp)
 %   is then very quick, as the operation is just a linear combination
 %   of the basis.
 %
-%   Examples: [xp1,xp2]=WTPS(TPS(x1,x2,Y),Yp).
+%   Example:
+%     [xp1,xp2]=WTPS(TPS(x1,x2,Y),Yp).
 %
-%   See also TPS.
+%   See also HELP_VLFEAT(), TPS()
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -1,12 +1,14 @@
 function J=imsc(I)
 % IMSC  Scale image
-%   J=IMSC(I) scales the ranges of the gray-scale or color image I
-%   to fit in the interval [0,1].
+%   J=IMSC(I) scales the ranges of the gray-scale or color image I to
+%   fit in the interval [0,1].
 %
-%   IMSC works only on floating point images.
+%   See also VLFEAT_HELP()
 
-if(~isfloat(I))
-  error('I must be float') ;
+% AUTORIGHTS
+
+if ~isfloat(I)
+  I = im2double(I) ;
 end
 
 J = I - min(I(:)) ;

@@ -1,11 +1,13 @@
-function varargout = affine(A,T,varargin)
-% AFFINE  Apply affine transformation to points
-%  Y = AFFINE(A,T,X) applies the affine transformatio (A,T) to points
+function varargout = waffine(A,T,varargin)
+% WAFFINE  Apply affine transformation to points
+%  Y = WAFFINE(A,T,X) applies the affine transformatio (A,T) to points
 %  X. X contains one point per column.
 %
-%  [Y1,Y2,...] = AFFINE(A,T,X1,X2,...) applies the affine
+%  [Y1,Y2,...] = WAFFINE(A,T,X1,X2,...) applies the affine
 %  transformations to points (X1,X2,...). Arrays X1,X2,... contain one
 %  of the coordinates of the points each.
+%
+%  See also HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

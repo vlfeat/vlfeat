@@ -8,7 +8,9 @@ function [x1,x2]=witps(xp1,xp2,Y,Yp)
 %   function uses Gauss-Newton to compute a set of points (X1,X2) such
 %   that [XP1,XP2]=WTPS(X1,X2,Y,Yp).
 %
-%   See also WTPS.
+%   See also HELP_VLFEAT(), WTPS()
+
+% AUTORIGHTS
 
 % Initial guess by inverting the control points
 [x1,x2] = wtps(tps(xp1,xp2,Yp),Y) ;

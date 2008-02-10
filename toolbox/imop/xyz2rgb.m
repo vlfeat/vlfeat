@@ -2,15 +2,14 @@ function J=xyz2rgb(I,ws)
 % XYZ2RGB  Convert XYZ to RGB
 %   J = XYZ2RGB(I) the XYZ image I in RGB format.
 %
-%   XYZ2RGB(I,WS) uses the specified RGB working space WS. The function
-%   supports the following RGB working spaces:
+%   XYZ2RGB(I,WS) uses the RGB workspace WS. WS is a string in
 %
-%   - `CIE'    E illuminant, gamma=2.2
-%   - `Adobe'  D65 illuminant, gamma=2.2
+%   - CIE:    E illuminant and 2.2 gamma
+%   - Adobe:  D65 illuminant and 2.2 gamma
 %
-%   The default is CIE.
+%   The default workspace is CIE.
 %
-%   See also RGB2XYZ().
+%   See also HELP_VLFEAT(), RGB2XYZ().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

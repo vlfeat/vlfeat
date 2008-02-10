@@ -1,13 +1,13 @@
-function J=xyz2luv(I,illuminant)
-% XYZ2LUV  Convert XYZ to LUV
-%   J = XYZ2LUV(I) converts the image I in XYZ format to the Luv
-%   format (using by default the illuminant E).
+function J=xyz2luv(I,il)
+% XYZ2LUV  Convert XYZ color space to LUV
+%   J = XYZ2LUV(I) converts the image I in XYZ format to the image J
+%   in Luv format.
 %
-%   J = XYZ2LUV(I,illuminant) uses the specified illuminant. The
-%   following illuminant are supported: A, B, C, E, D50, D55, D65,
-%   D75, D93.
+%   J = XYZ2LUV(I,IL) uses the specified illuminant. The following
+%   illuminant are supported: A, B, C, E, D50, D55, D65, D75, D93.  IL
+%   is the name of the illuminant.
 %
-%   See also XYZ2LAB().
+%   See also HELP_VLFEAT(), XYZ2LAB().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -16,35 +16,35 @@ function J=xyz2luv(I,illuminant)
 % General Public License version 2.
 
 if nargin < 2
-  illuminant='E' ;
+  il='E' ;
 end
 
-switch illuminant
-  case 'A'
+switch lower(il)
+  case 'a'
     xw = 0.4476 ;
     yw = 0.4074 ;  
-  case 'B'
+  case 'b'
     xw = 0.3324 ;
     yw = 0.3474 ;
-  case 'C' 
+  case 'c' 
     xw = 0.3101 ;
     yw = 0.3162 ;
-  case 'E'
+  case 'e'
     xw = 1/3 ;
     yw = 1/3 ;
-  case 'D50'
+  case 'd50'
     xw = 0.3457 ;
     yw = 0.3585 ;
-  case 'D55'
+  case 'd55'
     xw = 0.3324 ;
     yw = 0.3474 ;
-  case 'D65'
+  case 'd65'
     xw = 0.312713 ;
     yw = 0.329016 ;
-  case 'D75'
+  case 'd75'
     xw = 0.299 ;
     yw = 0.3149 ;
-  case 'D93'
+  case 'd93'
     xw = 0.2848 ;
     yw = 0.2932 ;
 end
