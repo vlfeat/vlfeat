@@ -13,6 +13,7 @@ General Public License version 2.
 */
 
 #include"mex.h"
+#include<vl/generic.h>
 #include<ctype.h>
 
 #ifdef __VISUALC__

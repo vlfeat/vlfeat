@@ -215,6 +215,7 @@ mexFunction(int nout, mxArray *out[],
       if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
       }
+      break ;
 
     case opt_frames :
       if (!uIsRealMatrix(optarg, 4, -1)) {
@@ -258,11 +259,11 @@ mexFunction(int nout, mxArray *out[],
     
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
-      mexPrintf("siftmx:   octaves      (O)     = %d\n", 
+      mexPrintf("siftmx:   octaves      (O)      = %d\n", 
                 vl_sift_get_octave_num   (filt)) ;
-      mexPrintf("siftmx:   levels       (S)     = %d\n",
+      mexPrintf("siftmx:   levels       (S)      = %d\n",
                 vl_sift_get_level_num    (filt)) ;
-      mexPrintf("siftmx:   first octave (o_min) = %d\n", 
+      mexPrintf("siftmx:   first octave (o_min)  = %d\n", 
                 vl_sift_get_octave_first (filt)) ;
       mexPrintf("siftmx:   edge thresh           = %g\n",
                 vl_sift_get_edge_thresh   (filt)) ;
@@ -274,7 +275,7 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_magnif        (filt)) ;
 
       mexPrintf((nikeys >= 0) ? 
-                "siftmx: will source frames? yes (%d)\n" :
+                "siftmx: will source frames? yes (%d read)\n" :
                 "siftmx: will source frames? no\n", nikeys) ;
       mexPrintf("siftmx: will force orientations? %s\n",
                 force_orientations ? "yes" : "no") ;      
@@ -409,7 +410,7 @@ mexFunction(int nout, mxArray *out[],
      * ............................................................ */
 
     {
-      int dims [2] ;
+      mwSize dims [2] ;
       
       /* create an empty array */
       dims [0] = 0 ;
@@ -420,8 +421,8 @@ mexFunction(int nout, mxArray *out[],
       /* set array content to be the frames buffer */
       dims [0] = 4 ;
       dims [1] = nframes ;
-      mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
       mxSetPr         (out[OUT_FRAMES], frames) ;
+      mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
       
       if (nout > 1) {
         
@@ -430,12 +431,12 @@ mexFunction(int nout, mxArray *out[],
         dims [1] = 0 ;
         out[OUT_DESCRIPTORS]= mxCreateNumericArray 
           (2, dims, mxUINT8_CLASS,  mxREAL) ;
-        
+
         /* set array content to be the descriptors buffer */
         dims [0] = 128 ;
         dims [1] = nframes ;
-        mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
         mxSetData       (out[OUT_DESCRIPTORS], descr) ;
+        mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
       }
     }
     

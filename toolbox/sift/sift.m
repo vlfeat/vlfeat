@@ -44,7 +44,7 @@
 %   Verbose::
 %       Be verbose (may be repeated).
 %
-%  See also VLFeat, UBCMATCH().
+%  See also HELP_VLFEAT, UBCMATCH().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
