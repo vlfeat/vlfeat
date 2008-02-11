@@ -16,6 +16,9 @@ doc/figures/demo
 # Emacs backups
 *~
 
+# Vim swap files
+.*.swp
+
 # Wiki pages
 *.wiki
 wiki/.mediawiki.errors
