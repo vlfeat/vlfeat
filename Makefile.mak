@@ -241,7 +241,7 @@ $(bindir)\vl.lib : $(libobj)
 	@echo LIB ^*.obj ===^> $(@R).lib
 	@lib $(**) /OUT:"$(@)" /NOLOGO
 
-# vl.lib => mexwin/vl.lib
+# vl.dll => mexwin/vl.dll
 $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
