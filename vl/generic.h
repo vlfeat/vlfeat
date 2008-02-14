@@ -161,17 +161,6 @@ static union { vl_uint64 raw ; vl_double value ; }
 
 
 /** ------------------------------------------------------------------
- ** @name Logging
- ** @{ 
- **/
-
-
-
-
-
-/** @} */
-
-/** ------------------------------------------------------------------
  ** @name Heap allocation
  ** @{ 
  **/
@@ -185,6 +174,13 @@ VL_INLINE void *vl_malloc  (vl_size n) ;
 VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
 VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
 VL_INLINE void  vl_free    (void* ptr) ;
+
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Logging
+ ** @{ 
+ **/
 
 VL_EXPORT
 void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
@@ -408,11 +404,11 @@ vl_adapt_endianness_2 (void *dst, void* src)
 #endif
 }
 
-extern int   (*vl_printf_func)  (char const * format, ...) ;
-extern void *(*vl_malloc_func)  (vl_size) ;
-extern void *(*vl_realloc_func) (void*,vl_size) ;
-extern void *(*vl_calloc_func)  (vl_size, vl_size) ;
-extern void  (*vl_free_func)    (void*) ;          
+extern VL_EXPORT int   (*vl_printf_func)  (char const * format, ...) ;
+extern VL_EXPORT void *(*vl_malloc_func)  (vl_size) ;
+extern VL_EXPORT void *(*vl_realloc_func) (void*,vl_size) ;
+extern VL_EXPORT void *(*vl_calloc_func)  (vl_size, vl_size) ;
+extern VL_EXPORT void  (*vl_free_func)    (void*) ;          
 
 /** ------------------------------------------------------------------
  ** @brief Call customizable @c malloc function
@@ -480,8 +476,6 @@ vl_free (void *ptr)
 {
   (*vl_free_func)(ptr) ;
 }
-
-
 
 /* VL_GENERIC_H */
 #endif

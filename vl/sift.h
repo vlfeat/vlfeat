@@ -73,6 +73,7 @@ typedef struct _VlSiftFilt
   double peak_thresh ;  /**< peak threshold. */
   double edge_thresh ;  /**< edge threshold. */
   double norm_thresh ;  /**< norm threshold. */
+  double magnif ;       /**< magnification factor. */
 
   vl_sift_pix *grad ;   /**< GSS gradient data. */
   int grad_o ;          /**< GSS gradient data octave. */
@@ -131,6 +132,7 @@ VL_INLINE int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_peak_thresh    (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_edge_thresh    (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_norm_thresh    (VlSiftFilt const *f) ;
+VL_INLINE double vl_sift_get_magnif         (VlSiftFilt const *f) ;
 
 VL_INLINE vl_sift_pix *vl_sift_get_octave  (VlSiftFilt const *f, int s) ;
 VL_INLINE VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
@@ -142,6 +144,7 @@ VL_INLINE VlSiftKeypoint const *vl_sift_get_keypoints (VlSiftFilt const *f) ;
 VL_INLINE void vl_sift_set_peak_thresh (VlSiftFilt *f, double t) ;
 VL_INLINE void vl_sift_set_edge_thresh (VlSiftFilt *f, double t) ;
 VL_INLINE void vl_sift_set_norm_thresh (VlSiftFilt *f, double t) ;
+VL_INLINE void vl_sift_set_magnif      (VlSiftFilt *f, double m) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -301,6 +304,19 @@ vl_sift_get_norm_thresh (VlSiftFilt const *f)
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Get the magnification factor
+ ** @param f SIFT filter.
+ ** @param t threshold.
+ **/
+
+VL_INLINE double
+vl_sift_get_magnif (VlSiftFilt const *f) 
+{
+  return f -> magnif ;
+}
+
+
+/** ------------------------------------------------------------------
  ** @brief Set peaks threshold
  ** @param f SIFT filter.
  ** @param t threshold.
@@ -334,4 +350,16 @@ VL_INLINE void
 vl_sift_set_norm_thresh (VlSiftFilt *f, double t) 
 {
   f -> norm_thresh = t ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set the magnification factor
+ ** @param f SIFT filter.
+ ** @param t threshold.
+ **/
+
+VL_INLINE void
+vl_sift_set_magnif (VlSiftFilt *f, double m) 
+{
+  f -> magnif = m ;
 }

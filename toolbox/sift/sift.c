@@ -20,6 +20,7 @@ enum {
   opt_edge_thresh,
   opt_peak_thresh,
   opt_norm_thresh,
+  opt_magnif,
   opt_orientations,
   opt_verbose 
 } ;
@@ -33,6 +34,7 @@ uMexOption options [] = {
   {"PeakThresh",   1,   opt_peak_thresh   },
   {"EdgeThresh",   1,   opt_edge_thresh   },
   {"NormThresh",   1,   opt_norm_thresh   },
+  {"Magnif",       1,   opt_magnif        },
   {"Orientations", 0,   opt_orientations  },
   {"Verbose",      0,   opt_verbose       },
   {0,              0,   0                 }
@@ -137,6 +139,7 @@ mexFunction(int nout, mxArray *out[],
   double             edge_thresh = -1 ;
   double             peak_thresh = -1 ;
   double             norm_thresh = -1 ;
+  double             magnif      = -1 ;
 
   mxArray           *ikeys_array = 0 ;
   double            *ikeys = 0 ;
@@ -208,6 +211,12 @@ mexFunction(int nout, mxArray *out[],
       }
       break ;
 
+    case opt_magnif :
+      if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
+      }
+      break ;
+
     case opt_frames :
       if (!uIsRealMatrix(optarg, 4, -1)) {
         mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
@@ -246,14 +255,15 @@ mexFunction(int nout, mxArray *out[],
     if (peak_thresh >= 0) vl_sift_set_peak_thresh (filt, peak_thresh) ;
     if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
     if (norm_thresh >= 0) vl_sift_set_norm_thresh (filt, norm_thresh) ;
+    if (magnif      >= 0) vl_sift_set_magnif      (filt, magnif) ;
     
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
-      mexPrintf("siftmx:   octaves      (O)     = %d\n", 
+      mexPrintf("siftmx:   octaves      (O)      = %d\n", 
                 vl_sift_get_octave_num   (filt)) ;
-      mexPrintf("siftmx:   levels       (S)     = %d\n",
+      mexPrintf("siftmx:   levels       (S)      = %d\n",
                 vl_sift_get_level_num    (filt)) ;
-      mexPrintf("siftmx:   first octave (o_min) = %d\n", 
+      mexPrintf("siftmx:   first octave (o_min)  = %d\n", 
                 vl_sift_get_octave_first (filt)) ;
       mexPrintf("siftmx:   edge thresh           = %g\n",
                 vl_sift_get_edge_thresh   (filt)) ;
@@ -261,8 +271,11 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_peak_thresh   (filt)) ;
       mexPrintf("siftmx:   norm thresh           = %g\n",
                 vl_sift_get_norm_thresh   (filt)) ;
+      mexPrintf("siftmx:   magnif                = %g\n",
+                vl_sift_get_magnif        (filt)) ;
+
       mexPrintf((nikeys >= 0) ? 
-                "siftmx: will source frames? yes (%d)\n" :
+                "siftmx: will source frames? yes (%d read)\n" :
                 "siftmx: will source frames? no\n", nikeys) ;
       mexPrintf("siftmx: will force orientations? %s\n",
                 force_orientations ? "yes" : "no") ;      
@@ -397,7 +410,7 @@ mexFunction(int nout, mxArray *out[],
      * ............................................................ */
 
     {
-      int dims [2] ;
+      mwSize dims [2] ;
       
       /* create an empty array */
       dims [0] = 0 ;
@@ -408,8 +421,8 @@ mexFunction(int nout, mxArray *out[],
       /* set array content to be the frames buffer */
       dims [0] = 4 ;
       dims [1] = nframes ;
-      mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
       mxSetPr         (out[OUT_FRAMES], frames) ;
+      mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
       
       if (nout > 1) {
         
@@ -418,12 +431,12 @@ mexFunction(int nout, mxArray *out[],
         dims [1] = 0 ;
         out[OUT_DESCRIPTORS]= mxCreateNumericArray 
           (2, dims, mxUINT8_CLASS,  mxREAL) ;
-        
+
         /* set array content to be the descriptors buffer */
         dims [0] = 128 ;
         dims [1] = nframes ;
-        mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
         mxSetData       (out[OUT_DESCRIPTORS], descr) ;
+        mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
       }
     }
     

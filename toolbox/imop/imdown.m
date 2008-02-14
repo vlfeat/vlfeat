@@ -1,11 +1,10 @@
 function J = imdown(I,method)
 % IMDOWN  Downsample image 
 %   J = IMDOWN(I,'sample') downsamples the image I by half by
-%   discarding each other pixel.
+%   discarding each other pixel. This is the default downsampling
+%   method.
 %   
-%   IMDOWN(I,'avg') downsmples by averaging groups of four pixels.
-%
-%   The image is always converted to double format.
+%   IMDOWN(I,'avg') downsamples by averaging groups of four pixels.
 %   
 %   See also HELP_VLFEAT(), IMUP().
 
@@ -19,9 +18,9 @@ if nargin < 2
   method = 'sample' ;
 end
 
-switch method
+switch lower(method)
   case 'sample'
-    J = I(1:2:end,1:2:end,:) ;
+    J = I(1:2:floor(end-.5),1:2:floor(end-.5),:) ;
     
   case 'avg'
     J = ...
@@ -30,4 +29,7 @@ switch method
         I(1:2:end-1,2:2:end,:) + ...
         I(2:2:end,2:2:end,:) ;
     J = J / 4 ;
+    
+  otherwise
+    error(sprintf('Unknown downsampling method ''%s''.', method)) ;
 end
