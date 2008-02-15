@@ -21,11 +21,10 @@ function h=plotsiftdescriptor(d,f,varargin)
 %   NumOrientBins [8]::
 %       Number of orientation bis.
 %
-%   Magnif [6.0]::
-%       Frame scale magnification to obtain the edge length of the
-%       keypoint bounding box.
+%   Magnif [3.0]::
+%       Magnification factor.
 %
-%   See also PLOTFRAME().
+%   See also HELP_VLFEAT(), SIFT(), PLOTFRAME().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -95,7 +94,7 @@ xall=[] ;
 yall=[] ;
 
 for k=1:K
-  SBP = 2 * magnif * f(3,k) / NBP ;
+  SBP = magnif * f(3,k) ;
   th=f(4,k) ;
   c=cos(th) ;
   s=sin(th) ;
@@ -130,7 +129,7 @@ yc = y(1:end-1,1:end-1) + 0.5 ;
 xc = xc' ;
 yc = yc' ;
 
-% Each bin contains a star with BO tips
+% Each spatial bin contains a star with BO tips
 xc = repmat(xc(:)',BO,1) ;
 yc = repmat(yc(:)',BO,1) ;
 
