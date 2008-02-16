@@ -1304,6 +1304,182 @@ normalize_histogram
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Run the SIFT descriptor on raw data
+ **
+ ** @param f        SIFT filter.
+ ** @param grad     image gradients.
+ ** @param descr    SIFT descriptor (output).
+ ** @param width    image width.
+ ** @param height   image height. 
+ ** @param x        keypoint x coordinate.
+ ** @param y        keypoint y coordinate.
+ ** @param sigma    keypoint scale.
+ ** @param angle0   keypoint orientation .
+ **
+ ** The function runs the SIFT descriptor on raw data. @c image is a
+ ** 2xWIDTHxHEIGHT matrix. The first layer contains the gradients
+ ** magnitued and the second the gradient angle (in radians, between 0
+ ** and 2 PI). @a x, @a y and @a sigma give the keypoint center and
+ ** scale respectively.
+ **
+ ** In order to be equivalent to a standard SIFT descriptor the image
+ ** gradients must be computed at a smoothing level equal to the
+ ** scale of the keypoint. In practice, the actual SIFT algorithm
+ ** makes the following additional approximation, which influence the result:
+ **
+ ** - Scale is discretized in @c S levels.
+ ** - The image is downsampled once for each octave (if you do this,
+ **   the parameters @param x, @param y and @param sigma must be
+ **   scaled too).
+ **/
+
+VL_EXPORT
+void               
+vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
+                             vl_sift_pix const* grad,
+                             vl_sift_pix *descr,
+                             int width, int height,
+                             double x, double y, 
+                             double sigma,
+                             double angle0)
+{
+  double const magnif      = f-> magnif ;
+  int const    NBO         = 8 ;
+  int const    NBP         = 4 ;
+
+  int          w           = width ;
+  int          h           = height ;
+  int const    xo          = 2 ;         /* x-stride */
+  int const    yo          = 2 * w ;     /* y-stride */
+  
+  int          xi          = (int) (x + 0.5) ; 
+  int          yi          = (int) (y + 0.5) ;
+  
+  double const st0         = sin (angle0) ;
+  double const ct0         = cos (angle0) ;
+  double const SBP         = magnif * sigma + VL_DOUBLE_EPSILON ;
+  int    const W           = floor
+    (sqrt(2.0) * SBP * (NBP + 1) / 2.0 + 0.5) ;
+  
+  int const binto = 1 ;          /* bin theta-stride */
+  int const binyo = NBO * NBP ;  /* bin y-stride */
+  int const binxo = NBO ;        /* bin x-stride */
+  
+  int bin, dxi, dyi ;
+  vl_sift_pix const *pt ; 
+  vl_sift_pix       *dpt ;
+  
+  /* check bounds */
+  if(xi    <  0               || 
+     xi    >= w               || 
+     yi    <  0               || 
+     yi    >= h -    1        )
+    return ;
+  
+  /* clear descriptor */
+  memset (descr, 0, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
+  
+  /* Center the scale space and the descriptor on the current keypoint. 
+   * Note that dpt is pointing to the bin of center (SBP/2,SBP/2,0).
+   */
+  pt  = grad + xi*xo + yi*yo ;
+  dpt = descr + (NBP/2) * binyo + (NBP/2) * binxo ;
+#define atd(dbinx,dbiny,dbint) *(dpt + (dbint)*binto + (dbiny)*binyo + (dbinx)*binxo)
+  
+  /*
+   * Process pixels in the intersection of the image rectangle
+   * (1,1)-(M-1,N-1) and the keypoint bounding box.
+   */
+  for(dyi =  VL_MAX (- W, 1 - yi    ) ; 
+      dyi <= VL_MIN (+ W, h - yi - 2) ; ++ dyi) {
+    
+    for(dxi =  VL_MAX (- W, 1 - xi    ) ; 
+        dxi <= VL_MIN (+ W, w - xi - 2) ; ++ dxi) {
+
+      /* retrieve */
+      vl_sift_pix mod   = *( pt + dxi*xo + dyi*yo + 0 ) ;
+      vl_sift_pix angle = *( pt + dxi*xo + dyi*yo + 1 ) ;
+      vl_sift_pix theta = vl_mod_2pi_f (angle - angle0) ;
+      
+      /* fractional displacement */
+      vl_sift_pix dx = xi + dxi - x;
+      vl_sift_pix dy = yi + dyi - y;
+      
+      /* get the displacement normalized w.r.t. the keypoint
+         orientation and extension */
+      vl_sift_pix nx = ( ct0 * dx + st0 * dy) / SBP ;
+      vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
+      vl_sift_pix nt = NBO * theta / (2 * VL_PI) ;
+      
+      /* Get the Gaussian weight of the sample. The Gaussian window
+       * has a standard deviation equal to NBP/2. Note that dx and dy
+       * are in the normalized frame, so that -NBP/2 <= dx <=
+       * NBP/2. */
+      vl_sift_pix const wsigma = NBP/2 ;
+      vl_sift_pix win = fast_expn 
+        ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
+      
+      /* The sample will be distributed in 8 adjacent bins.
+         We start from the ``lower-left'' bin. */
+      int         binx = vl_floor_f (nx - 0.5) ;
+      int         biny = vl_floor_f (ny - 0.5) ;
+      int         bint = vl_floor_f (nt) ;
+      vl_sift_pix rbinx = nx - (binx + 0.5) ;
+      vl_sift_pix rbiny = ny - (biny + 0.5) ;
+      vl_sift_pix rbint = nt - bint ;
+      int         dbinx ;
+      int         dbiny ;
+      int         dbint ;
+      
+      /* Distribute the current sample into the 8 adjacent bins*/
+      for(dbinx = 0 ; dbinx < 2 ; ++dbinx) {
+        for(dbiny = 0 ; dbiny < 2 ; ++dbiny) {
+          for(dbint = 0 ; dbint < 2 ; ++dbint) {
+            
+            if (binx + dbinx >= - (NBP/2) &&
+                binx + dbinx <    (NBP/2) &&
+                biny + dbiny >= - (NBP/2) &&
+                biny + dbiny <    (NBP/2) ) {
+              vl_sift_pix weight = win 
+                * mod 
+                * vl_abs_f (1 - dbinx - rbinx)
+                * vl_abs_f (1 - dbiny - rbiny)
+                * vl_abs_f (1 - dbint - rbint) ;
+              
+              atd(binx+dbinx, biny+dbiny, (bint+dbint) % NBO) += weight ;
+            }
+          }            
+        }
+      }
+    }  
+  }
+
+  /* Standard SIFT descriptors are normalized, truncated and normalized again */
+  if(1) {
+
+    /* Normalize the histogram to L2 unit length. */        
+    vl_sift_pix norm = normalize_histogram (descr, descr + NBO*NBP*NBP) ;
+
+    /* Set the descriptor to zero if it is lower than our norm_threshold */
+    if(f-> norm_thresh && norm < f-> norm_thresh) {
+        for(bin = 0; bin < NBO*NBP*NBP ; ++ bin)
+            descr [bin] = 0;
+    }
+    else {
+    
+      /* Truncate at 0.2. */
+      for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
+        if (descr [bin] > 0.2) descr [bin] = 0.2;
+      }
+      
+      /* Normalize again. */
+      normalize_histogram (descr, descr + NBO*NBP*NBP) ;
+    }
+  }
+}
+
+
+/** ------------------------------------------------------------------
  ** @brief Compute the descriptor of a keypoint
  **
  ** @param f        SIFT filter.
@@ -1320,7 +1496,7 @@ normalize_histogram
  **/
 
 VL_EXPORT
-void               
+void
 vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
                                   vl_sift_pix *descr,
                                   VlSiftKeypoint const* k,
@@ -1385,7 +1561,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
      si    >  f->s_max - 2     )
     return ;
   
-  /* syncrhonize gradient buffer */
+  /* synchronize gradient buffer */
   update_gradient (f) ;
 
   /* VL_PRINTF("W = %d ; magnif = %g ; SBP = %g\n", W,magnif,SBP) ; */
