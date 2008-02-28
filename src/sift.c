@@ -782,6 +782,12 @@ main(int argc, char **argv)
       vl_sift_delete (filt) ;
       filt = 0 ;
     }
+
+    /* release image data */
+    if (fdata) {
+      free (fdata) ;
+      fdata = 0 ;
+    }
     
     /* release image data */
     if (data) {
