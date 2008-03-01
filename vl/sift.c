@@ -41,7 +41,8 @@ SIFT filter usually involves the following steps:
 - Delete the SIFT filter by ::vl_sift_delete().
 
 These steps can be modified in order to run only the detector or only
-the descriptors.
+the descriptors. The function ::vl_sift_calc_raw_descriptor() can be
+used to further customize the descriptor calculation.
 
 @section sift-scale-space The scale space
 
