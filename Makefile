@@ -425,6 +425,10 @@ info :
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo 'MEX_LDFLAGS  = $(MEX_LDFLAGS)'
 
+.PHONY: wc
+wc:
+	cat $(m_src) $(mex_src) $(lib_src) $(bin_src) | wc
+
 # --------------------------------------------------------------------
 #                                                        Xcode Support
 # --------------------------------------------------------------------
