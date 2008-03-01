@@ -4,6 +4,7 @@ function [f d] = siftreg(I, spacing, patchwidth, varargin);
 orient = 0;
 scales = 1;
 normthresh = 0;
+skip = 0;
 colorspace = 'gray';
 
 for k=1:2:length(varargin)
@@ -22,6 +23,9 @@ for k=1:2:length(varargin)
 
         case 'colorspace'
             colorspace = arg;    
+
+        case 'skipdesc'
+            skip = arg;
 
         otherwise
             error(['Uknown parameter ''', varargin{a}, '''.']) ;
@@ -62,6 +66,11 @@ for s = 1:scales
 end
 
 f = f';
+
+if skip
+    d = zeros(128, size(f,2));
+    return
+end
 
 allf = [];
 alld = [];

@@ -355,6 +355,10 @@ $(NAME): TIMESTAMP VERSION
 	cp TIMESTAMP $(NAME)
 	cp VERSION $(NAME)
 
+wikidoc: $(NAME) 
+	cd wiki ; \
+	../doc/mdocall.py ../toolbox/ ../doc/toolbox
+
 dist: $(NAME)
 	COPYFILE_DISABLE=1                                           \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \

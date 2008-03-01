@@ -95,13 +95,17 @@ void         vl_sift_delete (VlSiftFilt *f) ;
 /** @name Process data
  ** @{
  **/
+
 VL_EXPORT
 int   vl_sift_process_first_octave       (VlSiftFilt *f, 
                                           vl_sift_pix const *im) ;
+
 VL_EXPORT
 int   vl_sift_process_next_octave        (VlSiftFilt *f) ;
+
 VL_EXPORT
 void  vl_sift_detect                     (VlSiftFilt *f) ;
+
 VL_EXPORT
 int   vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
                                           double angles [4],
@@ -111,6 +115,15 @@ void  vl_sift_calc_keypoint_descriptor   (VlSiftFilt *f,
                                           vl_sift_pix *descr,
                                           VlSiftKeypoint const* k,
                                           double angle) ;
+
+VL_EXPORT
+void  vl_sift_calc_raw_descriptor        (VlSiftFilt const *f,
+                                          vl_sift_pix const* image,
+                                          vl_sift_pix *descr,
+                                          int widht, int height,
+                                          double x, double y, 
+                                          double s, double angle0) ;
+
 VL_EXPORT
 void  vl_sift_keypoint_init              (VlSiftFilt const *f,
                                           VlSiftKeypoint *k, 
