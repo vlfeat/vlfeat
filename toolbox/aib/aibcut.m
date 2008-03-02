@@ -1,32 +1,33 @@
 function [cut, map, short] = aibcut(parents, n)
 % AIBCUT  Cut AIB tree
-%  CUT = AIBCUT(PARENTS, N) cuts the AIB tree PARENTS to get a cut of
-%  N nodes. PARENTS defines the AIB tree (see AIB()).
+%  CUT = AIBCUT(PARENTS, N) cuts the binary merge tree PARENTS and
+%  returns a cut CUT of N nodes. The format of PARENTS is the same
+%  used by% the AIB() function.
 %
-%  The N-sized cut is a compressed (coarser) partition of the original
-%  clusters as computed by AIB.
-%
-%  The function returns a vector CUT with the list of nodes of the
-%  AIB tree belonging to the cut.
+%  A cut is a set of N nodes such that no node is a descendant of any
+%  other node in the CUT and such that any leaf descend from a node in
+%  the cut. CUT lists the nodes of the binary merge tree PARENT that
+%  form the cut.
 %
 %  Nodes with null parent (as defined by PARENTS) are comprised in the
 %  cut if the other nodes are not enough to fill a cut of N elements.
 %
 %  [CUT, MAP] = AIBCUT(...) returns a vector MAP with the same size as
-%  PARENTS. Each element of the map re-assign each node below or in
-%  the cut to the corresponding CUT element and each element above the
-%  cut or with null parent to 0. MAP can be used to re-quantize AIB
-%  leaves in one step, or by means of AIBCUTPUSH() (which also deals
-%  with nodes with null parent).
+%  PARENTS. MAP assign each node below or in the cut to the
+%  corresponding element in the CUT vector (each element above the cut
+%  or with null parent is mapped to 0). To get the index of the
+%  corresponding cut nodes use CUT(MAP). MAP by itself is useful to
+%  quantize the leaves in a sequences of N contiguous indexes,
+%  starting from one (see also AIBCUTPUSH()).
 %
-%  [CUT, MAP, SHORT] = AIBCUT(...) returns also a vector SHORT which
-%  short-circuits nodes below the cut to nodes of the cut.  Nodes
-%  above or in the cut are short-circuited to themselves.  Nodes that
-%  where connected to the null node are short-circuited to zero.
-%  Nodes that where connected to the null but are also in the cut are
-%  short circutied to themselves.
+%  [CUT, MAP, SHORT] = AIBCUT(...) returns also a vector SHORT that
+%  represents a merge tree compressed to the cut. This is obtained by
+%  mapping all nodes below to the cut element above them. Nodes in or
+%  above the cut are mapped to themselves. Null parents are left
+%  unchanged, except if the corresponding node is in the cut (in which
+%  case the map-to-itself rule has the precedence).
 %
-%  See also AIB(), AIBHIST(), AIBCUTHIST().
+%  See also HELP_VLFEAT(), AIB().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
