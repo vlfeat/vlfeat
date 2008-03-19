@@ -9,7 +9,7 @@
 %   column of D is the descriptor of the corresponding frame in F. A
 %   descriptor is a 128-dimensional vector of storage class UINT8.
 %
-%   MSER(I,'Option'[,Value]...) accepts the following options
+%   Options:
 %
 %   Octaves::
 %       Set the number of octave of the DoG scale space.
@@ -23,26 +23,31 @@
 %   PeakThresh::
 %       Set the peak selection threshold.
 %
-%   Magnif::
-%       Set the descriptor magnification factor.
-%
 %   EdgeThresh::
 %       Set the non-edge selection threshold.
 %
 %   NormThresh::
 %       Set the minimum l2-norm of the descriptor before
-%       normalization. Descriptors below the threshold are set to zero.
+%       normalization. Descriptors below the threshold are set to
+%       zero.
+%
+%   Magnif::
+%       Set the descriptor magnification factor. The scale of the
+%       keypoint is multiplied by this factor to obtain the width (in
+%       pixels) of the spatial bins. For instance, since by default
+%       there are 4 spatial bins along each spatial direction, the
+%       ``diameter'' of the descriptor is approximatively 4 * MAGNIF.
 %
 %   Frames::
 %       Set the frames to use (bypass the detector). If frames are not
 %       passed in order of increasing scale, they are re-orderded.
 %
 %   Orientations::
-%       Force the computation of the oritentations of the frames
-%       even if the option 'Frames' is being used.
+%       Compute the orietantions of the frames overriding the 
+%       orientation specified by the 'Frames' option.
 %
 %   Verbose::
-%       Be verbose (may be repeated).
+%       Be verbose (may be repeated to increase the verbosity level).
 %
 %  See also HELP_VLFEAT, UBCMATCH().
 
