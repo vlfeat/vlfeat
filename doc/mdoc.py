@@ -15,7 +15,7 @@ from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option(
-    "-k", "--wiki", 
+    "-w", "--wiki", 
     dest    = "wikiformat",
     default = False,
     action  = "store_true",
@@ -35,16 +35,12 @@ verb = 0
 htmlHead = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="content-type"
-content="text/html; charset=iso-8859-1" />
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <meta name="robots"
       content="all" />
 <meta name="generator"
       content="mdoc" />
-<meta name="generatorversion"
-      content="alpha" />
 
-<!-- Include VLWeb CSS stylesheet and JavaScript functions -->
 <link rel="stylesheet"
       type="text/css"
       href="mdoc.css"/>
@@ -472,14 +468,14 @@ if __name__ == '__main__':
     f.write(page)
     f.close()
 
-    sys.exit(0)
-    try:
-        runcmd("mvs update %s" % wikiname)
-        print "Converting", overviewname, "to", wikiname
-        wikidoc(wikiname, overviewname)
-        runcmd("mvs commit -M -m 'Documentation update' %s" % wikiname)
-    except (KeyboardInterrupt, SystemExit):
-        sys.exit(1)
+    if wikiformat:
+        try:
+            runcmd("mvs update %s" % wikiname)
+            print "Converting", pagename, "to", pagename + '.wiki'
+            wikidoc(pagename + '.wiki', pagename)
+            runcmd("mvs commit -M -m 'Documentation update' %s" % wikiname)
+        except (KeyboardInterrupt, SystemExit):
+            sys.exit(1)
 
     # checkin files to wiki
     for funcname in mfiles:
