@@ -87,7 +87,12 @@ class MFile:
         self.path     = os.path.join(basedir, dirname, name)
         self.mdocname = os.path.join(dirname, funcname).replace(os.path.sep, '_')
         self.htmlname = self.mdocname + '.html'
-        self.wikiname = 'MDoc_' + os.path.join(dirname, funcname).upper().replace(os.path.sep, '_')
+        self.wikiname = 'MDoc_' + (os.path.join(dirname, funcname)
+                                   .upper().replace(os.path.sep, '_'))
+
+        self.prev = None
+        self.next = None
+        self.node = None
 
     def __str__(self):
         str  = "MFile: %s\n" % (self.funcname)
@@ -112,6 +117,7 @@ class Node:
 
     def addMFile(self, mfile):
         self.mfiles.append(mfile)
+        mfile.node = self
 
     def toIndexPage(self,format,depth=1):
         page = ""
@@ -121,7 +127,8 @@ class Node:
                 page += "<ul>\n"
                 for m in self.mfiles:
                     page += "<li>"
-                    page += "<b><a href='%s'>%s</a></b>" % (m.htmlname, m.funcname)
+                    page += "<b><a href='%s'>%s</a></b>" % (m.htmlname, 
+                                                            m.funcname)
                     page += " %s" % (m.brief)
                     page += "</li>"
                 page += "</ul>\n"
@@ -135,7 +142,7 @@ class Node:
         for n in self.children:
             page += n.toIndexPage(format, depth+1)
         return page
-                
+
     def __str__(self):
         s = "Node: %s\n" % self.dirname
         for m in self.mfiles:
@@ -144,13 +151,18 @@ class Node:
             s += n.__str__()
         return s
 
+# --------------------------------------------------------------------
 def depth_first(node):
+# --------------------------------------------------------------------
+    """
+    depth_first(node) is a depth first generator over the descendent
+    of the specified node.
+    """
     yield node
     for n in node.children:
         for m in depth_first(n):
             yield m
     return
-
 
 # --------------------------------------------------------------------
 def extract(path):
@@ -183,6 +195,7 @@ def extract(path):
     #
     # Extract header from body
     #
+
     if len(body) > 0:
         head  = body[0]
         body  = body[1:]
@@ -203,8 +216,10 @@ def xscan(basedir, dirname=''):
     node = Node(dirname)
 
     dir   = os.listdir(os.path.join(basedir, dirname))
-    files = [f for f in dir if os.path.isfile(os.path.join(basedir, dirname, f))]
-    sdirs = [s for s in dir if os.path.isdir (os.path.join(basedir, dirname, s))]
+    files = [f for f in dir if os.path.isfile(
+            os.path.join(basedir, dirname, f))]
+    sdirs = [s for s in dir if os.path.isdir (
+            os.path.join(basedir, dirname, s))]
 
     # M-Files
     for f in files:
@@ -228,15 +243,20 @@ def xscan(basedir, dirname=''):
     return node
 
 # --------------------------------------------------------------------
-def decorateHTML(content, funcname, brief):
+def decorateHTML(m, content):
 # --------------------------------------------------------------------
     """
     decorateHTML(CONTENT, FUNCNAME, BRIEF)
     """
-    breadcrumb =  "<ul id='breadcrumb'><li>"
-    breadcrumb += "<a href='index.html'>Index</a>"
-    breadcrumb += "</li></ul>"
-    heading = "<h1>" + funcname + " <span>" + brief + "</span></h1>"
+    breadcrumb = "<div id='breadcrumb'>"
+    breadcrumb += "<ul>"
+    breadcrumb += "<li><a href='index.html'>Index</a></li>"
+    if m.prev: breadcrumb += "<li><a href='%s'>Prev</a></li>" % m.prev.htmlname
+    if m.next: breadcrumb += "<li><a href='%s'>Next</a></li>" % m.next.htmlname
+    breadcrumb += "</ul>"
+    breadcrumb += "<span class='path'>%s</span>" % m.node.dirname.upper()
+    breadcrumb += "</div>"
+    heading = "<h1>" + m.funcname + " <span>" + m.brief + "</span></h1>"
     
     x =  htmlHead + breadcrumb + heading + content
     x += "</body></html>"
@@ -253,14 +273,10 @@ body, html, div, dl, dt, dd, p
 }
 
 html { 
- background-color: black ;
- margin: 0 ;
- padding: 0 ;
+  background-color: white ;
 }
 
 body {
-  margin: 0 auto ;
-  max-width: 50em ;
   line-height: 1.4em ;
   background-color: white ;
   font-size: 10pt ;
@@ -325,11 +341,14 @@ div.documentation {
 }
 
 #breadcrumb {
-  display: block ;
   border-bottom: 1px solid #eee ;
   margin: 0 ;
   padding: 2px 0.5em ;
   font-size: 0.8em ;
+}
+
+#breadcrumb ul {
+  display: inline ;
 }
 
 #breadcrumb li {
@@ -337,6 +356,10 @@ div.documentation {
   margin: 0 ;
   padding: 0 ;
   margin-right: 2em ;
+}
+
+#breadcrumb span.path {
+  font-weight: bold ;
 }
 
 """
@@ -383,8 +406,14 @@ if __name__ == '__main__':
 
     linkdict = {}
     mfiles   = {}
+    prev     = None
+    next     = None
     for n in depth_first(toolbox):
         for m in n.mfiles:
+            if prev:
+                prev.next = m
+                m.prev = prev
+            prev = m            
             func = m.funcname
             mfiles[func] = m
             if wikiformat:
@@ -407,8 +436,7 @@ if __name__ == '__main__':
                 
     # ----------------------------------------------------------------
     #                          Extract comment block and run formatter
-    # ----------------------------------------------------------------
-
+    # ----------------------------------------------------------------        
     for (func, m) in mfiles.items():
         
         if wikiformat:
@@ -437,7 +465,7 @@ if __name__ == '__main__':
 
         # add decorations
         if not wikiformat:
-            content = decorateHTML(content, m.funcname, brief)
+            content = decorateHTML(m, content)
 
         # save the result to an html file
         if wikiformat:
