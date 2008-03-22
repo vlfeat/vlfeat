@@ -259,12 +259,12 @@ html {
 }
 
 body {
- max-width: 50em ;
- line-height: 1.4em ;
- margin: 0 auto ;
- background-color: white ;
- font-size: 10pt ;
- font-family: "Lucida Grande", Helvetica ;
+  margin: 0 auto ;
+  max-width: 50em ;
+  line-height: 1.4em ;
+  background-color: white ;
+  font-size: 10pt ;
+  font-family: "Lucida Grande", Helvetica ;
 }
 
 p {
@@ -452,7 +452,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------
     
     if not wikiformat:
-        pagename = os.path.join(docdir, 'index.html')
+        pagename = 'index.html'
         page = htmlHead 
         page += "<ul id='breadcrumb'></ul>"
         page += "<h1>Index of functions</h1>\n"
@@ -460,32 +460,35 @@ if __name__ == '__main__':
         page += toolbox.toIndexPage('html')
         page += "</div></body></html>"
     else:
-        pagename = os.path.join(docdir, 'index')
+        pagename = 'MDoc'
         page = "== Documentation ==\n"
         page += toolbox.toIndexPage('wiki')
 
-    f = open(pagename, 'w')
+    f = open(os.path.join(docdir, pagename), 'w')
     f.write(page)
     f.close()
 
+    # ----------------------------------------------------------------
+    #                                            Checkin files to wiki
+    # ----------------------------------------------------------------
+    def towiki(docdir, pagename):
+        pagenamewiki = pagename + '.wiki'
+   #     runcmd("cd %s ; mvs update %s" % (docdir, pagenamewiki))
+        if verb:
+            print "mdoc: converting", pagename, "to", pagenamewiki
+        wikidoc(os.path.join(docdir, pagenamewiki), 
+                os.path.join(docdir, pagename))
+  #      runcmd("cd %s ; mvs commit -M -m 'Documentation update' %s" 
+  #               % (docdir, pagenamewiki))
+ 
     if wikiformat:
         try:
-            runcmd("mvs update %s" % wikiname)
-            print "Converting", pagename, "to", pagename + '.wiki'
-            wikidoc(pagename + '.wiki', pagename)
-            runcmd("mvs commit -M -m 'Documentation update' %s" % wikiname)
+            towiki(docdir, pagename)
         except (KeyboardInterrupt, SystemExit):
             sys.exit(1)
-
-    # checkin files to wiki
-    for funcname in mfiles:
-        (mname, htmlname, linkname, brief) = mfiles[funcname]
-        wikiname = linkname + ".wiki"
-        try:
-            runcmd("mvs update %s" % wikiname)
-            print "Converting", htmlname, "to", wikiname
-            wikidoc(wikiname, htmlname)
-            runcmd("mvs commit -M -m 'Documentation update' %s" % wikiname)
-            # possibly add -M for minor revision
-        except (KeyboardInterrupt, SystemExit):
-            sys.exit(1)
+            
+        for (func, m) in mfiles.items():
+            try:
+                towiki(docdir, m.wikiname)
+            except (KeyboardInterrupt, SystemExit):
+                sys.exit(1)
