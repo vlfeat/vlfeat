@@ -46,7 +46,7 @@
 %     compute weighed histograms, GRAD() To compute the gradient of a
 %     2-D function.
 %
-%   See http://vision.ucla.edu/vlfeat
+%   See also:: http://vision.ucla.edu/vlfeat
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -55,4 +55,3 @@
 % General Public License version 2.
 
 help help_vlfeat.m
-

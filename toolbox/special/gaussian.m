@@ -7,7 +7,7 @@ function y = gaussian(x)
 %
 %     Y = 1/S * GAUSSIAN(X/S).
 %
-%   See also DGAUSSIAN(), DDGAUSSIAN().
+%   See also:: DGAUSSIAN(), DDGAUSSIAN(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

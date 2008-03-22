@@ -3,7 +3,7 @@ function J = imup(I)
 %   J=IMUP(I) doubles the resolution of the image I by bilinear
 %   interpolation.
 %
-%   See also HELP_VLFEAT(), IMDOWN().
+%   See also:: IMDOWN(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

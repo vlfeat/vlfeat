@@ -6,7 +6,7 @@ function I = imreadgray(file,varargin)
 %
 %   IMREADGRAY(FILE,FMT) specifies the file format FMT (see IMREAD()).
 %
-%   See RGB2DOUBLE().
+%   See also:: RGB2DOUBLE().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

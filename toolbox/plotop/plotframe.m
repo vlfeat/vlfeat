@@ -35,6 +35,8 @@ function h=plotframe(frames,varargin)
 %  PLOTFRAME(FRAMES,...) passes any extra argument to the underlying
 %  plot function. The first optional argument can be a line
 %  specification string such as the one used by PLOT().
+%
+%  See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

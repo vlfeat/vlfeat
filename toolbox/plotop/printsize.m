@@ -7,7 +7,7 @@ function printsize(r)
 %   that elements are scaled to match the final figure size in
 %   print.
 %
-%  See also VLFEAT_HELP().
+%  See also HELP_VLFEAT().
 
 % AUTORIGHTS
 

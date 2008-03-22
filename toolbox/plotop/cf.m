@@ -1,8 +1,10 @@
-function h=cf(h0) ;
+function h=cf(h0)
 % CF  Copy figure
 %   H=CF() creates a duplicate of the current figure.
 %
 %   H=CF(H0) creates a duplicate of the figure whose handle is H0.
+%
+%   See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

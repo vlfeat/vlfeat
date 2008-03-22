@@ -5,7 +5,7 @@ function J=xyz2lab(I,il)
 %   XYZ2LAB(I,IL) uses one of the illuminants A, B, C, E, D50, D55,
 %   D65, D75, D93. The default illuminatn is E.
 %
-%   See also HELP_VLFEAT(), XYZ2LUV().
+%   See also:: XYZ2LUV(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -13,13 +13,13 @@ function sel = clickpoint(V,N,varargin)
 %   partial selection is returned. This can be used in combination
 %   with N=inf to get an arbitrary number of points.
 %
-%   CLICKPOINT(V,N,'Opt',val,...) accepts the following options:
+%   CLICKPOINT() accepts the following options:
 %
-%     'PlotMarker' [0]::
-%       Put a marker as points are selected. The markers are
-%       deleted on exiting the function.
+%   PlotMarker [0]::
+%     Put a marker as points are selected. The markers are deleted on
+%     exiting the function.
 %
-%   See also CLICK().
+%   See also:: CLICK(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

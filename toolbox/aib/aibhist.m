@@ -5,7 +5,7 @@
 %  H has the same dimension of parents and counts how many data points
 %  match the corresponding node of the AIB tree.
 %
-%  See also IKMEANSPUSH().
+%  See also:: HELP_VLFEAT(), AIB(), AIBCUTPUSH().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

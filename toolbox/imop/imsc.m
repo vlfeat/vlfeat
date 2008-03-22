@@ -1,9 +1,9 @@
 function J=imsc(I)
 % IMSC  Scale image
-%   J=IMSC(I) scales the ranges of the gray-scale or color image I to
+%   J=IMSC(I) scales the range of the gray-scale or color image I to
 %   fit in the interval [0,1].
 %
-%   See also VLFEAT_HELP()
+%   See also:: HELP_VLFEAT()
 
 % AUTORIGHTS
 

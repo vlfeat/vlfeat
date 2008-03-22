@@ -63,6 +63,8 @@
 %   [1] J. Matas, O. Chum, M. Urban, and T. Pajdla, "Robust wide
 %       baseline stereo from maximally stable extremal regions," in
 %       Proc. BMVC, 2002.
+%
+%   See also HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

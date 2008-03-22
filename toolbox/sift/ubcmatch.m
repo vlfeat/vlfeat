@@ -14,11 +14,11 @@
 %   The storage class of the descriptors can be either DOUBLE, FLOAT,
 %   INT8 or UINT8. Usually interger classes are faster.
 %   
-%   [1] D. G. Lowe, 
-%       `Distinctive image features from scale-invariant keypoints,'
-%       IJCV, vol. 2, no. 60, pp. 91–110, 2004.
+%   REFERENCES
+%   [1] D. G. Lowe, `Distinctive image features from scale-invariant
+%   keypoints,' IJCV, vol. 2, no. 60, pp. 91–110, 2004.
 %
-%   See also SIFT().
+%   See also HELP_VLFEAT(), SIFT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

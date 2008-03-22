@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 """
-MDOC fromats the embedded M-file documentation according to a simple
-set of rules. Pharagraphs, verbatim sections, lists and other
-structures are automatically instantiated by looking at blank lines,
-indentation and a few decoration symbols.
+MDOC fromats the help block of a MATLAB M-file based on a simple set
+of rules. Pharagraphs, verbatim sections, lists and other structures
+are automatically instantiated by looking at blank lines, indentation
+and a few decoration symbols.
 
 The documentation starts at a conventional indentation level N (by
 default 2). A block of non-epmty lines prefixed by N characters is
@@ -74,18 +74,20 @@ class DL (L):
 def lex(line):
 # --------------------------------------------------------------------
     """
-    Parse LINE to a terminal symbol. Note that each line corresponds to
-    exactlly one terminal type, but types are organized hierarchically.
+    Parse the string LINE to a terminal symbol. Each line corresponds
+    to exactly one terminal type. However, terminal types are the leaf
+    of a hierarchy of types.
     """
 
     match = re.match(r"\s*\n?$", line) ;
     if match: return B()
     
-    match = re.match(r"(\s*)(.*)::\s*\n?$", line) 
+    match = re.match(r"(\s*)(.*)::(.*)\n?$", line) 
     if match:
         x = DL()
-        x.indent  = len(match.group(1))
-        x.content = match.group(2)
+        x.indent        = len(match.group(1))
+        x.content       = match.group(2)
+        x.inner_content = match.group(3)
         return x
 
     match = re.match(r"(\s*)([-\*#]\s*)(\S.*)\n?$", line)
@@ -109,7 +111,9 @@ def lex(line):
 class Lexer(object):
 # --------------------------------------------------------------------
     """
-    l = Lexer(LINES) parses the array of strings LINES.
+    l = Lexer(LINES) parses the array of strings LINES. Lexer has a
+    head pointing to the current line. The head can be controlled by
+    the following methods:
 
     l.next() advances the head and fetches the next terminal.
     l.back() move back the head.
@@ -135,6 +139,9 @@ class Lexer(object):
     def back(self):
         if self.pos >=0: self.pos -= 1
 
+    def rewrite(self, str):
+        self.tokens [self.pos] = str ;
+
     def getpos(self):
         return self.pos
 
@@ -148,11 +155,15 @@ class Lexer(object):
 class Formatter:
 # --------------------------------------------------------------------
     """
-    f = Formatter(LINES) parse the array of text lines LINES.
+    f = Formatter(LINES) parse the array of strings LINES.
     
     f = Formatter(LINES, FUNCS) takes the dictionary of functions
     FUNCS.  Function names must be uppercase. The dictionary entries
     are used to embed links in the documentation.
+
+    Formatter(LINES, FUNCS, LINKTYPE) produces links of the specified
+    type.  Use 'a' for HTML anchors and 'wiki' for MediaWiki style
+    links.
 
     f.toDOM() process the data to construct an XML (HTML) representation
     of them.
@@ -185,7 +196,7 @@ class Formatter:
 
     def addFancyText(self, tag, s):
         xs = []
-        iter = re.finditer('([A-Z][A-Z0-9]*)\([^\)]*\)', s)
+        iter = re.finditer('([A-Z][A-Z0-9_]*)\([^\)]*\)', s)
         last = -1
 
         for i in iter:
@@ -400,7 +411,7 @@ class Formatter:
         return dltag
 
     # ................................................................
-    # DI(N) -> DL(N) DIV(M), M > N
+    # DI(N) -> DL(N) DIV(M)?, M > N
     def parse_DI(self, indent):
         content = "\n"
         good   = False 
@@ -422,6 +433,20 @@ class Formatter:
         dttag.appendChild(dttxt)
         xs.append(dttag)
 
+        # Inject inner_content
+        c = x.inner_content.strip()
+        if len(c) > 0:
+            tk = PL()
+            tk.content = x.inner_content
+            t = self.tokens.next()
+            self.tokens.back()
+            if t.isa(L) and t.indent > indent:
+                tk.indent = t.indent
+            else:
+                tk.indent = indent+1 ;
+            self.tokens.rewrite(tk)
+            self.tokens.back()
+            
         # Continued by DIV
         t = self.tokens.next()
         self.tokens.back()

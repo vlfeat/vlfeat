@@ -1,12 +1,14 @@
 function H = histmarg(H, dims)
 % HISTMARG  Marginal of histogram
-%  H = HISTMARG(H, DIMS) marginalizes the historgram HISTMARG w.r.t
-%  the dimensions DIM. This is done by summing out all dimensions
-%  not listed in DIM and deleting them.
+%   H = HISTMARG(H, DIMS) marginalizes the historgram H w.r.t the
+%   dimensions DIMS. This is done by summing out all dimensions not
+%   listed in DIMS and deleting them.
 %
-%  REMARK. If DIMS lists only one dimension, the returned H is a
-%  column vector. Notice that this way of deleting dimensions is not
-%  always consistent with the SQUEEZE function.
+%   REMARK. If DIMS lists only one dimension, the returned histogram H
+%   is a column vector. Notice that this way of deleting dimensions is
+%   not always consistent with the SQUEEZE function.
+%
+%   See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -16,7 +18,7 @@ function H = histmarg(H, dims)
 
 sz = size(H) ;
 
-for d=setdiff( 1:length(sz), dims(:) )
+for d=setdiff(1:length(sz), dims(:))
   H = sum(H, d) ;
 end
 

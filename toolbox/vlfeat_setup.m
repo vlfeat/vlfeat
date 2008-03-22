@@ -1,6 +1,8 @@
 function path = vlfeat_setup
 % VLFEAT_SETUP  Add VLFeat toolbox path to MATLAB path
 %  PATH = VLFEAT_SETUP() adds VLFeat to MATLAB path.
+%
+%  See also:: HELP_VLFEAT().
 
 root=vlfeat_root ;
 addpath(fullfile(root,'toolbox'           )) ;

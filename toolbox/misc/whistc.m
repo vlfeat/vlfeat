@@ -2,7 +2,7 @@
 %  H = WHISTC(X,W,EDGES) behaves exactly like HISTC(X,EDGES), but
 %  weights the samples by W. NaN-valued entries are skipped.
 %
-%  See also HITSC.
+%  See also:: HITSC(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

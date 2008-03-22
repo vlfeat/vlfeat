@@ -4,7 +4,7 @@ function [dWx,dWy] = dwaffine(x,y)
 %   warp [WX; WY] = [A T] [X; Y] with respect to the parameters A,T
 %   computed at points X,Y.
 %
-%   See also HELP_VLFEAT(), WAFFINE().
+%   See also:: WAFFINE(), HELP_VLFEAT().
 
 % AUTORIGHTS
 

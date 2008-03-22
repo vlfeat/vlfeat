@@ -3,6 +3,6 @@ function om = ihat( H )
 %   OM = IHAT(H) returns a vector OM such that HAT(OM) = H.
 %   H hast to be 3x3 skew-symmetric.
 %
-%   See also HAT().
+%   See also:: HAT(), HELP_VLFEAT().
 
 om = [H(3,2);H(1,3);H(2,1)] ;

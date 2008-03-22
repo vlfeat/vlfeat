@@ -16,5 +16,7 @@
 %    TWISTER() is slightly faster than RAND(). Moreover it can be used
 %    to control the state of the random number gnerator of VLFEAT
 %    functions.
+%
+%    See also:: HELP_VLFEAT().
 
 % AUTORIGHTS

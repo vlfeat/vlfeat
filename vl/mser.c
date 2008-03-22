@@ -680,7 +680,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
    * -------------------------------------------------------------- */
   /* For each extremal region Xi of value VAL we look for the biggest
    * parent that has value not greater than VAL+DELTA. This is dubbed
-   * the top parent. */
+   * `top parent'. */
 
   for(i = 0 ; i < ner ; ++i) {
 
@@ -711,12 +711,12 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
       er [i] .max_stable = 1 ;
     }
         
-    /* shortcut: since extremal regions are processed by increasing
-     * intensity, all next extremal regions being processed have value
-     * at least equal to the one of Xi. If any of them has parent the
-     * parent of Xi (this comprises the parent itself), we can safely
-     * skip most intermediate node along the branch and skip directly
-     * to the top to start our search. */
+    /* Optimization: since extremal regions are processed by
+     * increasing intensity, all next extremal regions being processed
+     * have value at least equal to the one of Xi. If any of them has
+     * parent the parent of Xi (this comprises the parent itself), we
+     * can safely skip most intermediate node along the branch and
+     * skip directly to the top to start our search. */
     {
       int parent = er [i] .parent ;
       int curr   = er [parent] .shortcut ;

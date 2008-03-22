@@ -1,17 +1,18 @@
 % IMINTEGRAL  Integral image
-%   J = IMINTEGRAL(I) calculates the integral image I of the image I.
+%   J = IMINTEGRAL(I) calculates the integral image J of the image I.
 %   I must a matrix with DOUBLE storage class. J is given by
 %
 %    J(i,j) = sum(I(1:i,1:j))
 %
 %   and has one column and one row more than I.
 %
-%   Example:
-%     IMINTEGRAL(ONES(3)) = [ 1 2 3 ; 
-%                             2 4 6 ; 
-%                             3 6 9 ]
+%   Example::
+%     The following identity holds:
+%       IMINTEGRAL(ONES(3)) = [ 1 2 3 ; 
+%                               2 4 6 ; 
+%                               3 6 9 ]
 % 
-%   See also HELP_VLFEAT().
+%   See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 %

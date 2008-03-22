@@ -11,7 +11,7 @@ function J=rgb2xyz(I,ws)
 %
 %   The default workspace is CIE.
 %
-%   See also HELP_VLFEAT(), XYZ2RGB().
+%   See also:: XYZ2RGB(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

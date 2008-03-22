@@ -47,7 +47,7 @@
 %   of the M-1 merges. If less than M-1 merges are performed, the rest
 %   of the vector is filled with NaNs.
 %
-%   Options:
+%   AIB accepts the following options:
 %
 %   Verbose::
 %     Increase verbosity level.
@@ -55,8 +55,8 @@
 %   ClusterNull::
 %     Do not signal null nodes; instead cluster them.
 %
-%   See also HELP_VLFEAT(), AIBCUT(), AIBHIST(), AIBCUTHIST(),
-%            AIBCUTPUSH().
+%   See also:: AIBCUT(), AIBHIST(), AIBCUTHIST(),
+%              AIBCUTPUSH(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

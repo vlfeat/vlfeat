@@ -10,7 +10,7 @@ function J=imwhiten(I,alpha,cutoff)
 %   cutoff frequency equal to CUTOFF x FN, where FN is the Nyquist
 %   frequency (half of the sampling frequency).
 %
-%   See also HELP_VLFEAT()
+%   See also:: HELP_VLFEAT()
 
 if ~exist('alpha'),  alpha = 1 ; end
 if ~exist('cutoff'), cutoff = [] ; end

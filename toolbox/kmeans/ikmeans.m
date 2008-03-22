@@ -5,7 +5,7 @@
 %   [C, I] = IKMEANS(...) returns the cluster associations I of the
 %   data as well.
 %
-%   IKMEANS(...,options...) accepts the following options
+%   IKMEANS() accepts the following options:
 %
 %   MaxPasses [200]::
 %     Maximum number of iterations before giving up (the algorithm
@@ -13,10 +13,12 @@
 %     associations).
 %
 %   Method ['Lloyd']::
-%     Algorithm to use (Lloyd, Elkan).
+%     Algorithm to use ('Lloyd', 'Elkan').
 %
 %   Verbose::
 %     Increase the verbosity level.
+%
+%  See also:: IKMEANS(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

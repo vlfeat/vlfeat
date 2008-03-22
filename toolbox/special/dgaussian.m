@@ -7,7 +7,7 @@ function y = dgaussian(x)
 %
 %     Y = 1/S^2 * DGAUSSIAN(X/S) .
 %
-%   See also GAUSSIAN(), DDGAUSSIAN().
+%   See also:: GAUSSIAN(), DDGAUSSIAN(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

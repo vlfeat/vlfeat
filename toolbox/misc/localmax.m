@@ -21,16 +21,18 @@
 %   dimensions of the Q-dimensional array F. This allows to process F
 %   in ``slices''.
 %
-%   REMARK.  Matrices (2-array) with a singleton dimension are
-%   interpreted as vectors (1-array). So for example LOCALMAX([0 1 0])
-%   and LOCALMAX([0 1 0]') both return 2 as an aswer. However, if [0 1
-%   0] is to be interpreted as a 1x2 matrix, then the correct answer
-%   is the empty set, as all elements are on the boundary.
-%   Unfortunately MATLAB does not distinguish between vectors and
-%   2-matrices with a singleton dimension.  To forece the
-%   interpretation of all matrices as 2-arrays, use
-%   LOCALMAX(F,TRESH,2) (but note that in this case the result is
-%   always empty!).
+%   Remark:: Matrices (2-array) with a singleton dimension are
+%     interpreted as vectors (1-array). So for example LOCALMAX([0 1
+%     0]) and LOCALMAX([0 1 0]') both return 2 as an aswer. However,
+%     if [0 1 0] is to be interpreted as a 1x2 matrix, then the
+%     correct answer is the empty set, as all elements are on the
+%     boundary. Unfortunately MATLAB does not distinguish between
+%     vectors and 2-matrices with a singleton dimension.  To forece
+%     the interpretation of all matrices as 2-arrays, use
+%     LOCALMAX(F,TRESH,2) (but note that in this case the result is
+%     always empty!).
+%
+%   See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

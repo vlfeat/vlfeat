@@ -1,7 +1,10 @@
 function [f,d] = ubcread(file) 
 % SIFTREAD Read Lowe's SIFT implementation data files
-%   [F,D] = UBCREAD(FILE) reads the frames F and the descriptors D
-%   from FILE in UBC (Lowe's SIFT) or Oxford format.
+%  [F,D] = UBCREAD(FILE) reads the frames F and the descriptors D from
+%  FILE in UBC (Lowe's SIFT) or Oxford format and converts them in
+%  the format used by SIFT().
+%
+%  See also:: SIFT(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

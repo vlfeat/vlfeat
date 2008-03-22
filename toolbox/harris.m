@@ -16,7 +16,7 @@ function [H,details] = harris(I,si,alpha)
 %  HARRIS(I,SI) uses Noble's variation [2] of the Harris score. If
 %  SIGMAP and SIGMAM are respectively the biggest and smallest
 %  eigenvalue of the structure tensor at a pixel, the score is given
-%  by (SIGMAP*SIGMAM) / (SIGMAP+SIGMAM/2).  Let GAMMA = SIGMAM/ SIGMAP
+%  by (SIGMAP*SIGMAM) / (SIGMAP+SIGMAM/2).  Let GAMMA = SIGMAM/SIGMAP
 %  the ratio between the eigenvalues, which measures the degree of
 %  anisotropy of the tensor and is always comprised in the range
 %  [0,1].  Noble's score can be decomposed in two factors: the biggest
@@ -29,8 +29,8 @@ function [H,details] = harris(I,si,alpha)
 %  [H,DETAILS] = HARRIS(I,SIGMA) returns the additional structure
 %  DETAILS with the following fields:
 %
-%  DETAILS.SIGMAP
-%  DETAILS.RHO
+%    DETAILS.SIGMAP
+%    DETAILS.RHO
 %
 %  HARRIS(I,SI,ALPHA) uses Harris' original score [1], defined to be
 %  SIGMAP*SIGMAM - ALPHA*(SIGMAP+SIGMAM)^2. This can be decomposed in
@@ -48,20 +48,22 @@ function [H,details] = harris(I,si,alpha)
 %  generally assumed to be a sampling artifact, and might be
 %  avoided by oversampling the image.
 %
-%  EXAMPLE. Extacts Harris points from image I:
-%    idx = localmax( harris( imsmooth( I, sd ), si ) ) ;
-%    [i,j] = ind2sub( size(I), idx )
+%  EXAMPLE:: 
+%    To extacts Harris points from image I:
+%      idx = localmax( harris( imsmooth( I, sd ), si ) ) ;
+%      [i,j] = ind2sub( size(I), idx )
 %
-%  REFERENCES
-%  [1]	C. Harris and M. Stephens, "A combined corner and edge detector,"
-%       in Proceedings of The Fourth Alvey Vision Conference, 
-%       pp. 147-151, 1988.
-%  [2]	J. A. Noble, "Finding corners, "Image Vision Computing,
-%       vol. 6, no. 2, pp. 121-128, 1988.
+%  REFERENCES::
+%   [1] C. Harris and M. Stephens, "A combined corner and edge detector,"
+%   in Proceedings of The Fourth Alvey Vision Conference, pp. 147-151,
+%   1988.
 %
-%  See also TEST_HARRIS().
+%   [2] J. A. Noble, "Finding corners, "Image Vision Computing, vol. 6,
+%   no. 2, pp. 121-128, 1988.
+%
+%  See also:: HELP_VLFEAT().
 
-verbose = 0 ;
+% AUTORIGHTS
 
 [Ix,Iy] = gradient(I) ;
 H11 = imsmooth(Ix.*Ix, si) ;
@@ -83,7 +85,7 @@ end
 %                                              Extract auxiliary info
 % -------------------------------------------------------------------
 
-if nargout > 1 || verbose
+if nargout > 1
   tr = H11 + H22 ;
   dt = H11.*H22 - H12.^2 ;
   Lm = 0.5 * (tr - sqrt(tr.^2 - 4*dt));

@@ -29,6 +29,8 @@ def m2ascii(mfile):
         ascii.append('%s\n' % line)
     if len(ascii) > 0:
         header = ascii[0].strip()
+        i=header.find(' ') ;        
+        header = header[i:].strip()
         ascii = ascii[1:]
     return (ascii, header)
 

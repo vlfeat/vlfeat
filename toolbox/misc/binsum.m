@@ -14,9 +14,13 @@
 %  H = BINSUM(H,X,...) where X is a scalar sums the same values to all
 %  elements.
 %
-%  Examples: BINSUM([0 0],  1, 2) = [0 1]
-%            BINSUM([1 7], -1, 1) = [0 7]
-%            BINSUM(EYE(3), [1 1 1], [1 2 3], 1) = 2*EYE(3)
+%  Example::
+%    The following relations illustrate BINSUM() behavior:
+%      BINSUM([0 0],  1, 2) = [0 1]
+%      BINSUM([1 7], -1, 1) = [0 7]
+%      BINSUM(EYE(3), [1 1 1], [1 2 3], 1) = 2*EYE(3)
+%
+%  See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

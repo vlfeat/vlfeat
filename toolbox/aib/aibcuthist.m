@@ -8,12 +8,15 @@ function hist = aibcuthist(map, x, varargin)
 %  Data are mapped to bins as specified by AIBCUTPUSH(). Data mapped
 %  to the null node are dropped.
 %
-%  Options:
-%    Nulls [drop]::
-%      What to do of null nodes: drop ('drop'), accumulate to an
-%      extra bin at the end of HIST ('append'), or accumulate to
-%      the first bin ('first')
-
+%  AIBCUTHIST() accepts the following options:
+%
+%  Nulls ['drop']::
+%    What to do of null nodes: drop ('drop'), accumulate to an
+%    extra bin at the end of HIST ('append'), or accumulate to
+%    the first bin ('first')
+%
+%  See also:: AIB(), HELP_VLFEAT().
+  
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
 % 

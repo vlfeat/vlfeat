@@ -1,14 +1,14 @@
 function [x1,x2]=witps(xp1,xp2,Y,Yp)
 % WITPS  Inverse thin-plate spline warping
-%   [X1,X2]=wtps(XP1,XP2,Y,Yp) computes the inverse thin-plate spline
+%   [X1,X2]=WITPS(XP1,XP2,Y,Yp) computes the inverse thin-plate spline
 %   (TPS) warp of the points XP1,XP2.
 %
-%   REMARK. The inverse of a thin-plate spline in general is NOT a
-%   thin-plate spline and some splines do not have an inverse.  This
-%   function uses Gauss-Newton to compute a set of points (X1,X2) such
-%   that [XP1,XP2]=WTPS(X1,X2,Y,Yp).
+%   Remark:: The inverse of a thin-plate spline in general is NOT a
+%     thin-plate spline and some splines do not have an inverse.  This
+%     function uses Gauss-Newton to compute a set of points (X1,X2)
+%     such that [XP1,XP2]=WTPS(X1,X2,Y,Yp).
 %
-%   See also HELP_VLFEAT(), WTPS()
+%   See also:: WTPS(), HELP_VLFEAT().
 
 % AUTORIGHTS
 

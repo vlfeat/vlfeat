@@ -6,7 +6,7 @@ function J = imdown(I,method)
 %   
 %   IMDOWN(I,'avg') downsamples by averaging groups of four pixels.
 %   
-%   See also HELP_VLFEAT(), IMUP().
+%   See also IMUP(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

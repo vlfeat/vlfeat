@@ -7,7 +7,7 @@ function J = imarray(A,varargin)
 %
 %   IMARRAY(...) display the image J rather than returning it.
 %
-%   The function accepts the following option-value pairs:
+%   IMARRAY() accepts the following options:
 %
 %   'Spacing' [0]::
 %     Orlates the images with a null border of the specified width.
@@ -22,10 +22,7 @@ function J = imarray(A,varargin)
 %   'CMap' [[]]::
 %     Specify a colormap for indexed images and movies.
 %
-%   IMARRAYSC(A, 'Spacing', spacing) is another way of specifying the
-%   spacing.
-%
-%   See also HELP_VLFEAT(), IMARRAYSC().
+%   See also IMARRAYSC(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

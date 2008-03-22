@@ -3,7 +3,7 @@ function h = ikmeanshist(K,asgn)
 %  H = IKMEANSHIST(K,ASGN) computes the histogram of the IKM clusters
 %  activated by cluster assignments ASGN.
 %
-%  See also IKMEANSPUSH().
+%  See also:: IKMEANS(), IKMEANSPUSH(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

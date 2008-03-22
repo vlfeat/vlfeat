@@ -8,13 +8,13 @@ function P = click(N,varargin) ;
 %  stop inserting points by pressing any key, in which case the
 %  partial list is returned.
 %
-%  CLICK(V,N,'Opt',val,...) accepts the following options:
+%  CLICK() accepts the following options:
 %
-%    'PlotMarker' [0]::
-%      Put a marker as points are selected. The markers are
-%      deleted on exiting the function.
+%  PlotMarker [0]::
+%    Put a marker as points are selected. The markers are deleted on
+%    exiting the function.
 %
-%  See also CLICKPOINT().
+%  See also:: CLICKPOINT(), HELP_VLEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

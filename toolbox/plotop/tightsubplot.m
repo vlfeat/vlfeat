@@ -10,7 +10,7 @@ function H = tightsubplot(varargin)
 %   H = TIGHTSUBPLOT(M,N,P) retursn an handle to the P-th axes in a
 %   regular subdivision with M rows and N columns.
 %
-%   The function accepts the following option-value pairs:
+%   TIGHTSUBPLOT() accepts the following options:
 %
 %   Margin       [0]::
 %   MarginLeft   [0]::
@@ -32,7 +32,7 @@ function H = tightsubplot(varargin)
 %   REMARK. While SUBPLOT kills any pre-existing axes that overalps a
 %   new one, this function does not.
 %
-%   See also SUBPLOT().
+%   See also:: SUBPLOT(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

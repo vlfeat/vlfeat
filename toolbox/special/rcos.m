@@ -1,6 +1,8 @@
 function y=rcos(r,x)
 % RCOS  rcos function
 %   Y=RCOS(R,X) computes the rcos function with roll-off R.
+%
+%   See also:: HELP_VLFEAT().
 
 x = abs(x) ;
 if(r > 0)

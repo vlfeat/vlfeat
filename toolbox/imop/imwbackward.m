@@ -2,21 +2,21 @@ function [wI,wIx,wIy] = imwbackward(varargin)
 % IMWBACKWARD  Image backward warping
 %   J = IMWBACKWARD(I, X, Y) returns the values of image I at
 %   locations X,Y. X and Y are real matrices of arbitrary but
-%   identical dimensions. I is bilinearly interpolated between
-%   samples and extended with NaNs to the whole real plane.
+%   identical dimensions. I is bilinearly interpolated between samples
+%   and extended with NaNs to the whole real plane.
 %
-%   [J,JX,XY] = IMWBACKWARD(...) returns the warped derivatives JX and
+%   [J,JX,JY] = IMWBACKWARD(...) returns the warped derivatives JX and
 %   JY too.
 %
-%   By default, IMWBACKWARD assumes that the image I uses the standard
-%   coordinate system (see WARP_OVERVIEW). IMWBACKWARD(XR,YR,I,X,Y)
-%   assumes instead that I is defined on a rectangular grid specified
-%   by the vectors XR and YR.
+%   By default, IMWBACKWARD() assumes that the image I uses the standard
+%   coordinate system. IMWBACKWARD(XR,YR,I,X,Y) assumes instead that I
+%   is defined on a rectangular grid specified by the vectors XR and
+%   YR.
 %
-%   IMWBACKWARD is less general than the MATLAB native function
-%   INTERP2, but significantly faster.
+%   IMWBACKWARD() is less general than the MATLAB native function
+%   INTERP2(), but it is significantly faster.
 %
-%   See also HELP_VLFEAT(), IMWFORWARD(), INTERP2().
+%   See also:: IMWFORWARD(), INTERP2(), HELP_VLFEAT().
 
 % AUTORIGHTS
 

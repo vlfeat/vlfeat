@@ -10,12 +10,14 @@ function h = hikmeanshist(tree,path)
 %  counting the root which carries no information). Nodes are stacked
 %  into a vector of bins in breadth frist order.
 %
-%  Example: H(1)   = # of paths such that PATH(1,:) = 1
-%           H(K)   = # of paths such that PATH(1,:) = K
-%           H(K+1) = # of paths such that PATH(1:2,:) = [1 ; 1]
-%           H(K+K) = # of paths such that PATH(1:2,:) = [1 ; K]
+%  Example::
+%    The folloing relations illustrate the structure of PATH:
+%      H(1)   = # of paths such that PATH(1,:) = 1
+%      H(K)   = # of paths such that PATH(1,:) = K
+%      H(K+1) = # of paths such that PATH(1:2,:) = [1 ; 1]
+%      H(K+K) = # of paths such that PATH(1:2,:) = [1 ; K]
 %
-%  See also HIKMEANSPUSH().
+%  See also:: HIKMEANS(), HIKMEANSPUSH(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

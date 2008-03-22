@@ -15,10 +15,12 @@ function [xp1,xp2]=wtps(phi,Yp)
 %   is then very quick, as the operation is just a linear combination
 %   of the basis.
 %
-%   Example:
-%     [xp1,xp2]=WTPS(TPS(x1,x2,Y),Yp).
+%   Example::
+%     To calculate the warped grid [X1,X2] by moving the control points Y to
+%     the control points YP use:
+%       [xp1,xp2]=WTPS(TPS(x1,x2,Y),Yp).
 %
-%   See also HELP_VLFEAT(), TPS()
+%   See also:: TPS(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

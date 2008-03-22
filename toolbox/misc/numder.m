@@ -6,7 +6,7 @@ function d = numder(func, x, varargin)
 %   D = NUMDER(FUNC, X, ARG1, ARG2, ...) allow to pass extra
 %   parameters to the function FUNC.
 %
-%   See also NUMDER2.
+%   See also:: NUMDER2(), HELP_VLFEAT().
 
 % TODO: uniform sacaling of axis is not a good idea
 

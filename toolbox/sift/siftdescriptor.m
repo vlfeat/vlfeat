@@ -4,8 +4,8 @@
 %  layer GRAD(1,:,:) contains the image gradient modulus and the
 %  second layer GRAD(2,:,:) the image gradient angle (w.r.t. the X
 %  axis, clockwise in the convention with the Y axis pointing
-%  downs). The matrix F contains one column per keypoint with the
-%  X, Y, SGIMA and ANLGE parameters.
+%  downs). The matrix F contains one column per keypoint with the X,
+%  Y, SGIMA and ANLGE parameters.
 %
 %  In order to simulate accurately the normal operations performed by
 %  SIFT, the gradient should be calculated on an image convolved by a
@@ -23,11 +23,11 @@
 %    grd      = single(grd) ;
 %    d        = siftdescriptor(grd, f) ;
 %
-%  REMARK. Notice that, in order to speed up the calculations, SIFT()
-%  samples finitely the scale space and downsample the image at each
-%  octave. Therefore the above procedure may not result in descriptor
-%  exactly equivalent.
+%  Remark:: In practice SIFT() samples finitely the scale space and
+%    downsamples the image at each octave. Therefore the above
+%    procedure may not result in descriptor identical to the one
+%    returned by SIFT().
 %
-%  See also HELP_VLFEAT(), SIFT().
+%  See also:: SIFT(), HELP_VLFEAT().
 
 % AUTORIGHTS

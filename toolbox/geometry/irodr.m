@@ -14,8 +14,4 @@
 %   for each column (or equivalently matrix with 9*K elements). In
 %   this case OM and DOM are arrays with K slices, one per rotation.
 %
-%   COMPATIBILITY. Some code uses the RODRIGUES() function. This
-%   function is very similar, except for the format of the derivative,
-%   which differs by a permutation of the elements.
-%
-%   See also RODR().
+%   See also:: RODR(), HELP_VLFEAT().

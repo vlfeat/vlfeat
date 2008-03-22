@@ -8,13 +8,13 @@ function J = imarraysc(A, varargin)
 %
 %   IMARRAYSC() works only with indexed (or gray-scale) images.
 %
-%   In addition to the option-value paris accepted by IMARRAY(),
-%   the function accepts also:
+%   IMARRAYSC() accepts the options of IMARRAY() and:
 %
 %   CLim [[]]:: 
-%     If not empty, use the specified intensity range.
+%     Specify the intensity range. If empty, the range is
+%     calcualted automatically.
 %
-%   See also HELP_VLFEAT(), IMARRAY().
+%   See also:: IMARRAY(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

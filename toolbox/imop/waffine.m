@@ -7,7 +7,7 @@ function varargout = waffine(A,T,varargin)
 %  transformations to points (X1,X2,...). Arrays X1,X2,... contain one
 %  of the coordinates of the points each.
 %
-%  See also HELP_VLFEAT().
+%  See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

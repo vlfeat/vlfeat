@@ -7,7 +7,7 @@ function J=xyz2luv(I,il)
 %   illuminant are supported: A, B, C, E, D50, D55, D65, D75, D93.  IL
 %   is the name of the illuminant.
 %
-%   See also HELP_VLFEAT(), XYZ2LAB().
+%   See also:: XYZ2LAB(), HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

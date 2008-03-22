@@ -11,59 +11,59 @@ function [tp,tn,info] = roc(y, score)
 %  [TP,TN,INFO] = ROC(...) returns the following additional
 %  informations:
 %
-%  INFO.EER       Equal error rate.
-%  INFO.AUC       Area under the ROC (AUC).
-%  INFO.UR        Uniform prior best op point rate.
-%  INFO.UT        Uniform prior best op point threhsold. 
-%  INFO.NR        Natural prior best op point rate.
-%  INFO.NT        Natural prior best op point threshold.
+%  INFO.EER::       Equal error rate.
+%  INFO.AUC::       Area under the ROC (AUC).
+%  INFO.UR::        Uniform prior best op point rate.
+%  INFO.UT::        Uniform prior best op point threhsold. 
+%  INFO.NR::        Natural prior best op point rate.
+%  INFO.NT::        Natural prior best op point threshold.
 %
 %  ROC(...) plots the ROC diagram in the current axis.
 %
-%  READING THE ROC CURVE
+%  Reading the ROC curve::
+%    Define a classifier by predicting as positve the data Y whose SCORE
+%    is greater than a threshold T. The ROC curve represent the
+%    performance of such classifier as the threshold T is
+%    varied. Define:
 %
-%  Define a classifier by predicting as positve the data Y whose SCORE
-%  is greater than a threshold T. The ROC curve represent the
-%  performance of such classifier as the threshold T is
-%  varied. Define:
+%      Np,       Nn      = num of pos/neg labels,
+%      Np_t(t),  Nn_t(t) = num of pos/neg labels with true prediction,
+%      Np_f(t),  Nn_f(t) = num of pos/neg labels with false prediction.
 %
-%    Np,       Nn      = num of pos/neg labels,
-%    Np_t(t),  Nn_t(t) = num of pos/neg labels with true prediction,
-%    Np_f(t),  Nn_f(t) = num of pos/neg labels with false prediction.
+%    The performances of the classifier for the threshold t are given by
+%    the numbers:
 %
-%  The performances of the classifier for the threshold t are given by
-%  the numbers:
+%     TP(t) = Np_t(t) / Np = P(ok|pos) = true positive rate
+%     TN(t) = Nn_t(t) / Nn = P(ok|neg) = true negative rate
+%     FP(t) = Nn_f(t) / Nn = P(e|neg)  = false positive rate
+%     FN(t) = Np_f(t) / Np = P(e|pos)  = false negative rate
 %
-%    TP(t) = Np_t(t) / Np = P(ok|pos) = true positive rate
-%    TN(t) = Nn_t(t) / Nn = P(ok|neg) = true negative rate
-%    FP(t) = Nn_f(t) / Nn = P(e|neg)  = false positive rate
-%    FN(t) = Np_f(t) / Np = P(e|pos)  = false negative rate
-%
-%  (Notice that TN = 1 - FP and TP = 1 - FN so only two numbers are
-%  needed.) The ROC curve is the parametric curve (TP(t),TN(t)). The
-%  ROC curve corresponding to a random score is the line connecting
-%  (1,0) and (0,1).
+%    (Notice that TN = 1 - FP and TP = 1 - FN so only two numbers are
+%    needed.) The ROC curve is the parametric curve (TP(t),TN(t)). The
+%    ROC curve corresponding to a random score is the line connecting
+%    (1,0) and (0,1).
 % 
-%  The ROC curve, differently from e.g. the empirical error, does NOT
-%  depend on the label prior distribution. In fact, the empirical risk
-%  is obtained as
+%    The ROC curve, differently from e.g. the empirical error, does NOT
+%    depend on the label prior distribution. In fact, the empirical risk
+%    is obtained as
 %
-%    Remp(t) = FP(t) P(neg) + FN(t) P(pos)
+%      Remp(t) = FP(t) P(neg) + FN(t) P(pos)
 %
-%  which requires specifying P(neg) and P(pos).
+%    which requires specifying P(neg) and P(pos).
 %
-%  An operating point is a point on the ROC curve, corresponding to a
-%  certain threshold. An operating point minimizes the empirical error
-%  for a certain choice of the labels prior.  In particular, we
-%  consider:
+%    An operating point is a point on the ROC curve, corresponding to a
+%    certain threshold. An operating point minimizes the empirical error
+%    for a certain choice of the labels prior.  In particular, we
+%    consider:
 %
-%  1) NATURAL OPERATING POINT. We assume P(neg) = Nn / N and P(pos) =
-%     Np / N as represented by Y.
-%  
-%  2) UNIFORM OPERATING POINT. We assume P(neg) = P(pos) = 1/2.
+%    Natural operating point:: We assume P(neg) = Nn / N and P(pos) =
+%      Np / N as represented by
+%    Uniform operating point:: We assume P(neg) = P(pos) = 1/2.
 %
-%  So, forinstance, INFO.UT gives optimal threshold to use in the case
-%  of uniform labels prior.
+%    So, forinstance, INFO.UT gives optimal threshold to use in the
+%    case of uniform labels prior.
+%
+%  See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

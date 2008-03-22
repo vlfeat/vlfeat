@@ -9,6 +9,8 @@ function config = override(config,update,warn)
 %   is used to update only a specific subset of it.
 %
 %   OVERRIDE(...,1) will print a warning message whenever 
+%
+%   See also:: HELP_VLFEAT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

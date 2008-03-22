@@ -9,29 +9,29 @@
 %
 %    D(i,j) = sum (X(:,i) - X(:,j)).^2
 %
-%  ALLDIST2(...,'METRIC') changes the computed distance. Supported values
-%  for METRIC are
+%  ALLDIST2(...,'METRIC') changes the computed distance. Supported
+%  values for METRIC are
 %
-%  METRIC  D(i,j)
-%  --------------------------------------------------------
-%   LINF   max |X  - Y|
-%   L2     sum (X  - Y).^2
-%   L1     sum |X  - Y|
-%   L0     sum (X ~= Y)
-%   CHI2   sum (X  - Y).^2 ./ (X + Y)
-%   HELL   sum (X^.5 + Y^.5) .^ 2
+%   METRIC  D(i,j)
+%   --------------------------------------------------------
+%    LINF   max |X  - Y|
+%    L2     sum (X  - Y).^2
+%    L1     sum |X  - Y|
+%    L0     sum (X ~= Y)
+%    CHI2   sum (X  - Y).^2 ./ (X + Y)
+%    HELL   sum (X^.5 + Y^.5) .^ 2
 %
 %  (Notice that the standard definition of chi2 is half of what is
 %  computed here).
 %
 %  ALLDIST2(...,'KERNEL') computes the following 'kernels' K:
 %
-%  KERNEL  K(i,j)
-%  ---------------------------------------------------------
-%   KL2    sum X .* Y
-%   KL1    sum min (X, Y)
-%   KCHI2  2 * sum (X .* Y) ./ (X + Y)
-%   KHELL  (X .* Y) .^ 0.5
+%   KERNEL  K(i,j)
+%   ---------------------------------------------------------
+%    KL2    sum X .* Y
+%    KL1    sum min (X, Y)
+%    KCHI2  2 * sum (X .* Y) ./ (X + Y)
+%    KHELL  (X .* Y) .^ 0.5
 %
 %  The constant are chosen so that D(i,j) = K(i,i) + K(j,j) - 2 K(i,j)
 %  where D is the metric corresponding to the kenrel (if the arguments
@@ -44,19 +44,23 @@
 %  same storage class. The sotrage class of D is promoted to reduce
 %  the chance of overvlow, but this is not checked.
 %
-%   X & Y class      D class  
-%  ---------------------------
-%   UINT8            UINT32   
-%    INT8             INT32   
-%   UINT16           UINT32   
-%    INT16            INT32   
-%   UINT32           UINT32   
-%    INT32            INT32   
-%   SINGLE           SINGLE   
-%   DOUBLE           DOUBLE   
+%    X & Y class      D class  
+%   ---------------------------
+%    UINT8            UINT32   
+%     INT8             INT32   
+%    UINT16           UINT32   
+%     INT16            INT32   
+%    UINT32           UINT32   
+%     INT32            INT32   
+%    SINGLE           SINGLE   
+%    DOUBLE           DOUBLE   
 %
-%  Warning: Both chi2 and kchi2 use integer math when presented with integer
-%  data types. This can easily result in zeros where you did not expect them.
+%  Warning: Both chi2 and kchi2 use integer math when presented with
+%  integer data types. This can easily result in zeros where you did
+%  not expect them.
+%
+%  See also:: HELP_VLFEAT().
+
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -4,6 +4,8 @@ function f = ertr(f) ;
 %  conversion is required as the MSER algorithm considers the column
 %  index I as the frist image index, while according standard image
 %  convention the first coordinate is the abscissa X.
+%
+%  See also HELP_VLFEAT(), MSER().
 
 if size(f,1) ~= 5
   error('F is not in the right format') ;

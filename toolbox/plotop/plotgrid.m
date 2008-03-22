@@ -4,6 +4,8 @@ function h=plotgrid(x,y,varargin)
 %  matrices, with one entry per vertex.
 %
 %  H=PLOTGRID(...) returns the handle to the grid object.
+%
+%  See also:: HELP_VLFEAT().
 
 washold = ishold ;
 
