@@ -495,13 +495,12 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------
     def towiki(docdir, pagename):
         pagenamewiki = pagename + '.wiki'
-   #     runcmd("cd %s ; mvs update %s" % (docdir, pagenamewiki))
+        runcmd("cd %s ; mvs update %s" % (docdir, pagenamewiki))
         if verb:
             print "mdoc: converting", pagename, "to", pagenamewiki
         wikidoc(os.path.join(docdir, pagenamewiki), 
                 os.path.join(docdir, pagename))
-  #      runcmd("cd %s ; mvs commit -M -m 'Documentation update' %s" 
-  #               % (docdir, pagenamewiki))
+        runcmd("cd %s ; mvs commit -M -m 'Documentation update' %s" % (docdir, pagenamewiki))
  
     if wikiformat:
         try:
