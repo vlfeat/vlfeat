@@ -2,7 +2,7 @@ function [cut, map, short] = aibcut(parents, n)
 % AIBCUT  Cut AIB tree
 %  CUT = AIBCUT(PARENTS, N) cuts the binary merge tree PARENTS and
 %  returns a cut CUT of N nodes. The format of PARENTS is the same
-%  used by% the AIB() function.
+%  used by the AIB() function.
 %
 %  A cut is a set of N nodes such that no node is a descendant of any
 %  other node in the CUT and such that any leaf descend from a node in
