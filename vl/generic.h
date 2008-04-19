@@ -120,6 +120,9 @@ typedef int                 vl_bool ;    /**< boolean */
 /** @brief Logarithm of 2 */
 #define VL_LOG_OF_2 0.693147180559945
 
+/** @brief Pi */
+#define VL_PI 3.141592653589793
+
 /* 
    For the code below: An ANSI C compiler takes the two expressions,
    LONG_VAR and CHAR_VAR, and implicitly casts them to the type of the

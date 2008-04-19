@@ -13,7 +13,7 @@ General Public License version 2.
 #ifndef VL_RANDOM_H
 #define VL_RANDOM_H
 
-#include <vl/generic.h>
+#include "generic.h"
 
 /** @name Setting and reading the state
  **

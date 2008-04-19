@@ -11,7 +11,6 @@ from m2ascii import convertfile
 from formatter import Formatter
 from optparse import OptionParser
 
-
 parser = OptionParser()
 
 parser.add_option(
