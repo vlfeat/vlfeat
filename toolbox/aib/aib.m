@@ -1,11 +1,11 @@
 % AIB  Agglomerative Information Bottleneck
 %   PARENTS = AIB(PCX) runs Agglomerative Information Bottleneck (AIB)
-%   on the class-feature co-occurence matrix PCX and returns a vector
+%   on the class-feature co-occurrence matrix PCX and returns a vector
 %   PARENTS representing the sequence of compressed AIB alphabets.
 %
 %   PCX is the joint probability of the occurrence of the class label
 %   C and the feature value X. PCX has one row for each class label
-%   and one colum for each feature value, non negative entires and
+%   and one column for each feature value, non negative entires and
 %   sums to one.  AIB iteratively merges the pair of feature values
 %   that decreases the least the mutual information I(X,C). This
 %   compresses the alphabet of the discrete random variable X in such
@@ -18,19 +18,18 @@
 %   The vector PARENTS represents the merge tree. The tree nodes are
 %   numbered in breadth-first order, starting from the leaves. The
 %   numbers associated to the tree leaves correspond to the original
-%   feature values (so the first leaf hans number one and correspond
+%   feature values (so the first leaf has number one and correspond
 %   to the first feature value).  In total there are 2*M-1 nodes,
 %   where M is the number of feature values (the number of columns of
 %   PCX). The internal nodes are numbered according to the order in
 %   which AIB generated them. It is therefore possible to recover from
-%   the tree the state of the AIB algorithm at each step (see AIBCUT()
-%   and AIBFINDCUT()).  PARENTS is a UINT32 array with one element for
-%   each tree node storing the index of the parent node. The root
-%   parent is conventionally set to 1.
+%   the tree the state of the AIB algorithm at each step (see AIBCUT())
+%   PARENTS is a UINT32 array with one element for each tree node storing the
+%   index of the parent node. The root parent is conventionally set to 1.
 %
 %   Feature values with null probability (null columns of the PCX
 %   matrix) are ignored by the AIB algorithm and the corresponding
-%   entries in the PARENTS vectors are set to zer.  Notice that this
+%   entries in the PARENTS vectors are set to zero.  Notice that this
 %   causes the root of the tree to have index smaller of 2*M-1
 %   (PARENTS has still 2*M-1 entries, but the last portion is
 %   zero-padded).
@@ -41,8 +40,8 @@
 %   small probability, uniform across categories.
 %
 %   [PARENTS, COST] = AIB(...) returns the values COST of the cost %
-%   function being optimizied by AIB (i.e. the mutual information
-%   I(X,C)). COST has M column. The first column is the inital value
+%   function being optimized by AIB (i.e. the mutual information
+%   I(X,C)). COST has M column. The first column is the initial value
 %   of the cost function. The others correspond to the cost after each
 %   of the M-1 merges. If less than M-1 merges are performed, the rest
 %   of the vector is filled with NaNs.

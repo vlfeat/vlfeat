@@ -222,6 +222,8 @@ class Formatter:
 
                 # set head
                 last = i.start()+len(i.group(1))-1
+            #else:
+            #    print "function: %s not found" % func_name
 
         xs.append(self.toTextNode(s[last+1:]))
         for x in xs:

@@ -1,15 +1,15 @@
 function [Fx,Fy] = grad(F,varargin) ;
 % GRAD  Gradient
-%   [Fx,Fy] = GRAD(F) returns the finite differencies gradient of the
-%   function F. The function uses central differencies and for all
+%   [Fx,Fy] = GRAD(F) returns the finite differences gradient of the
+%   function F. The function uses central differences and for all
 %   but the boundaries pixels, for which it uses forward/backward
-%   differencies as appropriate.
+%   differences as appropriate.
 %
-%   GRAD(F,'forward') uses only forward differencies (except on the
+%   GRAD(F,'forward') uses only forward differences (except on the
 %   lower and right boundaries, where backward difference is used).
-%   Similarly, GRAD(F,'backward') uses only backward differencies.
+%   Similarly, GRAD(F,'backward') uses only backward differences.
 %  
-%   See also:: GRADIENT(), VLFEAT_HELP().
+%   See also:: GRADIENT(), HELP_VLFEAT().
 
 % AUTORIGHTS
 

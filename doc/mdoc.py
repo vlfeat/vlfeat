@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# file:        mdocall.py
-# author:      Brian Fulkerson and Andea Vedaldi
+# file:        mdoc.py
+# author:      Brian Fulkerson and Andrea Vedaldi
 # description: MDoc main
 
 import sys, os, re
@@ -11,7 +11,12 @@ from m2ascii import convertfile
 from formatter import Formatter
 from optparse import OptionParser
 
-parser = OptionParser()
+usage = """usage: %prog [options] <basedir> <docdir>
+
+Takes all .m files in basedir and its subdirectories and converts
+them to html documentation, placing the results in docdir."""
+
+parser = OptionParser(usage=usage)
 
 parser.add_option(
     "-w", "--wiki", 
@@ -46,17 +51,6 @@ htmlHead = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://w
 </head>
 <body>
 """ 
-
-# --------------------------------------------------------------------
-def usage():
-# --------------------------------------------------------------------
-    """
-    usage() prints usage informations.
-    """
-    print "Usage:", sys.argv[0], "<basedir> <docdir>"
-    print ""
-    print "Takes all .m files in basedir and its subdirectories and converts"
-    print "them to html documentation, placing the results in docdir."
 
 # --------------------------------------------------------------------
 def runcmd(cmd):
@@ -380,7 +374,7 @@ if __name__ == '__main__':
     wikiformat = options.wikiformat
 
     if len(args) != 2:
-        usage()
+        parser.print_help()
         sys.exit(2)
     
     basedir = args[0]
@@ -391,7 +385,7 @@ if __name__ == '__main__':
     if verb:
         print "mdoc: search path: %s" % basedir
         print "mdoc: output path: %s" % docdir
-        print "mdoc: wiki foramt: %d" % wikiformat 
+        print "mdoc: wiki format: %d" % wikiformat 
 
     #
     # Search for mfiles
@@ -500,13 +494,12 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------
     def towiki(docdir, pagename):
         pagenamewiki = pagename + '.wiki'
-   #     runcmd("cd %s ; mvs update %s" % (docdir, pagenamewiki))
+        runcmd("cd %s ; mvs update %s" % (docdir, pagenamewiki))
         if verb:
             print "mdoc: converting", pagename, "to", pagenamewiki
         wikidoc(os.path.join(docdir, pagenamewiki), 
                 os.path.join(docdir, pagename))
-  #      runcmd("cd %s ; mvs commit -M -m 'Documentation update' %s" 
-  #               % (docdir, pagenamewiki))
+        runcmd("cd %s ; mvs commit -M -m 'Documentation update' %s" % (docdir, pagenamewiki))
  
     if wikiformat:
         try:
