@@ -6,8 +6,44 @@
 	objectVersion = 44;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2D36D6320DE337C700F6EFD5 /* mexversion.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D36D6310DE337C700F6EFD5 /* mexversion.c */; };
+		2D36D6340DE3380800F6EFD5 /* dft.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DBB83250DD2F90700D546E5 /* dft.c */; };
+		2D36D63D0DE3389800F6EFD5 /* libvlfeat-xcode-dll.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */; };
+		2DD3026A0DE32FEB009443C7 /* aib.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E7E0CF8C2E40099B03C /* aib.c */; };
+		2DD3026B0DE32FEB009443C7 /* generic.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E800CF8C2E40099B03C /* generic.c */; };
+		2DD3026C0DE32FEB009443C7 /* getopt_long.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E820CF8C2E40099B03C /* getopt_long.c */; };
+		2DD3026D0DE32FEB009443C7 /* hikmeans.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E840CF8C2E40099B03C /* hikmeans.c */; };
+		2DD3026E0DE32FEB009443C7 /* ikmeans.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E860CF8C2E40099B03C /* ikmeans.c */; };
+		2DD3026F0DE32FEB009443C7 /* imop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E8B0CF8C2E40099B03C /* imop.c */; };
+		2DD302700DE32FEB009443C7 /* mathop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E8E0CF8C2E40099B03C /* mathop.c */; };
+		2DD302710DE32FEB009443C7 /* mser.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E900CF8C2E40099B03C /* mser.c */; };
+		2DD302720DE32FEB009443C7 /* pgm.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E920CF8C2E40099B03C /* pgm.c */; };
+		2DD302730DE32FEB009443C7 /* rodrigues.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E940CF8C2E40099B03C /* rodrigues.c */; };
+		2DD302740DE32FEB009443C7 /* sift.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E960CF8C2E40099B03C /* sift.c */; };
+		2DD302750DE32FEB009443C7 /* stringop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E980CF8C2E40099B03C /* stringop.c */; };
+		2DD302760DE32FEB009443C7 /* dft.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DBB82F00DD241EB00D546E5 /* dft.c */; };
+		2DD3027A0DE33107009443C7 /* random.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DD302780DE33107009443C7 /* random.c */; };
+		2DD3027B0DE33107009443C7 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD302790DE33107009443C7 /* random.h */; };
+		2DD302880DE3318A009443C7 /* sift.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732DEA0CF8C2E40099B03C /* sift.c */; };
+		2DD3028A0DE331AF009443C7 /* libvlfeat-xcode-dll.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2D36D6390DE3388800F6EFD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */;
+			remoteInfo = "vlfeat-xcode-dll";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		2D36D6250DE3368F00F6EFD5 /* dft-mex.mexmaci */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "dft-mex.mexmaci"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/Matlab7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
+		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
+		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2D732DE50CF8C2E40099B03C /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aib.c; sourceTree = "<group>"; };
 		2D732DE60CF8C2E40099B03C /* generic-driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "generic-driver.h"; sourceTree = "<group>"; };
 		2D732DE80CF8C2E40099B03C /* mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mser.c; sourceTree = "<group>"; };
@@ -65,18 +101,53 @@
 		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
 		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
 		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
+		2DBB82EF0DD241EB00D546E5 /* dft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dft.h; sourceTree = "<group>"; };
+		2DBB82F00DD241EB00D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dft.c; sourceTree = "<group>"; };
+		2DBB83250DD2F90700D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dft.c; path = toolbox/sift/dft.c; sourceTree = "<group>"; };
 		2DCC82710D4581840017C716 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doxygen.conf; path = doc/doxygen.conf; sourceTree = "<group>"; };
+		2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libvlfeat-xcode-dll.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
+		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
+		2DD302800DE33154009443C7 /* sift-bin */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "sift-bin"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2D36D6230DE3368F00F6EFD5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D36D63D0DE3389800F6EFD5 /* libvlfeat-xcode-dll.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DD302630DE32F6E009443C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DD3027E0DE33154009443C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD3028A0DE331AF009443C7 /* libvlfeat-xcode-dll.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
+				2D36D6310DE337C700F6EFD5 /* mexversion.c */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
 				2DCC82710D4581840017C716 /* doxygen.conf */,
+				2DD302660DE32F6E009443C7 /* Products */,
 			);
 			name = vlfeat;
 			sourceTree = "<group>";
@@ -98,6 +169,8 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
+				2DD302780DE33107009443C7 /* random.c */,
+				2DD302790DE33107009443C7 /* random.h */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
 				2D732E7F0CF8C2E40099B03C /* aib.h */,
 				2D732E800CF8C2E40099B03C /* generic.c */,
@@ -126,6 +199,8 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
+				2DBB82EF0DD241EB00D546E5 /* dft.h */,
+				2DBB82F00DD241EB00D546E5 /* dft.c */,
 			);
 			path = vl;
 			sourceTree = "<group>";
@@ -133,6 +208,7 @@
 		2D732EAF0CF8C3950099B03C /* toolbox */ = {
 			isa = PBXGroup;
 			children = (
+				2D70CC780DDE1135000A23DE /* mexutils.h */,
 				2DAB13D30D454A81009BEE66 /* aib.c */,
 				2DAB13D40D454A81009BEE66 /* aibhist.c */,
 				2DAB13D50D454A81009BEE66 /* alldist2.c */,
@@ -155,11 +231,40 @@
 				2DAB13E60D454A81009BEE66 /* tpsumx.c */,
 				2DAB13E70D454A81009BEE66 /* ubcmatch.c */,
 				2DAB13E80D454A81009BEE66 /* whistc.c */,
+				2DBB83250DD2F90700D546E5 /* dft.c */,
 			);
 			name = toolbox;
 			sourceTree = "<group>";
 		};
+		2DD302660DE32F6E009443C7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */,
+				2D36D6250DE3368F00F6EFD5 /* dft-mex.mexmaci */,
+				2DD302800DE33154009443C7 /* sift-bin */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		2D36D6210DE3368F00F6EFD5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DD302610DE32F6E009443C7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD3027B0DE33107009443C7 /* random.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
 		2D732DBE0CF8BFFD0099B03C /* vlfeat-all */ = {
@@ -183,6 +288,7 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
 			dependencies = (
 			);
 			name = "vlfeat-dox";
@@ -191,6 +297,60 @@
 		};
 /* End PBXLegacyTarget section */
 
+/* Begin PBXNativeTarget section */
+		2D36D6240DE3368F00F6EFD5 /* dft-mex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2D36D6280DE336AD00F6EFD5 /* Build configuration list for PBXNativeTarget "dft-mex" */;
+			buildPhases = (
+				2D36D6210DE3368F00F6EFD5 /* Headers */,
+				2D36D6220DE3368F00F6EFD5 /* Sources */,
+				2D36D6230DE3368F00F6EFD5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2D36D63A0DE3388800F6EFD5 /* PBXTargetDependency */,
+			);
+			name = "dft-mex";
+			productName = "dft-mex";
+			productReference = 2D36D6250DE3368F00F6EFD5 /* dft-mex.mexmaci */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DD302690DE32F6F009443C7 /* Build configuration list for PBXNativeTarget "vlfeat-xcode-dll" */;
+			buildPhases = (
+				2DD302610DE32F6E009443C7 /* Headers */,
+				2DD302620DE32F6E009443C7 /* Sources */,
+				2DD302630DE32F6E009443C7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "vlfeat-xcode-dll";
+			productName = "vlfeat-xcode-dll";
+			productReference = 2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		2DD3027F0DE33154009443C7 /* sift-bin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DD302870DE3317B009443C7 /* Build configuration list for PBXNativeTarget "sift-bin" */;
+			buildPhases = (
+				2DD3027D0DE33154009443C7 /* Sources */,
+				2DD3027E0DE33154009443C7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "sift-bin";
+			productName = "sift-bin";
+			productReference = 2DD302800DE33154009443C7 /* sift-bin */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
@@ -198,14 +358,67 @@
 			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* vlfeat */;
+			productRefGroup = 2DD302660DE32F6E009443C7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				2D732DBE0CF8BFFD0099B03C /* vlfeat-all */,
 				2DAB13050D4533BF009BEE66 /* vlfeat-dox */,
+				2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */,
+				2DD3027F0DE33154009443C7 /* sift-bin */,
+				2D36D6240DE3368F00F6EFD5 /* dft-mex */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2D36D6220DE3368F00F6EFD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D36D6320DE337C700F6EFD5 /* mexversion.c in Sources */,
+				2D36D6340DE3380800F6EFD5 /* dft.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DD302620DE32F6E009443C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD3026A0DE32FEB009443C7 /* aib.c in Sources */,
+				2DD3026B0DE32FEB009443C7 /* generic.c in Sources */,
+				2DD3026C0DE32FEB009443C7 /* getopt_long.c in Sources */,
+				2DD3026D0DE32FEB009443C7 /* hikmeans.c in Sources */,
+				2DD3026E0DE32FEB009443C7 /* ikmeans.c in Sources */,
+				2DD3026F0DE32FEB009443C7 /* imop.c in Sources */,
+				2DD302700DE32FEB009443C7 /* mathop.c in Sources */,
+				2DD302710DE32FEB009443C7 /* mser.c in Sources */,
+				2DD302720DE32FEB009443C7 /* pgm.c in Sources */,
+				2DD302730DE32FEB009443C7 /* rodrigues.c in Sources */,
+				2DD302740DE32FEB009443C7 /* sift.c in Sources */,
+				2DD302750DE32FEB009443C7 /* stringop.c in Sources */,
+				2DD302760DE32FEB009443C7 /* dft.c in Sources */,
+				2DD3027A0DE33107009443C7 /* random.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DD3027D0DE33154009443C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD302880DE3318A009443C7 /* sift.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2D36D63A0DE3388800F6EFD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */;
+			targetProxy = 2D36D6390DE3388800F6EFD5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1DEB919408733D9F0010E9CD /* Debug */ = {
@@ -213,6 +426,7 @@
 			buildSettings = {
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MATLABROOT = /Applications/Matlab7;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
@@ -227,8 +441,59 @@
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MATLABROOT = /Applications/Matlab7;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Release;
+		};
+		2D36D6260DE3368F00F6EFD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = mexmaci;
+				EXECUTABLE_PREFIX = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-undefined",
+					suppress,
+					"-flat_namespace",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "dft-mex";
+				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR $MATLABROOT/extern/include";
+			};
+			name = Debug;
+		};
+		2D36D6270DE3368F00F6EFD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_EXTENSION = mexmaci;
+				EXECUTABLE_PREFIX = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-undefined",
+					suppress,
+					"-flat_namespace",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "dft-mex";
+				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR $MATLABROOT/extern/include";
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -238,6 +503,8 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				MATLAB = /Applications/Matlab7;
+				MEX = /Applications/Matlab7/bin/mex;
 				PRODUCT_NAME = "vlfeat-all";
 			};
 			name = Debug;
@@ -245,6 +512,7 @@
 		2D732DC00CF8BFFD0099B03C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MATLAB = /Applications/Matlab7;
 				MEX = /Applications/Matlab7/bin/mex;
 				PRODUCT_NAME = "vlfeat-all";
 			};
@@ -263,7 +531,88 @@
 		2DAB13070D4533BF009BEE66 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				PRODUCT_NAME = "vlfeat-dox";
+			};
+			name = Release;
+		};
+		2DD302670DE32F6F009443C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = "vlfeat-xcode-dll";
+			};
+			name = Debug;
+		};
+		2DD302680DE32F6F009443C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = "vlfeat-xcode-dll";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		2DD302820DE33155009443C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/bin/Release\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "sift-bin";
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR;
+			};
+			name = Debug;
+		};
+		2DD302830DE33155009443C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/bin/Release\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "sift-bin";
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR;
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -275,6 +624,15 @@
 			buildConfigurations = (
 				1DEB919408733D9F0010E9CD /* Debug */,
 				1DEB919508733D9F0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2D36D6280DE336AD00F6EFD5 /* Build configuration list for PBXNativeTarget "dft-mex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D36D6260DE3368F00F6EFD5 /* Debug */,
+				2D36D6270DE3368F00F6EFD5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -293,6 +651,24 @@
 			buildConfigurations = (
 				2DAB13060D4533BF009BEE66 /* Debug */,
 				2DAB13070D4533BF009BEE66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DD302690DE32F6F009443C7 /* Build configuration list for PBXNativeTarget "vlfeat-xcode-dll" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DD302670DE32F6F009443C7 /* Debug */,
+				2DD302680DE32F6F009443C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DD302870DE3317B009443C7 /* Build configuration list for PBXNativeTarget "sift-bin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DD302820DE33155009443C7 /* Debug */,
+				2DD302830DE33155009443C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

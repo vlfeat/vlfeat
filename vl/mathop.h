@@ -15,24 +15,6 @@ General Public License version 2.
 
 #include "generic.h"
 
-/** @brief Pi (math constant) */
-#define VL_PI 3.141592653589793
-
-/** @brief Single precision epsilon (math constant) 
- **
- **  Difference of the smallest representable number greater
- ** than 1.0 and 1.0.
- **
- **/
-#define VL_SINGLE_EPSILON 1.19209290E-07F
-
-/** @brief Double precision epsilon (math constant) 
- **
- ** Difference of the smallest representable number greater
- ** than 1.0 and 1.0.
- **/
-#define VL_DOUBLE_EPSILON 2.220446049250313e-16
-
 /** --------------------------------------------------------------- */
 /** @{ */
 /** @brief Modulo 2 PI
@@ -108,6 +90,28 @@ vl_abs_d (vl_double x)
 /** ---------------------------------------------------------------- */
 /** @{ */
 /** @brief Fast @c atan2 approximation
+ **
+ ** @section Algorithm
+ **
+ ** We approximate the function f(r)=atan((1-r)/(1+r)) for r in [-1,1]
+ ** by fitting a third order polynomial f(r)=c0 + c1 r + c2 r^2 + + c3 r^3.
+ ** We impose the constaints
+ ** 
+ ** <pre>
+ ** f(+1) = c0 + c1 + c2 + c3 = atan(0) = 0
+ ** f(-1) = c0 - c1 + c2 - c3 = atan(inf) = pi/2
+ ** f(0)  = c0                = atan(1) = pi/4
+ ** </pre>
+ **
+ ** We still miss a constraint, which we obtain by  minimizing the Linf 
+ ** approximation error. This yields
+ **
+ ** <pre>
+ ** c0=pi/4, c1=-0.9675, c2=0, c3=0.1821
+ ** </pre>
+ **
+ ** which has maxerr = 0.0061 rad = 0.35 grad.
+ **
  ** @param x argument.
  ** @param y argument.
  ** @return Approximation of @c atan2(x).
@@ -118,25 +122,7 @@ vl_single
 vl_fast_atan2_f (vl_single y, vl_single x)
 {
   /*
-    The function f(r)=atan((1-r)/(1+r)) for r in [-1,1] is easier to
-    approximate than atan(z) for z in [0,inf]. To approximate f(r) to
-    the third degree we may solve the system
-    
-    f(+1) = c0 + c1 + c2 + c3 = atan(0) = 0
-    f(-1) = c0 - c1 + c2 - c3 = atan(inf) = pi/2
-    f(0)  = c0                = atan(1) = pi/4
-    
-    which constrains the polynomial to go through the end points and
-    the middle point.
-    
-    We still miss a constrain, which might be simply a constarint on
-    the derivative in 0. Instead we minimize the Linf error in the
-    range [0,1] by searching for an optimal value of the free
-    parameter. This turns out to correspond to the solution
-    
-    c0=pi/4, c1=-0.9675, c2=0, c3=0.1821
-    
-    which has maxerr = 0.0061 rad = 0.35 grad.
+   
   */
 
   vl_single angle, r ;
@@ -241,6 +227,7 @@ vl_fast_resqrt_d (vl_double x)
  ** @param x argument.
  ** @return Approximation to @c sqrt(x).
  **/
+
 VL_INLINE
 vl_single
 vl_fast_sqrt_f (vl_single x)
@@ -254,7 +241,6 @@ vl_fast_sqrt_d (vl_double x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_d (x) ;
 }
-
 
 VL_INLINE
 vl_uint32

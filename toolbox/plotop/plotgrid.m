@@ -25,7 +25,13 @@ yv = [y ; nan*ones(1,N) ] ;
 xv = xv(:) ;
 yv = yv(:) ;
 
-h = line([xh' xv'], [yh' yv'],varargin{:}) ;
+lineprop = {} ;
+if length(varargin) > 0 
+  lineprop = linespec2prop(varargin{1}) ;
+  lineprop = {lineprop{:}, varargin{2:end}} ;
+end
+
+h = line([xh' xv'], [yh' yv'],lineprop{:}) ;
 
 if ~washold
   hold off ;

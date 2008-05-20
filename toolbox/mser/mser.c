@@ -208,7 +208,7 @@ mexFunction(int nout, mxArray *out[],
 
 #define REMAIN(test,num)                                                \
       mexPrintf("mser:  %5d (%7.3g %% of previous) " test "\n",         \
-                tot-(num),100.0*(double)(tot-(num))/(tot+VL_DOUBLE_EPSILON)) ; \
+                tot-(num),100.0*(double)(tot-(num))/(tot+VL_EPSILON_D)) ; \
       tot -= (num) ;
       
       REMAIN("maximally stable,", s-> num_unstable    ) ;

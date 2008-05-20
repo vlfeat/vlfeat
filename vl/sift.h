@@ -18,7 +18,7 @@ General Public License version 2.
 typedef vl_single vl_sift_pix ;
 
 /** ------------------------------------------------------------------
- ** @brief SIFT filter keypoint.
+ ** @brief SIFT filter keypoint
  **
  ** This structure represent a keypoint as extracted by the SIFT
  ** filter ::VLSiftFilt.
@@ -319,7 +319,7 @@ vl_sift_get_norm_thresh (VlSiftFilt const *f)
 /** ------------------------------------------------------------------
  ** @brief Get the magnification factor
  ** @param f SIFT filter.
- ** @param t threshold.
+ ** @return magnification factor.
  **/
 
 VL_INLINE double
@@ -368,7 +368,7 @@ vl_sift_set_norm_thresh (VlSiftFilt *f, double t)
 /** ------------------------------------------------------------------
  ** @brief Set the magnification factor
  ** @param f SIFT filter.
- ** @param t threshold.
+ ** @param m magnification factor.
  **/
 
 VL_INLINE void

@@ -1296,7 +1296,7 @@ normalize_histogram
   for (iter = begin ; iter != end ; ++ iter)
     norm += (*iter) * (*iter) ;
 
-  norm = vl_fast_sqrt_f (norm) + VL_SINGLE_EPSILON ;
+  norm = vl_fast_sqrt_f (norm) + VL_EPSILON_F ;
 
   for (iter = begin; iter != end ; ++ iter)
     *iter /= norm ;
@@ -1358,7 +1358,7 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
   
   double const st0         = sin (angle0) ;
   double const ct0         = cos (angle0) ;
-  double const SBP         = magnif * sigma + VL_DOUBLE_EPSILON ;
+  double const SBP         = magnif * sigma + VL_EPSILON_D ;
   int    const W           = floor
     (sqrt(2.0) * SBP * (NBP + 1) / 2.0 + 0.5) ;
   

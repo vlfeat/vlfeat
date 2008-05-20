@@ -111,17 +111,32 @@ typedef int                 vl_bool ;    /**< boolean */
 
 /** @} */
 
-/** @brief Big integer */
+/** @brief Big integer (math constant) */
 #define VL_BIG_INT    2147483647
 
 /** @brief Small integer */
 #define VL_SMALL_INT  (- VL_BIG_INT - 1)
 
-/** @brief Logarithm of 2 */
+/** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945
 
-/** @brief Pi */
+/** @brief Pi (math constant) */
 #define VL_PI 3.141592653589793
+
+/** @brief Single precision epsilon (math constant) 
+ **
+ ** Difference of the smallest representable number greater
+ ** than 1.0 and 1.0.
+ **
+ **/
+#define VL_EPSILON_F 1.19209290E-07F
+
+/** @brief Double precision epsilon (math constant) 
+ **
+ ** Difference of the smallest representable number greater
+ ** than 1.0 and 1.0.
+ **/
+#define VL_EPSILON_D 2.220446049250313e-16
 
 /* 
    For the code below: An ANSI C compiler takes the two expressions,

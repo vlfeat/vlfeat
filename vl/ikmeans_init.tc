@@ -20,7 +20,7 @@ typedef struct
   vl_int32 j;
 } pair_t;
 
-int cmp_pair (void const *a, void const *b)
+static int cmp_pair (void const *a, void const *b)
 {
   pair_t *pa = (pair_t *) a;
   pair_t *pb = (pair_t *) b;

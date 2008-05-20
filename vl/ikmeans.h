@@ -35,7 +35,6 @@ enum VlIKMAlgorithms {
 
 typedef struct _VlIKMFilt
 {
-  vl_ikm_acc *centers ;    /**< centers             */
   int M ;                  /**< data dimensionality */
   int K ;                  /**< number of centers   */
 
@@ -43,7 +42,8 @@ typedef struct _VlIKMFilt
   int max_niters ;         /**< Lloyd: maximum number of iterations */
   int verb ;               /**< verbosity level */
 
-  vl_ikm_acc *inter_dist ; /**< Centers inter-distances */
+  vl_ikm_acc *centers ;    /**< centers */
+  vl_ikm_acc *inter_dist ; /**< centers inter-distances */
 } VlIKMFilt ;
 
 /** @name Create and destroy

@@ -82,7 +82,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
  ** @return @c a[2] < b[2]
  **/
 
-int
+static int
 korder (void const* a, void const* b) {
   double x = ((double*) a) [2] - ((double*) b) [2] ;
   if (x < 0) return -1 ;
@@ -377,7 +377,7 @@ mexFunction(int nout, mxArray *out[],
             reserved += 2 * nkeys ;
             frames = mxRealloc (frames, 4 * sizeof(double) * reserved) ;
             if (nout > 1) {
-              descr  = mxRealloc (descr,  128 * sizeof(double) * reserved) ;
+              descr  = mxRealloc (descr,  128 * sizeof(vl_uint8) * reserved) ;
             }
           }
 
