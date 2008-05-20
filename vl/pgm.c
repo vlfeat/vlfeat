@@ -363,3 +363,89 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
   }
   return 0 ;
 }
+
+/** -------------------------------------------------------------------
+ ** @brief Write bytes to PGM file
+ **
+ ** @param name file name.
+ ** @param data data to write.
+ ** @param width width of the image.
+ ** @param height height of the image.
+ **
+ ** The function dumps the image @a data to the PGM file of the specified
+ ** name. This is an helper function simplyfying the usage of
+ ** vl_pgm_insert().
+ **
+ ** @return error code.
+ **/
+
+VL_EXPORT
+int vl_pgm_write (char const *name, vl_uint8 const* data, int width, int height)
+{
+  int err = 0 ;
+  VlPgmImage pgm ;
+  
+  FILE *f = fopen (name, "w") ;
+  
+  if (! f) {
+    vl_err_no = VL_ERR_PGM_IO ;
+    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
+             "Error opening PGM file for writing") ;
+    return vl_err_no ;
+  }
+    
+  pgm.width = width ;
+  pgm.height = height ;
+  pgm.is_raw = 1 ;
+  pgm.max_value = 255 ;
+  
+  err = vl_pgm_insert (f, &pgm, data) ;
+  fclose (f) ;
+  
+  return err ;
+}
+
+/** -------------------------------------------------------------------
+ ** @brief Write floats to PGM file
+ **
+ ** @param name file name.
+ ** @param data data to write.
+ ** @param width width of the image.
+ ** @param height height of the image.
+ **
+ ** The function dumps the image @a data to the PGM file of the specified
+ ** name. The data is re-scaled to fit in the range 0-255. 
+ ** This is an helper function simplyfying the usage of
+ ** vl_pgm_insert().
+ **
+ ** @return error code.
+ **/
+
+VL_EXPORT
+int vl_pgm_write_f (char const *name, float const* data, int width, int height)
+{
+  int err = 0 ;
+  int k ;
+  float min = - VL_INFINITY_F ;
+  float max = + VL_INFINITY_F ;
+  float scale ;
+  
+  vl_uint8 * buffer = vl_malloc (sizeof(float) * width * height) ;
+  
+  for (k = 0 ; k < width * height ; ++k) {
+    min = VL_MAX(min, data [k]) ;
+    max = VL_MIN(max, data [k]) ;
+  }
+  
+  scale = 255 / (max - min + VL_EPSILON_F) ;
+  
+  for (k = 0 ; k < width * height ; ++k) {
+    buffer [k] = (vl_uint8) ((data [k] - min) * scale) ;
+  }
+  
+  err = vl_pgm_write (name, buffer, width, height) ;
+  
+  vl_free (buffer) ;
+  
+  return err ;
+}
