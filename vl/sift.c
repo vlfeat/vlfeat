@@ -764,9 +764,9 @@ vl_sift_detect (VlSiftFilt * f)
     }
   }
   
-  /* ------------------------------------------------------------------
-   *                                           Find local maxima of DoG
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                          Find local maxima of DoG
+   * -------------------------------------------------------------- */
 
   /* start from dog [1,1,s_min+1] */
   pt  = dog + xo + yo + so ;
@@ -837,9 +837,9 @@ vl_sift_detect (VlSiftFilt * f)
     pt += 2 * yo ;
   }
   
-  /* ------------------------------------------------------------------
-   *                                                Refine local maxima
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                               Refine local maxima
+   * -------------------------------------------------------------- */
 
   /* this pointer is used to write the keypoints back */
   k = f->keys ;
@@ -954,7 +954,7 @@ vl_sift_detect (VlSiftFilt * f)
         }
       }
 
-      /* ........................................................... */      
+      /* .......................................................... */      
       /* If the translation of the keypoint is big, move the keypoint
        * and re-iterate the computation. Otherwise we are all set.
        */
@@ -1670,7 +1670,6 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   }
 
 }
-
 
 /** ------------------------------------------------------------------
  ** @brief Initialize a keypoint from its position and scale
