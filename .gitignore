@@ -1,3 +1,6 @@
+# Mac OS Finder Poop
+.DS_Store
+
 # MEX files
 *.mexglx
 *.mexmac
@@ -12,6 +15,16 @@ doc/figures/*.eps
 doc/figures/*.pdf
 doc/figures/*.png
 doc/figures/demo
+doc/html
+doc/vlfeat-dox
+
+# Other generated files and directories
+VERSION
+bin
+results
+toolbox/mex*
+vlfeat.xcodeproj/*.mode1v3
+vlfeat.xcodeproj/*.pbxuser
 
 # Emacs backups
 *~
