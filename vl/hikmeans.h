@@ -71,8 +71,8 @@ VL_INLINE void vl_hikm_set_max_niters (VlHIKMTree *f, int max_niters) ;
  ** @{
  **/
 VL_EXPORT void vl_hikm_init  (VlHIKMTree *f, int M, int K, int depth) ;
-VL_EXPORT void vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N) ;
-VL_EXPORT void vl_hikm_push  (VlHIKMTree *f, vl_uint *asgn, vl_ikm_data const *data, int N) ;
+VL_EXPORT void vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, int N) ;
+VL_EXPORT void vl_hikm_push  (VlHIKMTree *f, vl_uint *asgn, vl_uint8 const *data, int N) ;
 /** @} */
 
 /** ------------------------------------------------------------------

@@ -146,7 +146,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
   enum {IN_TREE = 0, IN_DATA, IN_END} ;
   enum {OUT_ASGN = 0} ;
-  vl_ikm_data const *data; 
+  vl_uint8 const *data; 
 
   int             opt ;
   int             next = IN_END ;

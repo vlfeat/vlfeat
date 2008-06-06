@@ -41,7 +41,7 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_ASGN=0} ;
   vl_uint*     asgn ;
   vl_ikm_acc*  centers ;
-  vl_ikm_data* data ;
+  vl_uint8* data ;
 
   int M,N,j,K=0 ;
 
@@ -132,7 +132,7 @@ mexFunction(int nout, mxArray *out[],
 
   out[OUT_ASGN] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
 
-  data    = (vl_ikm_data*) mxGetData (in[IN_X]) ;
+  data    = (vl_uint8*) mxGetData (in[IN_X]) ;
   centers = (vl_ikm_acc*)  mxGetData (in[IN_C]) ;
   asgn    = (vl_uint*)     mxGetData (out[OUT_ASGN]) ;
   ikmf    = vl_ikm_new (method_type) ;

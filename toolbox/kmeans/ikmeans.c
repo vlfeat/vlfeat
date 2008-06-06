@@ -43,7 +43,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   vl_uint     *asgn = 0 ;
   vl_ikm_acc  *centers = 0 ;
-  vl_ikm_data *data ;
+  vl_uint8 *data ;
   
   int method_type = VL_IKM_LLOYD ;
   int max_niters  = 200 ;
@@ -129,7 +129,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("ikmeans: Method    = %s\n", method_name) ;
   }
 
-  data = (vl_ikm_data*) mxGetPr(in[IN_X]) ;
+  data = (vl_uint8*) mxGetPr(in[IN_X]) ;
   ikmf = vl_ikm_new (method_type) ;
   
   vl_ikm_set_verbosity  (ikmf, verb) ;

@@ -43,8 +43,8 @@
  ** @return a new buffer with a copy of the selected data.
  **/
 
-vl_ikm_data*
-vl_hikm_copy_subset (vl_ikm_data const * data, 
+vl_uint8*
+vl_hikm_copy_subset (vl_uint8 const * data, 
                      vl_uint * ids, 
                      int N, int M, 
                      vl_uint id, int *N2)
@@ -60,14 +60,14 @@ vl_hikm_copy_subset (vl_ikm_data const * data,
   
   /* copy each datum to the buffer */
   {
-    vl_ikm_data * new_data = vl_malloc (sizeof(vl_ikm_data) * M * count);    
+    vl_uint8 * new_data = vl_malloc (sizeof(vl_uint8) * M * count);    
     count = 0;
     for (i = 0 ; i < N ; i ++)
       if (ids[i] == id)
         {
           memcpy(new_data + count * M, 
                  data     + i     * M, 
-                 sizeof(vl_ikm_data) * M);
+                 sizeof(vl_uint8) * M);
           count ++ ;
         }    
     *N2 = count ;
@@ -91,7 +91,7 @@ vl_hikm_copy_subset (vl_ikm_data const * data,
 
 static VlHIKMNode * 
 xmeans (VlHIKMTree *tree, 
-        vl_ikm_data const *data, 
+        vl_uint8 const *data, 
         int N, int K, int height)
 {
   VlHIKMNode *node = vl_malloc (sizeof(VlHIKMNode)) ;
@@ -112,7 +112,7 @@ xmeans (VlHIKMTree *tree,
     for (k = 0 ; k < K ; k ++) {
       int partition_N ;
       int partition_K ;
-      vl_ikm_data *partition ;
+      vl_uint8 *partition ;
       
       partition = vl_hikm_copy_subset
         (data, ids, N, tree->M, k, &partition_N) ;
@@ -235,7 +235,7 @@ vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
 
 VL_EXPORT
 void
-vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N)
+vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, int N)
 {
   f -> root  = xmeans (f, data, N, VL_MIN(f->K, N), f->depth) ;
 }
@@ -256,7 +256,7 @@ vl_hikm_train (VlHIKMTree *f, vl_ikm_data const *data, int N)
 
 VL_EXPORT
 void
-vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_ikm_data const *data, int N)
+vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_uint8 const *data, int N)
 {
   int i, d,
     M = vl_hikm_get_ndims (f),

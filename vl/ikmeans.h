@@ -17,7 +17,7 @@ General Public License version 2.
 #include "generic.h"
 
 typedef vl_int32 vl_ikm_acc ;  /**< IKM accumulator data type */
-typedef vl_uint8 vl_ikm_data ; /**< IKM data type */
+typedef vl_uint8 vl_uint8 ; /**< IKM data type */
 
 /** ------------------------------------------------------------------
  ** @brief IKM algorithms 
@@ -58,13 +58,13 @@ VL_EXPORT void       vl_ikm_delete (VlIKMFilt *f) ;
  **/
 VL_EXPORT void vl_ikm_init           (VlIKMFilt *f, vl_ikm_acc const *centers, int M, int K) ;
 VL_EXPORT void vl_ikm_init_rand      (VlIKMFilt *f, int M, int K) ;
-VL_EXPORT void vl_ikm_init_rand_data (VlIKMFilt *f, vl_ikm_data const *data, int M, int N, int K) ;
-VL_EXPORT int  vl_ikm_train          (VlIKMFilt *f, vl_ikm_data const *data, int N) ;
-VL_EXPORT void vl_ikm_push           (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) ;
+VL_EXPORT void vl_ikm_init_rand_data (VlIKMFilt *f, vl_uint8 const *data, int M, int N, int K) ;
+VL_EXPORT int  vl_ikm_train          (VlIKMFilt *f, vl_uint8 const *data, int N) ;
+VL_EXPORT void vl_ikm_push           (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) ;
 
 VL_EXPORT
 vl_uint  vl_ikm_push_one   (vl_ikm_acc const *centers, 
-                            vl_ikm_data const *data,
+                            vl_uint8 const *data,
                             int M, int K) ;
 /** @} */
 

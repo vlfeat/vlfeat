@@ -84,10 +84,10 @@ General Public License version 2.
 
 static void    vl_ikm_init_lloyd      (VlIKMFilt*) ;
 static void    vl_ikm_init_elkan      (VlIKMFilt*) ;
-static int     vl_ikm_train_lloyd     (VlIKMFilt*, vl_ikm_data const*, int) ;
-static int     vl_ikm_train_elkan     (VlIKMFilt*, vl_ikm_data const*, int) ;
-static void    vl_ikm_push_lloyd      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
-static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_ikm_data const*, int) ;
+static int     vl_ikm_train_lloyd     (VlIKMFilt*, vl_uint8 const*, int) ;
+static int     vl_ikm_train_elkan     (VlIKMFilt*, vl_uint8 const*, int) ;
+static void    vl_ikm_push_lloyd      (VlIKMFilt*, vl_uint*, vl_uint8 const*, int) ;
+static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_uint8 const*, int) ;
 
 /** @brief Create a new IKM quantizer
  **
@@ -142,7 +142,7 @@ void vl_ikm_delete (VlIKMFilt* f)
  **/
 
 VL_EXPORT
-int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
+int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
 { 
   int err ;
   
@@ -174,7 +174,7 @@ int vl_ikm_train (VlIKMFilt *f, vl_ikm_data const *data, int N)
 
 VL_EXPORT
 void
-vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
+vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) {
   switch (f -> method) {
   case VL_IKM_LLOYD : vl_ikm_push_lloyd (f, asgn, data, N) ; break ;
   case VL_IKM_ELKAN : vl_ikm_push_elkan (f, asgn, data, N) ; break ;
@@ -199,7 +199,7 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N) {
 VL_EXPORT
 vl_uint
 vl_ikm_push_one (vl_ikm_acc const *centers, 
-		 vl_ikm_data const *data, 
+		 vl_uint8 const *data, 
 		 int M, int K)
 {
   int i,k ;

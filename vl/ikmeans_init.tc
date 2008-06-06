@@ -112,7 +112,7 @@ vl_ikm_init_rand
 VL_EXPORT
 void
 vl_ikm_init_rand_data 
-(VlIKMFilt* f, vl_ikm_data const* data, int M, int N, int K)
+(VlIKMFilt* f, vl_uint8 const* data, int M, int N, int K)
 {
   int i, j, k ;
   pair_t  *pairs = (pair_t *) vl_malloc (sizeof(pair_t) * N);

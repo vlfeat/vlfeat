@@ -83,7 +83,7 @@ vl_ikm_init_elkan (VlIKMFilt *f)
  **/
 
 static int
-vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
+vl_ikm_train_elkan (VlIKMFilt* f, vl_uint8 const* data, int N)
 {
   /* REMARK !! All distances are squared !! */
   int i,pass,c,cp,x,cx ;
@@ -342,7 +342,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
  **/
 
 static void 
-vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N)
+vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
 {
   vl_uint i,c,cx,x,
     dist_calc = 0,

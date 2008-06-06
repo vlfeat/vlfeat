@@ -30,7 +30,7 @@ vl_ikm_init_lloyd (VlIKMFilt *f)
  **/
 
 static int
-vl_ikm_train_lloyd (VlIKMFilt* f, vl_ikm_data const* data, int N)
+vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
 {
   int iter, i, j, k, 
     K = f-> K,
@@ -122,7 +122,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_ikm_data const* data, int N)
  **/
 
 static void 
-vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint *asgn, vl_ikm_data const *data, int N)
+vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
 {
   int j ;
   for(j=0 ; j < N ; ++j) {
