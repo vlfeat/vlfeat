@@ -175,7 +175,7 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
     break ;
     
   case VL_PROT_BINARY :
-    vl_adapt_endianness_8 (&y, &x) ;
+    vl_swap_host_big_endianness_8 (&y, &x) ;
     n = fwrite (&y, sizeof(double), 1, fm -> file) ;
     err = n < 1 ;
     break ;
@@ -254,7 +254,7 @@ vl_file_meta_get_double (VlFileMeta *fm, double *x)
   case VL_PROT_BINARY :
     n = fread (&y, sizeof(double), 1, fm -> file) ;
     if (n < 1) return VL_ERR_BAD_ARG ;
-    vl_adapt_endianness_8 (x, &y) ;
+    vl_swap_host_big_endianness_8 (x, &y) ;
     break ;
 
   default :

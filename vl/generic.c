@@ -178,8 +178,8 @@ in:
 - <em>endianness</em> and
 - <em>size of the atomic data types</em>.
 
-An architecture is big endiand or little endian depending how
-multi-byte data are stored in memory:
+An host is big endiand or little endian depending how multi-byte
+data values are stored in memory:
 
 - <em>big endian</em> (big end first, also known as network order) if it
   stores the most significant byte has the smaller memory address.
@@ -187,13 +187,12 @@ multi-byte data are stored in memory:
   stores the lesser significant byte at the smaller memory address.
 
 Use the function ::vl_get_endianness() to detect endianness.  To
-serialize/deserialize data in big endian (network) order, call the
-functions ::vl_adapt_endianness_8(), ::vl_adapt_endianness_4(),
-::vl_adapt_endianness_2() after reading and before writing (the
-functions change edinanness only if the architecture is little endian
-and do nothing otherwise).
-
-Architecture differ also by the size of the atomic data type (such as
+convert data from/to the host to/from big endian (network) order, use the
+functions ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
+::vl_swap_host_big_endianness_2() (if the host is already big endian, these
+ functions simply copy the data).
+ 
+Hosts differ also by the size of the atomic data type (such as
 @c short, @c int, @c long and so on):
 
  <table><caption>32-bit and 64-bit data models</caption>

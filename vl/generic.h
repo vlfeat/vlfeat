@@ -337,9 +337,9 @@ char const * vl_get_version_string () ;
 #endif
 
 VL_INLINE int  vl_get_endianness () ;
-VL_INLINE void vl_adapt_endianness_8 (void *dst, void* src) ;
-VL_INLINE void vl_adapt_endianness_4 (void *dst, void* src) ;
-VL_INLINE void vl_adapt_endianness_2 (void *dst, void* src) ;
+VL_INLINE void vl_swap_host_big_endianness_8 (void *dst, void* src) ;
+VL_INLINE void vl_swap_host_big_endianness_4 (void *dst, void* src) ;
+VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -356,7 +356,7 @@ vl_get_endianness ()
 }
 
 /** ------------------------------------------------------------------
- ** @brief Change endianness of 8-byte value if required
+ ** @brief Host <-> big endian transformation for 8-bytes value
  **
  ** @param dst destination 8-byte buffer.
  ** @param src source 8-byte bufffer.
@@ -364,7 +364,7 @@ vl_get_endianness ()
  **/
 
 VL_INLINE void
-vl_adapt_endianness_8 (void *dst, void* src)
+vl_swap_host_big_endianness_8 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
@@ -390,7 +390,7 @@ vl_adapt_endianness_8 (void *dst, void* src)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Change endianness of 4-byte value if required
+ ** @brief Host <-> big endian transformation for 4-bytes value
  **
  ** @param dst destination 4-byte buffer.
  ** @param src source 4-byte bufffer.
@@ -398,7 +398,7 @@ vl_adapt_endianness_8 (void *dst, void* src)
  **/
 
 VL_INLINE void
-vl_adapt_endianness_4 (void *dst, void* src)
+vl_swap_host_big_endianness_4 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
@@ -416,7 +416,7 @@ vl_adapt_endianness_4 (void *dst, void* src)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Change endianness of 2-byte value if required
+ ** @brief Host <-> big endian transformation for 2-bytes value
  **
  ** @param dst destination 2-byte buffer.
  ** @param src source 2-byte bufffer.
@@ -424,7 +424,7 @@ vl_adapt_endianness_4 (void *dst, void* src)
  **/
 
 VL_INLINE void
-vl_adapt_endianness_2 (void *dst, void* src)
+vl_swap_host_big_endianness_2 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
