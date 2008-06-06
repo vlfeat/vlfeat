@@ -1,6 +1,6 @@
 /** @file     dft.h
  ** @author   Andrea Vedaldi
- ** @brief    Dense Feature Transform
+ ** @brief    Dense Feature Transform (DFT)
  **/
 
 /* AUTORIGHTS
@@ -25,12 +25,16 @@ typedef struct VlDftKeypoint_
 
 /** @brief DFT filter */
 typedef struct VlDftFilter_ 
-{
+{  
   int width ;            /**< image width */
   int height ;           /**< image height */
   int step ;             /**< downsampling step */
   int size ;             /**< spatial bin size (in pixels) */
+  int fast ;             /**< be fast but more approximated */
 
+  int dwidth ;           /**< downsampled width */
+  int dheight ;          /**< downsampled height */
+  
   float **hist ;         /**< dense histogram */
   float *tmp ;           /**< temporary buffer */
   float *tmp2 ;          /**< temporary buffer */
@@ -41,7 +45,7 @@ typedef struct VlDftFilter_
 
 VL_EXPORT VlDftFilter *vl_dft_new (int width, int height, int step, int size) ;
 VL_EXPORT void vl_dft_delete (VlDftFilter *f) ;
-VL_EXPORT void vl_dft_process (VlDftFilter *f, float const* im) ;
+VL_EXPORT void vl_dft_process (VlDftFilter *f, float const* im, vl_bool fast) ;
 
 /** @name Retrieve data and parameters
  ** @{

@@ -1,11 +1,10 @@
-/*
- *  dft.c
- *  vlfeat
- *
- *  Created by Andrea Vedaldi on 5/7/08.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
- *
- */
+/** @internal
+ ** @file     dft.c
+ ** @author   Andrea Vedaldi
+ ** @brief    Dense Feature Transform (DFT) - Definition
+ **/
+
+/* AUTORIGHTS */
 
 #include "dft.h"
 #include "pgm.h"
@@ -16,6 +15,14 @@
 int const NBP = 4 ;
 int const NBO = 8 ;
 
+/** ------------------------------------------------------------------
+ ** @internal@brief Normalize histogram
+ **
+ ** @param begin
+ ** @param end
+ ** @param step
+ **/
+ 
 VL_INLINE float
 normalize_histogram 
 (float *begin, float *end)
@@ -34,7 +41,8 @@ normalize_histogram
   return norm;
 }
 
-/** @internal@brief Convolve rows, downsample, transpose in sub-block
+/** ------------------------------------------------------------------
+ ** @internal@brief Convolve rows, downsample, transpose in sub-block
  **
  ** The filter window is in [-W W] (2W+1 pixels). @a begin and @a end
  ** are in this range.
@@ -86,7 +94,6 @@ econvolve(float*       dst_pt,
     dst_pt -= M_down*N - 1 ;
   }
 }
-
 
 /** ------------------------------------------------------------------
  ** @internal
@@ -143,7 +150,9 @@ VlDftFilter* vl_dft_new (int width, int height, int step, int size)
   
   f-> width  = width ;
   f-> height = height ;
-  f-> nkeys  = (f->width/step) * (f->height/step) ;  
+  f-> dwidth = width / step ;
+  f-> dheight= height / step ;
+  f-> nkeys  = f->dwidth * f->dheight ;
   f-> step   = step ;
   f-> size   = size ;
 
@@ -179,8 +188,14 @@ void vl_dft_delete (VlDftFilter *f)
   }
 }
 
+
+/** ------------------------------------------------------------------
+ ** @internal@brief Process with Gaussian window
+ ** @param f filter to delete.
+ **/
+
 VL_INLINE 
-void with_gaussian_window(VlDftFilter* f)
+void with_gaussian_window (VlDftFilter* f)
 {
   int n, W, x, y, i, t ;
   float del, u ;
@@ -206,8 +221,6 @@ void with_gaussian_window(VlDftFilter* f)
     acc += gker [i] ;
   }
   
-  VL_PRINTF("%d %d\n", n, W) ;
-  
   /* compute dense descriptors */
   for (y = 0 ; y < NBP ; ++y) {
     int xb, xe, yb, ye ;
@@ -231,8 +244,8 @@ void with_gaussian_window(VlDftFilter* f)
                   f->height, f->width/f->step, 
                   yker, W, yb - W, ye - W, f->step) ;
         
-        for (ys = 0 ; ys < f->height/f->step ; ++ys) {
-          for (xs = 0 ; xs < f->width/f->step ; ++xs) {
+        for (ys = 0 ; ys < f->dheight ; ++ys) {
+          for (xs = 0 ; xs < f->dwidth ; ++xs) {
             *dst = *src++ ;
             dst += NBP*NBP*NBO ;
           }
@@ -248,8 +261,14 @@ void with_gaussian_window(VlDftFilter* f)
 }
 
 
+
+/** ------------------------------------------------------------------
+ ** @internal@brief Process with flat window.
+ ** @param f filter to delete.
+ **/
+
 VL_INLINE 
-void with_flat_window(VlDftFilter* f)
+void with_flat_window (VlDftFilter* f)
 {
   int n, W, x, y, i, t ;
   float del ;
@@ -282,11 +301,6 @@ void with_flat_window(VlDftFilter* f)
     econvolve(f->hist[t], f->tmp2, 
               f->height, f->width/f->step, 
               ker, W, 0 - W, n - 1 - W, f->step) ;
-    
-    {
-      char str [80] ; sprintf(str, "/tmp/im%d.pgm", t) ;
-      vl_pgm_write_f (str, f->tmp, f->width/f->step, f->height/f->step) ;
-    }
   }
   
   /* compute dense descriptors */
@@ -298,14 +312,14 @@ void with_flat_window(VlDftFilter* f)
       
       float *dpt = f->descr + NBO * x + NBP*NBO * y ;
             
-      for (ys = 0 ; ys < f->height/f->step ; ++ys) {
-        for (xs = 0 ; xs < f->width/f->step ; ++xs) {
-          int xp = VL_MAX(0, VL_MIN(f->width/f->step,  xs + xd)) ;
-          int yp = VL_MAX(0, VL_MIN(f->height/f->step, ys + yd)) ;
+      for (ys = 0 ; ys < f->dheight ; ++ys) {
+        for (xs = 0 ; xs < f->dwidth ; ++xs) {
+          int xp = VL_MAX(0, VL_MIN(f->dwidth,  xs + xd)) ;
+          int yp = VL_MAX(0, VL_MIN(f->dheight, ys + yd)) ;
           for (t = 0 ; t < NBO ; ++t) {            
-            dpt [t] = *(f->hist[t] + xp + yp * (f->width/f->step)) ;
+            dpt [t] = *(f->hist[t] + xp + yp * f->dwidth) ;
           }
-          dpt += NBP*NBP*NBO ;        
+          dpt += NBP*NBP*NBO ;
         }
       }
     } /* for x */
@@ -321,7 +335,7 @@ void with_flat_window(VlDftFilter* f)
  ** @param im image data.
  **/
 
-void vl_dft_process (VlDftFilter* f, float const* im)
+void vl_dft_process (VlDftFilter* f, float const* im, vl_bool fast)
 {
   int t, x, y ;
 
@@ -372,17 +386,10 @@ void vl_dft_process (VlDftFilter* f, float const* im)
     }
   }
 
-  switch (2) {
-    case 1 :
-      with_gaussian_window(f) ;
-      break ;
-      
-    case 2 :
-      with_flat_window(f) ;
-      break ;
-      
-    default:
-      assert(0) ;
+  if (fast) {
+    with_flat_window(f) ;
+  } else {
+    with_gaussian_window(f) ;
   }
     
   {
