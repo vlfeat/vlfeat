@@ -19,11 +19,32 @@ General Public License version 2.
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.9.1"
 
-/** @brief Inline function declaration */
-#define VL_INLINE static __inline__
+/** @def VL_INLINE
+ ** @brief Adds appropriate inline function qualifier
+ ** @sa main-style-inline
+ **/
 
-/** @brief Exported functions should be prepended with this */
+/** @def VL_EXPORT
+ ** @brief Declares a DLL exported symbol
+ ** @sa @ref main-style-export
+ **/
+
+/** @def VL_CONSTRUCTOR
+ ** @brief Declares the DLL constructor function
+ ** @sa @ref main-style-export
+ **/
+
+/** @def VL_DESTRUCTOR
+ ** @brief Declares the DLL destructor function
+ ** @sa @ref main-style-export
+ **/
+
 #ifdef WIN32
+#define VL_INLINE static __inline
+#define VL_CONSTRUCTOR
+#define VL_DESTRUCTOR
+#define snprintf _snprintf
+#define isnan _isnan
 
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __declspec(dllexport)
@@ -31,7 +52,10 @@ General Public License version 2.
 #define VL_EXPORT __declspec(dllimport)
 #endif
 
-#else
+#else /* UNIX */
+#define VL_INLINE static __inline__
+#define VL_CONSTRUCTOR __attribute__((constructor))
+#define VL_DESTRUCTOR __attribute__((destructor))
 
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __attribute__((visibility ("default")))
@@ -39,14 +63,6 @@ General Public License version 2.
 #define VL_EXPORT
 #endif
 
-#endif
-
-#ifdef __VISUALC__
-#undef VL_INLINE
-#define VL_INLINE static __inline
-/*#define fscanf fscanf_s*/
-#define snprintf _snprintf
-#define isnan _isnan
 #endif
 
 /** @internal @brief Stringify argument helper

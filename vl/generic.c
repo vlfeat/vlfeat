@@ -12,117 +12,149 @@ General Public License version 2.
 
 /** @mainpage VisionLab Features Library
 
-@version __VLFEAT_VERSION__
-@author Andrea Vedaldi  (mailto:vedaldi@cs.ucla.edu)
-@author Brian Fulkerson (mailto:brian@cs.ucla.edu)
+ @version __VLFEAT_VERSION__
+ @author Andrea Vedaldi  (mailto:vedaldi@cs.ucla.edu)
+ @author Brian Fulkerson (mailto:brian@cs.ucla.edu)
+ 
+ @par Copyright &copy; 2007 Andrea Vedaldi and Brian Fulkerson
 
-@par Copyright &copy; 2007 Andrea Vedaldi and Brian Fulkerson
+ <em>VLFeat C library contains implementations of common computer
+ vision algorithms, with a special focus on visual features for
+ matching image regions. Applications include structure from motion and
+ object and category detection and recognition.
 
-<em>This library contains implementations of common computer vision
-algorithms, with a special focus on visual features for matching image
-regions. Applications include structure from motion, object and
-category detection, object and category recognition.</em>
+ The library is accurate and easy to use, understand and modify. In
+ order to maximize simplicity, the library is free of clutter and
+ different algorithms are only weakly dependent. The code is portable
+ (largerly C-89 compatible) and embeds extensive documentation.</em>
 
-@section main-contents Contents
+ @section main-contents Contents
 
-- @ref main                "Overview"
-- @ref main-style          "Coding style"
-  - @ref main-style-memory "Memory management" 
-- @ref main-glossary "Glossary"
-- Support functionalities
-  - @ref generic.h   "Atomic data types, errors, and others"
-  - @ref mathop.h    "Math operations"
-  - @ref random.h    "Random number generator"
-  - @ref stringop.h  "String operations"
-  - @ref imop.h      "Image operations"
-  - @ref rodrigues.h "Rodrigues formuals"
-  - @ref mexutils.h  "MATLAB MEX helper functions"
-- Algorithms
-  - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
-  - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
-  - @ref ikmeans.h  "Integer K-means (IKM)"
-  - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
-  - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
+ - @ref design          "Design Concepts"
+   - @ref design-objects     "Objects" 
+   - @ref design-resources   "Memory and resource management" 
+   - @ref design-threads     "Multi-threading"
+   - @ref design-portability "Portability"
+ - @ref main-glossary "Glossary"
+ - Support functionalities
+   - @ref generic.h   "Atomic data types, errors, and others"
+   - @ref mathop.h    "Math operations"
+   - @ref random.h    "Random number generator"
+   - @ref stringop.h  "String operations"
+   - @ref imop.h      "Image operations"
+   - @ref rodrigues.h "Rodrigues formuals"
+   - @ref mexutils.h  "MATLAB MEX helper functions"
+ - Algorithms
+   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
+   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
+   - @ref ikmeans.h  "Integer K-means (IKM)"
+   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
+   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
 
-@section main Overview
+ @section design VLFeat Design Concepts
 
-We want VLFeat C library to provide solid implementations a small 
-set of useful computer vision algorithms. Our 
-target users are other computer vision researchers. The library aims to
-be:
+ VLFeat follows a simple but rigorous design that makes it portable
+ and simple to use in conjunction with high level language such as
+ MATLAB. This section illustrates and motivates the aspects of such
+ design that are relevant to the users of the library. Most of the
+ features discussed in here are implemented in the @ref generic.h
+ module.
 
-- <b>Accurate</b>. Algorithms should be well defined and (when
-  possible) close to the description/implementation of the original
-  authors. 
-- <b>Easy to use</b>. The library should be easy to compile and
-  setup. The user interface should be simple and flexible. The
-  documentation should be clear and complete.
-- <b>Open</b>. The code should be easy to read, understand and modify.
-  It should also be easy to extract from the library a particular
-  algorithm.
+ @subsection design-objects Objects
 
-We think that the best way of achieving many of these results is to keep the library
- as simple and fruible as possible. The library is therefore designed to be:
+ Most of VLFeat functionalities are implemented as opaque data
+ structures, to which we refer as "objects". Typically, you create an
+ object by means of a constructor function and dispose of it by means
+ of a destructor function. The data member of the object should not be
+ accessed directly, but by means of appropriate accessor functions
+ (typicallly containing the @c _get and _set keywords in their names).
 
-- <b>Minimal</b>. The VLFeat C library implements only the core algorithms. 
-  This reduce clutter, ease maintenance and make it possible to produce
-  high quality code for the parts that really matter.
-- <b>Flat</b>. The intra-dependencies among library modules are
-  not deep.  Preferably, each algorithm depends only on the basic
-  modules (IO, math, ...). This simplifies understanding and maintaining
-  each algorithm, and make it possible to "copy and paste" code from
-  the library to other projcets.
-- <b>Portable</b>. The library adheres to the commom C standars 
-  (mostly  C-89, with a few exceptions) and has no external dependencies.
-  This makes much easier for new users to compile and modify the library.
-- <b>Slef-documenting</b>. Documentation is embedded in the source code
-  in Doxygen format. The documentation includes accurate
-  descriptions of each algorithm.
+ @subsection design-resources Memory and Resource Management
 
-@section main-style Coding conventions and style
+ Resource management in VLFeat is minimal. In most cases, you can
+ assume that VLFeat does not provide any resource management
+ functionality at all. Objects or memory blocsk allocated by the
+ library but owned by the client must be explicity disposed. The
+ following rule helps indentifying such blocks and objects:
+ 
+ <b> The client owns a meory block or object if, and only if, this is
+   returend by a library call containing the keywords @c _new or @c
+   _copy, or by the allocatr functions ::vl_malloc, ::vl_calloc,
+   ::vl_realloc.</b>
+ 
+ More in detail, the following rules apply:
 
-This section describes the coding conventions that the library uses.
+ - Memory is the only managed resource. Other resources used by the
+   library (e.g. files) are either passed to the library by the
+   client, or acquired and released within the scope of a library
+   function call.
+ - The memory manager can be customized through ::vl_set_alloc_func
+   (which sets the implementations of ::vl_malloc, ::vl_realloc,
+   ::vl_calloc and ::vl_free). The library allocates memory only through
+   these functions.
+ - The memory manager is global to all threads.
+ - At any moment, there is only one memory manager in
+   existence. ::vl_set_alloc_func can be used only before any other
+   function is invoked, or right before or after the previous memory
+   manager has relinquished all memory.
+ - Such rules apply both to the library client and to the library
+   implementation. The only exception regards the memory allocated in
+   the global library state, which uses the native memory manager.
 
-@subsection main-style-memory Memory management
+  These rules make it possible to undo all the work done by the
+  library at any given instant. Disposing the memory allocated by the
+  custom memory manager essentially "resets" the library (except for
+  its global state). This functionality is used extensively in the
+  implementation of MATLAB MEX functions that access the library to
+  support abrupt interruption.
 
-Memory is allocated and freed by means of ::vl_malloc(), vl_free(),
-::vl_realloc() functions, which are stubs pointing to the actual
-function to use. So when the library is linked to a MATLAB MEX file,
-it is possible to use MATLAB memory allocation functions instead of the
-operating system ones. The advantage is that MATLAB memory handler
-will free the allocated buffers in the case a MEX file is interrupted
-(Ctl-C).
+   @note The rules guarantee that all memory allocated by the library
+     at any given time is allocated by the same memory manager, except
+     for the global state that should survive the "reset"
+     operation. In order to support multiple memory managers, one
+     should keep track of the allocator of each object (or memory
+     block). Moreover, partial de-allocation of a pool of objects is
+     dangerous, as such objects may be referred by other objects that
+     are not being de-allocated, corrupting their state. A proper
+     solution to the latter problem is the retain/release mechanism
+     implemented, for instance, by Apple Core Foundation or Cocoa.
 
-This also requires a bit of care to work as intended:
+  @subsection design-threads Multi-threading
 
-- The library must be thread safe.
+  The library is currently <em>not</em> thread safe, but this support
+  will be added in a future release.
 
-- Objects must have allocation and de-allocation methods. Garbage collection 
-  (e.g. MATLAB exiting a MEX file) can be performed only after 
-  all objects have been deleted. So in effect garbage collection is useful
-  only to clean-up after an interrupted computation.
+  The library is almost entierely reentrant. The only thread-sensitive
+  operations are on the global library state and are limited to:
 
-- Static objects are not safe as they would violate the garbage collection rule.
-  For instance, one should not alocate static buffers in functions, as
-  the buffer could be stealed by sucessive garbage collection.
+  - Global library configuration (e.g. ::vl_set_alloc_func).
+  - Random number generator state (@ref random.h).
+  - Error handling (e.g. ::vl_err_no).
 
-@section main-glossary Glossary
+  @subsection design-portability Portability features
 
-- <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
-stacked with column-major order as the sequence \f$(A_{11}, A_{21},
-\dots, A_{12}, \dots)\f$. More in general, when stacking a multi
-dimensional array this indicates that the first index is the one
-varying most quickly, with the other followed in the natural order.
-- <b>Opaque structure.</b> A structure is opaque if its fields are not
-meant to be accessed directly but by means of appropriate interface
-functions. This techniuqe improves robustness and and isolates the
-implementation from the interface, much in the spirit of
-object-oriented programming.
-- <b>Row-major.</b> A <em>M x N </em> matrix <em>A</em> is
-stacked with row-major order as the sequence \f$(A_{11}, A_{12},
-\dots, A_{21}, \dots)\f$. More in general, when stacking a multi
-dimensional array this indicates that the last index is the one
-varying most quickly, with the other followed in reverse order.
+  Most host dependent details are isolated in the @ref generich.h
+  library modules. These include:
+
+  - Portable atomic types (e.g. ::vl_int32).
+  - Declaration of symbols, inline functions (e.g. ::VL_EXPORT).
+  - Host endianness conversion (e.g. ::).
+
+  @section main-glossary Glossary
+
+  - <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
+  stacked with column-major order as the sequence \f$(A_{11}, A_{21},
+  \dots, A_{12}, \dots)\f$. More in general, when stacking a multi
+  dimensional array this indicates that the first index is the one
+  varying most quickly, with the other followed in the natural order.
+  - <b>Opaque structure.</b> A structure is opaque if the user is not supposed
+  to access its member directly, but through appropriate interface functions.
+  Opaque structures are commonly used to define objects.
+  - <b>Row-major.</b> A <em>M x N </em> matrix <em>A</em> is
+  stacked with row-major order as the sequence \f$(A_{11}, A_{12},
+  \dots, A_{21}, \dots)\f$. More in general, when stacking a multi
+  dimensional array this indicates that the last index is the one
+  varying most quickly, with the other followed in reverse order.
 
 **/
 
@@ -132,43 +164,10 @@ varying most quickly, with the other followed in reverse order.
 
 This module provides basic functionalities:
 
+- @ref generic-data-model
 - @ref generic-error  
 - @ref generic-heap
 - @ref generic-logging
-- @ref generic-data-model
-
-
-@warning Currently <code>generic.h</code> works correctly only with
-ILP32 (all 32 bit), LP64 (UNIX-64) and LLP64 (Windows-64)
-architectures.
-
-@section generic-error Error handling
-
-Error handling uses the same style of the standard C library. Most
-functions return 0 when they succeed and -1 when they fail, and
-set the global variable ::vl_err_no with a code identifying the
-error occurred. This variable is never set on success and should
-be examinated right after an error had occurred.
-
-@section generic-heap Heap allocation
-
-VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
-::vl_free() functions to allocate the heap. Normally these functions
-are mapped to the underlying standar C library implementations. However
-::vl_set_alloc_func() can be used to map them to other implementations.
-For instance, in MATALB MEX files these functions are mapped to 
-the MATLAB equivalent, with the benefits of garbage collection 
-in case of interrupted execution.
-
-@section generic-logging Logging
-
-VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
-debug informations. These functions are normally mapped to the @c
-printf function of the underlying standard C library. However
-::vl_set_printf_func() can be used to map it to a different
-implementation. For instance, in MATLAB MEX files this function is
-mapped to @c mexPrintf. Setting the function to @c NULL disables
-logging.
 
 @section generic-data-model Data models
 
@@ -253,12 +252,7 @@ Architecture differ also by the size of the atomic data type (such as
    <td>Windows-64</td>
  </tr>
  </table>
-
-For uniformity, VLFeat introduces appropriate atomic data types of
-fixed width.  Notice that in C-99 the <code>stdint.h</code> header
-could be used for this purpose instead, but unfortunately it is not
-(yet) supported by Microsoft Visual C/C++.
-
+ 
 Most 32-bit architectures are equivalent for what concerns the size of
 the atomic data types.  64-bit vary more; for the atomic data types
 defined by VLFEat, the only important difference between architectures
@@ -266,12 +260,113 @@ is in practice limited the size of <code>long</code>. Relatively to
 the 32 bit architectures, the other important difference is the size
 of the pointers.
 
+@note For uniformity, VLFeat introduces appropriate atomic data types of
+fixed width.  Notice that in C-99 the <code>stdint.h</code> header
+could be used for this purpose instead, but unfortunately it is not
+supported by Microsoft Visual C/C++.
+
+ @section generic-symbols Exported symbols and inline functions
+
+ The library must rely on non-standard features of the C compiler to
+ support dynamic linking and inline functions in a portable way. Such
+ details are hidden by the following macros:
+
+ - ::VL_EXPORT declares an API symbols. The compiler and linker make
+    sure that these symbols (and, usually, no other symbol) are
+    visible to the library client.    
+ - ::VL_INLINE delcares an inline function.
+ - ::VL_CONSTRUCTOR and ::VL_DESTRUCTOR declares the constructor and
+   destructor functions of the DLL. 
+
+<table>
+<caption>Platform-dependent support for dynamic linking</caption>
+<tr>
+<td>Platform</td>
+<td>Macro</td>
+<td>Building</td>
+<td>Importing</td>
+</tr>
+<tr>
+<td>Unix/GCC</td>
+<td>::VL_EXPORT</td>
+<td>empty (assumes <c>-visibility=hidden</c> GCC option</c>)</td>
+<td><c>__attribute__((visibility ("default")))</c></td>
+</tr>
+<tr>
+<td>Win/Visual C++</td>
+<td>::VL_EXPORT</td>
+<td>@c __declspec(dllexport)</td>
+<td>@c __declspec(dllimport)</td>
+</tr>
+<tr>
+<td>Unix/GCC</td>
+<td>::VL_CONSTRUCTOR</td>
+<td><c>__attribute__((constructor))</c></td>
+<td>N.A.</td>
+</tr>
+<tr>
+<td>Unix/GCC</td>
+<td>::VL_DESTRUCTOR</td>
+<td><c>__attribute__((destructor))</c></td>
+<td>N.A.</td>
+</tr>
+</table>
+
+<table>
+<caption>Platform-dependent support for inline functions</caption>
+<tr>
+<td>Platform</td>
+<td>Macro</td>
+<td>Implementation</td>
+</tr>
+<tr>
+<td>Unix/GCC</td>
+<td>::VL_INLINE</td>
+<td>static inline</td>
+</tr>
+<tr>
+<td>Win/Visual C++</td>
+<td>::VL_INLINE</td>
+<td>static __inline</td>
+</tr>
+</table>
+
+@section generic-error Error handling
+
+Error handling uses the same style of the standard C library. Most
+functions return 0 when they succeed and -1 when they fail, and
+set the global variable ::vl_err_no with a code identifying the
+error occurred. This variable is never set on success and should
+be examinated right after an error had occurred.
+
+@section generic-heap Heap allocation
+
+VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
+::vl_free() functions to allocate the heap. Normally these functions
+are mapped to the underlying standar C library implementations. However
+::vl_set_alloc_func() can be used to map them to other implementations.
+For instance, in MATALB MEX files these functions are mapped to 
+the MATLAB equivalent, with the benefits of garbage collection 
+in case of interrupted execution.
+
+@section generic-logging Logging
+
+VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
+debug informations. These functions are normally mapped to the @c
+printf function of the underlying standard C library. However
+::vl_set_printf_func() can be used to map it to a different
+implementation. For instance, in MATLAB MEX files this function is
+mapped to @c mexPrintf. Setting the function to @c NULL disables
+logging.
+
+
 **/
 
 #include "generic.h"
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 VL_EXPORT int vl_err_no = 0 ;
@@ -318,7 +413,7 @@ void *(*vl_calloc_func)  (vl_size, vl_size) = &calloc ;
 void  (*vl_free_func)    (void*)            = &free ;
                                             
 /** @internal@brief Customizable @c printf function pointer */
-int   (*vl_printf_func)  (char const *, ...)= do_nothing_printf ;
+int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*/
 
 /** ------------------------------------------------------------------
  ** @brief Set memory allocation functions
@@ -352,3 +447,31 @@ vl_set_printf_func (int(*printf_func) (char const *format, ...))
 {
   vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
 }
+
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Dynamic library constructor function
+ ** @sa design-export
+ **/
+
+VL_CONSTRUCTOR
+static void initializer () 
+{
+  VL_PRINT ("VLFeat DLL constructor called.\n") ;
+}
+
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Dynamic library constructor function
+ ** @sa design-export
+ **/
+
+VL_DESTRUCTOR
+static void finalizer () 
+{
+  VL_PRINT ("VLFeat DLL destructor called.\n") ;
+}
+
+
+ 
+
