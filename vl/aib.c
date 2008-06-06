@@ -172,18 +172,18 @@ General Public License version 2.
 
 typedef struct _VlAIB
 {
-  vl_aib_node   *nodes ;    /**< Entires to nodes */
-  vl_aib_node    nentries ; /**< Total number of entries (= # active nodes) */
-  vl_double     *beta ;     /**< Minimum distance to an entry  */
-  vl_aib_node   *bidx ;     /**< Closest entry */
+  vl_uint   *nodes ;    /**< Entires to nodes */
+  vl_uint    nentries ; /**< Total number of entries (= # active nodes) */
+  double     *beta ;     /**< Minimum distance to an entry  */
+  vl_uint   *bidx ;     /**< Closest entry */
 
 
-  vl_aib_node   *which ;    /**< List of entries to update */
-  vl_aib_node    nwhich ;   /**< Number of entries to update */
+  vl_uint   *which ;    /**< List of entries to update */
+  vl_uint    nwhich ;   /**< Number of entries to update */
   
-  vl_aib_prob   *Pcx;       /**< Joint probability table */
-  vl_aib_prob   *Px;        /**< Marginal. */
-  vl_aib_prob   *Pc;        /**< Marginal. */
+  double   *Pcx;       /**< Joint probability table */
+  double   *Px;        /**< Marginal. */
+  double   *Pc;        /**< Marginal. */
   vl_uint       nvalues;    /**< Number of feature values */
   vl_uint       nlabels;    /**< Number of labels */
 } VlAIB;
@@ -198,10 +198,10 @@ typedef struct _VlAIB
  ** @return Modifies P to contain values which sum to 1
  **/
 
-void vl_aib_normalize_P (vl_aib_prob * P, vl_aib_node nelem)
+void vl_aib_normalize_P (double * P, vl_uint nelem)
 {
-    vl_aib_node i;
-    vl_aib_prob sum = 0;
+    vl_uint i;
+    double sum = 0;
     for(i=0; i<nelem; i++)
         sum += P[i];
     for(i=0; i<nelem; i++)
@@ -217,10 +217,10 @@ void vl_aib_normalize_P (vl_aib_prob * P, vl_aib_node nelem)
  ** @return an array containing elements 0...nentries
  **/
 
-vl_aib_node *vl_aib_new_nodelist (vl_aib_node nentries)
+vl_uint *vl_aib_new_nodelist (vl_uint nentries)
 {
-    vl_aib_node * nodelist = vl_malloc(sizeof(vl_aib_node)*nentries);
-    vl_aib_node n;
+    vl_uint * nodelist = vl_malloc(sizeof(vl_uint)*nentries);
+    vl_uint n;
     for(n=0; n<nentries; n++)
         nodelist[n] = n;
 
@@ -239,13 +239,13 @@ vl_aib_node *vl_aib_new_nodelist (vl_aib_node nentries)
  **         distribution over the rows.
  **/
 
-vl_aib_prob * vl_aib_new_Px(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node nlabels)
+double * vl_aib_new_Px(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 {
-    vl_aib_prob * Px = vl_malloc(sizeof(vl_aib_prob)*nvalues);
-    vl_aib_node r,c;
+    double * Px = vl_malloc(sizeof(double)*nvalues);
+    vl_uint r,c;
     for(r=0; r<nvalues; r++)
     {
-        vl_aib_prob sum = 0;
+        double sum = 0;
         for(c=0; c<nlabels; c++)
             sum += Pcx[r*nlabels+c];
         Px[r] = sum;
@@ -264,13 +264,13 @@ vl_aib_prob * vl_aib_new_Px(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node 
  **         over the columns
  **/
 
-vl_aib_prob * vl_aib_new_Pc(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node nlabels)
+double * vl_aib_new_Pc(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 {
-    vl_aib_prob * Pc = vl_malloc(sizeof(vl_aib_prob)*nlabels);
-    vl_aib_node r, c;
+    double * Pc = vl_malloc(sizeof(double)*nlabels);
+    vl_uint r, c;
     for(c=0; c<nlabels; c++)
     {
-        vl_aib_prob sum = 0;
+        double sum = 0;
         for(r=0; r<nvalues; r++)
             sum += Pcx[r*nlabels+c];
         Pc[c] = sum;
@@ -292,9 +292,9 @@ vl_aib_prob * vl_aib_new_Pc(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node 
  **/
 
 void vl_aib_min_beta
-(VlAIB * aib, vl_aib_node * besti, vl_aib_node * bestj, vl_double * minbeta)
+(VlAIB * aib, vl_uint * besti, vl_uint * bestj, double * minbeta)
 {
-    vl_aib_node i;
+    vl_uint i;
     *minbeta = aib->beta[0];
     *besti   = 0;
     *bestj   = aib->bidx[0];
@@ -331,16 +331,16 @@ void vl_aib_min_beta
  **/
 
 void 
-vl_aib_merge_nodes (VlAIB * aib, vl_aib_node i, vl_aib_node j, vl_aib_node new)
+vl_aib_merge_nodes (VlAIB * aib, vl_uint i, vl_uint j, vl_uint new)
 {
-  vl_aib_node last_entry = aib->nentries - 1 ;
-  vl_aib_node c, n ;
+  vl_uint last_entry = aib->nentries - 1 ;
+  vl_uint c, n ;
   
   /* clear the list of nodes to update */
   aib->nwhich = 0;
   
   /* make sure that i is smaller than j */
-  if(i > j) { vl_aib_node tmp = j; j = i; i = tmp; }
+  if(i > j) { vl_uint tmp = j; j = i; i = tmp; }
   
   /* -----------------------------------------------------------------
    *                    Merge entries i and j, storing the result in i
@@ -415,11 +415,11 @@ vl_aib_update_beta (VlAIB * aib)
 
 #define PLOGP(x) ((x)*log((x)))
 
-  vl_aib_node i;
-  vl_aib_prob * Px  = aib->Px;
-  vl_aib_prob * Pcx = aib->Pcx;
-  vl_aib_prob * tmp = vl_malloc(sizeof(vl_aib_prob)*aib->nentries);
-  vl_aib_node a, b, c ; 
+  vl_uint i;
+  double * Px  = aib->Px;
+  double * Pcx = aib->Pcx;
+  double * tmp = vl_malloc(sizeof(double)*aib->nentries);
+  vl_uint a, b, c ; 
   
   /* 
    * T1 = I(x,c) - I([x]_ij) = A + B - C
@@ -437,7 +437,7 @@ vl_aib_update_beta (VlAIB * aib)
   for (a = 0; a < aib->nentries; a++) {
     tmp[a] = 0;
     for (c = 0; c < aib->nlabels; c++) {
-        vl_double Pac = Pcx [a*aib->nlabels + c] ;       
+        double Pac = Pcx [a*aib->nlabels + c] ;       
         if(Pac != 0) tmp[a] += Pac * log (Pac / Px[a]) ;
     }
   }
@@ -448,7 +448,7 @@ vl_aib_update_beta (VlAIB * aib)
 
     /* for each other entry */
     for(b = 0 ; b < aib->nentries ; b++) {
-      vl_double T1 = 0 ;
+      double T1 = 0 ;
       
       if (a == b || Px [a] == 0 || Px [b] == 0) continue ;
 
@@ -457,8 +457,8 @@ vl_aib_update_beta (VlAIB * aib)
       T1 += tmp[a] + tmp[b] ;                         /* + A + B */
 
       for (c = 0 ; c < aib->nlabels; ++ c) {
-        vl_double Pac = Pcx [a*aib->nlabels + c] ;
-        vl_double Pbc = Pcx [b*aib->nlabels + c] ;
+        double Pac = Pcx [a*aib->nlabels + c] ;
+        double Pbc = Pcx [b*aib->nlabels + c] ;
         if (Pac == 0 && Pbc == 0) continue;
         T1 += - PLOGP ((Pac + Pbc)) ;                 /* - C1 */
       }
@@ -468,7 +468,7 @@ vl_aib_update_beta (VlAIB * aib)
        * for entries a and b.
        */
       {
-        vl_double beta = T1 ;
+        double beta = T1 ;
         
         if (beta < aib->beta[a])
           {
@@ -496,9 +496,9 @@ vl_aib_update_beta (VlAIB * aib)
  ** Calculates the current mutual information and entropy of Pcx and sets
  ** @a I and @a H to these new values.
  **/
-void vl_aib_calculate_information(VlAIB * aib, vl_aib_prob * I, vl_aib_prob * H)
+void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
 {
-    vl_aib_node r, c;
+    vl_uint r, c;
     *H = 0;
     *I = 0;
 
@@ -533,24 +533,24 @@ void vl_aib_calculate_information(VlAIB * aib, vl_aib_prob * I, vl_aib_prob * H)
  ** will be used during the AIB process. 
  **
  ** Allocates memory for the following:
- ** - Px (nvalues*sizeof(vl_aib_prob))
- ** - Pc (nlabels*sizeof(vl_aib_prob))
- ** - nodelist (nvalues*sizeof(vl_aib_node))
- ** - which (nvalues*sizeof(vl_aib_node))
- ** - beta (nvalues*sizeof(vl_double))
- ** - bidx (nvalues*sizeof(vl_aib_node))
+ ** - Px (nvalues*sizeof(double))
+ ** - Pc (nlabels*sizeof(double))
+ ** - nodelist (nvalues*sizeof(vl_uint))
+ ** - which (nvalues*sizeof(vl_uint))
+ ** - beta (nvalues*sizeof(double))
+ ** - bidx (nvalues*sizeof(vl_uint))
  **
  ** Since it simply copies to pointer to Pcx, the total additional memory
  ** requirement is: 
- ** (nvalues+nlabels)*sizeof(vl_aib_prob) + 3*nvalues*sizeof(vl_aib_prob) + 
- ** nvalues*sizeof(vl_double)
+ ** (nvalues+nlabels)*sizeof(double) + 3*nvalues*sizeof(double) + 
+ ** nvalues*sizeof(double)
  **
  ** @returns An allocated and initialized @a VlAIB pointer
  **/
-VlAIB * vl_aib_new_aib(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node nlabels)
+VlAIB * vl_aib_new_aib(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 {
     VlAIB * aib = vl_malloc(sizeof(VlAIB));
-    vl_aib_node i ;
+    vl_uint i ;
 
     aib->Pcx   = Pcx ;
     aib->nvalues = nvalues ;
@@ -563,8 +563,8 @@ VlAIB * vl_aib_new_aib(vl_aib_prob * Pcx, vl_aib_node nvalues, vl_aib_node nlabe
 
     aib->nentries = nvalues ;
     aib->nodes    = vl_aib_new_nodelist(aib->nentries) ;
-    aib->beta     = vl_malloc(sizeof(vl_double) * aib->nentries) ;
-    aib->bidx     = vl_malloc(sizeof(vl_aib_node)   * aib->nentries) ;
+    aib->beta     = vl_malloc(sizeof(double) * aib->nentries) ;
+    aib->bidx     = vl_malloc(sizeof(vl_uint)   * aib->nentries) ;
 
     for(i = 0 ; i < aib->nentries ; i++)
       aib->beta [i] = BETA_MAX ;
@@ -637,12 +637,12 @@ vl_aib_delete_aib (VlAIB * aib)
  **/ 
 
 VL_EXPORT
-vl_aib_node *
-vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
+vl_uint *
+vl_aib (double * Pcx, vl_uint nlabels, vl_uint nvalues,
         double ** cost)
 {
-  vl_aib_node * parents = vl_malloc(sizeof(vl_aib_node)*(nvalues*2-1));
-  vl_aib_node n;
+  vl_uint * parents = vl_malloc(sizeof(vl_uint)*(nvalues*2-1));
+  vl_uint n;
   
   /* Initially, all parents point to a nonexistant node */
   for (n = 0 ; n < 2 * nvalues - 1 ; n++)
@@ -653,9 +653,9 @@ vl_aib (vl_aib_prob * Pcx, vl_uint nlabels, vl_uint nvalues,
   
   {
     VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
-    vl_aib_node i, besti, bestj, newnode, nodei, nodej;
-    vl_aib_prob I, H;
-    vl_double minbeta;
+    vl_uint i, besti, bestj, newnode, nodei, nodej;
+    double I, H;
+    double minbeta;
 
     /* Caluclate initial value of cost functiion */
     vl_aib_calculate_information (aib, &I, &H) ;

@@ -101,10 +101,6 @@ typedef char      unsigned  vl_uint8 ;   /**< unsigned  8-bit integer. */
 
 typedef int                 vl_int ;     /**< @c int.                  */
 typedef unsigned int        vl_uint ;    /**< @c unsigned @c int.      */
-typedef float               vl_single ;  /**< single precision float.  */
-typedef double              vl_double ;  /**< double precision float.  */
-typedef unsigned int        vl_uidx ;    /**< unsigned index data type.*/
-typedef size_t              vl_size ;    /**< size data type.          */
 
 typedef int                 vl_bool ;    /**< boolean */
 /** @} */
@@ -127,11 +123,14 @@ typedef int                 vl_bool ;    /**< boolean */
 
 /** @} */
 
-/** @brief Big integer (math constant) */
-#define VL_BIG_INT    2147483647
+/** @brief Largest integer (math constant) */
+#define VL_BIG_INT  0x7FFFFFFFL
 
-/** @brief Small integer */
+/** @brief Smallest integer (math constant) */
 #define VL_SMALL_INT  (- VL_BIG_INT - 1)
+
+/** @brief Largest unsigned integer (math constant) */
+#define VL_BIG_UINT 0xFFFFFFFFUL
 
 /** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945
@@ -162,22 +161,22 @@ typedef int                 vl_bool ;    /**< boolean */
 */
 
 /** @brief IEEE single quiet NaN constant */
-static union { vl_uint32 raw ; vl_single value ; } 
+static union { vl_uint32 raw ; float value ; } 
   const vl_nan_f = 
     { 0x7FC00000UL } ;
 
 /** @brief IEEE single infinity constant */
-static union { vl_uint32 raw ; vl_single value ; } 
+static union { vl_uint32 raw ; float value ; } 
   const vl_infinity_f = 
     { 0x7F800000UL } ;
 
 /** @brief IEEE double quiet NaN constant */
-static union { vl_uint64 raw ; vl_double value ; } 
+static union { vl_uint64 raw ; double value ; } 
   const vl_nan_d = 
     { 0x7FF8000000000000ULL } ;
 
 /** @brief IEEE double infinity constant */
-static union { vl_uint64 raw ; vl_double value ; } 
+static union { vl_uint64 raw ; float value ; } 
   const vl_infinity_d = 
     { 0x7FF0000000000000ULL } ;
 
@@ -200,13 +199,13 @@ static union { vl_uint64 raw ; vl_double value ; }
  **/
 
 VL_EXPORT
-void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
-                        void *(*realloc_func) (void*,vl_size),
-                        void *(*calloc_func)  (vl_size, vl_size),
+void vl_set_alloc_func (void *(*malloc_func)  (size_t),
+                        void *(*realloc_func) (void*,size_t),
+                        void *(*calloc_func)  (size_t, size_t),
                         void  (*free_func)    (void*)) ;
-VL_INLINE void *vl_malloc  (vl_size n) ;
-VL_INLINE void *vl_realloc (void *ptr, vl_size n) ;
-VL_INLINE void *vl_calloc  (vl_size n, vl_size size) ;
+VL_INLINE void *vl_malloc  (size_t n) ;
+VL_INLINE void *vl_realloc (void *ptr, size_t n) ;
+VL_INLINE void *vl_calloc  (size_t n, size_t size) ;
 VL_INLINE void  vl_free    (void* ptr) ;
 
 /** @} */
@@ -439,9 +438,9 @@ vl_adapt_endianness_2 (void *dst, void* src)
 }
 
 extern VL_EXPORT int   (*vl_printf_func)  (char const * format, ...) ;
-extern VL_EXPORT void *(*vl_malloc_func)  (vl_size) ;
-extern VL_EXPORT void *(*vl_realloc_func) (void*,vl_size) ;
-extern VL_EXPORT void *(*vl_calloc_func)  (vl_size, vl_size) ;
+extern VL_EXPORT void *(*vl_malloc_func)  (size_t) ;
+extern VL_EXPORT void *(*vl_realloc_func) (void*,size_t) ;
+extern VL_EXPORT void *(*vl_calloc_func)  (size_t, size_t) ;
 extern VL_EXPORT void  (*vl_free_func)    (void*) ;          
 
 /** ------------------------------------------------------------------
@@ -455,7 +454,7 @@ extern VL_EXPORT void  (*vl_free_func)    (void*) ;
 
 VL_INLINE 
 void*
-vl_malloc (vl_size n)
+vl_malloc (size_t n)
 {
   return (*vl_malloc_func)(n) ;
 }
@@ -473,7 +472,7 @@ vl_malloc (vl_size n)
 
 VL_INLINE 
 void*
-vl_realloc (void* ptr, vl_size n)
+vl_realloc (void* ptr, size_t n)
 {
   return (*vl_realloc_func)(ptr, n) ;
 }
@@ -491,7 +490,7 @@ vl_realloc (void* ptr, vl_size n)
 
 VL_INLINE 
 void*
-vl_calloc (vl_size n, vl_size size)
+vl_calloc (size_t n, size_t size)
 {
   return (*vl_calloc_func)(n, size) ;
 }

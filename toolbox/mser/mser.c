@@ -138,7 +138,7 @@ mexFunction(int nout, mxArray *out[],
   {
     VlMserFilt        *filt ;    
     vl_uint     const *regions ;
-    vl_single   const *frames ;    
+    float   const *frames ;    
     int                i, j, nregions, nframes, dof ;    
     int                odims [2] ;
     double            *pt ;

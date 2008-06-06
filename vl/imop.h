@@ -25,16 +25,16 @@ General Public License version 2.
 
 /* @{ */
 VL_EXPORT
-void vl_convtransp_f(vl_single       *dst,
-                     vl_single const *src, 
-                     vl_single const *filt,
+void vl_convtransp_f(float       *dst,
+                     float const *src, 
+                     float const *filt,
                      int width, int height, int filt_width,
                      int mode) ;
 
 VL_EXPORT
-void vl_convtransp_d(vl_double       *dst,
-                     vl_double const *src, 
-                     vl_double const *filt,
+void vl_convtransp_d(double       *dst,
+                     double const *src, 
+                     double const *filt,
                      int width, int height, int filt_width,
                      int mode) ;
 /* @} */
@@ -42,15 +42,15 @@ void vl_convtransp_d(vl_double       *dst,
 
 /* @{ */
 VL_EXPORT
-void vl_imsmooth_f(vl_single       *dst, 
-                   vl_single       *temp,
-                   vl_single const *src,
+void vl_imsmooth_f(float       *dst, 
+                   float       *temp,
+                   float const *src,
                    int width, int height, double sigma) ;
 
 VL_EXPORT
-void vl_imsmooth_d(vl_double       *dst, 
-                   vl_double       *temp,
-                   vl_double const *src,
+void vl_imsmooth_d(double       *dst, 
+                   double       *temp,
+                   double const *src,
                    int width, int height, double sigma) ;
 /*@}*/
 

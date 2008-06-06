@@ -15,7 +15,7 @@ General Public License version 2.
 #include "generic.h"
 
 /** @brief SIFT filter pixel type */
-typedef vl_single vl_sift_pix ;
+typedef float vl_sift_pix ;
 
 /** ------------------------------------------------------------------
  ** @brief SIFT filter keypoint
@@ -32,10 +32,10 @@ typedef struct _VlSiftKeypoint
   int iy ;          /**< Integer unnormalized y coordinate. */
   int is ;          /**< Integer s coordinate. */
   
-  vl_single x ;     /**< x coorindate. */
-  vl_single y ;     /**< u coordinate. */
-  vl_single s ;     /**< x coordinate. */
-  vl_single sigma ; /**< scale. */
+  float x ;     /**< x coorindate. */
+  float y ;     /**< u coordinate. */
+  float s ;     /**< x coordinate. */
+  float sigma ; /**< scale. */
 } VlSiftKeypoint ;
 
 /** ------------------------------------------------------------------

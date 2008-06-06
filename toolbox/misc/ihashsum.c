@@ -193,7 +193,7 @@ mexFunction(int nout, mxArray *out[],
       /* append */
       if (next [p] == 0) {        
         if (last >= res) {
-          vl_size res_ = res + VL_MAX(res / 2, 2) ;
+          size_t res_ = res + VL_MAX(res / 2, 2) ;
           h    = mxRealloc(h,    res_ * sizeof(vl_uint32)       ) ;
           next = mxRealloc(next, res_ * sizeof(vl_uint32)       ) ;
           id   = mxRealloc(id,   res_ * sizeof(vl_uint8) * ndims) ;

@@ -24,15 +24,15 @@ General Public License version 2.
  ** @return @c mod(x, 2 * VL_PI)
  **/
 VL_INLINE
-vl_single vl_mod_2pi_f (vl_single x)
+float vl_mod_2pi_f (float x)
 {
-  while (x < 0.0      ) x += (vl_single) (2 * VL_PI);
-  while (x > 2 * VL_PI) x -= (vl_single) (2 * VL_PI);
+  while (x < 0.0      ) x += (float) (2 * VL_PI);
+  while (x > 2 * VL_PI) x -= (float) (2 * VL_PI);
   return x ;
 }
 
 VL_INLINE
-vl_double vl_mod_2pi_d (vl_double x)
+double vl_mod_2pi_d (double x)
 {
   while (x < 0.0      ) x += 2 * VL_PI ;
   while (x > 2 * VL_PI) x -= 2 * VL_PI ;
@@ -48,19 +48,19 @@ vl_double vl_mod_2pi_d (vl_double x)
  **/
 VL_INLINE
 int
-vl_floor_f (vl_single x)
+vl_floor_f (float x)
 {
   int xi = (int) x ;
-  if (x >= 0 || (vl_single) xi == x) return xi ;
+  if (x >= 0 || (float) xi == x) return xi ;
   else return xi - 1 ;
 }
 
 VL_INLINE
 int
-vl_floor_d (vl_double x)
+vl_floor_d (double x)
 {
   int xi = (int) x ;
-  if (x >= 0 || (vl_double) xi == x) return xi ;
+  if (x >= 0 || (double) xi == x) return xi ;
   else return xi - 1 ;
 }
 /* @} */
@@ -73,15 +73,15 @@ vl_floor_d (vl_double x)
  ** @return @c abs(x)
  **/
 VL_INLINE
-vl_single
-vl_abs_f (vl_single x)
+float
+vl_abs_f (float x)
 {
   return (x >= 0) ? x : -x ;
 }
 
 VL_INLINE
-vl_double
-vl_abs_d (vl_double x)
+double
+vl_abs_d (double x)
 {
   return (x >= 0) ? x : -x ;
 }
@@ -118,37 +118,37 @@ vl_abs_d (vl_double x)
  **/
 
 VL_INLINE
-vl_single
-vl_fast_atan2_f (vl_single y, vl_single x)
+float
+vl_fast_atan2_f (float y, float x)
 {
   /*
    
   */
 
-  vl_single angle, r ;
-  vl_single const c3 = 0.1821F ;
-  vl_single const c1 = 0.9675F ;
-  vl_single abs_y    = vl_abs_f (y) + 1e-10F ;
+  float angle, r ;
+  float const c3 = 0.1821F ;
+  float const c1 = 0.9675F ;
+  float abs_y    = vl_abs_f (y) + 1e-10F ;
   
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
-    angle = (vl_single) (VL_PI / 4) ;
+    angle = (float) (VL_PI / 4) ;
   } else {
     r = (x + abs_y) / (abs_y - x) ;
-    angle = (vl_single) (3 * VL_PI / 4) ;
+    angle = (float) (3 * VL_PI / 4) ;
   } 
   angle += (c3*r*r - c1) * r ; 
   return (y < 0) ? - angle : angle ;
 }
 
 VL_INLINE
-vl_double
-vl_fast_atan2_d (vl_double y, vl_double x)
+double
+vl_fast_atan2_d (double y, double x)
 {
-  vl_double angle, r ;
-  vl_double const c3 = 0.1821 ;
-  vl_double const c1 = 0.9675 ;
-  vl_double abs_y    = vl_abs_d (y) + 1e-10 ;
+  double angle, r ;
+  double const c3 = 0.1821 ;
+  double const c1 = 0.9675 ;
+  double abs_y    = vl_abs_d (y) + 1e-10 ;
   
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
@@ -171,16 +171,16 @@ vl_fast_atan2_d (vl_double y, vl_double x)
  **/
 
 VL_INLINE
-vl_single
-vl_fast_resqrt_f (vl_single x)
+float
+vl_fast_resqrt_f (float x)
 {
   /* 32-bit version */
   union {
-    vl_single x ;
+    float x ;
     vl_int32  i ;
   } u ;
   
-  vl_single xhalf = (vl_single) 0.5 * x ;
+  float xhalf = (float) 0.5 * x ;
 
   /* convert floating point value in RAW integer */
   u.x = x ;                   
@@ -190,22 +190,22 @@ vl_fast_resqrt_f (vl_single x)
   /*u.i = 0xdf59375f - (u.i>>1);*/
   
   /* two Newton steps */
-  u.x = u.x * ( (vl_single) 1.5  - xhalf*u.x*u.x) ; 
-  u.x = u.x * ( (vl_single) 1.5  - xhalf*u.x*u.x) ;
+  u.x = u.x * ( (float) 1.5  - xhalf*u.x*u.x) ; 
+  u.x = u.x * ( (float) 1.5  - xhalf*u.x*u.x) ;
   return u.x ;
 }
 
 VL_INLINE
-vl_double
-vl_fast_resqrt_d (vl_double x)
+double
+vl_fast_resqrt_d (double x)
 {
   /* 64-bit version */
   union {
-    vl_double x ;
+    double x ;
     vl_int64  i ;
   } u ;
   
-  vl_double xhalf = (vl_double) 0.5 * x ;
+  double xhalf = (double) 0.5 * x ;
   
   /* convert floating point value in RAW integer */
   u.x = x ;                   
@@ -214,8 +214,8 @@ vl_fast_resqrt_d (vl_double x)
   u.i = 0x5fe6ec85e7de30daLL - (u.i >> 1) ; 
   
   /* two Newton steps */
-  u.x = u.x * ( (vl_double) 1.5  - xhalf*u.x*u.x) ; 
-  u.x = u.x * ( (vl_double) 1.5  - xhalf*u.x*u.x) ;
+  u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ; 
+  u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ;
   return u.x ;
 }
 /* @} */
@@ -229,15 +229,15 @@ vl_fast_resqrt_d (vl_double x)
  **/
 
 VL_INLINE
-vl_single
-vl_fast_sqrt_f (vl_single x)
+float
+vl_fast_sqrt_f (float x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_f (x) ;
 }
 
 VL_INLINE
-vl_double
-vl_fast_sqrt_d (vl_double x)
+double
+vl_fast_sqrt_d (float x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_d (x) ;
 }

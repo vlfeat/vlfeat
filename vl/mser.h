@@ -75,7 +75,7 @@ VL_EXPORT void             vl_mser_ell_fit (VlMserFilt *f) ;
  **/
 VL_INLINE vl_uint          vl_mser_get_regions_num  (VlMserFilt const *f) ;
 VL_INLINE vl_uint const*   vl_mser_get_regions      (VlMserFilt const *f) ;
-VL_INLINE vl_single const* vl_mser_get_ell          (VlMserFilt const *f) ;
+VL_INLINE float const* vl_mser_get_ell          (VlMserFilt const *f) ;
 VL_INLINE vl_uint          vl_mser_get_ell_num      (VlMserFilt const *f) ;
 VL_INLINE vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *f) ;
 VL_INLINE VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;
@@ -112,7 +112,7 @@ VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
  ** widht by the image height (for instance, if the image is a square
  ** of side 256, the maximum value is 256 x 256 x 256).
  **/
-typedef vl_single vl_mser_acc ;
+typedef float vl_mser_acc ;
 
 /** @internal @brief Basic region flag: null region */
 #define VL_MSER_VOID_NODE ((1ULL<<32) - 1)
@@ -184,7 +184,7 @@ struct _VlMserExtrReg
   vl_mser_pix  value ;      /**< value of pivot pixel                         */
   vl_uint      shortcut ;   /**< shortcut used when building a tree           */
   vl_uint      area ;       /**< area of the region                           */
-  vl_single    variation ;  /**< rel. area variation                          */
+  float    variation ;  /**< rel. area variation                          */
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
 } ;
 
@@ -225,8 +225,8 @@ struct _VlMserFilt
 
   /** @name Ellipsoids fitting */
   /*@{*/
-  vl_single         *acc ;     /**< moment accumulator.                    */
-  vl_single         *ell ;     /**< ellipsoids list.                       */
+  float         *acc ;     /**< moment accumulator.                    */
+  float         *ell ;     /**< ellipsoids list.                       */
   int                rell ;    /**< size of ell buffer                     */
   int                nell ;    /**< number of ellipsoids extracted         */
   int                dof ;     /**< number of dof of ellipsoids.           */
@@ -388,7 +388,7 @@ vl_mser_get_regions_num (VlMserFilt const* f)
  ** @param f MSER filter.
  ** @return ellipsoids.
  **/
-VL_INLINE vl_single const *
+VL_INLINE float const *
 vl_mser_get_ell (VlMserFilt const* f)
 {
   return f-> ell ;

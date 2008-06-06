@@ -707,7 +707,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     {
       int area     = er [i  ] .area ;
       int area_top = er [top] .area ;
-      er [i] .variation  = (vl_single) (area_top - area) / area ;
+      er [i] .variation  = (float) (area_top - area) / area ;
       er [i] .max_stable = 1 ;
     }
         
@@ -732,9 +732,9 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   for(i = 0 ; i < ner ; ++i) {
     vl_uint    parent = er [i     ] .parent ;
     vl_mser_pix   val = er [i     ] .value ;
-    vl_single     var = er [i     ] .variation ;
+    float     var = er [i     ] .variation ;
     vl_mser_pix p_val = er [parent] .value ;
-    vl_single   p_var = er [parent] .variation ;
+    float   p_var = er [parent] .variation ;
     vl_uint     loser ;
     
     /* 
@@ -761,10 +761,10 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   /* It is critical for correct duplicate detection to remove regions
    * from the bottom (smallest one first).                          */
   {
-    vl_single max_area = (vl_single) f-> max_area * nel ;
-    vl_single min_area = (vl_single) f-> min_area * nel ;
-    vl_single max_var  = (vl_single) f-> max_variation ;
-    vl_single min_div  = (vl_single) f-> min_diversity ;
+    float max_area = (float) f-> max_area * nel ;
+    float min_area = (float) f-> min_area * nel ;
+    float max_var  = (float) f-> max_variation ;
+    float min_div  = (float) f-> min_diversity ;
 
     /* scann all extremal regions (intensity value order) */
     for(i = ner-1 ; i >= 0L  ; --i) {
@@ -782,7 +782,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
       if (min_div < 1.0) {
         vl_uint   parent = er [i] .parent ;
         int       area, p_area ;
-        vl_single div ;
+        float div ;
         
         /* check all but the root mser */
         if(parent != i) {
@@ -798,7 +798,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
            * regions are too similar, keep only the parent. */
           area    = er [i]      .area ;
           p_area  = er [parent] .area ;
-          div     = (vl_single) (p_area - area) / (vl_single) p_area ;
+          div     = (float) (p_area - area) / (float) p_area ;
           
           if (div < min_div) { ++ ndup ; goto remove ; }
         } /* remove dups end */
@@ -869,12 +869,12 @@ vl_mser_ell_fit (VlMserFilt* f)
   /* make room */
   if (f->rell < f->nmer) {
     if (f->ell) vl_free (f->ell) ;
-    f->ell  = vl_malloc (sizeof(vl_single) * f->nmer * f->dof) ;
+    f->ell  = vl_malloc (sizeof(float) * f->nmer * f->dof) ;
     f->rell = f-> nmer ;
   }
 
   if (f->acc == 0) {
-    f->acc = vl_malloc (sizeof(vl_single) * f->nel) ;
+    f->acc = vl_malloc (sizeof(float) * f->nel) ;
   }
  
   acc = f-> acc ;
@@ -936,9 +936,9 @@ vl_mser_ell_fit (VlMserFilt* f)
    * -------------------------------------------------------------- */
 
   for(index = 0 ; index < nmer ; ++index) {
-    vl_single  *pt  = ell + index * dof ;
+    float  *pt  = ell + index * dof ;
     vl_uint    idx  = mer [index] ;
-    vl_single  area = r [idx] .area ;
+    float  area = r [idx] .area ;
     
     for(d = 0 ; d < dof ; ++d) {
 

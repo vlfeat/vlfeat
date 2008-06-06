@@ -401,13 +401,13 @@ do_nothing_printf (char const* format, ...)
 }
 
 /** @internal@brief Customizable @c malloc function pointer */
-void *(*vl_malloc_func)  (vl_size)          = &malloc ;
+void *(*vl_malloc_func)  (size_t)          = &malloc ;
                                             
 /** @internal@brief Customizable @c realloc function pointer */
-void *(*vl_realloc_func) (void*,vl_size)    = &realloc ;
+void *(*vl_realloc_func) (void*,size_t)    = &realloc ;
 
 /** @internal@brief Customizable @c calloc function pointer */
-void *(*vl_calloc_func)  (vl_size, vl_size) = &calloc ;
+void *(*vl_calloc_func)  (size_t, size_t) = &calloc ;
 
 /** @internal@brief Customizable @c free function pointer */
 void  (*vl_free_func)    (void*)            = &free ;
@@ -424,9 +424,9 @@ int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*
  **/
 
 VL_EXPORT
-void vl_set_alloc_func (void *(*malloc_func)  (vl_size),
-                        void *(*realloc_func) (void*, vl_size),
-                        void *(*calloc_func)  (vl_size, vl_size),
+void vl_set_alloc_func (void *(*malloc_func)  (size_t),
+                        void *(*realloc_func) (void*, size_t),
+                        void *(*calloc_func)  (size_t, size_t),
                         void  (*free_func)    (void*))
 {
   vl_malloc_func  = malloc_func ;
