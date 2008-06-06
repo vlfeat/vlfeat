@@ -249,7 +249,7 @@ main(int argc, char **argv)
     vl_uint8        *data = 0 ;
     VlPgmImage       pim ;
     vl_uint const   *regions ;
-    vl_single const *frames ;
+    float const *frames ;
     enum            {ndims = 2} ;
     int              dims [ndims] ;
     int              i, j, dof, nregions, nframes, q ;

@@ -194,9 +194,9 @@ mexFunction(int nout, mxArray *out[],
   int            cost_type = INFORMATION ;
   int            cluster_null = 0 ;
 
-  vl_aib_prob   *Pcx     ;
-  vl_aib_node    nlabels ;
-  vl_aib_node    nvalues ;
+  double   *Pcx     ;
+  vl_uint    nlabels ;
+  vl_uint    nvalues ;
 
   mxArray *Pcx_cpy ;
 
@@ -267,7 +267,7 @@ mexFunction(int nout, mxArray *out[],
   
   { 
     double* cost ;
-    vl_aib_node *parents = 0 ;
+    vl_uint *parents = 0 ;
     int n ;
     
     switch (cost_type) {
