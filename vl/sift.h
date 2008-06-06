@@ -141,7 +141,7 @@ VL_INLINE int    vl_sift_get_octave_first   (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_octave_width   (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_octave_height  (VlSiftFilt const *f) ;
 VL_INLINE int    vl_sift_get_level_num      (VlSiftFilt const *f) ;
-VL_INLINE int    vl_sift_get_keypoints_num  (VlSiftFilt const *f) ;
+VL_INLINE int    vl_sift_get_nkeypoints     (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_peak_thresh    (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_edge_thresh    (VlSiftFilt const *f) ;
 VL_INLINE double vl_sift_get_norm_thresh    (VlSiftFilt const *f) ;
@@ -263,7 +263,7 @@ vl_sift_get_level_num (VlSiftFilt const *f)
  **/
 
 VL_INLINE int 
-vl_sift_get_keypoints_num (VlSiftFilt const *f) 
+vl_sift_get_nkeypoints (VlSiftFilt const *f) 
 {
   return f-> nkeys ;
 }

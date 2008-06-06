@@ -315,8 +315,8 @@ mexFunction(int nout, mxArray *out[],
       if (nikeys < 0) {
         vl_sift_detect (filt) ;
         
-        keys  = vl_sift_get_keypoints     (filt) ;
-        nkeys = vl_sift_get_keypoints_num (filt) ;
+        keys  = vl_sift_get_keypoints  (filt) ;
+        nkeys = vl_sift_get_nkeypoints (filt) ;
         i     = 0 ;
         
         if (verbose > 1) {
