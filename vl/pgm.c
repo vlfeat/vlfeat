@@ -325,7 +325,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 
 VL_EXPORT
 int
-vl_pgm_insert(FILE* f, VlPgmImage const *im, void *data)
+vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
 {
   int bpp       = vl_pgm_get_bpp       (im) ;
   int data_size = vl_pgm_get_data_size (im) ;
