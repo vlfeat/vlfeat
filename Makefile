@@ -318,7 +318,6 @@ docdeep: all
 
 dox: VERSION
 	make -C doc/figures all
-	(test -e dox || mkdir dox)
 	$(DOXYGEN) doc/doxygen.conf
 
 .PHONY: modc
@@ -354,7 +353,7 @@ clean:
 
 distclean: clean
 	make -C doc distclean
-	rm -rf bin dox
+	rm -rf bin
 	rm -f  doc/toolbox.html
 	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
 	do                                                           \
