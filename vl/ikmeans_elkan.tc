@@ -338,7 +338,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_ikm_data const* data, int N)
  ** @param f    IKM quantizer.
  ** @param asgn Assignment of data to centers (out).
  ** @param data Data to quantize.
- ** @param N    Number of data.
+ ** @param N    Number of data elements.
  **/
 
 static void 
