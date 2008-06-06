@@ -17,7 +17,6 @@ General Public License version 2.
 #include "generic.h"
 
 typedef vl_int32 vl_ikm_acc ;  /**< IKM accumulator data type */
-typedef vl_uint8 vl_uint8 ; /**< IKM data type */
 
 /** ------------------------------------------------------------------
  ** @brief IKM algorithms 
