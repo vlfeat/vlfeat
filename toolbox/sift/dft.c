@@ -4,6 +4,8 @@
  ** @brief    Dense Feature Transform (SIFT) - MEX
  **/
 
+/* AUTORIGHTS */
+
 #include <mexutils.h>
 #include <vl/mathop.h>
 #include <vl/dft.h>
@@ -15,7 +17,7 @@
 enum {
   opt_step = 0,
   opt_size,
-  opt_magnif,
+  opt_fast,
   opt_verbose
 } ;
 
@@ -23,8 +25,8 @@ enum {
 uMexOption options [] = {
 {"Step",         1,   opt_step          },
 {"Size",         1,   opt_size          },
-{"Magnif",       1,   opt_magnif        },
 {"Verbose",      0,   opt_verbose       },
+{"Fast",         0,   opt_fast          },
 {0,              0,   0                 }
 } ;
 
@@ -42,7 +44,7 @@ uMexOption options [] = {
  **/
 
 VL_INLINE void 
-transpose_descriptor (float* dst, float* src) 
+transpose_descriptor (float* dst, float const* src) 
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
@@ -60,25 +62,6 @@ transpose_descriptor (float* dst, float* src)
   }
 }
 
-
-/** -------------------------------------------------------------------
- ** @internal
- ** @brief Ordering of tuples by increasing scale
- ** 
- ** @param a tuple.
- ** @param b tuble.
- **
- ** @return @c a[2] < b[2]
- **/
-
-static int
-korder (void const* a, void const* b) {
-  double x = ((double*) a) [2] - ((double*) b) [2] ;
-  if (x < 0) return -1 ;
-  if (x > 0) return +1 ;
-  return 0 ;
-}
-
 /** ------------------------------------------------------------------
  ** @brief MEX entry point
  **/
@@ -88,7 +71,7 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_I=0,IN_END} ;
-  enum {OUT_FRAMES, OUT_DESCRIPTORS} ;
+  enum {OUT_FRAMES=0, OUT_DESCRIPTORS} ;
   
   int                verbose = 0 ;
   int                opt ;
@@ -100,7 +83,7 @@ mexFunction(int nout, mxArray *out[],
   
   int                step = 1 ;
   int                size = 3 ;
-  double             magnif = 3.0f ;
+  vl_bool            fast = 0 ;
   
   VL_USE_MATLAB_ENV ;
   
@@ -130,6 +113,10 @@ mexFunction(int nout, mxArray *out[],
         ++ verbose ;
         break ;
         
+      case opt_fast :
+        fast = 1 ;
+        break ;
+        
       case opt_size :
         if (!uIsRealScalar(optarg) || (size = (int) *mxGetPr(optarg)) < 0) {
           mexErrMsgTxt("'Size' must be a positive integer.") ;
@@ -139,12 +126,6 @@ mexFunction(int nout, mxArray *out[],
       case opt_step :
         if (!uIsRealScalar(optarg) || (step = (int) *mxGetPr(optarg)) < 0) {
           mexErrMsgTxt("'Step' must be a positive integer.") ;
-        }
-        break ;
-        
-      case opt_magnif :
-        if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
-          mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
         }
         break ;
         
@@ -173,11 +154,11 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("dft: image size: %d x %d\n", M, N) ;
       mexPrintf("dft: step:       %d\n", step) ;
       mexPrintf("dft: size:       %d\n", size) ;
+      mexPrintf("dft: fast:       %d\n", fast) ;
       mexPrintf("dft: num keys:   %d\n", nkeys) ;  
     }
     
-    vl_dft_process (dft, data) ;
-    
+    vl_dft_process (dft, data, fast) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
