@@ -188,7 +188,7 @@ mexFunction(int nout, mxArray *out[],
         float tmpdesc [128] ;
         *kpt++ = keys [k].y + 1 ;
         *kpt++ = keys [k].x + 1 ;
-        transpose_descriptor(tmpdesc, descs + 128 * k) ;
+        vl_dft_transpose_descriptor(tmpdesc, descs + 128 * k) ;
         for (i = 0 ; i < 128 ; ++i) {
           *dpt++ = (vl_uint8) (VL_MIN(512.0f * tmpdesc[i], 256.0f)) ;
         }
