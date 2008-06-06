@@ -34,7 +34,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */;
+			remoteGlobalIDString = 2DD302640DE32F6E009443C7;
 			remoteInfo = "vlfeat-xcode-dll";
 		};
 /* End PBXContainerItemProxy section */
@@ -101,6 +101,7 @@
 		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
 		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
 		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
+		2DBA34DB0DF17B5900361FB9 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = "doc/vlfeat-dox/index.html"; sourceTree = SOURCE_ROOT; };
 		2DBB82EF0DD241EB00D546E5 /* dft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dft.h; sourceTree = "<group>"; };
 		2DBB82F00DD241EB00D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dft.c; sourceTree = "<group>"; };
 		2DBB83250DD2F90700D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dft.c; path = toolbox/sift/dft.c; sourceTree = "<group>"; };
@@ -141,6 +142,7 @@
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
+				2DBA34DB0DF17B5900361FB9 /* index.html */,
 				2D36D6310DE337C700F6EFD5 /* mexversion.c */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
@@ -169,8 +171,6 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
-				2DD302780DE33107009443C7 /* random.c */,
-				2DD302790DE33107009443C7 /* random.h */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
 				2D732E7F0CF8C2E40099B03C /* aib.h */,
 				2D732E800CF8C2E40099B03C /* generic.c */,
@@ -193,6 +193,8 @@
 				2D732E910CF8C2E40099B03C /* mser.h */,
 				2D732E920CF8C2E40099B03C /* pgm.c */,
 				2D732E930CF8C2E40099B03C /* pgm.h */,
+				2DD302780DE33107009443C7 /* random.c */,
+				2DD302790DE33107009443C7 /* random.h */,
 				2D732E940CF8C2E40099B03C /* rodrigues.c */,
 				2D732E950CF8C2E40099B03C /* rodrigues.h */,
 				2D732E960CF8C2E40099B03C /* sift.c */,
@@ -532,6 +534,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
+				MATLAB = /Applications/Matlab7;
+				MEX = /Applications/Matlab7/bin/mex;
 				PRODUCT_NAME = "vlfeat-dox";
 			};
 			name = Release;
