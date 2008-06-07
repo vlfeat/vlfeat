@@ -3,7 +3,7 @@
 
 
 COMPILING
-  The core library and command line utilities requrie a common C
+  The core library and command line utilities require a common C
   compiler supporting the (old) C-90 standard (GCC and Visual C will
   do) plus a few common extension (see APPENDIX). To compile the MEX
   files, MATLAB needs also to be installed.
@@ -15,7 +15,7 @@ COMPILING
   > cd vlfeat
   > make
 
-  WINDOWS. We provide a Microsoft NMAKE program (makefile.mak) that
+  WINDOWS. We provide a Microsoft NMAKE Makefile (Makefile.mak) that
   has been tested under Visual C 8.0 and Matlab 7.0 (minor adjustment
   may be required for other version). Open the Visual C terminal, cd
   into the VLFeat directory and issue
@@ -25,7 +25,7 @@ COMPILING
 INSTALLING
   Binaries are created in the bin/XXX directory, where XXX changes
   depending on the architecture. We support the following (the naming
-  reflects MATLAB namings for MEX files):
+  reflects MATLAB naming for MEX files):
 
   - mac     Mac OS X PPC
   - maci    Mac OS X Intel
@@ -42,7 +42,7 @@ INSTALLING
   command.
   
 CREATING THE DOCUMENTATION
-  This task is handled by varius Makefile that have been tested
+  This task is handled by various Makefile that have been tested
   under Mac OS X and Linux only. Compiling the documentation
   requires the following additional tools
   
@@ -60,7 +60,7 @@ CREATING THE DOCUMENTATION
 
   However you need to run some MATLAB code to generate part
   of the figures to start with. To this end, load MATLAB and
-  (priovided that everything is compiled and installed correctly)
+  (provided that everything is compiled and installed correctly)
   type
 
   > demo_all
@@ -79,11 +79,11 @@ See the file doc/html/vlfeat.html or doc/vlfeat.pdf for an overview.
 
 
 APPENDIX
-  CODE COMPATIBILITY. In addition to the C-90 standard, the C compielr
+  CODE COMPATIBILITY. In addition to the C-90 standard, the C compiler
   is supposed to support the following common features:
 
   - long int (64 bit integer) support
-  - varadic macro support
+  - variadic macro support
 
 CHANGES
   beta-3     Completions to the ikmeans code.
