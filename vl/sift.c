@@ -437,8 +437,8 @@ copy_and_downsample
  **
  ** @param width    image width.
  ** @param height   image height.
- ** @param O        number of octaves.
- ** @param S        number of levels per octave.
+ ** @param noctaves number of octaves.
+ ** @param nlevels  number of levels per octave.
  ** @param o_min    first octave index.
  **
  ** The function allocates and returns a new SIFT filter for the
@@ -454,7 +454,7 @@ copy_and_downsample
 VL_EXPORT
 VlSiftFilt *
 vl_sift_new (int width, int height,
-             int O, int S,
+             int noctaves, int nlevels,
              int o_min)
 {
   VlSiftFilt *f = vl_malloc (sizeof(VlSiftFilt)) ;
@@ -464,17 +464,17 @@ vl_sift_new (int width, int height,
   int nel = w * h ;
 
   /* negative value O => calculate max. value */
-  if (O < 0) {
-    O = VL_MAX (floor (log2 (VL_MIN(width, height))) - o_min - 3, 1) ;
+  if (noctaves < 0) {
+    noctaves = VL_MAX (floor (log2 (VL_MIN(width, height))) - o_min - 3, 1) ;
   }
 
   f-> width   = width ;
   f-> height  = height ;
-  f-> O       = O ;
-  f-> S       = S ;
+  f-> O       = noctaves ;
+  f-> S       = nlevels ;
   f-> o_min   = o_min ;
   f-> s_min   = -1 ;
-  f-> s_max   = S + 1 ;
+  f-> s_max   = nlevels + 1 ;
   f-> o_cur   = o_min ;
 
   f-> temp    = vl_malloc (sizeof(vl_sift_pix) * nel    ) ;
@@ -486,8 +486,8 @@ vl_sift_new (int width, int height,
                         * (f->s_max - f->s_min    )  ) ;
 
   f-> sigman  = 0.5 ;
-  f-> sigma0  = 1.6 * pow (2.0, 1.0 / S) ;      
-  f-> sigmak  =       pow (2.0, 1.0 / S) ;
+  f-> sigma0  = 1.6 * pow (2.0, 1.0 / nlevels) ;      
+  f-> sigmak  =       pow (2.0, 1.0 / nlevels) ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak)) ;
 
   /*

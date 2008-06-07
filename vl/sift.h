@@ -86,7 +86,7 @@ typedef struct _VlSiftFilt
  **/
 VL_EXPORT
 VlSiftFilt*  vl_sift_new    (int width, int height,
-                             int O, int S,
+                             int noctaves, int nlevels,
                              int o_min) ;
 VL_EXPORT
 void         vl_sift_delete (VlSiftFilt *f) ;
