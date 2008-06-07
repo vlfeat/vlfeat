@@ -607,9 +607,9 @@ main(int argc, char **argv)
     if (verbose > 1) {    
       printf ("sift: filter settings:\n") ;
       printf ("sift:   octaves      (O)     = %d\n", 
-              vl_sift_get_octave_num   (filt)) ;
+              vl_sift_get_noctaves     (filt)) ;
       printf ("sift:   levels       (S)     = %d\n",
-              vl_sift_get_level_num    (filt)) ;
+              vl_sift_get_nlevels      (filt)) ;
       printf ("sift:   first octave (o_min) = %d\n", 
               vl_sift_get_octave_first (filt)) ;
       printf ("sift:   edge thresh           = %g\n",

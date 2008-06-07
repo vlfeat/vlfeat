@@ -260,11 +260,11 @@ mexFunction(int nout, mxArray *out[],
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
       mexPrintf("siftmx:   octaves      (O)      = %d\n", 
-                vl_sift_get_octave_num   (filt)) ;
+                vl_sift_get_noctaves      (filt)) ;
       mexPrintf("siftmx:   levels       (S)      = %d\n",
-                vl_sift_get_level_num    (filt)) ;
+                vl_sift_get_nlevels       (filt)) ;
       mexPrintf("siftmx:   first octave (o_min)  = %d\n", 
-                vl_sift_get_octave_first (filt)) ;
+                vl_sift_get_octave_first  (filt)) ;
       mexPrintf("siftmx:   edge thresh           = %g\n",
                 vl_sift_get_edge_thresh   (filt)) ;
       mexPrintf("siftmx:   peak thresh           = %g\n",
