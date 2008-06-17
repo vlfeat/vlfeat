@@ -155,41 +155,6 @@ General Public License version 2.
 
 /** ------------------------------------------------------------------
  ** @internal 
- ** @brief AIB algorithm data
- **
- ** The implementation is quite straightforward, but the way feature
- ** values are handled in order to support efficiently joins,
- ** deletions and re-arrangement needs to be explaiend. This is
- ** achieved by a layer of indrirection:
- ** - Call each feature value (either original or obtained by a join
- **   operation) <em>node</em>. Nodes are idenitfied by numbers.
- ** - Call the elements of various array (such as VlAIB::Px)
- **    <em>entry</em>.
- ** - Entry are dynamically associated to nodes as specified by
- **   VlAIB::nodes. So @c Px[i] actually refers to the node @c
- **   nodes[i].
- **/
-
-typedef struct _VlAIB
-{
-  vl_uint   *nodes ;    /**< Entires to nodes */
-  vl_uint    nentries ; /**< Total number of entries (= # active nodes) */
-  double     *beta ;     /**< Minimum distance to an entry  */
-  vl_uint   *bidx ;     /**< Closest entry */
-
-
-  vl_uint   *which ;    /**< List of entries to update */
-  vl_uint    nwhich ;   /**< Number of entries to update */
-  
-  double   *Pcx;       /**< Joint probability table */
-  double   *Px;        /**< Marginal. */
-  double   *Pc;        /**< Marginal. */
-  vl_uint       nvalues;    /**< Number of feature values */
-  vl_uint       nlabels;    /**< Number of labels */
-} VlAIB;
-
-/** ------------------------------------------------------------------
- ** @internal 
  ** @brief Normalizes an array of probabilities to sum to 1
  **
  ** @param P        The array of probabilities 
@@ -539,15 +504,17 @@ void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
  ** - which (nvalues*sizeof(vl_uint))
  ** - beta (nvalues*sizeof(double))
  ** - bidx (nvalues*sizeof(vl_uint))
+ ** - parents ((2*nvalues-1)*sizeof(vl_uint))
+ ** - costs (nvalues*sizeof(vl_uint))
  **
  ** Since it simply copies to pointer to Pcx, the total additional memory
  ** requirement is: 
- ** (nvalues+nlabels)*sizeof(double) + 3*nvalues*sizeof(double) + 
- ** nvalues*sizeof(double)
+ ** (nvalues+nlabels)*sizeof(double) + nvalues*sizeof(double) + 
+ ** 5*nvalues*sizeof(vl_uint)
  **
  ** @returns An allocated and initialized @a VlAIB pointer
  **/
-VlAIB * vl_aib_new_aib(double * Pcx, vl_uint nvalues, vl_uint nlabels)
+VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 {
     VlAIB * aib = vl_malloc(sizeof(VlAIB));
     vl_uint i ;
@@ -561,7 +528,7 @@ VlAIB * vl_aib_new_aib(double * Pcx, vl_uint nvalues, vl_uint nlabels)
     aib->Px = vl_aib_new_Px (aib->Pcx, aib->nvalues, aib->nlabels) ;
     aib->Pc = vl_aib_new_Pc (aib->Pcx, aib->nvalues, aib->nlabels) ;
 
-    aib->nentries = nvalues ;
+    aib->nentries = aib->nvalues ;
     aib->nodes    = vl_aib_new_nodelist(aib->nentries) ;
     aib->beta     = vl_malloc(sizeof(double) * aib->nentries) ;
     aib->bidx     = vl_malloc(sizeof(vl_uint)   * aib->nentries) ;
@@ -570,9 +537,18 @@ VlAIB * vl_aib_new_aib(double * Pcx, vl_uint nvalues, vl_uint nlabels)
       aib->beta [i] = BETA_MAX ;
     
     /* Initially we must consider all nodes */
-    aib->nwhich = nvalues;
+    aib->nwhich = aib->nvalues;
     aib->which  = vl_aib_new_nodelist (aib->nwhich) ;
     
+    aib->parents = vl_malloc(sizeof(vl_uint)*(aib->nvalues*2-1));
+    /* Initially, all parents point to a nonexistent node */
+    for (i = 0 ; i < 2 * aib->nvalues - 1 ; i++)
+      aib->parents [i] = 2 * aib->nvalues ; 
+
+    /* Allocate cost output vector */
+    aib->costs = vl_malloc (sizeof(double) * (aib->nvalues - 1 + 1)) ;
+  
+
     return aib ;
 }
 
@@ -583,15 +559,17 @@ VlAIB * vl_aib_new_aib(double * Pcx, vl_uint nvalues, vl_uint nlabels)
  **/
 
 void 
-vl_aib_delete_aib (VlAIB * aib)
+vl_aib_delete (VlAIB * aib)
 {
   if (aib) {
-    if (aib-> nodes) vl_free (aib-> nodes);
-    if (aib-> beta)  vl_free (aib-> beta);
-    if (aib-> bidx)  vl_free (aib-> bidx);
-    if (aib-> which) vl_free (aib-> which);
-    if (aib-> Px)    vl_free (aib-> Px);
-    if (aib-> Pc)    vl_free (aib-> Pc);
+    if (aib-> nodes)   vl_free (aib-> nodes);
+    if (aib-> beta)    vl_free (aib-> beta);
+    if (aib-> bidx)    vl_free (aib-> bidx);
+    if (aib-> which)   vl_free (aib-> which);
+    if (aib-> Px)      vl_free (aib-> Px);
+    if (aib-> Pc)      vl_free (aib-> Pc);
+    if (aib-> parents) vl_free (aib-> parents);
+    if (aib-> costs)   vl_free (aib-> costs);
   }
   vl_free (aib) ;
 }
@@ -599,15 +577,12 @@ vl_aib_delete_aib (VlAIB * aib)
 /** ------------------------------------------------------------------
  ** @brief Runs AIB on Pcx
  **
- ** @param Pcx     joint probability table (column major).
- ** @param nlabels number of rows in @a Pcx (number of labels).
- ** @param nvalues number of columns in @a Pcx (number of feature values).
- ** @param cost    cost of each node (out).
+ ** @param aib     AIB object to process
  **
  ** The function runs Agglomerative Information Bottleneck (AIB) on
- ** the joint probabilit talbe @a Pcx which has labels along the
- ** columns and feature valeus along the rows. AIB iteratively merges
- ** the two vlaues of the feature @c x that casuses the smallest
+ ** the joint probability table @a aib->Pcx which has labels along the
+ ** columns and feature values along the rows. AIB iteratively merges
+ ** the two values of the feature @c x that causes the smallest
  ** decrease in mutual information between the random variables @c x
  ** and @c c.
  **
@@ -618,53 +593,39 @@ vl_aib_delete_aib (VlAIB * aib)
  ** is zero. In this way, the leaves correspond directly to the
  ** original feature values.  In total there are @c 2*nvalues-1 nodes.
  **
- ** The function returns an array whit one element per tree node. Each
+ ** The results may be accessed through vl_aib_get_parents which
+ ** returns an array with one element per tree node. Each
  ** element is the index the parent node. The root parent is equal to
- ** zero.
+ ** zero. The array has @c 2*nvalues-1 elements.
  **
  ** Feature values with null probability are ignored by the algorithm
- ** and their nodes have parents indexing a non-existant tree node (a
+ ** and their nodes have parents indexing a non-existent tree node (a
  ** value bigger than @c 2*nvalues-1).
  **
- ** If @a cost is not equal to NULL, then the function will also
- ** return a vector with the information level after each merge. @a
+ ** Then the function will also compute the information level after each 
+ ** merge. vl_get_costs will return a vector with the information level
+ ** after each merge. @a
  ** cost has @c nvalues entries: The first is the value of the cost
- ** funcitonal before any merge, and the other are the cost after the
+ ** functional before any merge, and the others are the cost after the
  ** @c nvalues-1 merges.
  ** 
- ** @return the array of parents representing the tree. The array has
- ** @c 2*nvalues-1 elements.
  **/ 
 
 VL_EXPORT
-vl_uint *
-vl_aib (double * Pcx, vl_uint nlabels, vl_uint nvalues,
-        double ** cost)
+void vl_aib_process(VlAIB *aib)
 {
-  vl_uint * parents = vl_malloc(sizeof(vl_uint)*(nvalues*2-1));
-  vl_uint n;
-  
-  /* Initially, all parents point to a nonexistant node */
-  for (n = 0 ; n < 2 * nvalues - 1 ; n++)
-    parents [n] = 2 * nvalues ; 
-
-  /* Allocate cost outut vector */
-  if (cost) *cost = vl_malloc (sizeof(double) * (nvalues - 1 + 1)) ;
-  
-  {
-    VlAIB * aib = vl_aib_new_aib (Pcx, nvalues, nlabels) ;    
     vl_uint i, besti, bestj, newnode, nodei, nodej;
     double I, H;
     double minbeta;
 
-    /* Caluclate initial value of cost functiion */
+    /* Calculate initial value of cost function */
     vl_aib_calculate_information (aib, &I, &H) ;
-    if (cost) (*cost)[0] = I ;
+    aib->costs[0] = I;
     
     /* Initially which = all */
     
     /* For each merge */
-    for(i = 0 ; i < nvalues - 1 ; i++) {
+    for(i = 0 ; i < aib->nvalues - 1 ; i++) {
       
       /* update entries in aib-> which */
       vl_aib_update_beta(aib);
@@ -677,21 +638,19 @@ vl_aib (double * Pcx, vl_uint nlabels, vl_uint nvalues,
         break;
       
       /* Add the parent pointers for the new node */
-      newnode = nvalues + i ;
+      newnode = aib->nvalues + i ;
       nodei = aib->nodes[besti];
       nodej = aib->nodes[bestj];
 
-      parents [nodei] = newnode ;
-      parents [nodej] = newnode ;
-      parents [newnode] = 0 ;
+      aib->parents [nodei] = newnode ;
+      aib->parents [nodej] = newnode ;
+      aib->parents [newnode] = 0 ;
       
       /* Merge the nodes which produced the minimum beta */
       vl_aib_merge_nodes (aib, besti, bestj, newnode) ;
       vl_aib_calculate_information (aib, &I, &H) ;
 
-      if (cost && *cost) {
-        (*cost) [i+1] = I ;
-      }
+      aib->costs[i+1] = I;
       
       VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n", 
                  nodei, 
@@ -704,13 +663,6 @@ vl_aib (double * Pcx, vl_uint nlabels, vl_uint nvalues,
     }
 
     /* fill ignored entries with NaNs */
-    for(; i < nvalues - 1 ; i++) {
-      if (cost && *cost) {
-        (*cost) [i+1] = VL_NAN_D ;
-      }
-    }
-
-    vl_aib_delete_aib(aib) ;
-  }  
-  return parents ;
+    for(; i < aib->nvalues - 1 ; i++)
+        aib->costs[i+1] = VL_NAN_D ;
 } 

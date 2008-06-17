@@ -42,7 +42,7 @@ uMexOption options [] = {
  ** It is convenient, however, to treat them as follows:
  ** 
  ** - we pretend that AIB merged those nodes at the very beginning into a
- **   single cluster (as they, after hall, yield zero information drop).
+ **   single cluster (as they, after all, yield zero information drop).
  **
  ** - we attach this cluster to the root as the very last step (as we
  **   do not want to change other nodes.
@@ -266,13 +266,31 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
   
   { 
-    double* cost ;
-    vl_uint *parents = 0 ;
+    VlAIB   *aib;
+    double* acost = 0, *cost = 0 ;
+    vl_uint *aparents = 0, *parents = 0 ;
     int n ;
+
+    out[OUT_PARENTS] = mxCreateNumericMatrix(1, 2*nvalues - 1, mxUINT32_CLASS, mxREAL);
+    parents = mxGetData(out[OUT_PARENTS]);
     
+    if (nout > 1) {
+      out[OUT_COST] = mxCreateNumericMatrix(1, nvalues, mxDOUBLE_CLASS, mxREAL);
+      cost = mxGetPr(out[OUT_COST]); 
+    }
+
     switch (cost_type) {
     case INFORMATION :
-      parents = vl_aib (Pcx, nlabels, nvalues, (nout == 0) ? 0 : &cost) ;
+      aib = vl_aib_new (Pcx, nvalues, nlabels) ;
+      vl_aib_process (aib);
+      
+      aparents = vl_aib_get_parents (aib);
+      acost    = vl_aib_get_costs (aib);
+      memcpy(parents, aparents, sizeof(vl_uint)*(2*nvalues-1));
+      if (nout > 1)
+        memcpy(cost, acost, sizeof(double)*nvalues);
+      
+      vl_aib_delete(aib);
       break ;
     case EC :
       mexErrMsgTxt("Not implemented") ;
@@ -295,14 +313,7 @@ mexFunction(int nout, mxArray *out[],
         ++ parents [n]  ;
       }
     }
-    
-    out[OUT_PARENTS] = uCreateNumericMatrix 
-      (1, 2 * nvalues - 1, mxUINT32_CLASS, parents) ;
-    
-    if (nout > 0) {
-      out[OUT_COST] = uCreateNumericMatrix 
-        (1, nvalues, mxDOUBLE_CLASS, cost) ;
-    }
+   
   }
   mxDestroyArray(Pcx_cpy);
 }

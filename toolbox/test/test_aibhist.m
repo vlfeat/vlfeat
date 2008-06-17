@@ -27,9 +27,6 @@ Pcx = Pcx / sum(Pcx(:)) ;
 [parents_, cost_] = aib(Pcx) ;
 [parents,  cost ] = aib(Pcx,'clusternull') ;
 
-%[parents_] = aib(Pcx) ;
-%[parents] = aib(Pcx,'clusternull') ;
-
 % find a null node for testing purposes
 anull = min(find(parents_==0)) ;
 f1 = [f1 repmat(anull,1,10)] ;

@@ -19,28 +19,30 @@ int main()
     0.6822,    0.8998,    0.3093,
     };
 
-    /* vl_prob * Pic = malloc(sizeof(vl_prob)*nrows*ncols); */
     int r,c;
+    VlAIB * aib;
+    vl_uint * parents;
 
     printf("Pic = [");
     for(r=0; r<nrows; r++)
     {
         for(c=0; c<ncols; c++)
-        {
-            /*Pic[r*ncols+c] = rand() % 100;*/
             printf("%f ", Pic[r*ncols+c]);
-        }
         printf("; ...\n");
     }
     printf("];\n");
 
     printf("AIB starting\n");
-    /*  parents always has size 2*nrows-1 */
     {
-      vl_uint * parents = vl_aib(Pic, nrows, ncols, 0);
+      aib = vl_aib_new(Pic, nrows, ncols);
+      vl_aib_process(aib);
+    
+      /*  parents always has size 2*nrows-1 */
+      parents = vl_aib_get_parents(aib);
       for(r=0; r<2*nrows-1; r++)
         printf("%d => %d\n", r, parents[r]);      
-      free(parents);
+
+      vl_aib_delete(aib);
     }
     /* free(Pic); */
 
