@@ -1,6 +1,6 @@
 /** @file   hikmeans.h
  ** @author Brian Fulkerson
- ** @brief  Heirachical Integer K-Means Clustering
+ ** @brief  Hierarchical Integer K-Means Clustering
  **/
 
 /* AUTORIGHTS

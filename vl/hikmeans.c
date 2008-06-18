@@ -1,25 +1,28 @@
 /** @file   hikmeans.c
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Heirachical Integer K-Means Clustering - Declaration
+ ** @brief  Hierarchical Integer K-Means Clustering - Declaration
  **/
 
 /** @file hikmeans.h
- ** @brief Hierachical integer K-Means clustering
+ ** @brief Hierarchical integer K-Means clustering
  ** 
- ** Hierarichial integer K-Means clustering (HIKM) is a simple
+ ** Hierarchical integer K-Means clustering (HIKM) is a simple
  ** hierarchical version of integer K-Means (@ref ikmeans.h
- ** "IKM"). The algorithm recusrively apply integer K-means to create
+ ** "IKM"). The algorithm recursively applies integer K-means to create
  ** more refined partitions of the data.
  **
- ** Use the ::vl_hikm() function to partition the data and create a
- ** HIKM tree (and ::vl_hikm_delete() to dispose of it).  Use
- ** ::vl_hikm_push() to project new data down a HIKM tree.
+ ** Create a tree with ::vl_hikm_new() and delete it with
+ ** ::vl_hikm_delete(). Use ::vl_hikm_train() to build the tree
+ ** from training data and ::vl_hikm_push() to project new data down 
+ ** a HIKM tree.
  **
  ** @section hikm-tree HIKM tree
  **
- ** The HIKM tree is a simple structure, represented by ::VlHIKMTree
- ** and ::VlHIKMNode. The tree as a 
+ ** The HIKM tree is represented by a ::VlHIKMTree structure, which
+ ** contains a tree composed of ::VlHIKMNode. Each node is an
+ ** integer K-means filter which partitions the data into @c K
+ ** clusters.
  **/
 
 #include <stdio.h>
@@ -33,12 +36,12 @@
  ** @internal
  ** @brief Copy a subset of the data to a buffer
  **
- ** @param data  Data.
- ** @param ids   Data labels.
- ** @param N     Number of indeces.
- ** @param M     Data dimensionality. 
- ** @param id    Label of data to copy.
- ** @param N2    Number of data copied (out).
+ ** @param data  Data
+ ** @param ids   Data labels
+ ** @param N     Number of indices
+ ** @param M     Data dimensionality 
+ ** @param id    Label of data to copy
+ ** @param N2    Number of data copied (out)
  **
  ** @return a new buffer with a copy of the selected data.
  **/
@@ -52,7 +55,7 @@ vl_hikm_copy_subset (vl_uint8 const * data,
   int i ;
   int count = 0;
 
-  /* count how many data with this label there are */
+  /* count how many data points with this label there are */
   for (i = 0 ; i < N ; i++)
     if (ids[i] == id)
       count ++ ;
@@ -84,7 +87,7 @@ vl_hikm_copy_subset (vl_uint8 const * data,
  ** @param K      Number of clusters for this node.
  ** @param height Tree height.
  **
- ** @remark height cannot be smller than 1.
+ ** @remark height cannot be smaller than 1.
  **
  ** @return a new HIKM node representing a sub-clustering.
  **/
@@ -249,7 +252,7 @@ vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, int N)
  ** @param N    Number of data.
  **
  ** The function writes to @a asgn the path of the data @a data
- ** down the HIKM tree @a f. The paramter @a asgn must point to
+ ** down the HIKM tree @a f. The parameter @a asgn must point to
  ** an array of @c M by @c N elements, where @c M is the depth of
  ** the HIKM tree and @c N is the number of data point to process.
  **/
