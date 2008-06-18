@@ -53,36 +53,6 @@ General Public License version 2.
  AIB iterates this procedure until the desired level of
  compression is achieved.
 
- @subsection aib-overview-ec Entropy constrained AIB
-
- Here we suggest an `entropy constrained' version of AIB. This version
- of AIB optimizes the information-entropy trade-off
- \f[
-   F(x,c|\beta) = I(x,c) - \beta H(x), \quad \beta > 0.
- \f]
- Joining \f$ij\f$ yields an improvement
- \f[
-    \Delta_{ij} =  F([x]_{ij},c|\beta) - F(x,c|\beta) 
- \f]
- of this goal function. For small values of \f$\beta\f$, there is no
- convenience in performing any merge (i.e. \f$\Delta_{ij} < 0\f$ for
- all pairs). However for \f$\beta\f$ big enough a merge will yield a
- positive improvement \f$\Delta_{ij} \geq 0\f$. The minimum vale of
- \f$\beta\f$ for which this happens is
- \f[
-   \beta = \min_{ij} \left(- \frac{I(x,c) - I([x]_{ij},c)}{H(x) - H([x]_{ij})} \right).
- \f]
- This also identifies the pair \f$ij\f$ that we shoudl merge. Entropy
- constrained AIB is therefore the same as AIB, except that it works
- with the adjusted matrix
- \f[
-   D_{ij} = - \frac{I(x,c) - I([x]_{ij},c)}{H(x) - H([x]_{ij})}.
- \f]
-
- @subsection aib-overview-volume Volume regularized AIB
-
- Blha
-
  @section aib-algorithm Algorithm details
 
  Computing \f$D_{ij}\f$ requires \f$O(C)\f$ operations. For example,

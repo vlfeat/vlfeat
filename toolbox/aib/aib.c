@@ -21,14 +21,12 @@ General Public License version 2.
 
 /* option codes */
 enum {
-  opt_cost = 0,
-  opt_cluster_null,
+  opt_cluster_null = 0,
   opt_verbose 
 } ;
 
 /* options */
 uMexOption options [] = {
-  {"Cost",       1,   opt_cost       },
   {"ClusterNull",0,   opt_cluster_null}, 
   {"Verbose",    0,   opt_verbose    },
   {0,            0,   0              }
@@ -191,7 +189,6 @@ mexFunction(int nout, mxArray *out[],
   int            opt ;
   int            next = IN_END ;
   mxArray const *optarg ;
-  int            cost_type = INFORMATION ;
   int            cluster_null = 0 ;
 
   double   *Pcx     ;
@@ -222,7 +219,6 @@ mexFunction(int nout, mxArray *out[],
   nvalues = mxGetN  (in[IN_PCX]) ;
   
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
-    char buf [1024] ;
     
     switch (opt) {
 
@@ -234,31 +230,11 @@ mexFunction(int nout, mxArray *out[],
       cluster_null = 1 ;
       break ;
       
-    case opt_cost :
-      if (!uIsString (optarg, -1)) {
-        mexErrMsgTxt("'Cost' must be a string.") ;        
-      }
-      if (mxGetString (optarg, buf, sizeof(buf))) {
-        mexErrMsgTxt("Option argument too long.") ;
-      }
-      if (strcmp("i", buf) == 0) {
-        cost_type = INFORMATION ;
-      } else if (strcmp("ec", buf) == 0) {
-        cost_type = EC ;
-      } else {
-        mexErrMsgTxt("Unknown cost type.") ;
-      }
     }
   }
 
   if (verbose) {
-    char const * cost_name = 0 ;
-    switch (cost_type) {
-    case INFORMATION: cost_name = "information" ; break ;
-    case EC:          cost_name = "entropy-constrained information" ; break ;
-    }
-    mexPrintf("aib: signal null:    %d", cluster_null) ;
-    mexPrintf("aib: cost minimized: %s", cost_name) ;    
+    mexPrintf("aib: cluster null:    %d", cluster_null) ;
   }
   
   /* -----------------------------------------------------------------
@@ -279,26 +255,17 @@ mexFunction(int nout, mxArray *out[],
       cost = mxGetPr(out[OUT_COST]); 
     }
 
-    switch (cost_type) {
-    case INFORMATION :
-      aib = vl_aib_new (Pcx, nvalues, nlabels) ;
-      vl_aib_process (aib);
-      
-      aparents = vl_aib_get_parents (aib);
-      acost    = vl_aib_get_costs (aib);
-      memcpy(parents, aparents, sizeof(vl_uint)*(2*nvalues-1));
-      if (nout > 1)
-        memcpy(cost, acost, sizeof(double)*nvalues);
-      
-      vl_aib_delete(aib);
-      break ;
-    case EC :
-      mexErrMsgTxt("Not implemented") ;
-      break ;
-    default:
-      assert (0) ;
-    }
-    
+    aib = vl_aib_new (Pcx, nvalues, nlabels) ;
+    vl_aib_process (aib);
+
+    aparents = vl_aib_get_parents (aib);
+    acost    = vl_aib_get_costs (aib);
+    memcpy(parents, aparents, sizeof(vl_uint)*(2*nvalues-1));
+    if (nout > 1)
+      memcpy(cost, acost, sizeof(double)*nvalues);
+
+    vl_aib_delete(aib);
+
     if (cluster_null) {
       cluster_null_nodes (parents, nvalues, (nout == 0) ? 0 : cost) ;
     }

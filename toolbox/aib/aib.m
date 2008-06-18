@@ -7,7 +7,7 @@
 %   C and the feature value X. PCX has one row for each class label
 %   and one column for each feature value, non negative entires and
 %   sums to one.  AIB iteratively merges the pair of feature values
-%   that decreases the least the mutual information I(X,C). This
+%   that decreases the mutual information I(X,C) the least. This
 %   compresses the alphabet of the discrete random variable X in such
 %   a way that the new variable is still informative about C.
 %
