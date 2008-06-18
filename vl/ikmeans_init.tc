@@ -59,7 +59,7 @@ void vl_ikm_init_helper (VlIKMFilt *f)
   }
 }
 
-/** @brief Inintialize quantizer with centers
+/** @brief Initialize quantizer with centers
  ** @param f       IKM quantizer.
  ** @param centers centers.
  ** @param M       data dimensionality.
@@ -77,7 +77,7 @@ vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
   vl_ikm_init_helper (f) ;
 }
 
-/** @brief Inintialize quantizer with random centers
+/** @brief Initialize quantizer with random centers
  ** @param f IKM quantizer.
  ** @param M data dimensionality.
  ** @param K number of clusters.
@@ -101,7 +101,7 @@ vl_ikm_init_rand
   vl_ikm_init_helper (f) ;
 }
 
-/** @brief Inintialize with centers from random data
+/** @brief Initialize with centers from random data
  ** @param f IKM quantizer.
  ** @param data data.
  ** @param M data dimensionality.

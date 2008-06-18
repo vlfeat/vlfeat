@@ -13,7 +13,7 @@ General Public License version 2.
 */
 
 /** @internal
- ** @brief Helper function to initialie filter for Lloyd algorithm
+ ** @brief Helper function to initialize a filter for Lloyd algorithm
  **
  ** @param f filter.
  **/
@@ -44,7 +44,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
     vl_bool done = 1 ;
     
     /* ---------------------------------------------------------------
-     *                                                Calc. assigments
+     *                                               Calc. assignments
      * ------------------------------------------------------------ */
     
     for (j = 0 ; j < N ; ++j) {
@@ -116,7 +116,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
 /** @internal
  ** @brief LLoyd algorithm
  ** @param f     IKM quantizer.
- ** @param asgn  Assignemnts (out).
+ ** @param asgn  Assignments (out).
  ** @param data  Data to quantize.
  ** @param N     Number of data.
  **/

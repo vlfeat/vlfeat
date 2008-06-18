@@ -15,7 +15,7 @@ General Public License version 2.
  ** 
  ** Integer K-means (IKM) is an implementation of K-means clustering
  ** (or vector quantization, VQ) for integer data. This is
- ** particuarlry useful for clustering large collections of visual
+ ** particularly useful for clustering large collections of visual
  ** descriptors.
  **
  ** Use the function ::vl_ikm_new() to create a IKM
@@ -24,8 +24,8 @@ General Public License version 2.
  ** the quantizer. Use ::vl_ikm_push() or ::vl_ikm_push_one() to
  ** quantize new data.
  **
- ** Given data @f$x_1,\dots,x_N\in R^d@f$ and an a number of clusters
- ** @f$K@f$, the goal is to find assigments @f$a_i\in\{1,\dots,K\},@f$
+ ** Given data @f$x_1,\dots,x_N\in R^d@f$ and a number of clusters
+ ** @f$K@f$, the goal is to find assignments @f$a_i\in\{1,\dots,K\},@f$
  ** and centers @f$c_1,\dots,c_K\in R^d@f$ so that the <em>expected
  ** distortion</em>
  ** 
@@ -42,7 +42,7 @@ General Public License version 2.
  **
  ** @subsection ikmeans-alg-init Initialization
  **
- ** Most K-means algorithms are iterative and needs an initalization
+ ** Most K-means algorithms are iterative and needs an initialization
  ** in the form of an initial choice of the centers
  ** @f$c_1,\dots,c_K@f$. We include the following options:
  **
@@ -54,8 +54,8 @@ General Public License version 2.
  **
  ** The Lloyd (also known as Lloyd-Max and LBG) algorithm iteratively:
  ** 
- ** - Fixes the centers, optimizing the assignments (minmizing by
- **   exhastive search the association of each data point to the
+ ** - Fixes the centers, optimizing the assignments (minimizing by
+ **   exhaustive search the association of each data point to the
  **   centers);
  ** - Fixes the assignments and optimizes the centers (by descending
  **   the distortion error function). For the squared distortion, this
@@ -67,11 +67,11 @@ General Public License version 2.
  **
  ** @subsection ikmeans-alg-elkan Elkan
  **
- ** Elkan algorithm is an optimized variant of Lloyd. By making use of
- ** the triangle inequality, many comparisons of data points and
- ** centers are avoided, especially at later iterations. Usually 4-5
- ** times less comparisons than Lloyd are preformed, determining a
- ** similar speedup in the execution time.
+ ** The Elkan algorithm is an optimized variant of Lloyd. By making
+ ** use of the triangle inequality, many comparisons of data points
+ ** and centers are avoided, especially at later iterations.
+ ** Usually 4-5 times less comparisons than Lloyd are preformed,
+ ** providing a dramatic speedup in the execution time.
  **
  **/
 
@@ -98,7 +98,7 @@ static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_uint8 const*, in
  **
  ** @a method has values in the enumerations ::VlIKMAlgorithms.
  ** 
- ** @return new IKM qunatizer.
+ ** @return new IKM quantizer.
  **/
 
 VL_EXPORT
@@ -118,9 +118,9 @@ vl_ikm_new (int method)
   return f ;
 }
 
-/** @brief Delete IKM qunatizer 
+/** @brief Delete IKM quantizer 
  **
- ** @param f IKM qunatizer.
+ ** @param f IKM quantizer.
  **/
 
 void vl_ikm_delete (VlIKMFilt* f)
@@ -134,11 +134,11 @@ void vl_ikm_delete (VlIKMFilt* f)
 
 /** @brief Train clusters
  **
- ** @param f     IKM qunatizer.
+ ** @param f     IKM quantizer.
  ** @param data  data.
  ** @param N     number of data (@a N @c >= 1).
  **
- ** @return -1 if an overflow may have occured.
+ ** @return -1 if an overflow may have occurred.
  **/
 
 VL_EXPORT
@@ -162,12 +162,12 @@ int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
 
 /** @brief Project data to clusters
  **
- ** @param f     IKM qunatizer.
- ** @param asgn  Assigments (out).
+ ** @param f     IKM quantizer.
+ ** @param asgn  Assignments (out).
  ** @param data  data.
  ** @param N     number of data (@a N @c >= 1).
  **
- ** The function projects the data @a data on the integer K-kmeans
+ ** The function projects the data @a data on the integer K-means
  ** clusters specified by the IKM quantizer @a f. Notice that the
  ** quantizer must be initialized.
  **/
