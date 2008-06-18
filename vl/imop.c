@@ -24,8 +24,8 @@ General Public License version 2.
  **
  ** @brief Convolve along columns and take transpose
  **
- ** The function convolve the columns of the matrix @a src by the
- ** kernel @a filt of variance @a s and writes the transpose of the
+ ** The function convolves the columns of the matrix @a src by the
+ ** kernel @a filt and writes the transpose of the
  ** result to the buffer @a dst.
  **
  ** @remark Here `columns' correspond to the fastest varying
@@ -52,8 +52,8 @@ General Public License version 2.
  **
  ** @brief Smooth image by Gaussian kernel
  **
- ** The functions convolve the image @a src by a Gaussian kernel of
- ** variance @a s and write the result to the buffer @a dst. The
+ ** The function convolves the image @a src by a Gaussian kernel of
+ ** variance @a sigma and write the result to the buffer @a dst. The
  ** functions also need a scratch buffer @a dst of the same size of
  ** the buffers @a src and @a dst.
  **

@@ -23,7 +23,9 @@ General Public License version 2.
 #define VL_CONV_CONT 2 /**< Pad by continuity    */
 /* @} */
 
-/* @{ */
+/** @name Convolution
+ ** @{ 
+ **/
 VL_EXPORT
 void vl_convtransp_f(float       *dst,
                      float const *src, 
@@ -40,7 +42,9 @@ void vl_convtransp_d(double       *dst,
 /* @} */
 
 
-/* @{ */
+/** @name Image Smoothing
+ ** @{ 
+ **/
 VL_EXPORT
 void vl_imsmooth_f(float       *dst, 
                    float       *temp,
