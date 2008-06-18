@@ -95,7 +95,7 @@ vl_abs_d (double x)
  **
  ** We approximate the function f(r)=atan((1-r)/(1+r)) for r in [-1,1]
  ** by fitting a third order polynomial f(r)=c0 + c1 r + c2 r^2 + + c3 r^3.
- ** We impose the constaints
+ ** We impose the constraints
  ** 
  ** <pre>
  ** f(+1) = c0 + c1 + c2 + c3 = atan(0) = 0
@@ -103,8 +103,8 @@ vl_abs_d (double x)
  ** f(0)  = c0                = atan(1) = pi/4
  ** </pre>
  **
- ** We still miss a constraint, which we obtain by  minimizing the Linf 
- ** approximation error. This yields
+ ** We are still missing a constraint, which we may obtain by
+ ** minimizing the Linf approximation error. This yields
  **
  ** <pre>
  ** c0=pi/4, c1=-0.9675, c2=0, c3=0.1821
