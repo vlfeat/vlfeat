@@ -3,7 +3,7 @@
  ** @brief   getopt_long
  **
  ** This is a re-implementation of GNU getopt_long meant to be used on
- ** platforms that do not support such function.
+ ** platforms that do not support such functionality.
  **/
 
 /* AUTORIGHTS
