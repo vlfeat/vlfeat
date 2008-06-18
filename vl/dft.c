@@ -20,7 +20,6 @@ int const NBO = 8 ;
  **
  ** @param begin
  ** @param end
- ** @param step
  **/
  
 VL_INLINE float
@@ -331,8 +330,10 @@ void with_flat_window (VlDftFilter* f)
 /** ------------------------------------------------------------------
  ** @brief Compute Dense Feature Transform
  **
- ** @param f DFT filter. 
- ** @param im image data.
+ ** @param f    DFT filter. 
+ ** @param im   image data.
+ ** @param fast speed up computation by replacing a gaussian window with
+ **             a flat one 
  **/
 
 void vl_dft_process (VlDftFilter* f, float const* im, vl_bool fast)

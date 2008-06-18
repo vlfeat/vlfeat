@@ -39,7 +39,7 @@ typedef struct VlDftFilter_
   float *tmp ;           /**< temporary buffer */
   float *tmp2 ;          /**< temporary buffer */
   float *descr ;         /**< descriptors */
-  VlDftKeypoint *keys ;  /**< keyooints */
+  VlDftKeypoint *keys ;  /**< keypoints */
   int nkeys ;            /**< number of keypoints */
 }  VlDftFilter ;
 
@@ -93,13 +93,13 @@ vl_dft_get_keypoint_num (VlDftFilter *f)
 
 /** ------------------------------------------------------------------
  ** @internal
- ** @brief Transpose desriptor
+ ** @brief Transpose descriptor
  **
  ** @param dst destination buffer.
  ** @param src source buffer.
  **
  ** The function writes to @a dst the transpose of the SIFT descriptor
- ** @a src. The tranpsose is defined as the descriptor that one
+ ** @a src. The transpose is defined as the descriptor that one
  ** obtains from computing the normal descriptor on the transposed
  ** image.
  **/
