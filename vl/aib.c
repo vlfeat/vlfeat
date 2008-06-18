@@ -16,7 +16,7 @@ General Public License version 2.
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
  ** @brief  Agglomerative Information Bottleneck (AIB)
-
+ 
  This provides an implementation of Agglomerative Information
  Bottleneck (AIB) as first described in:
  
@@ -24,15 +24,15 @@ General Public License version 2.
  bottleneck.  In Proc. NIPS, 1999</em>
 
  AIB takes a discrete valued feature \f$x\f$ and a label \f$c\f$ and
- gradually compresses \f$x\f$ by merging values while preserving as
- mush as possible the mutual information \f$I(x,c)\f$.
+ gradually compresses \f$x\f$ by iteratively merging values which 
+ minimize the loss in mutual information \f$I(x,c)\f$.
  
  While the algorithm is equivalent to the one described in [Slonim],
- it uses some speedups that enable handling much larger datasets. Let
+ it has some speedups that enable handling much larger datasets. Let
  <em>N</em> be the number of feature values and <em>C</em> the number
- of labels.  [Slonim] algorithm is \f$O(N^2)\f$ space and \f$O(C
- N^3)\f$ time. This algorithm is \f$O(N)\f$ space and \f$O(C N^2)\f$
- time in common cases (\f$O(N^3C)\f$ in the worst case).
+ of labels. The algorithm of [Slonim] is \f$O(N^2)\f$ in space and \f$O(C
+ N^3)\f$ in time. This algorithm is \f$O(N)\f$ space and \f$O(C N^2)\f$
+ time in common cases (\f$O(C N^3)\f$ in the worst case).
 
  @section aib-overview Overview
 
@@ -50,7 +50,7 @@ General Public License version 2.
     \sum_c (p(x_i)+p(x_j)) \log \frac {p(x_i,c)+p(x_i,c)}{(p(x_i)+p(x_j))p(c)}
  @f]
 
- AIB iterates this procedure as long as the desired level of
+ AIB iterates this procedure until the desired level of
  compression is achieved.
 
  @subsection aib-overview-ec Entropy constrained AIB
@@ -487,7 +487,6 @@ void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
  ** @brief Allocates and initializes the internal data structure
  **
  ** @param Pcx      A pointer to a 2D array of probabilities
@@ -505,12 +504,12 @@ void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
  ** - beta (nvalues*sizeof(double))
  ** - bidx (nvalues*sizeof(vl_uint))
  ** - parents ((2*nvalues-1)*sizeof(vl_uint))
- ** - costs (nvalues*sizeof(vl_uint))
+ ** - costs (nvalues*sizeof(double))
  **
  ** Since it simply copies to pointer to Pcx, the total additional memory
- ** requirement is: 
- ** (nvalues+nlabels)*sizeof(double) + nvalues*sizeof(double) + 
- ** 5*nvalues*sizeof(vl_uint)
+ ** requirement is:
+ ** 
+ ** (3*nvalues+nlabels)*sizeof(double) + 4*nvalues*sizeof(vl_uint)
  **
  ** @returns An allocated and initialized @a VlAIB pointer
  **/
@@ -553,7 +552,6 @@ VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
  ** @brief Deletes AIB data structure
  ** @param aib data structure to delete.
  **/

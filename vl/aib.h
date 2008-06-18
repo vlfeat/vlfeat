@@ -20,15 +20,15 @@ General Public License version 2.
  ** @brief AIB algorithm data
  **
  ** The implementation is quite straightforward, but the way feature
- ** values are handled in order to support efficiently joins,
- ** deletions and re-arrangement needs to be explaiend. This is
- ** achieved by a layer of indrirection:
+ ** values are handled in order to support efficient joins,
+ ** deletions and re-arrangement needs to be explained. This is
+ ** achieved by adding a layer of indirection:
  ** - Call each feature value (either original or obtained by a join
- **   operation) <em>node</em>. Nodes are idenitfied by numbers.
- ** - Call the elements of various array (such as VlAIB::Px)
- **    <em>entry</em>.
- ** - Entry are dynamically associated to nodes as specified by
- **   VlAIB::nodes. So @c Px[i] actually refers to the node @c
+ **   operation) a <em>node</em>. Nodes are identified by numbers.
+ ** - Call each element of the various arrays (such as VlAIB::Px)
+ **    an <em>entry</em>.
+ ** - Entries are dynamically associated to nodes as specified by
+ **   VlAIB::nodes. For example, @c Px[i] refers to the node @c
  **   nodes[i].
  **/
 
