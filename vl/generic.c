@@ -13,8 +13,8 @@ General Public License version 2.
 /** @mainpage VisionLab Features Library
 
  @version __VLFEAT_VERSION__
- @author Andrea Vedaldi  (mailto:vedaldi@cs.ucla.edu)
- @author Brian Fulkerson (mailto:brian@cs.ucla.edu)
+ @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
+ @author Brian Fulkerson (bfulkers@cs.ucla.edu)
  
  @par Copyright &copy; 2007 Andrea Vedaldi and Brian Fulkerson
 
@@ -26,7 +26,7 @@ General Public License version 2.
  The library is accurate and easy to use, understand and modify. In
  order to maximize simplicity, the library is free of clutter and
  different algorithms are only weakly dependent. The code is portable
- (largerly C-89 compatible) and embeds extensive documentation.</em>
+ (largely C-89 compatible) and embeds extensive documentation.</em>
 
  @section main-contents Contents
 
@@ -55,7 +55,7 @@ General Public License version 2.
 
  VLFeat follows a simple but rigorous design that makes it portable
  and simple to use in conjunction with high level language such as
- MATLAB. This section illustrates and motivates the aspects of such
+ MATLAB. This section illustrates and motivates the aspects of the
  design that are relevant to the users of the library. Most of the
  features discussed in here are implemented in the @ref generic.h
  module.
@@ -67,19 +67,19 @@ General Public License version 2.
  object by means of a constructor function and dispose of it by means
  of a destructor function. The data member of the object should not be
  accessed directly, but by means of appropriate accessor functions
- (typicallly containing the @c _get and _set keywords in their names).
+ (typically containing the @c _get and _set keywords in their names).
 
  @subsection design-resources Memory and Resource Management
 
  Resource management in VLFeat is minimal. In most cases, you can
  assume that VLFeat does not provide any resource management
- functionality at all. Objects or memory blocsk allocated by the
- library but owned by the client must be explicity disposed. The
- following rule helps indentifying such blocks and objects:
+ functionality at all. Objects or memory blocks allocated by the
+ library but owned by the client must be explicitly disposed. The
+ following rule helps identifying such blocks and objects:
  
- <b> The client owns a meory block or object if, and only if, this is
-   returend by a library call containing the keywords @c _new or @c
-   _copy, or by the allocatr functions ::vl_malloc, ::vl_calloc,
+ <b> The client owns a memory block or object if, and only if, it is
+   returned by a library call containing the keywords @c _new or @c
+   _copy, or by the allocator functions ::vl_malloc, ::vl_calloc,
    ::vl_realloc.</b>
  
  More in detail, the following rules apply:
@@ -124,7 +124,7 @@ General Public License version 2.
   The library is currently <em>not</em> thread safe, but this support
   will be added in a future release.
 
-  The library is almost entierely reentrant. The only thread-sensitive
+  The library is almost entirely reentrant. The only thread-sensitive
   operations are on the global library state and are limited to:
 
   - Global library configuration (e.g. ::vl_set_alloc_func).
@@ -133,12 +133,12 @@ General Public License version 2.
 
   @subsection design-portability Portability features
 
-  Most host dependent details are isolated in the @ref generich.h
+  Most host dependent details are isolated in the @ref generic.h
   library modules. These include:
 
   - Portable atomic types (e.g. ::vl_int32).
   - Declaration of symbols, inline functions (e.g. ::VL_EXPORT).
-  - Host endianness conversion (e.g. ::).
+  - Host endianness conversion (e.g. ::vl_swap_host_big_endianness_8()).
 
   @section main-glossary Glossary
 
@@ -171,14 +171,14 @@ This module provides basic functionalities:
 
 @section generic-data-model Data models
 
-VLFeat main target is to support common UNIX and Windows
-architectures. The data model of these architectures difffer mainly
+VLFeat's main target is to support common UNIX and Windows
+architectures. The data model of these architectures differ mainly
 in:
 
 - <em>endianness</em> and
 - <em>size of the atomic data types</em>.
 
-An host is big endiand or little endian depending how multi-byte
+An host is big endian or little endian depending how multi-byte
 data values are stored in memory:
 
 - <em>big endian</em> (big end first, also known as network order) if it
@@ -192,7 +192,7 @@ functions ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
 ::vl_swap_host_big_endianness_2() (if the host is already big endian, these
  functions simply copy the data).
  
-Hosts differ also by the size of the atomic data type (such as
+Hosts also differ in the size of the atomic data type (such as
 @c short, @c int, @c long and so on):
 
  <table><caption>32-bit and 64-bit data models</caption>
@@ -252,12 +252,11 @@ Hosts differ also by the size of the atomic data type (such as
  </tr>
  </table>
  
-Most 32-bit architectures are equivalent for what concerns the size of
-the atomic data types.  64-bit vary more; for the atomic data types
-defined by VLFEat, the only important difference between architectures
-is in practice limited the size of <code>long</code>. Relatively to
-the 32 bit architectures, the other important difference is the size
-of the pointers.
+Most 32-bit architectures are equivalent for the size of
+the atomic data types. 64-bit architectures vary more, but for the 
+atomic data types defined by VLFeat, the only important difference
+between architectures is in practice limited the size of 
+<code>long</code> and the size of the pointers.
 
 @note For uniformity, VLFeat introduces appropriate atomic data types of
 fixed width.  Notice that in C-99 the <code>stdint.h</code> header
@@ -273,7 +272,7 @@ supported by Microsoft Visual C/C++.
  - ::VL_EXPORT declares an API symbols. The compiler and linker make
     sure that these symbols (and, usually, no other symbol) are
     visible to the library client.    
- - ::VL_INLINE delcares an inline function.
+ - ::VL_INLINE declares an inline function.
  - ::VL_CONSTRUCTOR and ::VL_DESTRUCTOR declares the constructor and
    destructor functions of the DLL. 
 
@@ -336,17 +335,17 @@ Error handling uses the same style of the standard C library. Most
 functions return 0 when they succeed and -1 when they fail, and
 set the global variable ::vl_err_no with a code identifying the
 error occurred. This variable is never set on success and should
-be examinated right after an error had occurred.
+be examined right after an error had occurred.
 
 @section generic-heap Heap allocation
 
 VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
 ::vl_free() functions to allocate the heap. Normally these functions
-are mapped to the underlying standar C library implementations. However
+are mapped to the underlying standard C library implementations. However
 ::vl_set_alloc_func() can be used to map them to other implementations.
 For instance, in MATALB MEX files these functions are mapped to 
-the MATLAB equivalent, with the benefits of garbage collection 
-in case of interrupted execution.
+the MATLAB equivalent which has a garbage collection mechanism to cope
+with interruptions during execution.
 
 @section generic-logging Logging
 
