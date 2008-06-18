@@ -13,8 +13,6 @@ General Public License version 2.
 */
 
 /** @file aib.h
- ** @author Brian Fulkerson
- ** @author Andrea Vedaldi
  ** @brief  Agglomerative Information Bottleneck (AIB)
  
  This provides an implementation of Agglomerative Information
@@ -85,16 +83,16 @@ General Public License version 2.
  We can obtain a much better expected complexity as follows. First,
  instead of storing the whole matrix <em>D</em>, we store the smallest
  element (index and value) of each row as \f$(q_i, D_i)\f$ (notice
- that this is also the best element of each column, being <em>D</em>
- symmetric). This requires \f$O(N)\f$ space only and finding the
- minimal element of the marix requires \f$O(N)\f$ operations
- only. After joining \f$ij\f$, we have to update efficiently this
- representation. This is easily done as follows:
+ that this is also the best element of each column since <em>D</em>
+ is symmetric). This requires \f$O(N)\f$ space and finding the
+ minimal element of the matrix requires \f$O(N)\f$ operations. 
+ After joining \f$ij\f$, we have to efficiently update this
+ representation. This is done as follows:
  
  - The entries \f$(q_i,D_i)\f$ and \f$(q_j,D_j)\f$ are deleted.
  - A new entry \f$(q_{ij},D_{ij})\f$ for the joint value \f$x_{ij}\f$
    is added. This requires \f$O(CN)\f$ operations.
- - We test which among the other entries \f$(q_{k},D_{k})\f$ need to
+ - We test which other entries \f$(q_{k},D_{k})\f$ need to
    be updated. Recall that \f$(q_{k},D_{k})\f$ means that, before the
    merge, the value
    closest to \f$x_k\f$ was \f$x_{q_k}\f$ at a distance \f$D_k\f$. Then

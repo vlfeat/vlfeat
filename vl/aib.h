@@ -1,5 +1,6 @@
 /** @file   aib.h
  ** @author Brian Fulkerson
+ ** @author Andrea Vedaldi
  ** @brief  Agglomerative Information Bottleneck (AIB)
  **/
 
