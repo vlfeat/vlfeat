@@ -93,9 +93,9 @@ images).
 The SIFT detector extracts local extrema of the DoG scale space (in
 both @e x, @e y and @e \sigma directions). To compute such local
 extrema it is necessary to sample the DoG scale space in a 3x3x3
-neighboroud. This means that local extrema cannot be extracted in
+neighborhood. This means that local extrema cannot be extracted in
 correspondence of the first and last levels of an octave. This is the
-reason why we compute two reduntant levels for each octave.
+reason why we compute two redundant levels for each octave.
 
  <table>
  <tr>
@@ -201,8 +201,8 @@ returned as additional orientations.
 
 The SIFT descriptor is a three dimensional histogram
 @f$h(\theta,x,y)@f$ of the orientation @f$\theta@f$ and position
-@f$(x,y)@f$ of the gradient inside a patch surronding the
-keypoint. The following picutres illustrates the geometry of the
+@f$(x,y)@f$ of the gradient inside a patch surrounding the
+keypoint. The following pictures illustrates the geometry of the
 histogram:
 
 @image html sift-bins.png
@@ -219,15 +219,15 @@ There are @f$B_p@f$ bins along the @e x and @e y directions and
 The spatial dimension of each bin depends on the keypoint scale
 @f$\sigma@f$ and a <em>magnification factor</em> @e m. in particular,
 a bin extends for @f$m\sigma@f$ pixels (this does not count the
-boundaries effect induced by bilinear smoothing). In the picutre, the
+boundaries effect induced by bilinear smoothing). In the picture, the
 small blue circle has radius proportional to @f$\sigma@f$ and @e m has
 been set to 3 (a typical value).
 
 Since there are @f$B_p@f$ bins along each spatial direction the
-descirpotr support extends for @f$m\sigma B_p@f$ pixels in each
+descriptor support extends for @f$m\sigma B_p@f$ pixels in each
 direction. Accounting for the extra half bin used by bilinear
 smoothing, the actual support extends for @f$m\sigma (B_p + 1)@f$
-pixels. The picture shows the arragement of the bins for @f$B_p =
+pixels. The picture shows the arrangement of the bins for @f$B_p =
 4@f$.
 
 When added to the histogram, gradients are weighted by their magnitude
@@ -288,9 +288,10 @@ descriptors will be computed, but when this option is set,
 descriptors who have a small norm before scaling will be set
 explicitly to zero.
 
-Descriptor that have norm bleow this value are discarder set to the
+Descriptor that have norm below this value are discarder set to the
 null vector. This is useful to remove low contrast patches. The norm
-of a descriptor is defined as ...
+of a descriptor is defined as the sum of the gradient magnitude
+accumulated into each of the bins.
 
 @section sift-ack Acknowledgments
 
@@ -310,7 +311,7 @@ finding bugs in old versions of this program.
 #include <math.h>
 #include <stdio.h>
 
-/** @internal @brief Use bilinear interp. to compute orientations @internal */
+/** @internal @brief Use bilinear interpolation to compute orientations */
 #define VL_SIFT_BILINEAR_ORIENTATIONS 1
 
 #define EXPN_SZ  256         /**< ::fast_expn table size @internal */ 
@@ -363,13 +364,13 @@ fast_expn_init ()
  ** @internal 
  ** @brief Copy imge, upsample rows and take transpose
  **
- ** @param dst     output imgage buffer.
+ ** @param dst     output image buffer.
  ** @param src     input image buffer.
  ** @param width   input image width.
  ** @param height  input image height.
  **
  ** The output image has dimensions @a height by 2 @a width (so the
- ** the destination buffer must be at least as big as two times the
+ ** destination buffer must be at least as big as two times the
  ** input buffer).
  **
  ** Upsampling is performed by linear interpolation.
@@ -442,7 +443,7 @@ copy_and_downsample
  ** @param o_min    first octave index.
  **
  ** The function allocates and returns a new SIFT filter for the
- ** specified image and scale space geomtery.
+ ** specified image and scale space geometry.
  **
  ** Setting @a O to a negative value sets the number of octaves to the
  ** maximum possible value depending on the size of the image.
@@ -543,7 +544,7 @@ vl_sift_delete (VlSiftFilt* f)
  ** @param im image data.
  **
  ** The function starts processing a new image by computing its
- ** Gaussian scale spadce at the lower octave. It also empties the
+ ** Gaussian scale space at the lower octave. It also empties the
  ** internal keypoint buffer.
  **
  ** @return error code. The function returns ::VL_ERR_EOF if there are
@@ -653,7 +654,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
  ** previous octave.
  **
  ** @return error code. The function returns the error
- ** ::VL_ERR_EOF when there are no more ocvatves to process.
+ ** ::VL_ERR_EOF when there are no more octaves to process.
  **
  ** @sa ::vl_sift_process_first_octave().
  **/
@@ -1126,7 +1127,7 @@ update_gradient (VlSiftFilt *f)
  ** equal to the filter current octave ::vl_sift_get_octave. If this
  ** is not the case, the function returns zero orientations.
  **
- ** @remark The function requries the keypoint scale level @c k->s to
+ ** @remark The function requires the keypoint scale level @c k->s to
  ** be in the range @c s_min+1 and @c s_max-2 (where usually @c
  ** s_min=0 and @c s_max=S+2). If this is not the case, the function
  ** returns zero orientations.
@@ -1319,7 +1320,7 @@ normalize_histogram
  **
  ** The function runs the SIFT descriptor on raw data. @c image is a
  ** 2xWIDTHxHEIGHT matrix. The first layer contains the gradients
- ** magnitued and the second the gradient angle (in radians, between 0
+ ** magnitude and the second the gradient angle (in radians, between 0
  ** and 2 PI). @a x, @a y and @a sigma give the keypoint center and
  ** scale respectively.
  **
@@ -1506,16 +1507,16 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   /* 
      The SIFT descriptor is a three dimensional histogram of the
      position and orientation of the gradient.  There are NBP bins for
-     each spatial dimesions and NBO bins for the orientation dimesion,
+     each spatial dimension and NBO bins for the orientation dimension,
      for a total of NBP x NBP x NBO bins.
      
      The support of each spatial bin has an extension of SBP = 3sigma
      pixels, where sigma is the scale of the keypoint.  Thus all the
      bins together have a support SBP x NBP pixels wide. Since
      weighting and interpolation of pixel is used, the support extends
-     by another half bin. Therefore, the support is asquare window of
+     by another half bin. Therefore, the support is a square window of
      SBP x (NBP + 1) pixels. Finally, since the patch can be
-     arbitrarly rotated, we need to consider a window 2W += sqrt(2) x
+     arbitrarily rotated, we need to consider a window 2W += sqrt(2) x
      SBP x (NBP + 1) pixels wide.
   */      
   

@@ -32,7 +32,7 @@ typedef struct _VlSiftKeypoint
   int iy ;          /**< Integer unnormalized y coordinate. */
   int is ;          /**< Integer s coordinate. */
   
-  float x ;     /**< x coorindate. */
+  float x ;     /**< x coordinate. */
   float y ;     /**< u coordinate. */
   float s ;     /**< x coordinate. */
   float sigma ; /**< scale. */
