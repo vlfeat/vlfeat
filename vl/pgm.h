@@ -24,7 +24,7 @@ General Public License version 2.
 
 /** @name PGM parser error codes */
 /*@{*/
-#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM heder serction. */
+#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM header section. */
 #define VL_ERR_PGM_INV_META  102 /**< Invalid PGM meta section.   */
 #define VL_ERR_PGM_INV_DATA  103 /**< Invalid PGM data section.   */
 #define VL_ERR_PGM_IO        104 /**< Generic I/O error.          */
@@ -34,7 +34,7 @@ General Public License version 2.
  **
  ** A PGM image is a 2-D array of pixels of width #width and height
  ** #height. Each pixel is an integer one or two bytes wide, depending
- ** wether #max_value is smaller than 256.
+ ** whether #max_value is smaller than 256.
  **/
 
 struct _VlPgmImage

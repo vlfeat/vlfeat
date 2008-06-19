@@ -18,9 +18,9 @@ General Public License version 2.
 
 /** -------------------------------------------------------------------
  ** @internal
- ** @brief Reremove all characters to the next new-line
+ ** @brief Remove all characters to the next new-line
  ** @param f file to strip.
- ** @return number of characted removed.
+ ** @return number of characters removed.
  **/
 
 static int
@@ -48,9 +48,9 @@ remove_line(FILE* f)
 
 /** -------------------------------------------------------------------
  ** @internal
- ** @brief Reremove white-spaces and comments
+ ** @brief Remove white-spaces and comments
  ** @param f file to strip.
- ** @return number of characted removed.
+ ** @return number of characters removed.
  **/
 
 static int
@@ -111,7 +111,7 @@ vl_pgm_get_data_size (VlPgmImage const *im)
  **
  ** @param im PGM image descriptor.
  **
- ** The functions returns the number of bytes for each pixel of the
+ ** The function returns the number of bytes for each pixel of the
  ** PGM image @a im.
  **
  ** @return number of bytes per pixel.
@@ -135,7 +135,7 @@ vl_pgm_get_bpp (VlPgmImage const *im)
  ** VlPgmImage according.
  **
  ** @return error code. The function sets ::vl_err_no to
- ** ::VL_PGM_INV_HEAD or ::VL_PGM_INV_META depending wether the error
+ ** ::VL_PGM_INV_HEAD or ::VL_PGM_INV_META depending whether the error
  ** occurred in decoding the header or meta section of the PGM file.
  **/
 
@@ -263,7 +263,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
   /* 
      In RAW mode we read directly an array of bytes or shorts.  In
      the latter case, however, we must take care of the
-     endianess. PGM files are sotred in big-endian format. If our
+     endianess. PGM files are sorted in big-endian format. If our
      architecture is little endian, we must do a conversion.
   */  
   if (im->is_raw) {
@@ -373,7 +373,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
  ** @param height height of the image.
  **
  ** The function dumps the image @a data to the PGM file of the specified
- ** name. This is an helper function simplyfying the usage of
+ ** name. This is an helper function simplifying the usage of
  ** vl_pgm_insert().
  **
  ** @return error code.
@@ -415,7 +415,7 @@ int vl_pgm_write (char const *name, vl_uint8 const* data, int width, int height)
  **
  ** The function dumps the image @a data to the PGM file of the specified
  ** name. The data is re-scaled to fit in the range 0-255. 
- ** This is an helper function simplyfying the usage of
+ ** This is an helper function simplifying the usage of
  ** vl_pgm_insert().
  **
  ** @return error code.
