@@ -14,7 +14,7 @@ General Public License version 2.
  ** @author Andrea Vedaldi
  ** @brief  String Operations
 
-This module impelements common strings operations. All functions that
+This module implements common strings operations. All functions that
 write to strings use range checking, which makes them safer and more
 robust than standard POSIX equivalent (see @ref vl-stringop-err).
 
@@ -25,7 +25,7 @@ operation.  The string is written to a buffer passed to the function
 along with its length @c n and is @c NUL terminated. The function
 never writes more than @c n characters, thus preventing overflow (this
 includes the @c NUL character terminating the string). The function
-also returns the total number @c r of chatarcters that would have been
+also returns the total number @c r of characters that would have been
 written if the buffer was big enough (not counting the terminating @c
 NUL). Thus:
 
@@ -48,7 +48,7 @@ NUL). Thus:
  ** @param prot protocol code (output).
  **
  ** The function extracts the prefix of the string @a str terminated
- ** by the first occurence of the <tt>`:'</tt> character (if any). It
+ ** by the first occurrence of the <tt>`:'</tt> character (if any). It
  ** then matches the suffix to the supported @ref vl-file-protocols
  ** "protocols".  The corresponding protocol code is wrote to @a prot.
  **
@@ -132,7 +132,7 @@ vl_string_protocol_name (int prot)
  ** extensions from the string @a src and writes the result to the
  ** buffer @a dst of length @a n.
  **
- ** The leading path is the suffix that ends with the last occurence
+ ** The leading path is the suffix that ends with the last occurrence
  ** of the <tt>`\'</tt> or <tt>`/'</tt> characters. A trailing extension 
  ** is the shortest suffix starting with the <tt>`.'</tt> character.
  **
@@ -181,8 +181,8 @@ vl_string_basename (char *dst, int n, char const *src, int n_ext)
  ** character @a wild by the string @a repl. The result is written to
  ** the buffer @a dst of size @a n.
  **
- ** Wildcard characters may be escaped by preceeding them by the @a
- ** esc character. More in general, anything following an occurence of
+ ** Wildcard characters may be escaped by preceding them by the @a
+ ** esc character. More in general, anything following an occurrence of
  ** @a esc character is copied verbatim. To disable the escape
  ** characters simply set @a esc to 0.
  **
@@ -307,8 +307,8 @@ vl_string_copy_sub (char *dst, int n,
  ** @param end substring ending.
  ** @param c   character to search for.
  **
- ** The function searches for the last occurence of the character @a c
- ** in the substring from @a beg to @a end (the lattern not being included).
+ ** The function searches for the last occurrence of the character @a c
+ ** in the substring from @a beg to @a end (the latter not being included).
  **
  ** @return pointer to last occurrence of @a c, or 0 if none.
  **/
