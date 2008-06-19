@@ -109,7 +109,7 @@ VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
  **
  ** This is a large integer type. It should be large enough to contain
  ** a number equal to the area (volume) of the image by the image
- ** widht by the image height (for instance, if the image is a square
+ ** width by the image height (for instance, if the image is a square
  ** of side 256, the maximum value is 256 x 256 x 256).
  **/
 typedef float vl_mser_acc ;
@@ -155,12 +155,12 @@ typedef struct _VlMserReg VlMserReg ;
 /* ----------------------------------------------------------------- */
 /** @internal @brief MSER: extremal region (declaration)
  **
- ** Extermal regions (ER) are extracted from the region forest. Each
+ ** Extremal regions (ER) are extracted from the region forest. Each
  ** region is represented by an instance of this structure. The
  ** structures are stored into an array, in arbitrary order.
  **
  ** ER are arranged into a tree. @a parent points to the parent ER, or
- ** to iself if the ER is the root.
+ ** to itself if the ER is the root.
  **
  ** An instance of the structure represents the extremal region of the
  ** level set of intensity VlMserExtrReg::value and containing the
@@ -168,13 +168,13 @@ typedef struct _VlMserReg VlMserReg ;
  **
  ** VlMserExtrReg::area is the are of the extremal region and
  ** VlMserExtrReg::area_top is the area of the extremal region
- ** containing this region in the level set of intenisty
+ ** containing this region in the level set of intensity
  ** VlMserExtrReg::area + @c delta.
  **
  ** VlMserExtrReg::variation is the relative area variation @c
  ** (area_top-area)/area.
  **
- ** VlMserExtrReg::max_stable is a flag signaling wether this extremal
+ ** VlMserExtrReg::max_stable is a flag signaling whether this extremal
  ** region is also maximally stable.
  **/
 struct _VlMserExtrReg
@@ -188,7 +188,7 @@ struct _VlMserExtrReg
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
 } ;
 
-/** @internal @brief MSER: etremal region */
+/** @internal @brief MSER: extremal region */
 typedef struct _VlMserExtrReg VlMserExtrReg ;
 
 /* ----------------------------------------------------------------- */
@@ -236,11 +236,11 @@ struct _VlMserFilt
   /** @name Configuration */
   /*@{*/
   vl_bool   verbose ;          /**< be verbose                             */
-  int       delta ;            /**< delta filter paramter                  */
+  int       delta ;            /**< delta filter parameter                  */
   double    max_area ;         /**< badness test parameter                 */
   double    min_area ;         /**< badness test parameter                 */
   double    max_variation ;    /**< badness test parameter                 */
-  double    min_diversity ;    /**< minmium diversity                      */
+  double    min_diversity ;    /**< minimum diversity                      */
   /*@}*/
 
   VlMserStats stats ;          /** run statistic                           */

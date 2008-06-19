@@ -19,7 +19,7 @@ General Public License version 2.
  **
  ** - Initialize the MSER filter by ::vl_mser_new(). The
  **   filter can be reused for images of the same size.
- ** - Compute the MSERS by ::vl_mser_process().
+ ** - Compute the MSERs by ::vl_mser_process().
  ** - Optionally fit ellipsoids to the MSERs by  ::vl_mser_ell_fit().
  ** - Retrieve the results by ::vl_mser_get_regions() (and optionally ::vl_mser_get_ell()).
  ** - Optionally retrieve filter statistics by ::vl_mser_get_stats().
@@ -32,7 +32,7 @@ General Public License version 2.
  **
  ** @image html mser-er.png
  **
- ** For each intenstiy @f$l@f$, one has multiple disjoint extremal
+ ** For each intensity @f$l@f$, one has multiple disjoint extremal
  ** regions in the level set @f$S_l@f$. Let @f$l@f$ span a finite
  ** number of values @f$\mathcal{L}=\{0,\dots,M-1\}@f$ (a sampling of
  ** the image range).  One obtains a family of regions @f$R_l@f$; by
@@ -68,13 +68,13 @@ General Public License version 2.
  ** each branch @f$B(R_{l})@f$ and its parent branch
  ** @f$B(R_{l+1}):R_{l+1}\supset R_l@f$ (notice that, due to the
  ** discrete nature of the calculations, they might be geometrically
- ** identical) and we mark as unstble the less stable one, i.e.:
+ ** identical) and we mark as unstable the less stable one, i.e.:
  **
  **   - if @f$v(R_l)<v(R_{l+1})@f$, mark @f$R_{l+1}@f$ as unstable;
  **   - if @f$v(R_l)>v(R_{l+1})@f$, mark @f$R_{l}@f$ as unstable;
  **   - otherwise, do nothing.
  **
- ** This criterion selects among nearby regions the one that are more
+ ** This criterion selects among nearby regions the ones that are more
  ** stable. We optionally refine the selection by running (starting
  ** from the bigger and going to the smaller regions) the following
  ** tests:
@@ -84,7 +84,8 @@ General Public License version 2.
  **
  ** - @f$v(R_{l}) < v_+@f$: exclude MSERs too unstable.
  **
- ** - For any MSER @f$R_l@f$, find the parent MSER @f$R_{l'}@f$ and check wether
+ ** - For any MSER @f$R_l@f$, find the parent MSER @f$R_{l'}@f$ and check 
+ **   if 
  **   @f$|R_{l'} - R_l|/|R_l'| < d_+@f$: remove duplicated MSERs.
  **
  **  <table>
@@ -135,7 +136,7 @@ General Public License version 2.
  ** @subsection mser-ell Ellipsoids
  **
  ** Usually extremal regions are returned as a set of ellipsoids
- ** fitted to the actual regions (which have arbirary shape). The fit
+ ** fitted to the actual regions (which have arbitrary shape). The fit
  ** is done by calculating the mean and variance of the pixels
  ** composing the region:
  ** @f[
@@ -146,14 +147,14 @@ General Public License version 2.
  ** Ellipsoids are fitted by ::vl_mser_ell_fit().  Notice that for a
  ** <em>n</em> dimensional image, the mean has <em>n</em> components
  ** and the variance has <em>n(n+1)/2</em> independent components. The
- ** total number of componetns is obtained by ::vl_mser_get_ell_dof()
+ ** total number of components is obtained by ::vl_mser_get_ell_dof()
  ** and the total number of fitted ellipsoids by
  ** ::vl_mser_get_ell_num(). A matrix with an ellipsoid per column is
  ** returned by ::vl_mser_get_ell(). The column is the stacking of the
- ** mean and of the independet compontents of the variance, in the
+ ** mean and of the independent components of the variance, in the
  ** order <em>(1,1),(1,2),..,(1,n), (2,2),(2,3)...</em>. In the
- ** caluclations, the pixel coordinate @f$x=(x_1,...,x_n)@f$ use the
- ** stanadard index order and ranges.
+ ** calculations, the pixel coordinate @f$x=(x_1,...,x_n)@f$ use the
+ ** standard index order and ranges.
  **
  ** @subsection mser-algo Algorithm
  **
@@ -162,9 +163,9 @@ General Public License version 2.
  **
  ** - Pixels are sorted by increasing intensity.
  ** - Pixels are added to a forest by increasing intensity. The forest has the
- **   followin properties:
+ **   following properties:
  **   - All the descendent of a certain pixels are subset of an extremal region.
- **   - All the extremal regions are the descendents of some pixels.
+ **   - All the extremal regions are the descendants of some pixels.
  ** - Extremal regions are extracted from the region tree and the extremal regions tree is
  **   calculated.
  ** - Stable regions are marked.
@@ -172,12 +173,12 @@ General Public License version 2.
  **
  ** @remark The extremal region tree which is calculated is a subset
  ** of the actual extremal region tree. In particular, it does not
- ** contain redundant entries extremal regions that coincde as
+ ** contain redundant entries extremal regions that coincide as
  ** sets. So, for example, in the calculated extremal region tree, the
  ** parent @f$R_q@f$ of an extremal region @f$R_{l}@f$ may or may
- ** <em>not</em> correspond to @f$R_{l+1}@f$, depending wether
- ** @f$q\leq l+1@f$ or not. These subtelties are important when
- ** caluclating the stability tests.
+ ** <em>not</em> correspond to @f$R_{l+1}@f$, depending whether
+ ** @f$q\leq l+1@f$ or not. These subtleties are important when
+ ** calculating the stability tests.
  **/
 
 #include "mser.h"
@@ -210,8 +211,8 @@ adv(int ndims, int const *dims, int *subs)
 /** -------------------------------------------------------------------
  ** @brief Climb the region forest to reach aa root 
  **
- ** The function climbs the regions forest @a r starring from the node
- ** @a idx to the correspoding root.
+ ** The function climbs the regions forest @a r starting from the node
+ ** @a idx to the corresponding root.
  **
  ** To speed-up the operation, the function uses the
  ** VlMserReg::shortcut field to quickly jump to the root. After the
@@ -490,7 +491,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
 
       /* 
          Compute the neighbor subscript as NSUBS+SUB, the
-         correspoinding neighbor index NINDEX and check that the
+         corresponding neighbor index NINDEX and check that the
          neighbor is within the image domain.
       */
       for(k = 0 ; k < ndims && good ; ++k) {
@@ -508,7 +509,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
          2. The neighbor is indeed different from the current node
             (the opposite happens when DSUB=(0,0,...,0)).
 
-         3. The nieghbor is already in the forest, meaning that it has
+         3. The neighbor is already in the forest, meaning that it has
             already been processed.
       */
       if (good && 
@@ -610,7 +611,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
   /* 
      Extremal regions are extracted and stored into the array ER.  The
      structure R is also updated so that .SHORTCUT indexes the
-     correspoinding extremal region if any (otherwise it is set to
+     corresponding extremal region if any (otherwise it is set to
      VOID).
   */
  
@@ -766,7 +767,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
     float max_var  = (float) f-> max_variation ;
     float min_div  = (float) f-> min_diversity ;
 
-    /* scann all extremal regions (intensity value order) */
+    /* scan all extremal regions (intensity value order) */
     for(i = ner-1 ; i >= 0L  ; --i) {
       
       /* process only maximally stable extremal regions */
