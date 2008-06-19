@@ -101,7 +101,7 @@ void vl_rand_set_state (vl_uint32 const state [625])
   mti = VL_MIN (state [624], 624) ;
 }
 
-/** @brief Seed the state of the random number generatorx
+/** @brief Seed the state of the random number generator
  **
  ** @param s seed.
  **/
