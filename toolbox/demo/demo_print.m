@@ -9,6 +9,11 @@ if nargin > 1
   set(gcf,'paperposition',s*pos) ;
 end
 
-pfx = fullfile(vlfeat_root,'doc','figures','demo',[name '.eps']) ;
-print('-depsc',pfx) ;
-fprintf('Printed picture ''%s''\n', pfx)
+pfx = fullfile(vlfeat_root,'doc','demo') ;
+if ~ exist(pfx, 'dir')
+  mkdir(pfx) ;
+end
+
+filename = fullfile(pfx, [name '.eps']) ;
+print('-depsc', filename) ;
+fprintf('demo_print: wrote file ''%s''\n', filename) ;

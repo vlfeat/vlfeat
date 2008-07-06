@@ -1,0 +1,146 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	background-color: rgb(30,30,30);
+	color: #000;
+}
+
+body {
+	font-size: 10pt  ;
+  font-family: 'Lucida Grande';
+	margin: auto;
+	width: auto;
+}
+
+#frame {
+	height: 100%;
+	margin: 0 auto;
+	padding: 0;
+	border-style: none;
+	border-collapse: collapse;
+}
+
+#shl, #shr {
+	width: 29px;
+	padding: 0;
+	margin: 0;
+}
+
+#shl {background: url(images/shl.png) top left  repeat-y;}
+#shr {background: url(images/shr.png) top right repeat-y;}
+
+#page {
+	vertical-align: top;
+	background-color: white;
+	padding: 0;
+	margin: 0;
+}
+
+#header {
+	background-color: #343943;
+	padding: 0;
+	margin: 0;
+}
+
+#header h1, 
+#header h2 {
+	padding: 4px;
+	margin: 0;
+	color: white;
+	font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif ;
+	font-weight: normal;
+}
+
+#header h1 { font-size: 2em; background-color: #636e80;}
+#header h2 { font-size: 1em; }
+
+#content {
+	width: 60em;
+	padding-left: 1em;
+	line-height: 1.3em;
+}
+
+#index {
+	float: right;
+	width: 12em;
+	margin: 1em;
+	margin-right: 0;
+	padding: 0;
+	border: 1px dotted black;
+	background-color: white;
+	color: black;
+}
+
+#index ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+#index ul li {
+	display: block;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 1em;
+}
+
+#index ul ul li {
+	margin-bottom: 0px;
+}
+
+#index ul a {
+	display: block;
+	padding: 2px 0;
+	text-decoration: none;
+	color: blue;
+	font-weight: bold;
+}
+
+#index ul ul a {
+	font-weight: normal;
+	font-size: 0.9em;
+}
+
+#index ul a {padding-left: 0.5em;}
+#index ul ul a {padding-left: 1.5em;}
+#index ul ul ul a {padding-left: 2em;}
+#index ul ul ul ul a {padding-left: 2.5em;}
+
+#index a:hover,
+#index #current {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+#index a:hover,
+#index #current {
+	background-color: white;
+	font-weight: bold;
+}
+
+#index a:active {}
+
+p, #index {
+	max-width: 35em;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+h1, h2, h3, h4, h5 {
+	font-family: Helvetica;
+	font-size: 1.3em;
+  margin-top: 1em ;
+  margin-bottom: 1em ;
+}
+
+code, pre {
+	color: #294;
+}
+
+div.figure {
+  margin-left: 2em ;
+}
+div.caption {
+  font-style: italic;
+  font-size: 0.9em ;
+}

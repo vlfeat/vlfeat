@@ -1,4 +1,4 @@
-# file:        Makefile
+# file:        Makfile
 # author:      Andrea Vedaldi
 # description: Build everything
 
@@ -46,9 +46,16 @@ Linux_x86_64_ARCH           := g64
 # == PROGRAMS ==
 #
 # CC:           C compiler (e.g. gcc).
+# MATLAB:       Matlab (e.g. matlab)
 # MEX:          MEX compiler (e.g mex).
 # LIBTOOL       libtool (used only under Mac)
+#
+# The following programs are needed only to generate the documentation
+# and the source code and binary distributions:
+#
+# GIT:          Used to create distribution (e.g. git)
 # PYTHON:       Python interpreter (e.g. python)
+# 
 #
 # == EXECUTABLES ==
 #
@@ -63,7 +70,7 @@ Linux_x86_64_ARCH           := g64
 #
 # == MEX FILES ==
 #
-# MATLAB:       MATALB root
+# MATLABPATH:   MATALB root path
 # MEX_BINDIR:   where to put mex files
 # MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
 # MEX_FLAGS:    flags passed to $(MEX)
@@ -74,12 +81,18 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
+MATALB          ?= matlab
 MEX             ?= mex
 CC              ?= cc
 LIBTOOL         ?= libtool
 PYTHON          ?= python
 AR              ?= ar
 DOXYGEN         ?= doxygen
+CONVERT         ?= convert
+DVIPNG          ?= dvipng
+DVIPS           ?= dvips
+FIG2DEV         ?= fig2dev
+EPSTOPDF         ?= epstopdf
 
 CFLAGS          += -I$(CURDIR) -pedantic -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
@@ -105,7 +118,7 @@ CFLAGS          += -D__BIG_ENDIAN__ -Wno-variadic-macros
 CLFAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 DLL_CFLAGS      += -fvisibility=hidden
-MATLAB          ?= $(dir $(shell readlink `which mex`))/..
+MATLABPATH          ?= $(dir $(shell readlink `which mex`))/..
 MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
 MEX_CFLAGS      += 
 MEX_LDFLAGS     +=
@@ -119,7 +132,7 @@ MEX_SUFFIX      := mexmaci
 CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
-MATLAB          ?= $(dir $(shell readlink `which mex`))/..
+MATLABPATH          ?= $(dir $(shell readlink `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += 
@@ -132,7 +145,7 @@ MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 LDFLAGS         += -lm
-MATLAB          ?= $(dir $(shell readlink -f `which mex`))/..
+MATLABPATH          ?= $(dir $(shell readlink -f `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
@@ -145,7 +158,7 @@ MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 LDFLAGS         += -lm
-MATLAB          ?= $(dir $(shell readlink -f `which mex`))/..
+MATLABPATH          ?= $(dir $(shell readlink -f `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
@@ -170,7 +183,7 @@ all : all-dir all-lib all-bin all-mex
 
 # create auxiliary directories
 .PHONY: all-dir
-all-dir: results/.dirstamp doc/figures/demo/.dirstamp
+all-dir: results/.dirstamp doc/demo/.dirstamp
 
 # trick to make directories
 .PRECIOUS: %/.dirstamp
@@ -285,12 +298,11 @@ $(MEX_BINDIR)/.dirstamp:
 	@test -h $(MEX_BINDIR)/libvl.$(DLL_SUFFIX)                   \
 	 || ln -sf ../../$(BINDIR)/libvl.$(DLL_SUFFIX)               \
 	           $(MEX_BINDIR)/libvl.$(DLL_SUFFIX)
-	
-	
+
 $(MEX_BINDIR)/%.d : %.c $(MEX_BINDIR)/.dirstamp
 	@echo "   D  '$<' ==> '$@'"
 	@$(CC) $(MEX_CFLAGS)                                         \
-               -I$(MATLAB)/extern/include -M -MT                     \
+               -I$(MATLABPATH)/extern/include -M -MT                 \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
@@ -305,26 +317,77 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(MEX_BINDIR)/.dirstamp
 #                                                  Build documentation
 # --------------------------------------------------------------------
 
-.PHONY: doc dox docdeep mdoc
+.PHONY: doc, doc-figures, doc-api, doc-toolbox, doc-web, doc-demo
 
 m_src := $(shell find toolbox -name "*.m")
+fig_src := $(wildcard doc/figures/*.fig)
+demo_src := $(wildcard doc/demo/*.eps)
 
-doc:
-	make -C doc all
+pdf_tgt  := $(fig_src:.fig=.pdf) 
+eps_tgt  := $(fig_src:.fig=.eps)
+png_tgt  := $(fig_src:.fig=.png) $(demo_src:.eps=.pdf)
 
-docdeep: all
+doc/%.png : doc/%.eps
+	@echo CONVERT $< \=\=\> $@
+	$(CONVERT) -resample 75 $< png:$@
+
+doc/%.pdf : doc/%.eps
+	echo EPSTOPDF $< \=\=\> $@
+	@$(EPSTOPDF) --outfile=$@ $<
+
+
+doc/%.png : doc/%.dvi
+	echo DVIPNG $< \=\=\> $@
+	@$(DVIPNG) -D 75 -T tight -o $@ $<
+
+doc/%.eps : doc/%.dvi
+	echo DVIPS $< \=\=\> $@	
+	@$(DVIPS) -E -o $@ $<
+
+doc/figures/%-raw.tex : doc/figures/%.fig
+	echo FIG2DEV $< \=\=\> $@	
+	@$(FIG2DEV) -L pstex_t -p $*-raw.ps $< $@
+
+doc/figures/%-raw.ps : doc/figures/%.fig
+	echo FIG2DEV $< \=\=\> $@
+	@$(FIG2DEV) -L pstex $< $@
+
+doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :  \
+  doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps
+	echo LATEX $< \=\=\> $@
+	@cd doc/figures ; latex $*.tex ; \
+	rm $*.log $*.aux
+
+doc/figures/%.tex :
+	echo GEN $@
+	@/bin/echo '\documentclass[landscape]{article}' >$@
+	@/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
+	@/bin/echo '\usepackage{graphicx,color}'       >>$@
+	@/bin/echo '\begin{document}'                  >>$@
+	@/bin/echo '\pagestyle{empty}'                 >>$@
+	@/bin/echo '\input{$(*)-raw.tex}'              >>$@
+	@/bin/echo '\end{document}'	               >>$@
+
+doc-demo: all
 	cd toolbox ; \
-	matlab -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
+	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
-dox: VERSION
-	make -C doc/figures all
+doc-fig: $(png_tgt) $(pdf_tgt) $(eps_tgt)
+
+doc-api: doc-fig VERSION
 	$(DOXYGEN) doc/doxygen.conf
 
-.PHONY: modc
-mdoc: doc/toolbox.html
+doc-toolbox:
+	$(PYTHON) doc/mdoc.py toolbox doc/toolbox
 
-doc/toolbox.html : $(m_src)
-	perl mdoc.pl -o doc/toolbox.html toolbox
+doc-web: doc-fig
+	$(PYTHON) doc/webdoc.py --srcdir=doc/web/src/ --outdir=doc/web \
+	          doc/web/src/site.xml
+	ln -sf ../toolbox doc/web/tooblox
+	ln -sf ../api doc/web/api
+
+doc-wiki: $(NAME) 
+	$(PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
 
 # --------------------------------------------------------------------
 #                                                       Clean and dist
@@ -342,7 +405,6 @@ VERSION:
 	echo "$(VER)" > VERSION
 
 clean:
-	make -C doc clean
 	rm -rf `find ./bin -name 'objs' -type d`
 	rm -f  `find . -name '*~'`
 	rm -f  `find . -name '.DS_Store'`
@@ -352,9 +414,11 @@ clean:
 	rm -rf $(NAME)
 
 distclean: clean
-	make -C doc distclean
 	rm -rf bin
-	rm -f  doc/toolbox.html
+	rm -rf doc/api
+	rm -rf doc/tooblox
+	rm -f doc/web/*.html doc/web/*.css
+	rm -f $(png_tgt) $(pdf_tgt) $(eps_tgt)
 	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
 	do                                                           \
 	   rm -rf "toolbox/$${i}" ;                                  \
@@ -363,13 +427,9 @@ distclean: clean
 
 $(NAME): TIMESTAMP VERSION
 	rm -rf $(NAME)
-	git archive --prefix=$(NAME)/ HEAD | tar xvf -
+	$(GIT) archive --prefix=$(NAME)/ HEAD | tar xvf -
 	cp TIMESTAMP $(NAME)
 	cp VERSION $(NAME)
-
-wikidoc: $(NAME) 
-	cd wiki ; \
-	../doc/mdocall.py ../toolbox/ ../doc/toolbox
 
 dist: $(NAME)
 	COPYFILE_DISABLE=1                                           \
@@ -396,7 +456,7 @@ post:
 	    $(HOST)/download
 
 post-doc: doc
-	rsync -rv doc/vlfeat-dox -e "ssh" $(HOST)
+	rsync -rv doc/api -e "ssh" $(HOST)
 
 autorights: distclean
 	autorights                                                   \
@@ -431,13 +491,23 @@ info :
 	@echo $(lib_dep) 
 	@echo "mex_src ="
 	@echo $(mex_src) 
+	@echo "fig_src ="
+	@echo $(fig_src)
+	@echo "demo_src ="
+	@echo $(demo_src) 
 	@echo "mex_tgt ="
 	@echo $(mex_tgt) 
 	@echo "bin_src ="
 	@echo $(bin_src) 
 	@echo "bin_tgt ="
-	@echo $(bin_tgt)	
-	@echo "ARCH        = $(ARCH)"
+	@echo $(bin_tgt)
+	@echo "pdf_tgt ="
+	@echo $(pdf_tgt)
+	@echo "eps_tgt ="
+	@echo $(eps_tgt)
+	@echo "png_tgt ="
+	@echo $(png_tgt)
+	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"
 	@echo "MEX_BINDIR   = $(MEX_BINDIR)"

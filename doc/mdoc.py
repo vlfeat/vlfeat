@@ -7,7 +7,6 @@ import sys, os, re
 import subprocess, signal
 
 from wikidoc import wikidoc
-from m2ascii import convertfile
 from formatter import Formatter
 from optparse import OptionParser
 

@@ -16,6 +16,7 @@ addpath(fullfile(root,'toolbox','plotop'  )) ;
 addpath(fullfile(root,'toolbox','sift'    )) ;
 addpath(fullfile(root,'toolbox','special' )) ;
 addpath(fullfile(root,'toolbox','test'    )) ;
+addpath(fullfile(root,'toolbox','demo'    )) ;
 addpath(fullfile(root,'toolbox',mexext    )) ;
 
 fprintf('Welcome to VLFeat!\n') ;
