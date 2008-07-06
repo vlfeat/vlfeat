@@ -383,7 +383,9 @@ doc-toolbox:
 doc-web: doc-fig
 	$(PYTHON) doc/webdoc.py --srcdir=doc/web/src/ --outdir=doc/web \
 	          doc/web/src/site.xml
-	ln -sf ../toolbox doc/web/tooblox
+	ln -sf ../toolbox doc/web/toolbox
+	ln -sf ../figures doc/web/figures
+	ln -sf ../demo doc/web/demo
 	ln -sf ../api doc/web/api
 
 doc-wiki: $(NAME) 
@@ -416,7 +418,7 @@ clean:
 distclean: clean
 	rm -rf bin
 	rm -rf doc/api
-	rm -rf doc/tooblox
+	rm -rf doc/toolbox
 	rm -f doc/web/*.html doc/web/*.css
 	rm -f $(png_tgt) $(pdf_tgt) $(eps_tgt)
 	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
@@ -460,7 +462,7 @@ post-doc: doc
 
 autorights: distclean
 	autorights                                                   \
-	  tooblox vl                                                 \
+	  toolbox vl                                                 \
 	  --recursive                                                \
 	  --verbose                                                  \
 	  --template doc/copylet.txt                                 \

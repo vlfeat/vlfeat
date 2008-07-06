@@ -17,6 +17,10 @@ doc/figures/*.png
 doc/demo
 doc/web/*.html
 doc/web/*.css
+doc/web/api
+doc/web/demo
+doc/web/figures
+doc/web/toolbox
 doc/html
 doc/vlfeat-dox
 doc/api
