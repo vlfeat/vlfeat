@@ -56,7 +56,6 @@ Linux_x86_64_ARCH           := g64
 # GIT:          Used to create distribution (e.g. git)
 # PYTHON:       Python interpreter (e.g. python)
 # 
-#
 # == EXECUTABLES ==
 #
 # BINDIR:       where to put the exec (and libraries)
@@ -81,7 +80,7 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
-MATALB          ?= matlab
+MATLAB          ?= matlab
 MEX             ?= mex
 CC              ?= cc
 LIBTOOL         ?= libtool
@@ -92,7 +91,7 @@ CONVERT         ?= convert
 DVIPNG          ?= dvipng
 DVIPS           ?= dvips
 FIG2DEV         ?= fig2dev
-EPSTOPDF         ?= epstopdf
+EPSTOPDF        ?= epstopdf
 
 CFLAGS          += -I$(CURDIR) -pedantic -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
@@ -318,6 +317,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(MEX_BINDIR)/.dirstamp
 # --------------------------------------------------------------------
 
 .PHONY: doc, doc-figures, doc-api, doc-toolbox, doc-web, doc-demo
+.PHONY: doc-distclean
 
 m_src := $(shell find toolbox -name "*.m")
 fig_src := $(wildcard doc/figures/*.fig)
@@ -327,39 +327,30 @@ pdf_tgt  := $(fig_src:.fig=.pdf)
 eps_tgt  := $(fig_src:.fig=.eps)
 png_tgt  := $(fig_src:.fig=.png) $(demo_src:.eps=.pdf)
 
-doc/%.png : doc/%.eps
-	@echo CONVERT $< \=\=\> $@
-	$(CONVERT) -resample 75 $< png:$@
+doc/figures/%.png : doc/figures/%.dvi
+	@echo DVIPNG $< \=\=\> $@
+	@cd doc/figures ; $(DVIPNG) -D 75 -T tight -o $*.png *.dvi
 
-doc/%.pdf : doc/%.eps
-	echo EPSTOPDF $< \=\=\> $@
-	@$(EPSTOPDF) --outfile=$@ $<
-
-
-doc/%.png : doc/%.dvi
-	echo DVIPNG $< \=\=\> $@
-	@$(DVIPNG) -D 75 -T tight -o $@ $<
-
-doc/%.eps : doc/%.dvi
-	echo DVIPS $< \=\=\> $@	
-	@$(DVIPS) -E -o $@ $<
+doc/figures/%.eps : doc/figures/%.dvi
+	@echo DVIPS $< \=\=\> $@	
+	@cd doc/figures ; $(DVIPS) -E -o $*.eps $*.dvi
 
 doc/figures/%-raw.tex : doc/figures/%.fig
-	echo FIG2DEV $< \=\=\> $@	
+	@echo FIG2DEV $< \=\=\> $@	
 	@$(FIG2DEV) -L pstex_t -p $*-raw.ps $< $@
 
 doc/figures/%-raw.ps : doc/figures/%.fig
-	echo FIG2DEV $< \=\=\> $@
+	@echo FIG2DEV $< \=\=\> $@
 	@$(FIG2DEV) -L pstex $< $@
 
 doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :  \
   doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps
-	echo LATEX $< \=\=\> $@
+	@echo LATEX $< \=\=\> $@
 	@cd doc/figures ; latex $*.tex ; \
 	rm $*.log $*.aux
 
 doc/figures/%.tex :
-	echo GEN $@
+	@echo GEN $@
 	@/bin/echo '\documentclass[landscape]{article}' >$@
 	@/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
 	@/bin/echo '\usepackage{graphicx,color}'       >>$@
@@ -367,6 +358,16 @@ doc/figures/%.tex :
 	@/bin/echo '\pagestyle{empty}'                 >>$@
 	@/bin/echo '\input{$(*)-raw.tex}'              >>$@
 	@/bin/echo '\end{document}'	               >>$@
+	
+doc/demo/%.png : doc/demo/%.eps
+	@echo CONVERT $< \=\=\> $@
+	@$(CONVERT) -resample 75 $< png:$@
+
+doc/%.pdf : doc/%.eps
+	@echo EPSTOPDF $< \=\=\> $@
+	@$(EPSTOPDF) --outfile=$@ $<
+
+doc: doc-demo doc-fig doc-api doc-toolbox doc-web
 
 doc-demo: all
 	cd toolbox ; \
@@ -387,6 +388,12 @@ doc-web: doc-fig
 	ln -sf ../figures doc/web/figures
 	ln -sf ../demo doc/web/demo
 	ln -sf ../api doc/web/api
+	
+doc-distclean:
+	rm -rf doc/api
+	rm -rf doc/toolbox
+	rm -f doc/web/*.html doc/web/*.css
+	rm -f $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
 doc-wiki: $(NAME) 
 	$(PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
@@ -415,12 +422,8 @@ clean:
 	rm -rf  ./results
 	rm -rf $(NAME)
 
-distclean: clean
+distclean: clean doc-distclean
 	rm -rf bin
-	rm -rf doc/api
-	rm -rf doc/toolbox
-	rm -f doc/web/*.html doc/web/*.css
-	rm -f $(png_tgt) $(pdf_tgt) $(eps_tgt)
 	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
 	do                                                           \
 	   rm -rf "toolbox/$${i}" ;                                  \
