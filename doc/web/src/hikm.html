@@ -1,0 +1,70 @@
+<p></b>VLFeat</b> offers a hierarchical version of integer k-means, which
+recusively apply \cmd{ikmeans} to compute finer and finer partitions.
+We demonstrates this by:</p>
+<pre>
+K        = 3 ;
+nleaves  = 100 ;
+data     = uint8(rand(2,10000) * 255) ;
+datat    = uint8(rand(2,100000)* 255) ;
+[tree,A] = hikmeans(data,K,nleaves) ;
+AT       = hikmeanspush(tree,datat) ;
+</pre>
+
+<p>Here <code>nleaves</code> is the desired number of leaf
+clusters. This is obtained by subdividing recursively each cluster in
+k sub-clusters. Therefore <code>depth = floor(log(K nleaves))</code>
+recursive subdivisons are sufficient and the algorithm terminates with
+clusters arranged in a k-tree of of depth
+<code>depth</code> which has at least <code>nleaves</code> leaves (but
+it may have more).</p>
+
+<div class="figure">
+<image src="demo/hikmeans-tree.png"/>
+<image src="demo/hikmeans-clusters.png"/>
+<div class="caption"></b>Hierarchical integer K-means.</b>  Left: A
+depiction of the rescursive clsuters. Each node is a cluster
+center. The root note is not depicted (its center would be the mean of
+the dataset).  Right: Clusters are represented as different colors
+(here are more thatn 100 clusters, but only tree colors are
+used).</div>
+</div>
+
+<p>The output <code>tree</code> is a MATLAB structure representing the tree of
+clusters:<p>
+
+<pre>
+> tree
+tree =
+ 
+          K: 3
+      depth: 5
+    centers: [2x3 int32]
+        sub: [1x3 struct]
+</pre>
+
+<p>The field <code>centers</code> is the matrix of the cluster centers at the
+root node.  If the depth of the tree is larger than 1, then the field
+<code>sub</code> is a structure array with one entry for each cluster. Each
+element is in turn a structure such as</p>
+
+<pre>
+> tree.sub
+ans = 
+
+1x3 struct array with fields:
+    centers
+    sub
+</pre>
+
+<p>with the cluster centers for that recusrive parittions and a field
+\verb$sub$ for the recursive children. When there are no childrent,
+this field is equal to the empty matrix</p>
+
+<pre>
+K>> tree.sub(1).sub(1).sub(1).sub(1)
+
+ans = 
+
+    centers: [2x3 int32]
+        sub: []
+</pre>

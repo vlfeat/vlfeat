@@ -9,5 +9,9 @@
 <page src="tutorials.html" title="Tutorials" id="tut">
  <page src="sift.html" title="SIFT" id="tut.sift"/>
  <page src="mser.html" title="MSER" id="tut.mser"/>
+ <page src="ikm.html" title="IKM" id="tut.ikm"/>
+ <page src="hikm.html" title="HIKM" id="tut.hikm"/>
+ <page src="aib.html" title="AIB" id="tut.aib"/>
+ <page src="utils.html" title="Utils" id="tut.utils"/>
 </page>
 </site>

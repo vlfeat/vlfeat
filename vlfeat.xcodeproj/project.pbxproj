@@ -40,7 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2D334AAE0E15E4E10077D636 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = doc/web/index.html; sourceTree = "<group>"; };
+		2D334AAE0E15E4E10077D636 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/web/index.html; sourceTree = "<group>"; };
 		2D334AB50E15E98F0077D636 /* webdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = webdoc.py; path = doc/webdoc.py; sourceTree = "<group>"; };
 		2D334AD20E1600A80077D636 /* formatter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = formatter.py; path = doc/formatter.py; sourceTree = "<group>"; };
 		2D334AD30E1600A80077D636 /* mdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = mdoc.py; path = doc/mdoc.py; sourceTree = "<group>"; };
@@ -112,6 +112,10 @@
 		2DBA249E0E212E480035F71A /* mser.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = mser.html; path = src/mser.html; sourceTree = "<group>"; };
 		2DBA249F0E212E480035F71A /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = src/index.html; sourceTree = "<group>"; };
 		2DBA24A00E212E480035F71A /* sift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = sift.html; path = src/sift.html; sourceTree = "<group>"; };
+		2DBA24F30E222A930035F71A /* hikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = hikm.html; path = src/hikm.html; sourceTree = "<group>"; };
+		2DBA24F40E222A930035F71A /* aib.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = aib.html; path = src/aib.html; sourceTree = "<group>"; };
+		2DBA24F50E222A930035F71A /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = src/utils.html; sourceTree = "<group>"; };
+		2DBA24F60E222A930035F71A /* ikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ikm.html; path = src/ikm.html; sourceTree = "<group>"; };
 		2DBA34DB0DF17B5900361FB9 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = "doc/vlfeat-dox/index.html"; sourceTree = SOURCE_ROOT; };
 		2DBB82EF0DD241EB00D546E5 /* dft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dft.h; sourceTree = "<group>"; };
 		2DBB82F00DD241EB00D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dft.c; sourceTree = "<group>"; };
@@ -272,6 +276,10 @@
 				2DBA249D0E212E480035F71A /* tutorials.html */,
 				2DBA249E0E212E480035F71A /* mser.html */,
 				2DBA24A00E212E480035F71A /* sift.html */,
+				2DBA24F30E222A930035F71A /* hikm.html */,
+				2DBA24F40E222A930035F71A /* aib.html */,
+				2DBA24F50E222A930035F71A /* utils.html */,
+				2DBA24F60E222A930035F71A /* ikm.html */,
 			);
 			name = web;
 			path = doc/web;

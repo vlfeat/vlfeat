@@ -1,0 +1,53 @@
+<p><b>VLFeat</b> includes a basic implementation of k-means clustering
+and hierarchical k-means clustering. They are designed to be
+lightweight in order to work on large dataset. In particular, they
+assume that the data are vectors of usigned chars (one byte). While
+this is limiting for some application, works well for clustering image
+descriptors, where usually very high precision is unnecessary.</p>
+
+<div class="figure">            
+<image src="demo/ikmeans_lloyd.png"/>
+<div class="caption"><b>Integer k-means.</b> We show clusters of 2-D
+points obtained by integer k-means.  There are k=3 clusters
+represented with different colors. The clusters have been estimated
+from 1000 points (displayed as dots). Then other 10000 points have
+been projected on the same clusters (displayed as crosses). The three
+big markers represent the cluster centers.</div>
+</div>
+
+<p>Integer k-means (IKM) is run by the command <code>ikmeans</code>. In order to
+demonstrate the usage of this command, we sample 10000 random points
+in the $[0,255]^2$ integer square and launch the <code>ikmeans</code> to get
+k=3 clusters:</p>
+
+<pre>
+K = 3 ;
+data = uint8(rand(2,10000) * 255) ;
+[C,A] = ikmeans(data,K) ;
+</pre>
+
+<p>The program returns both the cluster centers <code>C</code> and the
+data-to-cluster assignments <code>A</code>. By means of the cluster
+centers
+<code>C</code> we can project more data on the same clusers</p>
+
+<pre>
+datat = uint8(rand(2,100000) * 255) ;
+AT = ikmeanspush(datat,C) ;
+</pre>
+
+<p>In order to visualize the results, we associate to each cluster a
+color and we plot the points:</p>
+
+<pre>
+cl = get(gca,'ColorOrder') ;
+ncl = size(cl,1) ;
+for k=1:K
+  sel  = find(A  == k) ;
+  selt = find(AT == k) ;
+  plot(data(1,sel),  data(2,sel),  '.',...
+       'Color',cl(mod(k,ncl)+1,:)) ;
+  plot(datat(1,selt),datat(2,selt),'+',...
+       'Color',cl(mod(k,ncl)+1,:)) ;  
+end
+</pre>

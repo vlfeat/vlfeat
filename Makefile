@@ -325,7 +325,7 @@ demo_src := $(wildcard doc/demo/*.eps)
 
 pdf_tgt  := $(fig_src:.fig=.pdf) 
 eps_tgt  := $(fig_src:.fig=.eps)
-png_tgt  := $(fig_src:.fig=.png) $(demo_src:.eps=.pdf)
+png_tgt  := $(fig_src:.fig=.png) $(demo_src:.eps=.png)
 
 doc/figures/%.png : doc/figures/%.dvi
 	@echo DVIPNG $< \=\=\> $@
