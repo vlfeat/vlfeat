@@ -1,4 +1,5 @@
 <site>
+<template src="template.html"/>
 <stylesheet src="site.css"/>
 <page src="index.html" title="Home" id="home">
 <page href="download/" title="Download" id="download"/>

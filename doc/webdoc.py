@@ -17,22 +17,7 @@ usage = """usage: %prog [options] <srcdir> <docdir>
 """
 
 template = """
-<html>
-<head>
-<link rel="stylesheet" href="%stylesheet;" type="text/css"/>
-</head>
-<body>
-<table id="frame">
-<tr>
-<td id="shl"/>
-<td id="page">
-<div id="header">%title;%subtitle;</div>
-<div id="index">%index;</div>
-<div id="content">%content;</div>
-</td>
-<td id="shr"/>
-</table>
-</body>
+
 """
 
 verb = 0
@@ -76,7 +61,7 @@ def readText(fileName):
 # --------------------------------------------------------------------
 def writeText(fileName, text):
   """
-  writeText(NAME, TEXT) writest TEXT to the file NAME.
+  writeText(NAME, TEXT) writes TEXT to the file NAME.
   """
   try:
     file = open(fileName, 'w')
@@ -144,10 +129,13 @@ class WebSite(Page):
     self.root = Page()
     self.ids = {}
     self.stylesheet = ""
+    self.template   = ""
         
   def load(self, fileName):
     self.src = fileName
     doc = minidom.parse(self.src).documentElement
+    for e in iterateChildNodesByTag(doc, 'template'):
+      self.template = e.getAttribute('src')    
     for e in iterateChildNodesByTag(doc, 'stylesheet'):
       self.stylesheet = e.getAttribute('src')    
     self.root.children = self.xLoadPages(doc, 1)
@@ -197,7 +185,7 @@ class WebSite(Page):
     return ids
     
   def genSite(self):
-    print "copyng stylesheet %s to %s" % (
+    print "copying stylesheet %s to %s" % (
       os.path.join(srcdir, self.stylesheet),
       os.path.join(outdir, self.stylesheet))
     shutil.copy(
@@ -205,7 +193,7 @@ class WebSite(Page):
       os.path.join(outdir, self.stylesheet))
     for page in iteratePages(self.root):
       if page.text is None: continue
-      text = template
+      text = readText(os.path.join(srcdir, self.template))
       text = re.sub("%stylesheet;", self.stylesheet, text)
       text = re.sub("%title;", "<h1>VLFeat</h1>", text)
       text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
