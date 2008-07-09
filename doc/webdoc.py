@@ -131,17 +131,18 @@ class WebSite(Page):
     self.stylesheet = ""
     self.template   = ""
         
-  def load(self, fileName):
+  def load(self, fileName, locprefix=""):
     self.src = fileName
+    print "Locprefix: ", locprefix
     doc = minidom.parse(self.src).documentElement
     for e in iterateChildNodesByTag(doc, 'template'):
       self.template = e.getAttribute('src')    
     for e in iterateChildNodesByTag(doc, 'stylesheet'):
       self.stylesheet = e.getAttribute('src')    
-    self.root.children = self.xLoadPages(doc, 1)
+    self.root.children = self.xLoadPages(doc, 1, locprefix)
     self.ids = self.extractRefs(self.root)
 
-  def xLoadPages(self, doc, depth):
+  def xLoadPages(self, doc, depth, locprefix):
     pages = []
     for e in iterateChildNodesByTag(doc, 'page'):
       page          = Page()
@@ -153,8 +154,10 @@ class WebSite(Page):
       if page.src is not None:
         page.text = readText(os.path.join(srcdir,page.src))
       if page.href is None:
-        page.href = page.src
-      page.children = self.xLoadPages(e, depth + 1)
+        page.href = locprefix + page.src
+      else:
+        page.href = locprefix + page.href
+      page.children = self.xLoadPages(e, depth + 1, locprefix)
       pages.append(page)
     return pages
 
@@ -195,11 +198,12 @@ class WebSite(Page):
       if page.text is None: continue
       text = readText(os.path.join(srcdir, self.template))
       text = re.sub("%stylesheet;", self.stylesheet, text)
+      text = re.sub("%pagetitle;", "VLFeat - %s" % page.title, text)
       text = re.sub("%title;", "<h1>VLFeat</h1>", text)
       text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
       text = re.sub("%index;", self.genHtmlIndex(self.root), text)
       text = re.sub("%content;", page.text, text)
-      generator = PageGenerator(self)
+      generator = PageGenerator(self, site)
       generator.feed(text)
       writeText(
         os.path.join(outdir, page.src), 
@@ -229,15 +233,13 @@ class PageGenerator(HTMLParser):
     HTMLParser.__init__(self)
     self.pieces = []
     self.site = site
-    self.pieces.append(
-      """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
     
   def handle_starttag(self, tag, attrs):
     for n in range(len(attrs)):
       (k,i) = attrs[n]
       if k == 'href':
-        if i in site.ids:
-          id = site.ids[i]
+        if i in self.site.ids:
+          id = self.site.ids[i]
           if id.htmlId is None:
             attrs[n] = (k, id.page.href)
           else:

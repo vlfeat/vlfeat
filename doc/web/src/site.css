@@ -144,3 +144,65 @@ div.caption {
   font-style: italic;
   font-size: 0.9em ;
 }
+
+/* Mdoc css */
+dt {
+color: DarkOrange  ;
+margin: 0 ;
+}
+
+dd {
+margin: 0em 0em 0em 2em ;
+}
+
+dd p {
+  margin-top: 0 ;
+}
+
+ul {
+padding:0 ;
+}
+
+li {
+padding: 0 ;
+margin: 0 ;
+margin-left: 1.5em ;
+}
+
+ul ul  {
+margin-left:1em ;
+margin-bottom: 1em ;
+}
+
+pre {
+    font-size: 1em ;
+    color: Teal ;
+}
+
+div.documentation {
+  padding: 0em 2em 2em 2em ;
+  max-width: 40em ;
+}
+
+#breadcrumb {
+  border-bottom: 1px solid #eee ;
+  margin: 0 ;
+  padding: 2px 0.5em ;
+  font-size: 0.8em ;
+}
+
+#breadcrumb ul {
+  display: inline ;
+}
+
+#breadcrumb li {
+  display: inline ;
+  margin: 0 ;
+  padding: 0 ;
+  margin-right: 2em ;
+}
+
+#breadcrumb span.path {
+  font-weight: bold ;
+}
+

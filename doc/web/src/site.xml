@@ -3,7 +3,7 @@
 <stylesheet src="site.css"/>
 <page src="index.html" title="Home" id="home">
 <page href="download/" title="Download" id="download"/>
-<page href="source/" title="Source code" id="code"/>
+<page href="download/" title="Source code" id="code"/>
 <page href="api/index.html"  title="API docs" id="api"/>
 <page href="toolbox/index.html" title="Matlab docs" id="mdoc"/>
 </page>

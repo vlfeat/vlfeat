@@ -3,12 +3,13 @@
 # author:      Brian Fulkerson and Andrea Vedaldi
 # description: MDoc main
 
-import sys, os, re
+import sys, os, re, shutil
 import subprocess, signal
 
 from wikidoc import wikidoc
 from formatter import Formatter
 from optparse import OptionParser
+from webdoc import WebSite, readText, PageGenerator
 
 usage = """usage: %prog [options] <basedir> <docdir>
 
@@ -30,26 +31,18 @@ parser.add_option(
     dest    = "verb",
     default = False,
     action  = "store_true",
-    help    = "print debug informations")
+    help    = "print debug information")
+
+parser.add_option(
+    "-s", "--site", 
+    dest    = "sitexml",
+    default = "",
+    action  = "store",
+    help    = "Site xml file")
 
 wikiformat = False
 verb = 0
-
-htmlHead = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-<meta name="robots"
-      content="all" />
-<meta name="generator"
-      content="mdoc" />
-
-<link rel="stylesheet"
-      type="text/css"
-      href="mdoc.css"/>
-</head>
-<body>
-""" 
+sitexml = ""
 
 # --------------------------------------------------------------------
 def runcmd(cmd):
@@ -234,12 +227,7 @@ def xscan(basedir, dirname=''):
 
     return node
 
-# --------------------------------------------------------------------
-def decorateHTML(m, content):
-# --------------------------------------------------------------------
-    """
-    decorateHTML(CONTENT, FUNCNAME, BRIEF)
-    """
+def breadCrumb(m):
     breadcrumb = "<div id='breadcrumb'>"
     breadcrumb += "<ul>"
     breadcrumb += "<li><a href='index.html'>Index</a></li>"
@@ -248,117 +236,9 @@ def decorateHTML(m, content):
     breadcrumb += "</ul>"
     breadcrumb += "<span class='path'>%s</span>" % m.node.dirname.upper()
     breadcrumb += "</div>"
-    heading = "<h1>" + m.funcname + " <span>" + m.brief + "</span></h1>"
     
-    x =  htmlHead + breadcrumb + heading + content
-    x += "</body></html>"
-    return x
+    return breadcrumb
 
-# --------------------------------------------------------------------
-def putCSS(docdir):
-# --------------------------------------------------------------------
-    content = """
-body, html, div, dl, dt, dd, p
-{
-  margin: 0 ;
-  padding: 0 ;
-}
-
-html { 
-  background-color: white ;
-}
-
-body {
-  line-height: 1.4em ;
-  background-color: white ;
-  font-size: 10pt ;
-  font-family: "Lucida Grande", Helvetica ;
-}
-
-p {
-margin: 0.8em 0;
-}
-
-dt {
-color: DarkOrange  ;
-margin: 0 ;
-}
-
-dd {
-margin: 0em 0em 0em 2em ;
-}
-
-dd p {
-  margin-top: 0 ;
-}
-
-ul {
-padding:0 ;
-}
-
-li {
-padding: 0 ;
-margin: 0 ;
-margin-left: 1.5em ;
-}
-
-ul ul  {
-margin-left:1em ;
-margin-bottom: 1em ;
-}
-
-pre {
-    font-size: 1em ;
-    color: Teal ;
-}
-
-h1 {
-  color: DarkBlue ;
-  font-size: 1.2em ;
-  border-bottom: 2px solid DarkBlue ;
-  padding-left: 0.5em ;
-  padding-bottom: 0.2em ;
-}
-
-h1 span {
-  color: black ;
-  font-size: 1em ;
-  font-weight: normal ;
-  margin-left: 0.5em ;
-}
-
-div.documentation {
-  padding: 0em 2em 2em 2em ;
-  max-width: 40em ;
-}
-
-#breadcrumb {
-  border-bottom: 1px solid #eee ;
-  margin: 0 ;
-  padding: 2px 0.5em ;
-  font-size: 0.8em ;
-}
-
-#breadcrumb ul {
-  display: inline ;
-}
-
-#breadcrumb li {
-  display: inline ;
-  margin: 0 ;
-  padding: 0 ;
-  margin-right: 2em ;
-}
-
-#breadcrumb span.path {
-  font-weight: bold ;
-}
-
-"""
-    f = open(os.path.join(docdir, "mdoc.css"), 'w')
-    f.write(content)
-    f.close()
-    
 # --------------------------------------------------------------------
 if __name__ == '__main__':
 # --------------------------------------------------------------------
@@ -371,6 +251,7 @@ if __name__ == '__main__':
 
     if options.verb: verb = 1
     wikiformat = options.wikiformat
+    sitexml = options.sitexml
 
     if len(args) != 2:
         parser.print_help()
@@ -378,6 +259,13 @@ if __name__ == '__main__':
     
     basedir = args[0]
     docdir  = args[1]
+    sitedir = basedir
+    if sitexml != "":
+      if verb: print "loading site", sitexml
+      site = WebSite()
+      site.load(sitexml, "../")
+      sitedir = os.path.dirname(sitexml)
+
     if not basedir.endswith('/'): basedir = basedir + "/"
     if not basedir.endswith('/'): docdir  = docdir + "/"
 
@@ -385,6 +273,7 @@ if __name__ == '__main__':
         print "mdoc: search path: %s" % basedir
         print "mdoc: output path: %s" % docdir
         print "mdoc: wiki format: %d" % wikiformat 
+        print "mdoc: site xml path: %s" % sitexml
 
     #
     # Search for mfiles
@@ -423,8 +312,11 @@ if __name__ == '__main__':
     if not os.access(docdir, os.F_OK):
         os.makedirs(docdir)
 
-    if not wikiformat:
-        putCSS(docdir)
+    # Copy stylesheet
+    if not wikiformat and not sitexml == "":
+        shutil.copy(
+          os.path.join(sitedir, site.stylesheet), 
+          os.path.join(docdir, site.stylesheet))
                 
     # ----------------------------------------------------------------
     #                          Extract comment block and run formatter
@@ -457,7 +349,18 @@ if __name__ == '__main__':
 
         # add decorations
         if not wikiformat:
-            content = decorateHTML(m, content)
+            content = breadCrumb(m) + content
+            page = readText(os.path.join(sitedir, site.template))
+            page = re.sub("%stylesheet;", site.stylesheet, page)
+            page = re.sub("%pagetitle;", "VLFeat - Toolbox - %s" % m.funcname, page)
+            page = re.sub("%title;", "<h1>VLFeat</h1>", page)
+            page = re.sub("%subtitle;", "<h2>Toolbox - %s - %s</h2>" %
+                (m.funcname, m.brief), page)
+            page = re.sub("%index;", site.genHtmlIndex(site.root), page)
+            page = re.sub("%content;", content, page);
+            generator = PageGenerator(site)
+            generator.feed(page)
+            content = generator.output()
 
         # save the result to an html file
         if wikiformat:
@@ -473,12 +376,21 @@ if __name__ == '__main__':
     
     if not wikiformat:
         pagename = 'index.html'
-        page = htmlHead 
-        page += "<ul id='breadcrumb'></ul>"
-        page += "<h1>Index of functions</h1>\n"
-        page += "<div class='documentation'>"
-        page += toolbox.toIndexPage('html')
-        page += "</div></body></html>"
+        page = readText(os.path.join(sitedir, site.template))
+        content  = "<ul id='breadcrumb'></ul>"
+        content += "<h1>Index of functions</h1>\n"
+        content += "<div class='documentation'>"
+        content += toolbox.toIndexPage('html')
+        content += "</div>"
+        page = re.sub("%stylesheet;", site.stylesheet, page)
+        page = re.sub("%pagetitle;", "VLFeat - Toolbox", page)
+        page = re.sub("%title;", "<h1>VLFeat</h1>", page)
+        page = re.sub("%subtitle;", "<h2>Toolbox</h2>", page)
+        page = re.sub("%index;", site.genHtmlIndex(site.root), page)
+        page = re.sub("%content;", content, page);
+        generator = PageGenerator(site)
+        generator.feed(page)
+        page = generator.output()
     else:
         pagename = 'MDoc'
         page = "== Documentation ==\n"

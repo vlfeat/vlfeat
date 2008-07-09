@@ -379,7 +379,7 @@ doc-api: doc-fig VERSION
 	$(DOXYGEN) doc/doxygen.conf
 
 doc-toolbox:
-	$(PYTHON) doc/mdoc.py toolbox doc/toolbox
+	$(PYTHON) doc/mdoc.py toolbox doc/toolbox --site=doc/web/src/site.xml
 
 doc-web: doc-fig
 	$(PYTHON) doc/webdoc.py --srcdir=doc/web/src/ --outdir=doc/web \
