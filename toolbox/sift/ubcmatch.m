@@ -15,8 +15,8 @@
 %   INT8 or UINT8. Usually integer classes are faster.
 %   
 %   REFERENCES
-%   [1] D. G. Lowe, `Distinctive image features from scale-invariant
-%   keypoints,' IJCV, vol. 2, no. 60, pp. 91–110, 2004.
+%   [1] D. G. Lowe, 'Distinctive image features from scale-invariant
+%   keypoints,' IJCV, vol. 2, no. 60, pp. 91-110, 2004.
 %
 %   See also HELP_VLFEAT(), SIFT().
 
