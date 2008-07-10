@@ -21,7 +21,7 @@ ylim([-4 4]);
 axis off ;
 rectangle('position',D*[-1 -1 2 2]) 
 
-demo_print('aib_basic_data', .4) ;
+demo_print('aib_basic_data', .6) ;
 
 C   = 1:K*K ;
 Pcx = zeros(3,K*K) ;
@@ -50,7 +50,7 @@ for i=1:length(cutsize)
   %plottree(D,K,parents_cut) ;
   axis equal ;
   axis off ;
-  title(sprintf('%d feature values', cutsize(i))) ;
+  title(sprintf('%d clusters', cutsize(i))) ;
   
   demo_print(sprintf('aib_basic_clust_%d',i),.6) ;
 end
