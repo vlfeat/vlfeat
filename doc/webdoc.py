@@ -203,7 +203,7 @@ class WebSite(Page):
       text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
       text = re.sub("%index;", self.genHtmlIndex(self.root), text)
       text = re.sub("%content;", page.text, text)
-      generator = PageGenerator(self, site)
+      generator = PageGenerator(site)
       generator.feed(text)
       writeText(
         os.path.join(outdir, page.src), 
