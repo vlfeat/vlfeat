@@ -47,7 +47,7 @@ for i=1:length(cutsize)
   
   figure(i+1) ; clf ;
   plotquantization(D,K,C) ; hold on ;
-  plottree(D,K,parents_cut) ;
+  %plottree(D,K,parents_cut) ;
   axis equal ;
   axis off ;
   title(sprintf('%d feature values', cutsize(i))) ;

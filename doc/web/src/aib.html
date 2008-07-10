@@ -1,16 +1,51 @@
+<p><b>Agglomerative Information Bottleneck (AIB)</b> is an algorithm which
+  greedily compresses discrete data by iteratively merging the two elements
+  which cause the mutual information between the data and the class labels to
+  decreases as little as possible.</p>
+
+  <p>Here we test AIB on the problem of finding a discriminatively
+optimal quantization of a mixure of Gaussians. The data in this case is 2
+dimensional:</p>
+
 <div class="figure">
-<image src="demo/aib_basic_data.png"/>
-<image src="demo/aib_basic_clust_1.png"/>
+  <image src="demo/aib_basic_data.png"/>
+  <div class="caption">Random data in R2 generated from 3 gaussians. Class
+    labels are indicated by color.</div>
+</div>
+
+<p>
+We quantize this data on a fixed lattice (a 20x20 grid shown in the figures
+below), and construct histograms for each class.</p>
+
+<pre>
+f1 = quantize(X1,D,K) ;
+f2 = quantize(X2,D,K) ;
+f3 = quantize(X3,D,K) ;
+
+Pcx(1,:) = binsum(Pcx(1,:), ones(size(f1)), f1) ;
+Pcx(2,:) = binsum(Pcx(2,:), ones(size(f2)), f2) ;
+Pcx(3,:) = binsum(Pcx(3,:), ones(size(f3)), f3) ;
+</pre>
+
+<p>Next we apply AIB:</p>
+
+<pre>
+[parents, cost] = aib(Pcx) ;
+</pre>
+
+<p>
+This provides us with a list of parents of each column in <code>Pcx</code>,
+forming a tree of merges. We can now "cut" this tree to obtain any number of
+clusters.</p>
+
+<div class="figure">
 <image src="demo/aib_basic_clust_2.png"/>
 <image src="demo/aib_basic_clust_3.png"/>
 <image src="demo/aib_basic_clust_4.png"/>
-<image src="demo/aib_basic_clust_5.png"/>
-<div class="caption"><b>Agglomerative Information Bottleneck
-(AIB).</b>  We test AIB on the problem of finding an discriminatively
-optimal quantization of a mixure of Gaussian. Left: mixture of three
-Gaussians. The 2-D values are uniformly quantized in 20x20 bins. Other
-figures: AIB clusterings.  The grayed areas correspond to feature
-values (bins) that did not collect any evidence and so remains
-unassigned. AIB then merges bins by preserving as much a spossible the
-information about the corresponding Gaussian blob identity.</div>
+<div class="caption">Three "cuts" of the merge tree, showing 10, 3, and 2
+  clusters. The gray squares are nodes of the tree which did not have any data
+  points which were quantized to them.</div>
 </div>
+
+<p>Notice that the resulting clusters do not have to be contiguous in the
+original space.</p>
