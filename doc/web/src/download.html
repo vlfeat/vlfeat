@@ -1,6 +1,6 @@
 <h1 id="download">Download VLFeat</h1>
 <p>
-The latest version of VLFeat is <code>0.9.1</code>, released on January 21,
+The latest version of VLFeat is <code>0.9.1</code>, released on July 16,
 2008.
 </p>
 
@@ -50,11 +50,27 @@ Finally, to use the <b>C library</b> in your programs, include the appropriate f
 <p><b>Note: Compiling is not necessary if you make use of the binary distribution.</b></p>
 
 <p>
-For <b>UNIX</b> based platforms (Mac OS X and Linux), the library bundles a GNU-Make makefile (<code>vlfeat/makefile</code>). The makefile tries to auto-detect the environment and automatically configure itself. In most cases, typing <code>make</code> is all it is required to compile everything. If this does not work, please edit the makefile and make the necessary adjustment to the flags. The required changes should be obvious.
+For <b>UNIX</b> based platforms (Mac OS X and Linux), the library bundles a
+GNU-Make makefile (<code>Makefile</code>). The makefile tries to auto-detect the environment and automatically configure itself. In most cases, typing <code>make</code> is all it is required to compile everything. If this does not work, please edit the makefile and make the necessary adjustment to the flags.
 </p>
 
 <p>
-For <b>Windows</b>, the library bundles a NMake makefile. To use it, run the Visual C command line console and type <code>nmake</code>.
+For <b>Windows</b>, the library bundles a NMake makefile
+(<code>Makefile.mak</code>). In order to use it, you must open Makefile.mak and
+adjust the values of configuration variables to match your setup. Once you have
+done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefile.mak</code>.
+</p>
+
+<p>
+<b>Windows: Troubleshooting common problems:</b>
+<dl>
+  <dt>syntax error: '=' unexpected:</dt>
+  <dd><p>Use <code>nmake /f Makefile.mak</code>.
+  Without <code>/f</code>, nmake will default to the wrong makefile.</p></dd>
+<dt>'long' followed by 'long' is illegal:</dt>
+<dd><p>This error is usually caused by
+attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
+</dl>
 </p>
 
 <h1 id="download.contrib">Contributing to VLFeat</h1>
