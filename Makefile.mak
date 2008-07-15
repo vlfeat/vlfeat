@@ -3,9 +3,15 @@
 # descrption: Microsoft NMake makefile
 
 # Customization:
+# - MSVCR    : the file name of msvcr__.dll for your compiler
+# - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
+# - MATLABLIB : Location of the externel libs, such as libmex and libmx.
 
+MSVCR      = msvcr90.dll
+MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT
 MATLABROOT = C:\Program Files\MATLAB\R2008a
+MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -70,7 +76,7 @@ MEX_CFLAGS = $(CFLAGS) /I"$(MATLABROOT)\extern\include" \
 MEX_LFLAGS = $(LFLAGS) \
              /DLL /EXPORT:mexFunction \
              /MACHINE:X86 \
-             /LIBPATH:"$(MATLABROOT)\extern\lib\win32\microsoft" \
+             /LIBPATH:$(MATLABLIB) \
              libmx.lib libmex.lib libmat.lib  
 
 libsrc =            	\
@@ -144,9 +150,9 @@ mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll) $(mexdir)\$(MSVCR) $(bindir)\$(MSVCR)
 !ELSE
-all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe)
+all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(mexdir)\$(MSVCR) $(bindir)\$(MSVCR)
 !ENDIF
 
 BUILD_DLL=@echo CC  $(<) ]===} $(@R).dll && \
@@ -160,18 +166,22 @@ BUILD_DLL=@echo CC  $(<) ]===} $(@R).dll && \
 # --------------------------------------------------------------------
 
 clean:
-	-del $(libobj)
-	-del /Q $(objdir)
-	-del $(cmdpdb)
-	-del $(mexpdb)
-	-del bin\win32\vl.dll
-	-del bin\win32\vl.dll.manifest
-	-del bin\win32\vl_dll.lib
-	-del bin\win32\vl.lib
+	del $(libobj)
+	del /Q $(objdir)
+	del $(cmdpdb)
+	del $(mexpdb)
+	del $(mexdir)\$(MSVCR)
+	del $(mexdir)\vl.dll
+	del bin\win32\$(MSVCR)
+	del bin\win32\vl.dll
+	del bin\win32\vl.dll.manifest
+	del bin\win32\vl_dll.lib
+	del bin\win32\vl_dll.exp
+	del bin\win32\vl.lib
 
 distclean: clean
-	-del $(cmdexe)
-	-del $(mexdll)
+	del $(cmdexe)
+	del $(mexdll)
 info:
 	@echo $(mexx)
 	@echo ** bindir     = $(bindir)
@@ -247,3 +257,10 @@ $(bindir)\vl.lib : $(libobj)
 $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
+# msvcr__.dll => bin/win32/msvcr__.dll
+$(bindir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
+	copy $(**) "$(@)"
+
+# msvcr__.dll => toolbox/mexw32/msvcr__.dll
+$(mexdir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
+	copy $(**) "$(@)"
