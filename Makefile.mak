@@ -5,7 +5,7 @@
 # Customization:
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 
-MATLABROOT = C:\MATLAB7
+MATLABROOT = C:\Program Files\MATLAB\R2008a
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -45,7 +45,7 @@ MATLABROOT = C:\MATLAB7
 #  /EXPORT:mexFunction : Export MEX file entry point
 
 bindir     = bin\win32
-mexdir     = toolbox\mexwin
+mexdir     = toolbox\mexw32
 objdir     = $(bindir)\objs
 
 CFLAGS     = /nologo /TC /MD \
@@ -61,16 +61,16 @@ LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
              /LIBPATH:$(bindir) vl_dll.lib \
              /DEBUG
 
-MEX_RC     = $(MATLABROOT)\extern\include\mexversion.rc
+MEX_RC     = "$(MATLABROOT)\extern\include\mexversion.rc"
 
-MEX_CFLAGS = $(CFLAGS) /I$(MATLABROOT)\extern\include \
+MEX_CFLAGS = $(CFLAGS) /I"$(MATLABROOT)\extern\include" \
              /Itoolbox \
              /DMATLAB_MEX_FILE /D_WINDLL
 
 MEX_LFLAGS = $(LFLAGS) \
              /DLL /EXPORT:mexFunction \
              /MACHINE:X86 \
-             /LIBPATH:$(MATLABROOT)\extern\lib\win32\microsoft\msvc71 \
+             /LIBPATH:"$(MATLABROOT)\extern\lib\win32\microsoft" \
              libmx.lib libmex.lib libmat.lib  
 
 libsrc =            	\
@@ -133,13 +133,13 @@ cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
 
 mexdll = $(mexsrc:.c=.dll) 
-mexdll = $(mexdll:toolbox\sift=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\mser=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\imop=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\geometry=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\kmeans=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\misc=toolbox\mexwin)
-mexdll = $(mexdll:toolbox\aib=toolbox\mexwin)
+mexdll = $(mexdll:toolbox\sift=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\mser=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\imop=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\geometry=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\misc=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\aib=toolbox\mexw32)
 mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
@@ -165,7 +165,9 @@ clean:
 	-del $(cmdpdb)
 	-del $(mexpdb)
 	-del bin\win32\vl.dll
+	-del bin\win32\vl.dll.manifest
 	-del bin\win32\vl_dll.lib
+	-del bin\win32\vl.lib
 
 distclean: clean
 	-del $(cmdexe)
@@ -241,7 +243,7 @@ $(bindir)\vl.lib : $(libobj)
 	@echo LIB ^*.obj ===^> $(@R).lib
 	@lib $(**) /OUT:"$(@)" /NOLOGO
 
-# vl.dll => mexwin/vl.dll
+# vl.dll => mexw32/vl.dll
 $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
