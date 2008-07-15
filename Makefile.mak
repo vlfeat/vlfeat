@@ -2,7 +2,10 @@
 # author:     Andrea Vedaldi
 # descrption: Microsoft NMake makefile
 
-# Customization:
+# --------------------------------------------------------------------
+#                                                        Customization
+# --------------------------------------------------------------------
+#
 # - MSVCR    : the file name of msvcr__.dll for your compiler
 # - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)

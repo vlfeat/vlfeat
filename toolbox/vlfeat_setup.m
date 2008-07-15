@@ -4,7 +4,10 @@ function path = vlfeat_setup
 %
 %  See also:: HELP_VLFEAT().
 
-root=vlfeat_root ;
+bindir = mexext ;
+if strcmp(bindir, 'dll'), bindir = 'mexwin' ; end
+
+root = vlfeat_root ;
 addpath(fullfile(root,'toolbox'           )) ;
 addpath(fullfile(root,'toolbox','aib'     )) ;
 addpath(fullfile(root,'toolbox','geometry')) ;
@@ -17,7 +20,7 @@ addpath(fullfile(root,'toolbox','sift'    )) ;
 addpath(fullfile(root,'toolbox','special' )) ;
 addpath(fullfile(root,'toolbox','test'    )) ;
 addpath(fullfile(root,'toolbox','demo'    )) ;
-addpath(fullfile(root,'toolbox',mexext    )) ;
+addpath(fullfile(root,'toolbox',bindir    )) ;
 
 fprintf('Welcome to VLFeat!\n') ;
 

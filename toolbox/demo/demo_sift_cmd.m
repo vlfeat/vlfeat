@@ -14,9 +14,12 @@ I = single(I) ;
 %                                                        Test detector
 % --------------------------------------------------------------------
 
+keyboard
+
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
                    ' --peak-thresh=3.4 --edge-thresh=10']) ;
 if (err), error(msg) ; end
+disp(msg) ;
 
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;
@@ -67,12 +70,12 @@ save(p_tmp,'tmp','-ASCII') ;
                     ' --output=ascii://' p_txt ...
                     ' --read-frames=ascii://' p_tmp ...
                     ' -v']) ;
+disp(msg) ;
+
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;
 d1        = uint8(data(:,5:end)') ;
 [f,d]     = sift(I,'FirstOctave',-1,'frames',f0,'verbose') ;
-
-disp(msg) ;
 
 [m0, sc0]  = ubcmatch(d,d0) ;
 [m1, sc1]  = ubcmatch(d,d1) ;

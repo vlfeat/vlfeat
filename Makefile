@@ -92,6 +92,7 @@ DVIPNG          ?= dvipng
 DVIPS           ?= dvips
 FIG2DEV         ?= fig2dev
 EPSTOPDF        ?= epstopdf
+GIT             ?= git
 
 CFLAGS          += -I$(CURDIR) -pedantic -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
@@ -367,9 +368,9 @@ doc/%.pdf : doc/%.eps
 	@echo EPSTOPDF $< \=\=\> $@
 	@$(EPSTOPDF) --outfile=$@ $<
 
-doc: doc-demo doc-fig doc-api doc-toolbox doc-web
+doc: doc-fig doc-api doc-toolbox doc-web
 
-doc-demo: all
+doc-deep: all
 	cd toolbox ; \
 	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
@@ -384,15 +385,19 @@ doc-toolbox:
 doc-web: doc-fig
 	$(PYTHON) doc/webdoc.py --srcdir=doc/web/src/ --outdir=doc/web \
 	          doc/web/src/site.xml
-	ln -sf ../toolbox doc/web/toolbox
-	ln -sf ../figures doc/web/figures
-	ln -sf ../demo doc/web/demo
-	ln -sf ../api doc/web/api
+	test -e doc/web/toolbox || ln -sf ../toolbox doc/web/toolbox
+	test -e doc/web/figures || ln -sf ../figures doc/web/figures
+	test -e doc/web/demo    || ln -sf ../demo doc/web/demo
+	test -e doc/web/api     || ln -sf ../api doc/web/api
 	
 doc-distclean:
 	rm -rf doc/api
 	rm -rf doc/toolbox
-	rm -f doc/web/*.html doc/web/*.css
+	rm -f doc/web/*.html doc/web/*.css 
+	rm -rf doc/web/toolbox 
+	rm -rf doc/web/figures
+	rm -rf doc/web/api
+	rm -rf doc/web/demo
 	rm -f $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
 doc-wiki: $(NAME) 
@@ -424,7 +429,7 @@ clean:
 
 distclean: clean doc-distclean
 	rm -rf bin
-	for i in mexmac mexmaci mexglx mexw32 mexa64 dll pdb ;       \
+	for i in mexmac mexmaci mexglx mexwin mexa64 dll pdb ;       \
 	do                                                           \
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
@@ -446,7 +451,7 @@ bindist: $(NAME) all doc
 	cp -rp doc $(NAME)
 	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;           \
 	do                                                           \
-	  fin2d toolbox                                              \
+	  find toolbox                                               \
                -name "*.$${i}"                                       \
                -exec cp -p "{}" "$(NAME)/{}" \; ;                    \
 	done
