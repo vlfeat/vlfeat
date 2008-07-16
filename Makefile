@@ -447,19 +447,12 @@ dist: $(NAME)
 	tar czvf $(DIST).tar.gz $(NAME)
 
 bindist: $(NAME) all doc
-	cp -rp bin $(NAME)
-	cp -rp doc $(NAME)
-	for i in mexmaci mexmac mexw32 mexglx mexa64 dll ;           \
-	do                                                           \
-	  find toolbox                                               \
-               -name "*.$${i}"                                       \
-               -exec cp -p "{}" "$(NAME)/{}" \; ;                    \
-	done
-	COPYFILE_DISABLE=1                                           \
-	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \
-	tar czvf $(BINDIST).tar.gz                                   \
-	    --exclude "objs"                                         \
-	    $(NAME)
+	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)
+	rsync -arv --exclude=*.eps doc $(NAME)
+	rsync -arv --include=*mexmaci --include=*mexmac --include=*mexw32 \
+	 				   --include=*mexglx --include=*mexa64 --include=*dll     \
+						 --exclude=* toolbox/ $(NAME)/toolbox 
+	tar czvf $(BINDIST).tar.gz $(NAME)
 
 post:
 	scp $(DIST).tar.gz $(BINDIST).tar.gz                         \
