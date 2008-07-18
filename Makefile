@@ -192,8 +192,6 @@ ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
-.PHONY : all
-all : dll all-bin all-mex
 
 # --------------------------------------------------------------------
 #                                  Generation of auxiliary directories
@@ -213,6 +211,9 @@ $(eval $(call gendir, doc,     doc doc/demo                         ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
+
+.PHONY : all
+all : dll all-bin all-mex $(results-dir) $(doc-dir)
 
 # --------------------------------------------------------------------
 #                                   Build static and dynamic libraries
@@ -382,7 +383,7 @@ doc/%.pdf : doc/%.eps
 
 doc: doc-fig doc-api doc-toolbox doc-web
 
-doc-deep: all
+doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
