@@ -68,15 +68,15 @@ CREATING THE DOCUMENTATION
 
   TUTORIAL. To compile the tutorial, issue
 
-  > make docdeep
+  > make doc-deep
   > make doc
 
   SOURCE CODE DOCUMENTATION. To compile the source code
   documentation type
 
-  > make dox
+  > make doc-api
   
-See the file doc/html/vlfeat.html or doc/vlfeat.pdf for an overview.
+See the file doc/index.html for an overview.
 
 
 APPENDIX
