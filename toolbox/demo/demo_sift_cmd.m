@@ -14,12 +14,9 @@ I = single(I) ;
 %                                                        Test detector
 % --------------------------------------------------------------------
 
-keyboard
-
 [err,msg] = demo_cmd('sift',[p_img ' --output=ascii://' p_txt ...
                    ' --peak-thresh=3.4 --edge-thresh=10']) ;
 if (err), error(msg) ; end
-disp(msg) ;
 
 data      = load(p_txt,'-ASCII') ;
 f1        = data(:,1:4)' ; f1(1:2,:) = f1(1:2,:) + 1 ;

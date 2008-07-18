@@ -1,6 +1,6 @@
 <site>
 <template src="template.html"/>
-<stylesheet src="site.css"/>
+<stylesheet src="web.css"/>
 <page src="index.html" title="Home" id="home">
 <page src="download.html" title="Download" id="download"/>
 <page src="download.html" title="Source code" id="code"/>

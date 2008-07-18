@@ -16,11 +16,11 @@ COMPILING
   > make
 
   WINDOWS. We provide a Microsoft NMAKE Makefile (Makefile.mak) that
-  has been tested under Visual C 8.0 and Matlab 7.0 (minor adjustment
-  may be required for other version). Open the Visual C terminal, cd
-  into the VLFeat directory and issue
+  has been tested under Visual C++ 2008 Express and Matlab R2008a (minor
+  adjustments may be required for other versions). Open the Visual C terminal,
+  cd into the VLFeat directory and issue.
   
-  > nmake
+  > nmake /f Makefile.mak
 
 INSTALLING
   Binaries are created in the bin/XXX directory, where XXX changes
@@ -30,6 +30,7 @@ INSTALLING
   - mac     Mac OS X PPC
   - maci    Mac OS X Intel
   - glx     GNU Linux i386
+  - g64     GNU Linux x64
   - win32   Windows
 
   The executable binaries can be installed anywhere in the command
