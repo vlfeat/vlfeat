@@ -40,13 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2D334AAE0E15E4E10077D636 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/web/index.html; sourceTree = "<group>"; };
-		2D334AB50E15E98F0077D636 /* webdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = webdoc.py; path = doc/webdoc.py; sourceTree = "<group>"; };
-		2D334AD20E1600A80077D636 /* formatter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = formatter.py; path = doc/formatter.py; sourceTree = "<group>"; };
-		2D334AD30E1600A80077D636 /* mdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = mdoc.py; path = doc/mdoc.py; sourceTree = "<group>"; };
-		2D334AD40E1600A80077D636 /* wikidoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = wikidoc.py; path = doc/wikidoc.py; sourceTree = "<group>"; };
 		2D36D6250DE3368F00F6EFD5 /* dft-mex.mexmaci */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "dft-mex.mexmaci"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/Matlab7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
+		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/MATLAB7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
 		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2D732DE50CF8C2E40099B03C /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aib.c; sourceTree = "<group>"; };
@@ -106,21 +101,9 @@
 		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
 		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
 		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
-		2DBA241E0E2101BA0035F71A /* site.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = site.css; path = src/site.css; sourceTree = "<group>"; };
-		2DBA24290E210FFB0035F71A /* site.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = site.xml; path = src/site.xml; sourceTree = "<group>"; };
-		2DBA249D0E212E480035F71A /* tutorials.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = tutorials.html; path = src/tutorials.html; sourceTree = "<group>"; };
-		2DBA249E0E212E480035F71A /* mser.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = mser.html; path = src/mser.html; sourceTree = "<group>"; };
-		2DBA249F0E212E480035F71A /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = src/index.html; sourceTree = "<group>"; };
-		2DBA24A00E212E480035F71A /* sift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = sift.html; path = src/sift.html; sourceTree = "<group>"; };
-		2DBA24F30E222A930035F71A /* hikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = hikm.html; path = src/hikm.html; sourceTree = "<group>"; };
-		2DBA24F40E222A930035F71A /* aib.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = aib.html; path = src/aib.html; sourceTree = "<group>"; };
-		2DBA24F50E222A930035F71A /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = src/utils.html; sourceTree = "<group>"; };
-		2DBA24F60E222A930035F71A /* ikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ikm.html; path = src/ikm.html; sourceTree = "<group>"; };
-		2DBA34DB0DF17B5900361FB9 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = "doc/vlfeat-dox/index.html"; sourceTree = SOURCE_ROOT; };
 		2DBB82EF0DD241EB00D546E5 /* dft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dft.h; sourceTree = "<group>"; };
 		2DBB82F00DD241EB00D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dft.c; sourceTree = "<group>"; };
 		2DBB83250DD2F90700D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dft.c; path = toolbox/sift/dft.c; sourceTree = "<group>"; };
-		2DCC82710D4581840017C716 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doxygen.conf; path = doc/doxygen.conf; sourceTree = "<group>"; };
 		2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libvlfeat-xcode-dll.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
@@ -157,30 +140,14 @@
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
-				2DBA34DB0DF17B5900361FB9 /* index.html */,
-				2D334AAE0E15E4E10077D636 /* index.html */,
 				2D36D6310DE337C700F6EFD5 /* mexversion.c */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
-				2D334ABD0E1600800077D636 /* doc */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
-				2DCC82710D4581840017C716 /* doxygen.conf */,
 				2DD302660DE32F6E009443C7 /* Products */,
 			);
 			name = vlfeat;
-			sourceTree = "<group>";
-		};
-		2D334ABD0E1600800077D636 /* doc */ = {
-			isa = PBXGroup;
-			children = (
-				2DBA24910E212D990035F71A /* web */,
-				2D334AD20E1600A80077D636 /* formatter.py */,
-				2D334AD30E1600A80077D636 /* mdoc.py */,
-				2D334AD40E1600A80077D636 /* wikidoc.py */,
-				2D334AB50E15E98F0077D636 /* webdoc.py */,
-			);
-			name = doc;
 			sourceTree = "<group>";
 		};
 		2D732DE40CF8C2E40099B03C /* src */ = {
@@ -267,24 +234,6 @@
 			name = toolbox;
 			sourceTree = "<group>";
 		};
-		2DBA24910E212D990035F71A /* web */ = {
-			isa = PBXGroup;
-			children = (
-				2DBA24290E210FFB0035F71A /* site.xml */,
-				2DBA241E0E2101BA0035F71A /* site.css */,
-				2DBA249F0E212E480035F71A /* index.html */,
-				2DBA249D0E212E480035F71A /* tutorials.html */,
-				2DBA249E0E212E480035F71A /* mser.html */,
-				2DBA24A00E212E480035F71A /* sift.html */,
-				2DBA24F30E222A930035F71A /* hikm.html */,
-				2DBA24F40E222A930035F71A /* aib.html */,
-				2DBA24F50E222A930035F71A /* utils.html */,
-				2DBA24F60E222A930035F71A /* ikm.html */,
-			);
-			name = web;
-			path = doc/web;
-			sourceTree = "<group>";
-		};
 		2DD302660DE32F6E009443C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -329,20 +278,6 @@
 			name = "vlfeat-all";
 			passBuildSettingsInEnvironment = 1;
 			productName = "vlfeat-all";
-		};
-		2DAB13050D4533BF009BEE66 /* vlfeat-dox */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "dox-$(ACTION)";
-			buildConfigurationList = 2DAB13120D4533F3009BEE66 /* Build configuration list for PBXLegacyTarget "vlfeat-dox" */;
-			buildPhases = (
-			);
-			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = "";
-			dependencies = (
-			);
-			name = "vlfeat-dox";
-			passBuildSettingsInEnvironment = 1;
-			productName = "vlfeat-dox";
 		};
 /* End PBXLegacyTarget section */
 
@@ -412,7 +347,6 @@
 			projectRoot = "";
 			targets = (
 				2D732DBE0CF8BFFD0099B03C /* vlfeat-all */,
-				2DAB13050D4533BF009BEE66 /* vlfeat-dox */,
 				2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */,
 				2DD3027F0DE33154009443C7 /* sift-bin */,
 				2D36D6240DE3368F00F6EFD5 /* dft-mex */,
@@ -510,6 +444,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				MATLABROOT = /Applications/Matlab7;
 				OTHER_LDFLAGS = (
 					"-undefined",
 					suppress,
@@ -564,26 +499,6 @@
 				MATLAB = /Applications/Matlab7;
 				MEX = /Applications/Matlab7/bin/mex;
 				PRODUCT_NAME = "vlfeat-all";
-			};
-			name = Release;
-		};
-		2DAB13060D4533BF009BEE66 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "vlfeat-dox";
-			};
-			name = Debug;
-		};
-		2DAB13070D4533BF009BEE66 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
-				MATLAB = /Applications/Matlab7;
-				MEX = /Applications/Matlab7/bin/mex;
-				PRODUCT_NAME = "vlfeat-dox";
 			};
 			name = Release;
 		};
@@ -693,15 +608,6 @@
 			buildConfigurations = (
 				2D732DBF0CF8BFFD0099B03C /* Debug */,
 				2D732DC00CF8BFFD0099B03C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2DAB13120D4533F3009BEE66 /* Build configuration list for PBXLegacyTarget "vlfeat-dox" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2DAB13060D4533BF009BEE66 /* Debug */,
-				2DAB13070D4533BF009BEE66 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
