@@ -9,7 +9,12 @@ I     = test_pattern(n) ;
 I     = uint8(I) ; 
 [M,N] = size(I) ;
 
-imwrite(I,'../results/autotest.pgm') ;
+pfx = fullfile(vlfeat_root,'results') ;
+if ~ exist(pfx, 'dir')
+  mkdir(pfx) ;
+end
+
+imwrite(I,fullfile(pfx, 'autotest.pgm')) ;
 
 [p,f] = mser(I,...
              'delta',6,...

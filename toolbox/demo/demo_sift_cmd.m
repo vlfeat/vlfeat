@@ -1,9 +1,14 @@
 % DEMO_SIFT_CMD Demo: SIFT: test command line utility
 
+pfx = fullfile(vlfeat_root,'results') ;
+if ~ exist(pfx, 'dir')
+  mkdir(pfx) ;
+end
+
 p_img = fullfile(vlfeat_root,'data','box.pgm') ;
 p_low = fullfile(vlfeat_root,'data','box.sift') ;
-p_txt = fullfile(vlfeat_root,'results','box.sift') ;
-p_tmp = fullfile(vlfeat_root,'results','box.tmp') ;
+p_txt = fullfile(pfx,'box.sift') ;
+p_tmp = fullfile(pfx,'box.tmp') ;
 
 I = imread(p_img) ;
 I = single(I) ;
