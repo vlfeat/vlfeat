@@ -273,8 +273,6 @@ supported by Microsoft Visual C/C++.
     sure that these symbols (and, usually, no other symbol) are
     visible to the library client.    
  - ::VL_INLINE declares an inline function.
- - ::VL_CONSTRUCTOR and ::VL_DESTRUCTOR declares the constructor and
-   destructor functions of the DLL. 
 
 <table>
 <caption>Platform-dependent support for dynamic linking</caption>
@@ -295,18 +293,6 @@ supported by Microsoft Visual C/C++.
 <td>::VL_EXPORT</td>
 <td>@c __declspec(dllexport)</td>
 <td>@c __declspec(dllimport)</td>
-</tr>
-<tr>
-<td>Unix/GCC</td>
-<td>::VL_CONSTRUCTOR</td>
-<td><c>__attribute__((constructor))</c></td>
-<td>N.A.</td>
-</tr>
-<tr>
-<td>Unix/GCC</td>
-<td>::VL_DESTRUCTOR</td>
-<td><c>__attribute__((destructor))</c></td>
-<td>N.A.</td>
 </tr>
 </table>
 
@@ -445,31 +431,3 @@ vl_set_printf_func (int(*printf_func) (char const *format, ...))
 {
   vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
 }
-
-/** ------------------------------------------------------------------
- ** @internal
- ** @brief Dynamic library constructor function
- ** @sa design-export
- **/
-
-VL_CONSTRUCTOR
-static void initializer () 
-{
-  VL_PRINT ("VLFeat DLL constructor called.\n") ;
-}
-
-/** ------------------------------------------------------------------
- ** @internal
- ** @brief Dynamic library constructor function
- ** @sa design-export
- **/
-
-VL_DESTRUCTOR
-static void finalizer () 
-{
-  VL_PRINT ("VLFeat DLL destructor called.\n") ;
-}
-
-
- 
-

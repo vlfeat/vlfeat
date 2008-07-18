@@ -29,20 +29,8 @@ General Public License version 2.
  ** @sa @ref main-style-export
  **/
 
-/** @def VL_CONSTRUCTOR
- ** @brief Declares the DLL constructor function
- ** @sa @ref main-style-export
- **/
-
-/** @def VL_DESTRUCTOR
- ** @brief Declares the DLL destructor function
- ** @sa @ref main-style-export
- **/
-
 #ifdef WIN32
 #define VL_INLINE static __inline
-#define VL_CONSTRUCTOR
-#define VL_DESTRUCTOR
 #define snprintf _snprintf
 #define isnan _isnan
 
@@ -54,8 +42,6 @@ General Public License version 2.
 
 #else /* UNIX */
 #define VL_INLINE static __inline__
-#define VL_CONSTRUCTOR __attribute__((constructor))
-#define VL_DESTRUCTOR __attribute__((destructor))
 
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __attribute__((visibility ("default")))

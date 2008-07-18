@@ -33,10 +33,15 @@ switch mexext
     arch = 'win32\sift.exe' ;
 end
 
+pfx = fullfile(vlfeat_root,'results') ;
+if ~ exist(pfx, 'dir')
+  mkdir(pfx) ;
+end
+
 pfx_sift_cmd = fullfile(vlfeat_root,'bin',arch) ;
-pfx_im       = fullfile(vlfeat_root,'results','autotest.pgm') ;
-pfx_d        = fullfile(vlfeat_root,'results','autotest.descr') ;
-pfx_f        = fullfile(vlfeat_root,'results','autotest.frame') ;
+pfx_im       = fullfile(pfx,'autotest.pgm') ;
+pfx_d        = fullfile(pfx,'autotest.descr') ;
+pfx_f        = fullfile(pfx,'autotest.frame') ;
 
 imwrite(uint8(I), pfx_im) ;
 

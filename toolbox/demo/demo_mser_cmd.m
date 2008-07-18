@@ -1,10 +1,15 @@
 % DEMO_MSER_CMD Demo: MSER: test command line utility
 
+pfx = fullfile(vlfeat_root,'results') ;
+if ~ exist(pfx, 'dir')
+  mkdir(pfx) ;
+end
+
 p_img = fullfile(vlfeat_root,'data','spots.jpg') ;
-p_pgm = fullfile(vlfeat_root,'results','spots.pgm') ;
-p_sed = fullfile(vlfeat_root,'results','spots.mser') ;
-p_frm = fullfile(vlfeat_root,'results','spots.frame') ;
-p_tmp = fullfile(vlfeat_root,'results','spots.tmp') ;
+p_pgm = fullfile(pfx,'spots.pgm') ;
+p_sed = fullfile(pfx,'spots.mser') ;
+p_frm = fullfile(pfx,'spots.frame') ;
+p_tmp = fullfile(pfx,'spots.tmp') ;
 
 I = imread(p_img) ;
 I = uint8(rgb2gray(I)) ;
