@@ -461,6 +461,8 @@ bindist: $(NAME) all doc
 	rsync -arv --exclude=*.eps doc $(NAME)
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
+	           --include=*.dylib                                 \
+	           --include=*.so                                    \
 	           --include=*mexw32                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
