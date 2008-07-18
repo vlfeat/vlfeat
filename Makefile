@@ -502,11 +502,28 @@ endif
 #                                                       Debug Makefile
 # --------------------------------------------------------------------
 
+
 # $(call tocol,VAR) prints the content of a variable VAR
-define tocol
-@echo $(1) =
-@echo $($(1)) | sed -E 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
-endef
+
+ifeq ($(ARCH),mac)
+  define tocol
+  @echo $(1) =
+  @echo $($(1)) | sed -E 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
+  endef
+else
+ifeq ($(ARCH),mci)
+  define tocol
+  @echo $(1) =
+  @echo $($(1)) | sed -E 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
+  endef
+else
+  define tocol
+  @echo $(1) =
+  @echo $($(1)) | sed -r 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
+  endef
+endif
+endif
+
 
 .PHONY: info
 info :
