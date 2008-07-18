@@ -4,7 +4,7 @@
 
 NAME               := vlfeat
 VER                := 0.9.1
-HOST               := ganesh.cs.ucla.edu:/var/www/vlfeat/
+HOST               := ganesh.cs.ucla.edu:/var/www/vlfeat
 NDEBUG             :=
 
 # --------------------------------------------------------------------
@@ -475,7 +475,7 @@ post:
 	    $(HOST)/download
 
 post-doc: doc
-	rsync -rv doc/api -e "ssh" $(HOST)
+	rsync -aP doc/ $(HOST)
 
 autorights: distclean
 	autorights                                                   \
