@@ -1,9 +1,14 @@
 % AIBHIST  Compute histogram over AIB tree
-%  H = AIBHIST(PARENTS, DATA) computes the histogram of the data DATA
-%  on the AIB tree defined by PARENTS. 
+%  H = AIBHIST(PARENTS, DATA) computes the histogram of the data
+%  points DATA on the AIB tree defined by PARENTS. Each element of
+%  DATA indexes one of the leaves of the AIB tree.
+%
+%  H = AIBHIST(PARENTS, DATA, 'HIST') treats DATA as an histograms.
+%  In this case each compoment of DATA is the number of occurences of
+%  the AIB leaves corresponding to that component.
 %
 %  H has the same dimension of parents and counts how many data points
-%  match the corresponding node of the AIB tree.
+%  are descendent of the corresponding node of the AIB tree.
 %
 %  See also:: HELP_VLFEAT(), AIB(), AIBCUTPUSH().
 

@@ -111,7 +111,7 @@ $(eval define $(strip $(1))
 endef)
 endef
 
-$(eval $(call make-silent, CC      ))
+#$(eval $(call make-silent, CC      ))
 $(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
 $(eval $(call make-silent, FIG2DEV ))
@@ -119,6 +119,7 @@ $(eval $(call make-silent, DVIPS   ))
 $(eval $(call make-silent, DVIPNG  ))
 $(eval $(call make-silent, DOXYGEN ))
 $(eval $(call make-silent, CONVERT ))
+$(eval $(call make-silent, EPSTOPDF))
 
 CFLAGS          += -I$(CURDIR) -pedantic 
 CFLAGS          += -Wall -std=c89 -O3
@@ -171,7 +172,7 @@ BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
-LDFLAGS         += -lm -Wl,--rpath,\\\$$ORIGIN/
+LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MATLABPATH      ?= $(dir $(shell readlink -f `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
@@ -186,7 +187,7 @@ DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 LDFLAGS         += -lm
 MATLABPATH      ?= $(dir $(shell readlink -f `which mex`))/..
-MEX_FLAGS       += -lm -Wl,--rpath,\\\$$ORIGIN/
+MEX_FLAGS       += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
@@ -379,16 +380,13 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.png
-	@echo CONVERT $< \=\=\> $@
-	@$(CONVERT) $< jpg:$@
-	
+	$(CONVERT) $< jpg:$@
+
 doc/demo/%.png : doc/demo/%.eps
-	@echo CONVERT $< \=\=\> $@
-	@$(CONVERT) -resample 75 $< png:$@
+	$(CONVERT) -resample 75 $< png:$@
 
 doc/%.pdf : doc/%.eps
-	@echo EPSTOPDF $< \=\=\> $@
-	@$(EPSTOPDF) --outfile=$@ $<
+	$(EPSTOPDF) --outfile=$@ $<
 
 doc: doc-fig doc-api doc-toolbox doc-web
 

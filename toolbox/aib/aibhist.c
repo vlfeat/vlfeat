@@ -1,5 +1,5 @@
 /** @internal
- ** @file    aibpush.c
+ ** @file    aibhist.c
  ** @brief   Push data down the AIB tree - MEX driver
  ** @author  Andrea Vedaldi
  **/
@@ -28,7 +28,7 @@ General Public License version 2.
 void 
 mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
-  enum {IN_PARENTS = 0, IN_DATA} ;
+  enum {IN_PARENTS = 0, IN_DATA, IN_OPT} ;
   enum {OUT_TREE} ;
 
   vl_uint32 const *parents ;  
@@ -36,6 +36,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   double const *data ;
 
   int nnull = 0 ;
+  int histmode = 0 ;
   
   int i, P, N ;
 
@@ -43,8 +44,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin != 2) {
-    mexErrMsgTxt ("Two arguments required.") ;
+  if ((nin < 2) || (nin > 3)) {
+    mexErrMsgTxt ("Two or three arguments required.") ;
   }
 
   if (nout > 1) {
@@ -68,6 +69,20 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   P = mxGetNumberOfElements (in[IN_PARENTS]) ;
   parents = mxGetData (in[IN_PARENTS]) ;
+  
+  if (nin > 2) {
+    enum {buflen = 32} ;
+    char buf [buflen] ;
+    if (!uIsString(in[IN_OPT], -1)) {
+      mexErrMsgTxt("OPT must be a string") ;
+    }
+    mxGetString(in[IN_OPT], buf, buflen) ;
+    buf [buflen - 1] = 0 ;
+    if (!uStrICmp("hist", buf)) {
+      mexErrMsgTxt("OPT must be equal to 'hist'") ;
+    }
+    histmode = 1 ;
+  }
   
   out[OUT_TREE] = mxCreateNumericMatrix(1, P,mxUINT32_CLASS, mxREAL) ;
   tree = mxGetData (out[OUT_TREE]) ;
@@ -120,11 +135,22 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     
     /* process data */
     for (i = 0 ; i < N ; ++i) {
+      int w = 1 ;
       int x = (int) data [i] ;
+
+      if (histmode) {
+        w = x ;
+        x = i ;
+      }
       
       if ((x < 1) | (x > last_leaf)) {
-        snprintf(buf, sizeof(buf),
-                 "DATA [%d] = %d is not a leaf", i, x) ;
+        if (histmode) {
+          snprintf(buf, sizeof(buf), 
+                   "DATA length exceeds number of AIB leaves") ;
+        } else {
+          snprintf(buf, sizeof(buf),
+                   "DATA [%d] = %d is not a leaf", i, x) ;
+        }
         mexErrMsgTxt (buf) ;        
       }
       
