@@ -460,7 +460,7 @@ dist: $(NAME)
 
 bindist: $(NAME) all doc
 	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)
-	rsync -arv --exclude=*.eps --exclude=demo/*.png doc $(NAME)
+	rsync -arv --exclude=*.eps doc $(NAME)
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
 	           --include=*.dylib                                 \
@@ -479,7 +479,7 @@ post:
 	    $(HOST)/download
 
 post-doc: doc
-	rsync -aP doc/ $(HOST)
+	rsync -aP --exclude=*.eps doc/ $(HOST)
 
 autorights: distclean
 	autorights                                                   \
