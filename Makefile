@@ -346,14 +346,15 @@ fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
 
 pdf_tgt := #$(fig_src:.fig=.pdf) 
-eps_tgt := #$(fig_src:.fig=.eps)
-png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png)) $(demo_src:.eps=.png)
+eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
+png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
+jpg_tgt := $(demo_src:.eps=.jpg)
 
 doc/figures/%.png : doc/figures/%.dvi
-	$(DVIPNG) -D 75 -T tight -o $@ $<
+	cd doc/figures; $(DVIPNG) -D 75 -T tight -o $*.png $*.dvi
 
 doc/figures/%.eps : doc/figures/%.dvi
-	$(DVIPS) -E -o $@ $<
+	cd doc/figures; $(DVIPS) -E -o $*.eps $*.dvi
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
 	$(FIG2DEV) -L pstex_t -p $*-raw.ps $< $@ 
