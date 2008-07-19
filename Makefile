@@ -111,7 +111,7 @@ $(eval define $(strip $(1))
 endef)
 endef
 
-#$(eval $(call make-silent, CC      ))
+$(eval $(call make-silent, CC      ))
 $(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
 $(eval $(call make-silent, FIG2DEV ))
