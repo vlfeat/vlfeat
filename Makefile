@@ -475,7 +475,7 @@ bindist: $(NAME) all doc
 
 
 post:
-	scp $(DIST).tar.gz $(BINDIST).tar.gz                         \
+	rsync -aP $(DIST).tar.gz $(BINDIST).tar.gz                         \
 	    $(HOST)/download
 
 post-doc: doc
