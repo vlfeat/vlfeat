@@ -26,7 +26,7 @@ I = imread(pfx) ;
 image(I) ;
 </pre>
 <div class="figure">
-<img src="demo/sift_basic_0.png"/>
+<img src="demo/sift_basic_0.jpg"/>
 <div class="caption">
 Input image.
 </div>
@@ -57,7 +57,7 @@ set(h1,'color','y','linewidth',3) ;
 set(h2,'color','k','linewidth',1) ;
 </pre>
 <div class="figure">
-<img src="demo/sift_basic_2.png"/>
+<img src="demo/sift_basic_2.jpg"/>
 <div class="caption">
 Some of the detected SIFT frames.
 </div>
@@ -68,7 +68,7 @@ h3 = plotsiftdescriptor(d(:,sel),f(:,sel)) ;
 set(h3,'color','g') ;
 </pre>
 <div class="figure">
-<img src="demo/sift_basic_3.png"/>
+<img src="demo/sift_basic_3.jpg"/>
 <div class="caption">
 A test image for the peak threshold parameter.
 </div>
@@ -93,7 +93,7 @@ I = 2*pi*4^2 * imsmooth(I,4)
 I = single(255 * I) ;
 </pre>
 <div class="figure">
-<img src="demo/sift_peak_0.png/"/>
+<img src="demo/sift_peak_0.jpg/"/>
 </div>
 <p>We run the detector with peak treshold \verb$x$ by</p>
 <pre>
@@ -101,10 +101,10 @@ f = sift(I, 'PeakTresh', x) ;
 </pre>
 <p>obtaining less and less features</p>
 <div class="figure">
-<img src="demo/sift_peak_1.png"/>
-<img src="demo/sift_peak_2.png"/>
-<img src="demo/sift_peak_3.png"/>
-<img src="demo/sift_peak_4.png"/>
+<img src="demo/sift_peak_1.jpg"/>
+<img src="demo/sift_peak_2.jpg"/>
+<img src="demo/sift_peak_3.jpg"/>
+<img src="demo/sift_peak_4.jpg"/>
 <div class="caption">
 Selected frames for varying peak threshold.
 </div>
@@ -123,7 +123,7 @@ I = 2*pi*8^2 * imsmooth(I,8) ;
 I = single(255 * I) ;
 </pre>
 <div class="figure">
-<img src="demo/sift_edge_0.png"/>
+<img src="demo/sift_edge_0.jpg"/>
 <div class="caption">
 A test image for the edge threshold parameter.
 </div>
@@ -135,10 +135,10 @@ f = sift(I, 'EdgeTresh', x) ;
 </pre>
 <p>obtaining more and more features:
 <div class="figure">
-<img src="demo/sift_edge_1.png"/>
-<img src="demo/sift_edge_2.png"/>
-<img src="demo/sift_edge_3.png"/>
-<img src="demo/sift_edge_4.png"/>
+<img src="demo/sift_edge_1.jpg"/>
+<img src="demo/sift_edge_2.jpg"/>
+<img src="demo/sift_edge_3.jpg"/>
+<img src="demo/sift_edge_4.jpg"/>
 <div class="caption">
 Selected frames for varying edge threshold.
 </div>
@@ -153,7 +153,7 @@ can bypass the detector and run the descriptor on custom frames by
 means of the <ode>Frames</code> option.</o>
 
 <div class="figure">
-<img src="demo/sift_or.png"/>
+<img src="demo/sift_or.jpg"/>
 <div class="caption">Custom frames with computed orientations.</div>
 </div>
 

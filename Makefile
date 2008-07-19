@@ -378,6 +378,10 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\input{$(*)-raw.tex}'              >>$@
 	@/bin/echo '\end{document}'	               >>$@
 
+doc/demo/%.jpg : doc/demo/%.png
+	@echo CONVERT $< \=\=\> $@
+	@$(CONVERT) $< jpg:$@
+	
 doc/demo/%.png : doc/demo/%.eps
 	@echo CONVERT $< \=\=\> $@
 	@$(CONVERT) -resample 75 $< png:$@
@@ -392,7 +396,7 @@ doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
-doc-fig: $(png_tgt) $(pdf_tgt) $(eps_tgt)
+doc-fig: $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
 doc-api: doc-fig VERSION
 	$(DOXYGEN) docsrc/doxygen.conf
@@ -456,7 +460,7 @@ dist: $(NAME)
 
 bindist: $(NAME) all doc
 	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)
-	rsync -arv --exclude=*.eps doc $(NAME)
+	rsync -arv --exclude=*.eps --exclude=demo/*.png doc $(NAME)
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
 	           --include=*.dylib                                 \
@@ -537,6 +541,7 @@ info :
 	$(call tocol,pdf_tgt)
 	$(call tocol,eps_tgt)
 	$(call tocol,png_tgt)
+	$(call tocol,jpg_tgt)
 	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"
