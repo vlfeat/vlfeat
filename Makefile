@@ -106,15 +106,13 @@ GIT             ?= git
 # $(call make-silent, CMD) makes the execution of $(CMD) silent
 define make-silent
 $(eval define $(strip $(1))
-@function run () {                         \
-printf '%10s %s\n' $(strip $(1)) "$$(@)" ; \
-output=$$$$($($(strip $(1))) "$$$$@") ;    \
-status=$$$$? ;                             \
-} ; run
+@printf '%10s %s\n' $(strip $(1)) "$$(@)" ; 
+@$($(strip $(1)))
 endef)
 endef
 
 $(eval $(call make-silent, CC      ))
+$(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
 $(eval $(call make-silent, FIG2DEV ))
 $(eval $(call make-silent, DVIPS   ))
@@ -269,7 +267,6 @@ $(BINDIR)/objs/%.d : vl/%.c $(bin-dir)
 	       $< -MF $@
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
-	@echo "DYLIB '$@'"
 	@$(LIBTOOL) -dynamic                                         \
                     -flat_namespace                                  \
                     -install_name @loader_path/libvl.dylib           \
