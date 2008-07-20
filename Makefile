@@ -116,7 +116,7 @@ $(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
 $(eval $(call make-silent, FIG2DEV ))
 $(eval $(call make-silent, DVIPS   ))
-$(eval $(call make-silent, DVIPNG  ))
+#$(eval $(call make-silent, DVIPNG  ))
 $(eval $(call make-silent, DOXYGEN ))
 $(eval $(call make-silent, CONVERT ))
 $(eval $(call make-silent, EPSTOPDF))
@@ -185,9 +185,9 @@ BINDIR          := bin/g64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
-LDFLAGS         += -lm
+LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MATLABPATH      ?= $(dir $(shell readlink -f `which mex`))/..
-MEX_FLAGS       += -lm -Wl,--rpath,\$$ORIGIN/
+MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
