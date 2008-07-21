@@ -2,8 +2,7 @@
 <template src="template.html"/>
 <stylesheet src="web.css"/>
 <page src="index.html" title="Home" id="home">
-<page src="download.html" title="Download" id="download"/>
-<page src="download.html" title="Source code" id="code"/>
+<page src="download.html" title="Download &amp; Install" id="download"/>
 <page href="api/index.html"  title="API docs" id="api"/>
 <page href="toolbox/index.html" title="Matlab docs" id="mdoc"/>
 </page>

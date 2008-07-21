@@ -7,7 +7,7 @@ html, body {
 
 body {
 	font-size: 10pt  ;
-        font-family: 'Lucida Grande';
+        font-family: 'Lucida Grande', sans-serif ;
 	margin: auto;
 	width: auto;
 }
@@ -47,28 +47,35 @@ body {
 	padding: 4px;
 	margin: 0;
 	color: white;
-	font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif ;
 	font-weight: normal;
 }
 
-#header h1 { font-size: 2em; background-color: #636e80;}
+#header h1 { font-size: 2em; background-color: #636e80; }
 #header h2 { font-size: 1em; }
+
+#footer { 
+    clear: both ;
+    text-align: center;
+    border-top: 1px solid gray ;
+    padding: 0.5em ;
+}
 
 #content {
 	width: 60em;
-	padding-left: 1em;
+	padding-left: 1.5em;
+        padding-right: 1.5em;
 	line-height: 1.3em;
 }
 
 #index {
-	float: right;
+	float: right ;
 	width: 12em;
 	margin: 1em;
 	margin-right: 0;
 	padding: 0;
 	border: 1px dotted black;
 	background-color: white;
-	color: black;
 }
 
 #index ul {
@@ -121,7 +128,7 @@ body {
 #index a:active {}
 
 p, #index {
-	max-width: 35em;
+	max-width: 40em;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
@@ -129,8 +136,8 @@ p, #index {
 h1, h2, h3, h4, h5 {
 	font-family: Helvetica;
 	font-size: 1.3em;
-  margin-top: 1em ;
-  margin-bottom: 1em ;
+        margin-top: 1em ;
+        margin-bottom: 1em ;
 }
 
 code, pre {
