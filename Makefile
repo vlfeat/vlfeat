@@ -4,8 +4,9 @@
 
 # AUTORIGHTS
 
-# This makefile builds VLFeat on modern UNIX boxes. Mac and Linux are
-# explicitly supported, and many other boxes should be easy to add.
+# This makefile builds VLFeat on modern UNIX boxes with the GNU
+# compiler and make programs. Mac and Linux are explicitly supported,
+# and many other boxes should be easy to add.
 #
 # This makefile builds three components: VLFeat shared library (DLL),
 # the command line programs, and the MATLAB toolbox. It also builds
@@ -126,11 +127,11 @@ endif
 # --------------------------------------------------------------------
 
 # $(call dump-var,VAR) prints the content of a variable VAR in
-# three columns
+# two columns
 define dump-var
 @echo $(1) =
-@echo $($(1)) | sed 's/\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
-tr '#' '\n' | column -t
+@echo $($(1)) | sed 's/\([^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
+tr '#' '\n' | column -t | sed 's/\(.*\)/  \1/g'
 endef
 
 # $(call print-command, CMD, TGT)
@@ -155,29 +156,30 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
-MATLAB          ?= matlab
-MEX             ?= mex
 CC              ?= cc
-LIBTOOL         ?= libtool
-PYTHON          ?= python
-AR              ?= ar
-DOXYGEN         ?= doxygen
 CONVERT         ?= convert
+DOXYGEN         ?= doxygen
 DVIPNG          ?= dvipng
 DVIPS           ?= dvips
-FIG2DEV         ?= fig2dev
 EPSTOPDF        ?= epstopdf
+FIG2DEV         ?= fig2dev
 GIT             ?= git
+LATEX           ?= latex
+LIBTOOL         ?= libtool
+MATLAB          ?= matlab
+MEX             ?= mex
+PYTHON          ?= python
 
 $(eval $(call make-silent, CC      ))
+$(eval $(call make-silent, CONVERT ))
+$(eval $(call make-silent, DOXYGEN ))
+$(eval $(call make-silent, DVIPNG  ))
+$(eval $(call make-silent, DVIPS   ))
+$(eval $(call make-silent, EPSTOPDF))
+$(eval $(call make-silent, FIG2DEV ))
+$(eval $(call make-silent, LATEX   ))
 $(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
-$(eval $(call make-silent, FIG2DEV ))
-$(eval $(call make-silent, DVIPS   ))
-$(eval $(call make-silent, DVIPNG  ))
-$(eval $(call make-silent, DOXYGEN ))
-$(eval $(call make-silent, CONVERT ))
-$(eval $(call make-silent, EPSTOPDF))
 
 CFLAGS          += -I$(CURDIR) -pedantic 
 CFLAGS          += -Wall -std=c89 -O3
@@ -408,16 +410,14 @@ doc/figures/%.eps : doc/figures/%.dvi
 	$(DVIPS) -E -o $@ $<
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
-	$(FIG2DEV) -L pstex_t -p $*-raw.ps $< $@ 
+	$(FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@ 
 
 doc/figures/%-raw.ps : docsrc/figures/%.fig
 	$(FIG2DEV) -L pstex $< $@
 
 doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :  \
   doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
-	$(print-command, LATEX, $@)
-	@cd doc/figures ; latex $*.tex ; \
-	rm -f $*.log $*.aux
+	$(LATEX) -output-directory=$(dir $@) $<
 
 doc/figures/%.tex : $(doc-dir)
 	@$(print-command GEN, $@)
@@ -426,7 +426,7 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\usepackage{graphicx,color}'       >>$@
 	@/bin/echo '\begin{document}'                  >>$@
 	@/bin/echo '\pagestyle{empty}'                 >>$@
-	@/bin/echo '\input{$(*)-raw.tex}'              >>$@
+	@/bin/echo '\input{doc/figures/$(*)-raw.tex}'  >>$@
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.png
