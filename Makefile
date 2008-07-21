@@ -2,13 +2,94 @@
 # author:      Andrea Vedaldi
 # description: Build everything
 
-NAME               := vlfeat
-VER                := 0.9.1
-HOST               := ganesh.cs.ucla.edu:/var/www/vlfeat
-NDEBUG             :=
+# AUTORIGHTS
+
+# This makefile builds VLFeat on modern UNIX boxes. Mac and Linux are
+# explicitly supported, and many other boxes should be easy to add.
+#
+# This makefile builds three components: VLFeat shared library (DLL),
+# the command line programs, and the MATLAB toolbox. It also builds
+# the documentation (for the API, the MATLAB toolbox, the command line
+# utility, and also VLFeat homepage).
+#
+# Configuring the build system entails setting the appropriate
+# variables, which are summarized next. The makefile attempts to
+# auto-detect the right configuration parameters depending on the
+# architecture (see later).
+#
+# == MISCELLANEOUS VARIABLES ==
+#
+# VER:          Package version (e.g. 1.0)
+# DIST:         Package name for the source distr. ('vlfeat-1.0')
+# BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
+# HOST:         Where to pulbish the package.
+# NDEBUG:       Set this flag to YES to remove debugging support
+#
+# == PROGRAMS REQUIRED FOR BUILDING ==
+#
+# The following programs are required to compile the C library and the
+# command line utilities:
+#
+# CC:           C compiler (e.g. gcc).
+# LIBTOOL:      libtool (used only under Mac)
+#
+# The following programs are required to compile the C code in the
+# MATLAB Toolbox. Both are bundeld with MATLAB, but may not be
+# available directly from the command line path.
+#
+# MATLAB:       Matlab executable (typically `matlab')
+# MEX:          MEX compiler executable (typically `mex')
+#
+# The following programs are required to make the distribution
+# packages:
+#
+# GIT:          Version system (you also need the full GIT repository).
+#
+# The following programs are needed only to generate the
+# documentation:
+#
+# PYTHON:       Python interpreter
+# DOXYGEN:      Doxygen documentation system
+# DVIPNG:       TeX DVI to PNG converter
+# DVIPS:        TeX DVI to PS converter
+# EPS2PDF:      EPS to PDF converter
+# CONVERT:      ImageMagik convert utility
+# FIG2DEV:      X-Fig conversion program
+#
+# == BUILDING THE SHARED LIBRARY ==
+#
+# DLL_CLFAGS:   flags passed to $(CC) to compile a DLL C source
+# DLL_SUFFIX:   suffix of a DLL (.so, .dylib)
+# 
+# == BUILDING THE COMMAND LINE UTILITIES ==
+#
+# BINDIR:       where to put the exec (and libraries)
+# CLFAGS:       flags passed to $(CC) to compile a C source
+# LDFLAGS:      flags passed to $(CC) to link C objects into an exec
+#
+# == BUILDING THE MEX FILES ==
+#
+# MATLABPATH:   MATALB root path
+# MEX_BINDIR:   where to put mex files
+# MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
+# MEX_FLAGS:    flags passed to $(MEX)
+# MEX_CFLAGS:   flags added to the CLFAGS variable of $(MEX)
+# MEX_LDFLAGS:  flags added to the LDFLAGS variable of $(MEX)
+#
+# == BUILDING THE DOCUMENTATION ==
+#
+# There are no configuration parameters.
+
+NAME   := vlfeat
+VER    := 0.9.1
+HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat
+NDEBUG :=
+
+.PHONY : all
+all : dll all-bin all-mex
 
 # --------------------------------------------------------------------
-#                                                       Error messages
+#                                                       Error Messages
 # --------------------------------------------------------------------
 
 err_no_arch  =
@@ -21,7 +102,7 @@ err_internal  =$(shell echo Internal error)
 err_internal +=internal
 
 # --------------------------------------------------------------------
-#                                  Architecture Identification Strings
+#                                             Auto-detect Architecture
 # --------------------------------------------------------------------
 
 Darwin_PPC_ARCH             := mac
@@ -32,58 +113,43 @@ Linux_i686_ARCH             := glx
 Linux_unknown_ARCH          := glx
 Linux_x86_64_ARCH           := g64
 
+UNAME := $(shell uname -sm)
+ARCH  := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+
+# sanity check
+ifeq ($(ARCH),)
+die:=$(error $(err_no_arch))
+endif
+
 # --------------------------------------------------------------------
-#                                                        Configuration
+#                                                            Functions
 # --------------------------------------------------------------------
 
-# == DISTRIBUTION AND VERSION ==
-#
-# VER:
-# DIST:
-# BINDIST:
-# NDEBUG:
-#
-# == PROGRAMS ==
-#
-# CC:           C compiler (e.g. gcc).
-# MATLAB:       Matlab (e.g. matlab)
-# MEX:          MEX compiler (e.g mex).
-# LIBTOOL:      libtool (used only under Mac)
-#
-# The following programs are needed only to generate the documentation
-# and the source code and binary distributions:
-#
-# GIT:          Used to create distribution (e.g. git)
-# PYTHON:       Python interpreter (e.g. python)
-# DOXYGEN:      Doxygen
-# DVIPNG:       TeX DVI to PNG
-# DVIPS:        TeX DVI to PS
-# CONVERT:      ImageMagik convert utility
-# FIG2DEV:      X-Fig FIG format conversion program
-# EPS2PDF:      EPS to PDF
-# 
-# == EXECUTABLES ==
-#
-# BINDIR:       where to put the exec (and libraries)
-# CLFAGS:       flags passed to $(CC) to compile a C source
-# LDFLAGS:      flags passed to $(CC) to link C objects into an exec
-#
-# == LIBRARY ==
-#
-# DLL_CLFAGS:   flags passed to $(CC) to compile a DLL C source
-# DLL_SUFFIX:   suffix of a DLL (.so, .dylib)
-#
-# == MEX FILES ==
-#
-# MATLABPATH:   MATALB root path
-# MEX_BINDIR:   where to put mex files
-# MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
-# MEX_FLAGS:    flags passed to $(MEX)
-# MEX_CFLAGS:   flags added to the CLFAGS variable of $(MEX)
-# MEX_LDFLAGS:  flags added to the LDFLAGS variable of $(MEX)
-#
-# == DOCUMENTATION ==
-#
+# $(call dump-var,VAR) prints the content of a variable VAR in
+# three columns
+define dump-var
+@echo $(1) =
+@echo $($(1)) | sed 's/\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
+tr '#' '\n' | column -t
+endef
+
+# $(call print-command, CMD, TGT)
+define print-command
+@printf "%10s %s\n" "$(strip $(1))" "$(strip $(2))"
+endef
+
+# $(call make-silent, CMD) makes the execution of the command $(CMD)
+# silent
+define make-silent
+define $(strip $(1))
+$(call print-command, $(1), "$$(@)")
+@$($(strip $(1)))
+endef
+endef
+
+# --------------------------------------------------------------------
+#                                            Common UNIX Configuration
+# --------------------------------------------------------------------
 
 ifndef NDEBUG
 DEBUG=yes
@@ -103,20 +169,12 @@ FIG2DEV         ?= fig2dev
 EPSTOPDF        ?= epstopdf
 GIT             ?= git
 
-# $(call make-silent, CMD) makes the execution of $(CMD) silent
-define make-silent
-$(eval define $(strip $(1))
-@printf '%10s %s\n' $(strip $(1)) "$$(@)" ; 
-@$($(strip $(1)))
-endef)
-endef
-
 $(eval $(call make-silent, CC      ))
 $(eval $(call make-silent, LIBTOOL ))
 $(eval $(call make-silent, MEX     ))
 $(eval $(call make-silent, FIG2DEV ))
 $(eval $(call make-silent, DVIPS   ))
-#$(eval $(call make-silent, DVIPNG  ))
+$(eval $(call make-silent, DVIPNG  ))
 $(eval $(call make-silent, DOXYGEN ))
 $(eval $(call make-silent, CONVERT ))
 $(eval $(call make-silent, EPSTOPDF))
@@ -134,8 +192,9 @@ DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
 
-UNAME           := $(shell uname -sm)
-ARCH            := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+# --------------------------------------------------------------------
+#                                  Architecture-specific Configuration
+# --------------------------------------------------------------------
 
 # Mac OS X on PPC processor
 ifeq ($(ARCH),mac)
@@ -196,24 +255,14 @@ DIST            := $(NAME)-$(VER)
 BINDIST         := $(DIST)-bin
 MEX_BINDIR      := toolbox/$(MEX_SUFFIX)
 
-# Print an error message if the architecture was not recognized.
-ifeq ($(ARCH),)
-die:=$(error $(err_no_arch))
-endif
-
 # Sanity check
 ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
-
 # --------------------------------------------------------------------
-#                                  Generation of auxiliary directories
+#                                                     Make directories
 # --------------------------------------------------------------------
-
-define gendir
-$(1)-dir=$(foreach x,$(2),$(x)/.dirstamp)
-endef
 
 .PRECIOUS: %/.dirstamp
 %/.dirstamp :
@@ -221,16 +270,17 @@ endef
 	@mkdir -p $(dir $@)
 	@echo "Directory generated by make." > $@
 
+define gendir
+$(1)-dir=$(foreach x,$(2),$(x)/.dirstamp)
+endef
+
 $(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
 
-.PHONY : all
-all : dll all-bin all-mex $(results-dir) $(doc-dir)
-
 # --------------------------------------------------------------------
-#                                   Build static and dynamic libraries
+#                                                  Build shared library
 # --------------------------------------------------------------------
 #
 # Objects and dependecies are placed in the $(BINDIR)/objs/
@@ -279,7 +329,7 @@ $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 	$(CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
 
 # --------------------------------------------------------------------
-#                                                          Build execs
+#                                         Build command line utilities
 # --------------------------------------------------------------------
 # We place the exacutables in $(BINDIR).
 
@@ -334,13 +384,10 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt)
 #                                                  Build documentation
 # --------------------------------------------------------------------
 
-# doc-figures: create figures from X-Fig sources
-# 
-
-.PRECIOUS: *
-
-.PHONY: doc, doc-figures, doc-api, doc-toolbox, doc-web, doc-demo
+.PHONY: doc, doc-figures, doc-api, doc-toolbox
+.PHONY: doc-web, doc-demo
 .PHONY: doc-bindist, doc-distclean
+.PHONY: autorights
 
 m_src    := $(shell find toolbox -name "*.m")
 fig_src  := $(wildcard docsrc/figures/*.fig)
@@ -351,11 +398,14 @@ eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
 png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
 jpg_tgt := $(demo_src:.eps=.jpg)
 
+VERSION:
+	echo "Version $(VER) (`date`)" > VERSION
+
 doc/figures/%.png : doc/figures/%.dvi
-	cd doc/figures; $(DVIPNG) -D 75 -T tight -o $*.png $*.dvi
+	$(DVIPNG) -D 75 -T tight -o $@ $<
 
 doc/figures/%.eps : doc/figures/%.dvi
-	cd doc/figures; $(DVIPS) -E -o $*.eps $*.dvi
+	$(DVIPS) -E -o $@ $<
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
 	$(FIG2DEV) -L pstex_t -p $*-raw.ps $< $@ 
@@ -365,12 +415,12 @@ doc/figures/%-raw.ps : docsrc/figures/%.fig
 
 doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :  \
   doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
-	@echo LATEX $@
+	$(print-command, LATEX, $@)
 	@cd doc/figures ; latex $*.tex ; \
 	rm -f $*.log $*.aux
 
 doc/figures/%.tex : $(doc-dir)
-	@printf "%20s %s" GEN $@
+	@$(print-command GEN, $@)
 	@/bin/echo '\documentclass[landscape]{article}' >$@
 	@/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
 	@/bin/echo '\usepackage{graphicx,color}'       >>$@
@@ -417,24 +467,29 @@ doc-distclean:
 doc-wiki: $(NAME) 
 	$(PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
 
+autorights: distclean
+	autorights                                                   \
+	  toolbox vl                                                 \
+	  --recursive                                                \
+	  --verbose                                                  \
+	  --template doc/copylet.txt                                 \
+	  --years 2007                                               \
+	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
+	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
+	  --program "VLFeat"
+
 # --------------------------------------------------------------------
-#                                                       Clean and dist
+#                                                           Make clean
 # --------------------------------------------------------------------
 
-.PHONY: $(NAME) 
-.PHONY: dist, bindist, clean, distclean
-.PHONY: post, post-doc, autorights
-
-VERSION:
-	echo "Version $(VER)"            > VERSION
-	echo "Archive created on `date`" >>VERSION
+.PHONY: clean, distclean
 
 clean:
-	rm -rf `find ./bin -name 'objs' -type d`
 	rm -f  `find . -name '*~'`
 	rm -f  `find . -name '.DS_Store'`
 	rm -f  `find . -name '.gdb_history'`
 	rm -f  `find . -name '._*'`
+	rm -rf `find ./bin -name 'objs' -type d`
 	rm -rf  ./results
 	rm -rf $(NAME)
 
@@ -446,10 +501,17 @@ distclean: clean doc-distclean
 	done
 	rm -f $(NAME)-*.tar.gz
 
+# --------------------------------------------------------------------
+#                                          Build distribution packages
+# --------------------------------------------------------------------
+
+.PHONY: $(NAME), dist, bindist
+.PHONY: post, post-doc
+
 $(NAME): VERSION
 	rm -rf $(NAME)
 	$(GIT) archive --prefix=$(NAME)/ HEAD | tar xvf -
-	cp VERSION $(NAME)
+	rsync -arv VERSION $(NAME)
 
 dist: $(NAME)
 	COPYFILE_DISABLE=1                                           \
@@ -473,28 +535,17 @@ bindist: $(NAME) all doc
 
 
 post:
-	rsync -aP $(DIST).tar.gz $(BINDIST).tar.gz                         \
+	rsync -aP $(DIST).tar.gz $(BINDIST).tar.gz                   \
 	    $(HOST)/download
 
 post-doc: doc
 	rsync -aP --exclude=*.eps doc/ $(HOST)
 
-autorights: distclean
-	autorights                                                   \
-	  toolbox vl                                                 \
-	  --recursive                                                \
-	  --verbose                                                  \
-	  --template doc/copylet.txt                                 \
-	  --years 2007                                               \
-	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
-	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
-	  --program "VLFeat"
-
 # --------------------------------------------------------------------
 #                                               Automatic Dependencies
 # --------------------------------------------------------------------
 
-ifeq ($(filter doc dox clean distclean info, $(MAKECMDGOALS)),)
+ifeq ($(filter doc clean distclean info, $(MAKECMDGOALS)),)
 include $(dll_dep) $(mex_dep)
 endif
 
@@ -502,44 +553,21 @@ endif
 #                                                       Debug Makefile
 # --------------------------------------------------------------------
 
-
-# $(call tocol,VAR) prints the content of a variable VAR
-
-ifeq ($(ARCH),mac)
-  define tocol
-  @echo $(1) =
-  @echo $($(1)) | sed -E 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
-  endef
-else
-ifeq ($(ARCH),mci)
-  define tocol
-  @echo $(1) =
-  @echo $($(1)) | sed -E 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
-  endef
-else
-  define tocol
-  @echo $(1) =
-  @echo $($(1)) | sed -r 's/([^ ]+ [^ ]+ [^ ]+) */\1#/g' | tr '#' '\n' | column -t
-  endef
-endif
-endif
-
-
 .PHONY: info
 info :
-	$(call tocol,dll_src)
-	$(call tocol,dll_obj)
-	$(call tocol,dll_dep)
-	$(call tocol,mex_src)
-	$(call tocol,fig_src)
-	$(call tocol,demo_src)
-	$(call tocol,mex_tgt)
-	$(call tocol,bin_src)
-	$(call tocol,bin_tgt)
-	$(call tocol,pdf_tgt)
-	$(call tocol,eps_tgt)
-	$(call tocol,png_tgt)
-	$(call tocol,jpg_tgt)
+	$(call dump-var,dll_src)
+	$(call dump-var,dll_obj)
+	$(call dump-var,dll_dep)
+	$(call dump-var,mex_src)
+	$(call dump-var,fig_src)
+	$(call dump-var,demo_src)
+	$(call dump-var,mex_tgt)
+	$(call dump-var,bin_src)
+	$(call dump-var,bin_tgt)
+	$(call dump-var,pdf_tgt)
+	$(call dump-var,eps_tgt)
+	$(call dump-var,png_tgt)
+	$(call dump-var,jpg_tgt)
 	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"
@@ -552,10 +580,8 @@ info :
 	@echo "MEX_FLAGS    = $(MEX_FLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
-
-.PHONY: wc
-wc:
-	cat $(m_src) $(mex_src) $(dll_src) $(bin_src) | wc
+	@printf "\nThere are %s lines of code.\n" \
+	`cat $(m_src) $(mex_src) $(dll_src) $(bin_src) | wc -l`
 
 # --------------------------------------------------------------------
 #                                                        Xcode Support
