@@ -429,11 +429,11 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\input{doc/figures/$(*)-raw.tex}'  >>$@
 	@/bin/echo '\end{document}'	               >>$@
 
-doc/demo/%.jpg : doc/demo/%.png
-	$(CONVERT) $< jpg:$@
+doc/demo/%.jpg : doc/demo/%.eps
+	$(CONVERT) -density 400 $< -colorspace rgb -resize 25% jpg:$@
 
 doc/demo/%.png : doc/demo/%.eps
-	$(CONVERT) -resample 75 $< png:$@
+	$(CONVERT) -density 400 $< -colorspace rgb -resize 25% png:$@
 
 doc/%.pdf : doc/%.eps
 	$(EPSTOPDF) --outfile=$@ $<
