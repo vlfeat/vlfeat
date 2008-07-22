@@ -1,111 +1,111 @@
 html, body {
-	width: 100%;
-	height: 100%;
-	background-color: rgb(30,30,30);
-	color: black;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(30,30,30);
+  color: black;
 }
 
 body {
-	font-size: 10pt  ;
-        font-family: 'Lucida Grande', sans-serif ;
-	margin: auto;
-	width: auto;
+  font-size: 10pt  ;
+  font-family: 'Lucida Grande', sans-serif ;
+  margin: auto;
+  width: auto;
 }
 
 #frame {
-	height: 100%;
-	margin: 0 auto;
-	padding: 0;
-	border-style: none;
-	border-collapse: collapse;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  border-style: none;
+  border-collapse: collapse;
 }
 
 #shl, #shr {
-	width: 29px;
-	padding: 0;
-	margin: 0;
+  width: 29px;
+  padding: 0;
+  margin: 0;
 }
 
 #shl {background: url(images/shl.png) top left  repeat-y;}
 #shr {background: url(images/shr.png) top right repeat-y;}
 
 #page {
-	vertical-align: top;
-	background-color: white;
-	padding: 0;
-	margin: 0;
+  vertical-align: top;
+  background-color: white;
+  padding: 0;
+  margin: 0;
 }
 
 #header {
-	background-color: #343943;
-	padding: 0;
-	margin: 0;
+  background-color: #343943;
+  padding: 0;
+  margin: 0;
 }
 
 #header h1, 
 #header h2 {
-	padding: 4px;
-	margin: 0;
-	color: white;
-	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif ;
-	font-weight: normal;
+  padding: 4px;
+  margin: 0;
+  color: white;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif ;
+  font-weight: normal;
 }
 
 #header h1 { font-size: 2em; background-color: #636e80; }
 #header h2 { font-size: 1em; }
 
 #footer { 
-    clear: both ;
-    text-align: center;
-    border-top: 1px solid gray ;
-    padding: 0.5em ;
+  clear: both ;
+  text-align: center;
+  border-top: 1px solid gray ;
+  padding: 0.5em ;
 }
 
 #content {
-	width: 60em;
-	padding-left: 1.5em;
-        padding-right: 1.5em;
-	line-height: 1.3em;
+  width: 60em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  line-height: 1.3em;
 }
 
 #index {
-	float: right ;
-	width: 12em;
-	margin: 1em;
-	margin-right: 0;
-	padding: 0;
-	border: 1px dotted black;
-	background-color: white;
+  float: right ;
+  width: 12em;
+  margin: 1em;
+  margin-right: 0;
+  padding: 0;
+  border: 1px dotted black;
+  background-color: white;
 }
 
 #index ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 #index ul li {
-	display: block;
-	margin: 0;
-	padding: 0;
-	margin-bottom: 1em;
+  display: block;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 1em;
 }
 
 #index ul ul li {
-	margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 #index ul a {
-	display: block;
-	padding: 2px 0;
-	text-decoration: none;
-	color: blue;
-	font-weight: bold;
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+  color: blue;
+  font-weight: bold;
 }
 
 #index ul ul a {
-	font-weight: normal;
-	font-size: 0.9em;
+  font-weight: normal;
+  font-size: 0.9em;
 }
 
 #index ul a {padding-left: 0.5em;}
@@ -115,33 +115,33 @@ body {
 
 #index a:hover,
 #index #current {
-	padding-top: 2px;
-	padding-bottom: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 #index a:hover,
 #index #current {
-	background-color: white;
-	font-weight: bold;
+  background-color: white;
+  font-weight: bold;
 }
 
 #index a:active {}
 
 p, #index {
-	max-width: 40em;
-	margin-top: 1em;
-	margin-bottom: 1em;
+  max-width: 40em;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 h1, h2, h3, h4, h5 {
-	font-family: Helvetica;
-	font-size: 1.3em;
-        margin-top: 1em ;
-        margin-bottom: 1em ;
+  font-family: Helvetica;
+  font-size: 1.3em;
+  margin-top: 1em ;
+  margin-bottom: 1em ;
 }
 
 code, pre {
-	color: #CF652A ;
+  color: #CF652A ;
 }
 
 div.figure {
@@ -154,12 +154,12 @@ div.caption {
 
 /* Mdoc css */
 dt {
-color: DarkOrange  ;
-margin: 0 ;
+  color: DarkOrange  ;
+  margin: 0 ;
 }
 
 dd {
-margin: 0em 0em 0em 2em ;
+  margin: 0em 0em 0em 2em ;
 }
 
 dd p {
@@ -167,23 +167,23 @@ dd p {
 }
 
 ul {
-padding:0 ;
+  padding:0 ;
 }
 
 li {
-padding: 0 ;
-margin: 0 ;
-margin-left: 1.5em ;
+  padding: 0 ;
+  margin: 0 ;
+  margin-left: 1.5em ;
 }
 
 ul ul  {
-margin-left:1em ;
-margin-bottom: 1em ;
+  margin-left:1em ;
+  margin-bottom: 1em ;
 }
 
 pre {
-    font-size: 1em ;
-    color: Teal ;
+  font-size: 1em ;
+  color: Teal ;
 }
 
 div.documentation {
@@ -215,117 +215,117 @@ div.documentation {
 
 /* Doxygen */
 .mdescLeft {
-       padding: 0px 8px 4px 8px;
-	font-size: 80%;
-	font-style: italic;
-	background-color: #FAFAFA;
-	border-top: 1px none #E0E0E0;
-	border-right: 1px none #E0E0E0;
-	border-bottom: 1px none #E0E0E0;
-	border-left: 1px none #E0E0E0;
-	margin: 0px;
+  padding: 0px 8px 4px 8px;
+  font-size: 80%;
+  font-style: italic;
+  background-color: #FAFAFA;
+  border-top: 1px none #E0E0E0;
+  border-right: 1px none #E0E0E0;
+  border-bottom: 1px none #E0E0E0;
+  border-left: 1px none #E0E0E0;
+  margin: 0px;
 }
 .mdescRight {
-       padding: 0px 8px 4px 8px;
-	font-size: 80%;
-	font-style: italic;
-	background-color: #FAFAFA;
-	border-top: 1px none #E0E0E0;
-	border-right: 1px none #E0E0E0;
-	border-bottom: 1px none #E0E0E0;
-	border-left: 1px none #E0E0E0;
-	margin: 0px;
+  padding: 0px 8px 4px 8px;
+  font-size: 80%;
+  font-style: italic;
+  background-color: #FAFAFA;
+  border-top: 1px none #E0E0E0;
+  border-right: 1px none #E0E0E0;
+  border-bottom: 1px none #E0E0E0;
+  border-left: 1px none #E0E0E0;
+  margin: 0px;
 }
 .memItemLeft {
-	padding: 1px 0px 0px 8px;
-	margin: 4px;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-color: #E0E0E0;
-	border-right-color: #E0E0E0;
-	border-bottom-color: #E0E0E0;
-	border-left-color: #E0E0E0;
-	border-top-style: solid;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
-	background-color: #FAFAFA;
-	font-size: 80%;
+  padding: 1px 0px 0px 8px;
+  margin: 4px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-color: #E0E0E0;
+  border-right-color: #E0E0E0;
+  border-bottom-color: #E0E0E0;
+  border-left-color: #E0E0E0;
+  border-top-style: solid;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  background-color: #FAFAFA;
+  font-size: 80%;
 }
 .memItemRight {
-	padding: 1px 8px 0px 8px;
-	margin: 4px;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-color: #E0E0E0;
-	border-right-color: #E0E0E0;
-	border-bottom-color: #E0E0E0;
-	border-left-color: #E0E0E0;
-	border-top-style: solid;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
-	background-color: #FAFAFA;
-	font-size: 80%;
+  padding: 1px 8px 0px 8px;
+  margin: 4px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-color: #E0E0E0;
+  border-right-color: #E0E0E0;
+  border-bottom-color: #E0E0E0;
+  border-left-color: #E0E0E0;
+  border-top-style: solid;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  background-color: #FAFAFA;
+  font-size: 80%;
 }
 .memTemplItemLeft {
-	padding: 1px 0px 0px 8px;
-	margin: 4px;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-color: #E0E0E0;
-	border-right-color: #E0E0E0;
-	border-bottom-color: #E0E0E0;
-	border-left-color: #E0E0E0;
-	border-top-style: none;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
-	background-color: #FAFAFA;
-	font-size: 80%;
+  padding: 1px 0px 0px 8px;
+  margin: 4px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-color: #E0E0E0;
+  border-right-color: #E0E0E0;
+  border-bottom-color: #E0E0E0;
+  border-left-color: #E0E0E0;
+  border-top-style: none;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  background-color: #FAFAFA;
+  font-size: 80%;
 }
 .memTemplItemRight {
-	padding: 1px 8px 0px 8px;
-	margin: 4px;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-color: #E0E0E0;
-	border-right-color: #E0E0E0;
-	border-bottom-color: #E0E0E0;
-	border-left-color: #E0E0E0;
-	border-top-style: none;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
-	background-color: #FAFAFA;
-	font-size: 80%;
+  padding: 1px 8px 0px 8px;
+  margin: 4px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-color: #E0E0E0;
+  border-right-color: #E0E0E0;
+  border-bottom-color: #E0E0E0;
+  border-left-color: #E0E0E0;
+  border-top-style: none;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  background-color: #FAFAFA;
+  font-size: 80%;
 }
 .memTemplParams {
-	padding: 1px 0px 0px 8px;
-	margin: 4px;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-color: #E0E0E0;
-	border-right-color: #E0E0E0;
-	border-bottom-color: #E0E0E0;
-	border-left-color: #E0E0E0;
-	border-top-style: solid;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
-       color: #606060;
-	background-color: #FAFAFA;
-	font-size: 80%;
+  padding: 1px 0px 0px 8px;
+  margin: 4px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-color: #E0E0E0;
+  border-right-color: #E0E0E0;
+  border-bottom-color: #E0E0E0;
+  border-left-color: #E0E0E0;
+  border-top-style: solid;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  color: #606060;
+  background-color: #FAFAFA;
+  font-size: 80%;
 }
 
 /* Style for detailed member documentation */
@@ -382,8 +382,8 @@ div.documentation {
 
 /* for the tree view */
 .ftvtree {
-	font-family: sans-serif;
-	margin:0.5em;
+  font-family: sans-serif;
+  margin:0.5em;
 }
 .directory { font-size: 9pt; font-weight: bold; }
 .directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
