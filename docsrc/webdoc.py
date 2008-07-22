@@ -10,9 +10,10 @@ import sys, os, re, subprocess, signal, htmlentitydefs, shutil
 from wikidoc import wikidoc
 from optparse import OptionParser
 from HTMLParser import HTMLParser
+from xml.parsers.expat import ExpatError
 from xml.dom import minidom 
 
-usage = """usage: %prog [options] <srcdir> <docdir>
+usage = """usage: %prog [options] WEB.XML <docdir>
 
 """
 
@@ -32,12 +33,6 @@ parser.add_option(
     action  = "store_true",
     help    = "print debug informations")      
 parser.add_option(
-    "-s", "--srcdir", 
-    dest    = "srcdir",
-    default = "",
-    action  = "store",
-    help    = "directory containing the HTML sources")
-parser.add_option(
     "-o", "--outdir", 
     dest    = "outdir",
     default = "",
@@ -46,6 +41,7 @@ parser.add_option(
 
 # --------------------------------------------------------------------
 def readText(fileName):
+# --------------------------------------------------------------------
   """
   TEXT = readText(NAME) returns the content of file NAME.
   """
@@ -60,6 +56,7 @@ def readText(fileName):
   
 # --------------------------------------------------------------------
 def writeText(fileName, text):
+# --------------------------------------------------------------------
   """
   writeText(NAME, TEXT) writes TEXT to the file NAME.
   """
@@ -72,6 +69,7 @@ def writeText(fileName, text):
 
 # --------------------------------------------------------------------
 def iterateChildNodesByTag(node, tag):
+# --------------------------------------------------------------------
   """
   This generator searches the childern of NODE for 
   XML elements matching TAG.
@@ -84,6 +82,7 @@ def iterateChildNodesByTag(node, tag):
     
 # --------------------------------------------------------------------
 def getAttribute(element, attr, default=None):
+# --------------------------------------------------------------------
   if element.hasAttribute(attr):
     return element.getAttribute(attr)
   else:
@@ -91,6 +90,7 @@ def getAttribute(element, attr, default=None):
     
 # --------------------------------------------------------------------
 class Page:
+# --------------------------------------------------------------------
   def __init__(self):
     self.text = None
     self.href = None
@@ -101,6 +101,7 @@ class Page:
 
 # --------------------------------------------------------------------
 def iteratePages(parentPage):
+# --------------------------------------------------------------------
   """
   Iterate over a tree of pages in depth first order.
   """
@@ -110,6 +111,7 @@ def iteratePages(parentPage):
 
 # --------------------------------------------------------------------
 class ID:
+# --------------------------------------------------------------------
   """
   A class instance represents an element ID which has a validity 
   throughout the website.
@@ -123,42 +125,72 @@ class ID:
     return "%s (%s)" % (self.page.src, self.htmlId)
 
 # --------------------------------------------------------------------
-class WebSite(Page):
-    
+class WebSite:
+# --------------------------------------------------------------------
+  """
+  WebSite represent the whole website. A website is mainly a
+  hierarchical collection of pages.
+  """
+  
   def __init__(self):
     self.root = Page()
     self.ids = {}
     self.stylesheet = ""
     self.template   = ""
-        
-  def load(self, fileName, locprefix=""):
+    self.src        = ""
+  
+  def getFullName(self, name):
+    if name == None: return None
+    if (os.path.isabs(name)):
+      return name
+    else:
+      return os.path.join(os.path.dirname(self.src), name)
+    
+  def load(self, fileName):
+    if verb:
+      print "webdoc: loading website `%s'\n" % fileName
+
     self.src = fileName
-    print "Locprefix: ", locprefix
     doc = minidom.parse(self.src).documentElement
     for e in iterateChildNodesByTag(doc, 'template'):
-      self.template = e.getAttribute('src')    
+      self.template = self.getFullName(e.getAttribute('src'))
     for e in iterateChildNodesByTag(doc, 'stylesheet'):
-      self.stylesheet = e.getAttribute('src')    
-    self.root.children = self.xLoadPages(doc, 1, locprefix)
+      self.stylesheet = self.getFullName(e.getAttribute('src'))
+    self.root.children = self.xLoadPages(doc, 1)
     self.ids = self.extractRefs(self.root)
 
-  def xLoadPages(self, doc, depth, locprefix):
+  def xLoadPages(self, doc, depth):
     pages = []
     for e in iterateChildNodesByTag(doc, 'page'):
       page          = Page()
       page.id       = getAttribute(e, 'id')
       page.href     = getAttribute(e, 'href')
-      page.src      = getAttribute(e, 'src')
+      page.src      = self.getFullName(getAttribute(e, 'src'))
       page.title    = getAttribute(e, 'title')
       page.depth    = depth
+      page.hide     = getAttribute(e, 'hide')
       if page.src is not None:
-        page.text = readText(os.path.join(srcdir,page.src))
+        page.text = readText(page.src)
       if page.href is None:
-        page.href = locprefix + page.src
+        page.href = os.path.basename(page.src)
       else:
-        page.href = locprefix + page.href
-      page.children = self.xLoadPages(e, depth + 1, locprefix)
+        page.href = page.href
+      page.children = self.xLoadPages(e, depth + 1)
       pages.append(page)
+
+    for i in iterateChildNodesByTag(doc, 'include'):
+      filename = self.getFullName(getAttribute(i, 'src'))
+      if verb:
+        print "webdoc: including website `%s'\n" % filename
+      site = WebSite()
+      try:
+        site.load(filename)
+        pages[len(pages):] = site.root.children
+
+      except IOError, e:
+        print "Could not access file %s (%s)" % (filename, e)
+      except ExpatError, e:
+        print "Error parsing file %s (%s)" % (filename, e)
     return pages
 
   def genHtmlIndex(self, parentPage, activePage = None):
@@ -167,6 +199,7 @@ class WebSite(Page):
     parentIndent = " " * parentPage.depth
     html += parentIndent + "<ul>\n"
     for page in parentPage.children:
+      if page.hide == 'yes': continue
       indent = " " * page.depth
       html += indent + "<li>\n"
       html += indent + "<a href='%s'>%s</a>\n" % (page.id,page.title) 
@@ -178,7 +211,7 @@ class WebSite(Page):
   def extractRefs(self, parentPage):
     ids = {}
     for page in iteratePages(self.root):
-      print "extra page %s" % page.title
+      print "extra page %s (id: %s)" % (page.title, page.id)
       ids[page.id] = ID(page)
       if page.text is not None:
         extractor = RefExtractor()
@@ -189,15 +222,15 @@ class WebSite(Page):
     
   def genSite(self):
     print "copying stylesheet %s to %s" % (
-      os.path.join(srcdir, self.stylesheet),
-      os.path.join(outdir, self.stylesheet))
+      self.stylesheet, 
+      os.path.join(outdir, os.path.basename(self.stylesheet)))
     shutil.copy(
-      os.path.join(srcdir, self.stylesheet), 
-      os.path.join(outdir, self.stylesheet))
+      self.stylesheet,
+      os.path.join(outdir, os.path.basename(self.stylesheet)))
     for page in iteratePages(self.root):
       if page.text is None: continue
       text = readText(os.path.join(srcdir, self.template))
-      text = re.sub("%stylesheet;", self.stylesheet, text)
+      text = re.sub("%stylesheet;", os.path.basename(self.stylesheet), text)
       text = re.sub("%pagetitle;", "VLFeat - %s" % page.title, text)
       text = re.sub("%title;", "<h1>VLFeat</h1>", text)
       text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
@@ -205,19 +238,22 @@ class WebSite(Page):
       text = re.sub("%content;", page.text, text)
       generator = PageGenerator(site)
       generator.feed(text)
+      outName = os.path.join(outdir, os.path.basename(page.src))
       writeText(
-        os.path.join(outdir, page.src), 
+        outName,
         generator.output())
+      print "webdoc: wrote %s" % (outName)
         
   def debug(self):
     print "=== Index ==="
     print self.genHtmlIndex(self.root)
     print "=== IDs ==="
     for (k,i) in self.ids.iteritems():
-      print "%10s) %s" % (k, i)
+      print "%30s) %s" % (k, i)
 
 # --------------------------------------------------------------------    
 class RefExtractor(HTMLParser):
+# --------------------------------------------------------------------
   def __init__(self):
     HTMLParser.__init__(self)
     self.ids = []
@@ -229,6 +265,7 @@ class RefExtractor(HTMLParser):
         
 # --------------------------------------------------------------------    
 class PageGenerator(HTMLParser):
+# --------------------------------------------------------------------
   def __init__(self, site):
     HTMLParser.__init__(self)
     self.pieces = []
@@ -277,23 +314,24 @@ class PageGenerator(HTMLParser):
 
 # --------------------------------------------------------------------    
 if __name__ == '__main__':
+# --------------------------------------------------------------------
 
   #
-  ## Parse comand line options
+  # Parse comand line options
   #
   (options, args) = parser.parse_args()
   filename = args[0]
   
   verb = options.verb
-  srcdir = options.srcdir
+  xmldoc = args[0]
   outdir = options.outdir
 
   if verb:
-    print "%prog: search path: %s" % srcdir
-    print "%prog: output path: %s" % outdir
+    print "webdoc: website document: `%s'" % xmldoc
+    print "webdoc: output path: `%s'" % outdir
 
   site = WebSite()
-  site.load(args[0])
+  site.load(xmldoc)
   site.debug()
   site.genSite()
   

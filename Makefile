@@ -303,6 +303,7 @@ $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_src := $(wildcard vl/*.c)
+dll_hdr := $(wildcard vl/*.h) $(wildcard vl/*.tc)
 dll_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(dll_src:.c=.o)))
 dll_dep := $(dll_obj:.o=.d)
 
@@ -333,17 +334,26 @@ $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 # --------------------------------------------------------------------
 #                                         Build command line utilities
 # --------------------------------------------------------------------
-# We place the exacutables in $(BINDIR).
+# The executables are stored in $(BINDIR). $(dll_tgt) is not a direct
+# dependency in order avoiding rebuilding all the executables if only
+# a part of the library is changed.
 
 bin_src := $(wildcard src/*.c)
 bin_tgt := $(notdir $(bin_src))
 bin_tgt := $(addprefix $(BINDIR)/, $(bin_tgt:.c=))
+bin_dep := $(addsuffix .d, $(bin_tgt))
 
 .PHONY: all-bin
 all-bin: $(bin_tgt)
 
-$(BINDIR)/% : src/%.c src/generic-driver.h $(dll_tgt)
+$(BINDIR)/% : src/%.c $(bin-dir)
+	@make -s $(dll_tgt)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+
+$(BINDIR)/%.d : src/%.c $(bin-dir)
+	$(CC) $(CFLAGS) -M -MT                                        \
+	       '$(BINDIR)/$* $(MEX_BINDIR)/$*.d'                      \
+	       $< -MF $@
 
 # --------------------------------------------------------------------
 #                                                      Build MEX files
@@ -367,13 +377,14 @@ vpath %.c $(shell find toolbox -type d)
 .PHONY: all-mex
 all-mex : $(mex_tgt)
 
-$(MEX_BINDIR)/%.d : %.c $(mex-dir) $(dll_tgt)
+$(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(CC) $(MEX_CFLAGS)                                          \
                -I$(MATLABPATH)/extern/include -M -MT                 \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
+	@make -s $(dll_tgt)
 	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'                      \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
@@ -403,6 +414,10 @@ jpg_tgt := $(demo_src:.eps=.jpg)
 VERSION:
 	echo "Version $(VER) (`date`)" > VERSION
 
+doc: doc-fig doc-api doc-web
+
+doc-api: doc-fig doc/api/index.html
+
 doc/figures/%.png : doc/figures/%.dvi
 	$(DVIPNG) -D 75 -T tight -o $@ $<
 
@@ -430,15 +445,13 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.eps
-	$(CONVERT) -density 400 $< -colorspace rgb -resize 25% jpg:$@
+	$(CONVERT) -density 400 $< -colorspace rgb -resize 20% jpg:$@
 
 doc/demo/%.png : doc/demo/%.eps
-	$(CONVERT) -density 400 $< -colorspace rgb -resize 25% png:$@
+	$(CONVERT) -density 400 $< -colorspace rgb -resize 20% png:$@
 
 doc/%.pdf : doc/%.eps
 	$(EPSTOPDF) --outfile=$@ $<
-
-doc: doc-fig doc-api doc-toolbox doc-web
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
@@ -446,19 +459,22 @@ doc-deep: all $(doc-dir) $(results-dir)
 
 doc-fig: $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
-doc-api: doc-fig VERSION
-	$(DOXYGEN) docsrc/doxygen.conf
+doc/api/index.html: docsrc/doxygen.conf VERSION $(dll_src) $(dll_hdr)
+	$(DOXYGEN) $<
 
 doc-toolbox:
 	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox --site=docsrc/web.xml
 
 doc-web: doc-fig
-	$(PYTHON) docsrc/webdoc.py --srcdir=docsrc/ --outdir=doc \
-	          docsrc/web.xml
+	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src --format=web	
+	$(PYTHON) docsrc/webdoc.py --outdir=doc \
+	          docsrc/web.xml --verbose
 	rsync -arv docsrc/images doc
 
 doc-bindist: $(NAME) doc
-	rsync -arv doc $(NAME) --exclude=doc/demo/*.eps
+	rsync -arv doc $(NAME)/                                      \
+	  --exclude=doc/demo/*.eps                                   \
+	  --exclude=doc/toolbox-src*
 
 doc-distclean:
 	rm -f  docsrc/*.pyc
@@ -511,16 +527,15 @@ distclean: clean doc-distclean
 $(NAME): VERSION
 	rm -rf $(NAME)
 	$(GIT) archive --prefix=$(NAME)/ HEAD | tar xvf -
-	rsync -arv VERSION $(NAME)
+	rsync -arv VERSION $(NAME)/
 
 dist: $(NAME)
 	COPYFILE_DISABLE=1                                           \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \
 	tar czvf $(DIST).tar.gz $(NAME)
 
-bindist: $(NAME) all doc
-	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)
-	rsync -arv --exclude=*.eps doc $(NAME)
+bindist: $(NAME) all doc-bindist
+	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)/
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
 	           --include=*.dylib                                 \
@@ -531,7 +546,7 @@ bindist: $(NAME) all doc
 	           --include=*dll                                    \
 		   --exclude=*                                       \
 	           toolbox/ $(NAME)/toolbox 
-	tar czvf $(BINDIST).tar.gz $(NAME)
+	tar czvf $(BINDIST).tar.gz $(NAME)/
 
 
 post:
@@ -546,7 +561,7 @@ post-doc: doc
 # --------------------------------------------------------------------
 
 ifeq ($(filter doc clean distclean info, $(MAKECMDGOALS)),)
-include $(dll_dep) $(mex_dep)
+include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
 
 # --------------------------------------------------------------------
@@ -555,6 +570,7 @@ endif
 
 .PHONY: info
 info :
+	$(call dump-var,dll_hdr)
 	$(call dump-var,dll_src)
 	$(call dump-var,dll_obj)
 	$(call dump-var,dll_dep)
@@ -564,6 +580,7 @@ info :
 	$(call dump-var,mex_tgt)
 	$(call dump-var,bin_src)
 	$(call dump-var,bin_tgt)
+	$(call dump-var,bin_dep)
 	$(call dump-var,pdf_tgt)
 	$(call dump-var,eps_tgt)
 	$(call dump-var,png_tgt)
@@ -581,7 +598,7 @@ info :
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
 	@printf "\nThere are %s lines of code.\n" \
-	`cat $(m_src) $(mex_src) $(dll_src) $(bin_src) | wc -l`
+	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 
 # --------------------------------------------------------------------
 #                                                        Xcode Support
