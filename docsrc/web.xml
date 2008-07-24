@@ -2,11 +2,14 @@
 <template src="template.html"/>
 <stylesheet src="web.css"/>
 <page src="index.html" title="Home" id="home">
-<page src="download.html" title="Download &amp; Install" id="download"/>
-<page href="api/index.html"  title="API docs" id="api"/>
-<page src="../doc/toolbox-src/mdoc.html" title="Matlab docs" id="mdoc">
- <include src="../doc/toolbox-src/mdoc.xml"/>
-</page>
+ <page src="download.html" title="Download &amp; Install" id="download"/>
+ <page href="api/index.html"  title="API docs" id="api"/>
+ <page src="api.html" title="API docs" id="api.template" hide="yes">
+  <page src="api.html" title="API docs" id="api.entry.template" hide="yes"/>
+ </page>
+ <page src="../doc/toolbox-src/mdoc.html" title="Matlab docs" id="mdoc">
+  <include src="../doc/toolbox-src/mdoc.xml"/>
+ </page>
 </page>
 <page src="tutorials.html" title="Tutorials" id="tut">
  <page src="sift.html" title="SIFT" id="tut.sift"/>

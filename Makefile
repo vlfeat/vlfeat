@@ -405,18 +405,63 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 m_src    := $(shell find toolbox -name "*.m")
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
+html_src := $(wildcard docsrc/*.html)
 
 pdf_tgt := #$(fig_src:.fig=.pdf) 
 eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
 png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
 jpg_tgt := $(demo_src:.eps=.jpg)
+img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
 VERSION:
 	echo "Version $(VER) (`date`)" > VERSION
 
-doc: doc-fig doc-api doc-web
+doc: doc-api doc-web
+doc-api: doc/api/index.html
+doc-web: doc/index.html
+doc-toolbox: doc/toolbox-src/mdoc.html
 
-doc-api: doc-fig doc/api/index.html
+doc-deep: all $(doc-dir) $(results-dir)
+	cd toolbox ; \
+	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
+
+
+#
+# Use webdoc.py to generate the website
+#
+
+doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
+ docsrc/web.xml docsrc/web.css docsrc/webdoc.py $(img_tgt)
+	$(PYTHON) docsrc/webdoc.py --outdir=doc \
+	     docsrc/web.xml --verbose
+	rsync -arv docsrc/images doc
+
+#
+# Use mdoc.py to create the toolbox documentation that will be
+# embedded in the website.
+#
+
+doc/toolbox-src/mdoc.html : $(m_src)
+	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src --format=web
+
+#
+# Generate the customized API documentation
+#
+
+doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
+	cat doc/api/api.html | \
+	sed -n '/<!-- Doc Here -->/q;p'  > doc/doxygen_header.html
+	cat doc/api/api.html | \
+	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
+
+doc/api/index.html: docsrc/doxygen.conf VERSION $(img_tgt)            \
+  $(dll_src) $(dll_hdr) $(img_tgt)                                    \
+  doc/doxygen_header.html doc/doxygen_footer.html
+	$(DOXYGEN) $<
+
+#
+# Figure conversion
+#
 
 doc/figures/%.png : doc/figures/%.dvi
 	$(DVIPNG) -D 75 -T tight -o $@ $<
@@ -453,23 +498,6 @@ doc/demo/%.png : doc/demo/%.eps
 doc/%.pdf : doc/%.eps
 	$(EPSTOPDF) --outfile=$@ $<
 
-doc-deep: all $(doc-dir) $(results-dir)
-	cd toolbox ; \
-	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
-
-doc-fig: $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
-
-doc/api/index.html: docsrc/doxygen.conf VERSION $(dll_src) $(dll_hdr)
-	$(DOXYGEN) $<
-
-doc-toolbox:
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox --site=docsrc/web.xml
-
-doc-web: doc-fig
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src --format=web	
-	$(PYTHON) docsrc/webdoc.py --outdir=doc \
-	          docsrc/web.xml --verbose
-	rsync -arv docsrc/images doc
 
 doc-bindist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
