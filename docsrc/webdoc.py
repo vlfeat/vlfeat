@@ -1,8 +1,7 @@
 #!/usr/bin/python
-#
-#  webdoc.py
-#  vlfeat
-#
+# file:        webdoc.py
+# authors:     Andrea Vedaldi and Brian Fulkerson
+# description: Utility to generate a website
 
 # AUTORIGHTS
 
@@ -14,12 +13,40 @@ from xml.parsers.expat import ExpatError
 from xml.dom import minidom 
 import random
 
-usage = """usage: %prog [options] WEB.XML <docdir>
+usage = """usage: %prog [options] DOCUMENT
+
+The program parses the webdoc document DOCUMENT and produces the final
+website, ready for publication.
+
+DOCUMENT is an XML file describing the website structure. 
+The format of DOCUMENTS is best described by an example:
+
+<site>
+  <stylesheet src="web.css">
+  <page id="google" href="http://www.google.com" title="Google">
+  <page id="index" title="Home page" src="index.html">
+    <page id="index.greetings" title="Greetings" src="greetings.html"/>
+  <page>
+</site>
+
+The site is a collection of files with a hierarchical structure. Files
+are things such as HTML pages, stylesheets and so on.
 
 """
 
 template = """
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.o
+rg/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  %stylesheet;
+</head>
+<body>
+&title;
+&subtitle;
+&index;
+&content;
+</body>
 """
 
 verb = 0
@@ -27,26 +54,28 @@ srcdir = ""
 outdir = ""
 
 parser = OptionParser(usage=usage)
+
 parser.add_option(
     "-v", "--verbose", 
     dest    = "verb",
     default = False,
     action  = "store_true",
-    help    = "print debug informations")      
+    help    = "print debug informations")
+
 parser.add_option(
     "-o", "--outdir", 
     dest    = "outdir",
     default = "",
     action  = "store",
-    help    = "directory containing the produced HTML files")
+    help    = "write output to this directory")
 
 # --------------------------------------------------------------------
 def xmkdir(newdir):
 # --------------------------------------------------------------------
-    """works the way a good mkdir should :)
-        - already exists, silently complete
-        - regular file in the way, raise an exception
-        - parent directory(ies) does not exist, make them as well
+    """
+    xmkdir(NEWDIR) makes the directory NEWDIR if need, along with any
+    intermediate subpath. Overwriting existing files raises 
+    an exception.
     """
     if os.path.isdir(newdir):
         pass
@@ -117,43 +146,58 @@ def iterateChildNodes(node):
 # --------------------------------------------------------------------
 def getAttribute(element, attr, default=None):
 # --------------------------------------------------------------------
+  """
+  V=getAttribute(ELEMENT, ATTR) returns the value of the attribute ATTR
+  of the XML element ELEMENT. If ELEMENT has no such attribute, 
+  the function returns None.
+  
+  V=getAttribute(ELEMENT, ATTR, DEFAULT) returns DEFAULT instead of 
+  None if the attribute is not found.
+  """
   if element.hasAttribute(attr):
     return element.getAttribute(attr)
   else:
     return default
 
 # --------------------------------------------------------------------
-# This is easy to solve with a simple tiny wrapper:
-# --------------------------------------------------------------------
 class MakeStatic:
-    def __init__(self, method):
-        self.__call__ = method
+# --------------------------------------------------------------------
+  """
+  The instance MakeStatitc(CALLABLE) is a wrapper that calls
+  CALLABLE. It is used to define static methods in Python classes, such
+  as in:
+
+    class TheClass:
+      def theStaticMethod():
+        pass
+      theStaticMethod = MakeStatic(theStaticMethod)
+      
+  Now one can use the syntams TheClass.theStatitcMethod().
+  """
+  
+  def __init__(self, method):
+    self.__call__ = method
   
 # --------------------------------------------------------------------
 class Thing:
 # --------------------------------------------------------------------
   """
-  Represents a file of the website.
-  
-  - id:        unique ID string for the file  
-  - parent:    parent file
-  - children:  array of children files
-  - depth:     nesting depth
-  - dirName:   name of the associated sub-directory
-  - baseName:  name of the associated data file
-
+  A Thing is an object which has an identity and is listed in a global
+  directory of things, indexed by identity. 
+  The directory is used to globally
+  reference files and other objects.
   """
   directory = {}
 
   def genUniqueID():
-    "Generate an ID not already present in the directory of files"
+    "Generate an ID not already present in the directory."
     while 1:
-      id = "%010d" % random.random * 1e10
+      id = "%010d" % int(random.random() * 1e10)
       if id not in Thing.directory: break
     return id
 
   def dumpDirectory():
-    "Dump the content of the file directory to standard output"
+    "Dump the content of the file directory to standard output."
     for (id, file) in Thing.directory.iteritems():
       print file
 
@@ -161,19 +205,21 @@ class Thing:
   dumpDirectory = MakeStatic(dumpDirectory)
 
   def __init__(self, id=None):
+    if id == None:
+      id = Thing.genUniqueID()
     self.id = id
     Thing.directory [self.id] = self
 
   def __str__(self):
     return "id:%s" % self.id
 
-
 # --------------------------------------------------------------------
 class HtmlElement(Thing):
 # --------------------------------------------------------------------
   """
-  A class instance represents an element ID which has a validity 
-  throughout the website.
+  An HtmlElement instance represents an HTML element in a page of 
+  the website. This is used only to create cross references and holds
+  no data.
   """
 
   def __init__(self, page, htmlId, id=None):
@@ -195,10 +241,22 @@ class HtmlElement(Thing):
 class File(Thing):
 # --------------------------------------------------------------------
   """
-  Represents a page or other file of the website
-
-  - href:   Static hyperref (provided from the XML file) or None
-  - title:  Title of the page
+  A File instance represents a HTML page, stylesheet or other
+  file of the website.
+  
+  A File may hold data read off the disk, or just be a placeholder
+  to reference externally provided data. So for instance, a webpage
+  may be generated by this program from data read from disk, or
+  just reference to an externally provided page. A File which does not
+  hold data uses only self.href to store a pointer to the external
+  data. For a file that holds data, baseName provides a name for
+  the file that will be eventually produced. Also, dirName optionally
+  provide a sub-directory name, if that file must generate
+  a sub-directory.
+  
+  Files have a hierarchical structure which is used to construct
+  indexes and to create the final directory layout of the produced
+  website.
   """
   
   SITE = 0
@@ -227,10 +285,23 @@ class File(Thing):
                                    self.getPathFromRoot())
 
   def addChild(self, file):
+    """
+    F.addChild(G) adds file G as a child of file F. Both the parent
+    of G and the children of F are modified to relfect the addition.
+    """
     self.children.append(file)
     file.parent = self
 
   def getPathFromRoot(self, dironly=False):
+    """
+    F.getPathFromRoot() compute the path of the file F in the output 
+    hierarchy. The path is a chain of sub-directories associated
+    to parent files, and the base name of F.
+    
+    F.getPathFromRoot(dironly=True) returns only the directory part
+    of the path.
+    """
+    
     path = ""
     if self.href: return self.href
     if self.parent: path = self.parent.getPathFromRoot(dironly=True)
@@ -239,6 +310,10 @@ class File(Thing):
     return path
 
   def getPathFrom(self, basedir, dironly=False):
+    """
+    F.getPathFrom(BASEDIR, DIRONLY) behaves as F.getPathFromRoot(DIRONLY),
+    but the path is computed relatively to BASEDIR.
+    """
     path = self.getPathFromRoot(dironly)
     c = 0
     while c < len(path) and c < len(basedir) and path[c] == basedir[c]:
@@ -260,6 +335,11 @@ def iterateFiles(parentPage):
 # --------------------------------------------------------------------
 def findStyles(file):
 # --------------------------------------------------------------------
+  """
+  A = findStyles(FILE) returns a list of stylesheets applicable to
+  file FILE. These are all stylesheets that are children of FILE 
+  or of any of its ancestors.
+  """  
   styles = []
   if file.parent: styles = findStyles(file.parent)
   for x in file.children:
@@ -277,7 +357,7 @@ class WebSite:
   
   def __init__(self):
     self.root       = File(File.SITE)
-    self.template   = ""
+    self.template   = template
     self.src        = ""
   
   def genFullName(self, name):
@@ -299,37 +379,45 @@ class WebSite:
     if verb:
       print "webdoc: parsing `%s'" % self.src
     doc = minidom.parse(self.src).documentElement
-    self.xLoadPages(doc, self.root)
+    self.xLoad(doc, self.root)
 
-  def xLoadPages(self, doc, parent):
+  def xLoad(self, doc, parent):
+    """
+    W.xLoad(DOC, PARENT) parses recursively the XML element DOC,
+    appending the results as childern of PARENT.
+    """
     for e in iterateChildNodes(doc):
       file = None
 
       if   e.tagName == 'stylesheet': fileType = File.STYLESHEET
+      elif e.tagName == 'script':     fileType = File.SCRIPT
       elif e.tagName == 'page':       fileType = File.PAGE
 
       if e.tagName == 'stylesheet' or \
-         e.tagName == 'page':
-        theId     = getAttribute(e, 'id')
-        file      = File(fileType, parent, theId)
-        file.src  = self.genFullName(getAttribute(e, 'src'))
-        file.href = getAttribute(e, 'href')
-        file.title= getAttribute(e, 'title')
-        file.hide = getAttribute(e, 'hide') == 'yes'
-        if file.src: file.baseName = os.path.basename(file.src)
-
+         e.tagName == 'page'       or \
+         e.tagName == 'script':
+        theId      = getAttribute(e, 'id')
+        file       = File(fileType, parent, theId)
+        file.src   = self.genFullName(getAttribute(e, 'src'))
+        file.href  = getAttribute(e, 'href')
+        file.title = getAttribute(e, 'title')
+        file.hide  = getAttribute(e, 'hide') == 'yes'
+        if file.src: 
+          file.baseName = os.path.basename(file.src)
+        
       if e.tagName == 'template':
-        self.template = self.genFullName(e.getAttribute('src'))
+        fileName = self.genFullName(e.getAttribute('src'))
+        if verb:
+          print "webdoc: setting template to `%s'" % fileName
+        self.template = readText(fileName)
 
       # load children
       if e.tagName == 'page':
-        self.xLoadPages(e, file)
+        self.xLoad(e, file)
         if len(file.children) > 0:
-          dirName = os.path.splitext(file.baseName)[0]
-          if not dirName == 'index':
-            file.dirName = dirName
-          else:
-            file.dirName = ''
+          file.dirName = os.path.splitext(file.baseName)[0]
+          if file.dirName == 'index':
+            file.dirName = None
 
       # extract refs
       if e.tagName == 'page' and file.src:
@@ -357,7 +445,12 @@ class WebSite:
             parent.addChild(x)
 
   def genHtmlIndex(self, parentPage):
+    """
+    W.genHtmlIndex(PARENT) generates the HTML index starting from
+    pate PARENT and down, recusrively.
+    """
     html = ""
+    hasContent = False
     if len(parentPage.children) == 0: return html
     parentIndent = " " * parentPage.depth
     html += parentIndent + "<ul>\n"
@@ -369,26 +462,33 @@ class WebSite:
       html += indent + "<a href='%s'>%s</a>\n" % (page.id,page.title) 
       html += self.genHtmlIndex(page)
       html += indent + "</li>\n"
+      hasContent = True
     html += parentIndent + "</ul>\n"
+    if not hasContent: return ""
     return html
         
   def genSite(self):
-    for thing in iterateFiles(self.root):
+    """
+    W.genSite() generate the website, creating the file hierechiy
+    """
+    for file in iterateFiles(self.root):
+    
+      dirName = file.getPathFromRoot(True)
+      fileName = os.path.join(outdir, file.getPathFromRoot())
 
-      if isinstance (thing, File) and thing.fileType == File.STYLESHEET:
-        fileName = thing.getPathFromRoot()
-        print "webdoc: writing stylesheet %s from %s" % (fileName, thing.src)
-        writeText(os.path.join(outdir, fileName), readText(thing.src))
+      if file.fileType == File.STYLESHEET:
+        print "webdoc: copying stylesheet `%s' from `%s'" % (fileName, file.src)
+        writeText(fileName, readText(file.src))
+        
+      if file.fileType == File.SCRIPT:
+        print "webdoc: copying script `%s' from `%s'" % (fileName, file.src)
+        writeText(fileName, readText(file.src))
       
-      if isinstance (thing, File) and thing.fileType == File.PAGE:
-        page = thing
-        if thing.data:
-          dirName = page.getPathFromRoot(True)
-          fileName = page.getPathFromRoot()
-
-          text = readText(os.path.join(srcdir, self.template))
-
-          rootpath = self.root.getPathFrom(thing.getPathFromRoot(True), True)
+      if file.fileType == File.PAGE:
+        page = file
+        if page.data:
+          text = self.template
+          rootpath = self.root.getPathFrom(dirName, True)
 
           # stylesheets block
           block = ""
@@ -408,7 +508,7 @@ class WebSite:
           generator.feed(text)
           text = generator.output()
 
-          writeText(os.path.join(outdir, fileName), text)
+          writeText(fileName, text)
           print "webdoc: wrote page %s" % (fileName)
         
   def debug(self):
@@ -483,9 +583,6 @@ class PageGenerator(HTMLParser):
 if __name__ == '__main__':
 # --------------------------------------------------------------------
 
-  #
-  # Parse comand line options
-  #
   (options, args) = parser.parse_args()
   filename = args[0]
   
@@ -501,10 +598,4 @@ if __name__ == '__main__':
   site.load(xmldoc)
   site.debug()
   site.genSite()
-  
-  
-  
-    
-    
-
 

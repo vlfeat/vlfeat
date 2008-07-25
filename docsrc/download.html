@@ -1,31 +1,21 @@
 <p>The latest version of VLFeat is <code>0.9.1</code>, released on July 16,
 2008.</p>
 
-<p>
 <ul>
   <li><b><a href="%root;download/vlfeat-0.9.1-bin.tar.gz">Download the
       precompiled binaries</a></b></li>
   <li><a href="%root;download/vlfeat-0.9.1.tar.gz">Download the source
   code</a></li>
 </ul>
-</p>
 
-<p>
-Old versions may be obtained <a href="download/">here</a>
-</p>
+<p>Old versions may be obtained <a href="download/">here</a></p>
 
 <h1 id="download.install">Installation</h1>
 
-<p>
-Installing VLFeat is very simple. After downloading and unpacking the most
-recent binary package (see above), follow these instructions:
-</p>
+<p>Installing VLFeat is very simple. After downloading and unpacking the most recent binary package (see above), follow these instructions:</p>
 
-<p>
-To use the <b>MATLAB Toolbox</b>, simply run the <code>vlfeat_setup</code> command found in the <code>vlfeat/toolbox</code> directory. This command adds the necessary paths to MATLAB search path list. Notice that the paths are not saved. To automate this step, you can add the following fragment of code to your MATLAB <code>startup.m</code> file (on UNIX based system this file is located in <code>~/matlab/</code>, where <code>~</code> denotes your home directory):
-</p>
+<p>To use the <b>MATLAB Toolbox</b>, simply run the <code>vlfeat_setup</code> command found in the <code>vlfeat/toolbox</code> directory. This command adds the necessary paths to MATLAB search path list. Notice that the paths are not saved. To automate this step, you can add the following fragment of code to your MATLAB <code>startup.m</code> file (on UNIX based system this file is located in <code>~/matlab/</code>, where <code>~</code> denotes your home directory):</p>
 
-<p>
 <pre>
 p=pwd ;
 cd PATHTOVLFEAT ;
@@ -34,34 +24,25 @@ vlfeat_setup
 cd(p) ;
 clear p
 </pre>
-</p>
 
-<p>
-To install the <b>command line utilities</b>, copy the appropriate files from the
-<code>vlfeat/bin</code> directory to a location in your command path.
-</p>
+<p>To install the <b>command line utilities</b>, copy the appropriate files from the
+<code>vlfeat/bin</code> directory to a location in your command path.</p>
 
-<p>
-Finally, to use the <b>C library</b> in your programs, include the appropriate files from the <code>vlfeat/vl</code> hierarchy and link against <code>libvl.a</code> located in the appropriate subdirectory in the <code>vlfeat/bin</code> hierarchy.
-</p>
+<p>Finally, to use the <b>C library</b> in your programs, include the appropriate files from the <code>vlfeat/vl</code> hierarchy and link against <code>libvl.a</code> located in the appropriate subdirectory in the <code>vlfeat/bin</code> hierarchy.</p>
 
 <h1 id="download.compile">Compiling VLFeat</h1>
+
 <p><b>Note: Compiling is not necessary if you make use of the binary distribution.</b></p>
 
-<p>
-For <b>UNIX</b> based platforms (Mac OS X and Linux), the library bundles a
-GNU-Make makefile (<code>Makefile</code>). The makefile tries to auto-detect the environment and automatically configure itself. In most cases, typing <code>make</code> is all it is required to compile everything. If this does not work, please edit the makefile and make the necessary adjustment to the flags.
-</p>
+<p>For <b>UNIX</b> based platforms (Mac OS X and Linux), the library bundles a
+GNU-Make makefile (<code>Makefile</code>). The makefile tries to auto-detect the environment and automatically configure itself. In most cases, typing <code>make</code> is all it is required to compile everything. If this does not work, please edit the makefile and make the necessary adjustment to the flags.</p>
 
-<p>
-For <b>Windows</b>, the library bundles a NMake makefile
+<p>For <b>Windows</b>, the library bundles a NMake makefile
 (<code>Makefile.mak</code>). In order to use it, you must open Makefile.mak and
 adjust the values of configuration variables to match your setup. Once you have
-done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefile.mak</code>.
-</p>
+done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefile.mak</code>.</p>
 
-<p>
-<b>Windows: Troubleshooting common problems:</b>
+<p><b>Windows: Troubleshooting common problems:</b></p>
 <dl>
   <dt>syntax error: '=' unexpected:</dt>
   <dd><p>Use <code>nmake /f Makefile.mak</code>.
@@ -70,9 +51,9 @@ done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefi
 <dd><p>This error is usually caused by
 attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
 </dl>
-</p>
 
 <h1 id="download.contrib">Contributing to VLFeat</h1>
+
 <p>
 We welcome contributions to both the documentation and the source code of
 VLFeat. To contribute to either the library or the documentation, you can create
@@ -80,13 +61,11 @@ patches against our Git repository and send them to us for inclusion in the next
 version. The first step is to clone our public repository using:
 </p>
 
-<p>
 <pre>git clone http://vision.ucla.edu/vlfeat/vlfeat.git</pre>
-</p>
 
 <p>
 Once you have made and committed your changes locally, consider submitting them to the project via e-mail using a command like <code>git-format-patch</code>:
 </p>
-<p>
+
 <pre>git-format-patch origin</pre>
-</p>
+

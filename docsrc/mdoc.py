@@ -3,6 +3,8 @@
 # author:      Brian Fulkerson and Andrea Vedaldi
 # description: MDoc main
 
+# AUTORIGHTS
+
 import sys, os, re, shutil
 import subprocess, signal
 

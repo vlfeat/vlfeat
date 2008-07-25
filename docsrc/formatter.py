@@ -1,4 +1,9 @@
 #!/usr/bin/python
+# file:        formatter.py
+# author:      Andrea Vedaldi
+# description: Utility to format MATLAB comments.
+
+# AUTORIGHTS
 
 """
 MDOC fromats the help block of a MATLAB M-file based on a simple set

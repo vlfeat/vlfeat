@@ -30,6 +30,7 @@ body {
 #shr {background: url(images/shr.png) top right repeat-y;}
 
 #page {
+  width: 65em;
   vertical-align: top;
   background-color: white;
   padding: 0;
@@ -40,6 +41,10 @@ body {
   background-color: #343943;
   padding: 0;
   margin: 0;
+}
+
+#header h1 {
+  background: url(images/bk.jpg) repeat;
 }
 
 #header h1, 
@@ -62,7 +67,6 @@ body {
 }
 
 #content {
-  width: 60em;
   padding-left: 1.5em;
   padding-right: 1.5em;
   line-height: 1.3em;

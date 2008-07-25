@@ -2,7 +2,7 @@
 <template src="template.html"/>
 <stylesheet src="web.css"/>
 <page src="index.html" title="Home" id="home">
- <page src="download.html" title="Download &amp; Install" id="download"/>
+ <page src="download.html" title="Download and Install" id="download"/>
  <page href="api/index.html"  title="API docs" id="api"/>
  <page src="api.html" title="API docs" id="api.template" hide="yes">
   <page src="api.html" title="API docs" id="api.entry.template" hide="yes"/>

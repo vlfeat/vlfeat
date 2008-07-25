@@ -413,8 +413,8 @@ png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
 jpg_tgt := $(demo_src:.eps=.jpg)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
-VERSION:
-	echo "Version $(VER) (`date`)" > VERSION
+VERSION: Makefile
+	echo "$(VER) (Generated on `date`)" > VERSION
 
 doc: doc-api doc-web
 doc-api: doc/api/index.html
@@ -454,8 +454,8 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/api.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
-doc/api/index.html: docsrc/doxygen.conf VERSION $(img_tgt)            \
-  $(dll_src) $(dll_hdr) $(img_tgt)                                    \
+doc/api/index.html: docsrc/doxygen.conf VERSION $(img_tgt)           \
+  $(dll_src) $(dll_hdr) $(img_tgt)                                   \
   doc/doxygen_header.html doc/doxygen_footer.html
 	$(DOXYGEN) $<
 
@@ -475,7 +475,7 @@ doc/figures/%-raw.tex : docsrc/figures/%.fig
 doc/figures/%-raw.ps : docsrc/figures/%.fig
 	$(FIG2DEV) -L pstex $< $@
 
-doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :  \
+doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :              \
   doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
 	$(LATEX) -output-directory=$(dir $@) $<
 
@@ -498,7 +498,6 @@ doc/demo/%.png : doc/demo/%.eps
 doc/%.pdf : doc/%.eps
 	$(EPSTOPDF) --outfile=$@ $<
 
-
 doc-bindist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
 	  --exclude=doc/demo/*.eps                                   \
@@ -517,7 +516,7 @@ autorights: distclean
 	  --recursive                                                \
 	  --verbose                                                  \
 	  --template doc/copylet.txt                                 \
-	  --years 2007                                               \
+	  --years 2007-2008                                          \
 	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
 	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
 	  --program "VLFeat"
