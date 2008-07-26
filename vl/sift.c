@@ -314,9 +314,9 @@ finding bugs in old versions of this program.
 /** @internal @brief Use bilinear interpolation to compute orientations */
 #define VL_SIFT_BILINEAR_ORIENTATIONS 1
 
-#define EXPN_SZ  256         /**< ::fast_expn table size @internal */ 
-#define EXPN_MAX 25.0        /**< ::fast_expn table max  @internal */
-double  expn_tab [EXPN_SZ] ; /**< ::fast_expn table      @internal */
+#define EXPN_SZ  256          /**< ::fast_expn table size @internal */ 
+#define EXPN_MAX 25.0         /**< ::fast_expn table max  @internal */
+double expn_tab [EXPN_SZ+1] ; /**< ::fast_expn table      @internal */
 
 #define log2(x) (log(x)/VL_LOG_OF_2)
 
