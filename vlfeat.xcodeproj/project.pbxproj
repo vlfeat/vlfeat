@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2D36D6320DE337C700F6EFD5 /* mexversion.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D36D6310DE337C700F6EFD5 /* mexversion.c */; };
-		2D36D6340DE3380800F6EFD5 /* dft.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DBB83250DD2F90700D546E5 /* dft.c */; };
 		2D36D63D0DE3389800F6EFD5 /* libvlfeat-xcode-dll.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */; };
 		2DD3026A0DE32FEB009443C7 /* aib.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E7E0CF8C2E40099B03C /* aib.c */; };
 		2DD3026B0DE32FEB009443C7 /* generic.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E800CF8C2E40099B03C /* generic.c */; };
@@ -22,7 +21,6 @@
 		2DD302730DE32FEB009443C7 /* rodrigues.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E940CF8C2E40099B03C /* rodrigues.c */; };
 		2DD302740DE32FEB009443C7 /* sift.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E960CF8C2E40099B03C /* sift.c */; };
 		2DD302750DE32FEB009443C7 /* stringop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E980CF8C2E40099B03C /* stringop.c */; };
-		2DD302760DE32FEB009443C7 /* dft.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DBB82F00DD241EB00D546E5 /* dft.c */; };
 		2DD3027A0DE33107009443C7 /* random.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DD302780DE33107009443C7 /* random.c */; };
 		2DD3027B0DE33107009443C7 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD302790DE33107009443C7 /* random.h */; };
 		2DD302880DE3318A009443C7 /* sift.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732DEA0CF8C2E40099B03C /* sift.c */; };
@@ -42,6 +40,9 @@
 /* Begin PBXFileReference section */
 		2D36D6250DE3368F00F6EFD5 /* dft-mex.mexmaci */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "dft-mex.mexmaci"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/MATLAB7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
+		2D3EC8D80E3BC79300B0F237 /* dhog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dhog.c; sourceTree = "<group>"; };
+		2D3EC8D90E3BC79300B0F237 /* dhog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dhog.h; sourceTree = "<group>"; };
+		2D3EC8DA0E3BCFB200B0F237 /* dhog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dhog.c; path = toolbox/sift/dhog.c; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
 		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2D732DE50CF8C2E40099B03C /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aib.c; sourceTree = "<group>"; };
@@ -119,9 +120,6 @@
 		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
 		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
 		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
-		2DBB82EF0DD241EB00D546E5 /* dft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dft.h; sourceTree = "<group>"; };
-		2DBB82F00DD241EB00D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dft.c; sourceTree = "<group>"; };
-		2DBB83250DD2F90700D546E5 /* dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dft.c; path = toolbox/sift/dft.c; sourceTree = "<group>"; };
 		2DD302650DE32F6E009443C7 /* libvlfeat-xcode-dll.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libvlfeat-xcode-dll.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
@@ -158,8 +156,8 @@
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
-				2D7AD0870E38C15700783252 /* doc */,
 				2D36D6310DE337C700F6EFD5 /* mexversion.c */,
+				2D7AD0870E38C15700783252 /* doc */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
@@ -186,6 +184,8 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
+				2D3EC8D80E3BC79300B0F237 /* dhog.c */,
+				2D3EC8D90E3BC79300B0F237 /* dhog.h */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
 				2D732E7F0CF8C2E40099B03C /* aib.h */,
 				2D732E800CF8C2E40099B03C /* generic.c */,
@@ -216,8 +216,6 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
-				2DBB82EF0DD241EB00D546E5 /* dft.h */,
-				2DBB82F00DD241EB00D546E5 /* dft.c */,
 			);
 			path = vl;
 			sourceTree = "<group>";
@@ -225,6 +223,7 @@
 		2D732EAF0CF8C3950099B03C /* toolbox */ = {
 			isa = PBXGroup;
 			children = (
+				2D3EC8DA0E3BCFB200B0F237 /* dhog.c */,
 				2D70CC780DDE1135000A23DE /* mexutils.h */,
 				2DAB13D30D454A81009BEE66 /* aib.c */,
 				2DAB13D40D454A81009BEE66 /* aibhist.c */,
@@ -248,7 +247,6 @@
 				2DAB13E60D454A81009BEE66 /* tpsumx.c */,
 				2DAB13E70D454A81009BEE66 /* ubcmatch.c */,
 				2DAB13E80D454A81009BEE66 /* whistc.c */,
-				2DBB83250DD2F90700D546E5 /* dft.c */,
 			);
 			name = toolbox;
 			sourceTree = "<group>";
@@ -404,7 +402,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D36D6320DE337C700F6EFD5 /* mexversion.c in Sources */,
-				2D36D6340DE3380800F6EFD5 /* dft.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,7 +421,6 @@
 				2DD302730DE32FEB009443C7 /* rodrigues.c in Sources */,
 				2DD302740DE32FEB009443C7 /* sift.c in Sources */,
 				2DD302750DE32FEB009443C7 /* stringop.c in Sources */,
-				2DD302760DE32FEB009443C7 /* dft.c in Sources */,
 				2DD3027A0DE33107009443C7 /* random.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

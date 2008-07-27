@@ -10,21 +10,21 @@
  General Public License version 2.
  */
 
-#ifndef VL_DFT_H 
-#define VL_DFT_H 
+#ifndef VL_dhog_H 
+#define VL_dhog_H 
 
 #include "generic.h"
 
 /** @brief DFT keypoint */
-typedef struct VlDftKeypoint_
+typedef struct VlDhogKeypoint_
 {
   double x ; /**< x coordinate */
   double y ; /**< y coordinate */
   double s ; /**< scale */
-} VlDftKeypoint ;
+} VlDhogKeypoint ;
 
 /** @brief DFT filter */
-typedef struct VlDftFilter_ 
+typedef struct VlDhogFilter_ 
 {  
   int width ;            /**< image width */
   int height ;           /**< image height */
@@ -39,21 +39,21 @@ typedef struct VlDftFilter_
   float *tmp ;           /**< temporary buffer */
   float *tmp2 ;          /**< temporary buffer */
   float *descr ;         /**< descriptors */
-  VlDftKeypoint *keys ;  /**< keypoints */
+  VlDhogKeypoint *keys ; /**< keypoints */
   int nkeys ;            /**< number of keypoints */
-}  VlDftFilter ;
+}  VlDhogFilter ;
 
-VL_EXPORT VlDftFilter *vl_dft_new (int width, int height, int step, int size) ;
-VL_EXPORT void vl_dft_delete (VlDftFilter *f) ;
-VL_EXPORT void vl_dft_process (VlDftFilter *f, float const* im, vl_bool fast) ;
+VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height, int step, int size) ;
+VL_EXPORT void vl_dhog_delete (VlDhogFilter *f) ;
+VL_EXPORT void vl_dhog_process (VlDhogFilter *f, float const* im, vl_bool fast) ;
 
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_INLINE float         *vl_dft_get_descriptors   (VlDftFilter *f) ;
-VL_INLINE int            vl_dft_get_keypoint_num  (VlDftFilter *f) ;
-VL_INLINE VlDftKeypoint *vl_dft_get_keypoints     (VlDftFilter *f) ;
-VL_INLINE void           vl_dft_transpose_descriptor (float* dst, float* src) ;
+VL_INLINE float         *vl_dhog_get_descriptors   (VlDhogFilter *f) ;
+VL_INLINE int            vl_dhog_get_keypoint_num  (VlDhogFilter *f) ;
+VL_INLINE VlDhogKeypoint *vl_dhog_get_keypoints     (VlDhogFilter *f) ;
+VL_INLINE void           vl_dhog_transpose_descriptor (float* dst, float* src) ;
 
 /** @} */
 
@@ -63,7 +63,7 @@ VL_INLINE void           vl_dft_transpose_descriptor (float* dst, float* src) ;
  **/
 
 float *
-vl_dft_get_descriptors (VlDftFilter *f)
+vl_dhog_get_descriptors (VlDhogFilter *f)
 {
   return f->descr ;
 }
@@ -73,8 +73,8 @@ vl_dft_get_descriptors (VlDftFilter *f)
  ** @param f DFT filter.
  **/
 
-VlDftKeypoint *
-vl_dft_get_keypoints (VlDftFilter *f)
+VlDhogKeypoint *
+vl_dhog_get_keypoints (VlDhogFilter *f)
 {
   return f->keys ;
 }
@@ -85,7 +85,7 @@ vl_dft_get_keypoints (VlDftFilter *f)
  **/
 
 int
-vl_dft_get_keypoint_num (VlDftFilter *f)
+vl_dhog_get_keypoint_num (VlDhogFilter *f)
 {
   return f->nkeys ;
 }
@@ -105,7 +105,7 @@ vl_dft_get_keypoint_num (VlDftFilter *f)
  **/
 
 VL_INLINE void 
-vl_dft_transpose_descriptor (float* dst, float* src) 
+vl_dhog_transpose_descriptor (float* dst, float* src) 
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
@@ -123,5 +123,5 @@ vl_dft_transpose_descriptor (float* dst, float* src)
   }
 }
 
-/*  VL_DFT_H */
+/*  VL_dhog_H */
 #endif

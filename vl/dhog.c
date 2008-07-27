@@ -1,12 +1,12 @@
 /** @internal
- ** @file     dft.c
+ ** @file     dhog.c
  ** @author   Andrea Vedaldi
- ** @brief    Dense Feature Transform (DFT) - Definition
+ ** @brief    Dense Histogram of Oriented Gradients (DHOG) - Definition
  **/
 
 /* AUTORIGHTS */
 
-#include "dft.h"
+#include "dhog.h"
 #include "pgm.h"
 #include "mathop.h"
 #include <math.h>
@@ -142,10 +142,10 @@ make_kernel (float *ker, int* b, int *e,
  ** @return new filter.
  **/
 
-VlDftFilter* vl_dft_new (int width, int height, int step, int size)
+VlDhogFilter* vl_dhog_new (int width, int height, int step, int size)
 {
   int t ;
-  VlDftFilter* f = vl_malloc (sizeof(VlDftFilter)) ;
+  VlDhogFilter* f = vl_malloc (sizeof(VlDhogFilter)) ;
   
   f-> width  = width ;
   f-> height = height ;
@@ -156,7 +156,7 @@ VlDftFilter* vl_dft_new (int width, int height, int step, int size)
   f-> size   = size ;
 
   f-> descr = vl_malloc (sizeof(float) * 128 * f->nkeys) ;
-  f-> keys  = vl_malloc (sizeof(VlDftKeypoint) * f->nkeys) ;
+  f-> keys  = vl_malloc (sizeof(VlDhogKeypoint) * f->nkeys) ;
   f-> tmp   = vl_malloc (sizeof(float) * f->width * f->height) ;
   f-> tmp2  = vl_malloc (sizeof(float) * f->width * f->height) ;
   f-> hist  = vl_malloc (sizeof(float*) * NBO) ;
@@ -171,7 +171,7 @@ VlDftFilter* vl_dft_new (int width, int height, int step, int size)
  ** @param f filter to delete.
  **/
 
-void vl_dft_delete (VlDftFilter *f)
+void vl_dhog_delete (VlDhogFilter *f)
 {
   if (f) {
     int t ;
@@ -194,7 +194,7 @@ void vl_dft_delete (VlDftFilter *f)
  **/
 
 VL_INLINE 
-void with_gaussian_window (VlDftFilter* f)
+void with_gaussian_window (VlDhogFilter* f)
 {
   int n, W, x, y, i, t ;
   float del, u ;
@@ -267,7 +267,7 @@ void with_gaussian_window (VlDftFilter* f)
  **/
 
 VL_INLINE 
-void with_flat_window (VlDftFilter* f)
+void with_flat_window (VlDhogFilter* f)
 {
   int n, W, x, y, i, t ;
   float del ;
@@ -336,7 +336,7 @@ void with_flat_window (VlDftFilter* f)
  **             a flat one 
  **/
 
-void vl_dft_process (VlDftFilter* f, float const* im, vl_bool fast)
+void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
 {
   int t, x, y ;
 
@@ -394,7 +394,7 @@ void vl_dft_process (VlDftFilter* f, float const* im, vl_bool fast)
   }
     
   {
-    VlDftKeypoint* k = f->keys ;
+    VlDhogKeypoint* k = f->keys ;
     int xs, ys,bin ;
     float *dpt = f->descr ;
     float adj = (f->size*NBP & 0x1) ? 0.0f : -0.5f ;

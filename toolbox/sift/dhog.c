@@ -1,5 +1,5 @@
 /** @internal
- ** @file     dft.c
+ ** @file     dhog.c
  ** @author   Andrea Vedaldi
  ** @brief    Dense Feature Transform (SIFT) - MEX
  **/
@@ -8,7 +8,7 @@
 
 #include <mexutils.h>
 #include <vl/mathop.h>
-#include <vl/dft.h>
+#include <vl/dhog.h>
 
 #include <math.h>
 #include <assert.h>
@@ -140,15 +140,15 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
   {
     int nkeys, k, i ;
-    VlDftKeypoint* keys ;
+    VlDhogKeypoint* keys ;
     float* descs ;
 
-    VlDftFilter *dft ;    
-    dft = vl_dft_new (M, N, step, size) ; 
+    VlDhogFilter *dft ;    
+    dft = vl_dhog_new (M, N, step, size) ; 
  
-    nkeys = vl_dft_get_keypoint_num (dft) ;
-    keys  = vl_dft_get_keypoints (dft) ;
-    descs = vl_dft_get_descriptors (dft) ;
+    nkeys = vl_dhog_get_keypoint_num (dft) ;
+    keys  = vl_dhog_get_keypoints (dft) ;
+    descs = vl_dhog_get_descriptors (dft) ;
     
     if (verbose) {
       mexPrintf("dft: image size: %d x %d\n", M, N) ;
@@ -158,7 +158,7 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("dft: num keys:   %d\n", nkeys) ;  
     }
     
-    vl_dft_process (dft, data, fast) ;
+    vl_dhog_process (dft, data, fast) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
@@ -188,13 +188,13 @@ mexFunction(int nout, mxArray *out[],
         float tmpdesc [128] ;
         *kpt++ = keys [k].y + 1 ;
         *kpt++ = keys [k].x + 1 ;
-        vl_dft_transpose_descriptor(tmpdesc, descs + 128 * k) ;
+        vl_dhog_transpose_descriptor(tmpdesc, descs + 128 * k) ;
         for (i = 0 ; i < 128 ; ++i) {
           *dpt++ = (vl_uint8) (VL_MIN(512.0f * tmpdesc[i], 256.0f)) ;
         }
       }
     }
     
-    vl_dft_delete (dft) ;
+    vl_dhog_delete (dft) ;
   }
 }
