@@ -142,13 +142,13 @@ endef
 # $(call C, CMD) runs $(CMD) silently
 define C
 @$(call print-command, $(1), "$(@)")                                 
-@function quiet ()                                                   \
+@quiet ()                                                            \
 {                                                                    \
     local cmd out err ;					             \
     cmd="$($(1))";                                                   \
     out=$$($${cmd} "$${@}" 2>&1);                                    \
     err=$${?};                                                       \
-    if (( $${err} > 0 )) ; then                                      \
+    if test $${err} -gt 0 ; then                                     \
         echo "******* Offending Command:";                           \
         echo "$${cmd}" "$${@}";                                      \
         echo "******* Error Code: $${err}";                          \
