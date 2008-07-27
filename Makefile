@@ -139,13 +139,35 @@ define print-command
 @printf "%10s %s\n" "$(strip $(1))" "$(strip $(2))"
 endef
 
+# $(call C, CMD) runs $(CMD) silently
+define C
+@$(call print-command, $(1), "$(@)")                                 
+@function quiet ()                                                   \
+{                                                                    \
+    local cmd out err ;					             \
+    cmd="$($(1))";                                                   \
+    out=$$($${cmd} "$${@}" 2>&1);                                    \
+    err=$${?};                                                       \
+    if (( $${err} > 0 )) ; then                                      \
+        echo "******* Offending Command:";                           \
+        echo "$${cmd}" "$${@}";                                      \
+        echo "******* Error Code: $${err}";                          \
+	echo "******* Command Output:";                              \
+        echo "$${out}";                                              \
+    fi;                                                              \
+    return $${err};                                                  \
+} ; quiet
+endef
+
 # $(call make-silent, CMD) makes the execution of the command $(CMD)
 # silent
 define make-silent
+ifeq ($(filter info, $(MAKECMDGOALS)),)
 define $(strip $(1))
 $(call print-command, $(1), "$$(@)")
 @$($(strip $(1)))
 endef
+endif
 endef
 
 # --------------------------------------------------------------------
@@ -170,17 +192,6 @@ MATLAB          ?= matlab
 MEX             ?= mex
 PYTHON          ?= python
 
-$(eval $(call make-silent, CC      ))
-$(eval $(call make-silent, CONVERT ))
-$(eval $(call make-silent, DOXYGEN ))
-$(eval $(call make-silent, DVIPNG  ))
-$(eval $(call make-silent, DVIPS   ))
-$(eval $(call make-silent, EPSTOPDF))
-$(eval $(call make-silent, FIG2DEV ))
-$(eval $(call make-silent, LATEX   ))
-$(eval $(call make-silent, LIBTOOL ))
-$(eval $(call make-silent, MEX     ))
-
 CFLAGS          += -I$(CURDIR) -pedantic 
 CFLAGS          += -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
@@ -193,6 +204,8 @@ DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
 MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
+MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
+                   sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 # --------------------------------------------------------------------
 #                                  Architecture-specific Configuration
@@ -207,7 +220,6 @@ CFLAGS          += -D__BIG_ENDIAN__ -Wno-variadic-macros
 CLFAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 DLL_CFLAGS      += -fvisibility=hidden
-MATLABPATH      ?= $(dir $(shell readlink `which mex`))/..
 MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
 MEX_CFLAGS      += 
 MEX_LDFLAGS     +=
@@ -221,7 +233,6 @@ MEX_SUFFIX      := mexmaci
 CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
-MATLABPATH      ?= $(dir $(shell readlink `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += 
@@ -234,7 +245,6 @@ MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
-MATLABPATH      ?= $(dir $(shell readlink -f `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
@@ -247,7 +257,6 @@ MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
-MATLABPATH      ?= $(dir $(shell readlink -f `which mex`))/..
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
@@ -313,15 +322,15 @@ dll: $(dll_tgt)
 .PRECIOUS: $(BINDIR)/objs/%.d
 
 $(BINDIR)/objs/%.o : vl/%.c $(bin-dir)
-	$(CC) $(DLL_CFLAGS) -c $< -o $@
+	$(call C,CC) $(DLL_CFLAGS) -c $< -o $@
 
 $(BINDIR)/objs/%.d : vl/%.c $(bin-dir)
-	$(CC) $(DLL_CFLAGS)                                          \
+	$(call C,CC) $(DLL_CFLAGS)                                   \
 	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
 	       $< -MF $@
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
-	@$(LIBTOOL) -dynamic                                         \
+	$(call C,LIBTOOL) -dynamic                                   \
                     -flat_namespace                                  \
                     -install_name @loader_path/libvl.dylib           \
 	            -compatibility_version $(VER)                    \
@@ -329,7 +338,7 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
-	$(CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
+	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
 
 # --------------------------------------------------------------------
 #                                         Build command line utilities
@@ -348,11 +357,11 @@ all-bin: $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(bin-dir)
 	@make -s $(dll_tgt)
-	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+	$(call C,CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 $(BINDIR)/%.d : src/%.c $(bin-dir)
-	$(CC) $(CFLAGS) -M -MT                                        \
-	       '$(BINDIR)/$* $(MEX_BINDIR)/$*.d'                      \
+	$(call C,CC) $(CFLAGS) -M -MT                                \
+	       '$(BINDIR)/$* $(MEX_BINDIR)/$*.d'                     \
 	       $< -MF $@
 
 # --------------------------------------------------------------------
@@ -378,14 +387,14 @@ vpath %.c $(shell find toolbox -type d)
 all-mex : $(mex_tgt)
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
-	$(CC) $(MEX_CFLAGS)                                          \
+	$(call C,CC) $(MEX_CFLAGS)                                   \
                -I$(MATLABPATH)/extern/include -M -MT                 \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	@make -s $(dll_tgt)
-	$(MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'                      \
+	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
 	       $< -outdir $(dir $(@))
@@ -457,23 +466,23 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 doc/api/index.html: docsrc/doxygen.conf VERSION $(img_tgt)           \
   $(dll_src) $(dll_hdr) $(img_tgt)                                   \
   doc/doxygen_header.html doc/doxygen_footer.html
-	$(DOXYGEN) $<
+	$(call C,DOXYGEN) $<
 
 #
 # Figure conversion
 #
 
 doc/figures/%.png : doc/figures/%.dvi
-	$(DVIPNG) -D 75 -T tight -o $@ $<
+	$(call C,DVIPNG) -D 75 -T tight -o $@ $<
 
 doc/figures/%.eps : doc/figures/%.dvi
-	$(DVIPS) -E -o $@ $<
+	$(call C,DVIPS) -E -o $@ $<
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
-	$(FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@ 
+	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@ 
 
 doc/figures/%-raw.ps : docsrc/figures/%.fig
-	$(FIG2DEV) -L pstex $< $@
+	$(call C,FIG2DEV) -L pstex $< $@
 
 doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :              \
   doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
@@ -490,13 +499,13 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.eps
-	$(CONVERT) -density 400 $< -colorspace rgb -resize 20% jpg:$@
+	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 20% jpg:$@
 
 doc/demo/%.png : doc/demo/%.eps
-	$(CONVERT) -density 400 $< -colorspace rgb -resize 20% png:$@
+	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 20% png:$@
 
 doc/%.pdf : doc/%.eps
-	$(EPSTOPDF) --outfile=$@ $<
+	$(call C,EPSTOPDF) --outfile=$@ $<
 
 doc-bindist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
@@ -508,7 +517,7 @@ doc-distclean:
 	rm -rf doc
 
 doc-wiki: $(NAME) 
-	$(PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
+	$(call C,PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
 
 autorights: distclean
 	autorights                                                   \
@@ -621,6 +630,8 @@ info :
 	@echo "CFLAGS       = $(CFLAGS)"
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "MATLAB       = $(MATLAB)"
+	@echo "MEX          = $(MEX)"
+	@echo "MATLABPATH   = $(MATLABPATH)"
 	@echo "MEX_FLAGS    = $(MEX_FLAGS)"
 	@echo "MEX_CFLAGS   = $(MEX_CFLAGS)"
 	@echo "MEX_LDFLAGS  = $(MEX_LDFLAGS)"
