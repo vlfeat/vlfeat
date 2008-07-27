@@ -10,27 +10,11 @@
 # Python complied files
 *.pyc
 
-# Generated figure files
-doc/figures/*.eps
-doc/figures/*.pdf
-doc/figures/*.png
-doc/demo
-doc/web/*.html
-doc/web/*.css
-doc/web/api
-doc/web/demo
-doc/web/figures
-doc/web/toolbox
-doc/html
-doc/vlfeat-dox
-doc/api
-doc/toolbox
-doc/wiki
-
 # Other generated files and directories
 VERSION
 bin
 results
+doc
 toolbox/mex*
 vlfeat.xcodeproj/*.mode1v3
 vlfeat.xcodeproj/*.pbxuser
