@@ -126,15 +126,14 @@ endif
 #                                                            Functions
 # --------------------------------------------------------------------
 
-# $(call dump-var,VAR) prints the content of a variable VAR in
-# two columns
+# $(call dump-var,VAR) pretty-prints the content of a variable VAR
 define dump-var
 @echo $(1) =
 @echo $($(1)) | sed 's/\([^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
 tr '#' '\n' | column -t | sed 's/\(.*\)/  \1/g'
 endef
 
-# $(call print-command, CMD, TGT)
+# $(call print-command, CMD, TGT) prints a message
 define print-command
 @printf "%10s %s\n" "$(strip $(1))" "$(strip $(2))"
 endef
@@ -157,17 +156,6 @@ define C
     fi;                                                              \
     return $${err};                                                  \
 } ; quiet
-endef
-
-# $(call make-silent, CMD) makes the execution of the command $(CMD)
-# silent
-define make-silent
-ifeq ($(filter info, $(MAKECMDGOALS)),)
-define $(strip $(1))
-$(call print-command, $(1), "$$(@)")
-@$($(strip $(1)))
-endef
-endif
 endef
 
 # --------------------------------------------------------------------
