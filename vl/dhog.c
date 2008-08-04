@@ -132,9 +132,8 @@ make_kernel (float *ker, int* b, int *e,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Allocate and initialize a new DFT filter
+ ** @brief Allocate and initialize a new DHOG filter
  **
- ** @param f
  ** @param width
  ** @param height
  ** @param step
@@ -167,7 +166,7 @@ VlDhogFilter* vl_dhog_new (int width, int height, int step, int size)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Delete DFT filter
+ ** @brief Delete DHOG filter
  ** @param f filter to delete.
  **/
 
@@ -330,7 +329,7 @@ void with_flat_window (VlDhogFilter* f)
 /** ------------------------------------------------------------------
  ** @brief Compute Dense Feature Transform
  **
- ** @param f    DFT filter. 
+ ** @param f    DHOG filter. 
  ** @param im   image data.
  ** @param fast speed up computation by replacing a gaussian window with
  **             a flat one 

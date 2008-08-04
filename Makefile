@@ -154,9 +154,14 @@ define C
 	echo "******* Command Output:";                              \
         echo "$${out}";                                              \
     fi;                                                              \
+    echo "$${out}" | grep Warning ;                                  \
     return $${err};                                                  \
 } ; quiet
 endef
+
+# to disable the above, define the following
+# C = $($(1))
+
 
 # --------------------------------------------------------------------
 #                                            Common UNIX Configuration
@@ -176,7 +181,7 @@ FIG2DEV         ?= fig2dev
 GIT             ?= git
 LATEX           ?= latex
 LIBTOOL         ?= libtool
-MATLAB          ?= matlab
+MATLABEXE       ?= matlab
 MEX             ?= mex
 PYTHON          ?= python
 
@@ -420,7 +425,7 @@ doc-toolbox: doc/toolbox-src/mdoc.html
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLAB) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
+	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
 
 
 #
@@ -451,7 +456,7 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/api.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
-doc/api/index.html: docsrc/doxygen.conf VERSION $(img_tgt)           \
+doc/api/index.html: docsrc/doxygen.conf VERSION                      \
   $(dll_src) $(dll_hdr) $(img_tgt)                                   \
   doc/doxygen_header.html doc/doxygen_footer.html
 	$(call C,DOXYGEN) $<
@@ -617,7 +622,7 @@ info :
 	@echo "MEX_SUFFIX   = $(MEX_SUFFIX)"
 	@echo "CFLAGS       = $(CFLAGS)"
 	@echo "LDFLAGS      = $(LDFLAGS)"
-	@echo "MATLAB       = $(MATLAB)"
+	@echo "MATLABEXE    = $(MATLABEXE)"
 	@echo "MEX          = $(MEX)"
 	@echo "MATLABPATH   = $(MATLABPATH)"
 	@echo "MEX_FLAGS    = $(MEX_FLAGS)"

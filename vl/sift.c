@@ -15,6 +15,7 @@ General Public License version 2.
  ** @author Andrea Vedaldi
  ** @brief  Scale Invariant Feature Transform (SIFT)
     
+- @ref sift-usage
 - @ref sift-scale-space
 - @ref sift-detector
   -  @ref sift-detector-peak
@@ -25,9 +26,36 @@ General Public License version 2.
   -  @ref sift-extensions-norm
 - @ref sift-ack
 
-SIFT bundles a feature detector and a feature descriptor. Running the
-SIFT filter usually involves the following steps:
-    
+The <b>Scale Invariant Feature Transform</b> (SIFT) bundles a feature
+detector and a feature descriptor. This program implements a @ref
+sift-usage "&ldquo;SIFT filter&rdquo;". This is a a reusable object
+that can be used to extract SIFT features from multiple images of the
+same size.
+
+The <b>@ref sift-detector "SIFT detector"</b> determines the geometry of
+a SIFT feature.  Geometrically, the feature is an oriented disk (also
+called feature frame or keypoint) and has a center @f$ (x,y) @f$, a
+scale @f$ \sigma @f$, and an orientation @f$ \theta @f$. The SIFT
+detector works by identifying blob-like sturcures in an image and
+attaching oriented disks to them.
+
+The <b>@ref sift-descriptor "SIFT descriptor"</b> describes compactly
+the appearance of the image region corresponding to a SIFT frame.  The
+SIFT descriptor works by extracting a so called Histogram of Oriented
+Gradients (HOG), which is a statistic of the gradient orientations
+inside that image region.
+
+
+@section sift-usage Usage patterns
+
+The code provided in this module can be used in different ways.  You
+should use the SIFT filter to extract both SIFT keypoints and
+descriptors from one or multiple images. Alternatively, you can use a
+lower level function to run only a part of the SIFT algorithm (for
+instance, you can compute the SIFT descriptors of your own keypoints).
+
+To use the <b>SIFT filter</b>:
+ 
 - Initialize the SIFT filter by ::vl_sift_new(). The
   filter can be reused if the image size does not change.
 - For each octave:
@@ -37,12 +65,11 @@ SIFT filter usually involves the following steps:
   - For each keypoint:
     - Use ::vl_sift_calc_keypoint_orientations() to get the keypoint orientation(s).
     - For each orientation:
-      - Use ::vl_sift_calc_keypoint_descriptor()   to get the keypoint descriptor.
+      - Use ::vl_sift_calc_keypoint_descriptor() to get the keypoint descriptor.
 - Delete the SIFT filter by ::vl_sift_delete().
 
-These steps can be modified in order to run only the detector or only
-the descriptors. The function ::vl_sift_calc_raw_descriptor() can be
-used to further customize the descriptor calculation.
+To compute SIFT descriptors of custom keypoints use the
+::vl_sift_calc_raw_descriptor().
 
 @section sift-scale-space The scale space
 
@@ -61,14 +88,14 @@ follows:
 
 The black vertical segments represent images of the Gaussian Scale
 Space (GSS), arranged by increasing scale @f$\sigma@f$. The image at
-scale @f$\sigma@f$ is equal to the image at scale 1 smoothed with a
+scale @f$ \sigma @f$ is equal to the image at scale 1 smoothed with a
 Gaussian kernel of that variance.
 
-The input image is assumed to be pre-smoothed at scale @f$\sigma_n@f$
+The input image is assumed to be pre-smoothed at scale @f$ \sigma_n @f$
 due to pixel aliasing (hence the image at scale 1 is not really
 available).
 
-Scales are sampled at points @f$\sigma(o,s)@f$ logarithmically spaced.
+Scales are sampled at points @f$ \sigma(o,s) @f$ logarithmically spaced.
 The levels are indexed by @e o (octave index) and @e s (level
 index). There are @e O octaves and @e S levels per octave. Images are
 downsampled at the octave boundaries; this is represented by the
@@ -91,7 +118,7 @@ blue segments and sit in between the smoothed images (black segments).
 images).
 
 The SIFT detector extracts local extrema of the DoG scale space (in
-both @e x, @e y and @e \sigma directions). To compute such local
+both @e x, @e y and @f$ \sigma @f$ directions). To compute such local
 extrema it is necessary to sample the DoG scale space in a 3x3x3
 neighborhood. This means that local extrema cannot be extracted in
 correspondence of the first and last levels of an octave. This is the
@@ -238,8 +265,8 @@ the Gaussian window is represented by the larger blue circle.
 @remark In practice, the descriptor is computed by scanning a
 rectangular area that covers its support (scaled to match the
 resolution of the corresponding image in the GSS scale space).  Since
-the descriptor can be rotated, this area has extension @f$m\sigma
-(B_p+1)/2\sqrt{2}@f$ (see also the picture). This remark has
+the descriptor can be rotated, this area has extension 
+@f$m\sigma (B_p+1)/2\sqrt{2}@f$ (see also the picture). This remark has
 significance only for the implementation.
 
 The following table summarizes the descriptors parameters along
@@ -523,6 +550,7 @@ vl_sift_new (int width, int height,
  **
  ** The function frees the resources allocated by ::vl_sift_new().
  **/
+
 VL_EXPORT
 void
 vl_sift_delete (VlSiftFilt* f)
@@ -1316,22 +1344,24 @@ normalize_histogram
  ** @param x        keypoint x coordinate.
  ** @param y        keypoint y coordinate.
  ** @param sigma    keypoint scale.
- ** @param angle0   keypoint orientation .
+ ** @param angle0   keypoint orientation.
  **
- ** The function runs the SIFT descriptor on raw data. @c image is a
- ** 2xWIDTHxHEIGHT matrix. The first layer contains the gradients
- ** magnitude and the second the gradient angle (in radians, between 0
- ** and 2 PI). @a x, @a y and @a sigma give the keypoint center and
- ** scale respectively.
+ ** The function runs the SIFT descriptor on raw data. Here @a image
+ ** is a 2 x @a width x @a height array (by convention, the memory
+ ** layout is a s such the first index is the fastest varying
+ ** one). The first @a width x @a heigth layer of the array contains
+ ** the gradient magnitude and the second the gradient angle (in
+ ** radians, between 0 and @f$ 2\pi @f$). @a x, @a y and @a sigma give
+ ** the keypoint center and scale respectively.
  **
  ** In order to be equivalent to a standard SIFT descriptor the image
- ** gradients must be computed at a smoothing level equal to the
- ** scale of the keypoint. In practice, the actual SIFT algorithm
- ** makes the following additional approximation, which influence the result:
+ ** gradient must be computed at a smoothing level equal to the scale
+ ** of the keypoint. In practice, the actual SIFT algorithm makes the
+ ** following additional approximation, which influence the result:
  **
  ** - Scale is discretized in @c S levels.
  ** - The image is downsampled once for each octave (if you do this,
- **   the parameters @param x, @param y and @param sigma must be
+ **   the parameters @a x, @a y and @a sigma must be
  **   scaled too).
  **/
 
@@ -1345,22 +1375,22 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
                              double sigma,
                              double angle0)
 {
-  double const magnif      = f-> magnif ;
-  int const    NBO         = 8 ;
-  int const    NBP         = 4 ;
+  double const magnif = f-> magnif ;
+  int const    NBO    = 8 ;
+  int const    NBP    = 4 ;
 
-  int          w           = width ;
-  int          h           = height ;
-  int const    xo          = 2 ;         /* x-stride */
-  int const    yo          = 2 * w ;     /* y-stride */
+  int          w      = width ;
+  int          h      = height ;
+  int const    xo     = 2 ;         /* x-stride */
+  int const    yo     = 2 * w ;     /* y-stride */
   
-  int          xi          = (int) (x + 0.5) ; 
-  int          yi          = (int) (y + 0.5) ;
+  int          xi     = (int) (x + 0.5) ; 
+  int          yi     = (int) (y + 0.5) ;
   
-  double const st0         = sin (angle0) ;
-  double const ct0         = cos (angle0) ;
-  double const SBP         = magnif * sigma + VL_EPSILON_D ;
-  int    const W           = floor
+  double const st0    = sin (angle0) ;
+  double const ct0    = cos (angle0) ;
+  double const SBP    = magnif * sigma + VL_EPSILON_D ;
+  int    const W      = floor
     (sqrt(2.0) * SBP * (NBP + 1) / 2.0 + 0.5) ;
   
   int const binto = 1 ;          /* bin theta-stride */
@@ -1386,6 +1416,8 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
    */
   pt  = grad + xi*xo + yi*yo ;
   dpt = descr + (NBP/2) * binyo + (NBP/2) * binxo ;
+
+#undef atd
 #define atd(dbinx,dbiny,dbint) *(dpt + (dbint)*binto + (dbiny)*binyo + (dbinx)*binxo)
   
   /*
@@ -1577,6 +1609,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   pt  = f->grad + xi*xo + yi*yo + (si - f->s_min - 1)*so ;
   dpt = descr + (NBP/2) * binyo + (NBP/2) * binxo ;
      
+#undef atd
 #define atd(dbinx,dbiny,dbint) *(dpt + (dbint)*binto + (dbiny)*binyo + (dbinx)*binxo)
       
   /*

@@ -26,7 +26,7 @@ General Public License version 2.
 
 /** @def VL_EXPORT
  ** @brief Declares a DLL exported symbol
- ** @sa @ref main-style-export
+ ** @sa @ref generic-symbols
  **/
 
 #ifdef WIN32
@@ -215,7 +215,7 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
  ** @return results of the user-customizable @c printf.
  **/
 #define VL_PRINTF(format, ...) \
-  ((*vl_printf_func)((format), __VA_ARGS__))
+((*vl_printf_func)((format), __VA_ARGS__))
 
 /** @def VL_PRINT
  ** @brief Call user-customizable @c printf function (no varags)
@@ -332,7 +332,7 @@ VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
  ** @brief Get endianness
  ** @return @c ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN depending on the
  ** host endianness.
- ** @sa @ref generic-endian
+ ** @sa @ref generic-data-models
  **/
 
 VL_INLINE int
@@ -346,7 +346,7 @@ vl_get_endianness ()
  **
  ** @param dst destination 8-byte buffer.
  ** @param src source 8-byte bufffer.
- ** @see @ref generic-endian.
+ ** @see @ref generic-data-models.
  **/
 
 VL_INLINE void
@@ -380,7 +380,7 @@ vl_swap_host_big_endianness_8 (void *dst, void* src)
  **
  ** @param dst destination 4-byte buffer.
  ** @param src source 4-byte bufffer.
- ** @sa @ref generic-endian
+ ** @sa @ref generic-data-models
  **/
 
 VL_INLINE void
@@ -406,7 +406,7 @@ vl_swap_host_big_endianness_4 (void *dst, void* src)
  **
  ** @param dst destination 2-byte buffer.
  ** @param src source 2-byte bufffer.
- ** @see generic-endianness.
+ ** @see generic-data-models.
  **/
 
 VL_INLINE void

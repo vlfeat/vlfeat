@@ -164,12 +164,12 @@ General Public License version 2.
 
 This module provides basic functionalities:
 
-- @ref generic-data-model
+- @ref generic-data-models
 - @ref generic-error  
 - @ref generic-heap
 - @ref generic-logging
 
-@section generic-data-model Data models
+@section generic-data-models Data models
 
 VLFeat's main target is to support common UNIX and Windows
 architectures. The data model of these architectures differ mainly
@@ -285,7 +285,7 @@ supported by Microsoft Visual C/C++.
 <tr>
 <td>Unix/GCC</td>
 <td>::VL_EXPORT</td>
-<td>empty (assumes <c>-visibility=hidden</c> GCC option</c>)</td>
+<td>empty (assumes <c>-visibility=hidden</c> GCC option)</td>
 <td><c>__attribute__((visibility ("default")))</c></td>
 </tr>
 <tr>

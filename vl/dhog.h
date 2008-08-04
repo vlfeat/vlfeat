@@ -1,6 +1,6 @@
-/** @file     dft.h
+/** @file     dhog.h
  ** @author   Andrea Vedaldi
- ** @brief    Dense Feature Transform (DFT)
+ ** @brief    Dense Feature Transform (DHOG)
  **/
 
 /* AUTORIGHTS
@@ -15,7 +15,7 @@
 
 #include "generic.h"
 
-/** @brief DFT keypoint */
+/** @brief DHOG keypoint */
 typedef struct VlDhogKeypoint_
 {
   double x ; /**< x coordinate */
@@ -23,7 +23,7 @@ typedef struct VlDhogKeypoint_
   double s ; /**< scale */
 } VlDhogKeypoint ;
 
-/** @brief DFT filter */
+/** @brief DHOG filter */
 typedef struct VlDhogFilter_ 
 {  
   int width ;            /**< image width */
@@ -59,7 +59,8 @@ VL_INLINE void           vl_dhog_transpose_descriptor (float* dst, float* src) ;
 
 /** ------------------------------------------------------------------
  ** @brief Get descriptors.
- ** @param DFT filter.
+ ** @param f DHOG filter.
+ ** @return descriptors.
  **/
 
 float *
@@ -70,7 +71,7 @@ vl_dhog_get_descriptors (VlDhogFilter *f)
 
 /** ------------------------------------------------------------------
  ** @brief Get keypoints
- ** @param f DFT filter.
+ ** @param f DHOG filter.
  **/
 
 VlDhogKeypoint *
@@ -81,7 +82,7 @@ vl_dhog_get_keypoints (VlDhogFilter *f)
 
 /** ------------------------------------------------------------------
  ** @brief Get number of keypoints
- ** @param f DFT filter.
+ ** @param f DHOG filter.
  **/
 
 int

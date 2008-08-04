@@ -50,7 +50,7 @@ struct _VlPgmImage
  **/
 typedef struct  _VlPgmImage  VlPgmImage ;
 
-/** @group Core operations
+/** @name Core operations
  ** @{ */
 VL_EXPORT int vl_pgm_extract_head  (FILE *f, VlPgmImage       *im) ;
 VL_EXPORT int vl_pgm_extract_data  (FILE *f, VlPgmImage const *im, void *data) ;
@@ -61,7 +61,7 @@ VL_EXPORT int vl_pgm_get_data_size (VlPgmImage const *im) ;
 VL_EXPORT int vl_pgm_get_bpp       (VlPgmImage const *im) ;
 /** @} */
 
-/** @group Helper functions
+/** @name Helper functions
  ** @{ */
 VL_EXPORT int vl_pgm_write         (char const *name,
                                     vl_uint8 const *data, 

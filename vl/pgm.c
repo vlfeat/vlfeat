@@ -16,7 +16,7 @@ General Public License version 2.
 #include <stdlib.h>
 #include <string.h>
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @internal
  ** @brief Remove all characters to the next new-line
  ** @param f file to strip.
@@ -46,7 +46,7 @@ remove_line(FILE* f)
   return count ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @internal
  ** @brief Remove white-spaces and comments
  ** @param f file to strip.
@@ -85,7 +85,7 @@ remove_blanks(FILE* f)
   return count ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @brief Get PGM image data size
  **
  ** @param im PGM image descriptor.
@@ -106,7 +106,7 @@ vl_pgm_get_data_size (VlPgmImage const *im)
   return im->width * im->height ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @brief Get PGM image bytes per pixel
  **
  ** @param im PGM image descriptor.
@@ -124,8 +124,8 @@ vl_pgm_get_bpp (VlPgmImage const *im)
   return (im->max_value >= 256) + 1 ;
 }
 
-/** ---------------------------------------------------------------- */ 
-/** @brief Read PGM header
+/** ------------------------------------------------------------------
+ ** @brief Read PGM header
  **
  ** @param f  input file.
  ** @param im image structure to fill.
@@ -153,9 +153,9 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   vl_bool  good ;
   
 
-  /* ------------------------------------------------------------------
-   *                                                 check magic number
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                                check magic number
+   * -------------------------------------------------------------- */
   sz = fread(magic, 1, 2, f) ;
   
   if (sz < 2) {
@@ -184,9 +184,9 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
     return -1 ;
   }
 
-  /* ------------------------------------------------------------------
-   *                                     parse width, height, max_value
-   * --------------------------------------------------------------- */  
+  /* -----------------------------------------------------------------
+   *                                    parse width, height, max_value
+   * -------------------------------------------------------------- */  
   good = 1 ;
 
   c = remove_blanks(f) ;
@@ -233,7 +233,7 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   return 0 ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @brief Read PGM data
  **
  ** @param f    input file.
@@ -256,9 +256,9 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
   int c ;
   vl_bool good = 1 ;
 
-  /* ------------------------------------------------------------------
-   *                                                          read data
-   * --------------------------------------------------------------- */  
+  /* -----------------------------------------------------------------
+   *                                                         read data
+   * -------------------------------------------------------------- */  
 
   /* 
      In RAW mode we read directly an array of bytes or shorts.  In
@@ -314,7 +314,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
   return 0 ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @brief Write a PGM image
  **
  ** @param f output file.
@@ -364,7 +364,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
   return 0 ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @brief Write bytes to PGM file
  **
  ** @param name file name.

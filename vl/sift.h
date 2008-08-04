@@ -80,7 +80,6 @@ typedef struct _VlSiftFilt
 
 } VlSiftFilt ;
 
-
 /** @name Create and destroy
  ** @{
  **/

@@ -307,17 +307,45 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		2D732DBE0CF8BFFD0099B03C /* vlfeat-all */ = {
+		2D72E9C90E4765D2005DAA47 /* make doc-api */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "vlfeat-all" */;
+			buildArgumentsString = "doc-api";
+			buildConfigurationList = 2D72E9CA0E4765D2005DAA47 /* Build configuration list for PBXLegacyTarget "make doc-api" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
 			buildWorkingDirectory = "";
 			dependencies = (
 			);
-			name = "vlfeat-all";
+			name = "make doc-api";
+			passBuildSettingsInEnvironment = 1;
+			productName = "vlfeat-all";
+		};
+		2D72EA220E476C05005DAA47 /* make info */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = info;
+			buildConfigurationList = 2D72EA230E476C05005DAA47 /* Build configuration list for PBXLegacyTarget "make info" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = "make info";
+			passBuildSettingsInEnvironment = 1;
+			productName = "vlfeat-all";
+		};
+		2D732DBE0CF8BFFD0099B03C /* make */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = make;
 			passBuildSettingsInEnvironment = 1;
 			productName = "vlfeat-all";
 		};
@@ -388,7 +416,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2D732DBE0CF8BFFD0099B03C /* vlfeat-all */,
+				2D732DBE0CF8BFFD0099B03C /* make */,
+				2D72E9C90E4765D2005DAA47 /* make doc-api */,
+				2D72EA220E476C05005DAA47 /* make info */,
 				2DD302640DE32F6E009443C7 /* vlfeat-xcode-dll */,
 				2DD3027F0DE33154009443C7 /* sift-bin */,
 				2D36D6240DE3368F00F6EFD5 /* dft-mex */,
@@ -447,9 +477,11 @@
 		1DEB919408733D9F0010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MATLABROOT = /Applications/Matlab7;
+				MATLABEXE = /Applications/Matlab7/bin/matlab;
+				MEX = /Applications/Matlab7/bin/mex;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
@@ -462,9 +494,11 @@
 					ppc,
 					i386,
 				);
+				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MATLABROOT = /Applications/Matlab7;
+				MATLABEXE = /Applications/Matlab7/bin/matlab;
+				MEX = /Applications/Matlab7/bin/mex;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
@@ -521,6 +555,43 @@
 			};
 			name = Release;
 		};
+		2D72E9CB0E4765D2005DAA47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MATLAB = /Applications/Matlab7;
+				MEX = /Applications/Matlab7/bin/mex;
+				PRODUCT_NAME = "vlfeat-all";
+			};
+			name = Debug;
+		};
+		2D72E9CC0E4765D2005DAA47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "make doc-api";
+			};
+			name = Release;
+		};
+		2D72EA240E476C05005DAA47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MATLAB = /Applications/Matlab7;
+				MEX = /Applications/Matlab7/bin/mex;
+				PRODUCT_NAME = "vlfeat-all";
+			};
+			name = Debug;
+		};
+		2D72EA250E476C05005DAA47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
 		2D732DBF0CF8BFFD0099B03C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -536,9 +607,7 @@
 		2D732DC00CF8BFFD0099B03C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MATLAB = /Applications/Matlab7;
-				MEX = /Applications/Matlab7/bin/mex;
-				PRODUCT_NAME = "vlfeat-all";
+				PRODUCT_NAME = make;
 			};
 			name = Release;
 		};
@@ -643,7 +712,25 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "vlfeat-all" */ = {
+		2D72E9CA0E4765D2005DAA47 /* Build configuration list for PBXLegacyTarget "make doc-api" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D72E9CB0E4765D2005DAA47 /* Debug */,
+				2D72E9CC0E4765D2005DAA47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2D72EA230E476C05005DAA47 /* Build configuration list for PBXLegacyTarget "make info" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D72EA240E476C05005DAA47 /* Debug */,
+				2D72EA250E476C05005DAA47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2D732DBF0CF8BFFD0099B03C /* Debug */,

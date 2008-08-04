@@ -1,7 +1,7 @@
-/* file:       imop.tc
-** author:     Andrea Vedaldi
-** descripton: Generics templates definition
-**/
+/** file:       imop.tc
+ ** author:     Andrea Vedaldi
+ ** descripton: Generics templates definition
+ **/
 
 /* AUTORIGHTS
 Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -15,7 +15,12 @@ General Public License version 2.
 #include <math.h>
 #include <stdlib.h>
 
-#define VL_IMSMOOTH(SFX)    vl_imsmooth_   ## SFX
+#undef VL_IMSMOOTH
+#undef VL_IMSMOOTH_
+#undef VL_CONVTRANSP
+#undef VL_CONVTRANSP_
+
+#define VL_IMSMOOTH(SFX)    vl_imsmooth_ ## SFX
 #define VL_IMSMOOTH_(SFX)   VL_IMSMOOTH(SFX)
 #define VL_CONVTRANSP(SFX)  vl_convtransp_ ## SFX
 #define VL_CONVTRANSP_(SFX) VL_CONVTRANSP(SFX)

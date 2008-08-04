@@ -143,22 +143,22 @@ mexFunction(int nout, mxArray *out[],
     VlDhogKeypoint* keys ;
     float* descs ;
 
-    VlDhogFilter *dft ;    
-    dft = vl_dhog_new (M, N, step, size) ; 
+    VlDhogFilter *dhog ;    
+    dhog = vl_dhog_new (M, N, step, size) ; 
  
-    nkeys = vl_dhog_get_keypoint_num (dft) ;
-    keys  = vl_dhog_get_keypoints (dft) ;
-    descs = vl_dhog_get_descriptors (dft) ;
+    nkeys = vl_dhog_get_keypoint_num (dhog) ;
+    keys  = vl_dhog_get_keypoints (dhog) ;
+    descs = vl_dhog_get_descriptors (dhog) ;
     
     if (verbose) {
-      mexPrintf("dft: image size: %d x %d\n", M, N) ;
-      mexPrintf("dft: step:       %d\n", step) ;
-      mexPrintf("dft: size:       %d\n", size) ;
-      mexPrintf("dft: fast:       %d\n", fast) ;
-      mexPrintf("dft: num keys:   %d\n", nkeys) ;  
+      mexPrintf("dhog: image size: %d x %d\n", M, N) ;
+      mexPrintf("dhog: step:       %d\n", step) ;
+      mexPrintf("dhog: size:       %d\n", size) ;
+      mexPrintf("dhog: fast:       %d\n", fast) ;
+      mexPrintf("dhog: num keys:   %d\n", nkeys) ;  
     }
     
-    vl_dhog_process (dft, data, fast) ;
+    vl_dhog_process (dhog, data, fast) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
@@ -195,6 +195,6 @@ mexFunction(int nout, mxArray *out[],
       }
     }
     
-    vl_dhog_delete (dft) ;
+    vl_dhog_delete (dhog) ;
   }
 }
