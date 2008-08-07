@@ -15,7 +15,7 @@ General Public License version 2.
  ** @author Andrea Vedaldi
  ** @brief  Scale Invariant Feature Transform (SIFT)
     
-- @ref sift-usage
+- @ref sift-filter-usage
 - @ref sift-scale-space
 - @ref sift-detector
   -  @ref sift-detector-peak
@@ -28,7 +28,7 @@ General Public License version 2.
 
 The <b>Scale Invariant Feature Transform</b> (SIFT) bundles a feature
 detector and a feature descriptor. This program implements a @ref
-sift-usage "&ldquo;SIFT filter&rdquo;". This is a a reusable object
+sift-filter-usage "&ldquo;SIFT filter&rdquo;". This is a a reusable object
 that can be used to extract SIFT features from multiple images of the
 same size.
 
@@ -45,14 +45,14 @@ SIFT descriptor works by extracting a so called Histogram of Oriented
 Gradients (HOG), which is a statistic of the gradient orientations
 inside that image region.
 
-
-@section sift-usage Usage patterns
+@section sift-filter-usage Using the SIFT filter
 
 The code provided in this module can be used in different ways.  You
-should use the SIFT filter to extract both SIFT keypoints and
-descriptors from one or multiple images. Alternatively, you can use a
-lower level function to run only a part of the SIFT algorithm (for
-instance, you can compute the SIFT descriptors of your own keypoints).
+can instantiate and use a <b>SIFT filter</b> to extract both SIFT
+keypoints and descriptors from one or multiple images. Alternatively,
+you can use a lower level function to run only a part of the SIFT
+algorithm (for instance, to compute the SIFT descriptors of custom
+keypoints).
 
 To use the <b>SIFT filter</b>:
  
@@ -68,34 +68,73 @@ To use the <b>SIFT filter</b>:
       - Use ::vl_sift_calc_keypoint_descriptor() to get the keypoint descriptor.
 - Delete the SIFT filter by ::vl_sift_delete().
 
-To compute SIFT descriptors of custom keypoints use the
+To compute SIFT descriptors of custom keypoints, use the
 ::vl_sift_calc_raw_descriptor().
 
 @section sift-scale-space The scale space
 
-SIFT keypoints are computed at different scales. The algorithm starts
-by generating the Gaussian scale space of the input image. This is
-obtained by convolving the image by isotropic Gaussian kernels of
-increasing variance. In order to maintain the computation efficient,
-the smoothed images are downsampled by half when the variance of the
-Gaussian kernel doubles (we also say that the scale parameter moves to
-the next octave). The second step is to compute the DoG scale space
-from the Gaussian scale space by subtracting successive scales.  The
-ensamble of the smoothed images and their difference are organized as
-follows:
+The @ref sift-detector "SIFT detector" searches for image blobs at
+multiple scales. In order to do this, it first computes a Gaussian
+pyramid by gradually smoothing the image and reducing its scale
+(resolution). Then, it looks for blobls at all possible location and
+scales.
+
+Scales are sampled by octaves and by sublevels within each octave.
+This is controlled by three parameters: the starting octave
+@f$o_{\mathrm{min}}@f$, the number of octaves @e O, and the number of
+subdivisions for each octave @e S. While @e O is usually set to its
+maximum value, @f$o_min@f$ can be set to either 0 (native resolution),
+-1 (subpixel resolution), or a larger value (coarser resolution).  The
+effect of the number of subdivision @e S is more subtle, and we
+reccomend reading Lowe's original paper.
+
+ <table>
+ <caption>Parameters controlling the scale space</caption>
+ <tr>
+  <td>parameter</td>
+  <td>alt. name</td>
+  <td>default value</td>
+  <td>set by</td>
+ </tr>
+ <tr>
+   <td>@f$O@f$</td>
+   <td>@c O</td>
+   <td>as big as possible</td>
+   <td>::vl_sift_new()</td>
+ </tr>
+ <tr>
+   <td>@f$o_{\mathrm{min}}@f$</td>
+   <td>@c o_min</td>
+   <td>-1</td>
+   <td>::vl_sift_new()</td>
+ </tr>
+ <tr>
+   <td>@f$S@f$</td>
+   <td>@c S</td>
+   <td>3</td>
+   <td>::vl_sift_new()</td>
+ </tr>
+</table>
+
+@subsection sift-scale-space-details Scale space details
+
+In addition to the Gaussian scale space, SIFT uses the so called
+Difference of Gaussians (DoG) scale space, obtaiend by subtracting
+successive scales of the Gaussian scale space.  The ensamble of the
+smoothed images and their difference are organized as follows:
 
 @image html sift-ss.png
 
 The black vertical segments represent images of the Gaussian Scale
 Space (GSS), arranged by increasing scale @f$\sigma@f$. The image at
-scale @f$ \sigma @f$ is equal to the image at scale 1 smoothed with a
+scale @f$\sigma@f$ is equal to the image at scale 1 smoothed with a
 Gaussian kernel of that variance.
 
-The input image is assumed to be pre-smoothed at scale @f$ \sigma_n @f$
+The input image is assumed to be pre-smoothed at scale @f$\sigma_n@f$
 due to pixel aliasing (hence the image at scale 1 is not really
 available).
 
-Scales are sampled at points @f$ \sigma(o,s) @f$ logarithmically spaced.
+Scales are sampled at points @f$\sigma(o,s)@f$ logarithmically spaced.
 The levels are indexed by @e o (octave index) and @e s (level
 index). There are @e O octaves and @e S levels per octave. Images are
 downsampled at the octave boundaries; this is represented by the
@@ -123,33 +162,6 @@ extrema it is necessary to sample the DoG scale space in a 3x3x3
 neighborhood. This means that local extrema cannot be extracted in
 correspondence of the first and last levels of an octave. This is the
 reason why we compute two redundant levels for each octave.
-
- <table>
- <tr>
-  <td>parameter</td>
-  <td>alt. name</td>
-  <td>standard value</td>
-  <td>set by</td>
- </tr>
- <tr>
-   <td>@f$O@f$</td>
-   <td>@c O</td>
-   <td>as big as possible</td>
-   <td>::vl_sift_new()</td>
- </tr>
- <tr>
-   <td>@f$o_{\mathrm{min}}@f$</td>
-   <td>@c o_min</td>
-   <td>-1</td>
-   <td>::vl_sift_new()</td>
- </tr>
- <tr>
-   <td>@f$S@f$</td>
-   <td>@c S</td>
-   <td>3</td>
-   <td>::vl_sift_new()</td>
- </tr>
-</table>
 
 @section sift-detector The detector
 
@@ -207,7 +219,7 @@ returned as additional orientations.
  <tr>
   <td>parameter</td>
   <td>alt. name</td>
-  <td>standard value</td>
+  <td>default value</td>
   <td>set by</td>
  </tr>
  <tr>
@@ -229,26 +241,24 @@ returned as additional orientations.
 The SIFT descriptor is a three dimensional histogram
 @f$h(\theta,x,y)@f$ of the orientation @f$\theta@f$ and position
 @f$(x,y)@f$ of the gradient inside a patch surrounding the
-keypoint. The following pictures illustrates the geometry of the
+keypoint. The figure illustrates the layout of the
 histogram:
 
 @image html sift-bins.png
 
-While SIFT descriptor @f$h(\theta,x,y)@f$ is a 3-D array but it is
+The SIFT descriptor @f$h(\theta,x,y)@f$ is a 3-D array, but it is
 usually presented as a vector. This vector is obtained by stacking
-the 3-D array being @f$\theta@f$ is the fastest varying index and
-@e y the slowest.
+the 3-D array (being @f$\theta@f$ the fastest varying index).
 
-The histogram uses soft binning, so that bins partially overlap.
+Bins are bilinearly interpolated and partially overlap.
 There are @f$B_p@f$ bins along the @e x and @e y directions and
 @f$B_o@f$ along the @f$\theta@f$ direction.
 
-The spatial dimension of each bin depends on the keypoint scale
-@f$\sigma@f$ and a <em>magnification factor</em> @e m. in particular,
-a bin extends for @f$m\sigma@f$ pixels (this does not count the
-boundaries effect induced by bilinear smoothing). In the picture, the
-small blue circle has radius proportional to @f$\sigma@f$ and @e m has
-been set to 3 (a typical value).
+The spatial extent of the bins depends on the keypoint scale
+@f$\sigma@f$ and a <em>magnification factor</em> @e m. A bin extends 
+for @f$m\sigma@f$ pixels (ignoring bilinear smoothing). In the picture, the
+small blue circle has radius proportional to @f$\sigma@f$ and @e m is equal 
+to 3 (the standard value).
 
 Since there are @f$B_p@f$ bins along each spatial direction the
 descriptor support extends for @f$m\sigma B_p@f$ pixels in each
@@ -267,7 +277,7 @@ rectangular area that covers its support (scaled to match the
 resolution of the corresponding image in the GSS scale space).  Since
 the descriptor can be rotated, this area has extension 
 @f$m\sigma (B_p+1)/2\sqrt{2}@f$ (see also the picture). This remark has
-significance only for the implementation.
+significance only for` the implementation.
 
 The following table summarizes the descriptors parameters along
 with their standard vale.
@@ -276,7 +286,7 @@ with their standard vale.
  <tr>
   <td>parameter</td>
   <td>alt. name</td>
-  <td>standard value</td>
+  <td>default value</td>
  </tr>
  <tr>
    <td>@f$B_p@f$</td>
@@ -659,9 +669,9 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
     vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
   }
   
-  /* ------------------------------------------------------------------
-   *                                           Compute the first octave
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                          Compute the first octave
+   * -------------------------------------------------------------- */
   
   for(s = s_min + 1 ; s <= s_max ; ++s) {
     double sd = dsigma0 * pow (sigmak, s) ;
