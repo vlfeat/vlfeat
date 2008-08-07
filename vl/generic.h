@@ -14,6 +14,7 @@ General Public License version 2.
 #define VL_GENERIC_H
 
 #include <stddef.h>
+#include <time.h>
 #include <assert.h>
 
 /** @brief Library version string */
@@ -89,6 +90,11 @@ typedef int                 vl_int ;     /**< @c int.                  */
 typedef unsigned int        vl_uint ;    /**< @c unsigned @c int.      */
 
 typedef int                 vl_bool ;    /**< boolean */
+#ifndef WIN64
+typedef long                vl_ptrint ;  /**< integer type holding a pointer. */
+#else
+typedef long long           vl_ptrint ;
+#endif
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -296,6 +302,16 @@ extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] ;
 
 VL_EXPORT
 char const * vl_get_version_string () ;
+
+/** @name Measuring time
+ ** @{
+ **/
+VL_EXPORT 
+void vl_tic() ;
+
+VL_EXPORT 
+double vl_toc() ;
+/** @} */
 
 /** @name Endianness detection and conversions
  ** @{

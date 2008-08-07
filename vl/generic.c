@@ -10,13 +10,14 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-/** @mainpage VisionLab Features Library
+/** 
+ @mainpage VLFeat -- Vision Lab Features Library 
 
  @version __VLFEAT_VERSION__
  @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
  
- @par Copyright &copy; 2007 Andrea Vedaldi and Brian Fulkerson
+ @par Copyright &copy; 2007-08 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
  vision algorithms, with a special focus on visual features for
@@ -155,12 +156,18 @@ General Public License version 2.
   \dots, A_{21}, \dots)\f$. More in general, when stacking a multi
   dimensional array this indicates that the last index is the one
   varying most quickly, with the other followed in reverse order.
-
+  - <b>Feature frame.</b> A <em>feature frame</em> is the geometrical
+  description of a visual features. For instance, the frame of 
+  a @ref sift.h "SIFT feature" is oriented disk and the frame of
+  @ref mser.h "MSER feature" is either a compact and connected set or
+  a disk.
+  - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
+  (usually a vector) which describes compactly the appearance of an
+  image region (usually correspondnent to a feature frame).
 **/
 
-/** @file   generic.h
- ** @author Andrea Vedaldi
- ** @brief  Generic
+/** 
+@file generic.h
 
 This module provides basic functionalities:
 
@@ -430,4 +437,30 @@ void
 vl_set_printf_func (int(*printf_func) (char const *format, ...))
 {
   vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
+}
+
+clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
+
+/** ------------------------------------------------------------------
+ ** @brief Set time reference
+ **/
+
+VL_EXPORT
+void vl_tic() 
+{
+  tic_mark = clock() ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get time since reference
+ **
+ ** Returns the processor time elapsed since ::vl_tic() was called.
+ **
+ ** @return time in seconds.
+ **/
+
+VL_EXPORT
+double vl_toc()
+{
+  return (double) (clock() - tic_mark) / CLOCKS_PER_SEC ;
 }
