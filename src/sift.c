@@ -478,9 +478,9 @@ main(int argc, char **argv)
               pim. height) ;
     
     /* allocate buffer */
-    data  = malloc(vl_pgm_get_data_size (&pim) * 
+    data  = malloc(vl_pgm_get_npixels (&pim) * 
                    vl_pgm_get_bpp       (&pim) * sizeof (vl_uint8)   ) ;
-    fdata = malloc(vl_pgm_get_data_size (&pim) * 
+    fdata = malloc(vl_pgm_get_npixels (&pim) * 
                    vl_pgm_get_bpp       (&pim) * sizeof (vl_sift_pix)) ;
     
     if (!data || !fdata) {

@@ -1,12 +1,6 @@
 /** @file    pgm.h
  ** @author  Andrea Vedaldi
  ** @brief   Portable graymap format (PGM) parser
- **
- ** To read a PGM image, first call ::vl_pgm_extract_head() to extract
- ** the image meta data (size and bit-depth). Then allocate the
- ** appropriate buffer and call ::vl_pgm_extract_data().
- **
- ** To write a PGM image use ::vl_pgm_insert().
  **/
 
 /* AUTORIGHTS
@@ -57,7 +51,7 @@ VL_EXPORT int vl_pgm_extract_data  (FILE *f, VlPgmImage const *im, void *data) ;
 VL_EXPORT int vl_pgm_insert        (FILE *f, 
                                     VlPgmImage const *im, 
                                     void const*data ) ;
-VL_EXPORT int vl_pgm_get_data_size (VlPgmImage const *im) ;
+VL_EXPORT int vl_pgm_get_npixels   (VlPgmImage const *im) ;
 VL_EXPORT int vl_pgm_get_bpp       (VlPgmImage const *im) ;
 /** @} */
 
@@ -69,6 +63,13 @@ VL_EXPORT int vl_pgm_write         (char const *name,
 VL_EXPORT int vl_pgm_write_f       (char const *name,
                                     float const *data, 
                                     int width, int height) ;
+VL_EXPORT int vl_pgm_read_new      (char const *name,
+                                    VlPgmImage *im,
+                                    vl_uint8 **data) ;
+VL_EXPORT int vl_pgm_read_new_f    (char const *name,
+                                    VlPgmImage *im,
+                                    float **data) ;
+
 /** @} */
 /* VL_PGM */
 #endif

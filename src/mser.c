@@ -324,7 +324,7 @@ main(int argc, char **argv)
     }
     
     /* allocate buffer */
-    data = malloc(vl_pgm_get_data_size (&pim) * 
+    data = malloc(vl_pgm_get_npixels (&pim) * 
                   vl_pgm_get_bpp       (&pim)) ;
     
     if (!data) {

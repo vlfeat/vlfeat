@@ -10,6 +10,23 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
+/** 
+ @file pgm.h
+ 
+ To extract a PGM image from an input stream, 
+ first call ::vl_pgm_extract_head() to extract
+ the image meta data (size and bit-depth). Then allocate the
+ appropriate buffer to hold the image pixels and then 
+ call ::vl_pgm_extract_data().
+ 
+ To insert a PGM image to a file stream use ::vl_pgm_insert().
+ 
+ To quickly read/write a PGM image from/to a given file, use
+ ::vl_pgm_read_new() and ::vl_pgm_write(). To to the same
+ from a buffer in floating point format use ::vl_pgm_read_new_f() and 
+ ::vl_pgm_write_f().
+ **/
+
 #include "pgm.h"
 
 #include <stdio.h>
@@ -86,7 +103,7 @@ remove_blanks(FILE* f)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get PGM image data size
+ ** @brief Get PGM image number of pixels.
  **
  ** @param im PGM image descriptor.
  **
@@ -101,7 +118,7 @@ remove_blanks(FILE* f)
 
 VL_EXPORT
 int
-vl_pgm_get_data_size (VlPgmImage const *im)
+vl_pgm_get_npixels (VlPgmImage const *im)
 {
   return im->width * im->height ;
 }
@@ -125,7 +142,7 @@ vl_pgm_get_bpp (VlPgmImage const *im)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Read PGM header
+ ** @brief Extract PGM header from stream
  **
  ** @param f  input file.
  ** @param im image structure to fill.
@@ -234,7 +251,7 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Read PGM data
+ ** @brief Extract PGM data from stream
  **
  ** @param f    input file.
  ** @param im   PGM image descriptor.
@@ -242,7 +259,8 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
  **
  ** The function extracts from the file @a f the data section of an
  ** image encoded in PGM format. The function fills the buffer @a data
- ** according.
+ ** according. The buffer @a data should be ::vl_pgm_get_npixels() by
+ ** ::vl_pgm_get_bpp() bytes large.
  **
  ** @return error code.
  **/
@@ -252,7 +270,7 @@ int
 vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 {
   int bpp       = vl_pgm_get_bpp       (im) ;
-  int data_size = vl_pgm_get_data_size (im) ;
+  int data_size = vl_pgm_get_npixels (im) ;
   int c ;
   vl_bool good = 1 ;
 
@@ -315,7 +333,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Write a PGM image
+ ** @brief Insert a PGM image into a stream
  **
  ** @param f output file.
  ** @param im   PGM image meta-data.
@@ -327,8 +345,8 @@ VL_EXPORT
 int
 vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
 {
-  int bpp       = vl_pgm_get_bpp       (im) ;
-  int data_size = vl_pgm_get_data_size (im) ;
+  int bpp = vl_pgm_get_bpp (im) ;
+  int data_size = vl_pgm_get_npixels (im) ;
   int c ; 
   
   /* write preamble */
@@ -365,7 +383,107 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Write bytes to PGM file
+ ** @brief Read a PGM file
+ **
+ ** @param name file name.
+ ** @param im a pointer to the PGM image structure to fill.
+ ** @param data a pointer to the pointer to the allocated buffer.
+ **
+ ** The function reads a PGM image from file @a name and initializes the
+ ** structure @a im and the buffer @a data accordingly. 
+ **
+ ** The onwership of the buffer @a data is transfered to the caller.
+ ** @a data should be freed by means of ::vl_free().
+ **
+ ** @bug Only PGM files with 1 BPP are supported.
+ **
+ ** @return error code.
+ **/
+
+VL_EXPORT
+int vl_pgm_read_new (char const *name, VlPgmImage *im, vl_uint8** data)
+{
+  int err = 0 ;
+
+  FILE *f = fopen (name, "rb") ;
+  
+  if (! f) {
+    vl_err_no = VL_ERR_PGM_IO ;
+    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
+             "Error opening PGM file `%s' for reading", name) ;
+    return vl_err_no ;
+  }
+  
+  err = vl_pgm_extract_head(f, im) ;
+  if (err) {
+    fclose (f) ;
+    return err ;
+  }
+  
+  if (vl_pgm_get_bpp(im) > 1) {
+    vl_err_no = VL_ERR_BAD_ARG ;
+    snprintf(vl_err_msg, VL_ERR_MSG_LEN,
+             "vl_pgm_read(): PGM with BPP > 1 not supported") ;
+    return vl_err_no ;
+  }
+  
+  *data = vl_malloc (vl_pgm_get_npixels(im) * sizeof(vl_uint8)) ;
+  err = vl_pgm_extract_data(f, im, *data) ;
+  
+  if (err) {
+    vl_free (data) ;
+    fclose (f) ;
+  }
+  
+  fclose (f) ;  
+  return err ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Read floats from a PGM file
+ **
+ ** @param name file name.
+ ** @param im a pointer to the PGM image structure to fill.
+ ** @param data a pointer to the pointer to the allocated buffer.
+ **
+ ** The function reads a PGM image from file @a name and initializes the
+ ** structure @a im and the buffer @a data accordingly. The buffer
+ ** @a data is an array of floats in the range [0, 1].
+ **
+ ** The onwership of the buffer @a data is transfered to the caller.
+ ** @a data should be freed by means of ::vl_free().
+ **
+ ** @bug Only PGM files with 1 BPP are supported.
+ **
+ ** @return error code.
+ **/
+
+VL_EXPORT
+int vl_pgm_read_new_f (char const *name,  VlPgmImage *im, float** data)
+{
+  int err = 0 ;
+  size_t npixels ;
+  vl_uint8 *idata ;
+  
+  err = vl_pgm_read_new (name, im, &idata) ;
+  if (err) {
+    return err ;
+  }
+  
+  npixels = vl_pgm_get_npixels(im) ;
+  *data = vl_malloc (sizeof(float) * npixels) ;
+  {
+    size_t k ;
+    float scale = 1.0f / im->max_value ;
+    for (k = 0 ; k < npixels ; ++ k) (*data)[k] = scale * idata[k] ;
+  }
+  
+  vl_free (idata) ;
+  return err ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Write bytes to a PGM file
  **
  ** @param name file name.
  ** @param data data to write.
@@ -385,7 +503,7 @@ int vl_pgm_write (char const *name, vl_uint8 const* data, int width, int height)
   int err = 0 ;
   VlPgmImage pgm ;
   
-  FILE *f = fopen (name, "w") ;
+  FILE *f = fopen (name, "wb") ;
   
   if (! f) {
     vl_err_no = VL_ERR_PGM_IO ;
@@ -426,15 +544,15 @@ int vl_pgm_write_f (char const *name, float const* data, int width, int height)
 {
   int err = 0 ;
   int k ;
-  float min = - VL_INFINITY_F ;
-  float max = + VL_INFINITY_F ;
+  float min = + VL_INFINITY_F ;
+  float max = - VL_INFINITY_F ;
   float scale ;
   
   vl_uint8 * buffer = vl_malloc (sizeof(float) * width * height) ;
   
   for (k = 0 ; k < width * height ; ++k) {
-    min = VL_MAX(min, data [k]) ;
-    max = VL_MIN(max, data [k]) ;
+    min = VL_MIN(min, data [k]) ;
+    max = VL_MAX(max, data [k]) ;
   }
   
   scale = 255 / (max - min + VL_EPSILON_F) ;
@@ -445,7 +563,6 @@ int vl_pgm_write_f (char const *name, float const* data, int width, int height)
   
   err = vl_pgm_write (name, buffer, width, height) ;
   
-  vl_free (buffer) ;
-  
+  vl_free (buffer) ;  
   return err ;
 }
