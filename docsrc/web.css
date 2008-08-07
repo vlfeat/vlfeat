@@ -131,74 +131,6 @@ body {
 
 #index a:active {}
 
-p, #index {
-  max-width: 40em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-
-h1, h2, h3, h4, h5 {
-  font-family: Helvetica;
-  font-size: 1em;
-  margin-top: 1em ;
-  margin-bottom: 1em ;
-}
-
-h1 {font-size:1.3em;}
-h2 {font-size:1.2em;}
-h3 {font-size:1.1em;}
-
-code, pre {
-  color: #CF652A ;
-}
-
-div.figure {
-  margin-left: 2em ;
-}
-div.caption {
-  font-style: italic;
-  font-size: 0.9em ;
-}
-
-/* Mdoc css */
-dt {
-  color: DarkOrange  ;
-  margin: 0 ;
-}
-
-dd {
-  margin: 0em 0em 0em 2em ;
-}
-
-dd p {
-  margin-top: 0 ;
-}
-
-ul {
-  padding:0 ;
-}
-
-li {
-  padding: 0 ;
-  margin: 0 ;
-  margin-left: 1.5em ;
-}
-
-ul ul  {
-  margin-left:1em ;
-  margin-bottom: 1em ;
-}
-
-pre {
-  font-size: 1em ;
-  color: Teal ;
-}
-
-div.documentation {
-  padding: 0em 2em 2em 2em ;
-  max-width: 40em ;
-}
-
 #breadcrumb, div.navigation {
   border-bottom: 1px solid #eee ;
   margin: 0 ;
@@ -219,6 +151,78 @@ div.documentation {
 
 #breadcrumb span.path, div.tabs li.current {
   font-weight: bold ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                               Body                               */
+/* ---------------------------------------------------------------- */
+
+p, #index, li {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+p, li {
+  max-width: 40em ;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: Helvetica;
+  font-size: 1em;
+  margin-top: 1em ;
+  margin-bottom: 1em ;
+}
+
+h1 {font-size:1.3em;}
+h2 {font-size:1.2em;}
+h3 {font-size:1.1em;}
+
+dt {
+  color: DarkOrange  ;
+  margin: 0 ;
+}
+dd {
+  margin: 0em 0em 0em 2em ;
+}
+dd p {
+  margin-top: 0 ;
+}
+
+ul {
+  padding:0 ;
+  margin-top: 1em ;
+  margin-bottom: 1em ;
+}
+li {
+  margin-left: 1.5em ;
+  margin-top: 0.2em ;
+  margin-bottom: 0.2em;
+}
+
+pre {
+  font-size: 1em ;
+  color: Teal ;
+}
+
+code, pre {
+  color: #CF652A ;
+}
+
+div.figure {
+  margin-left: 2em ;
+}
+div.caption {
+  font-style: italic;
+  font-size: 0.9em ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                               MDoc                               */
+/* ---------------------------------------------------------------- */
+
+div.documentation {
+  padding: 0em 2em 2em 2em ;
+  max-width: 40em ;
 }
 
 /* ---------------------------------------------------------------- */
