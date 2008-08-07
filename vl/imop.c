@@ -1,7 +1,7 @@
-/* file:        imop.c
-** author:      Andrea Vedaldi
-** description: Image operations definitions
-**/
+/** @file   imop.c
+ ** @author Andrea Vedaldi
+ ** @brief  Image operations - Definition
+ **/
 
 /* AUTORIGHTS
 Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
@@ -9,10 +9,6 @@ Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
-
-/** @file
- ** @brief Image operations - Definitions
- **/
 
 #include "imop.h"
 
