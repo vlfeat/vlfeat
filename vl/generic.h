@@ -313,18 +313,20 @@ VL_EXPORT
 double vl_toc() ;
 /** @} */
 
-/** @name Endianness detection and conversions
+/** @name Endianness detection and conversion
  ** @{
  **/
 
-#define VL_LITTLE_ENDIAN 0  /**< little endian. */
-#define VL_BIG_ENDIAN    1  /**< big endian. */
+#define VL_LITTLE_ENDIAN 0  /**< little endian architecture. */
+#define VL_BIG_ENDIAN    1  /**< big endian architecture. */
        
 /** @def VL_ENDIANNESS
- ** @brief Host endianness.
+ ** @brief Host Endianness.
  **
  ** This macro is equal to ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN
  ** depending on the endianness of the host.
+ **
+ ** @see @ref generic-data-models.
  **/
 #if                                                \
   defined(__LITTLE_ENDIAN__)                   ||  \

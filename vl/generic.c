@@ -51,6 +51,7 @@ General Public License version 2.
    - @ref ikmeans.h  "Integer K-means (IKM)"
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
+   - @ref dhog.h     "Dense Histogram of Oriented Gradients (DHOG)"
 
  @section design VLFeat Design Concepts
 
@@ -134,12 +135,19 @@ General Public License version 2.
 
   @subsection design-portability Portability features
 
-  Most host dependent details are isolated in the @ref generic.h
-  library modules. These include:
+  Platform dependent details are isolated in the @ref generic.h
+  library module. These include:
 
-  - Portable atomic types (e.g. ::vl_int32).
-  - Declaration of symbols, inline functions (e.g. ::VL_EXPORT).
-  - Host endianness conversion (e.g. ::vl_swap_host_big_endianness_8()).
+  - Atomic types (e.g. ::vl_int32).
+  - Special syntaxes for the declaration of symbols exported by the library
+    and inline functions (e.g. ::VL_EXPORT).
+  - Host-dependent conversion of data endianess 
+    (e.g. ::vl_swap_host_big_endianness_8()).
+
+  VLFeat uses processor specific features (e.g. Intel SSE) if those
+  are available at compile time.
+ 
+  @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0
 
   @section main-glossary Glossary
 
@@ -167,41 +175,75 @@ General Public License version 2.
 **/
 
 /** 
-@file generic.h
+ @file generic.h
 
-This module provides basic functionalities:
-
-- @ref generic-data-models
-- @ref generic-error  
-- @ref generic-heap
-- @ref generic-logging
-
-@section generic-data-models Data models
-
-VLFeat's main target is to support common UNIX and Windows
-architectures. The data model of these architectures differ mainly
-in:
-
-- <em>endianness</em> and
-- <em>size of the atomic data types</em>.
-
-An host is big endian or little endian depending how multi-byte
-data values are stored in memory:
-
-- <em>big endian</em> (big end first, also known as network order) if it
-  stores the most significant byte has the smaller memory address.
-- <em>little endian</em> (small end first, used by x86 processors) if it
-  stores the lesser significant byte at the smaller memory address.
-
-Use the function ::vl_get_endianness() to detect endianness.  To
-convert data from/to the host to/from big endian (network) order, use the
-functions ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
-::vl_swap_host_big_endianness_2() (if the host is already big endian, these
- functions simply copy the data).
+ This module provides the following functionalities:
  
-Hosts also differ in the size of the atomic data type (such as
-@c short, @c int, @c long and so on):
+ - @ref generic-data-models
+ - @ref generic-error  
+ - @ref generic-heap
+ - @ref generic-logging
 
+ @section generic-data-models Data models
+
+ Processors may differ in the way they represent multi-byte data types. This
+ regards the 
+ <em>endianness</em> of the assignment of data types to memory addresses
+ and the <em>size</em> of the such types.
+ 
+ <b>Endianness</b> concerns how multi-byte data types (such as 16, 32 and 64 bits
+ integres) are stored into the addressable memory. All processors assign the bytes of a multi-byte data types
+ to a contiguous range of memory addresses (e.g. a 16-bit integer could
+ be assigned to the addresses <c>0x10001</c> and <c>0x10002</c>). There is
+ however an ambiguity on which bytes are
+ assigned to which addresses in the range.
+  
+ - The assignment is <em>big endian</em>, or in <em>network order</em>,
+   if the most significant byte of the multi-byte data type is assigned to 
+   the smaller memory address.
+ 
+ - Analogously, the assignment is <em>little endian</em> if  the least significant
+   byte is assigned to the smaller memory address.
+  
+ @remark Generally speaking, PPC processors are big endian and x86 processors
+ are little endian.<br/><br/>
+ 
+ @remark The names &ldquo;big endian&rdquo; and &ldquo;little endian&rdquo; are 
+ a little confusing. &ldquo;Big endian&rdquo; means &ldquo;big endian first&rdquo;, i.e.
+ the most significant byte comes first in the addressable space. Similarly,
+ &ldquo;little endian&rdquo; means &ldquo;little endian first&rdquo;, 
+ in the sense that the least significant byte comes first.
+ 
+ In most cases endianness is not a concern as data is stored and read to the addressable space
+ by one processor (or multiple processors of the same kind). Endianness 
+ becomes a concern when data is communicated. 
+ This includes: exchanging data with other processors 
+ that use a different convention,
+ transmitting data over a network, and storing data
+ to a file.
+ 
+ VLFeat provides a few functions to perform the¢ necessary conversions in the
+ latter two cases. The function ::vl_get_endianness() detects endianness. The functions
+ ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
+ ::vl_swap_host_big_endianness_2() change the endiannes of the data from 
+ the host convention (either little or big endian) to the network convention
+ (big endian) and viceversa.
+ 
+ The <b>size of C atomic data type</b> (such as
+ @c short, @c int, @c long and so on) also differs with different
+ processors. This may be a concern in several ways: communication of data,
+ overflow of the numerical representations, need to 
+ process data of a specific size (e.g. 8-bit image pixels). To this end,
+ the C-99 standard header <c>stdint.h</c> provides types that have guaranteed
+ sizes. Unfortunately Visual C++ does not implement this header, so 
+ VLFeat reproduces part of its functionalities.
+ 
+ In particular, VLFeat provides a full range of atomic data types
+ (::vl_int8, ::vl_int16, ::vl_int32, etc.) which are mapped to the appropriate
+ C native data type according to the following table.
+ Notice that in practice the only relevant differences
+ are the size of <code>long</code> and the size of pointers. 
+   
  <table><caption>32-bit and 64-bit data models</caption>
  <tr style="font-weight:bold;">
    <td>Data model</td>
@@ -259,96 +301,113 @@ Hosts also differ in the size of the atomic data type (such as
  </tr>
  </table>
  
-Most 32-bit architectures are equivalent for the size of
-the atomic data types. 64-bit architectures vary more, but for the 
-atomic data types defined by VLFeat, the only important difference
-between architectures is in practice limited the size of 
-<code>long</code> and the size of the pointers.
-
-@note For uniformity, VLFeat introduces appropriate atomic data types of
-fixed width.  Notice that in C-99 the <code>stdint.h</code> header
-could be used for this purpose instead, but unfortunately it is not
-supported by Microsoft Visual C/C++.
-
  @section generic-symbols Exported symbols and inline functions
 
- The library must rely on non-standard features of the C compiler to
- support dynamic linking and inline functions in a portable way. Such
- details are hidden by the following macros:
+ Creating a dynamically linked library requires non-standard features
+ of the C compiler to identify which symbols should be exported by
+ the library and which should not. Similarly, the declaration of inline
+ functions is a non-standard feature in C-89 compilers such as Visual C.
+  
+ The details on how such declarations are performed on each specific platform
+ are hiddend by the following macros:
 
- - ::VL_EXPORT declares an API symbols. The compiler and linker make
-    sure that these symbols (and, usually, no other symbol) are
-    visible to the library client.    
+ - ::VL_EXPORT declares symbols exported by the library.
  - ::VL_INLINE declares an inline function.
+ 
+ @par "Example:"
+ The following header file declares a function @c f that
+ should be visible from outside the library.
+ @code 
+ #include <vl/generic.h>
+ VL_EXPORT void f () ;
+ VL_EXPORT int i ;
+ @endcode
+ Notice that the macro ::VL_EXPORT needs not to be included again
+ when the function is defined.
+ 
+ @par "Example:"
+ The following header file declares an inline function @c f:
+ @code
+ #include <vl/generic.h>
+ VL_INLINE int f() ;
+ 
+ VL_INLINE int f() { return 1 ; }
+ @endcode
+ Here the first instruction defines the function @c f, where the second
+ declares it. Notice that since this is an inline function, its definition
+ must be found in the header file rather than in an implementation file.
+ Notice also that definition and declaration can be merged.
+ 
+ These macros translate according to the following tables:
 
-<table>
-<caption>Platform-dependent support for dynamic linking</caption>
-<tr>
-<td>Platform</td>
-<td>Macro</td>
-<td>Building</td>
-<td>Importing</td>
-</tr>
-<tr>
-<td>Unix/GCC</td>
-<td>::VL_EXPORT</td>
-<td>empty (assumes <c>-visibility=hidden</c> GCC option)</td>
-<td><c>__attribute__((visibility ("default")))</c></td>
-</tr>
-<tr>
-<td>Win/Visual C++</td>
-<td>::VL_EXPORT</td>
-<td>@c __declspec(dllexport)</td>
-<td>@c __declspec(dllimport)</td>
-</tr>
-</table>
+  <table style="font-size:70%;">
+  <caption>Macros for exporting library symbols</caption>
+  <tr>
+  <td>Platform</td>
+  <td>Macro name</td>
+  <td>Value when building the library</td>
+  <td>Value when importing the library</td>
+  </tr>
+  <tr>
+  <td>Unix/GCC</td>
+  <td>::VL_EXPORT</td>
+  <td>empty (assumes <c>-visibility=hidden</c> GCC option)</td>
+  <td><c>__attribute__((visibility ("default")))</c></td>
+  </tr>
+  <tr>
+  <td>Win/Visual C++</td>
+  <td>::VL_EXPORT</td>
+  <td>@c __declspec(dllexport)</td>
+  <td>@c __declspec(dllimport)</td>
+  </tr>
+  </table>
 
-<table>
-<caption>Platform-dependent support for inline functions</caption>
-<tr>
-<td>Platform</td>
-<td>Macro</td>
-<td>Implementation</td>
-</tr>
-<tr>
-<td>Unix/GCC</td>
-<td>::VL_INLINE</td>
-<td>static inline</td>
-</tr>
-<tr>
-<td>Win/Visual C++</td>
-<td>::VL_INLINE</td>
-<td>static __inline</td>
-</tr>
-</table>
+  <table style="font-size:70%;">
+  <caption>Macros for declaring inline functions</caption>
+  <tr>
+  <td>Platform</td>
+  <td>Macro name</td>
+  <td>Value</td>
+  </tr>
+  <tr>
+  <td>Unix/GCC</td>
+  <td>::VL_INLINE</td>
+  <td>static inline</td>
+  </tr>
+  <tr>
+  <td>Win/Visual C++</td>
+  <td>::VL_INLINE</td>
+  <td>static __inline</td>
+  </tr>
+  </table>
 
-@section generic-error Error handling
+  @section generic-error Error handling
 
-Error handling uses the same style of the standard C library. Most
-functions return 0 when they succeed and -1 when they fail, and
-set the global variable ::vl_err_no with a code identifying the
-error occurred. This variable is never set on success and should
-be examined right after an error had occurred.
+  Error handling uses the same style of the standard C library. Most
+  functions return 0 when they succeed and -1 when they fail, and
+  set the global variable ::vl_err_no with a code identifying the
+  error occurred. This variable is never set on success and should
+  be examined right after an error had occurred.
 
-@section generic-heap Heap allocation
+  @section generic-heap Heap allocation
 
-VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
-::vl_free() functions to allocate the heap. Normally these functions
-are mapped to the underlying standard C library implementations. However
-::vl_set_alloc_func() can be used to map them to other implementations.
-For instance, in MATALB MEX files these functions are mapped to 
-the MATLAB equivalent which has a garbage collection mechanism to cope
-with interruptions during execution.
+  VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
+  ::vl_free() functions to allocate the heap. Normally these functions
+  are mapped to the underlying standard C library implementations. However
+  ::vl_set_alloc_func() can be used to map them to other implementations.
+  For instance, in MATALB MEX files these functions are mapped to 
+  the MATLAB equivalent which has a garbage collection mechanism to cope
+  with interruptions during execution.
 
-@section generic-logging Logging
+  @section generic-logging Logging
 
-VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
-debug informations. These functions are normally mapped to the @c
-printf function of the underlying standard C library. However
-::vl_set_printf_func() can be used to map it to a different
-implementation. For instance, in MATLAB MEX files this function is
-mapped to @c mexPrintf. Setting the function to @c NULL disables
-logging.
+  VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
+  debug informations. These functions are normally mapped to the @c
+  printf function of the underlying standard C library. However
+  ::vl_set_printf_func() can be used to map it to a different
+  implementation. For instance, in MATLAB MEX files this function is
+  mapped to @c mexPrintf. Setting the function to @c NULL disables
+  logging.
 
 
 **/
