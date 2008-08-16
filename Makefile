@@ -54,7 +54,7 @@
 # DVIPNG:       TeX DVI to PNG converter
 # DVIPS:        TeX DVI to PS converter
 # EPS2PDF:      EPS to PDF converter
-# CONVERT:      ImageMagik convert utility
+# CONVERT:      ImageMagick convert utility
 # FIG2DEV:      X-Fig conversion program
 #
 # == BUILDING THE SHARED LIBRARY ==
@@ -160,7 +160,7 @@ define C
 endef
 
 # to disable the above, define the following
-# C = $($(1))
+C = $($(1))
 
 
 # --------------------------------------------------------------------
@@ -223,7 +223,7 @@ ifeq ($(ARCH),mci)
 BINDIR          := bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
-CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
+CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros -msse3
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 MEX_FLAGS       += -lm
@@ -236,7 +236,7 @@ ifeq ($(ARCH),glx)
 BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99 -msse3
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
@@ -248,7 +248,7 @@ ifeq ($(ARCH),g64)
 BINDIR          := bin/g64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99 -msse3
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
