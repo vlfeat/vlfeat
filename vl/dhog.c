@@ -1,7 +1,7 @@
 /** @internal
- ** @file     dhog.c
- ** @author   Andrea Vedaldi
- ** @brief    Dense Histogram of Oriented Gradients (DHOG) - Definition
+ ** @file   dhog.c
+ ** @author Andrea Vedaldi
+ ** @brief  Dense Histogram of Oriented Gradients (DHOG) - Definition
  **/
 
 /* AUTORIGHTS */
@@ -9,11 +9,94 @@
 #include "dhog.h"
 #include "pgm.h"
 #include "mathop.h"
+#include "imopv.h"
 #include <math.h>
 #include <strings.h>
 
 int const NBP = 4 ;
 int const NBO = 8 ;
+
+
+/** 
+ @file dhog.h
+ 
+ This module implements the Dense Histogram of Gradient descriptor (DHOG).
+ The DHOG descriptor is equivalent or similar to a
+ @ref sift-descriptor "SIFT descriptor" computed
+ at each pixel of an image, for a fixed scale and orientation.
+ 
+ Each DHOG descriptor is an histogram of the gradient orientations inside
+ a square image patch, very similar to a SIFT descriptor. The histogram has @f$N_b@f$ bins along each
+ spatial direction @e x and @e y and @f$N_o@f$ bins along the orientation
+ dimension. Each spatial bin correspond a portion of image which has
+ size equal to @f$\Delta@f$ pixels (along @e x and @e y), where @f$\Delta@f$
+ is an even number. In addition, bins are bilinearly interpolated and partially
+ overlap. The following figure illustrates which pixels (tick marks along 
+ the axis) are associated to one of two bins, and with weights (triangular
+ signals).
+ 
+ @image html dhog-bins.png
+ 
+ The top row shows bins of extension @f$\Delta=2@f$ whose center is aligned
+ to a pixel. The bottom row shows the same bins, but whose center sits
+ in between two adjacent pixels. Notice that, while the bin extent is always
+ the same, in the first case
+ the pixels that actually contributes to a bin (i.e. the ones with weights
+ greater than zero) are @f$2\Delta -1@f$, while in the second case
+ they are @f$2\Delta@f$.
+ 
+ While both arrangements could be used, this implementation uses only
+ the first (centers aligned to pixels), which is valid also for the case
+ @f$\Delta=1@f$.
+ 
+ @section dhog-grid Covering with descriptor and downsampling
+ 
+ DHOG extract a dense collection of descriptor, one each few pixels.
+ How many descriptors can be computed out of an image? Since 
+ most caluclations are going to be done by convolutions, for simplicity we require
+ the centers of all descriptor bins to lie at integer coordinates within
+ the image boundaries.
+ 
+ The center of the top-left bin of the top-left descriptor has
+ have coordinates 
+ @f[
+ x_0(0) = 0,\qquad y_0(0) = 0 
+ @f]
+ The center of the top-left bin of any other descriptor is
+ @f[
+ x_0(i) = x_0(0) + i \delta,
+ \qquad
+ y_0(j) = y_0(0) + j \delta 
+ @f]
+ where @f$\delta@f$ is the sampling step (an integer not smaller than one).
+ The center of the bottom-right bin is related to the center of the
+ top-left one by
+ @f[
+ x_{N_s-1}(i) = x_0(i) + \Delta (N_s - 1),
+ \qquad
+ y_{N_s-1}(i) = y_0(i) + \Delta (N_s - 1).
+ @f]
+ Notice that if @f$N_s = 1@f$ the two bins coincide.
+ Our conditions translate into @f$0 \leq x_0(0) \leq 
+ x_{N_s-1}(i_{\mathrm{max}}) \leq \mathrm{width} - 1@f$. Hence
+ @f[
+  0 \leq i \leq 
+ \lfloor 
+ \frac{\mathrm{width} - 1 - \Delta (N_s - 1)}{\delta}
+ \rfloor
+ @f]
+ and similarly for the @e y coordinate. Notice that the center of
+ each descriptor is then given by
+ @f[
+ x_{(N_s-1)/2}(i) = \delta i + \frac{\Delta (N_s - 1)}{2},
+ \qquad
+ y_{(N_s-1)/2}(i) = \delta j + \frac{\Delta (N_s - 1)}{2}.
+ @f]
+ 
+ 
+ 
+ **/
+
 
 /** ------------------------------------------------------------------
  ** @internal@brief Normalize histogram
@@ -40,119 +123,31 @@ normalize_histogram
   return norm;
 }
 
-/** ------------------------------------------------------------------
- ** @internal@brief Convolve rows, downsample, transpose in sub-block
- **
- ** The filter window is in [-W W] (2W+1 pixels). @a begin and @a end
- ** are in this range.
- **
- ** @param begin start of filter sub-block.
- ** @param end   end of filter sub-block.
- ** @param step  downsample step.
- **/
-static void
-econvolve(float*       dst_pt,
-          const float* src_pt,    int M, int N,
-          const float* filter_pt, int W,
-          int begin, int end, int step)
-{
-  int i,j ;
-  int M_down = M / step ;
-  for(j = 0 ; j < N ; ++j) { 
-    for(i = 0 ; i+step-1 < M ; i+=step) {
-      float        acc = 0.0 ;
-      float const* g = filter_pt + (W + begin) ;
-      float const* start = src_pt + (i + begin) ;
-      float const* stop ;
-      float        x ;
-      
-      if (i + begin < 0) {
-        start = src_pt + (i + begin) ;
-        stop  = src_pt + VL_MIN(i + end, -1) ;
-        x = *src_pt ;
-        while (start <= stop) { acc += (*g++) * x ; start++ ; }
-      }
-      
-      start = src_pt + VL_MIN(VL_MAX(i + begin, 0), M - 1) ;
-      stop  = src_pt + VL_MIN(VL_MAX(i + end,   0), M - 1) ;
-      while (start <=  stop) acc += (*g++) * (*start++) ;
-
-      if (i + end > M - 1) {
-        start = src_pt + M ;
-        stop  = src_pt + i + end ;
-        x = *(src_pt + M - 1) ;
-        while (start <= stop) { acc += (*g++) * x ; start++ ; }
-      }
-
-      /* save */
-      *dst_pt = acc ; 
-      dst_pt += N ;
-    }
-    /* next column */
-    src_pt += M ;
-    dst_pt -= M_down*N - 1 ;
-  }
-}
-
-/** ------------------------------------------------------------------
- ** @internal
- ** @brief Shape kernel for linear interpolation
- **
- ** @param ker
- ** @param b
- ** @param e
- ** @param gker
- ** @param r
- ** @param k
- **/
-
-static void 
-make_kernel (float *ker, int* b, int *e, 
-             float const* gker, int r, int k)
-{
-  double center, rate ;
-  int i, n ;
-  
-  if (r & 0x1) {
-    n = NBP * r + r - 1 ;
-  } else {
-    n = NBP * r + r ;
-  }  
-   
-  *b = k * r ;
-  *e = k * r + r + r - (r & 0x1) - 1 ;
-  
-  center = (*e + *b) / 2.0f ;
-  rate = r ; 
-      
-  for (i = *b ; i <= *e ; ++i) {
-    float box = 1 - fabs ((i - center) / rate) ;
-    ker [i] = gker [i] * box ;
-  }
-}
 
 /** ------------------------------------------------------------------
  ** @brief Allocate and initialize a new DHOG filter
  **
  ** @param width
  ** @param height
- ** @param step
+ ** @param sampling_step step used to sample descriptors (must be 1 or a multiple of bin_size).
  ** @param size
  ** @return new filter.
  **/
 
-VlDhogFilter* vl_dhog_new (int width, int height, int step, int size)
+VL_EXPORT
+VlDhogFilter* 
+vl_dhog_new (int width, int height, int sampling_step, int bin_size)
 {
   int t ;
   VlDhogFilter* f = vl_malloc (sizeof(VlDhogFilter)) ;
   
-  f-> width  = width ;
-  f-> height = height ;
-  f-> dwidth = width / step ;
-  f-> dheight= height / step ;
+  f-> width   = width ;
+  f-> height  = height ;
+  f-> dwidth  = (width  - 1 - (NBP - 1)*bin_size - 1) / sampling_step + 1;
+  f-> dheight = (height - 1 - (NBP - 1)*bin_size - 1) / sampling_step + 1;
   f-> nkeys  = f->dwidth * f->dheight ;
-  f-> step   = step ;
-  f-> size   = size ;
+  f-> sampling_step = sampling_step ;
+  f-> bin_size = bin_size ;
 
   f-> descr = vl_malloc (sizeof(float) * 128 * f->nkeys) ;
   f-> keys  = vl_malloc (sizeof(VlDhogKeypoint) * f->nkeys) ;
@@ -170,7 +165,9 @@ VlDhogFilter* vl_dhog_new (int width, int height, int step, int size)
  ** @param f filter to delete.
  **/
 
-void vl_dhog_delete (VlDhogFilter *f)
+VL_EXPORT
+void
+vl_dhog_delete (VlDhogFilter *f)
 {
   if (f) {
     int t ;
@@ -187,78 +184,79 @@ void vl_dhog_delete (VlDhogFilter *f)
 }
 
 
+float * _vl_dhog_new_kernel (VlDhogFilter *f, int i)
+{
+  int filt_len = 2*f->bin_size - 1 ;
+  float * ker = vl_malloc (sizeof(float) * filt_len) ;
+  float delta = f->bin_size * (NBP / 2.0f - i) ;
+  float * kerit = ker ;
+  float sigma = (NBP * f->bin_size) / 2.0f ;
+  int k ;
+  
+  for (k  = - f->bin_size + 1 ;
+       k <= + f->bin_size - 1 ;
+       ++ k) {
+    float z = (k - delta) / sigma ;
+    *kerit++ = (1.0f - fabsf(k) / f->bin_size) * 
+               (i >= 0) ? expf(-0.5f * z*z) : 1.0f ;
+  }
+  return ker ;
+}
+
 /** ------------------------------------------------------------------
  ** @internal@brief Process with Gaussian window
  ** @param f filter to delete.
  **/
 
 VL_INLINE 
-void with_gaussian_window (VlDhogFilter* f)
+void _vl_dhog_with_gaussian_window (VlDhogFilter* f)
 {
-  int n, W, x, y, i, t ;
-  float del, u ;
-  float *gker, *xker, *yker, acc, sigma ;
-  
-  /* Gaussian window */
-  if (f->size & 0x1) {
-    n = NBP * f->size + f->size - 1 ;
-  } else {
-    n = NBP * f->size + f->size ;
-  }  
-  del = - (n - 1) / 2.0f ;
-  W = n / 2 ; 
-  
-  gker = vl_malloc (sizeof(float) * n) ;
-  xker = vl_malloc (sizeof(float) * n) ;
-  yker = vl_malloc (sizeof(float) * n) ;
-  acc  = 0 ;
-  sigma = (f->size * NBP) / 2 ;
-  for (i = 0 ; i < n ; ++ i) {    
-    u = (i + del) / sigma ;
-    gker [i] = expf (- u*u) ;
-    acc += gker [i] ;
-  }
-  
-  /* compute dense descriptors */
-  for (y = 0 ; y < NBP ; ++y) {
-    int xb, xe, yb, ye ;
-    bzero(yker, sizeof(float)*n) ;
-    make_kernel (yker, &yb, &ye, gker, f->size, y) ;
+  int binx, biny, bint, centx, centy ;
+  float *xker, *yker ;
+  int W = f->bin_size - 1 ;
     
-    for (x = 0 ; x < NBP ; ++x) {      
-      bzero(xker, sizeof(float)*n) ;
-      make_kernel (xker, &xb, &xe, gker, f->size, x) ;
+  for (biny = 0 ; biny < NBP ; ++biny) {
+    yker = _vl_dhog_new_kernel(f, biny) ;
+    
+    for (binx = 0 ; binx < NBP ; ++binx) {
+      xker = _vl_dhog_new_kernel(f, binx) ;
       
-      for (t = 0 ; t < NBO ; ++t) {
-        int xs, ys ;
-        float *dst = f->descr + x * NBO + y * (NBP*NBO) + t ;
+      for (bint = 0 ; bint < NBO ; ++bint) {
+        float *dst = f->descr + binx * NBO + biny * (NBP*NBO) + bint ;
         float *src = f->tmp ;
         
-        econvolve(f->tmp2, f->hist[t], 
-                  f->width, f->height, 
-                  xker, W, xb - W, xe - W, f->step) ;
+        vl_imconvcol_vf (f->tmp2, f->height,
+                         f->hist [bint], f->width, f->height, f->width,
+                         yker, -W, +W, 1,
+                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
         
-        econvolve(f->tmp, f->tmp2, 
-                  f->height, f->width/f->step, 
-                  yker, W, yb - W, ye - W, f->step) ;
+        vl_imconvcol_vf (f->tmp, f->width,
+                         f->tmp2, f->height, f->width, f->height,
+                         xker, -W, +W, 1,
+                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
         
-        for (ys = 0 ; ys < f->dheight ; ++ys) {
-          for (xs = 0 ; xs < f->dwidth ; ++xs) {
-            *dst = *src++ ;
-            dst += NBP*NBP*NBO ;
+        {
+          int A = f->bin_size * (NBP - 1) ;
+          int d = f->sampling_step ;
+          
+          for (centy = 0 ;
+               centy <= (f->height - 1 - A) / d ;
+               ++ centy) {
+            for (centx = 0 ;
+                 centx <= (f->width - 1 - A) / d ;
+                 ++ centx) {
+              *dst = src [(centx + f->width*centy)*d +
+                          (binx + f->width*biny)*f->bin_size] ;
+              dst += NBP*NBP*NBO ;
+            }
           }
         }
-        
       } /* for t */
+      vl_free (xker) ;
     } /* for x */
-  } /* for y */
-  
-  vl_free (gker) ;
-  vl_free (xker) ;
-  vl_free (yker) ;
+    vl_free (yker) ;
+  } /* for biny */  
 }
-
-
 
 /** ------------------------------------------------------------------
  ** @internal@brief Process with flat window.
@@ -266,63 +264,46 @@ void with_gaussian_window (VlDhogFilter* f)
  **/
 
 VL_INLINE 
-void with_flat_window (VlDhogFilter* f)
+void _vl_dhog_with_flat_window (VlDhogFilter* f)
 {
-  int n, W, x, y, i, t ;
-  float del ;
-  float *ker ;
-  
-  /* Gaussian window */
-  if (f->size & 0x1) {
-    n = f->size + f->size - 1 ;
-  } else {
-    n = f->size + f->size ;
-  }  
-  del = - (n - 1) / 2.0f ;
-  W = n / 2 ;
-  
-  ker = vl_malloc (sizeof(float) * n) ;
-  {
-    double center, rate ;
-    center = (n - 1) / 2.0f ;
-    rate = f->size ;    
-    for (i = 0 ; i < n ; ++i) {
-      ker [i] = 1 - fabs ((i - center) / rate) ;    
-    }
-  }
-  
-  for (t = 0 ; t < NBO ; ++t) {
-    econvolve(f->tmp2, f->hist[t], 
-              f->width, f->height, 
-              ker, W, 0 - W, n - 1 - W, f->step) ;
+  int binx, biny, bint, centx, centy ;
+  float *ker = _vl_dhog_new_kernel(f, -1);
+  int W = f->bin_size - 1 ;
     
-    econvolve(f->hist[t], f->tmp2, 
-              f->height, f->width/f->step, 
-              ker, W, 0 - W, n - 1 - W, f->step) ;
-  }
-  
-  /* compute dense descriptors */
-  for (y = 0 ; y < NBP ; ++y) {
-    for (x = 0 ; x < NBP ; ++x) {
-      int xs, ys ;
-      int xd = (int) (-((NBP - 1) * f->size) / 2.0f + x * f->size) / f->step ;    
-      int yd = (int) (-((NBP - 1) * f->size) / 2.0f + y * f->size) / f->step ;
-      
-      float *dpt = f->descr + NBO * x + NBP*NBO * y ;
-            
-      for (ys = 0 ; ys < f->dheight ; ++ys) {
-        for (xs = 0 ; xs < f->dwidth ; ++xs) {
-          int xp = VL_MAX(0, VL_MIN(f->dwidth,  xs + xd)) ;
-          int yp = VL_MAX(0, VL_MIN(f->dheight, ys + yd)) ;
-          for (t = 0 ; t < NBO ; ++t) {            
-            dpt [t] = *(f->hist[t] + xp + yp * f->dwidth) ;
+  for (bint = 0 ; bint < NBO ; ++bint) {
+    
+    vl_imconvcol_vf (f->tmp2, f->height,
+                     f->hist [bint], f->width, f->height, f->width,
+                     ker, -W, +W, 1,
+                     VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    
+    vl_imconvcol_vf (f->tmp, f->width,
+                     f->tmp2, f->height, f->width, f->height,
+                     ker, -W, +W, 1,
+                     VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    
+    for (biny = 0 ; biny < NBP ; ++biny) {
+      for (binx = 0 ; binx < NBP ; ++binx) {
+        
+        float *dst = f->descr + binx * NBO + biny * (NBP*NBO) + bint ;
+        float *src = f->tmp ;
+        int A = f->bin_size * (NBP - 1) ;
+        int d = f->sampling_step ;
+        
+        for (centy = 0 ;
+             centy <= (f->height - 1 - A) / d ;
+             ++ centy) {
+          for (centx = 0 ;
+               centx <= (f->width - 1 - A) / d ;
+               ++ centx) {
+            *dst = src [(centx + f->width*centy)*d +
+                        (binx + f->width*biny)*f->bin_size] ;
+            dst += NBP*NBP*NBO ;
           }
-          dpt += NBP*NBP*NBO ;
         }
       }
-    } /* for x */
-  } /* for y */
-  
+    } /* for t */
+  } /* for x */
   vl_free (ker) ;
 }
 
@@ -346,7 +327,7 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
 #undef at
 #define at(u,v) (im[(v)*f->width+(u)])
   
-  /* histograms */
+  /*  */
   for (y = 0 ; y < f->height ; ++y) {
     for (x = 0 ; x < f->width ; ++x) {      
       float gx, gy ;
@@ -387,27 +368,35 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
   }
 
   if (fast) {
-    with_flat_window(f) ;
+    _vl_dhog_with_flat_window(f) ;
   } else {
-    with_gaussian_window(f) ;
+    _vl_dhog_with_gaussian_window(f) ;
   }
-    
+  
   {
     VlDhogKeypoint* k = f->keys ;
-    int xs, ys,bin ;
+    int centx, centy, bint ;
+    int A = f->bin_size * (NBP - 1) ;
+    double A_ = f->bin_size * (NBP - 1) / 2.0f ;
+    int d = f->sampling_step ;
     float *dpt = f->descr ;
-    float adj = (f->size*NBP & 0x1) ? 0.0f : -0.5f ;
-    for (ys = 0 ; ys < f->height/f->step ; ++ys) {
-      for (xs = 0 ; xs < f->width/f->step ; ++xs) {
-        k->x = xs*f->step + adj ;
-        k->y = ys*f->step + adj ;
+    
+    for (centy = 0 ;
+         centy <= (f->height - 1 - A) / d ;
+         ++ centy) {
+      for (centx = 0 ;
+           centx <= (f->width - 1 - A) / d ;
+           ++ centx) {
+        k->x = centx*d + A_ ;
+        k->y = centy*d + A_ ;
+        
         normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
-        for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
-          if (dpt[bin] > 0.2f) dpt[bin] = 0.2f ;
+        for(bint = 0; bint < NBO*NBP*NBP ; ++ bint) {
+          if (dpt[bint] > 0.2f) dpt[bint] = 0.2f ;
         }
         normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
         ++ k ;
-        dpt += NBP*NBP*NBO ;        
+        dpt += NBP*NBP*NBO ;
       }
     }
   }

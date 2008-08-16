@@ -10,8 +10,8 @@
  General Public License version 2.
  */
 
-#ifndef VL_dhog_H 
-#define VL_dhog_H 
+#ifndef VL_DHOG_H 
+#define VL_DHOG_H 
 
 #include "generic.h"
 
@@ -28,14 +28,14 @@ typedef struct VlDhogFilter_
 {  
   int width ;            /**< image width */
   int height ;           /**< image height */
-  int step ;             /**< downsampling step */
-  int size ;             /**< spatial bin size (in pixels) */
+  int sampling_step ;    /**< downsampling step */
+  int bin_size ;         /**< spatial bin size (in pixels) */
   int fast ;             /**< be fast but more approximated */
 
   int dwidth ;           /**< downsampled width */
   int dheight ;          /**< downsampled height */
   
-  float **hist ;         /**< dense histogram */
+  float **hist ;         /**< dense histograms */
   float *tmp ;           /**< temporary buffer */
   float *tmp2 ;          /**< temporary buffer */
   float *descr ;         /**< descriptors */
@@ -43,7 +43,7 @@ typedef struct VlDhogFilter_
   int nkeys ;            /**< number of keypoints */
 }  VlDhogFilter ;
 
-VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height, int step, int size) ;
+VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height, int sampling_step, int bin_size) ;
 VL_EXPORT void vl_dhog_delete (VlDhogFilter *f) ;
 VL_EXPORT void vl_dhog_process (VlDhogFilter *f, float const* im, vl_bool fast) ;
 
@@ -124,5 +124,5 @@ vl_dhog_transpose_descriptor (float* dst, float* src)
   }
 }
 
-/*  VL_dhog_H */
+/*  VL_DHOG_H */
 #endif

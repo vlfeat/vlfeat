@@ -2,6 +2,7 @@ sz = 5 ;
 st = 5 ;
 I = single(test_pattern(2))  ;
 %I = I + 100*single(randn(size(I))) ;
+[f,d] = dhog(I,'step', st, 'size', sz, 'verbose') ;% 'fast') ;
 [f,d] = dhog(I,'step', st, 'size', sz, 'verbose', 'fast') ;
 
 f = [f  ; sz * ones(1,size(f,2)) ; pi/2 - zeros(1,size(f,2))] ;
