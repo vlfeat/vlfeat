@@ -101,7 +101,6 @@ static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_uint8 const*, in
  ** @return new IKM quantizer.
  **/
 
-VL_EXPORT
 VlIKMFilt *
 vl_ikm_new (int method)
 {

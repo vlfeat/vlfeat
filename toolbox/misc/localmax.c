@@ -35,9 +35,10 @@ mexFunction(int nout, mxArray *out[],
   enum {MAXIMA=0} ;
   double threshold = - mxGetInf() ; 
 
-  /* ------------------------------------------------------------------
-   *                                                Check the arguments
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
+  
   if (nin < 1) {
     mexErrMsgTxt("At least one input argument is required.");
   } else if (nin > 3) {

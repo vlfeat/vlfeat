@@ -34,8 +34,8 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   enum {IN_X = 0, IN_K, IN_END} ;  
   enum {OUT_C = 0, OUT_I} ;
   
-  int             opt ;
-  int             next = IN_END ;
+  int opt ;
+  int next = IN_END ;
   mxArray const  *optarg ;
   
   int M, N, K = 0 ;
@@ -104,7 +104,6 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       } else {
         mexErrMsgTxt("Unknown method type.") ;
       }
-
       break ;
       
     default :
