@@ -1,7 +1,7 @@
 /** @internal
- ** @file    imsmooth.c
- ** @author  Andrea Vedaldi
- ** @brief   Smooth an image - MEX definition
+ ** @file   imsmooth.c
+ ** @author Andrea Vedaldi
+ ** @brief  Smooth an image - MEX definition
  **/
 
 /* AUTORIGHTS
@@ -14,155 +14,184 @@ General Public License version 2.
 #include <mexutils.h>
 
 #include <vl/generic.h>
+#include <vl/imopv.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#define PAD_BY_CONTINUITY
+/* option codes */
+enum {
+  opt_padding = 0,
+  opt_no_simd,
+  opt_subsample,
+  opt_verbose 
+} ;
 
-/* convolve and transopose */
-void
-convolve(double*       dst_pt, 
-         const double* src_pt,    int M, int N,
-         const double* filter_pt, int W)
-{
-  int i,j ;
-  for(j = 0 ; j < N ; ++j) {
-    for(i = 0 ; i < M ; ++i) {
-      double const* start = src_pt + VL_MAX (i-W,0  ) ;        
-      double const* stop  = src_pt + VL_MIN (i+W,M-1) + 1 ;
-      double const* g     = filter_pt + VL_MIN (0, W-i) ;
-      double acc = 0.0 ;
-      while(stop != start) acc += (*g++) * (*start++) ;
-      *dst_pt = acc ;
-      dst_pt += N ;
-    }
-    src_pt += M ;
-    dst_pt -= M*N - 1 ;
-  }
-}
-
-/* convolve and transopose and pad by continuity*/
-void
-econvolve(double*       dst_pt, 
-	  const double* src_pt,    int M, int N,
-	  const double* filter_pt, int W)
-{
-  int i,j ;
-  for(j = 0 ; j < N ; ++j) { 
-    for(i = 0 ; i < M ; ++i) {
-      double        acc = 0.0 ;
-      double const* g = filter_pt ;
-      double const* start = src_pt + (i-W) ;
-      double const* stop  ;
-      double        x ;
-      
-      /* beginning */
-      stop = src_pt + VL_MAX (0, i-W) ;
-      x    = *stop ;
-      while( start <= stop ) { acc += (*g++) * x ; start++ ; }
-      
-      /* middle */
-      stop =  src_pt + VL_MIN (M-1, i+W) ;
-      while( start <  stop ) acc += (*g++) * (*start++) ;
-      
-      /* end */
-      x  = *start ;
-      stop = src_pt + (i+W) ;
-      while( start <= stop ) { acc += (*g++) * x ; start++ ; } 
-      
-      /* save */
-      *dst_pt = acc ; 
-      dst_pt += N ;      
-    }
-    /* next column */
-    src_pt += M ;
-    dst_pt -= M*N - 1 ;
-  }
-}
+/* options */
+uMexOption options [] = {
+{"Padding",      1,   opt_padding       },
+{"NoSIMD",       0,   opt_no_simd       },
+{"Verbose",      0,   opt_verbose       },
+{"Subsample",    1,   opt_subsample     },
+{0,              0,   0                 }
+} ;
 
 void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {
-  int M,N,K,ndims ;
-  int const *dims ;
-  double* I_pt ;
-  double* J_pt ;
-  double s ;
-  enum {I=0,S} ;
-  enum {J=0} ;
+  enum {IN_I=0, IN_S, IN_END} ;
+  enum {OUT_J=0} ;
+  int opt ;
+  int next = IN_END ;
+  mxArray const  *optarg ;
 
-  /* ------------------------------------------------------------------
-  **                                                Check the arguments
-  ** --------------------------------------------------------------- */ 
-  if (nin != 2) {
-    mexErrMsgTxt("Exactly two input arguments required.");
+  int padding = VL_PAD_BY_CONTINUITY ;
+  int flags ;
+  vl_bool no_simd = 0 ;
+  int subsample = 1 ;
+  int verb = 0 ;  
+  double sigma ;
+  mxClassID classid ;
+  
+  int const *dims ;  
+  void* I_pt ;
+  void* J_pt ;
+  
+  int M,N,K,W,i,j,k,ndims ;
+  int M_, N_, dims_[3] ;
+  
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */ 
+  
+  if (nin < 2) {
+    mexErrMsgTxt("At least two input arguments required.");
   } else if (nout > 1) {
     mexErrMsgTxt("Too many output arguments.");
   }
-  
-  if (!mxIsDouble(in[I]) || 
-      !mxIsDouble(in[S]) ) {
-    mexErrMsgTxt("All arguments must be real.") ;
-  }
-  
-  if(mxGetNumberOfDimensions(in[I]) > 3||
-     mxGetNumberOfDimensions(in[S]) > 2) {
-    mexErrMsgTxt("I must be a two dimensional array and S a scalar.") ;
-  }
-  
-  if(VL_MAX(mxGetM(in[S]),mxGetN(in[S])) > 1) {
-    mexErrMsgTxt("S must be a scalar.\n") ;
-  }
+    
+  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+    switch (opt) {
+      case opt_padding :
+      {
+        enum {buflen = 32} ;
+        char buf [buflen] ;
+        if (!uIsString(optarg, -1)) {
+          mexErrMsgTxt("PADDING argument must be a string") ;
+        }
+        mxGetString(optarg, buf, buflen) ;
+        buf [buflen - 1] = 0 ;
+        if (uStrICmp("zero", buf)) {
+          padding = VL_PAD_BY_ZERO ;
+        } else if (uStrICmp("continuity", buf)) {
+          padding = VL_PAD_BY_CONTINUITY ;
+        } else {
+          mexErrMsgTxt("PADDING can be either ZERO or CONTINUITY") ;
+        }
+        break ;
+      }
+        
+      case opt_subsample :
+        if (!uIsRealScalar(optarg)) {
+          mexErrMsgTxt("SUBSAMPLE must be a scalar") ;
+        }
+        subsample = *mxGetPr(optarg) ;
+        if (subsample < 1) {
+          mexErrMsgTxt("SUBSAMPLE must be not less than one") ;
+        }
+        break ;
 
-  ndims = mxGetNumberOfDimensions(in[I]) ;
-  dims  = mxGetDimensions(in[I]) ;
+      case opt_verbose :
+        ++ verb ;
+        break ;
+        
+      case opt_no_simd :
+        no_simd = 1 ;
+        break ;
+        
+      default: 
+        assert(0) ;
+    }
+  }
+    
+  if (!uIsRealScalar(in[IN_S])) {
+    mexErrMsgTxt("S must be a real scalar") ;
+  }
+  
+  classid = mxGetClassID(in[IN_I]) ;
+  
+  if (classid != mxDOUBLE_CLASS &&
+      classid != mxSINGLE_CLASS) {
+    mexErrMsgTxt("I must be either DOUBLE or SINGLE.") ;
+  }
+  
+  if (mxGetNumberOfDimensions(in[IN_I]) > 3) {
+    mexErrMsgTxt("I must be either a two or three dimensional array.") ;
+  }
+  
+  ndims = mxGetNumberOfDimensions(in[IN_I]) ;
+  dims = mxGetDimensions(in[IN_I]) ;
   M = dims[0] ;
   N = dims[1] ;
   K = (ndims > 2) ? dims[2] : 1 ;
 
-  out[J] = mxCreateNumericArray(ndims, dims, mxDOUBLE_CLASS, mxREAL) ;
+  sigma = *mxGetPr(in[IN_S]) ;
+  if ((sigma < 0.01) && (subsample == 1)) {    
+    out[OUT_J] = mxDuplicateArray(in[IN_I]) ;
+    return ;
+  }
   
-  I_pt   = mxGetPr(in[I]) ;
-  J_pt   = mxGetPr(out[J]) ;
-  s      = *mxGetPr(in[S]) ;
-
-  /* ------------------------------------------------------------------
-  **                                                         Do the job
-  ** --------------------------------------------------------------- */ 
-  if(s > 0.01) {
-    
-    int W = (int) ceil(4*s) ;
-    int j,k ;
-    double* g0 = (double*) mxMalloc( (2*W+1)*sizeof(double) ) ;
-    double* buffer = (double*) mxMalloc( M*N*sizeof(double) ) ;
-    double acc=0.0 ;
-    
-    for(j = 0 ; j < 2*W+1 ; ++j) {
-      g0[j] = exp(-0.5 * (j - W)*(j - W)/(s*s)) ;
-      acc += g0[j] ;
-    }
-    for(j = 0 ; j < 2*W+1 ; ++j) {
-      g0[j] /= acc ;
-    }
-
-    for(k = 0 ; k < K ; ++k) {
-#if defined PAD_BY_CONTINUITY
-    econvolve(buffer, I_pt, M, N, g0, W) ;
-    econvolve(J_pt, buffer, N, M, g0, W) ;
-#else
-    convolve(buffer, I_pt, M, N, g0, W) ;
-    convolve(J_pt, buffer, N, M, g0, W) ;
-#endif
-      I_pt += M*N ;
-      J_pt += M*N ;
-    }
+  M_ = (M - 1) / subsample + 1 ;
+  N_ = (N - 1) / subsample + 1 ;
+  dims_ [0] = M_ ;
+  dims_ [1] = N_ ;
+  if (ndims > 2) dims_ [2] = ndims ;
   
-    mxFree(buffer) ;
-    mxFree(g0) ;
-  } else {
-    memcpy(J_pt, I_pt, sizeof(double)*M*N) ;   
+  out[OUT_J] = mxCreateNumericArray(ndims, dims_, classid, mxREAL) ;
+
+  if (verb) {    
+    char const * msg ;
+    mexPrintf("%dx%d -> %dx%d, ", N, M, N_, M_) ;
+    switch (padding) {
+      case VL_PAD_BY_ZERO       : msg = "with zeroes" ; break ;
+      case VL_PAD_BY_CONTINUITY : msg = "by continuity" ; break ;
+      default: assert (0) ; break ;
+    }
+    mexPrintf("imsmooth: padding %s, ", msg) ;
+    switch (classid) {
+      case mxDOUBLE_CLASS: msg = "DOUBLE" ; break ;
+      case mxSINGLE_CLASS: msg = "SINGLE" ; break ;
+      default: assert (0) ; break ;
+    }
+    mexPrintf("data is %s, ", msg) ;
+    if (no_simd) mexPrintf("no SIMD accel,") ;
+    else mexPrintf("SIMD accel, ") ;    
+    mexPrintf("subsample: %d\n", subsample) ;
+  }
+  
+  /* -----------------------------------------------------------------
+   *                                                        Do the job
+   * -------------------------------------------------------------- */ 
+  W = ceil (4 * sigma) ;
+  flags  = padding ;
+  flags |= VL_TRANSPOSE ;
+  flags |= no_simd ? VL_NO_SIMD : 0 ;
+  
+  switch (classid) {
+    case mxSINGLE_CLASS: 
+#undef FLT
+#undef VL_IMCONVCOL
+#define FLT float
+#define VL_IMCONVCOL vl_imconvcol_vf
+#include "imsmooth.tc"
+    case mxDOUBLE_CLASS:
+#undef FLT
+#undef VL_IMCONVCOL
+#define FLT double 
+#define VL_IMCONVCOL vl_imconvcol_vd
+#include "imsmooth.tc"
+    default: assert (0) ; break ;
   }
 }

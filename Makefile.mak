@@ -16,6 +16,11 @@ MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsof
 MATLABROOT = C:\Program Files\MATLAB\R2008a
 MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
+MSVCR      = msvcr80.dll
+MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+MATLABROOT = C:\Program Files\MATLAB08a
+MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
+
 # --------------------------------------------------------------------
 #                                                                Flags
 # --------------------------------------------------------------------
@@ -80,19 +85,20 @@ MEX_LFLAGS = $(LFLAGS) \
              /DLL /EXPORT:mexFunction \
              /MACHINE:X86 \
              /LIBPATH:$(MATLABLIB) \
-             libmx.lib libmex.lib libmat.lib  
+             libmx.lib libmex.lib libmat.lib
 
-libsrc =            	\
+libsrc =                \
  vl\aib.c               \
  vl\generic.c           \
  vl\getopt_long.c       \
  vl\hikmeans.c          \
  vl\ikmeans.c           \
  vl\imop.c              \
+ vl\imopv.c             \
  vl\mathop.c            \
  vl\mser.c              \
  vl\pgm.c               \
- vl\random.c		    \
+ vl\random.c            \
  vl\rodrigues.c         \
  vl\sift.c              \
  vl\stringop.c
@@ -103,7 +109,9 @@ cmdsrc =                \
  src\aib.c              \
  src\test_getopt_long.c \
  src\test_stringop.c    \
- src\test_nan.c
+ src\test_nan.c         \
+ src\test_rand.c        \
+ src\test_imopv.c
 
 mexsrc =                       \
  toolbox\sift\sift.c           \
@@ -169,22 +177,23 @@ BUILD_DLL=@echo CC  $(<) ]===} $(@R).dll && \
 # --------------------------------------------------------------------
 
 clean:
-	del $(libobj)
-	del /Q $(objdir)
-	del $(cmdpdb)
-	del $(mexpdb)
-	del $(mexdir)\$(MSVCR)
-	del $(mexdir)\vl.dll
-	del bin\win32\$(MSVCR)
-	del bin\win32\vl.dll
-	del bin\win32\vl.dll.manifest
-	del bin\win32\vl_dll.lib
-	del bin\win32\vl_dll.exp
-	del bin\win32\vl.lib
+	del /f /Q $(libobj)
+	del /f /Q $(objdir)
+	del /f /Q $(cmdpdb)
+	del /f /Q $(mexpdb)
+	del /f /Q $(mexdir)\$(MSVCR)
+	del /f /Q $(mexdir)\vl.dll
+	del /f /Q bin\win32\$(MSVCR)
+	del /f /Q bin\win32\vl.dll
+	del /f /Q bin\win32\vl.dll.manifest
+	del /f /Q bin\win32\vl_dll.lib
+	del /f /Q bin\win32\vl_dll.exp
+	del /f /Q bin\win32\vl.lib
 
 distclean: clean
-	del $(cmdexe)
-	del $(mexdll)
+	del /f /Q $(cmdexe)
+	del /f /Q $(mexdll)
+
 info:
 	@echo $(mexx)
 	@echo ** bindir     = $(bindir)

@@ -1,6 +1,6 @@
-/** file:       imop.tc
- ** author:     Andrea Vedaldi
- ** descripton: Generics templates definition
+/** @file    imop.tc
+ ** @author  Andrea Vedaldi
+ ** @brief   Image operations - Definition Template
  **/
 
 /* AUTORIGHTS

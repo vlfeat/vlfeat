@@ -1,0 +1,174 @@
+/** @file    imopv.tc
+ ** @author  Andrea Vedaldi
+ ** @brief   Vectorized image operations - Definition Template
+ **/
+
+VL_EXPORT
+void
+VL_IMCONVCOL (FLT* dst, int dst_stride,
+              FLT const* src,
+              int src_width, int src_height, int src_stride,
+              FLT const* filt, int filt_begin, int filt_end,
+              int step, unsigned int flags)
+{
+#undef ALIGNPTR
+#define ALIGNPTR (sizeof(FLT) * VSIZE - 1)
+#undef ALIGNSTRIDE
+#define ALIGNSTRIDE (VSIZE - 1)
+  int x = 0 ;
+  int y ;
+  int dheight = (src_height - 1) / step + 1 ;
+  vl_bool use_simd  = ((src_stride & ALIGNSTRIDE) == 0) && 
+  (! (flags & VL_NO_SIMD)) ;
+  vl_bool transp = flags & VL_TRANSPOSE ;
+  vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
+  double totcol = 0 ;
+  double simdcol = 0 ;
+
+  /* let filt point to the last sample of the filter */
+  filt += filt_end - filt_begin ;
+  
+  while (x < src_width) {
+    /* Calculate dest[x,y] = sum_p image[x,p] filt[y - p]
+     * where supp(filt) = [filt_begin, filt_end] = [fb,fe].
+     * 
+     * CHUNK_A: y - fe <= p < 0
+     *          completes VL_MAX(fe - y, 0) samples
+     * CHUNK_B: VL_MAX(y - fe, 0) <= p < VL_MIN(y - fb, height - 1)
+     *          completes fe - VL_MAX(fb, height - y) + 1 samples
+     * CHUNK_C: completes all samples
+     */
+    FLT const *filti ;
+    int stop ; 
+    
+#ifdef __SSE3__
+    if ((x + VSIZE < src_width) & 
+        (((vl_ptrint)(src + x) & ALIGNPTR) == 0) & 
+        use_simd) 
+    {
+      for (y = 0 ; y < src_height ; y += step)  {
+        union {VTYPE v ; FLT x [VSIZE] ; } acc ;
+        VTYPE v, c ;
+        FLT const *srci ;
+        acc.v = VSTZ () ;
+        
+        filti = filt ;
+        stop = filt_end - y ;
+        srci = src + x - stop * src_stride ;
+        
+        if (stop > 0) {
+          if (zeropad) {
+            v = VSTZ () ;
+          } else {
+            v = * (VTYPE*) (src + x) ;
+          } 
+          while (filti > filt - stop) {
+            c = VLD1 (filti--) ;
+            acc.v = VADD (acc.v,  VMUL (v, c)) ;
+            srci += src_stride ;
+          }
+        }
+        
+        stop = filt_end - VL_MAX(filt_begin, y - src_height + 1) + 1 ;
+        while (filti > filt - stop) {
+          v = * (VTYPE*) srci ; 
+          c = VLD1 (filti--) ;
+          acc.v = VADD (acc.v, VMUL (v, c)) ;
+          srci += src_stride ;
+        }
+        
+        if (zeropad) v = VSTZ () ;
+        
+        stop = filt_end - filt_begin + 1;
+        while (filti > filt - stop) {
+          c = VLD1 (filti--) ;
+          acc.v = VADD (acc.v, VMUL (v, c)) ;
+        }
+        
+        if (transp) {
+          *dst = acc.x[0] ; dst += dst_stride ;
+          *dst = acc.x[1] ; dst += dst_stride ;
+#if(VSIZE == 4)
+          *dst = acc.x[2] ; dst += dst_stride ;
+          *dst = acc.x[3] ; dst += dst_stride ;          
+#endif
+          dst += 1 * 1 - VSIZE * dst_stride ;
+        } else {
+          *dst = acc.x[0] ; dst += 1 ;
+          *dst = acc.x[1] ; dst += 1 ;      
+#if(VSIZE == 4)
+          *dst = acc.x[2] ; dst += 1 ;
+          *dst = acc.x[3] ; dst += 1 ;
+#endif
+          dst += 1 * dst_stride - VSIZE * 1 ;
+        }
+        
+      } /* next y */
+      if (transp) {
+        dst += VSIZE * dst_stride - dheight * 1 ;
+      } else {
+        dst += VSIZE * 1 - dheight * dst_stride ;
+      }
+      x += VSIZE ;
+      simdcol += VSIZE ;
+      totcol += VSIZE ;
+    } else {
+#endif
+      for (y = 0 ; y < src_height ; y += step) {
+        FLT acc = 0 ;  
+        FLT v, c ;
+        FLT const* srci ;
+        
+        filti = filt ;
+        stop = filt_end - y ;
+        srci = src + x - stop * src_stride ;
+        
+        if (stop > 0) {   
+          if (zeropad) {
+            v = 0 ;
+          } else {
+            v = *(src + x) ;
+          }
+          while (filti > filt - stop) { 
+            c = *filti-- ;
+            acc += v * c ;
+            srci += src_stride ;
+          }
+        }
+        
+        stop = filt_end - VL_MAX(filt_begin, y - src_height + 1) + 1 ;
+        while (filti > filt - stop) {
+          v = *srci ; 
+          c = *filti-- ;
+          acc += v * c ;
+          srci += src_stride ;
+        }
+        
+        if (zeropad) v = 0 ;
+        
+        stop = filt_end - filt_begin + 1 ;
+        while (filti > filt - stop) {
+          c = *filti-- ;
+          acc += v * c ;
+        }
+        
+        if (transp) {
+          *dst = acc ; dst += 1 ;
+          
+        } else {
+          *dst = acc ; dst += dst_stride ;
+        }
+      } /* next y */
+      if (transp) {
+        dst += 1 * dst_stride - dheight * 1 ;
+      } else {
+        dst += 1 * 1 - dheight * dst_stride ;
+      }
+      x += 1 ;
+      totcol += 1 ;
+#ifdef __SSE3__ 
+    } 
+#endif
+  } /* next x */
+/*  VL_PRINTF ("%f %% of colums computed by SIMD (src_stride: %d)\n", 100.0 * simdcol / totcol, src_stride) ;  */
+}
