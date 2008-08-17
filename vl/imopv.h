@@ -65,7 +65,7 @@ void vl_imconvcol_vd(double* dst, int dst_stride,
  ** and so on. Setting @a step two 2 (two) computes only (x,0), (x,2) and so on
  ** (in this case the height of the destination image is <code>floor(src_height/step)+1)</code>.
  **
- ** Calling twice the function can be used to compute 2-D separable convolutions.
+ ** The function may be called twice to compute 2-D separable convolutions.
  ** Use the flag ::VL_TRANSPOSE to transpose the result (in this case
  ** @a dst has transposed dimension as well).
  **

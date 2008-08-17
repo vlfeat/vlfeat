@@ -13,7 +13,7 @@
 
 /** @file imopv.h
  ** 
- ** This module includes vectorized image opearations.
+ ** This module includes vectorized image operations.
  **/
 
 #undef  VL_IMCONVCOL
