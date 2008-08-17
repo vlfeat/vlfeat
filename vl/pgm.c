@@ -392,7 +392,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
  ** The function reads a PGM image from file @a name and initializes the
  ** structure @a im and the buffer @a data accordingly. 
  **
- ** The onwership of the buffer @a data is transfered to the caller.
+ ** The ownership of the buffer @a data is transfered to the caller.
  ** @a data should be freed by means of ::vl_free().
  **
  ** @bug Only PGM files with 1 BPP are supported.
@@ -450,7 +450,7 @@ int vl_pgm_read_new (char const *name, VlPgmImage *im, vl_uint8** data)
  ** structure @a im and the buffer @a data accordingly. The buffer
  ** @a data is an array of floats in the range [0, 1].
  **
- ** The onwership of the buffer @a data is transfered to the caller.
+ ** The ownership of the buffer @a data is transfered to the caller.
  ** @a data should be freed by means of ::vl_free().
  **
  ** @bug Only PGM files with 1 BPP are supported.
