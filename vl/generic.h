@@ -103,10 +103,10 @@ typedef long long           vl_ptrint ;
  ** @{
  **/
 
-/** @def VL_FL_INT64 @brief @c prinf length flag for ::vl_int64, ::vl_uint64. */
-/** @def VL_FL_INT32 @brief @c prinf length flag for ::vl_int32, ::vl_uint32. */
-/** @def VL_FL_INT16 @brief @c prinf length flag for ::vl_int16, ::vl_uint16. */
-/** @def VL_FL_INT8  @brief @c prinf length flag for ::vl_int8,  ::vl_uint8.  */
+/** @def VL_FL_INT64 @brief @c printf length flag for ::vl_int64, ::vl_uint64. */
+/** @def VL_FL_INT32 @brief @c printf length flag for ::vl_int32, ::vl_uint32. */
+/** @def VL_FL_INT16 @brief @c printf length flag for ::vl_int16, ::vl_uint16. */
+/** @def VL_FL_INT8  @brief @c printf length flag for ::vl_int8,  ::vl_uint8.  */
 
 #define VL_FL_INT64  "ll"
 #define VL_FL_INT32  ""

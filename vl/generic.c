@@ -43,7 +43,7 @@ General Public License version 2.
    - @ref random.h    "Random number generator"
    - @ref stringop.h  "String operations"
    - @ref imop.h      "Image operations"
-   - @ref rodrigues.h "Rodrigues formuals"
+   - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
  - Algorithms
    - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
@@ -171,7 +171,7 @@ General Public License version 2.
   a disk.
   - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
   (usually a vector) which describes compactly the appearance of an
-  image region (usually correspondnent to a feature frame).
+  image region (usually corresponding to a feature frame).
 **/
 
 /** 
@@ -192,7 +192,7 @@ General Public License version 2.
  and the <em>size</em> of the such types.
  
  <b>Endianness</b> concerns how multi-byte data types (such as 16, 32 and 64 bits
- integres) are stored into the addressable memory. All processors assign the bytes of a multi-byte data types
+ integers) are stored into the addressable memory. All processors assign the bytes of a multi-byte data types
  to a contiguous range of memory addresses (e.g. a 16-bit integer could
  be assigned to the addresses <c>0x10001</c> and <c>0x10002</c>). There is
  however an ambiguity on which bytes are
@@ -229,7 +229,7 @@ General Public License version 2.
  the host convention (either little or big endian) to the network convention
  (big endian) and viceversa.
  
- The <b>size of C atomic data type</b> (such as
+ The <b>size of C atomic data types</b> (such as
  @c short, @c int, @c long and so on) also differs with different
  processors. This may be a concern in several ways: communication of data,
  overflow of the numerical representations, need to 
@@ -309,7 +309,7 @@ General Public License version 2.
  functions is a non-standard feature in C-89 compilers such as Visual C.
   
  The details on how such declarations are performed on each specific platform
- are hiddend by the following macros:
+ are hidden by the following macros:
 
  - ::VL_EXPORT declares symbols exported by the library.
  - ::VL_INLINE declares an inline function.
