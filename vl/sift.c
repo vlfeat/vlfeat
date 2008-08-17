@@ -28,22 +28,22 @@ General Public License version 2.
 
 The <b>Scale Invariant Feature Transform</b> (SIFT) bundles a feature
 detector and a feature descriptor. This program implements a @ref
-sift-filter-usage "&ldquo;SIFT filter&rdquo;". This is a a reusable object
+sift-filter-usage "&ldquo;SIFT filter&rdquo;". This is a reusable object
 that can be used to extract SIFT features from multiple images of the
 same size.
 
 The <b>@ref sift-detector "SIFT detector"</b> determines the geometry of
 a SIFT feature.  Geometrically, the feature is an oriented disk (also
-called feature frame or keypoint) and has a center @f$ (x,y) @f$, a
+called a feature frame or keypoint) and has a center @f$ (x,y) @f$, a
 scale @f$ \sigma @f$, and an orientation @f$ \theta @f$. The SIFT
-detector works by identifying blob-like sturcures in an image and
+detector works by identifying blob-like structures in an image and
 attaching oriented disks to them.
 
 The <b>@ref sift-descriptor "SIFT descriptor"</b> describes compactly
 the appearance of the image region corresponding to a SIFT frame.  The
-SIFT descriptor works by extracting a so called Histogram of Oriented
+SIFT descriptor works by extracting a Histogram of Oriented
 Gradients (HOG), which is a statistic of the gradient orientations
-inside that image region.
+inside the image region.
 
 @section sift-filter-usage Using the SIFT filter
 
@@ -56,19 +56,19 @@ keypoints).
 
 To use the <b>SIFT filter</b>:
  
-- Initialize the SIFT filter by ::vl_sift_new(). The
+- Initialize the SIFT filter with ::vl_sift_new(). The
   filter can be reused if the image size does not change.
 - For each octave:
-  - Compute the DOG scale space by either ::vl_sift_process_first_octave() or
+  - Compute the DOG scale space using either ::vl_sift_process_first_octave() or
    ::vl_sift_process_next_octave() (stop if ::VL_ERR_EOF is returned).
-  - Run the SIFT detector by ::vl_sift_detect() to get the keypoints.
+  - Run the SIFT detector with ::vl_sift_detect() to get the keypoints.
   - For each keypoint:
     - Use ::vl_sift_calc_keypoint_orientations() to get the keypoint orientation(s).
     - For each orientation:
       - Use ::vl_sift_calc_keypoint_descriptor() to get the keypoint descriptor.
 - Delete the SIFT filter by ::vl_sift_delete().
 
-To compute SIFT descriptors of custom keypoints, use the
+To compute SIFT descriptors of custom keypoints, use 
 ::vl_sift_calc_raw_descriptor().
 
 @section sift-scale-space The scale space
@@ -76,7 +76,7 @@ To compute SIFT descriptors of custom keypoints, use the
 The @ref sift-detector "SIFT detector" searches for image blobs at
 multiple scales. In order to do this, it first computes a Gaussian
 pyramid by gradually smoothing the image and reducing its scale
-(resolution). Then, it looks for blobls at all possible location and
+(resolution). Then, it looks for blobs at all possible locations and
 scales.
 
 Scales are sampled by octaves and by sublevels within each octave.
@@ -86,7 +86,7 @@ subdivisions for each octave @e S. While @e O is usually set to its
 maximum value, @f$o_min@f$ can be set to either 0 (native resolution),
 -1 (subpixel resolution), or a larger value (coarser resolution).  The
 effect of the number of subdivision @e S is more subtle, and we
-reccomend reading Lowe's original paper.
+recommend reading Lowe's original paper.
 
  <table>
  <caption>Parameters controlling the scale space</caption>
@@ -118,10 +118,10 @@ reccomend reading Lowe's original paper.
 
 @subsection sift-scale-space-details Scale space details
 
-In addition to the Gaussian scale space, SIFT uses the so called
-Difference of Gaussians (DoG) scale space, obtaiend by subtracting
-successive scales of the Gaussian scale space.  The ensamble of the
-smoothed images and their difference are organized as follows:
+In addition to the Gaussian scale space, SIFT uses a
+Difference of Gaussians (DoG) scale space, obtained by subtracting
+successive scales of the Gaussian scale space.  The ensemble of the
+smoothed images and their differences are organized as follows:
 
 @image html sift-ss.png
 
@@ -154,7 +154,6 @@ The scale of a DOG level obtained in such a way can be thought as
 sitting in between the scales of the two images being
 subtracted. Pictorially, the DOG levels are represented as vertical
 blue segments and sit in between the smoothed images (black segments).
-images).
 
 The SIFT detector extracts local extrema of the DoG scale space (in
 both @e x, @e y and @f$ \sigma @f$ directions). To compute such local
@@ -168,31 +167,31 @@ reason why we compute two redundant levels for each octave.
 The SIFT frames (keypoints) are extracted based on peaks (local
 extrema) of the DoG scale space. Peaks are searched in a
 neighborhood of 3x3x3 samples (in space and scale).  The previous
-figure shows the scale levels interested by this search (they are
+figure shows the scale levels involved in this search (they are
 the ones at the intersection of two green arrows). Peaks are then
-quadratically interpolated. Finally they are filtered and the
+quadratically interpolated. Finally, they are filtered and the
 orientation(s) is computed as explained in the next sections.
 
 @subsection sift-detector-peak Peak threshold
 
-Peaks too short may be generated by noise and are discarded. This
-is done by comparing the absolute value of the DoG scale space at
-the peak with the <b>peak threshold</b> @f$t_p@f$ and discarding
-the peak this value is below the threshold.
+Peaks which are too short may have been generated by noise and are
+discarded.  This is done by comparing the absolute value of the DoG
+scale space at the peak with the <b>peak threshold</b> @f$t_p@f$ and
+discarding the peak its value is below the threshold.
 
 @subsection sift-detector-edge Edge threshold
 
-Peaks too flat are generated by edges and do not yield stable
+Peaks which are too flat are often generated by edges and do not yield stable
 features. These peaks are detected and removed as follows.  Given
 a peak @f$x,y,\sigma@f$, the algorithm evaluates the Jacobian of
-the @f$x,y@f$ slice of DoG scae space at the scale @f$\sigma@f$.
-Then the following score (similar to the Harri's function) is
+the @f$x,y@f$ slice of DoG scale space at the scale @f$\sigma@f$.
+Then the following score (similar to the Harris function) is
 computed:
 
 @f[ \frac{(\mathrm{tr}\,G(x,y))^2}{\det G(x,y)} @f]
 
-This score as a minimum (equal to 4) when both eigenvaues of the
-Jacobian are equal (curved peak) and is bigger and bigger as one
+This score has a minimum (equal to 4) when both eigenvalues of the
+Jacobian are equal (curved peak) and increases as one
 of the eigenvalues grows and the other stays small. Peaks are
 retained if the score is below the quantity
 @f$(t_e+1)(t_e+1)/t_e@f$, where @f$t_e@f$ is the <b>edge
@@ -202,17 +201,17 @@ edge threshold is @f$[1,\infty)@f$.
     
 @subsection sift-detector-orientation Orientations
 
-A peak in the DoG scale space fixes 3 parameters of the keypoints,
-i.e.  position and scale. It remains to choose an orientation. In
+A peak in the DoG scale space fixes 2 parameters of the keypoint: the
+position and scale. It remains to choose an orientation. In
 order to do this, SIFT computes an histogram of the gradient
-orientations in a Gaussian window of std. dev. 1.5 times bigger than
-the scale @f$\sigma@f$ of the keypoint. 
+orientations in a Gaussian window with a standard deviation which is
+1.5 times bigger than the scale @f$\sigma@f$ of the keypoint. 
 
 @image html sift-orient.png
 
-The histogram is then smoothed and the maximum is selected.  In
+This histogram is then smoothed and the maximum is selected.  In
 addition to the biggest mode, up to other three modes whose
-amplitude is within the 80% of the biggest mode are retained too,
+amplitude is within the 80% of the biggest mode are retained and
 returned as additional orientations.
 
 <table>
@@ -277,7 +276,7 @@ rectangular area that covers its support (scaled to match the
 resolution of the corresponding image in the GSS scale space).  Since
 the descriptor can be rotated, this area has extension 
 @f$m\sigma (B_p+1)/2\sqrt{2}@f$ (see also the picture). This remark has
-significance only for` the implementation.
+significance only for the implementation.
 
 The following table summarizes the descriptors parameters along
 with their standard vale.
@@ -325,7 +324,7 @@ descriptors will be computed, but when this option is set,
 descriptors who have a small norm before scaling will be set
 explicitly to zero.
 
-Descriptor that have norm below this value are discarder set to the
+Descriptor that have norm below this value are set to the
 null vector. This is useful to remove low contrast patches. The norm
 of a descriptor is defined as the sum of the gradient magnitude
 accumulated into each of the bins.
@@ -399,7 +398,7 @@ fast_expn_init ()
 
 /** ------------------------------------------------------------------
  ** @internal 
- ** @brief Copy imge, upsample rows and take transpose
+ ** @brief Copy image, upsample rows and take transpose
  **
  ** @param dst     output image buffer.
  ** @param src     input image buffer.
@@ -1359,7 +1358,7 @@ normalize_histogram
  ** The function runs the SIFT descriptor on raw data. Here @a image
  ** is a 2 x @a width x @a height array (by convention, the memory
  ** layout is a s such the first index is the fastest varying
- ** one). The first @a width x @a heigth layer of the array contains
+ ** one). The first @a width x @a height layer of the array contains
  ** the gradient magnitude and the second the gradient angle (in
  ** radians, between 0 and @f$ 2\pi @f$). @a x, @a y and @a sigma give
  ** the keypoint center and scale respectively.
