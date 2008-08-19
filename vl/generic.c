@@ -225,7 +225,7 @@ General Public License version 2.
 #include <math.h>
 
 VL_EXPORT int vl_err_no = 0 ;
-VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
+VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] = "" ;
 
 /** ------------------------------------------------------------------
  ** @brief Get version string

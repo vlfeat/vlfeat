@@ -388,7 +388,7 @@ uStrICmp(const char *s1, const char *s2)
  ** optarg. Finally, @a next is advanced to point to the next option.
  **
  ** @return the code of the option, or -1 if the argument list is
- ** exhausetd. In case of an error (e.g. unkown option) the function
+ ** exhausetd. In case of an error (e.g. unknown option) the function
  ** prints an error message and quits the MEX file.
  **/
 
@@ -437,7 +437,7 @@ static int uNextOption(mxArray const *args[], int nargs,
   /* unknown argument */
   if (opt < 0) {
     snprintf(err_msg, sizeof(err_msg),
-             "Unkown option '%s'.", name) ;
+             "Unknown option '%s'.", name) ;
     mexErrMsgTxt(err_msg) ;
   }
 

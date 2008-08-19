@@ -22,14 +22,13 @@ General Public License version 2.
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.9.1"
 
-/** @internal @brief Stringify argument helper
+/** @internal @brief VL_STRINGIFY helper
  ** @see ::VL_STRINGIFY
  **/
 #define VL_STRINGIFY_(x) # x
 
-/** @brief Stringify macro
- **
- ** @param x macro to stringify
+/** @brief Convert the argument of 
+ ** @param x macro to convert to a string
  **
  ** For instance, the following fragment
  ** @code
@@ -154,20 +153,16 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
 /** ------------------------------------------------------------------
  ** @name Error handling 
- ** @{ 
- **/
+ ** @{ */
 
-/** @brief Last error code */
+/** @brief The number of the last error */
 extern VL_EXPORT int vl_err_no ;
 
-/** @brief Error description maximum length 
- **
- ** This is the size of the ::vl_err_msg buffer.
- **/
+/** @brief The maximum length of an error description. */
 #define VL_ERR_MSG_LEN 1024
 
-/** @brief Last error description */
-extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] ;
+/** @brief The description of the last error. */
+extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] ;
 
 #define VL_ERR_OK       0  /**< No error */
 #define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
@@ -181,8 +176,7 @@ extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] ;
 
 /** ------------------------------------------------------------------
  ** @name Common operations
- ** @{
- **/
+ ** @{ */
 
 /** @brief Min operation
  ** @param x value
@@ -229,7 +223,6 @@ VL_EXPORT double vl_toc() ;
 /** @name Endianness detection and conversion
  ** @{
  **/
-VL_INLINE int  vl_get_endianness () ;
 VL_INLINE void vl_swap_host_big_endianness_8 (void *dst, void* src) ;
 VL_INLINE void vl_swap_host_big_endianness_4 (void *dst, void* src) ;
 VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
@@ -240,7 +233,7 @@ VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
  **
  ** @param dst destination 8-byte buffer.
  ** @param src source 8-byte bufffer.
- ** @see @ref generic-data-models.
+ ** @see @ref host-arch-endianness.
  **/
 
 VL_INLINE void
@@ -274,7 +267,7 @@ vl_swap_host_big_endianness_8 (void *dst, void* src)
  **
  ** @param dst destination 4-byte buffer.
  ** @param src source 4-byte bufffer.
- ** @sa @ref generic-data-models
+ ** @sa @ref host-arch-endianness.
  **/
 
 VL_INLINE void
@@ -300,7 +293,7 @@ vl_swap_host_big_endianness_4 (void *dst, void* src)
  **
  ** @param dst destination 2-byte buffer.
  ** @param src source 2-byte bufffer.
- ** @see generic-data-models.
+ ** @see @ref host-arch-endianness.
  **/
 
 VL_INLINE void

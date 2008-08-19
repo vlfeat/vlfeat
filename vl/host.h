@@ -11,31 +11,35 @@
  They are derived from http://predef.sourceforge.net/ 
  */
 
-/** @name Identify the host operating system
+/** @name Identifying the host operating system
  ** @{ */
 #if defined(linux)     || \
     defined(__linux)   || \
-    defined(__linux__)
+    defined(__linux__) || \
+    defined(__DOXYGEN__)
 #define VL_OS_LINUX 1
 #endif
 
-#if defined(__APPLE__) & defined(__MACH__)
+#if (defined(__APPLE__) & defined(__MACH__)) || \
+     defined(__DOXYGEN__)
 #define VL_OS_MACOSX 1
 #endif
 
 #if defined(__WIN32__) || \
-    defined(_WIN32)
+    defined(_WIN32)    || \
+    defined(__DOXYGEN__)
 #define VL_OS_WIN 1
 #endif
 
-#if defined(_WIN64)
+#if defined(_WIN64) || \
+    defined(__DOXYGEN__)
 #define VL_OS_WIN64 1
 #endif
 /** @} */
 
-/** @name Identify the host compiler
+/** @name Identifying the host compiler
  ** @{ */
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__DOXYGEN__)
 # if defined(__GNUC_PATCHLEVEL__)
 #  define VL_COMPILER_GNUC (__GNUC__ * 10000 \
 + __GNUC_MINOR__ * 100 \
@@ -46,15 +50,16 @@
 # endif
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__DOXYGEN__)
 #define VL_COMPILER_MSC _MSC_VER
 #endif
 /** @} */
 
-/** @name Identify the host CPU architecture
+/** @name Identifying the host CPU architecture
  ** @{ */
 #if defined(i386)     || \
-defined(__i386__)
+    defined(__i386__) || \
+    defined(__DOXYGEN__)
 #define VL_ARCH_IX86 300
 #elif defined(__i486__)
 #define VL_ARCH_IX86 400
@@ -67,36 +72,50 @@ defined(__i386__)
 #endif
 
 #if defined(__ia64__) || \
-defined(_IA64)    || \
-defined(__IA64)   || \
-defined(__ia64)   || \
-defined(_M_IA64)
+    defined(_IA64)    || \
+    defined(__IA64)   || \
+    defined(__ia64)   || \
+    defined(_M_IA64)  || \
+    defined(__DOXYGEN__)
 #define VL_ARCH_IA64
 #endif
 /** @} */
 
-/** @name Identify the host data model
+/** @name Identifying the host data model
  ** @{ */
 #if defined(__LLP64__) || \
     defined(__LLP64)   || \
     defined(__LLP64)   || \
-    (defined(VL_COMPILER_MSC) & defined(VL_OS_WIN64))
+    (defined(VL_COMPILER_MSC) & defined(VL_OS_WIN64)) || \
+    defined(__DOXYGEN__)
 #define VL_COMPILER_LLP64
-#elif defined(__LP64__) || \
-      defined(__LP64)   || \
-      defined(__LP64)   || \
-      (defined(VL_OS_MACOSX) & defined(VL_ARCH_IA64)) 
+#endif
+
+#if defined(__LP64__) || \
+    defined(__LP64)   || \
+    defined(__LP64)   || \
+    (defined(VL_OS_MACOSX) & defined(VL_ARCH_IA64)) || \
+    defined(__DOXYGEN__)
 #define VL_COMPILER_LP64
-#else
+#endif
+
+#if (!defined(VL_COMPILER_LLP64) & !defined(VL_COMPILER_LP64)) || \
+    defined(__DOXYGEN__)
 #define VL_COMPILER_ILP32
 #endif
 /** @} */
 
-/** @name Identify the host endianness
+/** @name Identifying the host endianness
  ** @{ */
-#if defined(__LITTLE_ENDIAN__) || defined(VL_ARCH_IX86) || defined(VL_ARCH_IA64)
+#if defined(__LITTLE_ENDIAN__) || \
+    defined(VL_ARCH_IX86)      || \
+    defined(VL_ARCH_IA64)      || \
+    defined(__DOXYGEN__)
 #define VL_ARCH_LITTLE_ENDIAN
-#else
+#endif
+
+#if  defined(__DOXYGEN__) || \
+    !defined(VL_ARCH_LITTLE_ENDIAN)
 #define VL_ARCH_BIG_ENDIAN
 #endif
 /** @} */
@@ -112,7 +131,8 @@ defined(_M_IA64)
 #endif
 #endif
 
-#if defined(VL_COMPILER_GNUC)
+#if defined(VL_COMPILER_GNUC) || \
+    defined(__DOXYGEN__)
 #define VL_INLINE static __inline__
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __attribute__((visibility ("default")))
@@ -166,7 +186,7 @@ typedef vl_uint32           vl_uintptr ;
 /** @} */
 
 /** ------------------------------------------------------------------
- ** @name Printintg atomic data types
+ ** @name Printintg the atomic data types
  ** @{ */
 
 /** @def VL_FL_INT64 

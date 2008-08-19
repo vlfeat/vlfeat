@@ -21,29 +21,40 @@
  and CPU architecture. It also provides a few features
  to abstract from such details.
  
+ - @ref host-os "Host operating system"
  - @ref host-compiler "Host compiler"
    - @ref host-compiler-data-model "Data models"
    - @ref host-compiler-other      "Oter compiler specific features"
  - @ref host-arch "Host CPU architecture"
    - @ref host-arch-endianness "Endianness"
  
+ @section host-os Host operating system
+ 
+ The module defines a symbol to indentify the host operating system:
+ ::VL_OS_WIN for Windows, ::VL_OS_LINUX for Linux, ::VL_OS_MACOSX for
+ Mac OS X, and so on.
+ 
  @section host-compiler Host compiler 
  
- For each supported compiler, this module defines a corresponding
- symbol (e.g. ::VL_COMPILER_MSC, ::VL_COMPILER_GNUC) whose
- integer value is equal to the version of the compiler. It also defines
- one of ::VL_COMPILER_ILP32, ::VL_COMPILER_LP32, ::VL_COMPILER_LP64
- according to the compiler data model and defines the a set of atomic data types
- (::vl_int8, ::vl_int16, ::vl_int32, etc) of given width.
+ The module defines a symbol to indetify the host compiler:
+ ::VL_COMPILER_MSC for Microsoft Visual C++, ::VL_COMPILER_GNUC for GNU C,
+ and so on. The (integer) value of such symbols 
+ corresponds the version of the  compiler.
+ 
+ The module defines a symbol to identify the data model of the compiler:
+ ::VL_COMPILER_ILP32, ::VL_COMPILER_LP32, or ::VL_COMPILER_LP64 (see
+ Sect. @ref host-compiler-data-model).
+ For convenience, it also defines a number of atomic types of prescribed
+ width (::vl_int8, ::vl_int16, ::vl_int32, etc.).
 
- @remark While some of such functionalities can be found in the 
- standard header @c stdint.h, this unfortunately is not supported
+ @remark While some of such functionalities are provided by the 
+ standard header @c stdint.h, the latter is not supported
  by all platforms.
  
  @subsection host-compiler-data-model Data models
  
  The C language defines a number of atomic data types (such as @c char, @c short,
- @c int and so on). Unfortunately the number of bits (width)
+ @c int and so on). The number of bits (width)
  used to represent each data type depends on the compiler data model.
  The following table summarizes the relevant conventions:
  
@@ -106,18 +117,13 @@
  </tr>
  </table>
  
- @subsection host-compiler-other Other compiler specific features
-  
- Creating a dynamically linked library requires non-standard features
- of the C compiler to identify which symbols should be exported by
- the library and which should not. Similarly, the declaration of inline
- functions is a non-standard feature in C-89 compilers such as Visual C.
- 
- The details on how such declarations are performed on each specific platform
- are hidden by the following macros:
- 
- - ::VL_EXPORT declares symbols exported by the library.
- - ::VL_INLINE declares an inline function.
+ @subsection host-compiler-other Other compiler-specific features
+
+ The module provides the macro ::VL_EXPORT to declare symbols exported
+ from
+ the library and the macro ::VL_INLINE to declare inline functions.
+ Such features are not part of the C89 standard, and change
+ depending on the compiler.
  
  @par "Example:"
  The following header file declares a function @c f that
@@ -188,19 +194,19 @@
   
  @section host-arch Host CPU architecture
  
- For each supported architecture this module defines a corresponding
- symbol (e.g. ::VL_ARCH_IX86, ::VL_ARCH_IA64).
+ The module defines a symbol to identify the host CPU architecture:
+ ::VL_ARCH_IX86 for Intel x86, ::VL_ARCH_IA64 for Intel 64, and so on.
 
  @subsection host-arch-endianness Endianness
  
- The macros ::VL_ARCH_BIG_ENDIAN and ::VL_ARCH_LITTLE_ENDIAN
- can be used to detect the architecture endianness
- the host endianness and the functions 
+ The module defines a symbol to identify the host CPU enianness:
+ ::VL_ARCH_BIG_ENDIAN for big endian and ::VL_ARCH_LITTLE_ENDIAN for
+ little endian. The functions 
  ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
  ::vl_swap_host_big_endianness_2() to change the endianness
  of data (from/to host and network order).
  
- <b>Endianness</b> concerns how multi-byte data types 
+ Recall that <em>endianness</em> concerns the way multi-byte data types 
  (such as 16, 32 and 64 bits
  integres) are stored into the addressable memory. 
  All CPUs uses a continguous address range to store atomic data types
@@ -209,7 +215,7 @@
  the order may differ.
   
  - The convention is <em>big endian</em>, or in <em>network order</em>,
- if the most significant byte of the multi-byte data type is assigned to 
+ if the most significant byte of the multi-byte data types is assigned to 
  the smaller memory address. This is the convention used for instance
  by the PPC architecture.
  
@@ -223,7 +229,7 @@
  &ldquo;little endian&rdquo; means &ldquo;little endian first&rdquo;, 
  in the sense that the address of the least significant byte comes first.
 
- Endianness becomes a concern when data is exchangend with processors
+ Endianness is a concern when data is either exchangend with processors
  that use different conventions, 
  transmitted over a network, or stored
  to a file. For the latter two cases, one usually saves data in 
@@ -255,28 +261,57 @@
  ** @code
  ** 10000 * MAJOR + 100 * MINOR + PATCHLEVEL
  ** @endcode
+ ** @see @ref host-compiler
  **/
 
 /** @def VL_COMPILER_MSC
  ** @brief Defined if the host compiler is Microsoft Visual C++.
+ ** @see @ref host-compiler
+ **/
+
+/** @def VL_COMPILER_LLP64
+ ** @brief Defined if the host compiler data model is LLP64.
+ ** @see @ref host-compiler-data-model
+ **/
+
+/** @def VL_COMPILER_LP64
+ ** @brief Defined if the host compiler data model is LP64.
+ ** @see @ref host-compiler-data-model
+ **/
+
+/** @def VL_COMPILER_ILP32
+ ** @brief Defined if the host compiler data model is ILP32.
+ ** @see @ref host-compiler-data-model
  **/
 
 /** @def VL_ARCH_IX86
  ** @brief Defined if the host CPU is of the Intel x86 family.
+ ** @see @ref host-arch
  **/
 
 /** @def VL_ARCH_IA64
  ** @brief Defined if the host CPU is of the Intel Architecture-64 family.
+ ** @see @ref host-arch
+ **/
+
+/** @def VL_ARCH_LITTLE_ENDIAN
+ ** @brief Defined if the host CPU is little endian
+ ** @see @ref host-arch-endianness
+ **/
+
+/** @def VL_ARCH_BIG_ENDIAN
+ ** @brief Defined if the host CPU is big endian
+ ** @see @ref host-arch-endianness
  **/
 
 /** @def VL_INLINE
  ** @brief Adds appropriate inline function qualifier
- ** @sa main-style-inline
+ ** @see @ref host-compiler-others
  **/
 
 /** @def VL_EXPORT
  ** @brief Declares a DLL exported symbol
- ** @sa @ref generic-symbols
+ ** @see @ref host-compiler-others
  **/
 
 /** --------------------------------------------------------------- */
@@ -358,7 +393,12 @@ struct x86cpu_ const* _vl_x86cpu_get()
 vl_bool simd_enabled = 1 ;
 
 /** @brief Enalbe/disable usage of SIMD instructions
- ** @param x if @c true SIMD instructions are used (if available).
+ ** @param x set to @c true to enable SIMD instructions.
+ ** 
+ ** Notice that usage of SIMD instructions may be prevented due
+ ** to lack of CPU support and data alignment issues.
+ **
+ ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
  **/
 void vl_set_simd_enabled (vl_bool x)
 {

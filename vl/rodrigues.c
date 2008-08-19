@@ -219,8 +219,7 @@ void vl_irodrigues(double* om_pt, double* dom_pt, const double* R_pt)
     */
     
     double W_pt [9], x, y, z ;
-    W_pt[0] = 0.5*( R(0,0) + R(0,0) ) - 1.0 ;
-    
+    W_pt[0] = 0.5*( R(0,0) + R(0,0) ) - 1.0 ;    
     W_pt[0] = 0.5*( R(1,0) + R(0,1) ) ;
     W_pt[0] = 0.5*( R(2,0) + R(0,2) );
     
