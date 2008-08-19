@@ -1,39 +1,71 @@
+function test_imsmooth
+
 I = im2double(imread('data/spots.jpg')) ;
 I = max(min(imresize(I,2),1),0) ;
 I = im2single(I) ;
-J = imsmooth(I, 1, 'padding', 'zero', 'verbose') ;
-figure(2) ; clf ;
-imagesc([I J]) ;
 
-I = im2single(I) ;
-J = imsmooth(I, 1, 'padding', 'continuity', 'verbose') ;
-figure(3) ; clf ;
-imagesc([I J]) ;
+global fign ;
+fign = 1 ;
+step = 1 ;
+ker  = 'gaussian' ;
 
-J = imsmooth(I, 1, 'subsample', 2, 'verbose') ;
-figure(4) ; clf ;
-imagesc(J) ;
+testmany(I,'triangular',1) ;
+return ;
+testmany(I,'triangular',2) ;
 
-tim=[] ;
-for sigma=logspace(-2,2,100) 
-  tic ; I_ = imsmooth(I, sigma) ; tim = [tim toc] ;
-  figure(5) ; subplot(1,2,1) ;
-  imagesc(max(0,min(1,I_))) ; 
-  subplot(1,2,2) ; plot(tim) ;
-  drawnow ;
+testmany(I,'gaussian',1) ;
+testmany(I,'gaussian',2) ;
+
+function testmany(I,ker,step)
+global fign ;
+sigmar = [0, 1, 10, 100] ;
+for sigma = sigmar
+  [I1,I2,I3] = testone(I,ker,sigma,step) ;
+  compare(fign,I1,I2,I3,sprintf('%s, sigma %g, sub. step %d', ker, sigma, step)) ;
+  fign=fign+1 ;
 end
 
-%I=im2double(I);
-%tic ;
-%for t=1:10000
-%  imsmooth(I, 1, 'nosimd') ;
-%end
-%toc ;
+function I=icut(I)
+I=min(max(I,0),1) ;
 
-%tic ;
-%for t=1:10000
-%  imsmooth(I, 1) ;
-%end
-%toc ;
+function [I1,I2,I3]=testone(I,ker,sigma,step)
+switch ker
+  case 'gaussian'
+    W = ceil(4*sigma) ;
+    g = exp(-.5*((-W:W)/(sigma+eps)).^2) ;
+  case 'triangular'
+    W = max(round(sigma),1) ;
+    g = W - abs(-W+1:W-1) ;
+end
+g = g / sum(g) ;
 
+I1 = imconv(I,g) ;
+I1 = I1(1:step:end,1:step:end,:) ;
+I2 = imsmooth(I,sigma,'kernel',ker,'padding','zero',      'verbose','subsample',step) ;
+I3 = imsmooth(I,sigma,'kernel',ker,'padding','continuity','verbose','subsample',step) ;
 
+keyboard
+
+function [I1,I2]=triang(I,sigma)
+I1 = I ;
+I2 = imsmooth(I,sigma,'verbose') ;
+
+function compare(n,I1,I2,I3,tit)
+figure(n) ; clf ; colormap gray ;
+subplot(1,3,1) ; axis equal ; imagesc(icut(I1)) ; axis off ; 
+title('Matlab') ;
+subplot(1,3,2) ; axis equal ; imagesc(icut(I2)) ; axis off ; 
+title('imsmooth zeropad') ;
+subplot(1,3,3) ; axis equal ; imagesc(icut(I3)) ; axis off ; 
+title('imsmooth contpad') ;
+set(n,'name',tit) ;
+
+function I=imconv(I,g)
+if strcmp(class(I),'single')
+  g = single(g) ;
+else
+  g = double(g) ;
+end
+for k=1:size(I,3) 
+  I(:,:,k) = conv2(g,g,I(:,:,k),'same'); 
+end

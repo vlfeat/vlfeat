@@ -8,12 +8,12 @@
 
 #include "generic.h"
 
-/** @name Image convolution flags 
+/** @name Image convolution flags
  ** @{ */
-#define VL_PAD_BY_ZERO       (0x0 << 0) /**< zero padding */
-#define VL_PAD_BY_CONTINUITY (0x1 << 0) /**< pad by continuity */
-#define VL_PAD_MASK          (0x3)      /**< padding control field selector */
-#define VL_TRANSPOSE         (0x1 << 2) /**< traspose result */
+#define VL_PAD_BY_ZERO       (0x0 << 0) /**< @brief Pad with zeroes. */
+#define VL_PAD_BY_CONTINUITY (0x1 << 0) /**< @brief Pad by continuity. */
+#define VL_PAD_MASK          (0x3)      /**< @brief Padding field selector. */
+#define VL_TRANSPOSE         (0x1 << 2) /**< @brief Traspose result. */
 /** @} */
 
 /** @name Image convolution

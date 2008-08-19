@@ -7,7 +7,15 @@
 
 /** @file imopv.h
  ** 
- ** This module includes vectorized image operations.
+ ** This module provides image operations such as convolution.
+ **
+ ** Some operations are optimized to exploit possible SIMD instructions.
+ ** This requires image data to be properly aligned, along with
+ ** the image stride.
+ **
+ ** The function ::vl_imconvcol_vf() can be used to compute separable
+ ** convolutions. The function vl_imconvcoltri_vf() is an optimized
+ ** version that works with triangular kernels.
  **/
 
 #include "imopv.h"
@@ -65,12 +73,31 @@
  ** the image boundary. To cope with this edge cases, the function either 
  ** pads the image by zero (::VL_PAD_BY_ZERO) or 
  ** with the values at the boundary (::VL_PAD_BY_CONTINUITY).
- ** 
- ** The function attempts to use the host processor SIMD technology.
- ** This requires the data @a src_stride 
- ** to be properly aligned (for instance,
- ** Intel SSE2 requires the data to be aligned to 16 bytes). 
- ** There may be also
- ** a small computational advantage if @a src is aligned as well. Use
- ** the flag ::VL_NO_SIMD to force disabling SIMD based calculations.
+ **/
+
+/** @fn vl_imconvcol_vd(double*,int,double const*,int,int,int,double const*,int,int,int,unsigned int)
+ ** @see ::vl_imconvcol_vf()
+ **/
+
+/** @fn vl_imconvcoltri_vf(float*,int,float const*,int,int,int,int,int,unsigned int)
+ ** @brief Convolve image along columns by a triangular kernel
+ **
+ ** @param dst destinaton image.
+ ** @param dst_stride width of the destination image including padding.
+ ** @param src source image.
+ ** @param src_width width of the source image.
+ ** @param src_height height of the source image.
+ ** @param src_stride width of the source image including padding.
+ ** @param filt_size half length of the filter support.
+ ** @param step sub-sampling step.
+ ** @param flags operation modes.
+ **
+ ** The function convolves the column of the image @a src
+ ** by a triangular filter whose support is <code>2*filt_size</code> pixels long.
+ **
+ ** The operation of the function is otherwise similar to ::vl_imconvocl().
+ **/ 
+
+/** @fn vl_imconvcoltri_vd(double*,int,double const*,int,int,int,int,int,unsigned int)
+ ** @see ::vl_imconvcoltri_vf()
  **/

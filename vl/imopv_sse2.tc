@@ -226,6 +226,8 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
   vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
   
   FLT * buff = vl_malloc(sizeof(FLT) * (src_height + filt_size)) ;
+#define fa (1.0 / (double) (filt_size + 1))
+  FLT scale = fa*fa*fa*fa ;  
   buff += filt_size ;
   
   while (x < src_width) {
@@ -277,7 +279,7 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
       /* compute the filter backward */
       for (y = src_height - 1 ; y >= 0 ; --y) {
         dst [x*stridex + y*stridey] 
-        = buff [y] - buff [y - filt_size] ;
+        = scale * (buff [y] - buff [y - filt_size]) ;
       }
     } /* next y */
     x += 1 ;

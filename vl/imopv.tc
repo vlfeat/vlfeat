@@ -145,14 +145,13 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
   int dheight = (src_height - 1) / step + 1 ;
   vl_bool transp = flags & VL_TRANSPOSE ;
   vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
-  
+#define fa ((double)(filt_size))
+  FLT scale = ((FLT) (1.0/(fa*fa))) ;
   FLT * buff = vl_malloc(sizeof(FLT) * (src_height + filt_size)) ;
   buff += filt_size ;
-    
+
   while (x < src_width) {
     FLT const *srci ;
-    int stridex = transp ? dst_stride : 1 ;
-    int stridey = transp ? 1 : dst_stride ;
     srci = src + x + src_stride * (src_height - 1) ;
     
     /* integrate backward the column */
@@ -185,14 +184,19 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
     /* integrate forward the column */
     for (y = - filt_size + 1 ; y < src_height ; ++y) {
       buff [y] += buff [y - 1] ;
-    } 
+    }
     
     /* compute the filter backward */
-    for (y = src_height - 1 ; y >= 0 ; --y) {
-      dst [x*stridex + y*stridey] 
-      = buff [y] - buff [y - filt_size] ;
+    {
+      int stride = transp ? 1 : dst_stride ;
+      dst += dheight * stride ;
+      for (y = step * (dheight - 1) ; y >= 0 ; y -= step) {
+        *dst = scale * (buff [y] - buff [y - filt_size]) ;
+        dst -= stride ;
+      }
     }
     x += 1 ;
+    dst += transp ? dst_stride : 1 ;    
   } /* next x */ 
   vl_free (buff - filt_size) ;
 }

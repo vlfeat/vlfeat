@@ -23,8 +23,8 @@ General Public License version 2.
 /* option codes */
 enum {
   opt_padding = 0,
-  opt_no_simd,
   opt_subsample,
+  opt_kernel,
   opt_verbose 
 } ;
 
@@ -33,8 +33,11 @@ uMexOption options [] = {
 {"Padding",      1,   opt_padding       },
 {"Verbose",      0,   opt_verbose       },
 {"Subsample",    1,   opt_subsample     },
+{"Kernel",       1,   opt_kernel        },
 {0,              0,   0                 }
 } ;
+
+enum {GAUSSIAN, TRIANGULAR} ;
 
 void
 mexFunction(int nout, mxArray *out[], 
@@ -47,17 +50,16 @@ mexFunction(int nout, mxArray *out[],
   mxArray const  *optarg ;
 
   int padding = VL_PAD_BY_CONTINUITY ;
+  int kernel = GAUSSIAN ;
   int flags ;
-  vl_bool no_simd = 0 ;
   int subsample = 1 ;
   int verb = 0 ;  
   double sigma ;
-  mxClassID classid ;
+  mxClassID classid ;  
   
-  int const *dims ;  
-
-  int M,N,K,W,j,k,ndims ;
+  int M,N,K,j,k,ndims ;
   int M_, N_, dims_[3] ;
+  int const *dims ;
   
   /* -----------------------------------------------------------------
    *                                               Check the arguments
@@ -80,9 +82,9 @@ mexFunction(int nout, mxArray *out[],
         }
         mxGetString(optarg, buf, buflen) ;
         buf [buflen - 1] = 0 ;
-        if (uStrICmp("zero", buf)) {
+        if (uStrICmp("zero", buf) == 0) {
           padding = VL_PAD_BY_ZERO ;
-        } else if (uStrICmp("continuity", buf)) {
+        } else if (uStrICmp("continuity", buf) == 0) {
           padding = VL_PAD_BY_CONTINUITY ;
         } else {
           mexErrMsgTxt("PADDING can be either ZERO or CONTINUITY") ;
@@ -100,14 +102,29 @@ mexFunction(int nout, mxArray *out[],
         }
         break ;
 
+      case opt_kernel :
+      {
+        enum {buflen = 32} ;
+        char buf [buflen] ;
+        if (!uIsString(optarg, -1)) {
+          mexErrMsgTxt("KERNEL argument must be a string") ;
+        }
+        mxGetString(optarg, buf, buflen) ;
+        buf [buflen - 1] = 0 ;
+        if (uStrICmp("gaussian", buf) == 0) {
+          kernel = GAUSSIAN ;
+        } else if (uStrICmp("triangular", buf) == 0) {
+          kernel = TRIANGULAR ;
+        } else {
+          mexErrMsgTxt("Unknown kernel type") ;
+        }
+        break ;
+      }
+
       case opt_verbose :
         ++ verb ;
         break ;
-        
-      case opt_no_simd :
-        no_simd = 1 ;
-        break ;
-        
+                
       default: 
         assert(0) ;
     }
@@ -148,30 +165,35 @@ mexFunction(int nout, mxArray *out[],
   
   out[OUT_J] = mxCreateNumericArray(ndims, dims_, classid, mxREAL) ;
 
-  if (verb) {    
-    char const * msg = 0 ;
-    mexPrintf("%dx%d -> %dx%d, ", N, M, N_, M_) ;
+  if (verb) {
+    char const *classid_str = 0, *kernel_str = 0, *padding_str = 0 ;
     switch (padding) {
-      case VL_PAD_BY_ZERO       : msg = "with zeroes" ; break ;
-      case VL_PAD_BY_CONTINUITY : msg = "by continuity" ; break ;
+      case VL_PAD_BY_ZERO       : padding_str = "with zeroes" ; break ;
+      case VL_PAD_BY_CONTINUITY : padding_str = "by continuity" ; break ;
       default: assert (0) ; break ;
     }
-    mexPrintf("imsmooth: padding %s, ", msg) ;
     switch (classid) {
-      case mxDOUBLE_CLASS: msg = "DOUBLE" ; break ;
-      case mxSINGLE_CLASS: msg = "SINGLE" ; break ;
+      case mxDOUBLE_CLASS: classid_str = "DOUBLE" ; break ;
+      case mxSINGLE_CLASS: classid_str = "SINGLE" ; break ;
       default: assert (0) ; break ;
     }
-    mexPrintf("data is %s, ", msg) ;
-    if (no_simd) mexPrintf("no SIMD accel,") ;
-    else mexPrintf("SIMD accel, ") ;    
-    mexPrintf("subsample: %d\n", subsample) ;
+    switch (kernel) {
+      case GAUSSIAN:   kernel_str = "Gaussian" ; break ;
+      case TRIANGULAR: kernel_str = "triangular" ; break ;
+      default: assert (0) ; break ;
+    }
+    
+    mexPrintf("imsmooth: [%dx%d] -> [%dx%d] (%s, sampling per. %d)\n", 
+              N, M, N_, M_, classid_str, subsample) ;
+    mexPrintf("          padding: %s\n", padding_str) ;
+    mexPrintf("          kernel: %s\n", kernel_str) ;
+    mexPrintf("          sigma: %g\n", sigma) ;
+    mexPrintf("          SIMD enabled: %s\n", vl_get_simd_enabled() ? "yes" : "no") ;
   }
   
   /* -----------------------------------------------------------------
    *                                                        Do the job
    * -------------------------------------------------------------- */ 
-  W = ceil (4 * sigma) ;
   flags  = padding ;
   flags |= VL_TRANSPOSE ;
   
@@ -179,15 +201,21 @@ mexFunction(int nout, mxArray *out[],
     case mxSINGLE_CLASS: 
 #undef FLT
 #undef VL_IMCONVCOL
+#undef VL_IMCONVCOLTRI
 #define FLT float
 #define VL_IMCONVCOL vl_imconvcol_vf
+#define VL_IMCONVCOLTRI vl_imconvcoltri_vf
 #include "imsmooth.tc"
+      break ;
     case mxDOUBLE_CLASS:
 #undef FLT
 #undef VL_IMCONVCOL
+#undef VL_IMCONVCOLTRI
 #define FLT double 
 #define VL_IMCONVCOL vl_imconvcol_vd
+#define VL_IMCONVCOLTRI vl_imconvcoltri_vd
 #include "imsmooth.tc"
+      break ;
     default: assert (0) ; break ;
   }
 }
