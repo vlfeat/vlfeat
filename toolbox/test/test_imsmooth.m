@@ -10,7 +10,6 @@ step = 1 ;
 ker  = 'gaussian' ;
 
 testmany(I,'triangular',1) ;
-return ;
 testmany(I,'triangular',2) ;
 
 testmany(I,'gaussian',1) ;
@@ -43,8 +42,6 @@ I1 = imconv(I,g) ;
 I1 = I1(1:step:end,1:step:end,:) ;
 I2 = imsmooth(I,sigma,'kernel',ker,'padding','zero',      'verbose','subsample',step) ;
 I3 = imsmooth(I,sigma,'kernel',ker,'padding','continuity','verbose','subsample',step) ;
-
-keyboard
 
 function [I1,I2]=triang(I,sigma)
 I1 = I ;

@@ -34,6 +34,7 @@
       
     case TRIANGULAR:
     {
+      sigma = VL_MAX(sigma, 1) ;
       for (k = 0 ; k < K ; ++k) {                                 
         VL_IMCONVCOLTRI (buffer, N_,                                      
                          I_pt, M, N, M,                                  

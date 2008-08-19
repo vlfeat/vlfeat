@@ -94,6 +94,7 @@
  **
  ** The function convolves the column of the image @a src
  ** by a triangular filter whose support is <code>2*filt_size</code> pixels long.
+ ** The minimum filter size is 1, which corresponds to a delta function.
  **
  ** The operation of the function is otherwise similar to ::vl_imconvocl().
  **/ 
