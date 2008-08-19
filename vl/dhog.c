@@ -266,11 +266,12 @@ VL_INLINE
 void _vl_dhog_with_flat_window (VlDhogFilter* f)
 {
   int binx, biny, bint, centx, centy ;
-  float *ker = _vl_dhog_new_kernel(f, -1);
+/*  float *ker = _vl_dhog_new_kernel(f, -1);*/
   int W = f->bin_size - 1 ;
     
   for (bint = 0 ; bint < NBO ; ++bint) {
-    
+
+    /*
     vl_imconvcol_vf (f->tmp2, f->height,
                      f->hist [bint], f->width, f->height, f->width,
                      ker, -W, +W, 1,
@@ -280,6 +281,18 @@ void _vl_dhog_with_flat_window (VlDhogFilter* f)
                      f->tmp2, f->height, f->width, f->height,
                      ker, -W, +W, 1,
                      VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    */
+    
+    vl_imconvcoltri_vf (f->tmp2, f->height,
+                        f->hist [bint], f->width, f->height, f->width,
+                        W, 1,
+                        VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    
+    vl_imconvcoltri_vf (f->tmp, f->width,
+                        f->tmp2, f->height, f->width, f->height,
+                        W, 1,
+                        VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    
     
     for (biny = 0 ; biny < NBP ; ++biny) {
       for (binx = 0 ; binx < NBP ; ++binx) {
@@ -303,7 +316,7 @@ void _vl_dhog_with_flat_window (VlDhogFilter* f)
       } /* binx */
     } /* biny */
   } /* bint */
-  vl_free (ker) ;
+/*  vl_free (ker) ;*/
 }
 
 /** ------------------------------------------------------------------
