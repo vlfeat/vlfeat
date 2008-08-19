@@ -21,6 +21,12 @@
  and CPU architecture. It also provides a few features
  to abstract from such details.
  
+ - @ref host-compiler "Host compiler"
+   - @ref host-compiler-data-model "Data models"
+   - @ref host-compiler-other      "Oter compiler specific features"
+ - @ref host-arch "Host CPU architecture"
+   - @ref host-arch-endianness "Endianness"
+ 
  @section host-compiler Host compiler 
  
  For each supported compiler, this module defines a corresponding
@@ -33,7 +39,9 @@
  @remark While some of such functionalities can be found in the 
  standard header @c stdint.h, this unfortunately is not supported
  by all platforms.
-  
+ 
+ @subsection host-compiler-data-model Data models
+ 
  The C language defines a number of atomic data types (such as @c char, @c short,
  @c int and so on). Unfortunately the number of bits (width)
  used to represent each data type depends on the compiler data model.
@@ -98,12 +106,92 @@
  </tr>
  </table>
  
+ @subsection host-compiler-other Other compiler specific features
+  
+ Creating a dynamically linked library requires non-standard features
+ of the C compiler to identify which symbols should be exported by
+ the library and which should not. Similarly, the declaration of inline
+ functions is a non-standard feature in C-89 compilers such as Visual C.
+ 
+ The details on how such declarations are performed on each specific platform
+ are hidden by the following macros:
+ 
+ - ::VL_EXPORT declares symbols exported by the library.
+ - ::VL_INLINE declares an inline function.
+ 
+ @par "Example:"
+ The following header file declares a function @c f that
+ should be visible from outside the library.
+ @code 
+ #include <vl/generic.h>
+ VL_EXPORT void f () ;
+ VL_EXPORT int i ;
+ @endcode
+ Notice that the macro ::VL_EXPORT needs not to be included again
+ when the function is defined.
+ 
+ @par "Example:"
+ The following header file declares an inline function @c f:
+ @code
+ #include <vl/generic.h>
+ VL_INLINE int f() ;
+ 
+ VL_INLINE int f() { return 1 ; }
+ @endcode
+ Here the first instruction defines the function @c f, where the second
+ declares it. Notice that since this is an inline function, its definition
+ must be found in the header file rather than in an implementation file.
+ Notice also that definition and declaration can be merged.
+ 
+ These macros translate according to the following tables:
+ 
+ <table style="font-size:70%;">
+ <caption>Macros for exporting library symbols</caption>
+ <tr>
+ <td>Platform</td>
+ <td>Macro name</td>
+ <td>Value when building the library</td>
+ <td>Value when importing the library</td>
+ </tr>
+ <tr>
+ <td>Unix/GCC</td>
+ <td>::VL_EXPORT</td>
+ <td>empty (assumes <c>-visibility=hidden</c> GCC option)</td>
+ <td><c>__attribute__((visibility ("default")))</c></td>
+ </tr>
+ <tr>
+ <td>Win/Visual C++</td>
+ <td>::VL_EXPORT</td>
+ <td>@c __declspec(dllexport)</td>
+ <td>@c __declspec(dllimport)</td>
+ </tr>
+ </table>
+ 
+ <table style="font-size:70%;">
+ <caption>Macros for declaring inline functions</caption>
+ <tr>
+ <td>Platform</td>
+ <td>Macro name</td>
+ <td>Value</td>
+ </tr>
+ <tr>
+ <td>Unix/GCC</td>
+ <td>::VL_INLINE</td>
+ <td>static inline</td>
+ </tr>
+ <tr>
+ <td>Win/Visual C++</td>
+ <td>::VL_INLINE</td>
+ <td>static __inline</td>
+ </tr>
+ </table> 
+  
  @section host-arch Host CPU architecture
  
  For each supported architecture this module defines a corresponding
  symbol (e.g. ::VL_ARCH_IX86, ::VL_ARCH_IA64).
 
- @subsection host-arch-endianness CPU endianness
+ @subsection host-arch-endianness Endianness
  
  The macros ::VL_ARCH_BIG_ENDIAN and ::VL_ARCH_LITTLE_ENDIAN
  can be used to detect the architecture endianness

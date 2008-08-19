@@ -38,12 +38,13 @@ General Public License version 2.
    - @ref design-portability "Portability"
  - @ref main-glossary "Glossary"
  - Support functionalities
-   - @ref generic.h   "Atomic data types, errors, and others"
+   - @ref host.h      "Platform abstraction"
+   - @ref generic.h   "Errors, memory, logging, and others"
    - @ref mathop.h    "Math operations"
    - @ref random.h    "Random number generator"
    - @ref stringop.h  "String operations"
    - @ref imop.h      "Image operations"
-   - @ref rodrigues.h "Rodrigues formuals"
+   - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
  - Algorithms
    - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
@@ -171,7 +172,7 @@ General Public License version 2.
   a disk.
   - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
   (usually a vector) which describes compactly the appearance of an
-  image region (usually correspondnent to a feature frame).
+  image region (usually corresponding to a feature frame).
 **/
 
 /** 
@@ -179,96 +180,12 @@ General Public License version 2.
 
  This module provides the following functionalities:
  
- - @ref generic-data-models
  - @ref generic-error  
  - @ref generic-heap
  - @ref generic-logging
 
- @section generic-data-models Data models
- 
  @see http://predef.sourceforge.net/index.php
-
  
- @section generic-symbols Exported symbols and inline functions
-
- Creating a dynamically linked library requires non-standard features
- of the C compiler to identify which symbols should be exported by
- the library and which should not. Similarly, the declaration of inline
- functions is a non-standard feature in C-89 compilers such as Visual C.
-  
- The details on how such declarations are performed on each specific platform
- are hiddend by the following macros:
-
- - ::VL_EXPORT declares symbols exported by the library.
- - ::VL_INLINE declares an inline function.
- 
- @par "Example:"
- The following header file declares a function @c f that
- should be visible from outside the library.
- @code 
- #include <vl/generic.h>
- VL_EXPORT void f () ;
- VL_EXPORT int i ;
- @endcode
- Notice that the macro ::VL_EXPORT needs not to be included again
- when the function is defined.
- 
- @par "Example:"
- The following header file declares an inline function @c f:
- @code
- #include <vl/generic.h>
- VL_INLINE int f() ;
- 
- VL_INLINE int f() { return 1 ; }
- @endcode
- Here the first instruction defines the function @c f, where the second
- declares it. Notice that since this is an inline function, its definition
- must be found in the header file rather than in an implementation file.
- Notice also that definition and declaration can be merged.
- 
- These macros translate according to the following tables:
-
-  <table style="font-size:70%;">
-  <caption>Macros for exporting library symbols</caption>
-  <tr>
-  <td>Platform</td>
-  <td>Macro name</td>
-  <td>Value when building the library</td>
-  <td>Value when importing the library</td>
-  </tr>
-  <tr>
-  <td>Unix/GCC</td>
-  <td>::VL_EXPORT</td>
-  <td>empty (assumes <c>-visibility=hidden</c> GCC option)</td>
-  <td><c>__attribute__((visibility ("default")))</c></td>
-  </tr>
-  <tr>
-  <td>Win/Visual C++</td>
-  <td>::VL_EXPORT</td>
-  <td>@c __declspec(dllexport)</td>
-  <td>@c __declspec(dllimport)</td>
-  </tr>
-  </table>
-
-  <table style="font-size:70%;">
-  <caption>Macros for declaring inline functions</caption>
-  <tr>
-  <td>Platform</td>
-  <td>Macro name</td>
-  <td>Value</td>
-  </tr>
-  <tr>
-  <td>Unix/GCC</td>
-  <td>::VL_INLINE</td>
-  <td>static inline</td>
-  </tr>
-  <tr>
-  <td>Win/Visual C++</td>
-  <td>::VL_INLINE</td>
-  <td>static __inline</td>
-  </tr>
-  </table>
-
   @section generic-error Error handling
 
   Error handling uses the same style of the standard C library. Most

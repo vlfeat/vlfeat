@@ -189,8 +189,8 @@ define C
 } ; quiet
 endef
 
-# to disable the above, define the following
-C = $($(1))
+# Uncomment this line to unsuppress printing commands:
+# C = $($(1))
 
 
 # --------------------------------------------------------------------
