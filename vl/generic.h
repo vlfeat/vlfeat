@@ -17,40 +17,10 @@ General Public License version 2.
 #include <time.h>
 #include <assert.h>
 
+#include "host.h"
+
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.9.1"
-
-/** @def VL_INLINE
- ** @brief Adds appropriate inline function qualifier
- ** @sa main-style-inline
- **/
-
-/** @def VL_EXPORT
- ** @brief Declares a DLL exported symbol
- ** @sa @ref generic-symbols
- **/
-
-#ifdef WIN32
-#define VL_INLINE static __inline
-#define snprintf _snprintf
-#define isnan _isnan
-
-#ifdef VL_BUILD_DLL
-#define VL_EXPORT __declspec(dllexport)
-#else
-#define VL_EXPORT __declspec(dllimport)
-#endif
-
-#else /* UNIX */
-#define VL_INLINE static __inline__
-
-#ifdef VL_BUILD_DLL
-#define VL_EXPORT __attribute__((visibility ("default")))
-#else
-#define VL_EXPORT
-#endif
-
-#endif
 
 /** @internal @brief Stringify argument helper
  ** @see ::VL_STRINGIFY
@@ -69,60 +39,6 @@ General Public License version 2.
  ** will print the string @c x.y.z.
  **/
 #define VL_STRINGIFY(x) VL_STRINGIFY_(x)
-
-/** ------------------------------------------------------------------
- ** @name Atomic data types
- **
- ** @{
- **/
-
-typedef long long           vl_int64 ;   /**< signed 64-bit integer. */
-typedef int                 vl_int32 ;   /**< signed 32-bit integer. */
-typedef short               vl_int16 ;   /**< signed 16-bit integer. */
-typedef char                vl_int8  ;   /**< signed  8-bit integer. */
-
-typedef long long unsigned  vl_uint64 ;  /**< unsigned 64-bit integer. */
-typedef int       unsigned  vl_uint32 ;  /**< unsigned 32-bit integer. */
-typedef short     unsigned  vl_uint16 ;  /**< unsigned 16-bit integer. */
-typedef char      unsigned  vl_uint8 ;   /**< unsigned  8-bit integer. */
-
-typedef int                 vl_int ;     /**< @c int.                  */
-typedef unsigned int        vl_uint ;    /**< @c unsigned @c int.      */
-
-typedef int                 vl_bool ;    /**< boolean */
-#ifndef WIN64
-typedef long                vl_ptrint ;  /**< integer type holding a pointer. */
-#else
-typedef long long           vl_ptrint ;
-#endif
-/** @} */
-
-/** ------------------------------------------------------------------
- ** @name Format strings for @c printf
- **
- ** @{
- **/
-
-/** @def VL_FL_INT64 @brief @c prinf length flag for ::vl_int64, ::vl_uint64. */
-/** @def VL_FL_INT32 @brief @c prinf length flag for ::vl_int32, ::vl_uint32. */
-/** @def VL_FL_INT16 @brief @c prinf length flag for ::vl_int16, ::vl_uint16. */
-/** @def VL_FL_INT8  @brief @c prinf length flag for ::vl_int8,  ::vl_uint8.  */
-
-#define VL_FL_INT64  "ll"
-#define VL_FL_INT32  ""
-#define VL_FL_INT16  "h"
-#define VL_FL_INT8   "hh"
-
-/** @} */
-
-/** @brief Largest integer (math constant) */
-#define VL_BIG_INT  0x7FFFFFFFL
-
-/** @brief Smallest integer (math constant) */
-#define VL_SMALL_INT  (- VL_BIG_INT - 1)
-
-/** @brief Largest unsigned integer (math constant) */
-#define VL_BIG_UINT 0xFFFFFFFFUL
 
 /** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945
@@ -187,8 +103,7 @@ static union { vl_uint64 raw ; float value ; }
 
 /** ------------------------------------------------------------------
  ** @name Heap allocation
- ** @{ 
- **/
+ ** @{ */
 
 VL_EXPORT
 void vl_set_alloc_func (void *(*malloc_func)  (size_t),
@@ -204,13 +119,12 @@ VL_INLINE void  vl_free    (void* ptr) ;
 
 /** ------------------------------------------------------------------
  ** @name Logging
- ** @{ 
- **/
+ ** @{ */
 
 VL_EXPORT
 void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
 
-/** @def VL_PRINTF
+/** @def VL_PRINTF(format, ...)
  ** @brief Call user-customizable @c printf function
  **
  ** @param format format string.
@@ -235,7 +149,6 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
  **/
 #define VL_PRINT(string) \
   ((*vl_printf_func)(string))
-
 
 /** @} */
 
@@ -297,67 +210,30 @@ extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] ;
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
 /* @} */
 
-/** ------------------------------------------------------------------
- **/
-
+/** --------------------------------------------------------------- */
 VL_EXPORT
 char const * vl_get_version_string () ;
 
+VL_EXPORT
+void vl_print_info () ;
+
+/** --------------------------------------------------------------- */
 /** @name Measuring time
  ** @{
  **/
-VL_EXPORT 
-void vl_tic() ;
-
-VL_EXPORT 
-double vl_toc() ;
+VL_EXPORT void vl_tic() ;
+VL_EXPORT double vl_toc() ;
 /** @} */
 
+/** --------------------------------------------------------------- */
 /** @name Endianness detection and conversion
  ** @{
  **/
-
-#define VL_LITTLE_ENDIAN 0  /**< little endian architecture. */
-#define VL_BIG_ENDIAN    1  /**< big endian architecture. */
-       
-/** @def VL_ENDIANNESS
- ** @brief Host Endianness.
- **
- ** This macro is equal to ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN
- ** depending on the endianness of the host.
- **
- ** @see @ref generic-data-models.
- **/
-#if                                                \
-  defined(__LITTLE_ENDIAN__)                   ||  \
-  defined(__i386__)  || defined(__ia64__)      ||  \
-  defined(WIN32)     || defined(__x86_64)      ||  \
-  defined(__alpha__) || defined(__alpha)       ||  \
-  defined(__arm__)   || defined(__SYMBIAN32__) ||  \
-  (defined(__mips__) && defined(__MIPSEL__)) 
-#define VL_ENDIANNESS VL_LITTLE_ENDIAN
-#else
-#define VL_ENDIANNESS VL_BIG_ENDIAN
-#endif
-
 VL_INLINE int  vl_get_endianness () ;
 VL_INLINE void vl_swap_host_big_endianness_8 (void *dst, void* src) ;
 VL_INLINE void vl_swap_host_big_endianness_4 (void *dst, void* src) ;
 VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
 /** @} */
-
-/** ------------------------------------------------------------------
- ** @brief Get endianness
- ** @return @c ::VL_BIG_ENDIAN or ::VL_LITTLE_ENDIAN depending on the
- ** host endianness.
- ** @sa @ref generic-data-models
- **/
-
-VL_INLINE int
-vl_get_endianness () 
-{
-  return VL_ENDIANNESS ;
-}
 
 /** ------------------------------------------------------------------
  ** @brief Host <-> big endian transformation for 8-bytes value
@@ -372,7 +248,7 @@ vl_swap_host_big_endianness_8 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
-#if VL_ENDIANNESS == VL_BIG_ENDIAN
+#if defined(VL_ARCH_BIG_ENDIAN)
     dst_ [0] = src_ [0] ;
     dst_ [1] = src_ [1] ;
     dst_ [2] = src_ [2] ;
@@ -406,7 +282,7 @@ vl_swap_host_big_endianness_4 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
-#if VL_ENDIANNESS == VL_BIG_ENDIAN
+#if defined(VL_ARCH_BIG_ENDIAN)
     dst_ [0] = src_ [0] ;
     dst_ [1] = src_ [1] ;
     dst_ [2] = src_ [2] ;
@@ -432,7 +308,7 @@ vl_swap_host_big_endianness_2 (void *dst, void* src)
 {
   char *dst_ = (char*) dst ;
   char *src_ = (char*) src ;
-#if VL_ENDIANNESS == VL_BIG_ENDIAN
+#if defined(VL_ARCH_BIG_ENDIAN)
     dst_ [0] = src_ [0] ;
     dst_ [1] = src_ [1] ;
 #else
@@ -447,69 +323,26 @@ extern VL_EXPORT void *(*vl_realloc_func) (void*,size_t) ;
 extern VL_EXPORT void *(*vl_calloc_func)  (size_t, size_t) ;
 extern VL_EXPORT void  (*vl_free_func)    (void*) ;          
 
-/** ------------------------------------------------------------------
- ** @brief Call customizable @c malloc function
- ** @param n number of bytes to allocate.
- **
- ** The function calls the user customizable @c malloc.
- **
- ** @return result of @c malloc
- **/
-
 VL_INLINE 
-void*
-vl_malloc (size_t n)
+void* vl_malloc (size_t n)
 {
   return (*vl_malloc_func)(n) ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Call customizable @c resize function
- **
- ** @param ptr buffer to reallocate.
- ** @param n   number of bytes to allocate.
- **
- ** The function calls the user-customizable @c realloc.
- **
- ** @return result of the user-customizable @c realloc.
- **/
-
-VL_INLINE 
-void*
-vl_realloc (void* ptr, size_t n)
+VL_INLINE
+void* vl_realloc (void* ptr, size_t n)
 {
   return (*vl_realloc_func)(ptr, n) ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Call customizable @c calloc function
- **
- ** @param n    size of each element in byte.
- ** @param size size of the array to allocate (number of elements).
- **
- ** The function calls the user-customizable @c calloc.
- **
- ** @return result of the user-customizable @c calloc.
- **/
-
-VL_INLINE 
-void*
-vl_calloc (size_t n, size_t size)
+VL_INLINE
+void* vl_calloc (size_t n, size_t size)
 {
   return (*vl_calloc_func)(n, size) ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Call customizable @c free function
- **
- ** @param ptr buffer to free.
- **
- ** The function calls the user customizable @c free.
- **/
-
-VL_INLINE 
-void
-vl_free (void *ptr)
+VL_INLINE
+void vl_free (void *ptr)
 {
   (*vl_free_func)(ptr) ;
 }

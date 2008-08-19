@@ -185,121 +185,9 @@ General Public License version 2.
  - @ref generic-logging
 
  @section generic-data-models Data models
+ 
+ @see http://predef.sourceforge.net/index.php
 
- Processors may differ in the way they represent multi-byte data types. This
- regards the 
- <em>endianness</em> of the assignment of data types to memory addresses
- and the <em>size</em> of the such types.
- 
- <b>Endianness</b> concerns how multi-byte data types (such as 16, 32 and 64 bits
- integres) are stored into the addressable memory. All processors assign the bytes of a multi-byte data types
- to a contiguous range of memory addresses (e.g. a 16-bit integer could
- be assigned to the addresses <c>0x10001</c> and <c>0x10002</c>). There is
- however an ambiguity on which bytes are
- assigned to which addresses in the range.
-  
- - The assignment is <em>big endian</em>, or in <em>network order</em>,
-   if the most significant byte of the multi-byte data type is assigned to 
-   the smaller memory address.
- 
- - Analogously, the assignment is <em>little endian</em> if  the least significant
-   byte is assigned to the smaller memory address.
-  
- @remark Generally speaking, PPC processors are big endian and x86 processors
- are little endian.<br/><br/>
- 
- @remark The names &ldquo;big endian&rdquo; and &ldquo;little endian&rdquo; are 
- a little confusing. &ldquo;Big endian&rdquo; means &ldquo;big endian first&rdquo;, i.e.
- the most significant byte comes first in the addressable space. Similarly,
- &ldquo;little endian&rdquo; means &ldquo;little endian first&rdquo;, 
- in the sense that the least significant byte comes first.
- 
- In most cases endianness is not a concern as data is stored and read to the addressable space
- by one processor (or multiple processors of the same kind). Endianness 
- becomes a concern when data is communicated. 
- This includes: exchanging data with other processors 
- that use a different convention,
- transmitting data over a network, and storing data
- to a file.
- 
- VLFeat provides a few functions to perform the¢ necessary conversions in the
- latter two cases. The function ::vl_get_endianness() detects endianness. The functions
- ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
- ::vl_swap_host_big_endianness_2() change the endiannes of the data from 
- the host convention (either little or big endian) to the network convention
- (big endian) and viceversa.
- 
- The <b>size of C atomic data type</b> (such as
- @c short, @c int, @c long and so on) also differs with different
- processors. This may be a concern in several ways: communication of data,
- overflow of the numerical representations, need to 
- process data of a specific size (e.g. 8-bit image pixels). To this end,
- the C-99 standard header <c>stdint.h</c> provides types that have guaranteed
- sizes. Unfortunately Visual C++ does not implement this header, so 
- VLFeat reproduces part of its functionalities.
- 
- In particular, VLFeat provides a full range of atomic data types
- (::vl_int8, ::vl_int16, ::vl_int32, etc.) which are mapped to the appropriate
- C native data type according to the following table.
- Notice that in practice the only relevant differences
- are the size of <code>long</code> and the size of pointers. 
-   
- <table><caption>32-bit and 64-bit data models</caption>
- <tr style="font-weight:bold;">
-   <td>Data model</td>
-   <td >short</td>
-   <td>int</td>
-   <td>long</td>
-   <td>long long</td>
-   <td>pointers</td>
-   <td>architecture</td>
-  </tr>
- <tr>
-   <td>ILP32</td>
-   <td style="background-color:#ffa;">16</td>
-   <td style="background-color:#afa;">32</td>
-   <td style="background-color:#afa;">32</td>
-   <td >64</td>
-   <td style="background-color:#afa;">32</td>
-   <td>common 32 bit architectures</td>
- </tr>
- <tr>
-   <td>LP64</td>
-   <td style="background-color:#ffa;">16</td>
-   <td style="background-color:#afa;">32</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>UNIX-64 (Linux, Mac OS X)</td>
- </tr>
- <tr>
-   <td>ILP64</td>
-   <td style="background-color:#ffa;">16</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>Alpha, Cray</td>
- </tr>
- <tr>
-   <td>SLIP64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td>64</td>
-   <td></td>
- </tr>
- <tr>
-   <td>LLP64</td>
-   <td style="background-color:#ffa;">16</td>
-   <td style="background-color:#afa;">32</td>
-   <td style="background-color:#afa;">32</td>
-   <td>64</td>
-   <td>64</td>
-   <td>Windows-64</td>
- </tr>
- </table>
  
  @section generic-symbols Exported symbols and inline functions
 
@@ -428,19 +316,21 @@ VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN] = "" ;
  **/
 
 VL_EXPORT
-char const *
-vl_get_version_string ()
+char const * vl_get_version_string ()
 {
-  return VL_VERSION_STRING 
-    " (" 
-#if   VL_ENDIANNESS == VL_BIG_ENDIAN
-    "big endian"
-#elif VL_ENDIANNESS == VL_LITTLE_ENDIAN
-    "little endian"
-#else
-    "unkown endianness"
-#endif
-    ")" ;
+  return VL_VERSION_STRING ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Print information about the library
+ ** @return library version string
+ **/
+
+VL_EXPORT
+void vl_print_info () 
+{
+  VL_PRINTF ("VLFeat version %s\n", vl_get_version_string()) ;
+  vl_print_host_info () ;
 }
 
 /** @internal@brief A printf that does not do anything */
@@ -464,6 +354,47 @@ void  (*vl_free_func)    (void*)            = &free ;
                                             
 /** @internal@brief Customizable @c printf function pointer */
 int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*/
+
+/** --------------------------------------------------------------- */
+
+/** @fn ::vl_malloc(size_t)
+ ** @brief Call customizable @c malloc function
+ ** @param n number of bytes to allocate.
+ **
+ ** The function calls the user customizable @c malloc.
+ **
+ ** @return result of @c malloc
+ **/
+
+/** @fn ::vl_realloc(void*,size_t)
+ ** @brief Call customizable @c resize function
+ **
+ ** @param ptr buffer to reallocate.
+ ** @param n   number of bytes to allocate.
+ **
+ ** The function calls the user-customizable @c realloc.
+ **
+ ** @return result of the user-customizable @c realloc.
+ **/
+
+/** @fn ::vl_calloc(size_t,size_t)
+ ** @brief Call customizable @c calloc function
+ **
+ ** @param n    size of each element in byte.
+ ** @param size size of the array to allocate (number of elements).
+ **
+ ** The function calls the user-customizable @c calloc.
+ **
+ ** @return result of the user-customizable @c calloc.
+ **/
+
+/** @fn ::vl_free(void*)
+ ** @brief Call customizable @c free function
+ **
+ ** @param ptr buffer to free.
+ **
+ ** The function calls the user customizable @c free.
+ **/
 
 /** ------------------------------------------------------------------
  ** @brief Set memory allocation functions
@@ -504,7 +435,6 @@ clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
  ** @brief Set time reference
  **/
 
-VL_EXPORT
 void vl_tic() 
 {
   tic_mark = clock() ;
@@ -518,8 +448,8 @@ void vl_tic()
  ** @return time in seconds.
  **/
 
-VL_EXPORT
 double vl_toc()
 {
   return (double) (clock() - tic_mark) / CLOCKS_PER_SEC ;
 }
+

@@ -65,9 +65,10 @@ objdir     = $(bindir)\objs
 CFLAGS     = /nologo /TC /MD \
              /D"__VISUALC__" /D"WIN32" \
              /D"__LITTLE_ENDIAN__" \
+						 /D"VL_SUPPORT_SSE2" \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /I. \
-             /W1 /Z7 /Zp8 /O2 /arch:SSE2
+             /W1 /Z7 /Zp8 /O2
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 
@@ -89,12 +90,15 @@ MEX_LFLAGS = $(LFLAGS) \
 
 libsrc =                \
  vl\aib.c               \
+ vl\dhog.c              \
  vl\generic.c           \
  vl\getopt_long.c       \
  vl\hikmeans.c          \
+ vl\host.c              \
  vl\ikmeans.c           \
  vl\imop.c              \
  vl\imopv.c             \
+ vl\imopv_sse2.c        \
  vl\mathop.c            \
  vl\mser.c              \
  vl\pgm.c               \
@@ -102,7 +106,7 @@ libsrc =                \
  vl\rodrigues.c         \
  vl\sift.c              \
  vl\stringop.c
-
+ 
 cmdsrc =                \
  src\sift.c             \
  src\mser.c             \
@@ -111,7 +115,8 @@ cmdsrc =                \
  src\test_stringop.c    \
  src\test_nan.c         \
  src\test_rand.c        \
- src\test_imopv.c
+ src\test_imopv.c       \
+ src\test_host.c
 
 mexsrc =                       \
  toolbox\sift\sift.c           \
@@ -223,11 +228,16 @@ $(objdir) :
 $(mexdir) :
 	mkdir $(mexdir)
 
+# special sources with SSE2 support
+$(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
+	@echo CC  vl\$(@B).c ===^> $(@)
+	$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
+	
 # vl\*.c -> $objdir\*.obj
 {vl}.c{$(objdir)}.obj:
 	@echo CC  $(<) ===^> $(@)
 	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /c /Fo"$(@)" "$(<)"
-
+	
 # src\*.c -> $bindir\*.exe
 {src}.c{$(bindir)}.exe:
 	@echo CC  $(<) ===^> $(@)

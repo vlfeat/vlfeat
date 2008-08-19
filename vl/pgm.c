@@ -293,7 +293,8 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
     good = (c == data_size) ;
     
     /* adjust endianess */
-    if( bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN ) {
+#if defined(VL_ARCH_LITTLE_ENDIAN)
+    if (bpp == 2) {
       int i ;
       vl_uint8 *pt = (vl_uint8*) data ;
       for(i = 0 ; i < 2 * data_size ; i += 2) {
@@ -301,7 +302,8 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
         pt [i]   = pt [i+1] ;
         pt [i+1] = tmp ;
       }      
-    }    
+    }
+#endif
   }
   /* 
      In ASCII mode we read a sequence of decimal numbers separated
@@ -357,7 +359,8 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
           im->max_value) ;
 
   /* take care of endianness */
-  if (bpp == 2 && ! vl_get_endianness() == VL_BIG_ENDIAN) {
+#if defined(VL_ARCH_LITTLE_ENDIAN)
+  if (bpp == 2) {
     int i ;
     vl_uint8* temp = vl_malloc (2 * data_size) ;
     memcpy(temp, data, 2 * data_size) ;
@@ -370,8 +373,11 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
     vl_free (temp) ;
   }
   else {
+#endif
     c = fwrite(data, bpp, data_size, f) ;
+#if defined(VL_ARCH_LITTLE_ENDIAN)  
   }
+#endif
   
   if(c != data_size) {
     vl_err_no = VL_ERR_PGM_IO ;

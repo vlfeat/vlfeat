@@ -1,0 +1,220 @@
+/** @file    host.h
+ ** @author  Andrea Vedaldi
+ ** @brief   Host
+ **/
+
+#ifndef VL_HOST_H
+#define VL_HOST_H
+
+/* 
+ The following macros identify the host OS, architecture and compiler. 
+ They are derived from http://predef.sourceforge.net/ 
+ */
+
+/** @name Identify the host operating system
+ ** @{ */
+#if defined(linux)     || \
+    defined(__linux)   || \
+    defined(__linux__)
+#define VL_OS_LINUX 1
+#endif
+
+#if defined(__APPLE__) & defined(__MACH__)
+#define VL_OS_MACOSX 1
+#endif
+
+#if defined(__WIN32__) || \
+    defined(_WIN32)
+#define VL_OS_WIN 1
+#endif
+
+#if defined(_WIN64)
+#define VL_OS_WIN64 1
+#endif
+/** @} */
+
+/** @name Identify the host compiler
+ ** @{ */
+#if defined(__GNUC__)
+# if defined(__GNUC_PATCHLEVEL__)
+#  define VL_COMPILER_GNUC (__GNUC__ * 10000 \
++ __GNUC_MINOR__ * 100 \
++ __GNUC_PATCHLEVEL__)
+# else
+#  define VL_COMPILER_GNUC (__GNUC__ * 10000 \
++ __GNUC_MINOR__ * 100)
+# endif
+#endif
+
+#if defined(_MSC_VER)
+#define VL_COMPILER_MSC _MSC_VER
+#endif
+/** @} */
+
+/** @name Identify the host CPU architecture
+ ** @{ */
+#if defined(i386)     || \
+defined(__i386__)
+#define VL_ARCH_IX86 300
+#elif defined(__i486__)
+#define VL_ARCH_IX86 400
+#elif defined(__i586__)
+#define VL_ARCH_IX86 500
+#elif defined(__i686__)
+#define VL_ARCH_IX86 600
+#elif defined(_M_IX86)
+#define VL_ARCH_IX86 _M_IX86
+#endif
+
+#if defined(__ia64__) || \
+defined(_IA64)    || \
+defined(__IA64)   || \
+defined(__ia64)   || \
+defined(_M_IA64)
+#define VL_ARCH_IA64
+#endif
+/** @} */
+
+/** @name Identify the host data model
+ ** @{ */
+#if defined(__LLP64__) || \
+    defined(__LLP64)   || \
+    defined(__LLP64)   || \
+    (defined(VL_COMPILER_MSC) & defined(VL_OS_WIN64))
+#define VL_COMPILER_LLP64
+#elif defined(__LP64__) || \
+      defined(__LP64)   || \
+      defined(__LP64)   || \
+      (defined(VL_OS_MACOSX) & defined(VL_ARCH_IA64)) 
+#define VL_COMPILER_LP64
+#else
+#define VL_COMPILER_ILP32
+#endif
+/** @} */
+
+/** @name Identify the host endianness
+ ** @{ */
+#if defined(__LITTLE_ENDIAN__) || defined(VL_ARCH_IX86) || defined(VL_ARCH_IA64)
+#define VL_ARCH_LITTLE_ENDIAN
+#else
+#define VL_ARCH_BIG_ENDIAN
+#endif
+/** @} */
+
+#if defined(VL_COMPILER_MSC)
+#define VL_INLINE static __inline
+#define snprintf _snprintf
+#define isnan _isnan
+#ifdef VL_BUILD_DLL
+#define VL_EXPORT __declspec(dllexport)
+#else
+#define VL_EXPORT __declspec(dllimport)
+#endif
+#endif
+
+#if defined(VL_COMPILER_GNUC)
+#define VL_INLINE static __inline__
+#ifdef VL_BUILD_DLL
+#define VL_EXPORT __attribute__((visibility ("default")))
+#else
+#define VL_EXPORT
+#endif
+#endif
+
+/** ------------------------------------------------------------------
+ ** @name Atomic data types
+ ** @{
+ **/
+
+#if defined(VL_COMPILER_LP64) || defined(VL_COMPILER_LLP64)
+typedef long long           vl_int64 ;   /**< @brief Signed 64-bit integer. */
+typedef int                 vl_int32 ;   /**< @brief Signed 32-bit integer. */
+typedef short               vl_int16 ;   /**< @brief Signed 16-bit integer. */
+typedef char                vl_int8  ;   /**< @brief Signed  8-bit integer. */
+
+typedef long long unsigned  vl_uint64 ;  /**< @brief Unsigned 64-bit integer. */
+typedef int       unsigned  vl_uint32 ;  /**< @brief Unsigned 32-bit integer. */
+typedef short     unsigned  vl_uint16 ;  /**< @brief Unsigned 16-bit integer. */
+typedef char      unsigned  vl_uint8 ;   /**< @brief Unsigned  8-bit integer. */
+
+typedef int                 vl_int ;     /**< @brief Same as @c int. */
+typedef unsigned int        vl_uint ;    /**< @brief Same as <code>unsigned int</code>. */
+
+typedef int                 vl_bool ;    /**< @brief Boolean. */
+typedef vl_int64            vl_intptr ;  /**< @brief Integer holding a pointer. */
+typedef vl_uint64           vl_uintptr ; /**< @brief Unsigned integer holding a pointer. */
+#endif
+
+#ifdef VL_COMPILER_ILP32
+typedef long long           vl_int64 ;  
+typedef int                 vl_int32 ;  
+typedef short               vl_int16 ;  
+typedef char                vl_int8  ;  
+
+typedef long long unsigned  vl_uint64 ; 
+typedef int       unsigned  vl_uint32 ; 
+typedef short     unsigned  vl_uint16 ; 
+typedef char      unsigned  vl_uint8 ;  
+
+typedef int                 vl_int ;    
+typedef unsigned int        vl_uint ;   
+
+typedef int                 vl_bool ;   
+typedef vl_int32            vl_intptr ; 
+typedef vl_uint32           vl_uintptr ;
+#endif
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Printintg atomic data types
+ ** @{ */
+
+/** @def VL_FL_INT64 
+ ** @brief @c prinf length flag for ::vl_int64 and ::vl_uint64. 
+ **/
+
+/** @def VL_FL_INT32 
+ ** @brief @c prinf length flag for ::vl_int32 and ::vl_uint32. 
+ **/
+
+/** @def VL_FL_INT16 
+ ** @brief @c prinf length flag for ::vl_int16 and ::vl_uint16. 
+ **/
+
+/** @def VL_FL_INT8  
+ ** @brief @c prinf length flag for ::vl_int8 and ::vl_uint8.  
+ **/
+
+#define VL_FL_INT64  "ll"
+#define VL_FL_INT32  ""
+#define VL_FL_INT16  "h"
+#define VL_FL_INT8   "hh"
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Atomic data types limits
+ ** @{ */
+
+/** @brief Largest integer (math constant) */
+#define VL_BIG_INT  0x7FFFFFFFL
+
+/** @brief Smallest integer (math constant) */
+#define VL_SMALL_INT  (- VL_BIG_INT - 1)
+
+/** @brief Largest unsigned integer (math constant) */
+#define VL_BIG_UINT 0xFFFFFFFFUL
+
+/** @} */
+
+/** @name Obtaining host info at run time
+ ** @{ */
+VL_EXPORT void vl_print_host_info() ;
+VL_EXPORT vl_bool vl_cpu_has_sse3 () ;
+VL_EXPORT vl_bool vl_cpu_has_sse2 () ;
+/** @} */
+
+VL_EXPORT void vl_set_simd_enabled (vl_bool x) ;
+VL_EXPORT vl_bool vl_get_simd_enabled() ;
+
+/* VL_HOST_H */
+#endif

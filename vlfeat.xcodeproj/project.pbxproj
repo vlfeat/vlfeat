@@ -95,6 +95,12 @@
 		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
+		2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv_sse2.c; sourceTree = "<group>"; };
+		2DD99CC50E58A8C700CE1DA1 /* imopv_sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv_sse2.h; sourceTree = "<group>"; };
+		2DD99CC70E58A90F00CE1DA1 /* imopv_sse2.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv_sse2.tc; sourceTree = "<group>"; };
+		2DD99E8F0E59EA8E00CE1DA1 /* host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = host.h; sourceTree = "<group>"; };
+		2DD99E900E59EA8E00CE1DA1 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = host.c; sourceTree = "<group>"; };
+		2DD9A01F0E5A296700CE1DA1 /* test_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_host.c; sourceTree = "<group>"; };
 		2DEEF3EE0E5634EB0028798B /* imsmooth.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = imsmooth.tc; path = toolbox/imop/imsmooth.tc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -139,6 +145,7 @@
 				2D732DE80CF8C2E40099B03C /* mser.c */,
 				2D732DEA0CF8C2E40099B03C /* sift.c */,
 				2D732DEB0CF8C2E40099B03C /* test_getopt_long.c */,
+				2DD9A01F0E5A296700CE1DA1 /* test_host.c */,
 				2D732DEC0CF8C2E40099B03C /* test_nan.c */,
 				2D732DED0CF8C2E40099B03C /* test_stringop.c */,
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
@@ -151,6 +158,8 @@
 			children = (
 				2D732E800CF8C2E40099B03C /* generic.c */,
 				2D732E810CF8C2E40099B03C /* generic.h */,
+				2DD99E8F0E59EA8E00CE1DA1 /* host.h */,
+				2DD99E900E59EA8E00CE1DA1 /* host.c */,
 				2D3EC8D80E3BC79300B0F237 /* dhog.c */,
 				2D3EC8D90E3BC79300B0F237 /* dhog.h */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
@@ -167,9 +176,12 @@
 				2D732E8B0CF8C2E40099B03C /* imop.c */,
 				2D732E8D0CF8C2E40099B03C /* imop.tc */,
 				2D732E8C0CF8C2E40099B03C /* imop.h */,
+				2D72EAF10E48A42F005DAA47 /* imopv.h */,
 				2D72EAF00E48A42F005DAA47 /* imopv.c */,
 				2D6F09EC0E4C6ACA00B77055 /* imopv.tc */,
-				2D72EAF10E48A42F005DAA47 /* imopv.h */,
+				2DD99CC50E58A8C700CE1DA1 /* imopv_sse2.h */,
+				2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */,
+				2DD99CC70E58A90F00CE1DA1 /* imopv_sse2.tc */,
 				2D732E8E0CF8C2E40099B03C /* mathop.c */,
 				2D732E8F0CF8C2E40099B03C /* mathop.h */,
 				2D732E900CF8C2E40099B03C /* mser.c */,

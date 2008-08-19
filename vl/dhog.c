@@ -11,7 +11,7 @@
 #include "mathop.h"
 #include "imopv.h"
 #include <math.h>
-#include <strings.h>
+#include <string.h>
 
 int const NBP = 4 ;
 int const NBO = 8 ;
@@ -123,14 +123,13 @@ normalize_histogram
   return norm;
 }
 
-
 /** ------------------------------------------------------------------
  ** @brief Allocate and initialize a new DHOG filter
  **
  ** @param width
  ** @param height
  ** @param sampling_step step used to sample descriptors (must be 1 or a multiple of bin_size).
- ** @param size
+ ** @param bin_size
  ** @return new filter.
  **/
 
@@ -299,11 +298,11 @@ void _vl_dhog_with_flat_window (VlDhogFilter* f)
             *dst = src [(centx + f->width*centy)*d +
                         (binx + f->width*biny)*f->bin_size] ;
             dst += NBP*NBP*NBO ;
-          }
-        }
-      }
-    } /* for t */
-  } /* for x */
+          } /* centx */
+        } /* centy */
+      } /* binx */
+    } /* biny */
+  } /* bint */
   vl_free (ker) ;
 }
 
@@ -322,7 +321,7 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
 
   /* clear integral images */
   for (t = 0 ; t < NBO ; ++t)
-    bzero (f->hist[t], f->width*f->height*sizeof(float)) ;
+    memset (f->hist[t], 0, f->width*f->height*sizeof(float)) ;
   
 #undef at
 #define at(u,v) (im[(v)*f->width+(u)])
@@ -397,8 +396,8 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
         normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
         ++ k ;
         dpt += NBP*NBP*NBO ;
-      }
-    }
+      } /* centx */
+    } /* centy */
   }
 }
   

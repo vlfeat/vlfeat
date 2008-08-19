@@ -31,7 +31,6 @@ enum {
 /* options */
 uMexOption options [] = {
 {"Padding",      1,   opt_padding       },
-{"NoSIMD",       0,   opt_no_simd       },
 {"Verbose",      0,   opt_verbose       },
 {"Subsample",    1,   opt_subsample     },
 {0,              0,   0                 }
@@ -56,10 +55,8 @@ mexFunction(int nout, mxArray *out[],
   mxClassID classid ;
   
   int const *dims ;  
-  void* I_pt ;
-  void* J_pt ;
-  
-  int M,N,K,W,i,j,k,ndims ;
+
+  int M,N,K,W,j,k,ndims ;
   int M_, N_, dims_[3] ;
   
   /* -----------------------------------------------------------------
@@ -152,7 +149,7 @@ mexFunction(int nout, mxArray *out[],
   out[OUT_J] = mxCreateNumericArray(ndims, dims_, classid, mxREAL) ;
 
   if (verb) {    
-    char const * msg ;
+    char const * msg = 0 ;
     mexPrintf("%dx%d -> %dx%d, ", N, M, N_, M_) ;
     switch (padding) {
       case VL_PAD_BY_ZERO       : msg = "with zeroes" ; break ;
@@ -177,7 +174,6 @@ mexFunction(int nout, mxArray *out[],
   W = ceil (4 * sigma) ;
   flags  = padding ;
   flags |= VL_TRANSPOSE ;
-  flags |= no_simd ? VL_NO_SIMD : 0 ;
   
   switch (classid) {
     case mxSINGLE_CLASS: 

@@ -80,6 +80,31 @@
 # == BUILDING THE DOCUMENTATION ==
 #
 # There are no configuration parameters.
+#
+# == ABOUT DEBUGGING ==
+#
+# We use the older STABS+ debug format as MATLAB MEX command has buggy
+# support for DWARD-2. In particular, compiling a MEX file produces a DLL,
+# but removes the intermediate  object files, where DWARF-2 stores
+# the actual debugging information. Since MEX uses the default
+# debugging format (-g option) and this corresponds often to DWARF-2,
+# this should be considered a bug.
+#
+# As a workaround, we pass the -gstabs+ flag to MEX
+#
+# An alternative workaround is the following hack.
+# Fist we compile the MEX file without linking and then we linking in a 
+# second pass, effectively preserving an intermediate object file 
+# (but not all of them).  E.g., on Mac OS X
+#
+# > mex -c -g mymex.c ; mex -g mymex.o ; 
+#
+# does preserve debugging information. In fact is also possible to run
+#
+# > dsymutil mymex.mexmaci
+#
+# does produce a mymex.mexmaci.dSYM bundle with (almost complete) 
+# debugging information.
 
 NAME   := vlfeat
 VER    := 0.9.1
@@ -125,6 +150,11 @@ endif
 # --------------------------------------------------------------------
 #                                                            Functions
 # --------------------------------------------------------------------
+
+# $(call if-like,FILTER,WHY,WHAT)
+define if-like
+$(if $(filter $(1),$(2)),$(3))
+endef
 
 # $(call dump-var,VAR) pretty-prints the content of a variable VAR
 define dump-var
@@ -185,11 +215,11 @@ MATLABEXE       ?= matlab
 MEX             ?= mex
 PYTHON          ?= python
 
-CFLAGS          += -I$(CURDIR) -pedantic 
+CFLAGS          += -I$(CURDIR) -pedantic
 CFLAGS          += -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
 CFLAGS          += -Wno-long-long
-CFLAGS          += $(if $(DEBUG), -O0 -g)
+CFLAGS          += $(if $(DEBUG), -O3 -g)
 LDFLAGS         += -L$(BINDIR) -l$(DLL_NAME)
 
 DLL_NAME         = vl
@@ -210,7 +240,7 @@ BINDIR          := bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
 CFLAGS          += -D__BIG_ENDIAN__ -Wno-variadic-macros 
-CLFAGS          += $(if $(DEBUG), -gstabs+)
+CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 DLL_CFLAGS      += -fvisibility=hidden
 MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
@@ -223,7 +253,9 @@ ifeq ($(ARCH),mci)
 BINDIR          := bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
-CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros -msse3
+CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
+CFLAGS          += -DVL_SUPPORT_SSE2
+CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 MEX_FLAGS       += -lm
@@ -236,7 +268,9 @@ ifeq ($(ARCH),glx)
 BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99 -msse3
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+CFLAGS          += -DVL_SUPPORT_SSE2
+CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
@@ -248,7 +282,9 @@ ifeq ($(ARCH),g64)
 BINDIR          := bin/g64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99 -msse3
+CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
+CFLAGS          += -DVL_SUPPORT_SSE2
+CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
