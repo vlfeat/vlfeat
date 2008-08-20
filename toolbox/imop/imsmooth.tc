@@ -2,7 +2,7 @@
   FLT* I_pt   = (FLT*) mxGetData (in[IN_I]) ;                     
   FLT* J_pt   = (FLT*) mxGetData (out[OUT_J]) ;                   
   FLT* buffer = (FLT*) mxMalloc (sizeof(FLT) * M*N_) ;            
-  vl_set_simd_enabled(0);
+
   switch (kernel) {
     case GAUSSIAN :
     {
