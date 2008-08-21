@@ -57,6 +57,17 @@ MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 # MEX_LFLAGS
 #  /DLL                : Produce a DLL
 #  /EXPORT:mexFunction : Export MEX file entry point
+#
+# ======================= ABOUT THE DLL HELL =========================
+#
+# This makefile compiles VLFeat to make use of the side-by-side 
+# depoyment model. In other words, the C runtime library is
+# re-destributed with the application and the appropriate manifest
+# file is embedded in the binaries.
+#
+# References:
+#   http://www.codeguru.com/forum/showthread.php?t=408061
+#
 
 bindir     = bin\win32
 mexdir     = toolbox\mexw32
@@ -72,8 +83,8 @@ CFLAGS     = /nologo /TC /MD \
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 
-LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST:NO \
-             /LIBPATH:$(bindir) vl_dll.lib \
+LFLAGS     = /NOLOGO /INCREMENTAL:NO /MANIFEST \
+             /LIBPATH:$(bindir) vl.lib \
              /DEBUG
 
 MEX_RC     = "$(MATLABROOT)\extern\include\mexversion.rc"
@@ -171,11 +182,12 @@ all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cm
 all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(mexdir)\$(MSVCR) $(bindir)\$(MSVCR)
 !ENDIF
 
-BUILD_DLL=@echo CC  $(<) ]===} $(@R).dll && \
+BUILD_DLL=@echo .... CC [MEX] $(@R).dll && \
 	$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)" && \
 	RC /fo"$(@R).res" $(MEX_RC) && \
 	LINK $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@) && \
-	del "$(@R).obj" "$(@R).exp" "$(@R).lib" "$(@R).res" 
+	MT /nologo /outputresource:"$(@)";^#2 /manifest "$(@).manifest" && \
+	del "$(@R).obj" "$(@R).exp" "$(@R).lib" "$(@R).res" "$(@).manifest"
 
 # --------------------------------------------------------------------
 #                                                    Maintenance rules
@@ -189,12 +201,7 @@ clean:
 	del /f /Q $(mexdir)\$(MSVCR)
 	del /f /Q $(mexdir)\vl.dll
 	del /f /Q bin\win32\$(MSVCR)
-	del /f /Q bin\win32\vl.dll
-	del /f /Q bin\win32\vl.dll.manifest
-	del /f /Q bin\win32\vl_dll.lib
-	del /f /Q bin\win32\vl_dll.exp
-	del /f /Q bin\win32\vl.lib
-
+	
 distclean: clean
 	del /f /Q $(cmdexe)
 	del /f /Q $(mexdll)
@@ -230,18 +237,20 @@ $(mexdir) :
 
 # special sources with SSE2 support
 $(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
-	@echo CC  vl\$(@B).c ===^> $(@)
-	$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
+	@echo .... CC [+SSE2] $(@)
+	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
 	
 # vl\*.c -> $objdir\*.obj
 {vl}.c{$(objdir)}.obj:
-	@echo CC  $(<) ===^> $(@)
+	@echo .... CC $(@)
 	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /c /Fo"$(@)" "$(<)"
 	
 # src\*.c -> $bindir\*.exe
 {src}.c{$(bindir)}.exe:
-	@echo CC  $(<) ===^> $(@)
+	@echo .... CC [EXE] $(@)
 	@$(CC) $(CFLAGS) /Fe"$(@)" /Fo"$(@R).obj" "$(<)" /link $(LFLAGS)
+	@MT /nologo /outputresource:"$(@);#1" /manifest "$(@).manifest"
+	@-del "$(@).manifest"
 	@-del "$(@R).obj"
 
 # toolbox\*.c -> toolbox\*.dll
@@ -266,13 +275,16 @@ $(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
 {toolbox\misc}.c{$(mexdir)}.dll:
 	$(BUILD_DLL)
 
+# Link VLFeat DLL
 $(bindir)\vl.dll : $(libobj)
-	@echo LINK ^*.obj ===^> $(@R).dll
-	link /DLL $(**) /OUT:"$(@)" /IMPlIB:"$(@R)_dll.lib" /NOLOGO
+	@echo .. LINK [DLL] $(@R).dll
+	@link /DLL $(**) /OUT:"$(@)" /NOLOGO /MANIFEST
+	@mt /nologo /outputresource:"$(@);#2" /manifest "$(@R).dll.manifest"
+	@-del "$(@R).dll.manifest"
 
 # *.obj -> *.lib
 $(bindir)\vl.lib : $(libobj)
-	@echo LIB ^*.obj ===^> $(@R).lib
+	@echo ... LIB $(@R).lib
 	@lib $(**) /OUT:"$(@)" /NOLOGO
 
 # vl.dll => mexw32/vl.dll
