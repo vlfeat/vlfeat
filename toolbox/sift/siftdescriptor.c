@@ -97,45 +97,44 @@ mexFunction(int nout, mxArray *out[],
   if (mxGetNumberOfDimensions (in[IN_GRAD])    != 3              ||
       mxGetClassID            (in[IN_GRAD])    != mxSINGLE_CLASS ||
       mxGetDimensions         (in[IN_GRAD])[0] != 2              ) {
-    mexErrMsgTxt("GRAD must be a 2xMxN matrix of class SINGLE") ;
+    mexErrMsgTxt("GRAD must be a 2xMxN matrix of class SINGLE.") ;
+  }
+
+  if (!uIsRealMatrix(in[IN_FRAMES], 4, -1)) {
+    mexErrMsgTxt("FRAMES must be a 4xN matrix.") ;
+  }
+  nikeys = mxGetN (in[IN_FRAMES]) ;
+  ikeys  = mxGetPr(in[IN_FRAMES]) ;
+  
+  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+    switch (opt) {
+        
+      case opt_verbose :
+        ++ verbose ;
+        break ;
+        
+      case opt_magnif :
+        if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
+          mexErrMsgTxt("MAGNIF must be a non-negative scalar.") ;
+        }
+        break ;
+        
+      default :
+        assert(0) ;
+        break ;
+    }
   }
   
-  grad_array = mxDuplicateArray(in[IN_GRAD]) ;
-  
-  grad = (vl_sift_pix*) mxGetData (in[IN_GRAD]) ;
+  grad_array = mxDuplicateArray(in[IN_GRAD]) ;  
+  grad = (vl_sift_pix*) mxGetData (grad_array) ;
   M    = mxGetDimensions(in[IN_GRAD])[1] ;
   N    = mxGetDimensions(in[IN_GRAD])[2] ;
 
   /* transpose angles */
-  for (i = 0 ; i < 2*M*N ; i+=2) {
-    grad [1 + i] = VL_PI / 2 - grad [1 + i] ;
+  for (i = 1 ; i < 2*M*N ; i+=2) {
+    grad [i] = VL_PI/2 - grad [i] ;
   }
 
-  if (!uIsRealMatrix(in[IN_FRAMES], 4, -1)) {
-    mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
-  }
-  nikeys      = mxGetN (in[IN_FRAMES]) ;
-  ikeys       = mxGetPr(in[IN_FRAMES]) ;
-  
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
-    switch (opt) {
-
-    case opt_verbose :
-      ++ verbose ;
-      break ;
-      
-    case opt_magnif :
-      if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
-        mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
-      }
-      break ;
-      
-    default :
-      assert(0) ;
-      break ;
-    }
-  }
-  
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
@@ -191,6 +190,7 @@ mexFunction(int nout, mxArray *out[],
       }
     }    
     /* cleanup */
+    mxDestroyArray (grad_array) ;
     vl_sift_delete (filt) ;
   } /* job done */    
 }

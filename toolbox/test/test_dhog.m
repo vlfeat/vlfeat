@@ -1,24 +1,35 @@
-sz = 5 ;
-st = 5 ;
+function test_dhog
+% TEST_DHOG Test DHOG function
+%   For a correctness test, see TEST_DHOG_INTER.
+
+% AUTORIGHTS
+
+tri = 3 ;
 I = single(test_pattern(2))  ;
-%I = I + 100*single(randn(size(I))) ;
-[f,d] = dhog(I,'step', st, 'size', sz, 'verbose') ;% 'fast') ;
-[f,d] = dhog(I,'step', st, 'size', sz, 'verbose', 'fast') ;
+n = 1 ;
 
-f = [f  ; sz * ones(1,size(f,2)) ; pi/2 - zeros(1,size(f,2))] ;
+for siz=1:5
+  for step=1:10
+    ben(n).size = siz ;
+    ben(n).step = step ;
+    tic ;
+    for t=1:tri
+      [f_,d_] = dhog(I,'step', step, 'size', siz) ;
+    end
+    ben(n).elaps_full = toc / tri ;
 
-figure(1) ; clf ; 
-imagesc(I) ; hold on ; colormap gray ; 
-h = [] ;
-while 1
-  p = click ;
-  dst = (f(1,:) - p(1)).^2 + (f(2,:) - p(2)).^2 ;
-  [dst, i] = min(dst) ;
-  if ~isempty(h)
-    delete(h) ;
+    tic ;
+    for t=1:tri
+      [f_,d_] = dhog(I,'step', step, 'size', siz, 'fast') ;
+    end
+    ben(n).elaps_fast = toc / tri ;
+    n=n+1 ;
   end
-  h = plotsiftdescriptor(d(:,i),f(:,i),'magnif',1) ;
 end
 
-
-
+fprintf('%5s %5s %10s %10s %9s\n', 'siz','step','full','fast','speedup') ;
+for b=ben
+  fprintf('%5d %5d %8.1fus %8.1fus %8.1gX\n', ...
+          b.size, b.step, 1e3*b.elaps_full, 1e3*b.elaps_fast, ...
+          b.elaps_full/b.elaps_fast);
+end
