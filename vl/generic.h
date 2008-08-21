@@ -27,7 +27,7 @@ General Public License version 2.
  **/
 #define VL_STRINGIFY_(x) # x
 
-/** @brief Convert the argument of 
+/** @brief Convert to a string
  ** @param x macro to convert to a string
  **
  ** For instance, the following fragment
@@ -38,6 +38,17 @@ General Public License version 2.
  ** will print the string @c x.y.z.
  **/
 #define VL_STRINGIFY(x) VL_STRINGIFY_(x)
+
+/** @brief Convert boolean to "yes" or "no"
+ ** @param x boolean to convert.
+ ** A pointer to either the string "yes" (if @a x is true)
+ ** or the string "no"
+ ** @example
+ ** @code
+ ** VL_PRINTF("Is x true? %s.", VL_YESNO(x))
+ ** @endcode
+ **/
+#define VL_YESNO(x) ((x)?"yes":"no")
 
 /** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945

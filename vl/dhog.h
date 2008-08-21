@@ -53,7 +53,7 @@ VL_EXPORT void vl_dhog_process (VlDhogFilter *f, float const* im, vl_bool fast) 
 VL_INLINE float         *vl_dhog_get_descriptors   (VlDhogFilter *f) ;
 VL_INLINE int            vl_dhog_get_keypoint_num  (VlDhogFilter *f) ;
 VL_INLINE VlDhogKeypoint *vl_dhog_get_keypoints     (VlDhogFilter *f) ;
-VL_INLINE void           vl_dhog_transpose_descriptor (float* dst, float* src) ;
+VL_INLINE void           vl_dhog_transpose_descriptor (float* dst, float const* src) ;
 
 /** @} */
 
@@ -106,12 +106,13 @@ vl_dhog_get_keypoint_num (VlDhogFilter *f)
  **/
 
 VL_INLINE void 
-vl_dhog_transpose_descriptor (float* dst, float* src) 
+vl_dhog_transpose_descriptor (float* dst, float const* src) 
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
   int i, j, t ;
-  
+ 
+  /*
   for (j = 0 ; j < BP ; ++j) {
     int jp = BP - 1 - j ;
     for (i = 0 ; i < BP ; ++i) {
@@ -120,6 +121,16 @@ vl_dhog_transpose_descriptor (float* dst, float* src)
       dst [op] = src[o] ;      
       for (t = 1 ; t < BO ; ++t) 
         dst [BO - t + op] = src [t + o] ;
+    }
+  }
+   */
+  
+  for (j = 0 ; j < BP ; ++j) {
+    for (i = 0 ; i < BP ; ++i) {
+      int o  = BO * i + BP*BO * j  ;
+      int op = BO * j + BP*BO * i ;      
+      for (t = 0 ; t < BO ; ++t) 
+        dst [op+((BO/4+BO) -t)%BO] = src [o+t] ;
     }
   }
 }

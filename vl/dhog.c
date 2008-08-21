@@ -184,6 +184,13 @@ vl_dhog_delete (VlDhogFilter *f)
 }
 
 
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Initialize new convolution kernel
+ ** @param f DHOG filter.
+ ** @param i bin index.
+ ** @return Filter.
+ **/
 float * _vl_dhog_new_kernel (VlDhogFilter *f, int i)
 {
   int filt_len = 2*f->bin_size - 1 ;
@@ -370,7 +377,7 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
       mod = vl_fast_sqrt_f (gx*gx + gy*gy) ;
             
       /* quantize angle */
-      nt = vl_mod_2pi_f (angle) * (8 / (2*VL_PI)) ;
+      nt = vl_mod_2pi_f (angle) * (NBO / (2*VL_PI)) ;
       bint = vl_floor_f (nt) ;
       rbint = nt - bint ;
       

@@ -151,11 +151,11 @@ mexFunction(int nout, mxArray *out[],
     descs = vl_dhog_get_descriptors (dhog) ;
     
     if (verbose) {
-      mexPrintf("dhog: image size: %d x %d\n", M, N) ;
-      mexPrintf("dhog: step:       %d\n", step) ;
-      mexPrintf("dhog: size:       %d\n", size) ;
-      mexPrintf("dhog: fast:       %d\n", fast) ;
-      mexPrintf("dhog: num keys:   %d\n", nkeys) ;  
+      mexPrintf("dhog: image size:        %d x %d\n", M, N) ;
+      mexPrintf("      subsampling step:  %d\n", step) ;
+      mexPrintf("      bin size:          %d\n", size) ;
+      mexPrintf("      fast descriptors:  %s\n", VL_YESNO(fast)) ;
+      mexPrintf("      num. of keypoints: %d\n", nkeys) ;  
     }
     
     vl_dhog_process (dhog, data, fast) ;
@@ -188,7 +188,7 @@ mexFunction(int nout, mxArray *out[],
         float tmpdesc [128] ;
         *kpt++ = keys [k].y + 1 ;
         *kpt++ = keys [k].x + 1 ;
-        vl_dhog_transpose_descriptor(tmpdesc, descs + 128 * k) ;
+        vl_dhog_transpose_descriptor (tmpdesc, descs + 128 * k) ;
         for (i = 0 ; i < 128 ; ++i) {
           *dpt++ = (vl_uint8) (VL_MIN(512.0f * tmpdesc[i], 256.0f)) ;
         }

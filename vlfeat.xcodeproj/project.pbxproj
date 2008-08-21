@@ -70,6 +70,7 @@
 		2D7AD0B30E38C18600783252 /* tutorials.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = tutorials.html; path = docsrc/tutorials.html; sourceTree = "<group>"; };
 		2D7AD0B40E38C18600783252 /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = docsrc/utils.html; sourceTree = "<group>"; };
 		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; };
+		2D977C030E5E084700B3D9C4 /* siftdescriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = siftdescriptor.c; path = toolbox/sift/siftdescriptor.c; sourceTree = "<group>"; };
 		2DAB13D30D454A81009BEE66 /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aib.c; path = toolbox/aib/aib.c; sourceTree = "<group>"; };
 		2DAB13D40D454A81009BEE66 /* aibhist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aibhist.c; path = toolbox/aib/aibhist.c; sourceTree = "<group>"; };
 		2DAB13D50D454A81009BEE66 /* alldist2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alldist2.c; path = toolbox/misc/alldist2.c; sourceTree = "<group>"; };
@@ -225,6 +226,7 @@
 				2DAB13E30D454A81009BEE66 /* mser.c */,
 				2DAB13E40D454A81009BEE66 /* rodr.c */,
 				2DAB13E50D454A81009BEE66 /* sift.c */,
+				2D977C030E5E084700B3D9C4 /* siftdescriptor.c */,
 				2DAB13E60D454A81009BEE66 /* tpsumx.c */,
 				2DAB13E70D454A81009BEE66 /* ubcmatch.c */,
 				2DAB13E80D454A81009BEE66 /* whistc.c */,
