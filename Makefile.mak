@@ -44,7 +44,7 @@ MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 # LFLAGS
 #   /NOLOGO            : LINK does not display splash
 #   /INCREMENTAL:NO    : No incremental linking
-#   /MANIFEST:NO       : No manifest
+#   /MANIFEST          : See DLL HELL below
 #   /DEBUG             : Generate debug info (.pdb files)
 #
 # MEX_RC               : MEX .rc file location
