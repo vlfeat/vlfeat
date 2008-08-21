@@ -142,8 +142,8 @@ vl_dhog_new (int width, int height, int sampling_step, int bin_size)
   
   f-> width   = width ;
   f-> height  = height ;
-  f-> dwidth  = (width  - 1 - (NBP - 1)*bin_size - 1) / sampling_step + 1;
-  f-> dheight = (height - 1 - (NBP - 1)*bin_size - 1) / sampling_step + 1;
+  f-> dwidth  = (width  - 1 - (NBP - 1)*bin_size) / sampling_step + 1;
+  f-> dheight = (height - 1 - (NBP - 1)*bin_size) / sampling_step + 1;
   f-> nkeys  = f->dwidth * f->dheight ;
   f-> sampling_step = sampling_step ;
   f-> bin_size = bin_size ;
@@ -177,6 +177,7 @@ vl_dhog_delete (VlDhogFilter *f)
     }
     if (f->tmp2) vl_free (f->tmp2) ;
     if (f->tmp) vl_free (f->tmp) ;
+    if (f->descr) vl_free (f->keys) ;
     if (f->descr) vl_free (f->descr) ;
     vl_free(f) ;
   }
