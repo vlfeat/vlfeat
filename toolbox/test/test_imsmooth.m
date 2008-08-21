@@ -2,7 +2,7 @@ function test_imsmooth
 
 I = im2double(imread('data/spots.jpg')) ;
 I = max(min(imresize(I,2),1),0) ;
-I = im2single(I) ;
+I = single(I) ;
 
 global fign ;
 fign = 1 ;
