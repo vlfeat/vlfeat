@@ -32,19 +32,19 @@ body {
 #page {
   width: 65em;
   vertical-align: top;
-  background-color: white;
+  background-color:  #eee ;
   padding: 0;
   margin: 0;
 }
 
 #header {
-  background-color: #343943;
+  background-color: #B1BACC ;
   padding: 0;
   margin: 0;
 }
 
 #header h1 {
-  background: url(images/bk.jpg) repeat;
+ /* background: url(images/bk.jpg) repeat;*/
 }
 
 #header h1, 
@@ -56,42 +56,58 @@ body {
   font-weight: normal;
 }
 
-#header h1 { font-size: 2em; background-color: #636e80; }
+#header h1 { font-size: 2em; background-color: #777 ; }
 #header h2 { font-size: 1em; }
 
 #footer { 
   clear: both ;
   text-align: center;
-  border-top: 1px solid gray ;
+  border-top: 1px dotted gray ;
   padding: 0.5em ;
 }
 
 #content {
-  padding-left: 1.5em;
-  padding-right: 1.5em;
-  line-height: 1.3em;
+    margin-left: 203px ;
+    margin-right: 0px ;
+    margin-top: 10px ;
+    padding-left: 10px ;
+    padding-right: 4em ;
+    padding-top: 0.5em ;
+    padding-bottom: 0.5em ;
+    line-height: 1.3em;
+    background: url(images/cont-top-left.png) top left no-repeat white ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                               Index                              */
+/* ---------------------------------------------------------------- */
+
+#indexFrame {
+  float: left ;
+  width: 183px;
+  margin: 0 ;
+  margin-left: 10px ;
+  margin-top: 10px ;
+  padding: 0 ;
+  background: url(images/nav-header.png) top no-repeat #B1BACC ;
 }
 
 #index {
-  float: right ;
-  width: 12em;
-  margin: 1em;
-  margin-right: 0;
-  padding: 0;
-  border: 1px dotted black;
-  background-color: white;
+  padding: 0.5em 0 ;
+  margin:  0 ;
+  background: url(images/nav-footer.png) bottom no-repeat ;
 }
 
 #index ul {
   list-style-type: none;
-  margin: 0;
-  padding: 0;
+  margin: 0 ;
+  padding: 0 ;
 }
 
 #index ul li {
   display: block;
-  margin: 0;
-  padding: 0;
+  margin: 0 ;
+  padding: 0 ;
   margin-bottom: 1em;
 }
 
@@ -103,8 +119,8 @@ body {
   display: block;
   padding: 2px 0;
   text-decoration: none;
-  color: blue;
   font-weight: bold;
+  color: white ;
 }
 
 #index ul ul a {
@@ -119,20 +135,21 @@ body {
 
 #index a:hover,
 #index #current {
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-
-#index a:hover,
-#index #current {
-  background-color: white;
-  font-weight: bold;
+  padding-top: 1px ;
+  padding-bottom: 1px ;
+  border-top: 1px dotted black ;
+  border-bottom: 1px dotted black ;
+  background-color: orange ;
+  font-weight: bold ;
 }
 
 #index a:active {}
 
+/* ---------------------------------------------------------------- */
+/*                             Breadcrumb                           */
+/* ---------------------------------------------------------------- */
+
 #breadcrumb, div.navigation {
-  border-bottom: 1px solid #eee ;
   margin: 0 ;
   padding: 2px 0.5em ;
   font-size: 0.8em ;
@@ -154,46 +171,51 @@ body {
 }
 
 /* ---------------------------------------------------------------- */
-/*                               Body                               */
+/*                              Content                             */
 /* ---------------------------------------------------------------- */
 
-p, #index, li {
-  margin-top: 1em;
-  margin-bottom: 1em;
+#content p,
+#content ul,
+#content dl,
+#content table,
+#content pre {
+    margin-top: 0.5em ;
+    margin-bottom: 0.8em ;
 }
 
-p, li {
-  max-width: 40em ;
-}
-
-h1, h2, h3, h4, h5 {
+#content h1, 
+#content h2, 
+#content h3, 
+#content h4, 
+#content h5 {
   font-family: Helvetica;
   font-size: 1em;
-  margin-top: 1em ;
-  margin-bottom: 1em ;
+  margin-top: 1.5em ;
+  margin-bottom: 0.5em ;
 }
 
-h1 {font-size:1.3em;}
-h2 {font-size:1.2em;}
-h3 {font-size:1.1em;}
+#content h1 {font-size:1.3em;}
+#content h2 {font-size:1.2em;}
+#content h3 {font-size:1.1em;}
 
-dt {
+#content dt {
   color: DarkOrange  ;
   margin: 0 ;
 }
-dd {
+#content dd {
   margin: 0em 0em 0em 2em ;
 }
-dd p {
+#content dd p {
   margin-top: 0 ;
 }
 
-ul {
+#content ul {
   padding:0 ;
-  margin-top: 1em ;
+  margin-top: 0.5em ;
   margin-bottom: 1em ;
 }
-li {
+
+#content li {
   margin-left: 1.5em ;
   margin-top: 0.2em ;
   margin-bottom: 0.2em;
@@ -210,10 +232,13 @@ code, pre {
 
 div.figure {
   margin-left: 2em ;
+  margin-bottom: 0.5em ;
+  margin-top: 1em ;
+  text-align: center ;
 }
-div.caption {
-  font-style: italic;
+div.caption {  
   font-size: 0.9em ;
+  color: #555 ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -222,7 +247,6 @@ div.caption {
 
 div.documentation {
   padding: 0em 2em 2em 2em ;
-  max-width: 40em ;
 }
 
 /* ---------------------------------------------------------------- */

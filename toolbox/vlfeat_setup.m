@@ -5,7 +5,7 @@ function path = vlfeat_setup
 %  See also:: HELP_VLFEAT().
 
 bindir = mexext ;
-if strcmp(bindir, 'dll'), bindir = 'mexwin' ; end
+if strcmp(bindir, 'dll'), bindir = 'mexw32' ; end
 
 root = vlfeat_root ;
 addpath(fullfile(root,'toolbox'           )) ;
