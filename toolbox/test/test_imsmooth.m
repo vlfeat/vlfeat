@@ -43,16 +43,12 @@ I1 = I1(1:step:end,1:step:end,:) ;
 I2 = imsmooth(I,sigma,'kernel',ker,'padding','zero',      'verbose','subsample',step) ;
 I3 = imsmooth(I,sigma,'kernel',ker,'padding','continuity','verbose','subsample',step) ;
 
-function [I1,I2]=triang(I,sigma)
-I1 = I ;
-I2 = imsmooth(I,sigma,'verbose') ;
-
 function compare(n,I1,I2,I3,tit)
 figure(n) ; clf ; colormap gray ;
 subplot(1,3,1) ; axis equal ; imagesc(icut(I1)) ; axis off ; 
-title('Matlab') ;
-subplot(1,3,2) ; axis equal ; imagesc(icut(I2)) ; axis off ; 
-title('imsmooth zeropad') ;
+title('Matlab zeropad') ;
+subplot(1,3,2) ; axis equal ; imagesc(abs(I1-I2)) ; axis off ; 
+title('matlab - imsmooth') ;
 subplot(1,3,3) ; axis equal ; imagesc(icut(I3)) ; axis off ; 
 title('imsmooth contpad') ;
 set(n,'name',tit) ;

@@ -191,8 +191,8 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
       int stride = transp ? 1 : dst_stride ;
       dst += dheight * stride ;
       for (y = step * (dheight - 1) ; y >= 0 ; y -= step) {
-        *dst = scale * (buff [y] - buff [y - filt_size]) ;
         dst -= stride ;
+        *dst = scale * (buff [y] - buff [y - filt_size]) ;
       }
     }
     x += 1 ;
