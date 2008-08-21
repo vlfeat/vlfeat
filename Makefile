@@ -255,7 +255,7 @@ DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
 CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
 CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
+CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 MEX_FLAGS       += -lm
@@ -270,7 +270,7 @@ MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
+CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
@@ -284,7 +284,7 @@ MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2.o,$@,-msse2)
+CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
 MEX_CFLAGS      += 
