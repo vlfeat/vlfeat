@@ -1,5 +1,6 @@
 # file:       Makefile.mak
 # author:     Andrea Vedaldi
+# author:     Brian Fulkerson
 # descrption: Microsoft NMake makefile
 
 # --------------------------------------------------------------------
@@ -9,7 +10,7 @@
 # - MSVCR    : the file name of msvcr__.dll for your compiler
 # - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
-# - MATLABLIB : Location of the externel libs, such as libmex and libmx.
+# - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
 MSVCR      = msvcr90.dll
 MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT
@@ -61,8 +62,8 @@ MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 # ======================= ABOUT THE DLL HELL =========================
 #
 # This makefile compiles VLFeat to make use of the side-by-side 
-# depoyment model. In other words, the C runtime library is
-# re-destributed with the application and the appropriate manifest
+# deployment model. In other words, the C runtime library is
+# re-distributed with the application and the appropriate manifest
 # file is embedded in the binaries.
 #
 # References:
