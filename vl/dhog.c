@@ -39,7 +39,7 @@ int const NBO = 8 ;
  
  The top row shows bins of extension @f$\Delta=2@f$ whose center is aligned
  to a pixel. The bottom row shows the same bins, but whose center sits
- in between two adjacent pixels. Notice that, while the bin extent is always
+ in between two adjacent pixels. Notice that while the bin extent is always
  the same, in the first case
  the pixels that actually contributes to a bin (i.e. the ones with weights
  greater than zero) are @f$2\Delta -1@f$, while in the second case
@@ -51,14 +51,13 @@ int const NBO = 8 ;
  
  @section dhog-grid Covering with descriptor and downsampling
  
- DHOG extract a dense collection of descriptor, one each few pixels.
- How many descriptors can be computed out of an image? Since 
- most caluclations are going to be done by convolutions, for simplicity we require
+ DHOG extracts a dense collection of descriptors, one each few pixels.
+ Since most calculations use convolutions, for simplicity we require
  the centers of all descriptor bins to lie at integer coordinates within
  the image boundaries.
  
  The center of the top-left bin of the top-left descriptor has
- have coordinates 
+ coordinates 
  @f[
  x_0(0) = 0,\qquad y_0(0) = 0 
  @f]

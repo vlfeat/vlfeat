@@ -26,13 +26,13 @@ uMexOption options [] = {
 
 /** ------------------------------------------------------------------
  ** @internal
- ** @brief Transpose desriptor
+ ** @brief Transpose descriptor
  **
  ** @param dst destination buffer.
  ** @param src source buffer.
  **
  ** The function writes to @a dst the transpose of the SIFT descriptor
- ** @a src. The tranpsose is defined as the descriptor that one
+ ** @a src. The transpose is defined as the descriptor that one
  ** obtains from computing the normal descriptor on the transposed
  ** image.
  **/

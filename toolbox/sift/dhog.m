@@ -3,8 +3,8 @@
 %  descriptors for image I. I must be grayscale in SINGLE format.
 %
 %  A DHOG descriptor is equivalent to a SIFT descriptor (see SIFT()
-%  and VLFeat API documentation). This function calculate quickly a
-%  large number of such descriptors, for a dense covering of the image
+%  and VLFeat API documentation). This function quickly calculates a
+%  large number of such descriptors for a dense covering of the image
 %  with features of the same size and orientation.
 %
 %  The function returns the frames F and the descriptors D. Since all
@@ -15,7 +15,7 @@
 %  bins in each spatial direction (by default 4), then a DHOG keypoint
 %  covers a square patch of NS by SIZE pixels.
 %
-%  Remark:: The size of a SIFT bin is equal to the the magnification
+%  Remark:: The size of a SIFT bin is equal to the magnification
 %    factor MAGNIF (usually 3) by the scale of the SIFT keypoint. For
 %    instance, the scale that should be fed to SIFTDESCRIPTOR() in
 %    order to match the output of DHOG() is equal to SIFT / MAGNIF.

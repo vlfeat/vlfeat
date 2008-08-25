@@ -1,6 +1,6 @@
 % SIFTDESCRIPTOR   Run SIFT descriptor on raw data
 %  D = SIFTDESCRIPTOR(GRAD, F) calculates the SIFT descriptors of
-%  thekeypoints F on the pre-processed image GRAD. GRAD is a 2xMxN
+%  the keypoints F on the pre-processed image GRAD. GRAD is a 2xMxN
 %  array. The first layer GRAD(1,:,:) contains the modulus of gradient
 %  of the original image modulus. The second layer GRAD(2,:,:)
 %  contains the gradient angle (measured in radians, clockwise,

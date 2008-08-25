@@ -267,7 +267,7 @@ uIsRealVector(const mxArray* A, int N)
  ** - It is real (see ::uIsReal()).
  ** - @a ndims < 0 or it has @a ndims dimensions and
  **   - for each element of @a dims, either that element is negative
- **     or it is equal to the corresponding dimesion of the array.
+ **     or it is equal to the corresponding dimension of the array.
  **
  ** @return test result.
  **/
@@ -337,7 +337,7 @@ struct _uMexOption
   int val ;          /**< value to return */
 } ;
 
-/** @brief MEX opion type
+/** @brief MEX option type
  ** @see ::_uMexOption
  **/
 typedef struct _uMexOption uMexOption ;
@@ -345,7 +345,7 @@ typedef struct _uMexOption uMexOption ;
 /** ------------------------------------------------------------------
  ** @brief Case insensitive string comparison
  **
- ** @param s1 fisrt string.
+ ** @param s1 first string.
  ** @param s2 second string.
  **
  ** @return 0 if the strings are equal, >0 if the first string is
@@ -380,7 +380,7 @@ uStrICmp(const char *s1, const char *s2)
  ** The function scans the MEX driver arguments array @a args of @a
  ** nargs elements for the next option starting at location @a next.
  **
- ** This argument is suppsed to be the name of an option (case
+ ** This argument is supposed to be the name of an option (case
  ** insensitive). The option is looked up in the option table @a
  ** options and decoded as the value uMexOption::val. Furthermore, if
  ** uMexOption::has_arg is true, the next entry in the array @a args
@@ -388,7 +388,7 @@ uStrICmp(const char *s1, const char *s2)
  ** optarg. Finally, @a next is advanced to point to the next option.
  **
  ** @return the code of the option, or -1 if the argument list is
- ** exhausetd. In case of an error (e.g. unknown option) the function
+ ** exhausted. In case of an error (e.g. unknown option) the function
  ** prints an error message and quits the MEX file.
  **/
 
@@ -423,7 +423,7 @@ static int uNextOption(mxArray const *args[], int nargs,
     mexErrMsgTxt(err_msg) ;    
   }
   
-  /* advance argumnt list */
+  /* advance argument list */
   ++ (*next) ;
         
   /* now lookup the string in the option table */
