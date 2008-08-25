@@ -17,10 +17,12 @@ MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsof
 MATLABROOT = C:\Program Files\MATLAB\R2008a
 MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
-MSVCR      = msvcr80.dll
-MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
-MATLABROOT = C:\Program Files\MATLAB08a
-MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
+# Here is an example of how the variables might look with a different version
+# of Visual Studio and an alternate location for Matlab
+#MSVCR      = msvcr80.dll
+#MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+#MATLABROOT = C:\Program Files\MATLAB08a
+#MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # --------------------------------------------------------------------
 #                                                                Flags
