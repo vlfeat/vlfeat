@@ -28,6 +28,10 @@
 %  Size SIZE [3]::
 %    A spatial bin covers SIZE pixels.
 %
+%  Norm::
+%    Append the frames with the normalization factor applied to each descriptor.
+%    In this case, F has 3 rows and this value is the 3rd row.
+%
 %  Fast::
 %    Use a flat rather than Gaussian window. Much faster.
 %

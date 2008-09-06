@@ -18,7 +18,8 @@ enum {
   opt_step = 0,
   opt_size,
   opt_fast,
-  opt_verbose
+  opt_verbose,
+  opt_norm
 } ;
 
 /* options */
@@ -27,6 +28,7 @@ uMexOption options [] = {
 {"Size",         1,   opt_size          },
 {"Verbose",      0,   opt_verbose       },
 {"Fast",         0,   opt_fast          },
+{"Norm",         0,   opt_norm          },
 {0,              0,   0                 }
 } ;
 
@@ -84,6 +86,7 @@ mexFunction(int nout, mxArray *out[],
   int                step = 1 ;
   int                size = 3 ;
   vl_bool            fast = 0 ;
+  vl_bool            norm = 0 ;
   
   VL_USE_MATLAB_ENV ;
   
@@ -115,6 +118,10 @@ mexFunction(int nout, mxArray *out[],
         
       case opt_fast :
         fast = 1 ;
+        break ;
+
+      case opt_norm :
+        norm = 1 ;
         break ;
         
       case opt_size :
@@ -172,7 +179,10 @@ mexFunction(int nout, mxArray *out[],
       out[OUT_DESCRIPTORS] = mxCreateNumericArray
       (2, dims, mxUINT8_CLASS, mxREAL) ;
       
-      dims [0] = 2 ;
+      if (norm)
+        dims [0] = 3 ;
+      else
+        dims [0] = 2 ;
       
       out[OUT_FRAMES] = mxCreateNumericArray
       (2, dims, mxDOUBLE_CLASS, mxREAL) ;
@@ -188,6 +198,10 @@ mexFunction(int nout, mxArray *out[],
         float tmpdesc [128] ;
         *kpt++ = keys [k].y + 1 ;
         *kpt++ = keys [k].x + 1 ;
+        if (norm)
+          /* We have an implied / 2 in the norm, because of the clipping below */
+          *kpt++ = keys [k].norm / 2 ;
+
         vl_dhog_transpose_descriptor (tmpdesc, descs + 128 * k) ;
         for (i = 0 ; i < 128 ; ++i) {
           *dpt++ = (vl_uint8) (VL_MIN(512.0f * tmpdesc[i], 256.0f)) ;
