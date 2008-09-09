@@ -38,13 +38,9 @@ body {
 }
 
 #header {
-  background-color: #B1BACC ;
+  background-color: #555 ; /*#B1BACC ;*/
   padding: 0;
-  margin: 0;
-}
-
-#header h1 {
- /* background: url(images/bk.jpg) repeat;*/
+  margin: 0;  
 }
 
 #header h1, 
@@ -55,6 +51,13 @@ body {
   font-family: "Helvetica Neue", Arial, Helvetica, sans-serif ;
   font-weight: normal;
 }
+
+#header h1 {
+    background: url(images/bk-ka.jpg) repeat ;
+    padding-top: 1em ;
+    font-family: "Georgia" ;
+}
+
 
 #header h1 { font-size: 2em; background-color: #777 ; }
 #header h2 { font-size: 1em; }
