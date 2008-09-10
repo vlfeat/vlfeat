@@ -409,11 +409,11 @@ void vl_dhog_process (VlDhogFilter* f, float const* im, vl_bool fast)
         k->x = centx*d + A_ ;
         k->y = centy*d + A_ ;
         
-        normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
+        k->norm = normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
         for(bint = 0; bint < NBO*NBP*NBP ; ++ bint) {
           if (dpt[bint] > 0.2f) dpt[bint] = 0.2f ;
         }
-        normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
+        k->norm *= normalize_histogram (dpt, dpt + NBP*NBP*NBO) ;
         ++ k ;
         dpt += NBP*NBP*NBO ;
       } /* centx */

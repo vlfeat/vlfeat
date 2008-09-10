@@ -21,6 +21,7 @@ typedef struct VlDhogKeypoint_
   double x ; /**< x coordinate */
   double y ; /**< y coordinate */
   double s ; /**< scale */
+  double norm ; /**< norm */
 } VlDhogKeypoint ;
 
 /** @brief DHOG filter */
