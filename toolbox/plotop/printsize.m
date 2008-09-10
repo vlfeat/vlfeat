@@ -17,11 +17,14 @@ if nargin < 2
   a = NaN ;
 end
 
+papuni = get(gcf,'paperunits') ;
 set(gcf,'paperunits','normalized') ;
 pos = get(gcf,'paperposition') ;
+pos(1:2) = 0 ;
 s = r/pos(3) ;
 pos(3:4) = pos(3:4) * s ;
 if ~isnan(a)
   pos(4) = pos(3) / a ;
 end
 set(gcf,'paperposition',pos) ;
+set(gcf,'paperunits',papuni) ;
