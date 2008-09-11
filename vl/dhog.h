@@ -47,14 +47,13 @@ VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height, int sampling_step, i
 VL_EXPORT void vl_dhog_delete (VlDhogFilter *f) ;
 VL_EXPORT void vl_dhog_process (VlDhogFilter *f, float const* im, vl_bool fast) ;
 
-/** @name Retrieve data and parameters
+/** @name Retrieving data and parameters
  ** @{
  **/
-VL_INLINE float         *vl_dhog_get_descriptors   (VlDhogFilter *f) ;
-VL_INLINE int            vl_dhog_get_keypoint_num  (VlDhogFilter *f) ;
+VL_INLINE float          *vl_dhog_get_descriptors   (VlDhogFilter *f) ;
+VL_INLINE int             vl_dhog_get_keypoint_num  (VlDhogFilter *f) ;
 VL_INLINE VlDhogKeypoint *vl_dhog_get_keypoints     (VlDhogFilter *f) ;
-VL_INLINE void           vl_dhog_transpose_descriptor (float* dst, float const* src) ;
-
+VL_INLINE void            vl_dhog_transpose_descriptor (float* dst, float const* src) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -93,16 +92,15 @@ vl_dhog_get_keypoint_num (VlDhogFilter *f)
 
 
 /** ------------------------------------------------------------------
- ** @internal
  ** @brief Transpose descriptor
  **
  ** @param dst destination buffer.
  ** @param src source buffer.
  **
  ** The function writes to @a dst the transpose of the SIFT descriptor
- ** @a src. The transpose is defined as the descriptor that one
- ** obtains from computing the normal descriptor on the transposed
- ** image.
+ ** @a src. Let <code>I</code> be an image. The transpose operator
+ ** satisfies the equation
+ ** <code>transpose(dhog(I,x,y)) = dhog(transpose(I),y,x)</code>
  **/
 
 VL_INLINE void 
