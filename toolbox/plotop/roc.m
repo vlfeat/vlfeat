@@ -1,8 +1,8 @@
-function [tp,tn,info] = roc(y, score)
+function [tp,tn,info] = roc(y, score, varargin)
 % ROC Compute ROC curve
 %  [TP,TN] = ROC(Y, SCORE) computes the ROC curve of the specified
 %  data. Y are the ground thruth labels (+1 or -1) and SCORE is the
-%  discriminant score associated to the data by a classifier (high
+%  discriminant score associated to the data by a classifier (higher
 %  scores correspond to positive labels).
 %
 %  [TP,TN] are the true positive and true negative rates for
@@ -20,48 +20,50 @@ function [tp,tn,info] = roc(y, score)
 %
 %  ROC(...) plots the ROC diagram in the current axis.
 %
-%  Reading the ROC curve::
-%    Define a classifier by predicting as positve the data Y whose SCORE
-%    is greater than a threshold T. The ROC curve represent the
-%    performance of such classifier as the threshold T is
-%    varied. Define:
+%  About the ROC curve::
+%    Consider a classifier that predicts as positive al lables whose
+%    SCORE is not smaller than a threshold. The ROC curve represents
+%    the performance of such classifier as the threshold r is
+%    varied. Denote:
 %
-%      Np,       Nn      = num of pos/neg labels,
-%      Np_t(t),  Nn_t(t) = num of pos/neg labels with true prediction,
-%      Np_f(t),  Nn_f(t) = num of pos/neg labels with false prediction.
+%      P  = num of positive samples
+%      N  = num of negative samples
+%      TP = num of samples that are correctly classified as positive
+%      TN = num of samples that are correctly classified as negative
+%      FP = num of samples that are incorrectly classified as positive
+%      FN = num of samples that are incorrectly classified as negative
 %
-%    The performances of the classifier for the threshold t are given by
-%    the numbers:
+%    Consider also the rates:
 %
-%     TP(t) = Np_t(t) / Np = P(ok|pos) = true positive rate
-%     TN(t) = Nn_t(t) / Nn = P(ok|neg) = true negative rate
-%     FP(t) = Nn_f(t) / Nn = P(e|neg)  = false positive rate
-%     FN(t) = Np_f(t) / Np = P(e|pos)  = false negative rate
+%                TP_ = TP / P,      FN_ = FN / P,
+%                TN_ = TN / N,      FP_ = FP / N.
 %
-%    (Notice that TN = 1 - FP and TP = 1 - FN so only two numbers are
-%    needed.) The ROC curve is the parametric curve (TP(t),TN(t)). The
-%    ROC curve corresponding to a random score is the line connecting
-%    (1,0) and (0,1).
+%    Notice that:
+%
+%                 P = TP  + FN ,    N = TN  + FP,
+%                 1 = TP_ + FN_,    1 = TN_ + FP_.
+%
+%    The ROC curve is the parametric curve (TP_, TN_) obtained
+%    as the classifier threshold is changed.
+%
+%    The ROC curve is contained in the square with vertices (0,0)
+%    The (average) ROC curve of a random classifier is a line which
+%    connects (1,0) and (0,1).
 % 
-%    The ROC curve, differently from e.g. the empirical error, does NOT
-%    depend on the label prior distribution. In fact, the empirical risk
-%    is obtained as
+%    The ROC curve is independent of the prior probability of positive
+%    PPOS and negative labels PNEG. For instance, the empirical
+%    expected error (01-risk) is
 %
-%      Remp(t) = FP(t) P(neg) + FN(t) P(pos)
+%        ERR = FP_ PPOS + FN_ PNEG,   PPOS = P/(P+N), 
+%                                     PNEG = N/(P+N). 
 %
-%    which requires specifying P(neg) and P(pos).
+%    An OPERATING POINT is a point on the ROC curve, corresponding to
+%    a certain threshold. Each operating point minimizes the empirical
+%    error for certain label priors PPOS and PPNEG.  ROC() computes
+%    the following operating points:
 %
-%    An operating point is a point on the ROC curve, corresponding to a
-%    certain threshold. An operating point minimizes the empirical error
-%    for a certain choice of the labels prior.  In particular, we
-%    consider:
-%
-%    Natural operating point:: We assume P(neg) = Nn / N and P(pos) =
-%      Np / N as represented by
-%    Uniform operating point:: We assume P(neg) = P(pos) = 1/2.
-%
-%    So, forinstance, INFO.UT gives optimal threshold to use in the
-%    case of uniform labels prior.
+%     Natural operating point:: Assumes PPOS = P/(P+N).
+%     Uniform operating point:: Assumes PPOS = 1/2.
 %
 %  See also:: HELP_VLFEAT().
 
@@ -86,12 +88,12 @@ end
 
 % true positive rate
 % fliplr(perm) move the high scored ones to the beginning
-tp = cumsum( y(fliplr(perm)) == +1 ) / Np ;
+tp = cumsum( y(fliplr(perm)) == +1 ) / (Np + eps) ;
 tp = fliplr(tp) ;
 tp = [tp 0] ;
 
 % true negative rate
-tn = cumsum(y(perm) == -1) / Nn  ;
+tn = cumsum(y(perm) == -1) / (Nn + eps)  ;
 tn = [0 tn] ;
 
 % voc style
@@ -116,8 +118,10 @@ if nargout > 0 | nargout == 0
   % uniform prior and natural prior operationg points rates and thresholds
   ur = tp(upoint) * 1/2  + tn(upoint) * 1/2 ;
   nr = tp(npoint) * Np/N + tn(npoint) * Nn/N ;
-  ut = score(upoint) ;
-  nt = score(npoint) ;
+  
+  score_ = [-inf score] ;
+  ut = score_(upoint) ;
+  nt = score_(npoint) ;
   
   % area
   area = sum((tp(1:end-1)+tp(2:end)) .* diff(tn))/2 ;
@@ -137,32 +141,48 @@ end
 
 % plot?
 if nargout == 0
-	
-	% search whre TP + TN is max
-	
+		
 	cla ; hold on ;
 	plot(tn,tp,'linewidth',2) ;
-	line(eer             * [0 1 1], ...
-			 eer             * [1 1 0], ...
-			 'color','r', 'linestyle', '--','linewidth', 1) ;
-	line(tn(upoint) * [0 1 1], ...
-			 tp(upoint) * [1 1 0], ...
-			 'color','g', 'linestyle', '--', 'linewidth', 1) ;
-	line(tn(npoint) * [0 1 1], ...
-			 tp(npoint) * [1 1 0], ...
-			 'color','b', 'linestyle', '--', 'linewidth', 1) ;
-	line([0 1], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
-  line([0 1], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
 
-	axis square ;
-	xlim([0 1]) ; xlabel('true negative') ;
-	ylim([0 1]) ; ylabel('true positve') ;
+	if ~ opts.falsePoisitive
+    line(eer             * [0 1 1], ...
+         eer             * [1 1 0], ...
+         'color','r', 'linestyle', '--','linewidth', 1) ;
+    line(tn(upoint) * [0 1 1], ...
+         tp(upoint) * [1 1 0], ...
+         'color','g', 'linestyle', '--', 'linewidth', 1) ;
+    line(tn(npoint) * [0 1 1], ...
+         tp(npoint) * [1 1 0], ...
+         'color','b', 'linestyle', '--', 'linewidth', 1) ;
+    line([0 1], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
+    line([0 1], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
+    
+    xlim([0 1]) ; xlabel('true negative rate') ;
+    ylim([0 1]) ; ylabel('true positve rate') ;
+  else
+    line(1 - eer             * [0 1 1], ...
+             eer             * [1 1 0], ...
+         'color','r', 'linestyle', '--','linewidth', 1) ;
+    line(1 - tn(upoint) * [0 1 1], ...
+             tp(upoint) * [1 1 0], ...
+         'color','g', 'linestyle', '--', 'linewidth', 1) ;
+    line(1 - tn(npoint) * [0 1 1], ...
+             tp(npoint) * [1 1 0], ...
+         'color','b', 'linestyle', '--', 'linewidth', 1) ;
+    line([1 0], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
+    line([1 0], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
+    
+    xlim([0 1]) ; xlabel('false negative rate') ;
+    ylim([0 1]) ; ylabel('true positve rate') ;    
+  end
+  axis square ;
 	title(sprintf('ROC (AUC = %.3g)', area)) ;
 	legend('ROC', ...
 				 sprintf('eer     %.3g %%', 100 * eer), ...
 				 sprintf('op unif %.3g %%', 100 * ur), ...
 				 sprintf('op nat  %.3g %%', 100 * nr), ...
-				 'random order', 'Location', 'SouthWest') ;
+				 'random order', 'Location', 'SouthWest') ;    
 end
 
 % --------------------------------------------------------------------

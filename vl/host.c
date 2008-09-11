@@ -30,13 +30,13 @@
  
  @section host-os Host operating system
  
- The module defines a symbol to indentify the host operating system:
+ The module defines a symbol to identify the host operating system:
  ::VL_OS_WIN for Windows, ::VL_OS_LINUX for Linux, ::VL_OS_MACOSX for
  Mac OS X, and so on.
  
  @section host-compiler Host compiler 
  
- The module defines a symbol to indetify the host compiler:
+ The module defines a symbol to identify the host compiler:
  ::VL_COMPILER_MSC for Microsoft Visual C++, ::VL_COMPILER_GNUC for GNU C,
  and so on. The (integer) value of such symbols 
  corresponds the version of the  compiler.
@@ -59,7 +59,7 @@
  The following table summarizes the relevant conventions:
  
  <table><caption><b>Compiler data models.</b> The table shows
- how many bits are allocated to each tomic data type according to
+ how many bits are allocated to each atomic data type according to
  each model.</caption>
  <tr style="font-weight:bold;">
  <td>Data model</td>
@@ -199,7 +199,7 @@
 
  @subsection host-arch-endianness Endianness
  
- The module defines a symbol to identify the host CPU enianness:
+ The module defines a symbol to identify the host CPU endianness:
  ::VL_ARCH_BIG_ENDIAN for big endian and ::VL_ARCH_LITTLE_ENDIAN for
  little endian. The functions 
  ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
@@ -208,8 +208,8 @@
  
  Recall that <em>endianness</em> concerns the way multi-byte data types 
  (such as 16, 32 and 64 bits
- integres) are stored into the addressable memory. 
- All CPUs uses a continguous address range to store atomic data types
+ integers) are stored into the addressable memory. 
+ All CPUs uses a contiguous address range to store atomic data types
  (e.g. a 16-bit integer could
  be assigned to the addresses <c>0x10001</c> and <c>0x10002</c>), but
  the order may differ.
@@ -229,7 +229,7 @@
  &ldquo;little endian&rdquo; means &ldquo;little endian first&rdquo;, 
  in the sense that the address of the least significant byte comes first.
 
- Endianness is a concern when data is either exchangend with processors
+ Endianness is a concern when data is either exchanged with processors
  that use different conventions, 
  transmitted over a network, or stored
  to a file. For the latter two cases, one usually saves data in 
@@ -257,7 +257,7 @@
  ** @brief Defined if the host compiler is GNU C.
  **
  ** This macro is defined if the compiler is GNUC.
- ** Its value is caluclated as
+ ** Its value is calculated as
  ** @code
  ** 10000 * MAJOR + 100 * MINOR + PATCHLEVEL
  ** @endcode

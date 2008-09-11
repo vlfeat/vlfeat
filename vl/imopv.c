@@ -35,7 +35,7 @@
 /** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns
  **
- ** @param dst destinaton image.
+ ** @param dst destination image.
  ** @param dst_stride width of the destination image including padding.
  ** @param src source image.
  ** @param src_width width of the source image.
@@ -82,7 +82,7 @@
 /** @fn vl_imconvcoltri_vf(float*,int,float const*,int,int,int,int,int,unsigned int)
  ** @brief Convolve image along columns by a triangular kernel
  **
- ** @param dst destinaton image.
+ ** @param dst destination image.
  ** @param dst_stride width of the destination image including padding.
  ** @param src source image.
  ** @param src_width width of the source image.

@@ -35,7 +35,7 @@
 # LIBTOOL:      libtool (used only under Mac)
 #
 # The following programs are required to compile the C code in the
-# MATLAB Toolbox. Both are bundeld with MATLAB, but may not be
+# MATLAB Toolbox. Both are bundled with MATLAB, but may not be
 # available directly from the command line path.
 #
 # MATLAB:       Matlab executable (typically `matlab')
@@ -323,7 +323,7 @@ $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
 #                                                  Build shared library
 # --------------------------------------------------------------------
 #
-# Objects and dependecies are placed in the $(BINDIR)/objs/
+# Objects and dependencies are placed in the $(BINDIR)/objs/
 # directory. The makefile creates a static and a dynamic version of
 # the library. Depending on the architecture, one or more of the
 # following files are produced:

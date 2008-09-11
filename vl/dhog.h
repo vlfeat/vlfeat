@@ -21,6 +21,7 @@ typedef struct VlDhogKeypoint_
   double x ; /**< x coordinate */
   double y ; /**< y coordinate */
   double s ; /**< scale */
+  double norm ; /**< norm */
 } VlDhogKeypoint ;
 
 /** @brief DHOG filter */
@@ -109,7 +110,7 @@ vl_dhog_transpose_descriptor (float* dst, float const* src)
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
   int i, j, t ;
- 
+  
   for (j = 0 ; j < BP ; ++j) {
     for (i = 0 ; i < BP ; ++i) {
       int o  = BO * i + BP*BO * j  ;

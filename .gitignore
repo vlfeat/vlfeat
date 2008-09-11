@@ -15,6 +15,7 @@ VERSION
 bin
 results
 doc
+build
 toolbox/mex*
 vlfeat.xcodeproj/*.mode1v3
 vlfeat.xcodeproj/*.pbxuser

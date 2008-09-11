@@ -15,7 +15,7 @@
 %  bins in each spatial direction (by default 4), then a DHOG keypoint
 %  covers a square patch of NS by SIZE pixels.
 %
-%  Remark:: The size of a SIFT bin is equal to the the magnification
+%  Remark:: The size of a SIFT bin is equal to the magnification
 %    factor MAGNIF (usually 3) by the scale of the SIFT keypoint. For
 %    instance, the scale that should be fed to SIFTDESCRIPTOR() in
 %    order to match the output of DHOG() is equal to SIFT / MAGNIF.
@@ -27,6 +27,10 @@
 %
 %  Size SIZE [3]::
 %    A spatial bin covers SIZE pixels.
+%
+%  Norm::
+%    Append the frames with the normalization factor applied to each descriptor.
+%    In this case, F has 3 rows and this value is the 3rd row.
 %
 %  Fast::
 %    Use a flat rather than Gaussian window. Much faster.
