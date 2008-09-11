@@ -207,7 +207,7 @@ main(int argc, char **argv)
    * -------------------------------------------------------------- */
 
   while (!err) {
-    int ch = getopt_long(argc, argv, "vhd:p", longopts, 0) ;
+    int ch = getopt_long(argc, argv, opts, longopts, 0) ;
 
     /* end of option list? */
     if (ch == -1) break;
