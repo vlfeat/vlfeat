@@ -15,12 +15,13 @@ General Public License version 2.
 #include"mex.h"
 #include<vl/generic.h>
 #include<ctype.h>
+#include<stdio.h>
 
-#ifdef __VISUALC__
+#ifdef VL_COMPILER_MSC
 #define snprintf _snprintf
 #endif
 
-#if (MX_API_VER < 0x07030000)
+#if defined(MX_API_VER) & (MX_API_VER < 0x07030000)
 typedef int mwSize ;
 typedef int mwIndex ;
 #endif
@@ -276,25 +277,25 @@ static int
 uIsRealArray(const mxArray* A, int D, const int* dims)
 {
   if(!mxIsDouble(A) || mxIsComplex(A))
-    return false ;
+    return 0 ;
 
   if(D >= 0) {
     int d ;
     const int* actual_dims = mxGetDimensions(A) ;
 
     if(mxGetNumberOfDimensions(A) != D)
-      return false ;
+      return 0 ;
 
-    return true  ;
+    return 1 ;
     
     if(dims != NULL) {
       for(d = 0 ; d < D ; ++d) {
         if(dims[d] >= 0 && dims[d] != actual_dims[d])
-          return false ;
+          return 0 ;
       }
     }
   }
-  return true ;
+  return 1 ;
 }
 
 /** ------------------------------------------------------------------
