@@ -23,15 +23,28 @@ if ~isstruct(config)
   return ;
 end
 
-fields = fieldnames(update) ;
-for i=1:length(fields)
-  f=fields{i} ;
-  if(isfield(config, f))
-    config.(f) = override(config.(f), update.(f)) ;
-  else
-    if nargin > 2
-      warning(sprintf('field ''%s'' is in UPDATE but not in CONFIG',f)) ;
+if ~isstruct(update)
+  error('Attempted to update a structure with a non-structure') ;
+end
+
+% make sure that we can put UPDATE in correspondence with CONFIG.
+% otherwise assume a copy-over operation
+if numel(update) ~= numel(config)
+  config = update ;
+  return ;
+end
+
+for idx=1:numel(update)
+  fields = fieldnames(update) ;
+  for i=1:length(fields)
+    f=fields{i} ;
+    if(isfield(config, f))
+      config(idx).(f) = override(config(idx).(f), update(idx).(f)) ;
+    else
+      if nargin > 2
+        warning(sprintf('field ''%s'' is in UPDATE but not in CONFIG',f)) ;
+      end
+      config(idx).(f) = update(idx).(f) ;
     end
-    config.(f) = update.(f) ;
   end
 end
