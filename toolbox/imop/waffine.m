@@ -4,8 +4,8 @@ function varargout = waffine(A,T,varargin)
 %  X. X contains one point per column.
 %
 %  [Y1,Y2,...] = WAFFINE(A,T,X1,X2,...) applies the affine
-%  transformations to points (X1,X2,...). Arrays X1,X2,... contain one
-%  of the coordinates of the points each.
+%  transformation (A,T) to the points (X1,X2,...). Each array
+%  X1,X2,... contains one of the coordinates of the points.
 %
 %  See also:: HELP_VLFEAT().
 

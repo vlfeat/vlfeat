@@ -286,7 +286,7 @@ mexFunction(int nout, mxArray *out[],
      * ............................................................ */
     i     = 0 ;
     first = 1 ;
-    while (true) {
+    while (1) {
       int                   err ;
       VlSiftKeypoint const *keys  = 0 ;
       int                   nkeys = 0 ;

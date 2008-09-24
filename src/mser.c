@@ -58,7 +58,7 @@ enum {
 } ;
 
 /* short options */
-char const opts [] = "vhd" ;
+char const opts [] = "vhd:" ;
 
 /* long options */
 struct option const longopts [] = {
@@ -109,7 +109,7 @@ main(int argc, char **argv)
    *                                                      Parse options
    * --------------------------------------------------------------- */
   while (!err) {
-    int ch = getopt_long(argc, argv, "vhd:p", longopts, 0) ;
+    int ch = getopt_long(argc, argv, opts, longopts, 0) ;
 
     /* end of option list? */
     if (ch == -1) break;

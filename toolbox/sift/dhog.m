@@ -3,8 +3,8 @@
 %  descriptors for image I. I must be grayscale in SINGLE format.
 %
 %  A DHOG descriptor is equivalent to a SIFT descriptor (see SIFT()
-%  and VLFeat API documentation). This function quickly calculates a
-%  large number of such descriptors for a dense covering of the image
+%  and VLFeat API documentation). This function calculate quickly a
+%  large number of such descriptors, for a dense covering of the image
 %  with features of the same size and orientation.
 %
 %  The function returns the frames F and the descriptors D. Since all
@@ -27,6 +27,10 @@
 %
 %  Size SIZE [3]::
 %    A spatial bin covers SIZE pixels.
+%
+%  Norm::
+%    Append the frames with the normalization factor applied to each descriptor.
+%    In this case, F has 3 rows and this value is the 3rd row.
 %
 %  Fast::
 %    Use a flat rather than Gaussian window. Much faster.

@@ -83,8 +83,8 @@ getopt_long(int argc, char *const argv[],
   if (has_colon) ++ optstring ;
 
   /*
-    Here we are either processing a short option sequence or must we seek for
-    the next option.
+   Here we are either processing a short option sequence or 
+   we start processing a new option. This is indicated by optreset.   
   */
 
   if (optreset || *place == '\0') {
@@ -114,7 +114,7 @@ getopt_long(int argc, char *const argv[],
 
     /* an option is introduced by '-' */
     if (place [0] != '-') {
-      /* try next argument */
+      /* this argument is not an option: try next argument */
       ++ optbegin ;
       if (optbegin >= argc) {
         /* no more arguments to look for options */
@@ -162,7 +162,7 @@ getopt_long(int argc, char *const argv[],
       /* consume second `-' */
       ++ place ;
       
-      /* coun characters before `=' */
+      /* count characters before `=' */
       namelen = strcspn(place, "=") ;
       
       /* scan longopts for this option */
@@ -224,7 +224,7 @@ getopt_long(int argc, char *const argv[],
       ret_val = BADCH ;
       goto done_option ;
     }
-  } /* new option */
+  } /* end new option */
   
     /* --------------------------------------------------------------
      *                                   finish short option sequence
@@ -233,7 +233,7 @@ getopt_long(int argc, char *const argv[],
   
   /* search charcater in option list */
   oli = strchr(optstring, optopt);
-  
+    
   /* short option not found */    
   if (!oli) {
     
@@ -253,10 +253,10 @@ getopt_long(int argc, char *const argv[],
       ret_val = BADCH ;
       goto done_option ;
     }
-  } /* end option not found */
+  } /* end short option not found */
   
-    /* short option with no argument */    
   if (oli[1] != ':') {
+    /* short option with no argument */
     
     if (*place) {
       /* more short options in the list */
@@ -268,10 +268,10 @@ getopt_long(int argc, char *const argv[],
       ret_val = optopt ;
       goto done_option ;
     }
-  }
   
-  /* short option with argument (always closes short option list) */
-  else {
+  } else {
+    /* short option with argument */
+    
     /* -ovalue style */
     if (*place) {
       optarg  = place ;

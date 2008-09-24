@@ -2,9 +2,10 @@
 %   J = IMINTEGRAL(I) calculates the integral image J of the image I.
 %   I must a matrix with DOUBLE storage class. J is given by
 %
-%    J(i,j) = sum(I(1:i,1:j))
+%    J(i,j) = sum(I(1:i,1:j)).
 %
-%   and has one column and one row more than I.
+%   Notice that J has the same size as I (often one also adds a null
+%   column and row at the begnning of the matrix).
 %
 %   Example::
 %     The following identity holds:
