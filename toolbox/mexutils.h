@@ -21,7 +21,7 @@ General Public License version 2.
 #define snprintf _snprintf
 #endif
 
-#if defined(MX_API_VER) & (MX_API_VER < 0x07030000)
+#if !defined(MX_API_VER) | (MX_API_VER < 0x07030000) 
 typedef int mwSize ;
 typedef int mwIndex ;
 #endif
