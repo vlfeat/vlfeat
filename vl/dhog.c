@@ -92,8 +92,6 @@ int const NBO = 8 ;
  y_{(N_s-1)/2}(i) = \delta j + \frac{\Delta (N_s - 1)}{2}.
  @f]
  
- 
- 
  **/
 
 
@@ -182,7 +180,6 @@ vl_dhog_delete (VlDhogFilter *f)
   }
 }
 
-
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Initialize new convolution kernel
@@ -204,7 +201,7 @@ float * _vl_dhog_new_kernel (VlDhogFilter *f, int i)
        ++ k) {
     float z = (k - delta) / sigma ;
     *kerit++ = (1.0f - fabsf(k) / f->bin_size) * 
-               (i >= 0) ? expf(-0.5f * z*z) : 1.0f ;
+      ((i >= 0) ? expf(-0.5f * z*z) : 1.0f) ;
   }
   return ker ;
 }
