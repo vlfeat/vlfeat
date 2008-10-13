@@ -11,50 +11,44 @@
 %   The function supports images of arbitrary dimension D.
 %
 %   [R,F]=MSER(...) also returns ellipsoids F fitted to the regions.
-%   Each column of the matrix ELL describes an ellipsoid; F(1:D,i) is
-%   the center of the elliposid and F(D:end,i) the independent elments
-%   of the co-variance matrix of the ellipsoid.
+%   Each column of F describes an ellipsoid; F(1:D,i) is the center of
+%   the elliposid and F(D:end,i) are the independent elements of the
+%   co-variance matrix of the ellipsoid.
 %   
 %   Ellipsoids are computed according to the same reference frame of I
-%   seen as a matrix. This means that coordinates start at (1,1,...,1)
-%   and that the first coordinate spans the first dimension of I.
+%   seen as a matrix. This means that the first coordinate spans the
+%   first dimension of I.
 %
 %   Notice that for 2-D images usually the opposite convention is used
 %   (i.e. the first coordinate is the x-axis, which corresponds to the
 %   column index). Thus, if the function PLOTFRAME() is used to plot
-%   the ellipses, the frames F should be `transoposed' as in F = F([2
-%   1 5 4 3],:).
+%   the ellipses, the frames F should be `transposed' as in F = F([2
+%   1 5 4 3],:). ERTR() exists for this purpose.
 %
 %   MSER(I,'Option'[,Value]...) accepts the following options
 %
-%   Delta::
+%   Delta [5]::
 %       Set the DELTA parameter of the MSER algorithm. Roughly
 %       speaking, the stability of a region is the relative variation
 %       of the region area when the intensity is changed of +/-
 %       Delta/2.
 %
-%   Epsilon::
-%       Set the EPSILON parameter of the MSER algorithm. When the
-%       relative area variation of two nested regions is below
-%       this treshold, then only the most stable one is selected.
-%
-%   MaxArea::
+%   MaxArea [0.75]::
 %       Set the maximum area (volume) of the regions relative to
 %       the image domain area (volume).
 %
-%   MinArea::
+%   MinArea [3/npixels]::
 %       Set the minimum area (volume) of the regions relative to 
 %       the image domain area (volume).
 %
-%   MaxVariation::
+%   MaxVariation [0.25]::
 %       Set the maximum variation (absolute stability score) of the
 %       regions.
 %
-%   Dups::
-%       Activate dupliate regions removal.
-%
-%   NoDups::
-%       Deactivate duplcate regions removal.
+%   MinDiversity [0.2]::
+%       Set the minimum diversity of the region. When the relative
+%       area variation of two nested regions is below this threshold,
+%       then only the most stable one is selected.
 %
 %   Verbose::
 %       Be verbose.

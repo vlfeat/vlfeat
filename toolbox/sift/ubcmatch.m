@@ -1,6 +1,9 @@
 % UBCMATCH  Match SIFT features
-%   MATCHES=UBCMATCH(DESCR1, DESCR2) matches the two sets of SIFT
+%   MATCHES = UBCMATCH(DESCR1, DESCR2) matches the two sets of SIFT
 %   descriptors DESCR1 and DESCR2.
+%   
+%   [MATCHES,SCORES] = UBCMATCH(DESCR1, DESCR2) retuns the matches and
+%   also the squared Euclidean distance between the matches.
 %
 %   The function uses the same algorithm suggested by D. Lowe [1] to
 %   reject matches that are too ambiguous.

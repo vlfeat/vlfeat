@@ -194,7 +194,7 @@ float * _vl_dhog_new_kernel (VlDhogFilter *f, int i)
 {
   int filt_len = 2*f->bin_size - 1 ;
   float * ker = vl_malloc (sizeof(float) * filt_len) ;
-  float delta = f->bin_size * (NBP / 2.0f - i) ;
+  float delta = f->bin_size * (NBP / 2.0f - (i + 0.5)) ;
   float * kerit = ker ;
   float sigma = (NBP * f->bin_size) / 2.0f ;
   int k ;
