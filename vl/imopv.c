@@ -25,12 +25,13 @@
 #define FLOAT_TYPE_DOUBLE 2
 
 #undef FLOAT_TYPE
-#define FLOAT_TYPE FLOAT_TYPE_FLOAT
+#define FLOAT_TYPE FLOAT_TYPE_DOUBLE
 #include "imopv.tc"
 
 #undef FLOAT_TYPE
-#define FLOAT_TYPE FLOAT_TYPE_DOUBLE
+#define FLOAT_TYPE FLOAT_TYPE_FLOAT
 #include "imopv.tc"
+
 
 /** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns

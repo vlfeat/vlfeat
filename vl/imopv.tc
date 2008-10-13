@@ -2,8 +2,6 @@
  ** @author  Andrea Vedaldi
  ** @brief   Vectorized image operations - Definition Template
  **/
-#ifndef __IMOPV_TC__
-#define __IMOPV_TC__
 
 #define JOIN_(a,b) a ## b
 #define JOIN(a,b) JOIN_(a,b)
@@ -202,5 +200,3 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
   } /* next x */ 
   vl_free (buff - filt_size) ;
 }
-
-#endif // __IMOPV_TC__
