@@ -14,3 +14,14 @@ else
 end
 
 set(gcf,'position',pos) ;
+
+pos = get(gcf, 'paperposition') ;
+
+if a >= 1
+  pos(3) = a * pos(4) ;
+else
+  pos(4) = pos(3) / a ;
+end
+
+set(gcf,'paperposition',pos) ;
+

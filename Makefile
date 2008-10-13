@@ -109,7 +109,7 @@
 NAME   := vlfeat
 VER    := 0.9.2
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat
-NDEBUG :=
+#NDEBUG :=
 
 .PHONY : all
 all : dll all-bin all-mex
@@ -184,7 +184,7 @@ define C
 	echo "******* Command Output:";                              \
         echo "$${out}";                                              \
     fi;                                                              \
-    echo "$${out}" | grep Warning ;                                  \
+    echo "$${out}" | grep arning ;                                  \
     return $${err};                                                  \
 } ; quiet
 endef
@@ -219,12 +219,13 @@ CFLAGS          += -I$(CURDIR) -pedantic
 CFLAGS          += -Wall -std=c89 -O3
 CFLAGS          += -Wno-unused-function 
 CFLAGS          += -Wno-long-long
-CFLAGS          += $(if $(DEBUG), -O3 -g)
+CFLAGS          += $(if $(DEBUG), -O0 -g)
 LDFLAGS         += -L$(BINDIR) -l$(DLL_NAME)
 
 DLL_NAME         = vl
 DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
+MEX_FLAGS        = $(if $(DEBUG), -g)
 MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
 MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \

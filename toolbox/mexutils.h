@@ -16,6 +16,7 @@ General Public License version 2.
 #include<vl/generic.h>
 #include<ctype.h>
 #include<stdio.h>
+#include<stdarg.h>
 
 #ifdef VL_COMPILER_MSC
 #define snprintf _snprintf
@@ -324,6 +325,25 @@ uIsString(const mxArray* A, int L)
     mxGetNumberOfDimensions(A) == 2 &&
     M == 1 &&
     (L < 0 || N == L) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Formatted @c mexErrMsgTxt() 
+ **
+ ** @param args     Format string (for sprintf).
+ ** @param ...      format string arguments.
+ **/
+
+void
+uErrMsgTxt(char const * format, ...)
+{
+  enum { buffLen = 1024 } ;
+  char buffer [buffLen] ;
+  va_list args;
+  va_start (args, format) ;
+  vsnprintf (buffer, buffLen, format, args) ;
+  va_end (args) ;
+  mexErrMsgTxt (buffer) ;
 }
 
 

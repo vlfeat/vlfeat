@@ -75,11 +75,13 @@ info.auc_pa08 = ap ;
 if nargout == 0	
 	cla ; hold on ;
 	plot(recall,precision,'linewidth',2) ;
-  line([0 1], [1 1] * P / (P + N), 'color', 'r', 'linestyle', '--') ;
+  line([0 1], [1 1] * p / length(y), 'color', 'r', 'linestyle', '--') ;
 
 	axis square ;
 	xlim([0 1]) ; xlabel('recall') ;
 	ylim([0 1]) ; ylabel('precision') ;
 	title(sprintf('precision-recall (AUC = %.2f %%)', info.auc * 100)) ;
-	legend('PR', 'random classifier') ;
+	legend('PR', 'random classifier', 'location', 'northwestoutside') ;
+  
+  clear recall precision info ;
 end

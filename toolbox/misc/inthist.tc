@@ -1,0 +1,45 @@
+/* works in place! */
+
+#define JOIN_(a,b) a ## b
+#define JOIN(a,b) JOIN_(a,b)
+
+#undef INTEGRAL
+#define INTEGRAL JOIN(integral_, SFX)
+
+/* 
+   This function is transpose safe. That is, the integral histogram
+   src can be either column major or row major, as long as width is
+   the fastest varying dimension.
+*/
+void INTEGRAL (T* dst, 
+               int dstStride,
+               T const* src,
+               int srcWidth, int srcHeight, int srcStride)
+{
+  int x, y ;
+  *dst = *src ;
+  dst += 1 ;
+  src += 1 ;
+
+  for (x = 1 ; x < srcWidth ; ++ x) {
+    *dst += *(dst - 1)  + *src ;
+    dst += 1 ;
+    src += 1 ;
+  }
+  
+  for (y = 1 ; y < srcHeight ; ++ y) {
+    dst += dstStride - srcWidth ;
+    src += srcStride - srcWidth ;
+
+    *dst = *src + *(dst - dstStride) ;
+    dst += 1 ;
+    src += 1 ;
+    
+    for (x = 1 ; x < srcWidth ; ++ x) {
+      *dst = *(dst - 1) + *(dst - dstStride) - *(dst - dstStride - 1) + *src ;
+      dst += 1 ;
+      src += 1 ;
+    }
+  }
+}
+

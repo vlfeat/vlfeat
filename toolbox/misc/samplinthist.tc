@@ -1,0 +1,74 @@
+#define JOIN_(a,b) a ## b
+#define JOIN(a,b) JOIN_(a,b)
+
+#undef SAMPLE
+#define SAMPLE JOIN(sample_, SFX)
+
+VL_INLINE void 
+SAMPLE (T* histPt, 
+        T const* intHistPt,
+        int width, int height, int numLabels, 
+        vl_uint32 const* boxesPt, 
+        int numBoxes)
+{
+  int bi, k ;
+  for (bi = 0 ; bi < numBoxes ; ++ bi) {
+    vl_uint32 x1 = *boxesPt++ ;
+    vl_uint32 y1 = *boxesPt++ ;       
+    vl_uint32 x2 = *boxesPt++ ;
+    vl_uint32 y2 = *boxesPt++ ;
+    vl_uint32 stride = width ;
+    vl_uint32 labelStride = width * height ;
+    T const* iter = 0 ;
+    
+    if (x1 < 1  || y1 < 1) {
+      uErrMsgTxt("Box %d is out of bounds.", bi+1) ;
+    }
+    if (x1 == x2 - 1 || y1 == y2 - 1) {
+      /* empty box */
+      memset(histPt, 0, sizeof(T) * numLabels) ;
+    }
+    if (x1 > x2 || y1 > y2) {
+      uErrMsgTxt("Box %d is inconsistent.", bi+1) ;
+    }    
+    if (x2 > width || y2 > height) {
+      uErrMsgTxt("Box %d is out of bounds.", bi+1) ;
+    }
+
+    -- x1 ; 
+    -- x2 ; 
+    -- y1 ;
+    -- y2 ;
+    
+    iter = intHistPt + x2 + y2 * stride ;
+    for (k = 0 ; k < numLabels ; ++k) {
+      histPt [k] += *iter ;
+      iter += labelStride ;
+    }
+    
+    if (x1 > 0) {
+      iter = intHistPt + (x1 - 1) + y2 * stride ;
+      for (k = 0 ; k < numLabels ; ++k) {
+        histPt [k] -= *iter ;
+        iter += labelStride ;
+      }
+    }
+    
+    if (x1 > 0 && y1 > 0) {
+      iter = intHistPt + (x1 - 1) + (y1 - 1) * stride ;
+      for (k = 0 ; k < numLabels ; ++k) {
+        histPt [k] += *iter ;
+        iter += labelStride ;
+      }
+    }
+    
+    if (y1 > 0) {
+      iter = intHistPt + x2 + (y1 - 1) * stride ;
+      for (k = 0 ; k < numLabels ; ++k) {
+        histPt [k] -= *iter ;
+        iter += labelStride ;
+      }
+    }
+    histPt += numLabels ;
+  }
+}
