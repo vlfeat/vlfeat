@@ -115,7 +115,11 @@ VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
 typedef float vl_mser_acc ;
 
 /** @internal @brief Basic region flag: null region */
+#ifdef VL_COMPILER_MSC
+#define VL_MSER_VOID_NODE ((1ui64<<32) - 1)
+#else
 #define VL_MSER_VOID_NODE ((1ULL<<32) - 1)
+#endif
 
 /* ----------------------------------------------------------------- */
 /** @internal @brief MSER: basic region (declaration)
