@@ -186,7 +186,7 @@ typedef vl_uint32           vl_uintptr ;
 /** @} */
 
 /** ------------------------------------------------------------------
- ** @name Printintg the atomic data types
+ ** @name Printing the atomic data types
  ** @{ */
 
 /** @def VL_FL_INT64 
