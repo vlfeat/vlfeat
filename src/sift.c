@@ -196,9 +196,9 @@ main(int argc, char **argv)
   VlFileMeta gss  = {0, "%.pgm",   VL_PROT_ASCII, "", 0} ;
   VlFileMeta ifr  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
   
-#define ERR(...) {                                          \
+#define ERR(msg, arg) {                                         \
     err = VL_ERR_BAD_ARG ;                                      \
-    snprintf(err_msg, sizeof(err_msg), __VA_ARGS__) ;                  \
+    snprintf(err_msg, sizeof(err_msg), msg, arg) ;              \
     break ;                                                     \
   }
   
@@ -274,7 +274,7 @@ main(int argc, char **argv)
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       
       if (met.protocol != VL_PROT_ASCII)
-        ERR("meta file supports only ASCII protocol") ;
+        ERR("meta file supports only ASCII protocol", argv[optind - 1]) ;
       break ;
 
     case opt_read_frames :
