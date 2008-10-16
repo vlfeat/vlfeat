@@ -166,12 +166,12 @@ typedef vl_uint64           vl_uintptr ; /**< @brief Unsigned integer holding a 
 #endif
 
 #ifdef VL_COMPILER_ILP32
-typedef long long           vl_int64 ;  
+typedef __int64             vl_int64 ;  
 typedef int                 vl_int32 ;  
 typedef short               vl_int16 ;  
 typedef char                vl_int8  ;  
 
-typedef long long unsigned  vl_uint64 ; 
+typedef __int64   unsigned  vl_uint64 ; 
 typedef int       unsigned  vl_uint32 ; 
 typedef short     unsigned  vl_uint16 ; 
 typedef char      unsigned  vl_uint8 ;  
@@ -204,8 +204,11 @@ typedef vl_uint32           vl_uintptr ;
 /** @def VL_FL_INT8  
  ** @brief @c prinf length flag for ::vl_int8 and ::vl_uint8.  
  **/
-
+#ifdef VL_COMPILER_MSC
+#define VL_FL_INT64  "I64"
+#else
 #define VL_FL_INT64  "ll"
+#endif
 #define VL_FL_INT32  ""
 #define VL_FL_INT16  "h"
 #define VL_FL_INT8   "hh"
