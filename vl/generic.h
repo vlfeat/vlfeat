@@ -91,12 +91,20 @@ static union { vl_uint32 raw ; float value ; }
 /** @brief IEEE double quiet NaN constant */
 static union { vl_uint64 raw ; double value ; } 
   const vl_nan_d = 
+#ifdef VL_COMPILER_MSC
+    { 0x7FF8000000000000ui64 } ;
+#else
     { 0x7FF8000000000000ULL } ;
+#endif
 
 /** @brief IEEE double infinity constant */
 static union { vl_uint64 raw ; float value ; } 
   const vl_infinity_d = 
+#ifdef VL_COMPILER_MSC
+    { 0x7FF0000000000000ui64 } ;
+#else
     { 0x7FF0000000000000ULL } ;
+#endif
 
 /** @brief Single NaN (not signaling) */
 #define VL_NAN_F (vl_nan_f.value)
