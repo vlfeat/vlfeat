@@ -29,7 +29,6 @@ mexFunction(int nout, mxArray *out[],
   int NX, NB ;
   const double *X, *B ;
   double *IDX ;
-  mxArray *IDX_array;
   
   if( nin != 2 ) {
     mexErrMsgTxt("Two arguments required.") ;

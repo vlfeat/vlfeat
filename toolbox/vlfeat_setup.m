@@ -18,8 +18,6 @@ addpath(fullfile(root,'toolbox','mser'    )) ;
 addpath(fullfile(root,'toolbox','plotop'  )) ;
 addpath(fullfile(root,'toolbox','sift'    )) ;
 addpath(fullfile(root,'toolbox','special' )) ;
-addpath(fullfile(root,'toolbox','test'    )) ;
-addpath(fullfile(root,'toolbox','demo'    )) ;
 addpath(fullfile(root,'toolbox',bindir    )) ;
 
 fprintf('Welcome to VLFeat!\n') ;
