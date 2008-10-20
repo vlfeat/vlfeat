@@ -99,9 +99,9 @@ main(int argc, char **argv)
   VlFileMeta piv  = {0, "%.mser",  VL_PROT_ASCII, "", 0} ;
   VlFileMeta met  = {0, "%.meta",  VL_PROT_ASCII, "", 0} ;
   
-#define ERR(...) {                                                     \
+#define ERR(msg, arg) {                                                \
     err = VL_ERR_BAD_ARG ;                                             \
-    snprintf(err_msg, sizeof(err_msg), __VA_ARGS__) ;                  \
+    snprintf(err_msg, sizeof(err_msg), msg, arg) ;                     \
     break ;                                                            \
   }
   
@@ -154,25 +154,25 @@ main(int argc, char **argv)
     case opt_max_area :
       n = sscanf (optarg, "%lf", &max_area) ;
       if (n == 0 || max_area < 0 || max_area > 1)
-        ERR("max-area argument must be in the [0,1] range.") ;
+        ERR("max-area argument must be in the [0,1] range.", NULL) ;
       break ;
 
     case opt_min_area :
       n = sscanf (optarg, "%lf", &min_area) ;
       if (n == 0 || min_area < 0 || min_area > 1)
-        ERR("min-area argument must be in the [0,1] range.") ;
+        ERR("min-area argument must be in the [0,1] range.", NULL) ;
       break ;
 
     case opt_max_variation :
       n = sscanf (optarg, "%lf", &max_variation) ;
       if (n == 0 || max_variation < 0) 
-        ERR("max-variation argument must be non-negative.") ;
+        ERR("max-variation argument must be non-negative.", NULL) ;
       break ;      
 
     case opt_min_diversity :
       n = sscanf (optarg, "%lf", &min_diversity) ;
       if (n == 0 || min_diversity < 0 || min_diversity > 1)
-        ERR("min-diversity argument must be in the [0,1] rang.") ;
+        ERR("min-diversity argument must be in the [0,1] rang.", NULL) ;
       break ;
 
       /* ........................................................... */
@@ -194,7 +194,7 @@ main(int argc, char **argv)
         ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
 
       if (met.protocol != VL_PROT_ASCII)
-        ERR("meta file supports only ASCII protocol") ;
+        ERR("meta file supports only ASCII protocol", NULL) ;
       break ;
 
       /* .......................................................... */      

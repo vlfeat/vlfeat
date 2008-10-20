@@ -20,6 +20,7 @@ General Public License version 2.
 
 #ifdef VL_COMPILER_MSC
 #define snprintf _snprintf
+#define vsnprintf _vsnprintf
 #endif
 
 #if !defined(MX_API_VER) | (MX_API_VER < 0x07030000) 
