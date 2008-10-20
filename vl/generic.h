@@ -152,8 +152,7 @@ void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
  **
  ** @return results of the user-customizable @c printf.
  **/
-#define VL_PRINTF(format, ...) \
-((*vl_printf_func)((format), __VA_ARGS__))
+#define VL_PRINTF (*vl_printf_func)
 
 /** @def VL_PRINT
  ** @brief Call user-customizable @c printf function (no varags)
