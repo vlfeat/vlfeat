@@ -65,6 +65,10 @@ uMexOption options [] = {
 #define ABS(x)        ((x) >= 0   ? (x) : -(x))
 #define ABS_DIFF(x,y) ((x) >= (y) ? ((x) - (y)) : ((y) - (x)))
 
+#ifndef sqrtf
+#define sqrtf(x) ((float)sqrt(x))
+#endif
+
 /* for L2 norm */
 /*#define CMP(s1,s2) ((double)(s1*s2)) */
 
