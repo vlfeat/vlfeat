@@ -1,3 +1,10 @@
+% VL_COMPILE  Compile MEX files
+%   VL_COMPILE() uses MEX() to compile VLFeat MEX files. This command
+%   is needed moslty under Windows to re-build problematic binares.
+%
+%   See also:: VL_HELP().
+    
+
 basedir = fullfile(vlfeat_root, 'toolbox');
 dirlist = {'aib', 'demo', 'geometry', 'imop', 'kmeans', 'misc', 'mser', ...
            'plotop', 'sift', 'special', 'test'};

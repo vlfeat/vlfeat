@@ -184,14 +184,13 @@ define C
 	echo "******* Command Output:";                              \
         echo "$${out}";                                              \
     fi;                                                              \
-    echo "$${out}" | grep arning ;                                  \
+    echo "$${out}" | grep arning ;                                   \
     return $${err};                                                  \
 } ; quiet
 endef
 
 # Uncomment this line to unsuppress printing commands:
 # C = $($(1))
-
 
 # --------------------------------------------------------------------
 #                                            Common UNIX Configuration
@@ -215,10 +214,8 @@ MATLABEXE       ?= matlab
 MEX             ?= mex
 PYTHON          ?= python
 
-CFLAGS          += -I$(CURDIR) -pedantic
-CFLAGS          += -Wall -std=c89 -O3
-CFLAGS          += -Wno-unused-function 
-CFLAGS          += -Wno-long-long
+CFLAGS          += -I$(CURDIR) -pedantic -std=c89 -O3
+CFLAGS          += -Wall -Wno-unused-function -Wno-long-long
 CFLAGS          += $(if $(DEBUG), -O0 -g)
 LDFLAGS         += -L$(BINDIR) -l$(DLL_NAME)
 
@@ -321,7 +318,7 @@ $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
 
 # --------------------------------------------------------------------
-#                                                  Build shared library
+#                                             Build the shared library
 # --------------------------------------------------------------------
 #
 # Objects and dependencies are placed in the $(BINDIR)/objs/
@@ -464,7 +461,6 @@ doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;vlfeat_demo;exit'
 
-
 #
 # Use webdoc.py to generate the website
 #
@@ -499,7 +495,7 @@ doc/api/index.html: docsrc/doxygen.conf VERSION                      \
 	$(call C,DOXYGEN) $<
 
 #
-# Figure conversion
+# Convert figure formats
 #
 
 doc/figures/%.png : doc/figures/%.dvi
@@ -537,6 +533,10 @@ doc/demo/%.png : doc/demo/%.eps
 doc/%.pdf : doc/%.eps
 	$(call C,EPSTOPDF) --outfile=$@ $<
 
+#
+# Other documentation related targets
+#
+
 doc-bindist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
 	  --exclude=doc/demo/*.eps                                   \
@@ -545,9 +545,6 @@ doc-bindist: $(NAME) doc
 doc-distclean:
 	rm -f  docsrc/*.pyc
 	rm -rf doc
-
-doc-wiki: $(NAME) 
-	$(call C,PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
 
 autorights: distclean
 	autorights                                                   \
@@ -604,12 +601,12 @@ bindist: $(NAME) all doc-bindist
 	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)/
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
-	           --include=*.dylib                                 \
-	           --include=*.so                                    \
 	           --include=*mexw32                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
 	           --include=*dll                                    \
+	           --include=*.dylib                                 \
+	           --include=*.so                                    \
 		   --exclude=*                                       \
 	           toolbox/ $(NAME)/toolbox 
 	tar czvf $(BINDIST).tar.gz $(NAME)/
@@ -669,7 +666,7 @@ info :
 	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 
 # --------------------------------------------------------------------
-#                                                        Xcode Support
+#                                                       X-Code Support
 # --------------------------------------------------------------------
 
 .PHONY: dox-
