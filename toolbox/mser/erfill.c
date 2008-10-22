@@ -27,7 +27,7 @@ General Public License version 2.
 
 typedef char unsigned val_t ;
 typedef int  unsigned idx_t ;
-typedef long long int unsigned acc_t ;
+typedef vl_uint64 acc_t ;
 
 /* advance N-dimensional subscript */
 void

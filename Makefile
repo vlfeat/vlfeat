@@ -108,7 +108,7 @@
 
 NAME   := vlfeat
 VER    := 0.9.2
-HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat
+HOST   := ganesh.cs.ucla.edu:/var/www/vltest
 #NDEBUG :=
 
 .PHONY : all
@@ -462,7 +462,7 @@ doc-toolbox: doc/toolbox-src/mdoc.html
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;demo_all;exit'
+	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;vlfeat_demo;exit'
 
 
 #

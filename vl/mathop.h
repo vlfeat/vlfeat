@@ -211,8 +211,12 @@ vl_fast_resqrt_d (double x)
   u.x = x ;                   
   
   /* gives initial guess y0 */
-  u.i = 0x5fe6ec85e7de30daLL - (u.i >> 1) ; 
-  
+#ifdef VL_COMPILER_MSC
+  u.i = 0x5fe6ec85e7de30dai64 - (u.i >> 1) ; 
+#else
+  u.i = 0x5fe6ec85e7de30daLL - (u.i >> 1) ;
+#endif
+
   /* two Newton steps */
   u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ; 
   u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ;

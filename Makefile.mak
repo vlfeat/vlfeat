@@ -135,6 +135,8 @@ cmdsrc =                \
 mexsrc =                       \
  toolbox\sift\sift.c           \
  toolbox\sift\ubcmatch.c       \
+ toolbox\sift\dhog.c           \
+ toolbox\sift\siftdescriptor.c \
  \
  toolbox\mser\mser.c           \
  toolbox\mser\erfill.c         \
