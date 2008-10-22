@@ -53,6 +53,12 @@
 #if defined(_MSC_VER) || defined(__DOXYGEN__)
 #define VL_COMPILER_MSC _MSC_VER
 #endif
+
+#if defined(__LCC__) || defined(__DOXYGEN__)
+#warning "LCC support is experimental!"
+#define VL_COMPILER_LCC 1
+#endif
+
 /** @} */
 
 /** @name Identifying the host CPU architecture
@@ -87,6 +93,7 @@
     defined(__LLP64)   || \
     defined(__LLP64)   || \
     (defined(VL_COMPILER_MSC) & defined(VL_OS_WIN64)) || \
+    (defined(VL_COMPILER_LCC) & defined(VL_OS_WIN64)) || \
     defined(__DOXYGEN__)
 #define VL_COMPILER_LLP64
 #endif
@@ -131,6 +138,17 @@
 #endif
 #endif
 
+#if defined(VL_COMPILER_LCC)
+#define VL_INLINE static __inline
+#define snprintf _snprintf
+#define isnan _isnan
+#ifdef VL_BUILD_DLL
+#define VL_EXPORT __declspec(dllexport)
+#else
+#define VL_EXPORT 
+#endif
+#endif
+
 #if defined(VL_COMPILER_GNUC) || \
     defined(__DOXYGEN__)
 #define VL_INLINE static __inline__
@@ -165,7 +183,7 @@ typedef vl_int64            vl_intptr ;  /**< @brief Integer holding a pointer. 
 typedef vl_uint64           vl_uintptr ; /**< @brief Unsigned integer holding a pointer. */
 #endif
 
-#ifdef VL_COMPILER_ILP32
+#if defined(VL_COMPILER_ILP32)
 
 #ifdef VL_COMPILER_MSC
 typedef __int64             vl_int64 ;  
@@ -198,6 +216,7 @@ typedef vl_uint32           vl_uintptr ;
 /** ------------------------------------------------------------------
  ** @name Printing the atomic data types
  ** @{ */
+
 
 /** @def VL_FL_INT64 
  ** @brief @c prinf length flag for ::vl_int64 and ::vl_uint64. 

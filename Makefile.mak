@@ -12,17 +12,21 @@
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 # - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
-MSVCR      = msvcr90.dll
+MSVCR      = msvcr90.dll 
+MSVCP      = msvcp90.dll 
+MSVCM      = msvcm90.dll
 MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT
 MATLABROOT = C:\Program Files\MATLAB\R2008a
 MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # Here is an example of how the variables might look with a different version
 # of Visual Studio and an alternate location for Matlab
-#MSVCR      = msvcr80.dll
-#MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
-#MATLABROOT = C:\Program Files\MATLAB08a
-#MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
+MSVCR      = msvcr80.dll 
+MSVCP      = msvcp80.dll 
+MSVCM      = msvcm80.dll
+MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+MATLABROOT = C:\Program Files\MATLAB08a
+MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -79,7 +83,7 @@ objdir     = $(bindir)\objs
 CFLAGS     = /nologo /TC /MD \
              /D"__VISUALC__" /D"WIN32" \
              /D"__LITTLE_ENDIAN__" \
-						 /D"VL_SUPPORT_SSE2" \
+             /D"VL_SUPPORT_SSE2" \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /I. \
              /W1 /Z7 /Zp8 /O2
@@ -133,36 +137,36 @@ cmdsrc =                \
  src\test_host.c
 
 mexsrc =                       \
- toolbox\sift\sift.c           \
- toolbox\sift\ubcmatch.c       \
- toolbox\sift\dhog.c           \
- toolbox\sift\siftdescriptor.c \
+ toolbox\sift\vl_sift.c           \
+ toolbox\sift\vl_ubcmatch.c       \
+ toolbox\sift\vl_dhog.c           \
+ toolbox\sift\vl_siftdescriptor.c \
  \
- toolbox\mser\mser.c           \
- toolbox\mser\erfill.c         \
+ toolbox\mser\vl_mser.c           \
+ toolbox\mser\vl_erfill.c         \
  \
- toolbox\imop\imsmooth.c       \
- toolbox\imop\imintegral.c     \
- toolbox\imop\imwbackwardmx.c  \
- toolbox\imop\tpsumx.c         \
+ toolbox\imop\vl_imsmooth.c       \
+ toolbox\imop\vl_imintegral.c     \
+ toolbox\imop\vl_imwbackwardmx.c  \
+ toolbox\imop\vl_tpsumx.c         \
  \
- toolbox\geometry\rodr.c       \
- toolbox\geometry\irodr.c      \
+ toolbox\geometry\vl_rodr.c       \
+ toolbox\geometry\vl_irodr.c      \
  \
- toolbox\kmeans\ikmeans.c      \
- toolbox\kmeans\ikmeanspush.c  \
- toolbox\kmeans\hikmeans.c     \
- toolbox\kmeans\hikmeanspush.c \
+ toolbox\kmeans\vl_ikmeans.c      \
+ toolbox\kmeans\vl_ikmeanspush.c  \
+ toolbox\kmeans\vl_hikmeans.c     \
+ toolbox\kmeans\vl_hikmeanspush.c \
  \
- toolbox\misc\alldist2.c       \
- toolbox\misc\binsum.c         \
- toolbox\misc\ihashfind.c      \
- toolbox\misc\ihashsum.c       \
- toolbox\misc\localmax.c       \
- toolbox\misc\whistc.c         \
+ toolbox\misc\vl_alldist2.c       \
+ toolbox\misc\vl_binsum.c         \
+ toolbox\misc\vl_ihashfind.c      \
+ toolbox\misc\vl_ihashsum.c       \
+ toolbox\misc\vl_localmax.c       \
+ toolbox\misc\vl_whistc.c         \
  \
- toolbox\aib\aib.c             \
- toolbox\aib\aibhist.c
+ toolbox\aib\vl_aib.c             \
+ toolbox\aib\vl_aibhist.c
 
 libobj = $(libsrc:vl\=bin\win32\objs\)
 libobj = $(libobj:.c=.obj)
@@ -182,9 +186,9 @@ mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll) $(mexdir)\$(MSVCR) $(bindir)\$(MSVCR)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll) $(mexdir)\$(MSVCR) $(mexdir)\$(MSVCP) $(mexdir)\$(MSVCM) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
 !ELSE
-all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(mexdir)\$(MSVCR) $(bindir)\$(MSVCR)
+all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
 !ENDIF
 
 BUILD_DLL=@echo .... CC [MEX] $(@R).dll && \
@@ -300,6 +304,19 @@ $(mexdir)\vl.dll : $(bindir)\vl.dll
 $(bindir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
 	copy $(**) "$(@)"
 
+$(bindir)\$(MSVCP): "$(MSVCRLOC)\$(MSVCP)"
+	copy $(**) "$(@)"
+
+$(bindir)\$(MSVCM): "$(MSVCRLOC)\$(MSVCM)"
+	copy $(**) "$(@)"
+
 # msvcr__.dll => toolbox/mexw32/msvcr__.dll
 $(mexdir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
 	copy $(**) "$(@)"
+
+$(mexdir)\$(MSVCP): "$(MSVCRLOC)\$(MSVCP)"
+	copy $(**) "$(@)"
+
+$(mexdir)\$(MSVCM): "$(MSVCRLOC)\$(MSVCM)"
+	copy $(**) "$(@)"
+
