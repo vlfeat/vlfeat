@@ -316,6 +316,7 @@ $(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
+$(eval $(call gendir, usingvl, toolbox/usingvl                      ))
 
 # --------------------------------------------------------------------
 #                                             Build the shared library
@@ -409,9 +410,11 @@ mex_tgt := $(addprefix $(MEX_BINDIR)/,                               \
 mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 
 vpath %.c $(shell find toolbox -type d)
+vpath vl_%.m $(shell find toolbox -type d)
+vpath vl_%.$(MEX_SUFFIX) $(MEX_BINDIR)
 
 .PHONY: all-mex
-all-mex : $(mex_tgt)
+all-mex : $(mex_tgt) usingvl
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
@@ -429,6 +432,23 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	 ln -sf ../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)         \
 	        $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 
+m_src := $(shell find toolbox -name "vl_*.m")
+m_lnk := $(addprefix toolbox/usingvl/,                               \
+          $(filter-out test_%,                                       \
+          $(filter-out demo_%,                                       \
+          $(subst vl_,,$(notdir $(m_src))))))
+m_lnk += $(addprefix toolbox/usingvl/,                               \
+	  $(subst vl_,,$(notdir $(mex_tgt))))
+
+toolbox/usingvl/%.m : vl_%.m
+	ln -s ../../"$<" "$@"
+
+toolbox/usingvl/%.$(MEX_SUFFIX) : vl_%.$(MEX_SUFFIX)
+	ln -s ../../"$<" "$@"
+
+.PHONY: usingvl
+usingvl: $(usingvl-dir) $(m_lnk)
+
 # --------------------------------------------------------------------
 #                                                  Build documentation
 # --------------------------------------------------------------------
@@ -438,7 +458,6 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 .PHONY: doc-bindist, doc-distclean
 .PHONY: autorights
 
-m_src    := $(shell find toolbox -name "*.m")
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
 html_src := $(wildcard docsrc/*.html)
@@ -579,6 +598,7 @@ distclean: clean doc-distclean
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
 	rm -f $(NAME)-*.tar.gz
+	rm -rf toolbox/usingvl
 
 # --------------------------------------------------------------------
 #                                          Build distribution packages
