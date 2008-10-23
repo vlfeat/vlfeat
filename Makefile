@@ -495,9 +495,13 @@ doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
 # embedded in the website.
 #
 
-doc/toolbox-src/mdoc.html : $(m_src)
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src --format=web
-
+doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
+	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
+	          --format=web \
+	          --exclude='usingvl/.*' \
+	          --exclude='.*/vl_test_.*' \
+	          --exclude='.*/vl_demo_.*' \
+	          --verbose
 #
 # Generate the customized API documentation
 #

@@ -13,6 +13,11 @@ from formatter import Formatter
 from optparse import OptionParser
 from webdoc import WebSite, readText, PageGenerator
 
+excludeRegexList = []
+format           = 'html' 
+verb             = 0
+sitexml          = ""
+
 usage = """usage: %prog [options] <basedir> <docdir>
 
 Takes all .m files in basedir and its subdirectories and converts
@@ -29,15 +34,19 @@ parser.add_option(
     metavar = "STRING")
 
 parser.add_option(
+    "-x", "--exclude", 
+    dest    = "excludeList",
+    action  = "append",
+    type    = "string",
+    help    = "exclude files matching the specified regexp")
+
+parser.add_option(
     "-v", "--verbose", 
     dest    = "verb",
     default = False,
     action  = "store_true",
     help    = "print debug information")
 
-format = 'html' 
-verb = 0
-sitexml = ""
 
 # --------------------------------------------------------------------
 def runcmd(cmd):
@@ -212,39 +221,40 @@ def extract(path):
 
 
 # --------------------------------------------------------------------
-def xscan(basedir, dirname=''):
+def xscan(baseDir, subDir=''):
 # --------------------------------------------------------------------
     """
     NODE = xscan(BASEDIR) recusrively scans the directory BASEDIR and
     construct the toolbox hierarchy rooted at NODE.
     """
     
-    node = Node(dirname)
+    node = Node(subDir)
+    dir = os.listdir(os.path.join(baseDir, subDir))
+    fileNames  = [f for f in dir if os.path.isfile(
+                  os.path.join(baseDir, subDir, f))]
+    subSubDirs = [s for s in dir if os.path.isdir (
+                  os.path.join(baseDir, subDir, s))]
 
-    dir   = os.listdir(os.path.join(basedir, dirname))
-    files = [f for f in dir if os.path.isfile(
-            os.path.join(basedir, dirname, f))]
-    sdirs = [s for s in dir if os.path.isdir (
-            os.path.join(basedir, dirname, s))]
-
-    # Scan M-Files
-    for f in files:
+    # Scan M-FileNames
+    for fileName in fileNames:
         # only m-files
-        if not os.path.splitext(f)[1] == '.m':
+        if not os.path.splitext(fileName)[1] == '.m':
             continue
 
-        mfile = MFile(basedir, dirname, f)    
+        # skip if in the exclude list
+        for rx in excludeRegexList:
+            fileRelPath = os.path.join(subDir, fileName)
+            mo = rx.match(fileRelPath)
+            if not mo == None and (mo.end() - mo.start() == len(fileRelPath)):
+                if verb:
+                    print "mdoc: excluding ''%s''." % fileRelPath
+                    continue
 
-        # exclude demo/test functions
-        func = mfile.funcname
-        if func.find('DEMO') != -1 : continue
-        if func.find('TEST') != -1 : continue
-        
-        node.addMFile(mfile)
+        node.addMFile(MFile(baseDir, subDir, fileName))
 
     # Scan sub-directories
-    for s in sdirs:
-        node.addChildNode(xscan(basedir, os.path.join(dirname, s)))
+    for s in subSubDirs:
+        node.addChildNode(xscan(basedir, os.path.join(subDir, s)))
 
     return node
 
@@ -274,6 +284,11 @@ if __name__ == '__main__':
 
     if options.verb: verb = 1
     format = options.format
+
+    print options.excludeList
+    for ex in options.excludeList:
+        rx = re.compile(ex)
+        excludeRegexList.append(rx)
 
     if len(args) != 2:
         parser.print_help()
