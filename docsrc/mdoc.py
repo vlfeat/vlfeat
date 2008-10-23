@@ -242,13 +242,15 @@ def xscan(baseDir, subDir=''):
             continue
 
         # skip if in the exclude list
+        exclude = False
         for rx in excludeRegexList:
             fileRelPath = os.path.join(subDir, fileName)
             mo = rx.match(fileRelPath)
-            if not mo == None and (mo.end() - mo.start() == len(fileRelPath)):
+            if mo and (mo.end() - mo.start() == len(fileRelPath)):
                 if verb:
                     print "mdoc: excluding ''%s''." % fileRelPath
-                    continue
+                    exclude = True
+        if exclude: continue
 
         node.addMFile(MFile(baseDir, subDir, fileName))
 
