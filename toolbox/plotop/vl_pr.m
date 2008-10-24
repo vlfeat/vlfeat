@@ -6,8 +6,8 @@ function [recall, precision, info] = vl_pr(y, scores)
 %  data by a classifier (lager scores correspond to positive
 %  guesses). 
 %
-%  Remark:: Give -inf score to data which is never retrieved (this
-%     will result in maximum recall < 1).
+%  Remark:: You can assign -INF score to data which is never retrieved
+%    (this will result in maximum recall < 1).
 %
 %  RECALL and PRECISION are the recall and the precision for
 %  increasing values of the decision threshold.
@@ -20,14 +20,16 @@ function [recall, precision, info] = vl_pr(y, scores)
 %      R = TP / P = recall
 %
 %    The precision P is the fraction of positivie predictions which
-%    are correct, and the recall R is the fraction of actual positive
+%    are correct, and the recall R is the fraction of trurly positive
 %    labels that have been correctly classified (recalled).
 %
-%    Notice that the recall is also equal to the true positive rate.
+%    Notice that the recall is also equal to the true positive rate in
+%    a ROC curve (see VL_ROC()).
 %
-%  Remark:: precision is undefined (NaN) for those values of the
+%  Remark:: precision (P) is undefined for those values of the
 %    classifier threshold for which no example is classified as
-%    positive.
+%    positive. Conventionally, we assign a precision of P=1 to such
+%    cases.
 %
 %  See also:: VL_ROC(), VL_HELP_VLFEAT().
 
@@ -42,12 +44,12 @@ y = y(perm) ;
 
 stop = max(find(scores > -inf)) ;
 
-tp = cumsum(y(1:stop) == +1) ;
-fp = cumsum(y(1:stop) == -1) ;
+tp = [0 cumsum(y(1:stop) == +1)] ;
+fp = [0 cumsum(y(1:stop) == -1)] ;
 p  = sum(y == +1) ;
 
-recall    = tp / (p + eps) ;
-precision = tp ./ (tp + fp + eps) ;
+recall    = tp  / (p + eps) ;
+precision = (tp + eps) ./ (tp + fp + eps) ;
 
 % compute auc
 stop = max(find(~isnan(precision))) ;
