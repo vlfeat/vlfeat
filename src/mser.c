@@ -111,6 +111,10 @@ main(int argc, char **argv)
   while (!err) {
     int ch = getopt_long(argc, argv, opts, longopts, 0) ;
 
+    /* If there are no files passed as input, print the help and settings */
+    if (ch == -1 && argc - optind == 0)
+      ch = 'h';
+
     /* end of option list? */
     if (ch == -1) break;
 
@@ -129,9 +133,9 @@ main(int argc, char **argv)
       
     case 'h' :
       printf (help_message, argv [0]) ;
-      printf ("Default MSERs  filespec: `%s'\n", piv.pattern) ;
-      printf ("Default frames filespec: `%s'\n", frm.pattern) ;
-      printf ("Default meta   filespec: `%s'\n", met.pattern) ;
+      printf ("MSERs  filespec: `%s'\n", piv.pattern) ;
+      printf ("Frames filespec: `%s'\n", frm.pattern) ;
+      printf ("Meta   filespec: `%s'\n", met.pattern) ;
       printf ("Version: driver %s; libvl %s\n", 
               VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
               vl_get_version_string()) ;

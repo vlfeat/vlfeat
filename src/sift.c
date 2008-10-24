@@ -209,6 +209,10 @@ main(int argc, char **argv)
   while (!err) {
     int ch = getopt_long(argc, argv, opts, longopts, 0) ;
 
+    /* If there are no files passed as input, print the help and settings */
+    if (ch == -1 && argc - optind == 0)
+      ch = 'h';
+
     /* end of option list? */
     if (ch == -1) break;
 
@@ -228,12 +232,12 @@ main(int argc, char **argv)
     case 'h' :
       /* --help ................................................... */
       printf (help_message, argv [0]) ;
-      printf ("Default SIFT         filespec: `%s'\n", out.pattern) ;
-      printf ("Default frames       filespec: `%s'\n", frm.pattern) ;
-      printf ("Default descriptros  filespec: `%s'\n", dsc.pattern) ;
-      printf ("Default meta         filespec: `%s'\n", met.pattern) ;
-      printf ("Default GSS          filespec: '%s'\n", gss.pattern) ;
-      printf ("Default read frames  filespec: '%s'\n", ifr.pattern) ;
+      printf ("SIFT         filespec: `%s'\n", out.pattern) ;
+      printf ("Frames       filespec: `%s'\n", frm.pattern) ;
+      printf ("Descriptors  filespec: `%s'\n", dsc.pattern) ;
+      printf ("Meta         filespec: `%s'\n", met.pattern) ;
+      printf ("GSS          filespec: '%s'\n", gss.pattern) ;
+      printf ("Read frames  filespec: '%s'\n", ifr.pattern) ;
       printf ("Version: driver %s; libvl %s\n", 
               VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
               vl_get_version_string()) ;
