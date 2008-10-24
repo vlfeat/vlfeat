@@ -434,9 +434,14 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 
 m_src := $(shell find toolbox -name "vl_*.m")
 m_lnk := $(addprefix toolbox/usingvl/,                               \
+          $(filter-out setup.m,                                      \
+          $(filter-out help.m,                                       \
+          $(filter-out root.m,                                       \
+          $(filter-out demo.m,                                       \
+          $(filter-out compile.m,                                    \
           $(filter-out test_%,                                       \
           $(filter-out demo_%,                                       \
-          $(subst vl_,,$(notdir $(m_src))))))
+          $(subst vl_,,$(notdir $(m_src)))))))))))
 m_lnk += $(addprefix toolbox/usingvl/,                               \
 	  $(subst vl_,,$(notdir $(mex_tgt))))
 
