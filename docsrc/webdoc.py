@@ -498,7 +498,7 @@ class WebSite:
                        
           text = re.sub("%stylesheet;", block, text)
           text = re.sub("%pagetitle;", "VLFeat - %s" % page.title, text)
-          text = re.sub("%title;", "<h1>VLFeat</h1>", text)
+          text = re.sub("%title;", "<h1>VLFeat.org</h1>", text)
           text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
           text = re.sub("%index;", self.genHtmlIndex(self.root), text)
           text = re.sub("%content;", page.data, text)
