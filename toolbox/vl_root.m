@@ -1,10 +1,12 @@
 function path = vl_root
-% VL_ROOT  Obtain VLFeat package root directory
-%   PATH = VL_ROOT() returns the root directory of the VLFeat
-%   package.
+% VL_ROOT  Obtain VLFeat root path
+%   PATH = VL_ROOT() returns the path to the VLFeat installation.
 %   
 %   See also:: VL_SETUP(), VL_VLFEAT().
+%   Authors:: Andrea Vedaldi and Brian Fulkerson
 
-[a,b,c] = fileparts(which('vl_root')) ;
+% AUTORIGHTS
+
+[a,b,c] = fileparts(mfilename('fullpath')) ;
 [a,b,c] = fileparts(a) ;
-path = a;
+path = a ;
