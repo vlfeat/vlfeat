@@ -1,1 +1,0 @@
-imreadgray.m

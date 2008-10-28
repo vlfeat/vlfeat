@@ -1,22 +1,43 @@
-<p><img src="%root;images/cover.jpg" width=320 height=229 alt="VLFeat"/></p>
+<p><img style="float:left;margin-right:1em;" src="%root;images/cover.jpg" width=320 height=229 alt="VLFeat"/></p>
 
-<p><b>VLFeat</b> is a cross-platform open source collection of vision algorithms
-with a special focus on visual features (SIFT, MSER) and clustering (k-means,
-hierarchical k-means, agglomerative information bottleneck). It bundles
-a MATLAB toolbox, a clean and portable C library and a number of
-command line utilities. Thus it is possible to use the same algorithm
-both from MATLAB, the command line, and your own programs.</p>
+<p><b>VLFeat</b> is a MATLAB-compatible implementation common computer
+vision algorithms such
+as <em>SIFT</em>, <em>MSER</em>, <em>k-means</em>, <em>hierarchical
+k-means</em>, and <em>agglomerative information bottleneck</em>.</p>
 
-<p>VLFeat is an effort initiated by Andrea Vedaldi and Brian Fulkerson
-in 2007.</p>
+<p><b>VLFeat</b> is easily portable and supports natively <em>Mac OS
+X</em>, <em>Linux</em>, and <em>Windows</em>.</p>
 
-<h2 id="getting-started">Getting started</h2>
+<p><b>VLFeat</b> is <em>open source</em> software licensed in the term
+of
+the <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU
+GPL V2 license</a>.</p>
 
-<p>VLFeat can be obtained <a href="download">here</a>. To start using
-the MATLAB toolbox, you can read some of
-the <a href="tut">tutorials</a> and the <a href="mdoc">list of
-MATLAB functions</a>. To learn about the C library interface and
-details of the implemented algorithms, please refer to
-the <a href="api">C library documentation</a>. Finally, to use the
-command line utilities, please refer to the
-relative <a href="man">manual pages</a>.</p>
+<h2 style="clear:both;" id="getting-started">Getting started</h2>
+
+<p>You can obtain <b>VLFeat</b> source code or precompiled binares
+from <a href="download">here</a>. To start using the MATLAB toolbox,
+you can read some of the <a href="tut">tutorials</a> and have a look
+at the <a href="mdoc">list of MATLAB functions</a>.</p>
+
+<p>Some algorithms (SIFT and MSER) have command line intefraces as
+well (which do not require MATLAB). To learn about the command line
+utilities please refer to the relative <a href="man">manual
+pages</a>.</p>
+
+<p>The core of VLFeat is a clean C library. To learn about the C API
+and the details of the implemented algorithms, please refer to
+the <a href="api">C library documentation</a>.</p>
+
+<h2 id="cyting-vlfeat">Cyting</h2>
+
+<p>If you use VLFeat in your research work, please consider citing us. If you use
+BibTex, you can use the following entry:</p>
+<pre>
+@misc{vedaldi08vlfeat,
+  Author       = {A. Vedaldi and B. Fulkerson},
+  Howpublished = {\url{http://www.vlfeat.org/}},
+  Title        = {{VLFeat}: An Open and Portable Library 
+                  of Computer Vision Algorithms},
+  Year         = {2008}}
+</pre>

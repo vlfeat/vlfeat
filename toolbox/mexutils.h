@@ -258,7 +258,6 @@ uIsRealVector(const mxArray* A, int N)
     uIsRealMatrix(A, 1, N) || uIsRealMatrix(A, N, 1) ;
 }
 
-
 /** ------------------------------------------------------------------
  ** @brief Is the array real with specified dimensions?
  **
@@ -342,7 +341,11 @@ uErrMsgTxt(char const * format, ...)
   char buffer [buffLen] ;
   va_list args;
   va_start (args, format) ;
+#ifdef VL_COMPILER_LCC
+  vsprintf(buffer, format, args) ;
+#else
   vsnprintf (buffer, buffLen, format, args) ;
+#endif
   va_end (args) ;
   mexErrMsgTxt (buffer) ;
 }

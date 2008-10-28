@@ -184,14 +184,13 @@ define C
 	echo "******* Command Output:";                              \
         echo "$${out}";                                              \
     fi;                                                              \
-    echo "$${out}" | grep arning ;                                  \
+    echo "$${out}" | grep arning ;                                   \
     return $${err};                                                  \
 } ; quiet
 endef
 
 # Uncomment this line to unsuppress printing commands:
 # C = $($(1))
-
 
 # --------------------------------------------------------------------
 #                                            Common UNIX Configuration
@@ -215,10 +214,8 @@ MATLABEXE       ?= matlab
 MEX             ?= mex
 PYTHON          ?= python
 
-CFLAGS          += -I$(CURDIR) -pedantic
-CFLAGS          += -Wall -std=c89 -O3
-CFLAGS          += -Wno-unused-function 
-CFLAGS          += -Wno-long-long
+CFLAGS          += -I$(CURDIR) -pedantic -std=c89 -O3
+CFLAGS          += -Wall -Wno-unused-function -Wno-long-long
 CFLAGS          += $(if $(DEBUG), -O0 -g)
 LDFLAGS         += -L$(BINDIR) -l$(DLL_NAME)
 
@@ -319,9 +316,10 @@ $(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
+$(eval $(call gendir, usingvl, toolbox/usingvl                      ))
 
 # --------------------------------------------------------------------
-#                                                  Build shared library
+#                                             Build the shared library
 # --------------------------------------------------------------------
 #
 # Objects and dependencies are placed in the $(BINDIR)/objs/
@@ -412,9 +410,11 @@ mex_tgt := $(addprefix $(MEX_BINDIR)/,                               \
 mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 
 vpath %.c $(shell find toolbox -type d)
+vpath vl_%.m $(shell find toolbox -type d)
+vpath vl_%.$(MEX_SUFFIX) $(MEX_BINDIR)
 
 .PHONY: all-mex
-all-mex : $(mex_tgt)
+all-mex : $(mex_tgt) usingvl
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
@@ -432,6 +432,28 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	 ln -sf ../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)         \
 	        $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 
+m_src := $(shell find toolbox -name "vl_*.m")
+m_lnk := $(addprefix toolbox/usingvl/,                               \
+          $(filter-out setup.m,                                      \
+          $(filter-out help.m,                                       \
+          $(filter-out root.m,                                       \
+          $(filter-out demo.m,                                       \
+          $(filter-out compile.m,                                    \
+          $(filter-out test_%,                                       \
+          $(filter-out demo_%,                                       \
+          $(subst vl_,,$(notdir $(m_src)))))))))))
+m_lnk += $(addprefix toolbox/usingvl/,                               \
+	  $(subst vl_,,$(notdir $(mex_tgt))))
+
+toolbox/usingvl/%.m : vl_%.m
+	ln -s ../../"$<" "$@"
+
+toolbox/usingvl/%.$(MEX_SUFFIX) : vl_%.$(MEX_SUFFIX)
+	ln -s ../../"$<" "$@"
+
+.PHONY: usingvl
+usingvl: $(usingvl-dir) $(m_lnk)
+
 # --------------------------------------------------------------------
 #                                                  Build documentation
 # --------------------------------------------------------------------
@@ -441,7 +463,6 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 .PHONY: doc-bindist, doc-distclean
 .PHONY: autorights
 
-m_src    := $(shell find toolbox -name "*.m")
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
 html_src := $(wildcard docsrc/*.html)
@@ -464,7 +485,6 @@ doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;vlfeat_demo;exit'
 
-
 #
 # Use webdoc.py to generate the website
 #
@@ -480,9 +500,13 @@ doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
 # embedded in the website.
 #
 
-doc/toolbox-src/mdoc.html : $(m_src)
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src --format=web
-
+doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
+	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
+	          --format=web \
+	          --exclude='usingvl/.*' \
+	          --exclude='.*/vl_test_.*' \
+	          --exclude='.*/vl_demo_.*' \
+	          --verbose
 #
 # Generate the customized API documentation
 #
@@ -499,7 +523,7 @@ doc/api/index.html: docsrc/doxygen.conf VERSION                      \
 	$(call C,DOXYGEN) $<
 
 #
-# Figure conversion
+# Convert figure formats
 #
 
 doc/figures/%.png : doc/figures/%.dvi
@@ -537,6 +561,10 @@ doc/demo/%.png : doc/demo/%.eps
 doc/%.pdf : doc/%.eps
 	$(call C,EPSTOPDF) --outfile=$@ $<
 
+#
+# Other documentation related targets
+#
+
 doc-bindist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
 	  --exclude=doc/demo/*.eps                                   \
@@ -545,9 +573,6 @@ doc-bindist: $(NAME) doc
 doc-distclean:
 	rm -f  docsrc/*.pyc
 	rm -rf doc
-
-doc-wiki: $(NAME) 
-	$(call C,PYTHON) doc/mdoc.py --wiki toolbox doc/wiki
 
 autorights: distclean
 	autorights                                                   \
@@ -582,6 +607,7 @@ distclean: clean doc-distclean
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
 	rm -f $(NAME)-*.tar.gz
+	rm -rf toolbox/usingvl
 
 # --------------------------------------------------------------------
 #                                          Build distribution packages
@@ -604,12 +630,13 @@ bindist: $(NAME) all doc-bindist
 	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)/
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
-	           --include=*.dylib                                 \
-	           --include=*.so                                    \
 	           --include=*mexw32                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
 	           --include=*dll                                    \
+	           --include=*.manifest                              \
+	           --include=*.dylib                                 \
+	           --include=*.so                                    \
 		   --exclude=*                                       \
 	           toolbox/ $(NAME)/toolbox 
 	tar czvf $(BINDIST).tar.gz $(NAME)/
@@ -669,7 +696,7 @@ info :
 	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 
 # --------------------------------------------------------------------
-#                                                        Xcode Support
+#                                                       X-Code Support
 # --------------------------------------------------------------------
 
 .PHONY: dox-
