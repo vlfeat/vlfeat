@@ -15,18 +15,19 @@
 MSVCR      = msvcr90.dll 
 MSVCP      = msvcp90.dll 
 MSVCM      = msvcm90.dll
+MSMANIFEST = Microsoft.VC90.CRT.manifest
 MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT
 MATLABROOT = C:\Program Files\MATLAB\R2008a
 MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # Here is an example of how the variables might look with a different version
 # of Visual Studio and an alternate location for Matlab
-MSVCR      = msvcr80.dll 
-MSVCP      = msvcp80.dll 
-MSVCM      = msvcm80.dll
-MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
-MATLABROOT = C:\Program Files\MATLAB08a
-MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
+#MSVCR      = msvcr80.dll 
+#MSVCP      = msvcp80.dll 
+#MSVCM      = msvcm80.dll
+#MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+#MATLABROOT = C:\Program Files\MATLAB08a
+#MATLABLIB  = "$(MATLABROOT)\extern\lib\win32\microsoft"
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -186,9 +187,9 @@ mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !IFDEF MATLABROOT
-all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll) $(mexdir)\$(MSVCR) $(mexdir)\$(MSVCP) $(mexdir)\$(MSVCM) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
+all: $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\vl.dll $(cmdexe) $(mexdll) $(mexdir)\$(MSMANIFEST) $(mexdir)\$(MSVCR) $(mexdir)\$(MSVCP) $(mexdir)\$(MSVCM) $(bindir)\$(MSMANIFEST) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
 !ELSE
-all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
+all: $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(bindir)\$(MSMANIFEST) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
 !ENDIF
 
 BUILD_DLL=@echo .... CC [MEX] $(@R).dll && \
@@ -207,9 +208,16 @@ clean:
 	del /f /Q $(objdir)
 	del /f /Q $(cmdpdb)
 	del /f /Q $(mexpdb)
+	del /f /Q $(mexdir)\$(MSMANIFEST)
 	del /f /Q $(mexdir)\$(MSVCR)
+	del /f /Q $(mexdir)\$(MSVCP)
+	del /f /Q $(mexdir)\$(MSVCM)
 	del /f /Q $(mexdir)\vl.dll
-	del /f /Q bin\win32\$(MSVCR)
+	del /f /Q $(bindir)\$(MSMANIFEST)
+	del /f /Q $(bindir)\$(MSVCR)
+	del /f /Q $(bindir)\$(MSVCP)
+	del /f /Q $(bindir)\$(MSVCM)
+	del /f /Q $(bindir)\vl.dll
 	
 distclean: clean
 	del /f /Q $(cmdexe)
@@ -301,6 +309,9 @@ $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
 # msvcr__.dll => bin/win32/msvcr__.dll
+$(bindir)\$(MSMANIFEST): "$(MSVCRLOC)\$(MSMANIFEST)"
+	copy $(**) "$(@)"
+	
 $(bindir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
 	copy $(**) "$(@)"
 
@@ -311,6 +322,9 @@ $(bindir)\$(MSVCM): "$(MSVCRLOC)\$(MSVCM)"
 	copy $(**) "$(@)"
 
 # msvcr__.dll => toolbox/mexw32/msvcr__.dll
+$(mexdir)\$(MSMANIFEST): "$(MSVCRLOC)\$(MSMANIFEST)"
+	copy $(**) "$(@)"
+
 $(mexdir)\$(MSVCR): "$(MSVCRLOC)\$(MSVCR)"
 	copy $(**) "$(@)"
 
