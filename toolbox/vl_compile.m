@@ -53,13 +53,14 @@ if useLcc
   mkd(lccImpLibDir) ;
   cp(fullfile(binw32Dir, 'vl.dll'), fullfile(lccImpLibDir, 'vl.dll')) ;
 
-  cmd = [lccImpExePath, ' -u ', fullfile(lccImpLibDir, 'vl.dll')] ;
+  cmd = ['"' lccImpExePath '"', ' -u ', '"' fullfile(lccImpLibDir, 'vl.dll') '"'] ;
   fprintf('Running:\n> %s\n', cmd) ; 
   
   curPath = pwd ;
   try
     cd(lccImpLibDir) ;
     [d,w] = system(cmd) ;
+    if d, error(w); end
     cd(curPath) ;
   catch
     cd(curPath) ;
