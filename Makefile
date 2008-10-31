@@ -112,7 +112,7 @@ HOST   := ganesh.cs.ucla.edu:/var/www/vltest
 #NDEBUG :=
 
 .PHONY : all
-all : dll all-bin all-mex
+all : dll all-bin
 
 # --------------------------------------------------------------------
 #                                                       Error Messages
@@ -200,6 +200,8 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
+$(info * Debug mode: $(if $(DEBUG),yes,no))
+
 CC              ?= cc
 CONVERT         ?= convert
 DOXYGEN         ?= doxygen
@@ -227,6 +229,13 @@ MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
 MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
                    sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+
+ifdef MATLABPATH
+all: all-mex
+$(info * Compiling MATLAB MEX files (MATLABPATH=$(MATLABPATH)))
+else
+$(info * Not compiling MATLAB MEX files (mex command not found))
+endif
 
 # --------------------------------------------------------------------
 #                                  Architecture-specific Configuration
@@ -298,6 +307,8 @@ ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
+$(info * Auto-detected architecture: $(ARCH))
+
 # --------------------------------------------------------------------
 #                                                     Make directories
 # --------------------------------------------------------------------
@@ -322,21 +333,15 @@ $(eval $(call gendir, usingvl, toolbox/usingvl                      ))
 #                                             Build the shared library
 # --------------------------------------------------------------------
 #
-# Objects and dependencies are placed in the $(BINDIR)/objs/
-# directory. The makefile creates a static and a dynamic version of
-# the library. Depending on the architecture, one or more of the
-# following files are produced:
+# Objects and dependency files are placed in the $(BINDIR)/objs/
+# directory.
 #
-# $(OBJDIR)/libvl.so      ELF dynamic library (Linux)
-# $(OBJDIR)/libvl.dylib   Mach-O dynamic library (Mac OS X)
+# MAC/MACI: The library install_name is prefixed with @loader_path/.
+#   At run time this causes the loader to search for a local copy of
+#   the library for any binary which is linked against it. The
+#   install_name can be modified later by install_name_tool.
 #
-# == Note on Mac OS X ==
-#
-# On Mac we set the install name of the library to look in
-# @loader_path/.  This means that any binary linked (either an
-# executable or another DLL) will search in his own directory for a
-# copy of libvl (this behaviour can then be changed by
-# install_name_tool).
+# LINUX: 
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_src := $(wildcard vl/*.c)
@@ -411,7 +416,7 @@ mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 
 vpath %.c $(shell find toolbox -type d)
 vpath vl_%.m $(shell find toolbox -type d)
-vpath vl_%.$(MEX_SUFFIX) $(MEX_BINDIR)
+
 
 .PHONY: all-mex
 all-mex : $(mex_tgt) usingvl
@@ -422,15 +427,12 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
 	       $< -outdir $(dir $(@))
-	@test -e $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) ||       \
-	 ln -sf ../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)         \
-	        $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 
 m_src := $(shell find toolbox -name "vl_*.m")
 m_lnk := $(addprefix toolbox/usingvl/,                               \
@@ -445,14 +447,21 @@ m_lnk := $(addprefix toolbox/usingvl/,                               \
 m_lnk += $(addprefix toolbox/usingvl/,                               \
 	  $(subst vl_,,$(notdir $(mex_tgt))))
 
-toolbox/usingvl/%.m : vl_%.m
-	ln -s ../../"$<" "$@"
 
-toolbox/usingvl/%.$(MEX_SUFFIX) : vl_%.$(MEX_SUFFIX)
-	ln -s ../../"$<" "$@"
+$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+	ln -s "../../$<" "$@"
+
+toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+	ln -s "../../$<" "$@"
+
+toolbox/usingvl/%.m : vl_%.m
+	ln -s "../../$<" "$@"
+
+toolbox/usingvl/%.$(MEX_SUFFIX) : $(MEX_BINDIR)/%.$(MEX_SUFFIX)
+	ln -s "../../$<" "$@"
 
 .PHONY: usingvl
-usingvl: $(usingvl-dir) $(m_lnk)
+usingvl: $(usingvl-dir) $(m_lnk) toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX)
 
 # --------------------------------------------------------------------
 #                                                  Build documentation
@@ -553,10 +562,10 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 20% jpg:$@
+	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% jpg:$@
 
 doc/demo/%.png : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 20% png:$@
+	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% png:$@
 
 doc/%.pdf : doc/%.eps
 	$(call C,EPSTOPDF) --outfile=$@ $<
@@ -668,9 +677,11 @@ info :
 	$(call dump-var,dll_obj)
 	$(call dump-var,dll_dep)
 	$(call dump-var,mex_src)
+	$(call dump-var,mex_dep)
+	$(call dump-var,mex_tgt)
+	$(call dump-var,m_src)
 	$(call dump-var,fig_src)
 	$(call dump-var,demo_src)
-	$(call dump-var,mex_tgt)
 	$(call dump-var,bin_src)
 	$(call dump-var,bin_tgt)
 	$(call dump-var,bin_dep)
