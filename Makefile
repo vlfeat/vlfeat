@@ -335,7 +335,7 @@ $(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
-$(eval $(call gendir, usingvl, toolbox/usingvl                      ))
+$(eval $(call gendir, noprefix, toolbox/noprefix                    ))
 
 # --------------------------------------------------------------------
 #                                             Build the shared library
@@ -427,7 +427,7 @@ vpath vl_%.m $(shell find toolbox -type d)
 
 
 .PHONY: all-mex
-all-mex : $(mex_tgt) usingvl
+all-mex : $(mex_tgt) noprefix
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
@@ -443,7 +443,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DL
 	       $< -outdir $(dir $(@))
 
 m_src := $(shell find toolbox -name "vl_*.m")
-m_lnk := $(addprefix toolbox/usingvl/,                               \
+m_lnk := $(addprefix toolbox/noprefix/,                               \
           $(filter-out setup.m,                                      \
           $(filter-out help.m,                                       \
           $(filter-out root.m,                                       \
@@ -452,24 +452,20 @@ m_lnk := $(addprefix toolbox/usingvl/,                               \
           $(filter-out test_%,                                       \
           $(filter-out demo_%,                                       \
           $(subst vl_,,$(notdir $(m_src)))))))))))
-m_lnk += $(addprefix toolbox/usingvl/,                               \
-	  $(subst vl_,,$(notdir $(mex_tgt))))
-
+m_lnk += $(addprefix toolbox/noprefix/,                               \
+	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
 
 $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	ln -s "../../$<" "$@"
 
-toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
-	ln -s "../../$<" "$@"
+toolbox/noprefix/%.m : vl_%.m
+	@echo "function varargout = $*(varargin) \n[varargout{1:nargout}] = vl_$*(varargin{:});" > "$@"
 
-toolbox/usingvl/%.m : vl_%.m
-	ln -s "../../$<" "$@"
+toolbox/noprefix/%.m : $(MEX_BINDIR)/vl_%.$(MEX_SUFFIX)
+	@echo "function varargout = $*(varargin) \n[varargout{1:nargout}] = vl_$*(varargin{:});" > "$@"
 
-toolbox/usingvl/%.$(MEX_SUFFIX) : $(MEX_BINDIR)/vl_%.$(MEX_SUFFIX)
-	ln -s "../../$<" "$@"
-
-.PHONY: usingvl
-usingvl: $(usingvl-dir) $(m_lnk) toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX)
+.PHONY: noprefix
+noprefix: $(noprefix-dir) $(m_lnk)
 
 # --------------------------------------------------------------------
 #                                                  Build documentation
@@ -520,7 +516,7 @@ doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
 doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
 	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
 	          --format=web \
-	          --exclude='usingvl/.*' \
+	          --exclude='noprefix/.*' \
 	          --exclude='.*/vl_test_.*' \
 	          --exclude='.*/vl_demo_.*' \
 	          --verbose
@@ -624,7 +620,7 @@ distclean: clean doc-distclean
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
 	rm -f $(NAME)-*.tar.gz
-	rm -rf toolbox/usingvl
+	rm -rf toolbox/noprefix
 
 # --------------------------------------------------------------------
 #                                          Build distribution packages

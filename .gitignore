@@ -20,7 +20,7 @@ toolbox/mexw32
 toolbox/mexmaci
 toolbox/mexmac
 toolbox/mexglx 
-toolbox/usingvl
+toolbox/noprefix
 vlfeat.xcodeproj/*.mode1v3
 vlfeat.xcodeproj/*.pbxuser
 

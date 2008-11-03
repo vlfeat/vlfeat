@@ -14,16 +14,16 @@ function path = vl_setup(varargin)
 
 % AUTORIGHTS
 
-usingvl = false ;
+noprefix = false ;
 quiet   = false ;
 
 for ai=1:length(varargin)
   opt = varargin{ai} ;
   switch lower(opt)
     case 'noprefix'
-      usingvl = true ;
+      noprefix = true ;
     case 'usingvl'
-      usingvl = true ;
+      noprefix = true ;
     case 'quiet'
       quiet = true ;
   end
@@ -49,8 +49,8 @@ addpath(fullfile(root,'toolbox','sift'    )) ;
 addpath(fullfile(root,'toolbox','special' )) ;
 addpath(fullfile(root,'toolbox',bindir    )) ;
 
-if usingvl
-  addpath(fullfile(root,'toolbox','usingvl')) ;
+if noprefix
+  addpath(fullfile(root,'toolbox','noprefix')) ;
 end
 
 fprintf('** Welcome to the VLFeat Toolbox **\n') ;
