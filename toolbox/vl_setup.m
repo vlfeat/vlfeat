@@ -3,9 +3,9 @@ function path = vl_setup(varargin)
 %   PATH = VL_SETUP() adds the VLFeat Toolbox to MATLAB path and
 %   returns the path PATH to the VLFeat package.
 %
-%   VL_SETUP('USINGVL') adds to the path also the prefix-less version
-%   of each function (so, for instance, it is possible to use SIFT()
-%   instead of the more verbose VL_SIFT()).
+%   VL_SETUP('NOPREFIX') adds aliases to each function that do not
+%   contain the VL_ prefix. For example, with this option it is
+%   possible to use SIFT() instead of VL_SIFT().
 %
 %   VL_SETUP('QUIET') does not print the greeting message.
 %
@@ -20,6 +20,8 @@ quiet   = false ;
 for ai=1:length(varargin)
   opt = varargin{ai} ;
   switch lower(opt)
+    case 'noprefix'
+      usingvl = true ;
     case 'usingvl'
       usingvl = true ;
     case 'quiet'
