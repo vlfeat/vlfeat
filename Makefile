@@ -457,7 +457,7 @@ toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SU
 toolbox/usingvl/%.m : vl_%.m
 	ln -s "../../$<" "$@"
 
-toolbox/usingvl/%.$(MEX_SUFFIX) : $(MEX_BINDIR)/%.$(MEX_SUFFIX)
+toolbox/usingvl/%.$(MEX_SUFFIX) : $(MEX_BINDIR)/vl_%.$(MEX_SUFFIX)
 	ln -s "../../$<" "$@"
 
 .PHONY: usingvl
