@@ -108,7 +108,7 @@
 
 NAME   := vlfeat
 VER    := 0.9.2
-HOST   := ganesh.cs.ucla.edu:/var/www/vltest
+HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 #NDEBUG :=
 
 .PHONY : all
