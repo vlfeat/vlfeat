@@ -22,6 +22,19 @@ COMPILING
   
   > nmake /f Makefile.mak
 
+  If you do not have Visual C++ 2008, or you have an older version of Matlab
+  and wish to compile the mex files _only_, then you may start from our binary
+  distribution. Enter the toolbox directory:
+
+  > cd toolbox
+
+  And run our mex compilation script from the Matlab command line:
+
+  > vl_compile
+
+  This has been tested with Matlab R14 and lcc, but other configurations should
+  only require minor tweaking.
+
 INSTALLING
   Binaries are created in the bin/XXX directory, where XXX changes
   depending on the architecture. We support the following (the naming
