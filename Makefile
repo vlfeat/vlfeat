@@ -108,7 +108,7 @@
 # debugging information.
 
 NAME   := vlfeat
-VER    := 0.9.2
+VER    := 0.9.3
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 NDEBUG := YES
 VERB   := NO
