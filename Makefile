@@ -24,7 +24,8 @@
 # DIST:         Package name for the source distr. ('vlfeat-1.0')
 # BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
 # HOST:         Where to pulbish the package.
-# NDEBUG:       Set this flag to YES to remove debugging support
+# NDEBUG:       Set this flag to YES to remove debugging support (default YES)
+# VERB:         Set this flag to YES to provide extra information (default NO)
 #
 # == PROGRAMS REQUIRED FOR BUILDING ==
 #
@@ -110,6 +111,7 @@ NAME   := vlfeat
 VER    := 0.9.2
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 NDEBUG := YES
+VERB   := NO
 
 .PHONY : all
 all : dll all-bin
@@ -200,7 +202,9 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
+ifeq ($(VERB),YES)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
+endif
 
 CC              ?= cc
 CONVERT         ?= convert
@@ -232,7 +236,9 @@ MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
 
 ifdef MATLABPATH
 all: all-mex
+ifeq ($(VERB),YES)
 $(info * Compiling MATLAB MEX files (MATLABPATH=$(MATLABPATH)))
+endif
 else
 $(info * Not compiling MATLAB MEX files (mex command not found))
 endif
@@ -307,7 +313,9 @@ ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
+ifeq ($(VERB),YES)
 $(info * Auto-detected architecture: $(ARCH))
+endif
 
 # --------------------------------------------------------------------
 #                                                     Make directories
