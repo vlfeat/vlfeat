@@ -85,12 +85,14 @@ for i = 1:length(subDirs)
     fprintf('MEX %s\n', filePath);
     
     dot = strfind(fileName, '.');
-    mexFile = [fileName(1:dot) 'dll'];
+    mexFile = fullfile(mexw32Dir, [fileName(1:dot) 'dll']);
+    if exist(mexFile)
+      delete(mexFile)
+    end
     
     cmd = {['-I' toolboxDir],   ...
            ['-I' vlDir],        ...
            '-O',                ...
-          '-output', mexFile,   ...
           '-outdir', mexw32Dir, ...
            filePath             } ;
     
