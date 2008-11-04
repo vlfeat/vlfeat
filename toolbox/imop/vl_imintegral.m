@@ -13,7 +13,7 @@
 %                               2 4 6 ; 
 %                               3 6 9 ]
 % 
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 %

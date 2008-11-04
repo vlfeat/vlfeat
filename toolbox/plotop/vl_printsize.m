@@ -9,7 +9,7 @@ function vl_printsize(r,a)
 %   This command is useful to resize figures before printing them so
 %   that elements are scaled to match the final figure size in print.
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 

@@ -9,7 +9,7 @@
 %     the branches number 2, 1 and 4 starting from the root of the
 %     HIKM tree ending to a leaf.
 %
-%   See also:: VL_HIKMEANS(), VL_HELP_VLFEAT().
+%   See also:: VL_HIKMEANS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -24,7 +24,7 @@ function h=vl_plotsiftdescriptor(d,f,varargin)
 %   Magnif [3.0]::
 %       Magnification factor.
 %
-%   See also VL_HELP_VLFEAT(), VL_SIFT(), VL_PLOTFRAME().
+%   See also VL_HELP(), VL_SIFT(), VL_PLOTFRAME().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

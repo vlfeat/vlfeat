@@ -6,7 +6,7 @@ function [P1,P2] = vl_clicksegment
 %  The user can abort the operation by pressing any key. In this case
 %  the function returns the empty matrix.
 %
-%  See also:: VL_CLICK(), VL_CLICKPOINT(), VL_HELP_VLFEAT().
+%  See also:: VL_CLICK(), VL_CLICKPOINT(), VL_HELP().
 
 % AUTORIGHTS
 

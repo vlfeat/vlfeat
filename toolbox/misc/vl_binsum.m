@@ -20,7 +20,7 @@
 %      VL_BINSUM([1 7], -1, 1) = [0 7]
 %      VL_BINSUM(EYE(3), [1 1 1], [1 2 3], 1) = 2*EYE(3)
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

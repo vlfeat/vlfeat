@@ -14,7 +14,7 @@ function [U,dU,delta]=vl_tpsu(X,Y)
 %   respect to the parameters Y. The derivatives are arranged in a
 %   Mx2xN array, one layer per column of U.
 %
-%   See also:: VL_TPS(), VL_HELP_VLFEAT().
+%   See also:: VL_TPS(), VL_HELP().
 
 if exist('tpsumx') 
 	U = tpsumx(X,Y) ;

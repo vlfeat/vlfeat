@@ -59,7 +59,7 @@
 %  integer data types. This can easily result in zeros where you did
 %  not expect them.
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 
 % AUTORIGHTS

@@ -20,7 +20,7 @@ function [xp1,xp2]=vl_wtps(phi,Yp)
 %     the control points YP use:
 %       [xp1,xp2]=VL_WTPS(VL_TPS(x1,x2,Y),Yp).
 %
-%   See also:: VL_TPS(), VL_HELP_VLFEAT().
+%   See also:: VL_TPS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

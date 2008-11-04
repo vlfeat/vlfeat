@@ -58,7 +58,7 @@
 %       baseline stereo from maximally stable extremal regions," in
 %       Proc. BMVC, 2002.
 %
-%   See also VL_HELP_VLFEAT().
+%   See also VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

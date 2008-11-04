@@ -18,7 +18,7 @@
 %   Verbose::
 %     Increase the verbosity level.
 %
-%  See also:: VL_IKMEANS(), VL_HELP_VLFEAT().
+%  See also:: VL_IKMEANS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -32,7 +32,7 @@
 %     VL_LOCALMAX(F,TRESH,2) (but note that in this case the result is
 %     always empty!).
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

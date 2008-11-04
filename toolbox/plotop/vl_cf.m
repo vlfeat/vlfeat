@@ -4,7 +4,7 @@ function h=vl_cf(h0)
 %
 %   H=VL_CF(H0) creates a duplicate of the figure whose handle is H0.
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

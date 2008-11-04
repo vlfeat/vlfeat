@@ -32,7 +32,7 @@ function H = vl_tightsubplot(varargin)
 %   REMARK. While SUBPLOT kills any pre-existing axes that overalps a
 %   new one, this function does not.
 %
-%   See also:: SUBPLOT(), VL_HELP_VLFEAT().
+%   See also:: SUBPLOT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

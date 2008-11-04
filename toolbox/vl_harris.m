@@ -61,7 +61,7 @@ function [H,details] = vl_harris(I,si,alpha)
 %   [2] J. A. Noble, "Finding corners, "Image Vision Computing, vol. 6,
 %   no. 2, pp. 121-128, 1988.
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 % AUTORIGHTS
 

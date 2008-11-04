@@ -11,7 +11,7 @@ function y = vl_sigmoid(x)
 %     -  Centered sigmoid: 2 * VL_SIGMOID(X) - 1 ;
 %     -  VL_SIGMOID(X) = (EXP(X/2) - EXP(X/2)) / (EXP(X/2) + EXP(X/2))
 % 
-%   See also:: VL_DSIGMOID(), VL_HELP_VLFEAT().
+%   See also:: VL_DSIGMOID(), VL_HELP().
 
 % AUTORIGHTS
 

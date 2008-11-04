@@ -14,4 +14,4 @@
 %   for each column (or equivalently matrix with 9*K elements). In
 %   this case OM and DOM are arrays with K slices, one per rotation.
 %
-%   See also:: VL_RODR(), VL_HELP_VLFEAT().
+%   See also:: VL_RODR(), VL_HELP().

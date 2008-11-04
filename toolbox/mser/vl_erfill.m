@@ -8,7 +8,7 @@
 %  I must be of class UINT8 and ER must be a (scalar) index of the
 %  region representative point.
 %
-%  See also VL_HELP_VLFEAT(), VL_MSER().
+%  See also VL_HELP(), VL_MSER().
 
 % AUTORIGHTS
 

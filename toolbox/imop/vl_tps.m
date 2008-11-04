@@ -16,7 +16,7 @@ function [phi,S] = vl_tps(x1,x2,Y)
 %   [PHI,S] = VL_TPS(X1,X2,Y) additionally returns the stiffness matrix S
 %   of the TPS.
 %
-%   See also:: VL_WTPS(), VL_HELP_VLFEAT().
+%   See also:: VL_WTPS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
