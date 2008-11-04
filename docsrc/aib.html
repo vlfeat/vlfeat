@@ -4,12 +4,12 @@ elements which cause the mutual information between the data and the
 class labels to decreases as little as possible.</p>
 
 <p>Here we test AIB on the problem of finding a discriminatively
-optimal quantization of a mixure of Gaussians. The data in this case
+optimal quantization of a mixture of Gaussians. The data in this case
 is 2 dimensional:</p>
 
 <div class="figure">
   <image src="%root;demo/aib_basic_data.jpg"/>
-  <div class="caption">Random data generated from a Gaussian mixure
+  <div class="caption">Random data generated from a Gaussian mixture
     with three components (class labels are indicated by color).</div>
 </div>
 
@@ -21,15 +21,15 @@ f1 = quantize(X1,D,K) ;
 f2 = quantize(X2,D,K) ;
 f3 = quantize(X3,D,K) ;
 
-Pcx(1,:) = binsum(Pcx(1,:), ones(size(f1)), f1) ;
-Pcx(2,:) = binsum(Pcx(2,:), ones(size(f2)), f2) ;
-Pcx(3,:) = binsum(Pcx(3,:), ones(size(f3)), f3) ;
+Pcx(1,:) = vl_binsum(Pcx(1,:), ones(size(f1)), f1) ;
+Pcx(2,:) = vl_binsum(Pcx(2,:), ones(size(f2)), f2) ;
+Pcx(3,:) = vl_binsum(Pcx(3,:), ones(size(f3)), f3) ;
 </pre>
 
 <p>Next we apply AIB:</p>
 
 <pre>
-[parents, cost] = aib(Pcx) ;
+[parents, cost] = vl_aib(Pcx) ;
 </pre>
 
 <p>
