@@ -646,6 +646,7 @@ bindist: $(NAME) all doc-bindist
 	           --include=*mexw32                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
+	           --include=noprefix**                              \
 	           --include=*dll                                    \
 	           --include=*.manifest                              \
 	           --include=*.dylib                                 \
