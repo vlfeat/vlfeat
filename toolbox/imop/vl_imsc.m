@@ -3,7 +3,7 @@ function J=vl_imsc(I)
 %   J=VL_IMSC(I) scales the range of the gray-scale or color image I to
 %   fit in the interval [0,1].
 %
-%   See also:: VL_HELP_VLFEAT()
+%   See also:: VL_HELP()
 
 % AUTORIGHTS
 

@@ -3,7 +3,7 @@ function J = vl_imup(I)
 %   J=VL_IMUP(I) doubles the resolution of the image I by bilinear
 %   interpolation.
 %
-%   See also:: VL_IMDOWN(), VL_HELP_VLFEAT().
+%   See also:: VL_IMDOWN(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

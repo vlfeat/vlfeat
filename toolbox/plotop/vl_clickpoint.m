@@ -19,7 +19,7 @@ function sel = vl_clickpoint(V,N,varargin)
 %     Put a marker as points are selected. The markers are deleted on
 %     exiting the function.
 %
-%   See also:: VL_CLICK(), VL_HELP_VLFEAT().
+%   See also:: VL_CLICK(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

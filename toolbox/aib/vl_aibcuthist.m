@@ -15,7 +15,7 @@ function hist = vl_aibcuthist(map, x, varargin)
 %    extra bin at the end of HIST ('append'), or accumulate to
 %    the first bin ('first')
 %
-%  See also:: VL_AIB(), VL_HELP_VLFEAT().
+%  See also:: VL_AIB(), VL_HELP().
   
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

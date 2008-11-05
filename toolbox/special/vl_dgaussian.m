@@ -7,7 +7,7 @@ function y = vl_dgaussian(x)
 %
 %     Y = 1/S^2 * VL_DGAUSSIAN(X/S) .
 %
-%   See also:: VL_GAUSSIAN(), VL_DDGAUSSIAN(), VL_HELP_VLFEAT().
+%   See also:: VL_GAUSSIAN(), VL_DDGAUSSIAN(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

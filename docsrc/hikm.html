@@ -1,5 +1,5 @@
 <p><b>VLFeat</b> offers a hierarchical version of integer k-means, which
-recusively apply \cmd{ikmeans} to compute finer and finer partitions.
+recursively apply \cmd{ikmeans} to compute finer and finer partitions.
 We demonstrates this by:</p>
 
 <pre>
@@ -7,14 +7,14 @@ K        = 3 ;
 nleaves  = 100 ;
 data     = uint8(rand(2,10000) * 255) ;
 datat    = uint8(rand(2,100000)* 255) ;
-[tree,A] = hikmeans(data,K,nleaves) ;
-AT       = hikmeanspush(tree,datat) ;
+[tree,A] = vl_hikmeans(data,K,nleaves) ;
+AT       = vl_hikmeanspush(tree,datat) ;
 </pre>
 
 <p>Here <code>nleaves</code> is the desired number of leaf
 clusters. This is obtained by subdividing recursively each cluster in
 k sub-clusters. Therefore <code>depth = floor(log(K nleaves))</code>
-recursive subdivisons are sufficient and the algorithm terminates with
+recursive subdivisions are sufficient and the algorithm terminates with
 clusters arranged in a k-tree of of depth
 <code>depth</code> which has at least <code>nleaves</code> leaves (but
 it may have more).</p>
@@ -23,10 +23,10 @@ it may have more).</p>
 <image src="%root;demo/hikmeans-tree.jpg"/>
 <image src="%root;demo/hikmeans-clusters.jpg"/>
 <div class="caption"><b>Hierarchical integer K-means.</b>  Left: A
-depiction of the rescursive clsuters. Each node is a cluster
+depiction of the recursive clusters. Each node is a cluster
 center. The root note is not depicted (its center would be the mean of
 the dataset).  Right: Clusters are represented as different colors
-(here are more thatn 100 clusters, but only tree colors are
+(here are more than 100 clusters, but only tree colors are
 used).</div>
 </div>
 
@@ -57,12 +57,12 @@ ans =
     sub
 </pre>
 
-<p>with the cluster centers for that recusrive parittions and a field
-\verb$sub$ for the recursive children. When there are no childrent,
+<p>with the cluster centers for that recursive partitions and a field
+\verb$sub$ for the recursive children. When there are no children,
 this field is equal to the empty matrix</p>
 
 <pre>
-K>> tree.sub(1).sub(1).sub(1).sub(1)
+> tree.sub(1).sub(1).sub(1).sub(1)
 
 ans = 
 

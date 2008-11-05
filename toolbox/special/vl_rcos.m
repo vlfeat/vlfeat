@@ -2,7 +2,7 @@ function y=vl_rcos(r,x)
 % VL_RCOS  vl_rcos function
 %   Y=VL_RCOS(R,X) computes the vl_rcos function with roll-off R.
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 x = abs(x) ;
 if(r > 0)

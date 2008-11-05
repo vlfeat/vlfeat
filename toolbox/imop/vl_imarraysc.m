@@ -14,7 +14,7 @@ function J = vl_imarraysc(A, varargin)
 %     Specify the intensity range. If empty, the range is
 %     calcualted automatically.
 %
-%   See also:: VL_IMARRAY(), VL_HELP_VLFEAT().
+%   See also:: VL_IMARRAY(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

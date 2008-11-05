@@ -1,7 +1,7 @@
 <p><b>VLFeat</b> includes a basic implementation of k-means clustering
 and hierarchical k-means clustering. They are designed to be
 lightweight in order to work on large dataset. In particular, they
-assume that the data are vectors of usigned chars (one byte). While
+assume that the data are vectors of unsigned chars (one byte). While
 this is limiting for some application, works well for clustering image
 descriptors, where usually very high precision is unnecessary.</p>
 
@@ -23,17 +23,17 @@ k=3 clusters:</p>
 <pre>
 K = 3 ;
 data = uint8(rand(2,10000) * 255) ;
-[C,A] = ikmeans(data,K) ;
+[C,A] = vl_ikmeans(data,K) ;
 </pre>
 
 <p>The program returns both the cluster centers <code>C</code> and the
 data-to-cluster assignments <code>A</code>. By means of the cluster
 centers
-<code>C</code> we can project more data on the same clusers</p>
+<code>C</code> we can project more data on the same clusters</p>
 
 <pre>
 datat = uint8(rand(2,100000) * 255) ;
-AT = ikmeanspush(datat,C) ;
+AT = vl_ikmeanspush(datat,C) ;
 </pre>
 
 <p>In order to visualize the results, we associate to each cluster a

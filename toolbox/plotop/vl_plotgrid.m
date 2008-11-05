@@ -5,7 +5,7 @@ function h=vl_plotgrid(x,y,varargin)
 %
 %  H=VL_PLOTGRID(...) returns the handle to the grid object.
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 washold = ishold ;
 

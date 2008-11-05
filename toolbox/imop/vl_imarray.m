@@ -22,7 +22,7 @@ function J = vl_imarray(A,varargin)
 %   'CMap' [[]]::
 %     Specify a colormap for indexed images and movies.
 %
-%   See also VL_IMARRAYSC(), VL_HELP_VLFEAT().
+%   See also VL_IMARRAYSC(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

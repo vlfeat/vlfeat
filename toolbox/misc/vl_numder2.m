@@ -6,7 +6,7 @@ function d = vl_numder2(func, x, varargin)
 %   D = VL_NUMDER2(FUNC, X, ARG1, ARG2, ...) allow to pass extra
 %   parameters to the function FUNC.
 %
-%   See also:: VL_NUMDER(), VL_HELP_VLFEAT().
+%   See also:: VL_NUMDER(), VL_HELP().
 
 N=length(x(:)) ;
 f00 = feval(func, x, varargin{:}) ;

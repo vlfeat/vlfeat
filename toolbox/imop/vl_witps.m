@@ -8,7 +8,7 @@ function [x1,x2]=vl_witps(xp1,xp2,Y,Yp)
 %     function uses Gauss-Newton to compute a set of points (X1,X2)
 %     such that [XP1,XP2]=VL_WTPS(X1,X2,Y,Yp).
 %
-%   See also:: VL_WTPS(), VL_HELP_VLFEAT().
+%   See also:: VL_WTPS(), VL_HELP().
 
 % AUTORIGHTS
 

@@ -4,7 +4,7 @@ function [f,d] = vl_ubcread(file)
 %  FILE in UBC (Lowe's SIFT) or Oxford format and converts them in
 %  the format used by VL_SIFT().
 %
-%  See also:: VL_SIFT(), VL_HELP_VLFEAT().
+%  See also:: VL_SIFT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -17,6 +17,6 @@
 %    to control the state of the random number gnerator of VLFEAT
 %    functions.
 %
-%    See also:: VL_HELP_VLFEAT().
+%    See also:: VL_HELP().
 
 % AUTORIGHTS
