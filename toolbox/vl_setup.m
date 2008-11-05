@@ -20,9 +20,7 @@ quiet   = false ;
 for ai=1:length(varargin)
   opt = varargin{ai} ;
   switch lower(opt)
-    case 'noprefix'
-      noprefix = true ;
-    case 'usingvl'
+    case {'noprefix', 'usingvl'} 
       noprefix = true ;
     case 'quiet'
       quiet = true ;

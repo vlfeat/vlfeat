@@ -443,7 +443,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DL
 	       $< -outdir $(dir $(@))
 
 m_src := $(shell find toolbox -name "vl_*.m")
-m_lnk := $(addprefix toolbox/noprefix/,                               \
+m_lnk := $(addprefix toolbox/noprefix/,                              \
           $(filter-out setup.m,                                      \
           $(filter-out help.m,                                       \
           $(filter-out root.m,                                       \
@@ -452,17 +452,18 @@ m_lnk := $(addprefix toolbox/noprefix/,                               \
           $(filter-out test_%,                                       \
           $(filter-out demo_%,                                       \
           $(subst vl_,,$(notdir $(m_src)))))))))))
-m_lnk += $(addprefix toolbox/noprefix/,                               \
+m_lnk += $(addprefix toolbox/noprefix/,                              \
 	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
 
 $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	ln -s "../../$<" "$@"
 
 toolbox/noprefix/%.m : vl_%.m
-	@echo "function varargout = $*(varargin) \n[varargout{1:nargout}] = vl_$*(varargin{:});" > "$@"
-
-toolbox/noprefix/%.m : $(MEX_BINDIR)/vl_%.$(MEX_SUFFIX)
-	@echo "function varargout = $*(varargin) \n[varargout{1:nargout}] = vl_$*(varargin{:});" > "$@"
+	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
+	echo "function varargout = $*(varargin)" >> "$@" ;           \
+	echo "% $${upperName}  Stub function" >> "$@" ;              \
+	echo "%   See:: VL_$${upperName}()" >> "$@" ;                \
+	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ; 
 
 .PHONY: noprefix
 noprefix: $(noprefix-dir) $(m_lnk)

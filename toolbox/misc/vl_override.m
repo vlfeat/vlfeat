@@ -23,7 +23,7 @@ function config = vl_override(config,update,varargin)
 %    same dimensions, (ii) the indeces IA and IB are equal, and the
 %    field names FA and FB are equal.
 %
-%   See also:: HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

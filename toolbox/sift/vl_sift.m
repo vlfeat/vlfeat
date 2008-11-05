@@ -49,7 +49,7 @@
 %   Verbose::
 %       Be verbose (may be repeated to increase the verbosity level).
 %
-%  See also HELP_VLFEAT, VL_UBCMATCH().
+%  See also VL_HELP(), VL_UBCMATCH().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
