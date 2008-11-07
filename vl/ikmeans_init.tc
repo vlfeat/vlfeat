@@ -30,6 +30,17 @@ static int cmp_pair (void const *a, void const *b)
   return pa->j - pb->j;
 }
 
+VL_INLINE vl_uint32 calc_dist2 (vl_int32 const* A, vl_uint8 const* B, int M)
+{
+  vl_uint32 acc = 0; 
+  int i = 0 ;
+  for (i = 0 ; i < M ; ++i) {
+    vl_int32 dist = A [i] - B [i] ;
+    acc += dist * dist ;
+  }
+  return acc ;
+}
+
 /** @internal
  ** @brief Helper function to allocate memory for an IKM quantizer
  ** @param f quantizer.
@@ -128,14 +139,28 @@ vl_ikm_init_rand_data
   qsort (pairs, N, sizeof(pair_t), cmp_pair);
   
   /* initialize centers from random data points */
-  for (k = 0 ; k < K ; ++ k) {
-    for (i = 0 ; i < M ; ++ i) {
-      f-> centers [k * M + i] = data [pairs[k].j * M + i] ;
+  for (j = 0, k = 0 ; k < K ; ++ k) {
+
+    /* search for the next candidate which is not a dup */
+    for ( ; j < N - 1 ; ++j) {
+      int prevk = 0 ;
+      for (prevk = 0 ; prevk < k ; ++ prevk) {
+        vl_uint32 dist = calc_dist2
+          (f-> centers + prevk * M, 
+           data + pairs[j].j * M, M) ;
+        if (dist == 0)  break ;       
+      }
+      if (prevk == k) break ;
     }
+
+    for (i = 0 ; i < M ; ++ i) {
+      f-> centers [k * M + i] = data [pairs[j].j * M + i] ;
+    }
+
+    if (j < N - 1) ++ j ;
   }  
   
   vl_free (pairs) ;
-
   vl_ikm_init_helper (f) ;
 }
 

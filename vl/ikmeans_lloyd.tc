@@ -62,7 +62,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
         }
         
         /* compare with current best */
-        if (best == (vl_uint)-1 || dist < best_dist) {
+        if (best == (vl_uint) -1 || dist < best_dist) {
           best = k ;
           best_dist = dist ;
         }
