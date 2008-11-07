@@ -36,23 +36,23 @@ end
   
 if K == 1
 	if nargout == 1
-		wI = imwbackwardmx(xr, yr, I, varargin{:}) ;
+		wI = vl_imwbackwardmx(xr, yr, I, varargin{:}) ;
 	else
-		[wI,wIx,wIy] = imwbackwardmx(xr, yr, I, varargin{:}) ;
+		[wI,wIx,wIy] = vl_imwbackwardmx(xr, yr, I, varargin{:}) ;
 	end
 else
   [M,N] = size(varargin{1}) ;
 	if nargout == 1
 		wI = zeros(M,N,K) ;
 		for k=1:K
-			wI(:,:,k) = imwbackwardmx(xr, yr, squeeze(I(:,:,k)),  varargin{:}) ;
+			wI(:,:,k) = vl_imwbackwardmx(xr, yr, squeeze(I(:,:,k)),  varargin{:}) ;
 		end
 	else
 		wI  = zeros(M,N,K) ;
 		wIx = zeros(M,N,K) ;
 		wIy = zeros(M,N,K) ;
 		for k=1:K
-			[tmp1, tmp2, tmp3] = imwbackwardmx(xr, yr, squeeze(I(:,:,k)),  varargin{:}) ;
+			[tmp1, tmp2, tmp3] = vl_imwbackwardmx(xr, yr, squeeze(I(:,:,k)),  varargin{:}) ;
 			wI(:,:,k)  = tmp1;
 			wIx(:,:,k) = tmp2;
 			wIy(:,:,k) = tmp3 ; 
