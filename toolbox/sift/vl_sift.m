@@ -1,13 +1,14 @@
-% VL_SIFT  Scale-invariant feature transform
-%   F = VL_SIFT(I) computes the VL_SIFT frames (keypoints) F of the image
+% VL_SIFT  Scale-Invariant Feature Transform
+%   F = VL_SIFT(I) computes the SIFT frames (keypoints) F of the image
 %   I. I is a gray-scale image in single precision. Each column of F
 %   is a feature frame and has the format [X;Y;S;TH], where X,Y is the
 %   (fractional) center of the frame, S is the scale and TH is the
 %   orientation (in radians).
 %
-%   [F,D] = VL_SIFT(I) computes in addition the VL_SIFT descriptors D. Each
-%   column of D is the descriptor of the corresponding frame in F. A
-%   descriptor is a 128-dimensional vector of storage class UINT8.
+%   [F,D] = VL_SIFT(I) computes in addition the VL_SIFT descriptors
+%   D. Each column of D is the descriptor of the corresponding frame
+%   in F. A descriptor is a 128-dimensional vector of storage class
+%   UINT8.
 %
 %   Options:
 %
