@@ -21,7 +21,7 @@
 %   [1] D. G. Lowe, 'Distinctive image features from scale-invariant
 %   keypoints,' IJCV, vol. 2, no. 60, pp. 91-110, 2004.
 %
-%   See also VL_HELP_VLFEAT(), VL_SIFT().
+%   See also VL_HELP(), VL_SIFT().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

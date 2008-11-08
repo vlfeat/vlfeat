@@ -1,23 +1,23 @@
 <site>
 <template src="template.html"/>
 <stylesheet src="web.css"/>
-<page src="index.html" title="Home" id="home">
- <page src="download.html" title="Download and Install" id="download"/>
- <page href="api/index.html"  title="API docs" id="api"/>
- <page src="api.html" title="API docs" id="api.template" hide="yes">
- <page src="api.html" title="API docs" id="api.entry.template" hide="yes"/>
+<page src="index.html"        title="Home"                 id="home">
+ <page src="download.html"    title="Download and Install" id="download"/>
+ <page href="api/index.html"  title="API reference"        id="api"/>
+ <page src="api.html"         title="API reference"        id="api.template" hide="yes">
+ <page src="api.html"         title="API reference"        id="api.entry.template" hide="yes"/>
  </page>
- <page src="../doc/toolbox-src/mdoc.html" title="Matlab docs" id="mdoc">
+ <page src="../doc/toolbox-src/mdoc.html" title="MATLAB reference" id="mdoc">
   <include src="../doc/toolbox-src/mdoc.xml"/>
  </page>
  <page src="about.html" title="About VLFeat" id="about"/>
 </page>
-<page src="tutorials.html" title="Tutorials" id="tut">
- <page src="sift.html" title="SIFT" id="tut.sift"/>
- <page src="mser.html" title="MSER" id="tut.mser"/>
- <page src="ikm.html" title="IKM" id="tut.ikm"/>
- <page src="hikm.html" title="HIKM" id="tut.hikm"/>
- <page src="aib.html" title="AIB" id="tut.aib"/>
+<page src="overview.html" title="Overview" id="tut">
+ <page src="sift.html"  title="SIFT"  id="tut.sift"/>
+ <page src="mser.html"  title="MSER"  id="tut.mser"/>
+ <page src="ikm.html"   title="IKM"   id="tut.ikm"/>
+ <page src="hikm.html"  title="HIKM"  id="tut.hikm"/>
+ <page src="aib.html"   title="AIB"   id="tut.aib"/>
  <page src="utils.html" title="Utils" id="tut.utils"/>
 </page>
 </site>

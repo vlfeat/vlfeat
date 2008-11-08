@@ -14,7 +14,7 @@ General Public License version 2.
 /** @file ikmeans.h
  ** 
  ** Integer K-means (IKM) is an implementation of K-means clustering
- ** (or vector quantization, VQ) for integer data. This is
+ ** (or Vector Quantization, VQ) for integer data. This is
  ** particularly useful for clustering large collections of visual
  ** descriptors.
  **

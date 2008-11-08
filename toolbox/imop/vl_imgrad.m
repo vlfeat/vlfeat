@@ -9,7 +9,7 @@ function [Fx,Fy] = vl_imgrad(F,varargin) ;
 %   lower and right boundaries, where backward difference is used).
 %   Similarly, VL_GRAD(F,'backward') uses only backward differencies.
 %  
-%   See also:: GRADIENT(), VL_HELP_VLFEAT().
+%   See also:: GRADIENT(), VL_HELP().
 
 type = 'central' ; % forward, backward
 

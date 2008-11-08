@@ -6,7 +6,7 @@ function J = vl_imdown(I,method)
 %   
 %   VL_IMDOWN(I,'avg') downsamples by averaging groups of four pixels.
 %   
-%   See also VL_IMUP(), VL_HELP_VLFEAT().
+%   See also VL_IMUP(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

@@ -36,7 +36,7 @@ function h=vl_plotframe(frames,varargin)
 %  plot function. The first optional argument can be a line
 %  specification string such as the one used by PLOT().
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

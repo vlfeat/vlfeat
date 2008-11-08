@@ -5,7 +5,7 @@
 %   assumed to span different channels (e.g. R,G,B). In this case,
 %   each channel is convolved independently.
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

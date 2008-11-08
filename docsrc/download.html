@@ -1,10 +1,10 @@
-<p>The latest version of VLFeat is <code>0.9.2</code>, released on August 25,
+<p>The latest version of VLFeat is <code>0.9.3</code>, released on November 3,
 2008.</p>
 
 <ul>
-  <li><b><a href="%root;download/vlfeat-0.9.2-bin.tar.gz">Download the
+  <li><b><a href="%root;download/vlfeat-0.9.3-bin.tar.gz">Download the
       precompiled binaries</a></b></li>
-  <li><a href="%root;download/vlfeat-0.9.2.tar.gz">Download the source
+  <li><a href="%root;download/vlfeat-0.9.3.tar.gz">Download the source
   code</a></li>
 </ul>
 
@@ -14,13 +14,13 @@
 
 <p>Installing VLFeat is very simple. After downloading and unpacking the most recent binary package (see above), follow these instructions:</p>
 
-<p>To use the <b>MATLAB Toolbox</b>, simply run the <code>vlfeat_setup</code> command found in the <code>vlfeat/toolbox</code> directory. This command adds the necessary paths to MATLAB search path list. Notice that the paths are not saved. To automate this step, you can add the following fragment of code to your MATLAB <code>startup.m</code> file (on UNIX based system this file is located in <code>~/matlab/</code>, where <code>~</code> denotes your home directory):</p>
+<p>To use the <b>MATLAB Toolbox</b>, simply run the <code>vl_setup</code> command found in the <code>vlfeat/toolbox</code> directory. This command adds the necessary paths to MATLAB search path list. Notice that the paths are not saved. To automate this step, you can add the following fragment of code to your MATLAB <code>startup.m</code> file (on UNIX based system this file is located in <code>~/matlab/</code>, where <code>~</code> denotes your home directory):</p>
 
 <pre>
 p=pwd ;
 cd PATHTOVLFEAT ;
 cd toolbox ;
-vlfeat_setup
+vl_setup
 cd(p) ;
 clear p
 </pre>
@@ -42,6 +42,9 @@ GNU-Make makefile (<code>Makefile</code>). The makefile tries to auto-detect the
 adjust the values of configuration variables to match your setup. Once you have
 done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefile.mak</code>.</p>
 
+<p><b>Note: For Windows you can also compile only the mex files.</b> Start with
+our binary distribution.</p>
+
 <p><b>Windows: Troubleshooting common problems:</b></p>
 <dl>
   <dt>syntax error: '=' unexpected:</dt>
@@ -61,7 +64,7 @@ patches against our Git repository and send them to us for inclusion in the next
 version. The first step is to clone our public repository using:
 </p>
 
-<pre>git clone http://vision.ucla.edu/vlfeat/vlfeat.git</pre>
+<pre>git clone http://vlfeat.org/vlfeat.git</pre>
 
 <p>
 Once you have made and committed your changes locally, consider submitting them to the project via e-mail using a command like <code>git-format-patch</code>:

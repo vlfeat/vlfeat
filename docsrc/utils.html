@@ -1,44 +1,45 @@
 <p>This is a list of other notable MATLAB programs bundled in <b>VLFeat</b></p>
 
 <ul>
-<li><code>imsmooth</code> smoothes an image by a Gaussian kernel
+<li><code>vl_imsmooth</code> smoothes an image by a Gaussian kernel
   (simple but very useful as it is generally much faster than MATLAB
   general purpose smoothing functions).</li>
 
-<li><code>plotframe</code> plots a variety of feature frame kinds.</li>
+<li><code>vl_plotframe</code> plots a variety of feature frame kinds.</li>
 
-<li><code>binsum</code> performs binned summations, useful as a
+<li><code>vl_binsum</code> performs binned summations, useful as a
   building block for the fast computation of
-  histograms. <code>whistc</code> computes weighed histograms.</li>
-<li><code>imarray</code> and <code>imarraysc</code> arrange and visualize multiple
-  images in a grid; <code>imsc</code> scales the image range;
-  <code>tightsubplot</code> is similar to built-in <code>subplot</code>, but
+  histograms. <code>vl_whistc</code> computes weighed histograms.</li>
+<li><code>vl_imarray</code> and <code>vl_imarraysc</code> arrange and visualize multiple
+  images in a grid; <code>vl_imsc</code> scales the image range;
+  <code>vl_tightsubplot</code> is similar to built-in <code>subplot</code>, but
   produces narrower margins.</li>
 
-<li><code>cf</code> makes a copy of a figure.</li>
+<li><code>vl_cf</code> makes a copy of a figure.</li>
 
-<li><code>rord</code> and <code>irodr</code> compute the Rodrigues' formula and
+<li><code>vl_rodr</code> and <code>vl_irodr</code> compute the Rodrigues' formula and
   its inverse</li>
 
-<li><code>override</code> overrides members of a structure with members of
-  another strucutre.</li>
+<li><code>vl_override</code> overrides members of a structure with members of
+  another structure.</li>
 
-<li><code>imwbackward</code> warps an image by the inverse mapping method
+<li><code>vl_imwbackward</code> warps an image by the inverse mapping method
   (generally much faster than MATLAB general purpose warping
   functions).</li>
 
-<li><code>waffine</code> computes the affine warp of a set of
-  points. <code>tps</code>, <code>tpsu</code>, <code>wtps</code>
-  compute the thin-plate spline warp of a set of points. <code>witps</code>
+<li><code>vl_waffine</code> computes the affine warp of a set of
+  points. <code>vl_tps</code>, <code>vl_tpsu</code>, <code>vl_wtps</code>
+  compute the thin-plate spline warp of a set of points. <code>vl_witps</code>
   computes the inverse thin plate warp of a set of point (by
   numerically inverting the transformation). They may me used in
-  combination with <code>imwbackward</code>.</li>
+  combination with <code>vl_imwbackward</code>.</li>
 
-<li><code>xyz2lab</code>, 
-  <code>xyz2luv</code>, <code>xyz2rgb</code>, <code>rgb2xyz</code>
+<li><code>vl_xyz2lab</code>, 
+  <code>vl_xyz2luv</code>, <code>vl_xyz2rgb</code>, <code>vl_rgb2xyz</code>
   convert color spaces.</li>
 
-<li><code>rcos</code>, <code>gaussian</code>, <code>dgaussian</code>, <code>ddgaussian</code>
+<li><code>vl_rcos</code>, <code>vl_gaussian</code>, <code>vl_dgaussian</code>,
+<code>vl_ddgaussian</code>
 compute some useful special functions.</li>
 
 </ul>

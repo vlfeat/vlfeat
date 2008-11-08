@@ -33,6 +33,6 @@
 %  Magnif [3]::
 %    Magnification factor (see VL_SIFT()).
 %
-%  See also:: VL_SIFT(), VL_HELP_VLFEAT().
+%  See also:: VL_SIFT(), VL_HELP().
 
 % AUTORIGHTS

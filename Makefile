@@ -24,7 +24,8 @@
 # DIST:         Package name for the source distr. ('vlfeat-1.0')
 # BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
 # HOST:         Where to pulbish the package.
-# NDEBUG:       Set this flag to YES to remove debugging support
+# NDEBUG:       Set this flag to YES to remove debugging support (default YES)
+# VERB:         Set this flag to YES to provide extra information (default NO)
 #
 # == PROGRAMS REQUIRED FOR BUILDING ==
 #
@@ -107,9 +108,10 @@
 # debugging information.
 
 NAME   := vlfeat
-VER    := 0.9.2
-HOST   := ganesh.cs.ucla.edu:/var/www/vltest
-#NDEBUG :=
+VER    := 0.9.3
+HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
+NDEBUG := YES
+VERB   := NO
 
 .PHONY : all
 all : dll all-bin
@@ -200,7 +202,9 @@ ifndef NDEBUG
 DEBUG=yes
 endif
 
+ifeq ($(VERB),YES)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
+endif
 
 CC              ?= cc
 CONVERT         ?= convert
@@ -232,7 +236,9 @@ MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
 
 ifdef MATLABPATH
 all: all-mex
+ifeq ($(VERB),YES)
 $(info * Compiling MATLAB MEX files (MATLABPATH=$(MATLABPATH)))
+endif
 else
 $(info * Not compiling MATLAB MEX files (mex command not found))
 endif
@@ -307,7 +313,9 @@ ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
+ifeq ($(VERB),YES)
 $(info * Auto-detected architecture: $(ARCH))
+endif
 
 # --------------------------------------------------------------------
 #                                                     Make directories
@@ -327,7 +335,7 @@ $(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
-$(eval $(call gendir, usingvl, toolbox/usingvl                      ))
+$(eval $(call gendir, noprefix, toolbox/noprefix                    ))
 
 # --------------------------------------------------------------------
 #                                             Build the shared library
@@ -419,7 +427,7 @@ vpath vl_%.m $(shell find toolbox -type d)
 
 
 .PHONY: all-mex
-all-mex : $(mex_tgt) usingvl
+all-mex : $(mex_tgt) noprefix
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
@@ -435,7 +443,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DL
 	       $< -outdir $(dir $(@))
 
 m_src := $(shell find toolbox -name "vl_*.m")
-m_lnk := $(addprefix toolbox/usingvl/,                               \
+m_lnk := $(addprefix toolbox/noprefix/,                              \
           $(filter-out setup.m,                                      \
           $(filter-out help.m,                                       \
           $(filter-out root.m,                                       \
@@ -444,24 +452,21 @@ m_lnk := $(addprefix toolbox/usingvl/,                               \
           $(filter-out test_%,                                       \
           $(filter-out demo_%,                                       \
           $(subst vl_,,$(notdir $(m_src)))))))))))
-m_lnk += $(addprefix toolbox/usingvl/,                               \
-	  $(subst vl_,,$(notdir $(mex_tgt))))
-
+m_lnk += $(addprefix toolbox/noprefix/,                              \
+	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
 
 $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	ln -s "../../$<" "$@"
 
-toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
-	ln -s "../../$<" "$@"
+toolbox/noprefix/%.m : vl_%.m
+	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
+	echo "function varargout = $*(varargin)" >> "$@" ;           \
+	echo "% $${upperName}  Stub function" >> "$@" ;              \
+	echo "%   See:: VL_$${upperName}()" >> "$@" ;                \
+	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ; 
 
-toolbox/usingvl/%.m : vl_%.m
-	ln -s "../../$<" "$@"
-
-toolbox/usingvl/%.$(MEX_SUFFIX) : $(MEX_BINDIR)/%.$(MEX_SUFFIX)
-	ln -s "../../$<" "$@"
-
-.PHONY: usingvl
-usingvl: $(usingvl-dir) $(m_lnk) toolbox/usingvl/lib$(DLL_NAME).$(DLL_SUFFIX)
+.PHONY: noprefix
+noprefix: $(noprefix-dir) $(m_lnk)
 
 # --------------------------------------------------------------------
 #                                                  Build documentation
@@ -512,7 +517,7 @@ doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
 doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
 	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
 	          --format=web \
-	          --exclude='usingvl/.*' \
+	          --exclude='noprefix/.*' \
 	          --exclude='.*/vl_test_.*' \
 	          --exclude='.*/vl_demo_.*' \
 	          --verbose
@@ -616,7 +621,7 @@ distclean: clean doc-distclean
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
 	rm -f $(NAME)-*.tar.gz
-	rm -rf toolbox/usingvl
+	rm -rf toolbox/noprefix
 
 # --------------------------------------------------------------------
 #                                          Build distribution packages
@@ -642,6 +647,7 @@ bindist: $(NAME) all doc-bindist
 	           --include=*mexw32                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
+	           --include=noprefix**                              \
 	           --include=*dll                                    \
 	           --include=*.manifest                              \
 	           --include=*.dylib                                 \

@@ -31,7 +31,7 @@ function [recall, precision, info] = vl_pr(y, scores)
 %    positive. Conventionally, we assign a precision of P=1 to such
 %    cases.
 %
-%  See also:: VL_ROC(), VL_HELP_VLFEAT().
+%  See also:: VL_ROC(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

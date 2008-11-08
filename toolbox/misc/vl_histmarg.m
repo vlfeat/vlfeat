@@ -8,7 +8,7 @@ function H = vl_histmarg(H, dims)
 %   is a column vector. Notice that this way of deleting dimensions is
 %   not always consistent with the SQUEEZE function.
 %
-%   See also:: VL_HELP_VLFEAT().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

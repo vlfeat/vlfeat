@@ -11,7 +11,7 @@ function h=vl_plotpoint(V,varargin)
 %   rather it passess any extra argument to the underlying plot
 %   function.
 %
-%   See also:: PLOT(), PLOT3(), VL_HELP_VLFEAT().
+%   See also:: PLOT(), PLOT3(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

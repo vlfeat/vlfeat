@@ -27,7 +27,7 @@ function [cut, map, short] = vl_aibcut(parents, n)
 %  unchanged, except if the corresponding node is in the cut (in which
 %  case the map-to-itself rule has the precedence).
 %
-%  See also VL_HELP_VLFEAT(), VL_AIB().
+%  See also VL_HELP(), VL_AIB().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

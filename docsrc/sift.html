@@ -2,7 +2,7 @@
 feature detector and a feature descriptor. The detector extracts from
 an image a number of frames (attributed regions) in a way which is
 consistent with (some) variations of the illumination, viewpoint and
-other vieweing conditions. The descriptor associates to the regions a
+other viewing conditions. The descriptor associates to the regions a
 signature which identifies their appearance compactly and
 robustly.</p>
 
@@ -18,10 +18,10 @@ robustly.</p>
 <!-- ------------------------------------------------------------- -->
 
 <p>Both the detector and descriptor are accessible by
-the <code>sift</code> MATLAB command (there is a similar command line
+the <code>vl_sift</code> MATLAB command (there is a similar command line
 utility). Open MATLAB and load a test image</p>
 <pre>
-pfx = fullfile(vlfeat_root,'data','a.jpg') ;
+pfx = fullfile(vl_root,'data','a.jpg') ;
 I = imread(pfx) ;
 image(I) ;
 </pre>
@@ -31,8 +31,8 @@ image(I) ;
 Input image.
 </div>
 </div>
-<p>The <code>sift</code> command requires the an image in gray scale
-format and single precision.It also expects the range to be normalized
+<p>The <code>vl_sift</code> command requires an image in gray scale
+format and single precision. It also expects the range to be normalized
 in the [0,255] interval (while this is not strictly required, the
 default values of some internal thresholds are tuned for this
 case). The image <code>I</code> is converted in the appropriate format
@@ -42,7 +42,7 @@ I = float(rgb2gray(I)) ;
 </pre>
 <p>We compute the SIFT frames (keypoints) and descriptors by<p>
 <pre>
-[f,d] = sift(I) ;
+[f,d] = vl_sift(I) ;
 </pre>
 <p>The matrix <code>f</code> has a column for each frame. A frame is a
 disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
@@ -51,8 +51,8 @@ features by:</p>
 <pre>
 perm = randperm(size(f,2)) ; 
 sel  = perm(1:50) ;
-h1   = plotframe(f(:,sel)) ; 
-h2   = plotframe(f(:,sel)) ; 
+h1   = vl_plotframe(f(:,sel)) ; 
+h2   = vl_plotframe(f(:,sel)) ; 
 set(h1,'color','y','linewidth',3) ;
 set(h2,'color','k','linewidth',1) ;
 </pre>
@@ -64,7 +64,7 @@ Some of the detected SIFT frames.
 </div>
 <p>We can also overlay the descriptors by</p>
 <pre>
-h3 = plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
+h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
 set(h3,'color','g') ;
 </pre>
 <div class="figure">
@@ -79,9 +79,9 @@ A test image for the peak threshold parameter.
 <!-- ------------------------------------------------------------- -->
 
 <p>The SIFT detector is controlled mainly by two parameters: the peak
-threshold and the (non) edge treshold.</p>
+threshold and the (non) edge threshold.</p>
 
-<p>The <em>peak treshold</em> filters peaks of the DoG scale space
+<p>The <em>peak threshold</em> filters peaks of the DoG scale space
 that are too small (in absolute value). For instance, consider the
 test image obtained as a gradient of Gaussian blobs:</p>
 <pre>
@@ -89,15 +89,15 @@ I = double(rand(100,500) <= .005) ;
 I = (ones(100,1) * linspace(0,1,500)) .* I ;
 I(:,1) = 0 ; I(:,end) = 0 ;
 I(1,:) = 0 ; I(end,:) = 0 ;
-I = 2*pi*4^2 * imsmooth(I,4)
+I = 2*pi*4^2 * vl_imsmooth(I,4)
 I = single(255 * I) ;
 </pre>
 <div class="figure">
 <img src="%root;demo/sift_peak_0.jpg/"/>
 </div>
-<p>We run the detector with peak treshold \verb$x$ by</p>
+<p>We run the detector with peak threshold \verb$x$ by</p>
 <pre>
-f = sift(I, 'PeakTresh', x) ;
+f = vl_sift(I, 'PeakThresh', x) ;
 </pre>
 <p>obtaining less and less features</p>
 <div class="figure">
@@ -110,8 +110,8 @@ Selected frames for varying peak threshold.
 </div>
 </div>
 
-<p> Similary, the <em>edge trehsold</em> instead eliminates peaks of
-the DoG scale spcae whose curvature is too small (the reason is that
+<p> Similarly, the <em>edge threshold</em> instead eliminates peaks of
+the DoG scale space whose curvature is too small (the reason is that
 such peaks yields badly localized frames). For instance, consider the
 test image
 <pre>
@@ -119,7 +119,7 @@ I = zeros(100,500) ;
 for i=[10 20 30 40 50 60 70 80 90]
   I(50-round(i/3):50+round(i/3),i*5) = 1 ;
 end
-I = 2*pi*8^2 * imsmooth(I,8) ;
+I = 2*pi*8^2 * vl_imsmooth(I,8) ;
 I = single(255 * I) ;
 </pre>
 <div class="figure">
@@ -129,9 +129,9 @@ A test image for the edge threshold parameter.
 </div>
 </div>
 
-<p>We run the detector with edge treshold <code>x</code> by</p>
+<p>We run the detector with edge threshold <code>x</code> by</p>
 <pre>
-f = sift(I, 'EdgeTresh', x) ;
+f = vl_sift(I, 'EdgeThresh', x) ;
 </pre>
 <p>obtaining more and more features:
 <div class="figure">
@@ -162,16 +162,16 @@ at position <code>(100,100)</code>, of scale 10 and orientation
 <code>pi/8</code> by
 <pre>
 fc = [100;100;10;pi/8] ;
-[f,d] = sift(I,'frames',fc) ;
+[f,d] = vl_sift(I,'frames',fc) ;
 </pre>
-<p>Mutiple frames <code>fc</code> an be specified as well. In this
+<p>Multiple frames <code>fc</code> an be specified as well. In this
 case they are re-ordered by increasing
-scale. Th <code>Orientations</code> option insturcts the program to
+scale. Th <code>Orientations</code> option instructs the program to
 use the custom position and scale but to compute the keypoint
 orientations, as in</p>
 <pre>
 fc = [100;100;10;0] ;
-[f,d] = sift(I,'frames',fc,'orientations') ;
+[f,d] = vl_sift(I,'frames',fc,'orientations') ;
 </pre>
 <p>Notice that, depending on the local appearance, a keypoint may
 have <em>multiple</em> orientations.  Moreover, a keypoint computed on
@@ -195,11 +195,11 @@ next:</p>
 (bottom).</div>
 </div>
 
-<p>Our implementation uses the standard image reference systesm, with
-the <code>y</code> axis pointing downard. The frame
+<p>Our implementation uses the standard image reference system, with
+the <code>y</code> axis pointing downward. The frame
 orientation <code>&theta;</code> and descriptor use the same reference
 system (i.e. a small positive rotation of the <code>x</code> moves it
-towards the <code>y</code> axis). Recall that each descriptor elment
+towards the <code>y</code> axis). Recall that each descriptor element
 is a bin indexed by <code>(&theta;,x,y)</code>; the histogram is
 vectorized in such a way that <code>&theta;</code> is the fastest
 varying index and <code>y</code> the slowest.<p>

@@ -65,7 +65,7 @@ function [tp,tn,info] = vl_roc(y, score, varargin)
 %     Natural operating point:: Assumes PPOS = P/(P+N).
 %     Uniform operating point:: Assumes PPOS = 1/2.
 %
-%  See also:: VL_HELP_VLFEAT().
+%  See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
