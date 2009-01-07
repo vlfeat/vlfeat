@@ -154,7 +154,7 @@ VL_IMCONVCOL (FLT* dst, int dst_stride,
       /* -------------------------------------------------  Vanilla */
       for (y = 0 ; y < src_height ; y += step) {
         FLT acc = 0 ;  
-        FLT v, c ;
+        FLT v = 0, c ;
         FLT const* srci ;
         
         filti = filt ;
