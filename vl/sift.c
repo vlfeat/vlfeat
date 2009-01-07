@@ -50,9 +50,9 @@ inside the image region.
 The code provided in this module can be used in different ways.  You
 can instantiate and use a <b>SIFT filter</b> to extract both SIFT
 keypoints and descriptors from one or multiple images. Alternatively,
-you can use a lower level function to run only a part of the SIFT
-algorithm (for instance, to compute the SIFT descriptors of custom
-keypoints).
+you can use one of the low level functions to run only a part of the
+SIFT algorithm (for instance, to compute the SIFT descriptors of
+custom keypoints).
 
 To use the <b>SIFT filter</b>:
  
