@@ -69,11 +69,19 @@ if(size(d,1) ~= NBP*NBP*NBO)
 end
 
 if nargin > 1
-  if (~isempty(f) & size(f,1) ~= 4)
-    error('F should be a 4xK matrix or the empty matrix');
+  if (~isempty(f) & size(f,1) < 2 | size(f,1) > 4)
+    error('F should be a 2xK, 3xK, 4xK matrix or the empty matrix');
   end
   
-  if(~isempty(f) & size(f,2) ~= size(f,2))
+  if size(f,1) == 2
+    f = [f; 10 * ones(1, size(f,2)) ; 0 * zeros(1, size(f,2))] ;
+  end
+  
+  if size(f,1) == 3
+    f = [f; 0 * zeros(1, size(f,2))] ;
+  end
+  
+  if(~isempty(f) & size(f,2) ~= size(d,2))
     error('D and F have incompatible dimension') ;    
   end
 end
