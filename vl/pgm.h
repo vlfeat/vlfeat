@@ -11,6 +11,7 @@ General Public License version 2.
 */
 
 #include "generic.h"
+#include "mathop.h"
 #include <stdio.h>
 
 #ifndef VL_PGM

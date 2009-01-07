@@ -138,12 +138,12 @@ uMexOption options [] = {
   }
 #define F_HELL_SINGLE(x,y) { acc += x + y - 2 * sqrtf (x * y) ; }
 #define F_HELL_DOUBLE(x,y) { acc += x + y - 2 * sqrt  (x * y) ; }
-#define F_HELL_UINT32(x,y) { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
-#define F_HELL_INT32(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
-#define F_HELL_UINT16(x,y) { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
-#define F_HELL_INT16(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
-#define F_HELL_UINT8(x,y)  { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
-#define F_HELL_INT8(x,y)   { acc += x + y - 2 * vl_fast_sqrt_i (x * y) ; }
+#define F_HELL_UINT32(x,y) { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
+#define F_HELL_INT32(x,y)  { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
+#define F_HELL_UINT16(x,y) { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
+#define F_HELL_INT16(x,y)  { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
+#define F_HELL_UINT8(x,y)  { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
+#define F_HELL_INT8(x,y)   { acc += x + y - 2 * vl_fast_sqrt_ui32 (x * y) ; }
 #define F_HELL(AC,x,y) F_HELL_ ## AC (x,y)
 
 #define  F_KL2(AC,x,y)  { acc += (x*y) ; }
@@ -159,12 +159,12 @@ uMexOption options [] = {
   }
 #define F_KHELL_SINGLE(x,y) { acc += sqrtf (x * y) ; }
 #define F_KHELL_DOUBLE(x,y) { acc += sqrt  (x * y) ; }
-#define F_KHELL_UINT32(x,y) { acc += vl_fast_sqrt_i (x * y) ; }
-#define F_KHELL_INT32(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
-#define F_KHELL_UINT16(x,y) { acc += vl_fast_sqrt_i (x * y) ; }
-#define F_KHELL_INT16(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
-#define F_KHELL_UINT8(x,y)  { acc += vl_fast_sqrt_i (x * y) ; }
-#define F_KHELL_INT8(x,y)   { acc += vl_fast_sqrt_i (x * y) ; }
+#define F_KHELL_UINT32(x,y) { acc += vl_fast_sqrt_ui32 (x * y) ; }
+#define F_KHELL_INT32(x,y)  { acc += vl_fast_sqrt_ui32 (x * y) ; }
+#define F_KHELL_UINT16(x,y) { acc += vl_fast_sqrt_ui32 (x * y) ; }
+#define F_KHELL_INT16(x,y)  { acc += vl_fast_sqrt_ui32 (x * y) ; }
+#define F_KHELL_UINT8(x,y)  { acc += vl_fast_sqrt_ui32 (x * y) ; }
+#define F_KHELL_INT8(x,y)   { acc += vl_fast_sqrt_ui32 (x * y) ; }
 #define F_KHELL(AC,x,y) F_KHELL_ ## AC (x,y)
 
 DEF_CLASS (LINF,  F_LINF )

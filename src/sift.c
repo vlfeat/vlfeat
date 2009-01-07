@@ -239,7 +239,7 @@ main(int argc, char **argv)
       printf ("GSS          filespec: '%s'\n", gss.pattern) ;
       printf ("Read frames  filespec: '%s'\n", ifr.pattern) ;
       printf ("Version: driver %s; libvl %s\n", 
-              VL_STRINGIFY(VL_SIFT_DRIVER_VERSION),
+              VL_XSTRINGIFY(VL_SIFT_DRIVER_VERSION),
               vl_get_version_string()) ;
       exit (0) ;
       break ;

@@ -180,19 +180,25 @@ General Public License version 2.
 
  This module provides the following functionalities:
  
+ - @ref generic-preproc
  - @ref generic-error  
  - @ref generic-heap
  - @ref generic-logging
+ - @ref generic-time
 
- @see http://predef.sourceforge.net/index.php
- 
+  @section generic-preproc C preprocessor
+
+  VLFeat provides a few C preprocessor macros of general
+  utility. These include stringification (::VL_STRINGIFY,
+  ::VL_XSTRINGIFY) and concatenation (::VL_CAT, ::VL_XCAT) of symbols.
+
   @section generic-error Error handling
 
-  Error handling uses the same style of the standard C library. Most
-  functions return 0 when they succeed and -1 when they fail, and
-  set the global variable ::vl_err_no with a code identifying the
-  error occurred. This variable is never set on success and should
-  be examined right after an error had occurred.
+  Some VLFeat functions signal errors as the standard C library. Such
+  functions return 0 when they succeed and -1 when they fail, and set
+  the global variable ::vl_err_no with a code identifying the error
+  occurred. This variable is never set on success and should be
+  examined right after an error had occurred.
 
   @section generic-heap Heap allocation
 
@@ -214,6 +220,10 @@ General Public License version 2.
   mapped to @c mexPrintf. Setting the function to @c NULL disables
   logging.
 
+  @section generic-time Measruing time
+  
+  VLFeat provides ::vl_tic() and ::vl_toc() as an easy way of
+  measuring elapsed time.
 
 **/
 
@@ -223,6 +233,10 @@ General Public License version 2.
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
+#ifdef VL_OS_WIN
+#include <Windows.h>
+#endif
 
 VL_EXPORT int vl_err_no = 0 ;
 VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] = "" ;
@@ -333,20 +347,19 @@ void vl_set_alloc_func (void *(*malloc_func)  (size_t),
   vl_free_func    = free_func ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Set printf function
- ** @param printf_func  pointer to @c printf.
- ** Let @c print_func be NULL to disable printf.
- **/
-
 VL_EXPORT
 void 
-vl_set_printf_func (int(*printf_func) (char const *format, ...))
+vl_set_printf_func (printf_func_t printf_func)
 {
   vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
 }
 
+#ifdef VL_OS_WIN
+LARGE_INTEGER tic_freq ; 
+LARGE_INTEGER tic_mark ;
+#else
 clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
+#endif
 
 /** ------------------------------------------------------------------
  ** @brief Set time reference
@@ -354,7 +367,12 @@ clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
 
 void vl_tic() 
 {
+#ifdef VL_OS_WIN
+  QueryPerformanceFrequency(&tic_freq) ;
+  QueryPerformanceCounter(&tic_mark) ;
+#else
   tic_mark = clock() ;
+#endif
 }
 
 /** ------------------------------------------------------------------
@@ -362,11 +380,20 @@ void vl_tic()
  **
  ** Returns the processor time elapsed since ::vl_tic() was called.
  **
+ ** @remark On UNIX, this function uses the @c clock() system call.
+ ** On Windows, it uses the @c QueryPerformanceCounter() system call,
+ ** which is more accurate than @c clock() on this platform.
+ **
  ** @return time in seconds.
  **/
 
 double vl_toc()
 {
+#ifdef VL_OS_WIN
+  LARGE_INTEGER toc_mark ;
+  QueryPerformanceCounter(&toc_mark) ;
+  return (double) (toc_mark.QuadPart - tic_mark.QuadPart) / tic_freq.QuadPart ;
+#else
   return (double) (clock() - tic_mark) / CLOCKS_PER_SEC ;
+#endif
 }
-

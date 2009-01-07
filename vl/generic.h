@@ -20,104 +20,94 @@ General Public License version 2.
 #include "host.h"
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.3"
+#define VL_VERSION_STRING "0.9.4"
 
-/** @internal @brief VL_STRINGIFY helper
- ** @see ::VL_STRINGIFY
- **/
-#define VL_STRINGIFY_(x) # x
+/** ------------------------------------------------------------------
+ ** @name C preprocssor
+ ** @{ */
 
-/** @brief Convert to a string
- ** @param x macro to convert to a string
+/** @brief Convert the argument to a string
  **
- ** For instance, the following fragment
+ ** @param x value to be stringified.
+ **
+ ** This macro stringifies the argument @a x by means of the
+ ** <code>#</code> prerpocessor operator.
+ **
+ ** The standard C preprocessor does not prescan arguments which are
+ ** stringified, so
+ ** 
  ** @code
- ** #define A x.y.z
- ** printf(VL_STRINGIFY(A)) ;
+ ** #define A B
+ ** char const * str = VL_STRINGIFY(A) ;
  ** @endcode
- ** will print the string @c x.y.z.
+ **
+ ** initializes <code>str</code> with a pointer to the string
+ ** <code>"A"</code>, which mihgt be unexpected. To fix this issue,
+ ** you can use ::VL_XSTRINGIFY.
+ **
+ ** @sa ::VL_XSTRINGIFY
  **/
-#define VL_STRINGIFY(x) VL_STRINGIFY_(x)
 
-/** @brief Convert boolean to "yes" or "no"
+#define VL_STRINGIFY(x) # x
+
+/** @brief Expand and then convert the argument to a string
+ **
+ ** @param x value to be macro-expanded and converted.
+ **
+ ** This macro macro-expands the argument @a x and stringifies the
+ ** result of the expansion. For instance
+ **
+ ** @code
+ ** #define A B
+ ** char const * str = VL_STRINGIFY(A) ;
+ ** @endcode
+ **
+ ** initializes <code>str</code> with a pointer to the string
+ ** <code>"B"</code>.
+ **
+ ** @sa ::VL_STRINGIFY
+ **/
+#define VL_XSTRINGIFY(x) VL_STRINGIFY(x)
+
+/** @brief Concatenate the arguments into a lexical unit
+ **
+ ** @param x first argument to be concatenated.
+ ** @param y second argument to be concatenated.
+ **
+ ** This macro concatenates its arguments into a single lexical unit
+ ** by means of the <code>##</code> preprocessor operator. Notice that
+ ** arguments concatenated by <code>##</code> are not pre-expanded by
+ ** the C preprocessor. To macro-expand the arguments and then
+ ** concatenate them,use ::VL_XCAT.
+ **
+ ** @see ::VL_XCAT
+ **/
+#define VL_CAT(x,y) x ## y
+
+/** @brief Expand and then concatenate the arguments into a lexical unit
+ **
+ ** @param x first argument to be concatenated.
+ ** @param y second argument to be concatenated.
+ **
+ ** This macro is the same as ::VL_CAT, except that the arguments are
+ ** macro expanded before being concatenated.
+ **
+ ** @see ::VL_CAT
+ **/
+#define VL_XCAT(x,y) VL_CAT(x,y)
+
+/** @} */
+
+/** @brief Convert a boolean to "yes" or "no" strings
  ** @param x boolean to convert.
  ** A pointer to either the string "yes" (if @a x is true)
- ** or the string "no"
- ** @example
+ ** or the string "no".
+ ** @par Example
  ** @code
  ** VL_PRINTF("Is x true? %s.", VL_YESNO(x))
  ** @endcode
  **/
 #define VL_YESNO(x) ((x)?"yes":"no")
-
-/** @brief Logarithm of 2 (math constant)*/
-#define VL_LOG_OF_2 0.693147180559945
-
-/** @brief Pi (math constant) */
-#define VL_PI 3.141592653589793
-
-/** @brief Single precision epsilon (math constant) 
- **
- ** Difference of the smallest representable number greater
- ** than 1.0 and 1.0.
- **
- **/
-#define VL_EPSILON_F 1.19209290E-07F
-
-/** @brief Double precision epsilon (math constant) 
- **
- ** Difference of the smallest representable number greater
- ** than 1.0 and 1.0.
- **/
-#define VL_EPSILON_D 2.220446049250313e-16
-
-/* 
-   For the code below: An ANSI C compiler takes the two expressions,
-   LONG_VAR and CHAR_VAR, and implicitly casts them to the type of the
-   first member of the union. Refer to K&R Second Edition Page 148,
-   last paragraph.
-*/
-
-/** @brief IEEE single quiet NaN constant */
-static union { vl_uint32 raw ; float value ; } 
-  const vl_nan_f = 
-    { 0x7FC00000UL } ;
-
-/** @brief IEEE single infinity constant */
-static union { vl_uint32 raw ; float value ; } 
-  const vl_infinity_f = 
-    { 0x7F800000UL } ;
-
-/** @brief IEEE double quiet NaN constant */
-static union { vl_uint64 raw ; double value ; } 
-  const vl_nan_d = 
-#ifdef VL_COMPILER_MSC
-    { 0x7FF8000000000000ui64 } ;
-#else
-    { 0x7FF8000000000000ULL } ;
-#endif
-
-/** @brief IEEE double infinity constant */
-static union { vl_uint64 raw ; float value ; } 
-  const vl_infinity_d = 
-#ifdef VL_COMPILER_MSC
-    { 0x7FF0000000000000ui64 } ;
-#else
-    { 0x7FF0000000000000ULL } ;
-#endif
-
-/** @brief Single NaN (not signaling) */
-#define VL_NAN_F (vl_nan_f.value)
-
-/** @brief Single Infinity (not signaling) */
-#define VL_INFINITY_F (vl_infinity_f.value)
-
-/** @brief Double NaN (not signaling) */
-#define VL_NAN_D (vl_nan_d.value)
-
-/** @brief Double Infinity (not signaling) */
-#define VL_INFINITY_D (vl_infinity_d.value)
-
 
 /** ------------------------------------------------------------------
  ** @name Heap allocation
@@ -139,33 +129,27 @@ VL_INLINE void  vl_free    (void* ptr) ;
  ** @name Logging
  ** @{ */
 
-VL_EXPORT
-void vl_set_printf_func (int(*printf_func)(char const *str, ...)) ;
+/** ------------------------------------------------------------------
+ ** @brief Customizable printf function pointer type */
+typedef int(*printf_func_t) (char const *format, ...) ;
 
-/** @def VL_PRINTF(format, ...)
+/** @brief Set printf function
+ ** @param printf_func  pointer to @c printf.
+ ** Let @c print_func be NULL to disable printf.
+ **/
+VL_EXPORT void  vl_set_printf_func (printf_func_t printf_func)
+
+/** @def VL_PRINTF
  ** @brief Call user-customizable @c printf function
  **
- ** @param format format string.
- ** @param ... @c printf variable arguments.
- **
  ** The function calls the user customizable @c printf.
- **
- ** @return results of the user-customizable @c printf.
  **/
 #define VL_PRINTF (*vl_printf_func)
 
 /** @def VL_PRINT
- ** @brief Call user-customizable @c printf function (no varags)
- **
- ** @param string string to print.
- **
- ** This macro is the same as ::VL_PRINTF() and should
- ** be used when the variable list of arguments is empty.
- **
- ** @return results of the user-customizable @c printf.
+ ** @brief Same as ::VL_PRINTF (legacy code)
  **/
-#define VL_PRINT(string) \
-  ((*vl_printf_func)(string))
+#define VL_PRINT (*vl_printf_func)
 
 /** @} */
 
@@ -229,104 +213,13 @@ char const * vl_get_version_string () ;
 VL_EXPORT
 void vl_print_info () ;
 
-/** --------------------------------------------------------------- */
-/** @name Measuring time
+/** ------------------------------------------------------------------
+ ** @name Measuring time
  ** @{
  **/
 VL_EXPORT void vl_tic() ;
 VL_EXPORT double vl_toc() ;
 /** @} */
-
-/** --------------------------------------------------------------- */
-/** @name Endianness detection and conversion
- ** @{
- **/
-VL_INLINE void vl_swap_host_big_endianness_8 (void *dst, void* src) ;
-VL_INLINE void vl_swap_host_big_endianness_4 (void *dst, void* src) ;
-VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
-/** @} */
-
-/** ------------------------------------------------------------------
- ** @brief Host <-> big endian transformation for 8-bytes value
- **
- ** @param dst destination 8-byte buffer.
- ** @param src source 8-byte bufffer.
- ** @see @ref host-arch-endianness.
- **/
-
-VL_INLINE void
-vl_swap_host_big_endianness_8 (void *dst, void* src)
-{
-  char *dst_ = (char*) dst ;
-  char *src_ = (char*) src ;
-#if defined(VL_ARCH_BIG_ENDIAN)
-    dst_ [0] = src_ [0] ;
-    dst_ [1] = src_ [1] ;
-    dst_ [2] = src_ [2] ;
-    dst_ [3] = src_ [3] ;
-    dst_ [4] = src_ [4] ;
-    dst_ [5] = src_ [5] ;
-    dst_ [6] = src_ [6] ;
-    dst_ [7] = src_ [7] ;
-#else 
-    dst_ [0] = src_ [7] ;
-    dst_ [1] = src_ [6] ;
-    dst_ [2] = src_ [5] ;
-    dst_ [3] = src_ [4] ;
-    dst_ [4] = src_ [3] ;
-    dst_ [5] = src_ [2] ;
-    dst_ [6] = src_ [1] ;
-    dst_ [7] = src_ [0] ;
-#endif
-}
-
-/** ------------------------------------------------------------------
- ** @brief Host <-> big endian transformation for 4-bytes value
- **
- ** @param dst destination 4-byte buffer.
- ** @param src source 4-byte bufffer.
- ** @sa @ref host-arch-endianness.
- **/
-
-VL_INLINE void
-vl_swap_host_big_endianness_4 (void *dst, void* src)
-{
-  char *dst_ = (char*) dst ;
-  char *src_ = (char*) src ;
-#if defined(VL_ARCH_BIG_ENDIAN)
-    dst_ [0] = src_ [0] ;
-    dst_ [1] = src_ [1] ;
-    dst_ [2] = src_ [2] ;
-    dst_ [3] = src_ [3] ;
-#else 
-    dst_ [0] = src_ [3] ;
-    dst_ [1] = src_ [2] ;
-    dst_ [2] = src_ [1] ;
-    dst_ [3] = src_ [0] ;
-#endif
-}
-
-/** ------------------------------------------------------------------
- ** @brief Host <-> big endian transformation for 2-bytes value
- **
- ** @param dst destination 2-byte buffer.
- ** @param src source 2-byte bufffer.
- ** @see @ref host-arch-endianness.
- **/
-
-VL_INLINE void
-vl_swap_host_big_endianness_2 (void *dst, void* src)
-{
-  char *dst_ = (char*) dst ;
-  char *src_ = (char*) src ;
-#if defined(VL_ARCH_BIG_ENDIAN)
-    dst_ [0] = src_ [0] ;
-    dst_ [1] = src_ [1] ;
-#else
-    dst_ [0] = src_ [1] ;
-    dst_ [1] = src_ [0] ;
-#endif
-}
 
 extern VL_EXPORT int   (*vl_printf_func)  (char const * format, ...) ;
 extern VL_EXPORT void *(*vl_malloc_func)  (size_t) ;

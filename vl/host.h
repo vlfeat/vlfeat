@@ -258,7 +258,17 @@ typedef vl_uint32           vl_uintptr ;
 
 /** @} */
 
-/** @name Obtaining host info at run time
+/** ------------------------------------------------------------------
+ ** @name Endianness detection and conversion
+ ** @{
+ **/
+VL_INLINE void vl_swap_host_big_endianness_8 (void *dst, void* src) ;
+VL_INLINE void vl_swap_host_big_endianness_4 (void *dst, void* src) ;
+VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Obtaining host info at run time
  ** @{ */
 VL_EXPORT void vl_print_host_info() ;
 VL_EXPORT vl_bool vl_cpu_has_sse3 () ;
@@ -267,6 +277,88 @@ VL_EXPORT vl_bool vl_cpu_has_sse2 () ;
 
 VL_EXPORT void vl_set_simd_enabled (vl_bool x) ;
 VL_EXPORT vl_bool vl_get_simd_enabled() ;
+
+/** ------------------------------------------------------------------
+ ** @brief Host <-> big endian transformation for 8-bytes value
+ **
+ ** @param dst destination 8-byte buffer.
+ ** @param src source 8-byte bufffer.
+ ** @see @ref host-arch-endianness.
+ **/
+
+VL_INLINE void
+vl_swap_host_big_endianness_8 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if defined(VL_ARCH_BIG_ENDIAN)
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+    dst_ [2] = src_ [2] ;
+    dst_ [3] = src_ [3] ;
+    dst_ [4] = src_ [4] ;
+    dst_ [5] = src_ [5] ;
+    dst_ [6] = src_ [6] ;
+    dst_ [7] = src_ [7] ;
+#else 
+    dst_ [0] = src_ [7] ;
+    dst_ [1] = src_ [6] ;
+    dst_ [2] = src_ [5] ;
+    dst_ [3] = src_ [4] ;
+    dst_ [4] = src_ [3] ;
+    dst_ [5] = src_ [2] ;
+    dst_ [6] = src_ [1] ;
+    dst_ [7] = src_ [0] ;
+#endif
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Host <-> big endian transformation for 4-bytes value
+ **
+ ** @param dst destination 4-byte buffer.
+ ** @param src source 4-byte bufffer.
+ ** @sa @ref host-arch-endianness.
+ **/
+
+VL_INLINE void
+vl_swap_host_big_endianness_4 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if defined(VL_ARCH_BIG_ENDIAN)
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+    dst_ [2] = src_ [2] ;
+    dst_ [3] = src_ [3] ;
+#else 
+    dst_ [0] = src_ [3] ;
+    dst_ [1] = src_ [2] ;
+    dst_ [2] = src_ [1] ;
+    dst_ [3] = src_ [0] ;
+#endif
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Host <-> big endian transformation for 2-bytes value
+ **
+ ** @param dst destination 2-byte buffer.
+ ** @param src source 2-byte bufffer.
+ ** @see @ref host-arch-endianness.
+ **/
+
+VL_INLINE void
+vl_swap_host_big_endianness_2 (void *dst, void* src)
+{
+  char *dst_ = (char*) dst ;
+  char *src_ = (char*) src ;
+#if defined(VL_ARCH_BIG_ENDIAN)
+    dst_ [0] = src_ [0] ;
+    dst_ [1] = src_ [1] ;
+#else
+    dst_ [0] = src_ [1] ;
+    dst_ [1] = src_ [0] ;
+#endif
+}
 
 /* VL_HOST_H */
 #endif

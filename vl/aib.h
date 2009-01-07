@@ -15,6 +15,7 @@ General Public License version 2.
 #define VL_AIB_H
 
 #include "generic.h"
+#include "mathop.h"
 
 /** ------------------------------------------------------------------
  ** @internal 

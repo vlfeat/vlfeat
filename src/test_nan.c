@@ -1,4 +1,5 @@
 #include <vl/generic.h>
+#include <vl/mathop.h>
 
 int
 main(int argc, char** argv)

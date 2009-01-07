@@ -137,7 +137,7 @@ main(int argc, char **argv)
       printf ("Frames filespec: `%s'\n", frm.pattern) ;
       printf ("Meta   filespec: `%s'\n", met.pattern) ;
       printf ("Version: driver %s; libvl %s\n", 
-              VL_STRINGIFY(VL_MSER_DRIVER_VERSION),
+              VL_XSTRINGIFY(VL_MSER_DRIVER_VERSION),
               vl_get_version_string()) ;
       exit (0) ;
       break ;

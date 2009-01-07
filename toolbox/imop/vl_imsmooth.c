@@ -14,6 +14,7 @@ General Public License version 2.
 #include <mexutils.h>
 
 #include <vl/generic.h>
+#include <vl/mathop.h>
 #include <vl/imopv.h>
 
 #include <stdlib.h>
@@ -179,7 +180,7 @@ mexFunction(int nout, mxArray *out[],
     }
     switch (kernel) {
       case GAUSSIAN:   kernel_str = "Gaussian" ; break ;
-      case TRIANGULAR: kernel_str = "triangular" ; break ;
+      case TRIANGULAR: kernel_str = "triangular" ; break ;
       default: assert (0) ; break ;
     }
     
