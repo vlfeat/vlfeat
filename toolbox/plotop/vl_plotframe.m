@@ -19,11 +19,11 @@ function h=vl_plotframe(frames,varargin)
 %
 %   * ELLIPSES
 %     + FRAME(1:2)   center
-%     + FRAME(3:5)   S11, S12, S22 of x' inv(S) x = 1.
+%     + FRAME(3:5)   S11, S12, S22 such that ELLIPSE = {x: x' inv(S) x = 1}.
 %
 %   * ORIENTED ELLIPSES
 %     + FRAME(1:2)   center
-%     + FRAME(3:6)   A(:) of ELLIPSE = A UNIT_CIRCLE
+%     + FRAME(3:6)   stacking of A such that ELLIPSE = A {x : |x| = 1}
 %
 %  H=VL_PLOTFRAME(...) returns the handle of the graphical object
 %  representing the frames.
@@ -189,15 +189,24 @@ switch kind
     eframes(3:6,:) = [c ; s ; -s ; c] ;
 
   case 'ellipse'
-%    sz = find(1e6 * abs(eframes(3,:)) < abs(eframes(4,:)+eframes(5,:))
-    
     eframes(1:2,:) = frames(1:2,:) ;
-    
-    eframes(3,:) = sqrt(frames(3,:)) ;
-    eframes(4,:) = frames(4,:) ./ (eframes(3,:)+eps) ;
-    eframes(5,:) = zeros(1,K) ;
-    eframes(6,:) = sqrt(frames(5,:) - ...
-                        frames(4,:).*frames(4,:)./(frames(3,:)+eps)) ;
+    eframes(3:6,:) = mapFromS(frames(3:5,:)) ;
+  
   case 'oellipse' 
     eframes = frames ;
 end    
+
+
+
+% --------------------------------------------------------------------
+function A = mapFromS(S)
+% --------------------------------------------------------------------
+% Returns the (stacking of the) 2x2 matrix A that maps the unit circle
+% into the ellipses satisfying the equation x' inv(S) x = 1. Here S
+% is a stacked covariance matrix, with elements S11 S12 and S13.
+
+tmp = sqrt(S(3,:)) + eps ;
+A(1,:) = sqrt(S(1,:).*S(3,:) - S(2,:).^2) ./ tmp ;
+A(2,:) = zeros(1,length(tmp));
+A(3,:) = S(2,:) ./ tmp ;
+A(4,:) = tmp ;
