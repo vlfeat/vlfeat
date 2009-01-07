@@ -27,6 +27,8 @@
    - @ref host-compiler-other      "Oter compiler specific features"
  - @ref host-arch "Host CPU architecture"
    - @ref host-arch-endianness "Endianness"
+
+ @see http://predef.sourceforge.net/index.php
  
  @section host-os Host operating system
  
