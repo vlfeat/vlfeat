@@ -133,6 +133,7 @@ cmdsrc =                \
  src\test_getopt_long.c \
  src\test_stringop.c    \
  src\test_nan.c         \
+ src\test_mathop.c      \
  src\test_rand.c        \
  src\test_imopv.c       \
  src\test_host.c
