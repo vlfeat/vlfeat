@@ -10,6 +10,7 @@ from wikidoc import wikidoc
 from optparse import OptionParser
 from HTMLParser import HTMLParser
 from xml.parsers.expat import ExpatError
+from xml.parsers.expat import ErrorString
 from xml.dom import minidom 
 import random
 
@@ -182,10 +183,12 @@ class MakeStatic:
 class Thing:
 # --------------------------------------------------------------------
   """
-  A THING is an object which: (i) has a unique identifier code and
-  (ii) belongs to a global namespace. THINGs hold global references to
-  files and other objects. Example of THINGs include HTML elements and
-  files.
+  A THING is an object which has a unique identifier in the global namespace.
+  belongs to the global namespace. 
+
+THINGs are used as global
+  references to files and other objects. Example of THINGs include
+  HTML elements and files.
   """
   directory = {}
 
@@ -239,7 +242,7 @@ class HtmlElement(Thing):
 
 # --------------------------------------------------------------------
 class File(Thing):
-# --------------------------------------------------------------------
+    # --------------------------------------------------------------------
   """
   A FILE instance represents a HTML page, stylesheet, or other data
   file used by the website.
@@ -354,8 +357,10 @@ def findStyles(file):
 class WebSite:
 # --------------------------------------------------------------------
   """
-  WebSite represent the whole website. A website is mainly a
-  hierarchical collection of pages.
+  This class encapsulates a WEBSITE tree and other meta
+  information. The nodes of the WEBSITE tree correpsond to pages,
+  files, external references, and other objects. Additional meta
+  information include formatting templates.
   """
   
   def __init__(self):
@@ -376,11 +381,11 @@ class WebSite:
         
   def load(self, fileName):
     """
-    Parse the XML document fileName.
+    Load a WEBSITE document by parsting the XML document FILENAME.
     """
     self.src = fileName
     if verb:
-      print "webdoc: parsing `%s'" % self.src
+        print "webdoc: parsing WEBDOC document `%s'" % self.src
     doc = minidom.parse(self.src).documentElement
     self.xLoad(doc, self.root)
 
@@ -500,8 +505,8 @@ class WebSite:
                 x.getPathFrom(dirName)
                        
           text = re.sub("%stylesheet;", block, text)
-          text = re.sub("%pagetitle;", "VLFeat - %s" % page.title, text)
-          text = re.sub("%title;", "<h1>VLFeat.org</h1>", text)
+          text = re.sub("%pagetitle;", "%s - %s" % (self.root.title, page.title), text)
+          text = re.sub("%title;", "<h1>%s</h1>" % self.root.title, text)
           text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
           text = re.sub("%index;", self.genHtmlIndex(self.root), text)
           text = re.sub("%content;", page.data, text)
@@ -598,7 +603,12 @@ if __name__ == '__main__':
     print "webdoc: output path: `%s'" % outdir
 
   site = WebSite()
-  site.load(xmldoc)
+  try:
+      site.load(xmldoc)
+  except (ExpatError), e:
+      print "%s:%d:%d XML parsing error: %s" % (xmldoc, e.lineno, e.offset, 
+                                                ErrorString(e.code))
+      sys.exit(1)
   site.debug()
   site.genSite()
 

@@ -2,7 +2,9 @@
 <template src="template.html"/>
 <stylesheet src="web.css"/>
 <page src="index.html"        title="Home"                 id="home">
- <page src="download.html"    title="Download and Install" id="download"/>
+ <page src="download.html"    title="Download and Install" id="download">
+   <page src="using-xcode.html" title="X-Code" id="using.xcode"/>
+ </page>
  <page href="api/index.html"  title="API reference"        id="api"/>
  <page src="api.html"         title="API reference"        id="api.template" hide="yes">
  <page src="api.html"         title="API reference"        id="api.entry.template" hide="yes"/>

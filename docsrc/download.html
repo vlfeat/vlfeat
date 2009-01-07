@@ -8,66 +8,118 @@
   code</a></li>
 </ul>
 
-<p>Old versions may be obtained <a href="download/">here</a></p>
+<p>Old versions may be obtained <a href="download/">here</a>.</p>
 
 <h1 id="download.install">Installation</h1>
 
-<p>Installing VLFeat is very simple. After downloading and unpacking the most recent binary package (see above), follow these instructions:</p>
+<p>Installing VLFeat is very simple. After downloading and unpacking
+the most recent binary package (see above), follow these instructions
+(each item can be installed independently):</p>
 
-<p>To use the <b>MATLAB Toolbox</b>, simply run the <code>vl_setup</code> command found in the <code>vlfeat/toolbox</code> directory. This command adds the necessary paths to MATLAB search path list. Notice that the paths are not saved. To automate this step, you can add the following fragment of code to your MATLAB <code>startup.m</code> file (on UNIX based system this file is located in <code>~/matlab/</code>, where <code>~</code> denotes your home directory):</p>
+<dl>
+<dt>MATLAB Toolbox</dt>
+<dd>
+ <p>
+ Run the <code>vl_setup</code> command found in
+ the <code>vlfeat/toolbox</code> directory. This command adds the
+ necessary paths to MATLAB search path list.
+ </p>
 
-<pre>
-p=pwd ;
-cd PATHTOVLFEAT ;
-cd toolbox ;
-vl_setup
-cd(p) ;
-clear p
-</pre>
+ <p>Notice that the paths are not saved. To automate this step, you
+ can add the following fragment of code to your
+ MATLAB <code>startup.m</code> file (on UNIX based system this file is
+ located in <code>~/matlab/</code>, where <code>~</code> denotes your
+ home directory):</p>
 
-<p>To install the <b>command line utilities</b>, copy the appropriate files from the
-<code>vlfeat/bin</code> directory to a location in your command path.</p>
+ <pre>
+  p=pwd ;
+  cd PATHTOVLFEAT ;
+  cd toolbox ;
+  vl_setup
+  cd(p) ;
+  clear p
+ </pre>
 
-<p>Finally, to use the <b>C library</b> in your programs, include the appropriate files from the <code>vlfeat/vl</code> hierarchy and link against <code>libvl.a</code> located in the appropriate subdirectory in the <code>vlfeat/bin</code> hierarchy.</p>
+ <p>Alternatively, you can use 
+ <a href="http://www.google.com/search?q=site:www.mathworks.com+savepath&btnI=I">MATLAB
+ <code>savepath</code> command</a> to save the updated search
+ paths.</p>
+</dd>
 
+<dt>Command line utilities</dt>
+<dd>
+ <p>
+ Copy the content of the directory <code>vlfeat/bin/X</code> to a
+ location in your operating system command search
+ path. Here <code>X</code> denotes the subdirectory relative to your
+ architecture (e.g. <code>mac</code> for Mac OS X
+ PPC, <code>maci</code> for Mac OS X Intel</code>,
+ <code>glx</code> for Linux, and so on).
+ </p>
+</dd>
+
+<dt>
+ <dt>C library</dt>
+ <dd>
+  <p>Include in you C source code the appropriate files from
+  the <code>vlfeat/vl</code> hierarchy and link against the
+  library <code>vl</code> located the appropriate
+  subdirectory <code>vlfeat/bin/X</code>, where <code>X</code> depends
+  on your architecture and is defined above. The exact steps (and file
+  names) depend on the architecture and compiler that you are
+  using.</p>
+ </d>
+</dt>
+</dl>
+  
 <h1 id="download.compile">Compiling VLFeat</h1>
 
-<p><b>Note: Compiling is not necessary if you make use of the binary distribution.</b></p>
+<p><b>Note: Compiling is not necessary if you make use of the binary
+distribution.</b></p>
 
-<p>For <b>UNIX</b> based platforms (Mac OS X and Linux), the library bundles a
-GNU-Make makefile (<code>Makefile</code>). The makefile tries to auto-detect the environment and automatically configure itself. In most cases, typing <code>make</code> is all it is required to compile everything. If this does not work, please edit the makefile and make the necessary adjustment to the flags.</p>
+<p>For <b>UNIX</b> based platforms (Mac OS X and Linux), the library
+bundles a GNU-Make makefile (<code>Makefile</code>). The makefile
+tries to auto-detect the environment and automatically configure
+itself. In most cases, typing <code>make</code> is all it is required
+to compile everything. If this does not work, please edit the makefile
+and make the necessary adjustment to the flags.</p>
 
 <p>For <b>Windows</b>, the library bundles a NMake makefile
-(<code>Makefile.mak</code>). In order to use it, you must open Makefile.mak and
-adjust the values of configuration variables to match your setup. Once you have
-done that, start the Visual Studio Command Prompt and type <code>nmake /f Makefile.mak</code>.</p>
+(<code>Makefile.mak</code>). In order to use it, you must open
+Makefile.mak and adjust the values of configuration variables to match
+your setup. Once you have done that, start the Visual Studio Command
+Prompt and type <code>nmake /f Makefile.mak</code>.</p>
 
 <p><b>Note: For Windows you can also compile only the mex files.</b> Start with
 our binary distribution.</p>
 
 <p><b>Windows: Troubleshooting common problems:</b></p>
 <dl>
-  <dt>syntax error: '=' unexpected:</dt>
-  <dd><p>Use <code>nmake /f Makefile.mak</code>.
-  Without <code>/f</code>, nmake will default to the wrong makefile.</p></dd>
-<dt>'long' followed by 'long' is illegal:</dt>
-<dd><p>This error is usually caused by
-attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
+ <dt>syntax error: '=' unexpected:</dt>
+ <dd><p>Use <code>nmake /f Makefile.mak</code>.
+   Without <code>/f</code>, nmake will default to the wrong
+   makefile.</p></dd>
+ <dt>'long' followed by 'long' is illegal:</dt>
+ <dd><p>This error is usually caused by
+   attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
 </dl>
 
 <h1 id="download.contrib">Contributing to VLFeat</h1>
 
 <p>
-We welcome contributions to both the documentation and the source code of
-VLFeat. To contribute to either the library or the documentation, you can create
-patches against our Git repository and send them to us for inclusion in the next
-version. The first step is to clone our public repository using:
+We welcome contributions to both the documentation and the source code
+of VLFeat. To contribute to either the library or the documentation,
+you can create patches against our Git repository and send them to us
+for inclusion in the next version. The first step is to clone our
+public repository using:
 </p>
 
 <pre>git clone http://vlfeat.org/vlfeat.git</pre>
 
 <p>
-Once you have made and committed your changes locally, consider submitting them to the project via e-mail using a command like <code>git-format-patch</code>:
+Once you have made and committed your changes locally, consider
+submitting them to the project via e-mail using a command
+like <code>git-format-patch</code>:
 </p>
 
 <pre>git-format-patch origin</pre>
