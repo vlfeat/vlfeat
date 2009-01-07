@@ -1088,12 +1088,12 @@ update_gradient (VlSiftFilt *f)
     src  = vl_sift_get_octave (f,s) ;
     grad = f->grad + 2 * so * (s - s_min -1) ;
     
-    /* first first row */
+    /* first pixel of the first row */
     gx = src[+xo] - src[0] ;
     gy = src[+yo] - src[0] ;
     SAVE_BACK ;
 
-    /* middle first row */
+    /* middle pixels of the  first row */
     end = (src - 1) + w - 1 ;
     while (src < end) {
       gx = 0.5 * (src[+xo] - src[-xo]) ;
@@ -1101,19 +1101,19 @@ update_gradient (VlSiftFilt *f)
       SAVE_BACK ;
     }
     
-    /* first first row */
+    /* last pixel of the first row */
     gx = src[0]   - src[-xo] ;
     gy = src[+yo] - src[0] ;
     SAVE_BACK ;
     
     for (y = 1 ; y < h -1 ; ++y) {
 
-      /* first middle row */
+      /* first pixel of the middle rows */
       gx =        src[+xo] - src[0] ;
       gy = 0.5 * (src[+yo] - src[-yo]) ;
       SAVE_BACK ;
 
-      /* middle middle row */
+      /* middle pixels of the middle rows */
       end = (src - 1) + w - 1 ;
       while (src < end) {
         gx = 0.5 * (src[+xo] - src[-xo]) ;
@@ -1121,18 +1121,18 @@ update_gradient (VlSiftFilt *f)
         SAVE_BACK ;
       }
       
-      /* last middle row */
+      /* last pixel of the middle row */
       gx =        src[0]   - src[-xo] ;
       gy = 0.5 * (src[+yo] - src[-yo]) ;
       SAVE_BACK ;
     }
 
-    /* first last row */
+    /* first pixel of the last row */
     gx = src[+xo] - src[0] ;
     gy = src[  0] - src[-yo] ;
     SAVE_BACK ;
     
-    /* middle last row */
+    /* middle pixels of the last row */
     end = (src - 1) + w - 1 ;
     while (src < end) {
       gx = 0.5 * (src[+xo] - src[-xo]) ;
@@ -1140,7 +1140,7 @@ update_gradient (VlSiftFilt *f)
       SAVE_BACK ;
     }
     
-    /* last last row */
+    /* last pixel of the last row */
     gx = src[0]   - src[-xo] ;
     gy = src[0]   - src[-yo] ;
     SAVE_BACK ;
@@ -1230,13 +1230,6 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 
 #undef  at
 #define at(dx,dy) (*(pt + xo * (dx) + yo * (dy)))
-
-  /*
-  for(ys  =  VL_MAX (- W - 1, 1 - yi    ) ; 
-      ys <=  VL_MIN (+ W + 1, h - 2 - yi) ; ++ys) {
-    
-    for(xs  = VL_MAX (- W - 1, 1 - xi    ) ; 
-    xs <= VL_MIN (+ W + 1, w - 2 - xi) ; ++xs) {*/
 
   for(ys  =  VL_MAX (- W,       - yi) ; 
       ys <=  VL_MIN (+ W, h - 1 - yi) ; ++ys) {
@@ -1433,11 +1426,11 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
    * Process pixels in the intersection of the image rectangle
    * (1,1)-(M-1,N-1) and the keypoint bounding box.
    */
-  for(dyi =  VL_MAX (- W, 1 - yi    ) ; 
-      dyi <= VL_MIN (+ W, h - yi - 2) ; ++ dyi) {
+  for(dyi =  VL_MAX(- W,   - yi   ) ; 
+      dyi <= VL_MIN(+ W, h - yi -1) ; ++ dyi) {
     
-    for(dxi =  VL_MAX (- W, 1 - xi    ) ; 
-        dxi <= VL_MIN (+ W, w - xi - 2) ; ++ dxi) {
+    for(dxi =  VL_MAX(- W,   - xi   ) ; 
+        dxi <= VL_MIN(+ W, w - xi -1) ; ++ dxi) {
 
       /* retrieve */
       vl_sift_pix mod   = *( pt + dxi*xo + dyi*yo + 0 ) ;
@@ -1500,22 +1493,26 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
   /* Standard SIFT descriptors are normalized, truncated and normalized again */
   if(1) {
 
-    /* Normalize the histogram to L2 unit length. */        
+    /* normalize L2 norm */
     vl_sift_pix norm = normalize_histogram (descr, descr + NBO*NBP*NBP) ;
 
-    /* Set the descriptor to zero if it is lower than our norm_threshold */
-    if(f-> norm_thresh && norm < f-> norm_thresh) {
+    /* set the descriptor to zero if it is lower than our norm_threshold */
+    int numSamples = 
+      (VL_MIN(W, w - xi -1) - VL_MAX(-W, - xi) + 1) * 
+      (VL_MIN(W, h - yi -1) - VL_MAX(-W, - yi) + 1) ;
+
+    if(f-> norm_thresh && norm < f-> norm_thresh * numSamples) {
         for(bin = 0; bin < NBO*NBP*NBP ; ++ bin)
             descr [bin] = 0;
     }
     else {
     
-      /* Truncate at 0.2. */
+      /* truncate at 0.2. */
       for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
         if (descr [bin] > 0.2) descr [bin] = 0.2;
       }
       
-      /* Normalize again. */
+      /* normalize again. */
       normalize_histogram (descr, descr + NBO*NBP*NBP) ;
     }
   }
