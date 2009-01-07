@@ -20,6 +20,7 @@ General Public License version 2.
  ** @param nin number of input arguments.
  ** @param in input arguments.
  **/
+
 void 
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
