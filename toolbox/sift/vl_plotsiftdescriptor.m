@@ -1,11 +1,11 @@
 function h=vl_plotsiftdescriptor(d,f,varargin)
-% VL_PLOTSIFTDESCRIPTOR   Plot VL_SIFT descriptor
-%   VL_PLOTSIFTDESCRIPTOR(D) plots the VL_SIFT descriptors D, stored as
+% VL_PLOTSIFTDESCRIPTOR   Plot SIFT descriptor
+%   VL_PLOTSIFTDESCRIPTOR(D) plots the SIFT descriptors D, stored as
 %   columns of the matrix D. D has the same format used by VL_SIFT().
 %
-%   VL_PLOTSIFTDESCRIPTOR(D,F) plots the VL_SIFT descriptors warped to the
-%   VL_SIFT frames F, specified as columns of the matrix F. F has
-%   the same format used by VL_SIFT().
+%   VL_PLOTSIFTDESCRIPTOR(D,F) plots the SIFT descriptors warped to
+%   the SIFT frames F, specified as columns of the matrix F. F has the
+%   same format used by VL_SIFT().
 %
 %   H=VL_PLOTSIFTDESCRIPTOR(...) returns the handle H to the line drawing
 %   representing the descriptors.
@@ -16,13 +16,13 @@ function h=vl_plotsiftdescriptor(d,f,varargin)
 %   The function supports the following options
 %
 %   NumSpatialBins [4]::
-%       Number of spatial bins in each spatial direction.
+%     Number of spatial bins in each spatial direction.
 %
 %   NumOrientBins [8]::
-%       Number of orientation bis.
+%     Number of orientation bis.
 %
 %   Magnif [3.0]::
-%       Magnification factor.
+%     Magnification factor.
 %
 %   See also VL_HELP(), VL_SIFT(), VL_PLOTFRAME().
 
@@ -69,8 +69,11 @@ if(size(d,1) ~= NBP*NBP*NBO)
 end
 
 if nargin > 1
+  if size(f,1) == 3
+    f = [f;zeros(1,size(f,2))] ;
+  end
   if (~isempty(f) & size(f,1) ~= 4)
-    error('F should be a 4xK matrix or the empty matrix');
+    error('F should be a 4xK or 3xK  matrix or the empty matrix');
   end
   
   if(~isempty(f) & size(f,2) ~= size(f,2))
