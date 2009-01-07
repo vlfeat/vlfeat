@@ -1,26 +1,28 @@
 % VL_BINSUM  Binned summation
-%  H = VL_BINSUM(H,X,B) adds the elements of X to the elements of H
-%  indicated by B. X and B are arrays of the same dimensions, and the
-%  elements of B must be valid indexes for the array H.  This call can
-%  be used to compute histograms.
+%   H = VL_BINSUM(H,X,B) adds the elements of X to the elements of H
+%   indexed by B. X and B are arrays with the same dimensions, and the
+%   elements of B must be valid indexes for the array H. A typical
+%   application is computing an histogram H, where B are the
+%   occurences of the histogram bins and X are the occurence weights.
 %
-%  H = VL_BINSUM(H,X,B,DIM) operates only along the specified dimension
-%  DIM. In this case, H, X and B are array of the same dimensions,
-%  except for the dimension DIM of H, which may differ, and B is an
-%  array of subscripts of the DIM-th dimension of H. This call can be
-%  used to compute multiple histograms at once, with one histogam for
-%  each 1-dimensional slice of H along dimension DIM.
+%   H = VL_BINSUM(H,X,B,DIM) operates only along the specified
+%   dimension DIM. In this case, H, X and B are array of the same
+%   dimensions, except for the dimension DIM of H, which may differ,
+%   and B is an array of subscripts of the DIM-th dimension of H. A
+%   typical application is the caluclation of multiple histograms,
+%   where each histogram is a 1-dimensional slice of the array H along
+%   the dimension DIM.
 %
-%  H = VL_BINSUM(H,X,...) where X is a scalar sums the same values to all
-%  elements.
+%   X can also be a scalar. In this case, the value X is summed to all
+%   the specified bins.
 %
-%  Example::
-%    The following relations illustrate VL_BINSUM() behavior:
-%      VL_BINSUM([0 0],  1, 2) = [0 1]
-%      VL_BINSUM([1 7], -1, 1) = [0 7]
-%      VL_BINSUM(EYE(3), [1 1 1], [1 2 3], 1) = 2*EYE(3)
+%   Example::
+%     The following relations illustrate VL_BINSUM() behavior:
+%       VL_BINSUM([0 0],  1, 2) = [0 1]
+%       VL_BINSUM([1 7], -1, 1) = [0 7]
+%       VL_BINSUM(EYE(3), [1 1 1], [1 2 3], 1) = 2*EYE(3)
 %
-%  See also:: VL_HELP().
+%   See also:: VL_HELP().
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson

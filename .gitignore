@@ -19,8 +19,10 @@ build
 toolbox/mexw32
 toolbox/mexmaci
 toolbox/mexmac
-toolbox/mexglx 
+toolbox/mexglx
+toolbox/mexa64
 toolbox/noprefix
+
 vlfeat.xcodeproj/*.mode1v3
 vlfeat.xcodeproj/*.pbxuser
 

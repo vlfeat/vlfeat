@@ -52,10 +52,13 @@ recall    = tp  / (p + eps) ;
 precision = (tp + eps) ./ (tp + fp + eps) ;
 
 % compute auc
-stop = max(find(~isnan(precision))) ;
-a    = precision(1:stop) ;
-b    = recall(1:stop) ;
-auc  = sum((a(1:end-1) + a(2:end)) .* diff(b))/2 ;
+if length(recall) > 1
+  a    = precision ;
+  b    = recall ;
+  auc  = sum((a(1:end-1) + a(2:end)) .* diff(b))/2 ;
+else
+  auc  = 0 ;
+end
 
 % compute auc according to PA08 challenge
 ap=0;

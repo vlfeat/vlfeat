@@ -1,41 +1,55 @@
-% DFT Dense Feature Transform
-%  [F,D] = DFT(I) calculates the Dense Histogram of Gradient
-%  descriptors for image I. I must be grayscale in SINGLE format.
+% VL_DHOG Dense Histogram of Gradients
+%   [F,D] = VL_DHOG(I) calculates the Dense Histogram of Gradients
+%   (DHOG) descriptors for the image I. I must be grayscale in SINGLE
+%   format.
 %
-%  A VL_DHOG descriptor is equivalent to a VL_SIFT descriptor (see VL_SIFT()
-%  and VLFeat API documentation). This function calculate quickly a
-%  large number of such descriptors, for a dense covering of the image
-%  with features of the same size and orientation.
+%   In this implementation, a DHOG descriptor is equivalent to a SIFT
+%   descriptor (see VL_SIFT()). This function calculates quickly a
+%   large number of such descriptors, for a dense covering of the image
+%   with features of the same size and orientation.
 %
-%  The function returns the frames F and the descriptors D. Since all
-%  frames have identical size and orientation, F has only two rows
-%  (for the X and Y center coordinates). The orientation is fixed to
-%  zero. The scale is related to the SIZE of the spatial bins, which
-%  by default is equal to 3 pixels (see below). If NS is the number of
-%  bins in each spatial direction (by default 4), then a VL_DHOG keypoint
-%  covers a square patch of NS by SIZE pixels.
+%   The function returns the frames F and the descriptors D. Since all
+%   frames have identical size and orientation, F has only two rows
+%   (for the X and Y center coordinates). The orientation is fixed to
+%   zero. The scale is related to the SIZE of the spatial bins, which
+%   by default is equal to 3 pixels (see below). If NS is the number of
+%   bins in each spatial direction (by default 4), then a DHOG keypoint
+%   covers a square patch of NS by SIZE pixels.
 %
-%  Remark:: The size of a VL_SIFT bin is equal to the magnification
-%    factor MAGNIF (usually 3) by the scale of the VL_SIFT keypoint. For
-%    instance, the scale that should be fed to VL_SIFTDESCRIPTOR() in
-%    order to match the output of VL_DHOG() is equal to VL_SIFT / MAGNIF.
+%   Remark:: The size of a SIFT bin is equal to the magnification
+%     factor MAGNIF (usually 3) by the scale of the SIFT
+%     keypoint. This means that the scale of the SIFT keypoints
+%     corresponding to the DHOG descriptors is SIZE / MAGNIF.
 %
-%  VL_DHOG() accepts the following options:
+%   Remark:: In the literature, DHOG is often used to mean a related
+%     but different descriptor by [1]. This descriptor is equivalent to
+%     SIFT instead.
 %
-%  Step STEP [1]::
-%    Extract a descriptor each STEP pixels.
+%   VL_DHOG() accepts the following options:
 %
-%  Size SIZE [3]::
-%    A spatial bin covers SIZE pixels.
+%   Step STEP [1]::
+%     Extract a descriptor each STEP pixels.
 %
-%  Norm::
-%    Append the frames with the normalization factor applied to each descriptor.
-%    In this case, F has 3 rows and this value is the 3rd row.
+%   Size SIZE [3]::
+%     A spatial bin covers SIZE pixels.
 %
-%  Fast::
-%    Use a flat rather than Gaussian window. Much faster.
+%   Norm::
+%     Append the frames with the normalization factor applied to each
+%     descriptor. In this case, F has 3 rows and this value is the 3rd
+%     row. This information can be used to supporess descriptors
+%     with low contrast.
 %
-%  Verbose::
-%    Be verbose.
+%   Fast::
+%     Use a flat rather than Gaussian window. Much faster.
+%
+%   Verbose::
+%     Be verbose.
+%
+%  References
+%
+%  [1] N. Dalal and B. Triggs. Histograms of oriented gradients for
+%      human detection. In Proc. CVPR, 2005.
+%
+%  See also:: VL_HELP(), VL_SIFT().
 
 % AUTORIGHTS
