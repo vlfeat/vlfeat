@@ -460,7 +460,7 @@ $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFF
 
 toolbox/noprefix/%.m : vl_%.m
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
-	echo "function varargout = $*(varargin)" > "$@" ;           \
+	echo "function varargout = $*(varargin)" > "$@" ;            \
 	echo "% $${upperName}  Stub function" >> "$@" ;              \
 	echo "%   See:: VL_$${upperName}()" >> "$@" ;                \
 	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ; 
