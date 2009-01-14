@@ -1,8 +1,11 @@
 function [f,d] = vl_ubcread(file, varargin) 
 % SIFTREAD Read Lowe's SIFT implementation data files
 %   [F,D] = VL_UBCREAD(FILE) reads the frames F and the descriptors D
-%   from FILE in UBC (Lowe's SIFT) or Oxford format and converts them
-%   in the format used by VL_SIFT().
+%   from FILE in UBC (Lowe's original implementation of SIFT) format
+%   and returns F and D as defined by VL_SIFT().
+%
+%   VL_UBCREAD(FILE, 'FORMAT', 'OXFORD') assumes the format used by
+%   Oxford VGG implementations .
 %
 %   See also:: VL_SIFT(), VL_HELP().
 
@@ -103,6 +106,7 @@ switch opts.format
     end
     
   case 'oxford'
+    P(1:2,:) = P(1:2,:) + 1 ; % matlab origin
     f = P  ;
     f(3:5,:) = inv2x2(f(3:5,:)) ;
     d = uint8(L) ;

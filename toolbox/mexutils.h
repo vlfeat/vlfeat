@@ -104,6 +104,21 @@ uCreateNumericMatrix (int M, int N, mxClassID classid, void * data)
   return A ;
 }
 
+/** ------------------------------------------------------------------
+ ** @brief Create scalar
+ **
+ ** @param x inital value.
+ **
+ ** @return new array.
+ **/
+
+static mxArray *
+uCreateScalar (double x)
+{
+  mxArray *A = mxCreateDoubleMatrix(1,1,mxREAL) ;
+  *mxGetPr(A) = x ;
+  return A ;
+}
 
 /** ------------------------------------------------------------------
  ** @brief Is the array a numeric scalar?
@@ -112,7 +127,7 @@ uCreateNumericMatrix (int M, int N, mxClassID classid, void * data)
  **
  ** An array is <em>numeric and scalar</em> if:
  ** - It is numeric.
- ** - It as only one element.
+ ** - It as exactly one element.
  **
  ** @return test result.
  **/
