@@ -1,6 +1,6 @@
-#define F_EPS VL_EXPAND(VL_XCAT(SFX2, _EPSILON))
-#define F_MAX VL_EXPAND(VL_XCAT(SFX2, _MAX))
-#define F_MIN VL_EXPAND(VL_XCAT(SFX2, _MIN))
+#define F_EPS VL_XCAT(SFX2, _EPSILON)
+#define F_MAX VL_XCAT(SFX2, _MAX)
+#define F_MIN VL_XCAT(SFX2, _MIN)
 
 {
   T x ; 

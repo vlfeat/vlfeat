@@ -1,4 +1,4 @@
-#define FL VL_EXPAND(VL_XCAT(VL_FL_INT, SFX)) 
+#define FL VL_XCAT(VL_FL_INT, SFX)
 
 {
   T x, acc, acc_ ;
