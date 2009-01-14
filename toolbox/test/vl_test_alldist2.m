@@ -6,6 +6,7 @@ Y = [2 ; 4] ;
 fprintf('l0 norm') ;
 disp(sum((X~=Y))) ;
 disp(vl_alldist2(double(X),  double(Y), 'l0'  )) ;
+disp(vl_alldist2(sparse(double(X)),  sparse(double(Y)), 'l0'  )) ;
 disp(vl_alldist2(single(X),  single(Y), 'l0'  )) ;
 disp(vl_alldist2( int8(X),    int8(Y) , 'l0'  )) ;
 disp(vl_alldist2( int16(X),   int16(Y), 'l0'  )) ;

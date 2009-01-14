@@ -13,6 +13,7 @@ General Public License version 2.
 #include <mexutils.h>
 
 #include <vl/mathop.h>
+#include <vl/generic.h>
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -122,8 +123,8 @@ uMexOption options [] = {
     double const * s2_pt = 0 ;                                          \
     mwIndex  const * s2_ir  = 0 ;                                       \
     mwIndex const * s2_jc  = 0 ;                                        \
-    double * pt = mxGetPr(out[0]) ;                                     \
-    int j1, j2, l ;                                                     \
+    double * pt = mxGetPr(out[OUT_D]) ;                                 \
+    int j1, j2 ;                                                        \
                                                                         \
     if (self) {                                                         \
       s2_pt = s1_pt ;                                                   \
@@ -137,32 +138,54 @@ uMexOption options [] = {
                                                                         \
     for (j2 = 0 ; j2 < N2 ; ++j2)  {                                    \
       for (j1 = 0 ; j1 < N1 ; ++j1) {                                   \
-        int nz2 = s2_jc [j2+1] - s2_jc [j2] ;                           \
         int nz1 = s1_jc [j1+1] - s1_jc [j1] ;                           \
+        int nz2 = s2_jc [j2+1] - s2_jc [j2] ;                           \
         if(! self || j1 >= j2) {                                        \
           double acc = 0 ;                                              \
           double const * s1_it = s1_pt + s1_jc [j1] ;                   \
           double const * s2_it = s2_pt + s2_jc [j2] ;                   \
           mwIndex const * s1_ir_it = s1_ir + s1_jc [j1] ;               \
           mwIndex const * s2_ir_it = s2_ir + s2_jc [j2] ;               \
-          mwIndex ir1 = *s1_ir_it ;                                     \
-          mwIndex ir2 = *s2_ir_it ;                                     \
-          while (nz1 && nz2) {                                          \
-            if (ir1 < ir2) {                                            \
-              F(acc, *s1_it++, 0) ;                                     \
-              ir1 = *s1_ir_it++ ;                                       \
+          mwIndex ir1 ; \
+          mwIndex ir2 ; \
+          while (nz1 || nz2) {                                          \
+            if (nz2 == 0) {                                             \
+              double a = *s1_it++ ;                                     \
+              F(DOUBLE, a, 0) ;                                         \
+              s1_ir_it ++ ;                                             \
               nz1 -- ;                                                  \
-            } else if (ir2 < ir1) {                                     \
-              F(acc, 0, *s2_it++) ;                                     \
-              ir2 = *s2_ir_it++ ;                                       \
-              nz2 -- ;                                                  \
-            } else {                                                    \
-              F(acc, *s1_it++, *s2_it++) ;                              \
-              ir1 = *s1_ir_it++ ;                                       \
-              ir2 = *s2_ir_it++ ;                                       \
-              nz1 -- ;                                                  \
-              nz2 -- ;                                                  \
+              continue ;                                                \
             }                                                           \
+            if (nz1 == 0) {                                             \
+              double b = *s2_it++ ;                                     \
+              F(DOUBLE, 0, b) ;                                         \
+              s2_ir_it ++ ;                                             \
+              nz2 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            ir1 = *s1_ir_it ;                                           \
+            ir2 = *s2_ir_it ;                                           \
+            if (ir1 < ir2) {                                            \
+              double a = *s1_it++ ;                                     \
+              F(DOUBLE, a, 0) ;                                         \
+              s1_ir_it ++ ;                                             \
+              nz1 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            if (ir1 > ir2) {                                            \
+              double b = *s2_it++ ;                                     \
+              F(DOUBLE, 0, b) ;                                         \
+              s2_ir_it ++ ;                                             \
+              nz2 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            double a = *s1_it++ ;                                       \
+            double b = *s2_it++ ;                                       \
+            F(DOUBLE, a, b) ;                                           \
+            s1_ir_it ++ ;                                               \
+            s2_ir_it ++ ;                                               \
+            nz1 -- ;                                                    \
+            nz2 -- ;                                                    \
           }                                                             \
           *pt = acc;                                                    \
         } else {                                                        \
@@ -356,7 +379,7 @@ mexFunction(int nout, mxArray *out[],
   case opt_ ## NORM :                                                   \
     if (sparse) {                                                       \
       out[OUT_D] = mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL) ; \
-      CORE_SPARSE(NORM, VL_EXPAND(VL_JOIN(F_, NORM)))  ;                \
+      CORE_SPARSE(NORM, VL_XCAT(F_, NORM))                              \
     } else {                                                            \
       switch (data_class) {                                             \
         DISPATCH_CLASS(NORM,  UINT8 , UINT32)                           \
