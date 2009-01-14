@@ -59,8 +59,9 @@ mexFunction(int nout, mxArray *out[],
   mxClassID classid ;  
   
   int M,N,K,j,k,ndims ;
-  int M_, N_, dims_[3] ;
-  int const *dims ;
+  int M_, N_ ;
+  mwSize dims_[3] ;
+  mwSize const *dims ;
   
   /* -----------------------------------------------------------------
    *                                               Check the arguments

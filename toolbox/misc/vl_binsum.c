@@ -98,9 +98,9 @@ mexFunction(int nout, mxArray *out[],
     unsigned int XD = mxGetNumberOfDimensions(in[IN_X]) ;
     unsigned int BD = mxGetNumberOfDimensions(in[IN_B]) ;
     
-    int const* Hdims = mxGetDimensions(in[IN_H]) ;
-    int const* Xdims = mxGetDimensions(in[IN_X]) ;
-    int const* Bdims = mxGetDimensions(in[IN_B]) ;
+    mwSize const* Hdims = mxGetDimensions(in[IN_H]) ;
+    mwSize const* Xdims = mxGetDimensions(in[IN_X]) ;
+    mwSize const* Bdims = mxGetDimensions(in[IN_B]) ;
     
     const double* B_brk ;
     const double* B_nbrk ;

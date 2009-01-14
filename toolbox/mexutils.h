@@ -290,14 +290,14 @@ uIsRealVector(const mxArray* A, int N)
  **/
 
 static int
-uIsRealArray(const mxArray* A, int D, const int* dims)
+uIsRealArray(const mxArray* A, int D, int* dims)
 {
   if(!mxIsDouble(A) || mxIsComplex(A))
     return 0 ;
 
   if(D >= 0) {
     int d ;
-    const int* actual_dims = mxGetDimensions(A) ;
+    mwSize const * actual_dims = mxGetDimensions(A) ;
 
     if(mxGetNumberOfDimensions(A) != D)
       return 0 ;

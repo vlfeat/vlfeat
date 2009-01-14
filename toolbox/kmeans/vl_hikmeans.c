@@ -50,7 +50,8 @@ xcreate (mxArray *mnode, int i, VlHIKMNode *node)
   if (node->children) {
     mxArray * msub ;
     const char * field_names[] = {"centers", "sub" } ;
-    int dims [2], k ;
+    mwSize dims [2] ;
+    int k ;
     
     dims[0] = 1 ;
     dims[1] = node_K ;

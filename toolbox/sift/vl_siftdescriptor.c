@@ -156,7 +156,7 @@ mexFunction(int nout, mxArray *out[],
     }
 
     {
-      int dims [2] ;
+      mwSize dims [2] ;
       dims [0] = 128 ;
       dims [1] = nikeys ;
       out[OUT_DESCRIPTORS]= mxCreateNumericArray 

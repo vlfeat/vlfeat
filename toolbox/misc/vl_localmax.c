@@ -73,7 +73,7 @@ mexFunction(int nout, mxArray *out[],
        we need to adjust dims[].
     */
     int d ;
-    const int* const_dims = mxGetDimensions(in[F]) ;
+    mwSize const * const_dims = mxGetDimensions(in[F]) ;
     dims = mxMalloc(sizeof(int)*ndims) ;
     for(d=0 ; d < ndims ; ++d) dims[d] = const_dims[d] ;
   }

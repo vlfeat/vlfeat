@@ -60,7 +60,7 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   int M,N,K,ndims ;
-  int const *dims ;
+  mwSize const *dims ;
   double* I_pt ;
   double* J_pt ;
   int k;

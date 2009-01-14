@@ -258,7 +258,7 @@ mexFunction(int nout, mxArray *out[],
   void const * s2_pt ;
   mxClassID data_class ;
   mxClassID acc_class ;
-  int dims [2] ; 
+  mwSize dims [2] ; 
   
   /* for option parsing */
   bool           self = 1 ;      /* called with one numeric argument? */
