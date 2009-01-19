@@ -16,45 +16,41 @@
 int const NBP = 4 ;
 int const NBO = 8 ;
 
-
 /** 
  @file dhog.h
  
- This module implements the Dense Histogram of Gradient descriptor (DHOG).
- The DHOG descriptor is equivalent or similar to a
- @ref sift-descriptor "SIFT descriptor" computed
- at each pixel of an image, for a fixed scale and orientation.
+ This module implements a dense version of @ref sift.h "SIFT" where
+ features of fixed scale and orientation are computed on a regular
+ (and dense) grid.
+
+ @remark This descriptor is <em>not</em> equivalent to N. Dalal and
+ B. Triggs. <em>Histograms of Oriented Gradients for Human
+ Detection.</em> CVPR 2005. It is instead just a dense version of
+ SIFT.
  
- Each DHOG descriptor is an histogram of the gradient orientations inside
- a square image patch, very similar to a SIFT descriptor. The histogram has @f$N_b@f$ bins along each
- spatial direction @e x and @e y and @f$N_o@f$ bins along the orientation
- dimension. Each spatial bin correspond a portion of image which has
- size equal to @f$\Delta@f$ pixels (along @e x and @e y), where @f$\Delta@f$
- is an even number. In addition, bins are bilinearly interpolated and partially
- overlap. The following figure illustrates which pixels (tick marks along 
- the axis) are associated to one of two bins, and with weights (triangular
- signals).
+ - @ref dhog-usage
+ - @ref dhog-detector
+ - @ref dhog-descriptor
+
+ @section dhog-usage Usage
+
+ <p>DHOG is implemented by a filter, i.e. an object which can be
+ reused to process sequentially similar images. To use the <b>DHOG
+ filter</b>:</p>
  
- @image html dhog-bins.png
- 
- The top row shows bins of extension @f$\Delta=2@f$ whose center is aligned
- to a pixel. The bottom row shows the same bins, but whose center sits
- in between two adjacent pixels. Notice that while the bin extent is always
- the same, in the first case
- the pixels that actually contributes to a bin (i.e. the ones with weights
- greater than zero) are @f$2\Delta -1@f$, while in the second case
- they are @f$2\Delta@f$.
- 
- While both arrangements could be used, this implementation uses only
- the first (centers aligned to pixels), which is valid also for the case
- @f$\Delta=1@f$.
- 
- @section dhog-grid Covering with descriptor and downsampling
- 
+ - Initialize the DHOG filter with ::vl_dhog_new(). The
+   filter can be reused if the image size does not change.
+ - 
+ - Delete the DHOG filter by ::vl_dhog_delete().
+
+ To use o
+
+ @section dhog-detector Detector (feature sampling)
+
  DHOG extracts a dense collection of descriptors, one each few pixels.
  Since most calculations use convolutions, for simplicity we require
- the centers of all descriptor bins to lie at integer coordinates within
- the image boundaries.
+ the centers of all descriptor bins to lie at integer coordinates
+ within the image boundaries.
  
  The center of the top-left bin of the top-left descriptor has
  coordinates 
@@ -91,6 +87,33 @@ int const NBO = 8 ;
  \qquad
  y_{(N_s-1)/2}(i) = \delta j + \frac{\Delta (N_s - 1)}{2}.
  @f]
+
+ @section dhog-descriptor Descriptor
+ 
+ Each DHOG descriptor is an histogram of the gradient orientations
+ inside a square image patch, very similar to a @ref sift-descriptor
+ "SIFT descriptor". The histogram has @f$N_b@f$ bins along each
+ spatial direction @e x and @e y and @f$N_o@f$ bins along the
+ orientation dimension. Each spatial bin corresponds a portion of image
+ which has size equal to @f$\Delta@f$ pixels (along @e x and @e y),
+ where @f$\Delta@f$ is an even number. In addition, bins are
+ bilinearly interpolated and partially overlap. The following figure
+ illustrates which pixels (tick marks along the axis) are associated
+ to one of two bins, and with weights (triangular signals).
+ 
+ @image html dhog-bins.png
+ 
+ The top row shows bins of extension @f$\Delta=2@f$ whose center is
+ aligned to a pixel. The bottom row shows the same bins, but whose
+ center sits in between two adjacent pixels. Notice that while the bin
+ extent is always the same, in the first case the pixels that actually
+ contributes to a bin (i.e. the ones with weights greater than zero)
+ are @f$2\Delta -1@f$, while in the second case they are
+ @f$2\Delta@f$.
+ 
+ While both arrangements could be used, this implementation uses only
+ the first (centers aligned to pixels), which is valid also for the
+ case @f$\Delta=1@f$.  
  
  **/
 
