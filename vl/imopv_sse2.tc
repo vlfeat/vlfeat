@@ -90,7 +90,8 @@ VL_IMCONVCOL (FLT* dst, int dst_stride,
         VTYPE v, c ;
         FLT const *srci ;
         acc.v = VSTZ () ;
-        
+        v = VSTZ() ;
+
         filti = filt ;
         stop = filt_end - y ;
         srci = src + x - stop * src_stride ;

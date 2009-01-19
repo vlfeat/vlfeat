@@ -47,9 +47,9 @@ void
 mexFunction(int nout, mxArray *out[], 
             int nin, const mxArray *in[])
 {
-  int dims [3] ;
+  mwSize dims [3] ;
   int numDims ; 
-  int const *dimsPt = 0 ;
+  mwSize const * dimsPt = 0 ;
 
   void* histPt = 0 ;
   void const* intHistPt = 0 ;

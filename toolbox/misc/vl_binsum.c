@@ -68,19 +68,21 @@ mexFunction(int nout, mxArray *out[],
       
       /* next bin to accumulate */
       j = (int)(*B_pt++) - 1;
-
+      
       /* bin index out of bounds ?*/
-      if(j < 0 || j >= KH) {
+      if(j < -1 || j >= KH) {
         char str [256] ;
         snprintf(str, 256, 
                  "Index out of bounds "
-                 "(B(%d)=%d).",
+                 "(B(%ld)=%d).",
                  B_pt - mxGetPr(in[IN_B]), j + 1) ;
         mexErrMsgTxt(str) ;
       }
 
-      /* accumulate */
-      R_pt[j] += *X_pt ;
+      /* accumulate (but skip null indeces) */
+      if (j >= 0) {
+        R_pt[j] += *X_pt ;
+      }
       
       /* except for the scalar X case, keep X and B synchronized */
       if (KX > 1) ++ X_pt ;
@@ -96,9 +98,9 @@ mexFunction(int nout, mxArray *out[],
     unsigned int XD = mxGetNumberOfDimensions(in[IN_X]) ;
     unsigned int BD = mxGetNumberOfDimensions(in[IN_B]) ;
     
-    int const* Hdims = mxGetDimensions(in[IN_H]) ;
-    int const* Xdims = mxGetDimensions(in[IN_X]) ;
-    int const* Bdims = mxGetDimensions(in[IN_B]) ;
+    mwSize const* Hdims = mxGetDimensions(in[IN_H]) ;
+    mwSize const* Xdims = mxGetDimensions(in[IN_X]) ;
+    mwSize const* Bdims = mxGetDimensions(in[IN_B]) ;
     
     const double* B_brk ;
     const double* B_nbrk ;
@@ -177,10 +179,10 @@ mexFunction(int nout, mxArray *out[],
      *              after dimension d.
      *
      * We can easily keep track of the three cases without computing
-     * explicitly the indexs. In fact, we fall the first time in case
-     * (a) for srd-1 consecutive steps and in case (b) at the srd
-     * step. Similarly, we fall in case (c) at step srd * Bdims[d]
-     * steps. The pattern repeats regularly.
+     * explicitly the indexs. In fact, case (a) occurs srd-1
+     * consecutive steps and case (b) at the srd step. Similarly, case
+     * (c) accurs at step srd * Bdims[d] steps. The pattern repeats
+     * regularly.
      */
 
     KH     = Hdims[d] ;
@@ -193,17 +195,19 @@ mexFunction(int nout, mxArray *out[],
       j = (int)(*B_pt) - 1;
 
       /* index out of bounds? */
-      if(j < 0 || j >= KH) {
+      if(j < -1 || j >= KH) {
         char str [256] ;
-        snprintf(str, 256, 
+        snprintf(str, 256,
                  "Index out of bounds "
-                 "(B(%d)=%d).",
+                 "(B(%ld)=%d).",
                  B_pt-mxGetPr(in[IN_B]),j + 1) ;
         mexErrMsgTxt (str) ;
       }
       
-      /* accumulate */
-      R_pt [j * srd] += *X_pt ;
+      /* accumulate (but skip null indeces) */
+      if (j >= 0) {
+        R_pt [j * srd] += *X_pt ;
+      }
 
       /* next element */
       if (KX > 1) X_pt++ ;

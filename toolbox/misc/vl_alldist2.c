@@ -13,6 +13,7 @@ General Public License version 2.
 #include <mexutils.h>
 
 #include <vl/mathop.h>
+#include <vl/generic.h>
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -114,6 +115,88 @@ uMexOption options [] = {
     }                                                                   \
   }                                                                     \
   
+#define CORE_SPARSE(NORM, F)                                            \
+  {                                                                     \
+    double const * s1_pt = mxGetPr(in[IN_S1]) ;                         \
+    mwIndex const * s1_ir  = mxGetIr(in[IN_S1]) ;                       \
+    mwIndex const * s1_jc  = mxGetJc(in[IN_S1]) ;                       \
+    double const * s2_pt = 0 ;                                          \
+    mwIndex  const * s2_ir  = 0 ;                                       \
+    mwIndex const * s2_jc  = 0 ;                                        \
+    double * pt = mxGetPr(out[OUT_D]) ;                                 \
+    int j1, j2 ;                                                        \
+                                                                        \
+    if (self) {                                                         \
+      s2_pt = s1_pt ;                                                   \
+      s2_ir = s1_ir ;                                                   \
+      s2_jc = s1_jc ;                                                   \
+    } else {                                                            \
+      s2_pt = mxGetPr(in[IN_S2]) ;                                      \
+      s2_ir = mxGetIr(in[IN_S2]) ;                                      \
+      s2_jc = mxGetJc(in[IN_S2]) ;                                      \
+    }                                                                   \
+                                                                        \
+    for (j2 = 0 ; j2 < N2 ; ++j2)  {                                    \
+      for (j1 = 0 ; j1 < N1 ; ++j1) {                                   \
+        int nz1 = s1_jc [j1+1] - s1_jc [j1] ;                           \
+        int nz2 = s2_jc [j2+1] - s2_jc [j2] ;                           \
+        if(! self || j1 >= j2) {                                        \
+          double acc = 0 ;                                              \
+          double const * s1_it = s1_pt + s1_jc [j1] ;                   \
+          double const * s2_it = s2_pt + s2_jc [j2] ;                   \
+          mwIndex const * s1_ir_it = s1_ir + s1_jc [j1] ;               \
+          mwIndex const * s2_ir_it = s2_ir + s2_jc [j2] ;               \
+          mwIndex ir1 ; \
+          mwIndex ir2 ; \
+          while (nz1 || nz2) {                                          \
+            if (nz2 == 0) {                                             \
+              double a = *s1_it++ ;                                     \
+              F(DOUBLE, a, 0) ;                                         \
+              s1_ir_it ++ ;                                             \
+              nz1 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            if (nz1 == 0) {                                             \
+              double b = *s2_it++ ;                                     \
+              F(DOUBLE, 0, b) ;                                         \
+              s2_ir_it ++ ;                                             \
+              nz2 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            ir1 = *s1_ir_it ;                                           \
+            ir2 = *s2_ir_it ;                                           \
+            if (ir1 < ir2) {                                            \
+              double a = *s1_it++ ;                                     \
+              F(DOUBLE, a, 0) ;                                         \
+              s1_ir_it ++ ;                                             \
+              nz1 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            if (ir1 > ir2) {                                            \
+              double b = *s2_it++ ;                                     \
+              F(DOUBLE, 0, b) ;                                         \
+              s2_ir_it ++ ;                                             \
+              nz2 -- ;                                                  \
+              continue ;                                                \
+            }                                                           \
+            double a = *s1_it++ ;                                       \
+            double b = *s2_it++ ;                                       \
+            F(DOUBLE, a, b) ;                                           \
+            s1_ir_it ++ ;                                               \
+            s2_ir_it ++ ;                                               \
+            nz1 -- ;                                                    \
+            nz2 -- ;                                                    \
+          }                                                             \
+          *pt = acc;                                                    \
+        } else {                                                        \
+          *pt = *(pt + (j1 - j2) * (N1 - 1))  ;                         \
+        }                                                               \
+        pt++ ;                                                          \
+      }                                                                 \
+    }                                                                   \
+  }
+
+
 #define DEF_CLASS(NORM,F)                          \
   CORE (NORM,  F,  INT8,     INT32)                \
   CORE (NORM,  F,  UINT8,   UINT32)                \
@@ -122,7 +205,7 @@ uMexOption options [] = {
   CORE (NORM,  F,  INT32,    INT32)                \
   CORE (NORM,  F,  UINT32,  UINT32)                \
   CORE (NORM,  F,  SINGLE,  SINGLE)                \
-  CORE (NORM,  F,  DOUBLE,  DOUBLE)                \
+  CORE (NORM,  F,  DOUBLE,  DOUBLE)
 
 #define  F_L0(AC,x,y)   { acc += (x) != (y) ; }
 #define  F_L1(AC,x,y)   { acc += ABS_DIFF(x,y) ; }
@@ -193,11 +276,12 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_S1,IN_S2} ;
   enum {OUT_D=0} ;
   int L,N1,N2 ;
+  int sparse = 0 ;
   void const * s1_pt ;
   void const * s2_pt ;
   mxClassID data_class ;
   mxClassID acc_class ;
-  int dims [2] ; 
+  mwSize dims [2] ; 
   
   /* for option parsing */
   bool           self = 1 ;      /* called with one numeric argument? */
@@ -227,6 +311,14 @@ mexFunction(int nout, mxArray *out[],
     next = 2 ;
   }
 
+  sparse = mxIsSparse(in[IN_S1]) ;
+  
+  if (sparse && nin >=2 && mxIsNumeric(in[IN_S2])) {
+    if (! mxIsSparse(in[IN_S2])) {
+      mexErrMsgTxt ("X and Y must be either both full or sparse.") ;
+    }
+  }
+
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
     case opt_LINF :
@@ -254,6 +346,8 @@ mexFunction(int nout, mxArray *out[],
   if ((!self) && data_class != mxGetClassID(in[IN_S2])) {
     mexErrMsgTxt("X and Y must have the same numeric class") ;
   }
+
+  assert ((! sparse) || (data_class == mxDOUBLE_CLASS)) ;
   
   L  = mxGetM(in[IN_S1]) ; 
   N1 = mxGetN(in[IN_S1]) ;
@@ -280,21 +374,26 @@ mexFunction(int nout, mxArray *out[],
       L, N1, N2,                                                        \
       self ) ;                                                          \
   break ;
-  
-#define DISPATCH_NORM(NORM)                                    \
-  case opt_ ## NORM :                                          \
-    switch (data_class) {                                      \
-      DISPATCH_CLASS(NORM,  UINT8 , UINT32)                    \
-        DISPATCH_CLASS(NORM,  INT8 ,  INT32)                   \
-        DISPATCH_CLASS(NORM, UINT16, UINT32)                   \
-        DISPATCH_CLASS(NORM,  INT16,  INT32)                   \
-        DISPATCH_CLASS(NORM, UINT32, UINT32)                   \
-        DISPATCH_CLASS(NORM,  INT32,  INT32)                   \
-        DISPATCH_CLASS(NORM, SINGLE, SINGLE)                   \
-        DISPATCH_CLASS(NORM, DOUBLE,DOUBLE)                    \
-    default:                                                   \
-      mexErrMsgTxt("Data class not supported!") ;              \
-    }                                                          \
+
+#define DISPATCH_NORM(NORM)                                             \
+  case opt_ ## NORM :                                                   \
+    if (sparse) {                                                       \
+      out[OUT_D] = mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL) ; \
+      CORE_SPARSE(NORM, VL_XCAT(F_, NORM))                              \
+    } else {                                                            \
+      switch (data_class) {                                             \
+        DISPATCH_CLASS(NORM,  UINT8 , UINT32)                           \
+          DISPATCH_CLASS(NORM,  INT8 ,  INT32)                          \
+          DISPATCH_CLASS(NORM, UINT16, UINT32)                          \
+          DISPATCH_CLASS(NORM,  INT16,  INT32)                          \
+          DISPATCH_CLASS(NORM, UINT32, UINT32)                          \
+          DISPATCH_CLASS(NORM,  INT32,  INT32)                          \
+          DISPATCH_CLASS(NORM, SINGLE, SINGLE)                          \
+          DISPATCH_CLASS(NORM, DOUBLE,DOUBLE)                           \
+      default:                                                          \
+        mexErrMsgTxt("Data class not supported!") ;                     \
+      }                                                                 \
+    }                                                                   \
   break ;
   
   switch (norm) {

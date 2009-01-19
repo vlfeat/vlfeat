@@ -171,7 +171,7 @@ mexFunction(int nout, mxArray *out[],
      *                                            Create output arrays
      * ------------------------------------------------------------ */
     {
-      int dims [2] ;
+      mwSize dims [2] ;
       
       dims [0] = 128 ;
       dims [1] = nkeys ;

@@ -47,7 +47,7 @@ mexFunction(int nout, mxArray *out[],
     {
       enum { max_ndims = 30 } ;
       int ndims = 2 ;
-      int dims [max_ndims] = {1, 1} ;
+      mwSize dims [max_ndims] = {1, 1} ;
       int n, k ;
       double *x ;     
 

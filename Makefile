@@ -299,7 +299,7 @@ CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
 CFLAGS          += -DVL_SUPPORT_SSE2
 CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
-MEX_FLAGS       += -lm
+MEX_FLAGS       += -lm -largeArrayDims
 MEX_CFLAGS      += 
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif

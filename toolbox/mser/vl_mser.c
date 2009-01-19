@@ -58,7 +58,7 @@ mexFunction(int nout, mxArray *out[],
 
   int nel ;              
   int ndims ;            
-  int const* dims ; 
+  mwSize const* dims ; 
      
   vl_mser_pix const *data ; 
 
@@ -138,13 +138,18 @@ mexFunction(int nout, mxArray *out[],
   {
     VlMserFilt        *filt ;    
     vl_uint     const *regions ;
-    float   const *frames ;    
+    float       const *frames ;    
     int                i, j, nregions, nframes, dof ;    
-    int                odims [2] ;
+    mwSize             odims [2] ;
     double            *pt ;
     
     /* new filter */
-    filt = vl_mser_new (ndims, dims) ;
+    {
+      int * vlDims = vl_malloc(sizeof(int) * ndims) ;
+      for (i = 0 ; i < ndims ; ++i) vlDims [i] = dims [i] ;
+      filt = vl_mser_new (ndims, vlDims) ;
+      vl_free(vlDims) ;
+    }
 
     if (!filt) {
       mexErrMsgTxt("Could not create an MSER filter.") ;

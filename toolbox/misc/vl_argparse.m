@@ -1,7 +1,11 @@
-function conf = vl_argparse(conf, varargin)
+function [conf, args] = vl_argparse(conf, varargin)
 % VL_ARGPARSE  Parse option arguments
 %   CONF = VL_ARGPARSE(CONF, PAR1, VAL1, ... PARN, VALN) updates the
-%   structure CONF based on the specified parameter-value pairs.
+%   structure CONF based on the specified parameter-value pairs. The
+%   function produces an error if an uknown parameter is passed in.
+%
+%   [CONF, ARGS] = VL_ARGPARSE(...) copies unkown parameters to ARGS
+%   instead of producing an error.
 %
 %   Exampe:: The function can be used to quickly parse a variable list
 %     of arguments passed to a MATLAB functions:
@@ -15,6 +19,8 @@ function conf = vl_argparse(conf, varargin)
 
 if ~isstruct(conf), error('CONF must be a structure') ; end
 
+args = {} ;
+
 for ai = 1:2:length(varargin)
   try 
     paramName = varargin{ai} ;
@@ -26,10 +32,15 @@ for ai = 1:2:length(varargin)
   confParamName = findFieldI(conf, paramName) ;
 
   if isempty(confParamName)
-    error(sprintf('Unknown parameter ''%s''', ...
-                  paramName)) ;
-  end  
-  conf.(confParamName) = value ;
+    if nargout < 2
+      error(sprintf('Unknown parameter ''%s''', ...
+                    paramName)) ;
+    else
+      args(end+1:end+2) = varargin(ai:ai+1) ;
+    end
+  else
+    conf.(confParamName) = value ;
+  end
 end
 
 % --------------------------------------------------------------------

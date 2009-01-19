@@ -31,7 +31,7 @@ typedef vl_uint64 acc_t ;
 
 /* advance N-dimensional subscript */
 void
-adv(int const* dims, int ndims, int* subs_pt)
+adv(mwSize const* dims, int ndims, int* subs_pt)
 {
   int d = 0 ;
   while(d < ndims) {
@@ -51,7 +51,7 @@ mexFunction(int nout, mxArray *out[],
 
   idx_t i ;
   int k, nel, ndims ; 
-  int const * dims ;
+  mwSize const * dims ;
   val_t const * I_pt ;
   int last = 0 ;
   int last_expanded = 0 ;
@@ -182,7 +182,7 @@ mexFunction(int nout, mxArray *out[],
    * Save results
    */
   {
-    int dims[2] ;
+    mwSize dims[2] ;
     int unsigned * pt ;
     dims[0] = last ;
     out[OUT_MEMBERS] = mxCreateNumericArray(1,dims,mxUINT32_CLASS,mxREAL);

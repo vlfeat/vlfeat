@@ -57,7 +57,7 @@ mexFunction(int nout, mxArray *out[],
     if( K == 1 ) {
       out[OUT_DOM] = mxCreateDoubleMatrix(3,9,mxREAL) ;
     } else {
-      int dims [3] ;
+      mwSize dims [3] ;
       dims[0] = 3 ; dims[1] = 9 ; dims[2] = K ;
       out[OUT_DOM] = mxCreateNumericArray(3,dims,mxDOUBLE_CLASS,mxREAL) ;
     }

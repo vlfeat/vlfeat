@@ -75,7 +75,7 @@ VL_EXPORT void             vl_mser_ell_fit (VlMserFilt *f) ;
  **/
 VL_INLINE vl_uint          vl_mser_get_regions_num  (VlMserFilt const *f) ;
 VL_INLINE vl_uint const*   vl_mser_get_regions      (VlMserFilt const *f) ;
-VL_INLINE float const* vl_mser_get_ell          (VlMserFilt const *f) ;
+VL_INLINE float const*     vl_mser_get_ell          (VlMserFilt const *f) ;
 VL_INLINE vl_uint          vl_mser_get_ell_num      (VlMserFilt const *f) ;
 VL_INLINE vl_uint          vl_mser_get_ell_dof      (VlMserFilt const *f) ;
 VL_INLINE VlMserStats const*  vl_mser_get_stats     (VlMserFilt const *f) ;

@@ -7,6 +7,8 @@ function path = vl_setup(varargin)
 %   contain the VL_ prefix. For example, with this option it is
 %   possible to use SIFT() instead of VL_SIFT().
 %
+%   VL_SETUP('TEST') adds VLFeat test functions.
+%
 %   VL_SETUP('QUIET') does not print the greeting message.
 %
 %   See also:: VL_HELP(), VL_ROOT().
@@ -15,13 +17,16 @@ function path = vl_setup(varargin)
 % AUTORIGHTS
 
 noprefix = false ;
-quiet   = false ;
+quiet = false ;
+test = false ;
 
 for ai=1:length(varargin)
   opt = varargin{ai} ;
   switch lower(opt)
     case {'noprefix', 'usingvl'} 
       noprefix = true ;
+    case {'test'}
+      test = true ;
     case 'quiet'
       quiet = true ;
   end
@@ -49,6 +54,10 @@ addpath(fullfile(root,'toolbox',bindir    )) ;
 
 if noprefix
   addpath(fullfile(root,'toolbox','noprefix')) ;
+end
+
+if test
+  addpath(fullfile(root,'toolbox','test')) ;
 end
 
 fprintf('** Welcome to the VLFeat Toolbox **\n') ;

@@ -20,13 +20,18 @@ SAMPLE (T* histPt,
     vl_uint32 stride = width ;
     vl_uint32 labelStride = width * height ;
     T const* iter = 0 ;
+
+    /* empty box case */
+    if (x1 > x2 || y1 > y2) {
+      for (k = 0 ; k < numLabels ; ++k) {
+        histPt [k] = 0 ;
+      }
+      return ;
+    }
     
     if (x1 < 1  || y1 < 1) {
       uErrMsgTxt("Box %d is out of bounds.", bi+1) ;
     }
-    if (x1 > x2+1 || y1 > y2+1) {
-      uErrMsgTxt("Box %d is inconsistent.", bi+1) ;
-    }    
     if (x2 > width || y2 > height) {
       uErrMsgTxt("Box %d is out of bounds.", bi+1) ;
     }
