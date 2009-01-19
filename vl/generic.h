@@ -137,7 +137,7 @@ typedef int(*printf_func_t) (char const *format, ...) ;
  ** @param printf_func  pointer to @c printf.
  ** Let @c print_func be NULL to disable printf.
  **/
-VL_EXPORT void  vl_set_printf_func (printf_func_t printf_func) ;
+VL_EXPORT void vl_set_printf_func (printf_func_t printf_func) ;
 
 /** @def VL_PRINTF
  ** @brief Call user-customizable @c printf function

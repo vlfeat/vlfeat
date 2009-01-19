@@ -16,6 +16,7 @@
 /* option codes */
 enum {
   opt_step = 0,
+  opt_bounds,
   opt_size,
   opt_fast,
   opt_verbose,
@@ -24,45 +25,14 @@ enum {
 
 /* options */
 uMexOption options [] = {
-{"Step",         1,   opt_step          },
-{"Size",         1,   opt_size          },
-{"Verbose",      0,   opt_verbose       },
-{"Fast",         0,   opt_fast          },
-{"Norm",         0,   opt_norm          },
-{0,              0,   0                 }
+  {"Bounds",       1,   opt_bounds        },
+  {"Step",         1,   opt_step          },
+  {"Size",         1,   opt_size          },
+  {"Verbose",      0,   opt_verbose       },
+  {"Fast",         0,   opt_fast          },
+  {"Norm",         0,   opt_norm          },
+  {0,              0,   0                 }
 } ;
-
-/** ------------------------------------------------------------------
- ** @internal
- ** @brief Transpose descriptor
- **
- ** @param dst destination buffer.
- ** @param src source buffer.
- **
- ** The function writes to @a dst the transpose of the SIFT descriptor
- ** @a src. The transpose is defined as the descriptor that one
- ** obtains from computing the normal descriptor on the transposed
- ** image.
- **/
-
-VL_INLINE void 
-transpose_descriptor (float* dst, float const* src) 
-{
-  int const BO = 8 ;  /* number of orientation bins */
-  int const BP = 4 ;  /* number of spatial bins     */
-  int i, j, t ;
-  
-  for (j = 0 ; j < BP ; ++j) {
-    int jp = BP - 1 - j ;
-    for (i = 0 ; i < BP ; ++i) {
-      int o  = BO * i + BP*BO * j  ;
-      int op = BO * i + BP*BO * jp ;      
-      dst [op] = src[o] ;      
-      for (t = 1 ; t < BO ; ++t) 
-        dst [BO - t + op] = src [t + o] ;
-    }
-  }
-}
 
 /** ------------------------------------------------------------------
  ** @brief MEX entry point
@@ -87,6 +57,12 @@ mexFunction(int nout, mxArray *out[],
   int                size = 3 ;
   vl_bool            fast = 0 ;
   vl_bool            norm = 0 ;
+
+  vl_bool useFlatWindow = VL_FALSE ;
+  int descrDim = 0 ;
+  
+  double const* bounds = NULL ;
+  double const boundBuffer [4] ;
   
   VL_USE_MATLAB_ENV ;
   
@@ -117,22 +93,33 @@ mexFunction(int nout, mxArray *out[],
         break ;
         
       case opt_fast :
-        fast = 1 ;
+        useFlatWindow = 1 ;
         break ;
 
       case opt_norm :
         norm = 1 ;
         break ;
-        
+
+      case opt_bounds :
+        if (!uIsRealVector(optarg, 4)) {
+          mexErrMsgTxt("BOUNDS must be a 4-dimensional vector.") ;
+        }
+        bounds = boundBuffer ;
+        bounds [0] = data[0] ;
+        bounds [1] = data[1] ;
+        bounds [2] = data[2] ;
+        bounds [3] = data[3] ;
+        break ;
+
       case opt_size :
         if (!uIsRealScalar(optarg) || (size = (int) *mxGetPr(optarg)) < 0) {
-          mexErrMsgTxt("'Size' must be a positive integer.") ;
+          mexErrMsgTxt("'SIZE must be a positive integer.") ;
         }
         break ;
         
       case opt_step :
         if (!uIsRealScalar(optarg) || (step = (int) *mxGetPr(optarg)) < 0) {
-          mexErrMsgTxt("'Step' must be a positive integer.") ;
+          mexErrMsgTxt("STEP must be a positive integer.") ;
         }
         break ;
         
@@ -146,26 +133,59 @@ mexFunction(int nout, mxArray *out[],
    *                                                            Do job
    * -------------------------------------------------------------- */
   {
-    int nkeys, k, i ;
-    VlDhogKeypoint* keys ;
-    float* descs ;
+    int numFrames ;
+    int descrSize ;
+    VlDhogKeypoint* frames ;
+    VlDhogDescriptorGeometry geom ;
+    float* descrs ;
+    int k, i ;
 
     VlDhogFilter *dhog ;    
-    dhog = vl_dhog_new (M, N, step, size) ; 
- 
-    nkeys = vl_dhog_get_keypoint_num (dhog) ;
-    keys  = vl_dhog_get_keypoints (dhog) ;
-    descs = vl_dhog_get_descriptors (dhog) ;
+    dhog = vl_dhog_new_basic (M, N, step, size) ; 
+    if (bounds) {
+      vl_dhog_set_bounds(dhog, 
+                         VL_MAX(bounds[0], 0),
+                         VL_MAX(bounds[1], 0),
+                         VL_MIN(bounds[2], M - 1),
+                         VL_MIN(bounds[3], N - 1));
+    }
+    vl_dhog_set_flat_window(dhog, useFlatWindow) ;
+    
+    numFrames = vl_dhog_get_keypoint_num (dhog) ;
+    descrSize = vl_dhog_get_descriptor_size (dhog) ;
+    geom = *vl_dhog_get_geometry (dhog) ;
+    frames = vl_dhog_get_keypoints (dhog) ;
+    descrs = vl_dhog_get_descriptors (dhog) ;
     
     if (verbose) {
-      mexPrintf("dhog: image size:        %d x %d\n", M, N) ;
-      mexPrintf("      subsampling step:  %d\n", step) ;
-      mexPrintf("      bin size:          %d\n", size) ;
-      mexPrintf("      fast descriptors:  %s\n", VL_YESNO(fast)) ;
-      mexPrintf("      num. of keypoints: %d\n", nkeys) ;  
+      int stepX ;
+      int stepY ;
+      int minX ;
+      int minY ;
+      int maxX ;
+      int maxY ;
+      vl_bool useFlatWindow ;
+      
+      vl_dhog_get_steps (dhog, &stepX, &stepY) ;
+      vl_dhog_get_bounds (dhog, &minX, &minY, &maxX, &maxY) ;
+      useFlatWindow = vl_dhog_get_flat_window(dhog) ;
+      
+      mexPrintf("dhog: image size:        %d x %d\n", N, M) ;
+      mexPrintf("      bounds:            [%d, %d, %d, %d]\n", minY, minX, maxY, maxX)
+      mexPrintf("      subsampling steps: %d, %d\n", stepY, stepX) ;
+      mexPrintf("      num bins:          [%d, %d, %d]\n", 
+                geom->numBinT,
+                geom->numBinX, 
+                geom->numBinY) ;
+      mexPrintf("      descriptor size:   %d\n", descrSize) ;
+      mexPrintf("      bin sizes:         [%d, %d]\n", 
+                geom->binSizeX, 
+                geom->binSizeY) ;
+      mexPrintf("      flat window:       %s\n", VL_YESNO(useFlatWindow)) ;
+      mexPrintf("      number of frames:  %d\n", numFrames) ;
     }
     
-    vl_dhog_process (dhog, data, fast) ;
+    vl_dhog_process (dhog, data) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
@@ -173,11 +193,11 @@ mexFunction(int nout, mxArray *out[],
     {
       mwSize dims [2] ;
       
-      dims [0] = 128 ;
-      dims [1] = nkeys ;
+      dims [0] = descrSize ;
+      dims [1] = numFrames ;
       
       out[OUT_DESCRIPTORS] = mxCreateNumericArray
-      (2, dims, mxUINT8_CLASS, mxREAL) ;
+        (2, dims, mxUINT8_CLASS, mxREAL) ;
       
       if (norm)
         dims [0] = 3 ;
@@ -185,31 +205,34 @@ mexFunction(int nout, mxArray *out[],
         dims [0] = 2 ;
       
       out[OUT_FRAMES] = mxCreateNumericArray
-      (2, dims, mxDOUBLE_CLASS, mxREAL) ;
+        (2, dims, mxDOUBLE_CLASS, mxREAL) ;
     }
     
     /* ---------------------------------------------------------------
      *                                                       Copy back
      * ------------------------------------------------------------ */
     {
-      double *kpt = mxGetPr(out[OUT_FRAMES]) ;
-      vl_uint8  *dpt = mxGetData(out[OUT_DESCRIPTORS]) ;
-      for (k = 0 ; k < nkeys ; ++k) {
-        float tmpdesc [128] ;
-        *kpt++ = keys [k].y + 1 ;
-        *kpt++ = keys [k].x + 1 ;
+      float *tmpDescr = vl_malloc(sizeof(float) * descrSize) ;
+      double *outFrameIter = mxGetPr(out[OUT_FRAMES]) ;
+      vl_uint8  *outDescrIter = mxGetData(out[OUT_DESCRIPTORS]) ;
+      for (k = 0 ; k < numFrames ; ++k) {
+        *outFrameIter++ = frames[k].y + 1 ;
+        *outFrameIter++ = frames[k].x + 1 ;
         
+        /* We have an implied / 2 in the norm, because of the clipping
+           below */
         if (norm)
-          /* We have an implied / 2 in the norm, because of the clipping below */
-          *kpt++ = keys [k].norm / 2 ;
+          *outFrameIter++ = keys [k].norm / 2 ;
 
-        vl_dhog_transpose_descriptor (tmpdesc, descs + 128 * k) ;
-        for (i = 0 ; i < 128 ; ++i) {
-          *dpt++ = (vl_uint8) (VL_MIN(512.0f * tmpdesc[i], 256.0f)) ;
+        vl_dhog_transpose_descriptor (tmpdesc, 
+                                      descrs + descrSize * k,
+                                      geom) ;
+        for (i = 0 ; i < descrSize ; ++i) {
+          *outDescrIter++ = (vl_uint8) (VL_MIN(512.0f * tmpDescr[i], 256.0f)) ;
         }
       }
+      vl_free(tmpDescr) ;
     }
-    
     vl_dhog_delete (dhog) ;
   }
 }
