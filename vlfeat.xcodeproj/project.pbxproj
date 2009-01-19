@@ -10,7 +10,6 @@
 		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/MATLAB7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
 		2D3EC8D80E3BC79300B0F237 /* dhog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dhog.c; sourceTree = "<group>"; };
 		2D3EC8D90E3BC79300B0F237 /* dhog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dhog.h; sourceTree = "<group>"; };
-		2D3EC8DA0E3BCFB200B0F237 /* dhog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dhog.c; path = toolbox/sift/dhog.c; sourceTree = "<group>"; };
 		2D6F09EC0E4C6ACA00B77055 /* imopv.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv.tc; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
@@ -70,29 +69,35 @@
 		2D7AD0B30E38C18600783252 /* tutorials.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = tutorials.html; path = docsrc/tutorials.html; sourceTree = "<group>"; };
 		2D7AD0B40E38C18600783252 /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = docsrc/utils.html; sourceTree = "<group>"; };
 		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; };
-		2D977C030E5E084700B3D9C4 /* siftdescriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = siftdescriptor.c; path = toolbox/sift/siftdescriptor.c; sourceTree = "<group>"; };
-		2DAB13D30D454A81009BEE66 /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aib.c; path = toolbox/aib/aib.c; sourceTree = "<group>"; };
-		2DAB13D40D454A81009BEE66 /* aibhist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aibhist.c; path = toolbox/aib/aibhist.c; sourceTree = "<group>"; };
-		2DAB13D50D454A81009BEE66 /* alldist2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alldist2.c; path = toolbox/misc/alldist2.c; sourceTree = "<group>"; };
-		2DAB13D60D454A81009BEE66 /* binsum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = binsum.c; path = toolbox/misc/binsum.c; sourceTree = "<group>"; };
-		2DAB13D70D454A81009BEE66 /* erfill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = erfill.c; path = toolbox/mser/erfill.c; sourceTree = "<group>"; };
-		2DAB13D80D454A81009BEE66 /* hikmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hikmeans.c; path = toolbox/kmeans/hikmeans.c; sourceTree = "<group>"; };
-		2DAB13D90D454A81009BEE66 /* hikmeanspush.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hikmeanspush.c; path = toolbox/kmeans/hikmeanspush.c; sourceTree = "<group>"; };
-		2DAB13DA0D454A81009BEE66 /* ihashfind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ihashfind.c; path = toolbox/misc/ihashfind.c; sourceTree = "<group>"; };
-		2DAB13DB0D454A81009BEE66 /* ihashsum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ihashsum.c; path = toolbox/misc/ihashsum.c; sourceTree = "<group>"; };
-		2DAB13DC0D454A81009BEE66 /* ikmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ikmeans.c; path = toolbox/kmeans/ikmeans.c; sourceTree = "<group>"; };
-		2DAB13DD0D454A81009BEE66 /* ikmeanspush.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ikmeanspush.c; path = toolbox/kmeans/ikmeanspush.c; sourceTree = "<group>"; };
-		2DAB13DE0D454A81009BEE66 /* imintegral.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = imintegral.c; path = toolbox/imop/imintegral.c; sourceTree = "<group>"; };
-		2DAB13DF0D454A81009BEE66 /* imsmooth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = imsmooth.c; path = toolbox/imop/imsmooth.c; sourceTree = "<group>"; };
-		2DAB13E00D454A81009BEE66 /* imwbackwardmx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = imwbackwardmx.c; path = toolbox/imop/imwbackwardmx.c; sourceTree = "<group>"; };
-		2DAB13E10D454A81009BEE66 /* irodr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = irodr.c; path = toolbox/geometry/irodr.c; sourceTree = "<group>"; };
-		2DAB13E20D454A81009BEE66 /* localmax.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = localmax.c; path = toolbox/misc/localmax.c; sourceTree = "<group>"; };
-		2DAB13E30D454A81009BEE66 /* mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mser.c; path = toolbox/mser/mser.c; sourceTree = "<group>"; };
-		2DAB13E40D454A81009BEE66 /* rodr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rodr.c; path = toolbox/geometry/rodr.c; sourceTree = "<group>"; };
-		2DAB13E50D454A81009BEE66 /* sift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sift.c; path = toolbox/sift/sift.c; sourceTree = "<group>"; };
-		2DAB13E60D454A81009BEE66 /* tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tpsumx.c; path = toolbox/imop/tpsumx.c; sourceTree = "<group>"; };
-		2DAB13E70D454A81009BEE66 /* ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ubcmatch.c; path = toolbox/sift/ubcmatch.c; sourceTree = "<group>"; };
-		2DAB13E80D454A81009BEE66 /* whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = whistc.c; path = toolbox/misc/whistc.c; sourceTree = "<group>"; };
+		2D86B1080F24CC9B00E625D6 /* vl_aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_aib.c; path = toolbox/aib/vl_aib.c; sourceTree = "<group>"; };
+		2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_aibhist.c; path = toolbox/aib/vl_aibhist.c; sourceTree = "<group>"; };
+		2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist2.c; path = toolbox/misc/vl_alldist2.c; sourceTree = "<group>"; };
+		2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_binsearch.c; path = toolbox/misc/vl_binsearch.c; sourceTree = "<group>"; };
+		2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_binsum.c; path = toolbox/misc/vl_binsum.c; sourceTree = "<group>"; };
+		2D86B10D0F24CC9B00E625D6 /* vl_dhog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dhog.c; path = toolbox/sift/vl_dhog.c; sourceTree = "<group>"; };
+		2D86B10E0F24CC9B00E625D6 /* vl_erfill.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_erfill.c; path = toolbox/mser/vl_erfill.c; sourceTree = "<group>"; };
+		2D86B10F0F24CC9B00E625D6 /* vl_getpid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_getpid.c; path = toolbox/misc/vl_getpid.c; sourceTree = "<group>"; };
+		2D86B1100F24CC9B00E625D6 /* vl_hikmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_hikmeans.c; path = toolbox/kmeans/vl_hikmeans.c; sourceTree = "<group>"; };
+		2D86B1110F24CC9B00E625D6 /* vl_hikmeanspush.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_hikmeanspush.c; path = toolbox/kmeans/vl_hikmeanspush.c; sourceTree = "<group>"; };
+		2D86B1120F24CC9B00E625D6 /* vl_ihashfind.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ihashfind.c; path = toolbox/misc/vl_ihashfind.c; sourceTree = "<group>"; };
+		2D86B1130F24CC9B00E625D6 /* vl_ihashsum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ihashsum.c; path = toolbox/misc/vl_ihashsum.c; sourceTree = "<group>"; };
+		2D86B1140F24CC9B00E625D6 /* vl_ikmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ikmeans.c; path = toolbox/kmeans/vl_ikmeans.c; sourceTree = "<group>"; };
+		2D86B1150F24CC9B00E625D6 /* vl_ikmeanspush.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ikmeanspush.c; path = toolbox/kmeans/vl_ikmeanspush.c; sourceTree = "<group>"; };
+		2D86B1160F24CC9B00E625D6 /* vl_imintegral.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imintegral.c; path = toolbox/imop/vl_imintegral.c; sourceTree = "<group>"; };
+		2D86B1170F24CC9B00E625D6 /* vl_imsmooth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imsmooth.c; path = toolbox/imop/vl_imsmooth.c; sourceTree = "<group>"; };
+		2D86B1180F24CC9B00E625D6 /* vl_imwbackwardmx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imwbackwardmx.c; path = toolbox/imop/vl_imwbackwardmx.c; sourceTree = "<group>"; };
+		2D86B1190F24CC9B00E625D6 /* vl_inthist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_inthist.c; path = toolbox/misc/vl_inthist.c; sourceTree = "<group>"; };
+		2D86B11A0F24CC9B00E625D6 /* vl_irodr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_irodr.c; path = toolbox/geometry/vl_irodr.c; sourceTree = "<group>"; };
+		2D86B11B0F24CC9B00E625D6 /* vl_localmax.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_localmax.c; path = toolbox/misc/vl_localmax.c; sourceTree = "<group>"; };
+		2D86B11C0F24CC9B00E625D6 /* vl_mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_mser.c; path = toolbox/mser/vl_mser.c; sourceTree = "<group>"; };
+		2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_rodr.c; path = toolbox/geometry/vl_rodr.c; sourceTree = "<group>"; };
+		2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_samplinthist.c; path = toolbox/misc/vl_samplinthist.c; sourceTree = "<group>"; };
+		2D86B11F0F24CC9B00E625D6 /* vl_sift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_sift.c; path = toolbox/sift/vl_sift.c; sourceTree = "<group>"; };
+		2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_siftdescriptor.c; path = toolbox/sift/vl_siftdescriptor.c; sourceTree = "<group>"; };
+		2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_tpsumx.c; path = toolbox/imop/vl_tpsumx.c; sourceTree = "<group>"; };
+		2D86B1220F24CC9B00E625D6 /* vl_twister.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
+		2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
+		2D86B1240F24CC9B00E625D6 /* vl_whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_whistc.c; path = toolbox/misc/vl_whistc.c; sourceTree = "<group>"; };
 		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
@@ -204,32 +209,37 @@
 		2D732EAF0CF8C3950099B03C /* toolbox */ = {
 			isa = PBXGroup;
 			children = (
+				2D86B1080F24CC9B00E625D6 /* vl_aib.c */,
+				2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */,
+				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
+				2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */,
+				2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */,
+				2D86B10D0F24CC9B00E625D6 /* vl_dhog.c */,
+				2D86B10E0F24CC9B00E625D6 /* vl_erfill.c */,
+				2D86B10F0F24CC9B00E625D6 /* vl_getpid.c */,
+				2D86B1100F24CC9B00E625D6 /* vl_hikmeans.c */,
+				2D86B1110F24CC9B00E625D6 /* vl_hikmeanspush.c */,
+				2D86B1120F24CC9B00E625D6 /* vl_ihashfind.c */,
+				2D86B1130F24CC9B00E625D6 /* vl_ihashsum.c */,
+				2D86B1140F24CC9B00E625D6 /* vl_ikmeans.c */,
+				2D86B1150F24CC9B00E625D6 /* vl_ikmeanspush.c */,
+				2D86B1160F24CC9B00E625D6 /* vl_imintegral.c */,
+				2D86B1170F24CC9B00E625D6 /* vl_imsmooth.c */,
+				2D86B1180F24CC9B00E625D6 /* vl_imwbackwardmx.c */,
+				2D86B1190F24CC9B00E625D6 /* vl_inthist.c */,
+				2D86B11A0F24CC9B00E625D6 /* vl_irodr.c */,
+				2D86B11B0F24CC9B00E625D6 /* vl_localmax.c */,
+				2D86B11C0F24CC9B00E625D6 /* vl_mser.c */,
+				2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */,
+				2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */,
+				2D86B11F0F24CC9B00E625D6 /* vl_sift.c */,
+				2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */,
+				2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */,
+				2D86B1220F24CC9B00E625D6 /* vl_twister.c */,
+				2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */,
+				2D86B1240F24CC9B00E625D6 /* vl_whistc.c */,
 				2D70CC780DDE1135000A23DE /* mexutils.h */,
-				2D3EC8DA0E3BCFB200B0F237 /* dhog.c */,
-				2DAB13D30D454A81009BEE66 /* aib.c */,
-				2DAB13D40D454A81009BEE66 /* aibhist.c */,
-				2DAB13D50D454A81009BEE66 /* alldist2.c */,
-				2DAB13D60D454A81009BEE66 /* binsum.c */,
-				2DAB13D70D454A81009BEE66 /* erfill.c */,
-				2DAB13D80D454A81009BEE66 /* hikmeans.c */,
-				2DAB13D90D454A81009BEE66 /* hikmeanspush.c */,
-				2DAB13DA0D454A81009BEE66 /* ihashfind.c */,
-				2DAB13DB0D454A81009BEE66 /* ihashsum.c */,
-				2DAB13DC0D454A81009BEE66 /* ikmeans.c */,
-				2DAB13DD0D454A81009BEE66 /* ikmeanspush.c */,
-				2DAB13DE0D454A81009BEE66 /* imintegral.c */,
-				2DAB13DF0D454A81009BEE66 /* imsmooth.c */,
 				2DEEF3EE0E5634EB0028798B /* imsmooth.tc */,
-				2DAB13E00D454A81009BEE66 /* imwbackwardmx.c */,
-				2DAB13E10D454A81009BEE66 /* irodr.c */,
-				2DAB13E20D454A81009BEE66 /* localmax.c */,
-				2DAB13E30D454A81009BEE66 /* mser.c */,
-				2DAB13E40D454A81009BEE66 /* rodr.c */,
-				2DAB13E50D454A81009BEE66 /* sift.c */,
-				2D977C030E5E084700B3D9C4 /* siftdescriptor.c */,
-				2DAB13E60D454A81009BEE66 /* tpsumx.c */,
-				2DAB13E70D454A81009BEE66 /* ubcmatch.c */,
-				2DAB13E80D454A81009BEE66 /* whistc.c */,
 			);
 			name = toolbox;
 			sourceTree = "<group>";
@@ -282,7 +292,7 @@
 		};
 		2D732DBE0CF8BFFD0099B03C /* make */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION)";
+			buildArgumentsString = " NDEBUG=NO $(ACTION)";
 			buildConfigurationList = 2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */;
 			buildPhases = (
 			);
