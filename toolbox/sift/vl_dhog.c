@@ -55,14 +55,12 @@ mexFunction(int nout, mxArray *out[],
   
   int                step = 1 ;
   int                size = 3 ;
-  vl_bool            fast = 0 ;
   vl_bool            norm = 0 ;
 
   vl_bool useFlatWindow = VL_FALSE ;
-  int descrDim = 0 ;
   
-  double const* bounds = NULL ;
-  double const boundBuffer [4] ;
+  double *bounds = NULL ;
+  double boundBuffer [4] ;
   
   VL_USE_MATLAB_ENV ;
   
@@ -135,9 +133,9 @@ mexFunction(int nout, mxArray *out[],
   {
     int numFrames ;
     int descrSize ;
-    VlDhogKeypoint* frames ;
-    VlDhogDescriptorGeometry geom ;
-    float* descrs ;
+    VlDhogKeypoint const *frames ;
+    VlDhogDescriptorGeometry const *geom ;
+    float const *descrs ;
     int k, i ;
 
     VlDhogFilter *dhog ;    
@@ -153,9 +151,7 @@ mexFunction(int nout, mxArray *out[],
     
     numFrames = vl_dhog_get_keypoint_num (dhog) ;
     descrSize = vl_dhog_get_descriptor_size (dhog) ;
-    geom = *vl_dhog_get_geometry (dhog) ;
-    frames = vl_dhog_get_keypoints (dhog) ;
-    descrs = vl_dhog_get_descriptors (dhog) ;
+    geom = vl_dhog_get_geometry (dhog) ;
     
     if (verbose) {
       int stepX ;
@@ -171,7 +167,7 @@ mexFunction(int nout, mxArray *out[],
       useFlatWindow = vl_dhog_get_flat_window(dhog) ;
       
       mexPrintf("dhog: image size:        %d x %d\n", N, M) ;
-      mexPrintf("      bounds:            [%d, %d, %d, %d]\n", minY, minX, maxY, maxX)
+      mexPrintf("      bounds:            [%d, %d, %d, %d]\n", minY, minX, maxY, maxX) ;
       mexPrintf("      subsampling steps: %d, %d\n", stepY, stepX) ;
       mexPrintf("      num bins:          [%d, %d, %d]\n", 
                 geom->numBinT,
@@ -186,6 +182,9 @@ mexFunction(int nout, mxArray *out[],
     }
     
     vl_dhog_process (dhog, data) ;
+    
+    frames = vl_dhog_get_keypoints (dhog) ;
+    descrs = vl_dhog_get_descriptors (dhog) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
@@ -222,11 +221,14 @@ mexFunction(int nout, mxArray *out[],
         /* We have an implied / 2 in the norm, because of the clipping
            below */
         if (norm)
-          *outFrameIter++ = keys [k].norm / 2 ;
+          *outFrameIter++ = frames [k].norm / 2 ;
 
-        vl_dhog_transpose_descriptor (tmpdesc, 
+        vl_dhog_transpose_descriptor (tmpDescr, 
                                       descrs + descrSize * k,
-                                      geom) ;
+                                      geom->numBinT,
+                                      geom->numBinX,
+                                      geom->numBinY) ;
+        
         for (i = 0 ; i < descrSize ; ++i) {
           *outDescrIter++ = (vl_uint8) (VL_MIN(512.0f * tmpDescr[i], 256.0f)) ;
         }

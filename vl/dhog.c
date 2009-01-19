@@ -13,9 +13,6 @@
 #include <math.h>
 #include <string.h>
 
-int const NBP = 4 ;
-int const NBO = 8 ;
-
 /** 
  @file dhog.h
  
@@ -321,6 +318,29 @@ _vl_dhog_free_buffers (VlDhogFilter* self)
   self->numGradAlloc = 0 ;
 }
 
+
+/** ------------------------------------------------------------------
+ ** @internal
+ **/
+void _vl_dhog_update_buffers (VlDhogFilter *self) 
+{
+  int x1 = self->boundMinX ;
+  int x2 = self->boundMaxX ;
+  int y1 = self->boundMinY ;
+  int y2 = self->boundMaxY ;
+  
+  int rangeX =  x2 - x1 - (self->geom.numBinX - 1) * self->geom.binSizeX ;
+  int rangeY =  y2 - y1 - (self->geom.numBinY - 1) * self->geom.binSizeY ;
+  
+  int numFramesX = (rangeX >= 0) ? rangeX / self->stepX + 1 : 0 ;
+  int numFramesY = (rangeY >= 0) ? rangeY / self->stepY + 1 : 0 ;
+  
+  self->numFrames = numFramesX * numFramesY ;
+  self->descrSize = self->geom.numBinT * 
+                    self->geom.numBinX *
+                    self->geom.numBinY ;
+}
+
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Allocate internal buffers
@@ -333,45 +353,33 @@ _vl_dhog_free_buffers (VlDhogFilter* self)
 void
 _vl_dhog_alloc_buffers (VlDhogFilter* self)
 {
-  /* compute number of frames based on geometry */
-  int x1 = self->boundMinX ;
-  int x2 = self->boundMaxX ;
-  int y1 = self->boundMinY ;
-  int y2 = self->boundMaxY ;
-  
-  int rangeX =  x2 - x1 - (self->geom.numBinX - 1) * self->geom.binSizeX ;
-  int rangeY =  y2 - y1 - (self->geom.numBinY - 1) * self->geom.binSizeY ;
-  
-  int numFramesX = (rangeX >= 0) ? rangeX / self->stepX + 1 : 0 ;
-  int numFramesY = (rangeY >= 0) ? rangeY / self->stepY + 1 : 0 ;
-  
-  int numFrameAlloc = numFramesX * numFramesY ;
-  int numBinAlloc   = 
-    self->geom.numBinT * 
-    self->geom.numBinX * 
-    self->geom.numBinY ;
-  int numGradAlloc = self->geom.numBinT ;
-  
-  /* see if we need to update the buffers */
-  if (numBinAlloc != self->numBinAlloc || 
-      numGradAlloc != self->numGradAlloc ||
-      numFrameAlloc != self->numFrameAlloc) {
+  _vl_dhog_update_buffers (self) ;  
+  {
+    int numFrameAlloc = vl_dhog_get_keypoint_num (self) ;   
+    int numBinAlloc   = vl_dhog_get_descriptor_size (self) ;
+    int numGradAlloc  = self->geom.numBinT ;
     
-    int t ;
-
-    _vl_dhog_free_buffers(self) ;
-    
-    self->frames = vl_malloc(sizeof(VlDhogKeypoint) * numFrameAlloc) ;
-    self->descrs = vl_malloc(sizeof(vl_uint8) * numBinAlloc * numFrameAlloc) ;
-    self->grads = vl_malloc(sizeof(float*) * numGradAlloc) ;
-    for (t = 0 ; t < numGradAlloc ; ++t) {
-      self->grads[t] = 
-        vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
+    /* see if we need to update the buffers */
+    if (numBinAlloc != self->numBinAlloc || 
+        numGradAlloc != self->numGradAlloc ||
+        numFrameAlloc != self->numFrameAlloc) {
+      
+      int t ;
+      
+      _vl_dhog_free_buffers(self) ;
+      
+      self->frames = vl_malloc(sizeof(VlDhogKeypoint) * numFrameAlloc) ;
+      self->descrs = vl_malloc(sizeof(float) * numBinAlloc * numFrameAlloc) ;
+      self->grads = vl_malloc(sizeof(float*) * numGradAlloc) ;
+      for (t = 0 ; t < numGradAlloc ; ++t) {
+        self->grads[t] = 
+          vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
+      }
+      self->numBinAlloc = numBinAlloc ;
+      self->numGradAlloc = numGradAlloc ;
+      self->numFrameAlloc = numFrameAlloc ;
     }
-    self->numBinAlloc = numBinAlloc ;
-    self->numGradAlloc = numGradAlloc ;
-    self->numFrameAlloc = numFrameAlloc ;
-  }  
+  }
 }
 
 /** ------------------------------------------------------------------
@@ -409,7 +417,18 @@ vl_dhog_new (int imWidth, int imHeight)
 
   self->convTmp1 = vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
   self->convTmp2 = vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
+
+  self->numBinAlloc = 0 ;
+  self->numFrameAlloc = 0 ;
+  self->numGradAlloc = 0 ;
+
+  self->descrSize = 0 ;
+  self->numFrames = 0 ;
+  self->grads = NULL ;
+  self->frames = NULL ;
+  self->descrs = NULL ;
   
+  _vl_dhog_update_buffers(self) ;  
   return self ;
 }
  
@@ -424,12 +443,12 @@ vl_dhog_new (int imWidth, int imHeight)
  ** @return new filter.
  **/
  
- VL_EXPORT
+VL_EXPORT
 VlDhogFilter* 
 vl_dhog_new_basic (int imWidth, int imHeight, int step, int binSize) 
 {
   VlDhogFilter* self = vl_dhog_new(imWidth, imHeight) ;
-  VlDhogDescriptorGeometry geom ;
+  VlDhogDescriptorGeometry geom = *vl_dhog_get_geometry(self) ;
   geom.binSizeX = binSize ;
   geom.binSizeY = binSize ;
   vl_dhog_set_geometry(self, &geom) ;
@@ -497,7 +516,7 @@ void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
         {
           float *dst = self->descrs 
             + bint
-            + binx * self->geom.numBinX 
+            + binx * self->geom.numBinT
             + biny * (self->geom.numBinX * self->geom.numBinT)  ;
           
           float *src = self->convTmp2 ;
@@ -543,14 +562,14 @@ void _vl_dhog_with_flat_window (VlDhogFilter* self)
     vl_imconvcoltri_vf (self->convTmp1, self->imHeight,
                         self->grads [bint], self->imWidth, self->imHeight,
                         self->imWidth,
-                        self->geom.binSizeY, /* filt size */
+                        self->geom.binSizeY - 1, /* filt size */
                         1, /* subsampling step */
                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
     
     vl_imconvcoltri_vf (self->convTmp2, self->imWidth,
                         self->convTmp1, self->imHeight, self->imWidth, 
                         self->imHeight,
-                        self->geom.binSizeX,
+                        self->geom.binSizeX - 1,
                         1,
                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
         
@@ -559,7 +578,7 @@ void _vl_dhog_with_flat_window (VlDhogFilter* self)
         
         float *dst = self->descrs 
           + bint
-          + binx * self->geom.numBinX 
+          + binx * self->geom.numBinT
           + biny * (self->geom.numBinX * self->geom.numBinT)  ;
 
         float *src = self->convTmp2 ;
@@ -596,6 +615,9 @@ void _vl_dhog_with_flat_window (VlDhogFilter* self)
 void vl_dhog_process (VlDhogFilter* self, float const* im)
 {
   int t, x, y ;
+
+  /* update buffers */
+  _vl_dhog_alloc_buffers (self) ;
 
   /* clear integral images */
   for (t = 0 ; t < self->geom.numBinT ; ++t)
@@ -635,7 +657,7 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
       mod = vl_fast_sqrt_f (gx*gx + gy*gy) ;
             
       /* quantize angle */
-      nt = vl_mod_2pi_f (angle) * (NBO / (2*VL_PI)) ;
+      nt = vl_mod_2pi_f (angle) * (self->geom.numBinT / (2*VL_PI)) ;
       bint = vl_floor_f (nt) ;
       rbint = nt - bint ;
       
@@ -660,8 +682,8 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
     int frameSizeY = self->geom.binSizeY * (self->geom.numBinY - 1) + 1 ;
     int descrSize = vl_dhog_get_descriptor_size (self) ;
     
-    float deltaCenterX = 0.5F * self->geom.binSizeX * (self->geom.numBinX + 1) ;
-    float deltaCenterY = 0.5F * self->geom.binSizeY * (self->geom.numBinY + 1) ;
+    float deltaCenterX = 0.5F * self->geom.binSizeX * (self->geom.numBinX - 1) ;
+    float deltaCenterY = 0.5F * self->geom.binSizeY * (self->geom.numBinY - 1) ;
     
     for (framey  = self->boundMinY ;
          framey <= self->boundMaxY - frameSizeY + 1 ;
@@ -680,9 +702,10 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
           if (descrIter[bint] > 0.2F) descrIter[bint] = 0.2F ;
         frameIter->norm *= _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
         
+        frameIter ++ ;
         descrIter += descrSize ;
       } /* for framex */
     } /* for framey */
+    printf("total %d\n", frameIter - self->frames) ;
   }
 }
-  

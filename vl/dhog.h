@@ -34,7 +34,6 @@ typedef struct VlDhogDescriptorGeometry_
   int binSizeY ;
 } VlDhogDescriptorGeometry ;
 
-
 /** @brief DHOG filter */
 typedef struct VlDhogFilter_ 
 {  
@@ -53,6 +52,7 @@ typedef struct VlDhogFilter_
   int useFlatWindow ;
 
   int numFrames ;
+  int descrSize ;
   VlDhogKeypoint *frames ; 
   float *descrs ;
 
@@ -110,6 +110,8 @@ VL_INLINE VlDhogDescriptorGeometry const* vl_dhog_get_geometry (VlDhogFilter con
 VL_INLINE vl_bool         vl_dhog_get_flat_window     (VlDhogFilter const *self) ;
 /** @} */
 
+void _vl_dhog_update_buffers (VlDhogFilter *self) ;
+
 /** ------------------------------------------------------------------
  ** @brief Get descriptor size.
  ** @param self DHOG filter.
@@ -119,10 +121,7 @@ VL_INLINE vl_bool         vl_dhog_get_flat_window     (VlDhogFilter const *self)
 int
 vl_dhog_get_descriptor_size (VlDhogFilter const *self) 
 {
-  return 
-    self->geom.numBinT *
-    self->geom.numBinX * 
-    self->geom.numBinY ;
+  return self->descrSize ;
 }
 
 /** ------------------------------------------------------------------
@@ -157,38 +156,6 @@ int
 vl_dhog_get_keypoint_num (VlDhogFilter const *self)
 {
   return self->numFrames ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Set bounds
- ** @param self DHOG filter.
- ** @param minX bounding box minimum X coordinate.
- ** @parma minY bounding box minimum Y coordinate.
- ** @param maxX bounding box maximum X coordinate.
- ** @param maxY bounding box maximum Y coordinate.
- **/
-
-void
-vl_dhog_set_bounds (VlDhogFilter* self, 
-                    int minX, int minY, int maxX, int maxY)
-{
-  self->boundMinX = minX ;
-  self->boundMinY = minY ;
-  self->boundMaxX = maxX ;
-  self->boundMaxY = maxY ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Set SIFT descriptor geometry
- ** @param self DHOG filter.
- ** @param geom descriptor geometry parameters.
- **/
-
-void
-vl_dhog_set_geometry (VlDhogFilter *self, 
-                      VlDhogDescriptorGeometry const *geom)
-{
-  self->geom = *geom ;
 }
 
 /** ------------------------------------------------------------------
@@ -238,19 +205,6 @@ vl_dhog_get_flat_window (VlDhogFilter const* self)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Set flat window flag
- ** @param self DHOG filter.
- ** @param useFilatWindow TRUE if the DHOG filter uses a flat window.
- **/
-
-void
-vl_dhog_set_flat_window (VlDhogFilter* self, 
-                         int useFlatWindow)
-{
-  self->useFlatWindow = useFlatWindow ;
-}
-
-/** ------------------------------------------------------------------
  ** @brief Get steps
  ** @param self DHOG filter.
  ** @param stepX sampling step along X.
@@ -280,6 +234,54 @@ vl_dhog_set_steps (VlDhogFilter* self,
 {
   self->stepX = stepX ;
   self->stepY = stepY ;
+  _vl_dhog_update_buffers(self) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set bounds
+ ** @param self DHOG filter.
+ ** @param minX bounding box minimum X coordinate.
+ ** @parma minY bounding box minimum Y coordinate.
+ ** @param maxX bounding box maximum X coordinate.
+ ** @param maxY bounding box maximum Y coordinate.
+ **/
+
+void
+vl_dhog_set_bounds (VlDhogFilter* self, 
+                    int minX, int minY, int maxX, int maxY)
+{
+  self->boundMinX = minX ;
+  self->boundMinY = minY ;
+  self->boundMaxX = maxX ;
+  self->boundMaxY = maxY ;
+  _vl_dhog_update_buffers(self) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set SIFT descriptor geometry
+ ** @param self DHOG filter.
+ ** @param geom descriptor geometry parameters.
+ **/
+
+void
+vl_dhog_set_geometry (VlDhogFilter *self, 
+                      VlDhogDescriptorGeometry const *geom)
+{
+  self->geom = *geom ;
+  _vl_dhog_update_buffers(self) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set flat window flag
+ ** @param self DHOG filter.
+ ** @param useFilatWindow TRUE if the DHOG filter uses a flat window.
+ **/
+
+void
+vl_dhog_set_flat_window (VlDhogFilter* self, 
+                         int useFlatWindow)
+{
+  self->useFlatWindow = useFlatWindow ;
 }
 
 /** ------------------------------------------------------------------
@@ -305,7 +307,7 @@ vl_dhog_transpose_descriptor (float* dst,
                               int numBinY)
 {
   int t, x, y ;
-  
+    
   for (y = 0 ; y < numBinY ; ++y) {
     for (x = 0 ; x < numBinX ; ++x) {
       int offset  = numBinT * (x + y * numBinX) ;
@@ -313,7 +315,7 @@ vl_dhog_transpose_descriptor (float* dst,
       
       for (t = 0 ; t < numBinT ; ++t) {
         int tT = numBinT / 4 - t ;
-        dst [(offsetT + tT + numBinT) % numBinT] = src [offset + t] ;
+        dst [offsetT + (tT + numBinT) % numBinT] = src [offset + t] ;
       }
     }
   }

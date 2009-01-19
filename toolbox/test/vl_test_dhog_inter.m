@@ -1,8 +1,8 @@
 siz = 4 ;
 step = 10 ;
 I = single(vl_test_pattern(2))  ;
-[f,d] = vl_dhog(I,'step', step, 'size', siz) ;
-[f_,d_] = vl_dhog(I,'step', step, 'size', siz, 'fast') ;
+[f,d] = vl_dhog(I,'step', step, 'size', siz, 'verbose') ;
+[f_,d_] = vl_dhog(I,'step', step, 'size', siz, 'fast', 'verbose') ;
 
 [Ix, Iy]  = vl_grad(I) ;
 mod       = sqrt(Ix.^2 + Iy.^2) ;
