@@ -110,8 +110,9 @@
 NAME   := vlfeat
 VER    := 0.9.3
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
-NDEBUG := YES
-VERB   := NO
+
+NDEBUG ?= YES
+VERB   ?= NO
 
 .PHONY : all
 all : dll all-bin
@@ -198,11 +199,11 @@ endef
 #                                            Common UNIX Configuration
 # --------------------------------------------------------------------
 
-ifndef NDEBUG
+ifneq ($(NDEBUG),YES)
 DEBUG=yes
 endif
 
-ifeq ($(VERB),YES)
+ifneq ($(VERB),NO)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
 endif
 
