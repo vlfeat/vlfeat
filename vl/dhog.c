@@ -685,6 +685,13 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
     float deltaCenterX = 0.5F * self->geom.binSizeX * (self->geom.numBinX - 1) ;
     float deltaCenterY = 0.5F * self->geom.binSizeY * (self->geom.numBinY - 1) ;
     
+    float normConstant = frameSizeX * frameSizeY ;
+
+    if (self->useFlatWindow) {
+      /* invoncoltri is normalized */
+      normConstant /= self->geom.binSizeX * self->geom.binSizeY ;
+    }
+    
     for (framey  = self->boundMinY ;
          framey <= self->boundMaxY - frameSizeY + 1 ;
          framey += self->stepY) {
@@ -695,12 +702,22 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
         
         frameIter->x    = framex + deltaCenterX ;
         frameIter->y    = framey + deltaCenterY ;
-        frameIter->norm = _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
+
+        /* mass */
+        {
+          float mass = 0 ;
+          for (bint = 0 ; bint < descrSize ; ++ bint)
+            mass += descrIter[bint] ;
+          mass /= normConstant ;
+          frameIter->norm = mass ;
+        }
+
+        /* L2 normalize */
+        _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
 
         /* clamp */
         for(bint = 0 ; bint < descrSize ; ++ bint)
           if (descrIter[bint] > 0.2F) descrIter[bint] = 0.2F ;
-        frameIter->norm *= _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
         
         frameIter ++ ;
         descrIter += descrSize ;
