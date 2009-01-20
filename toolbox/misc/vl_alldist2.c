@@ -179,13 +179,15 @@ uMexOption options [] = {
               nz2 -- ;                                                  \
               continue ;                                                \
             }                                                           \
-            double a = *s1_it++ ;                                       \
-            double b = *s2_it++ ;                                       \
-            F(DOUBLE, a, b) ;                                           \
-            s1_ir_it ++ ;                                               \
-            s2_ir_it ++ ;                                               \
-            nz1 -- ;                                                    \
-            nz2 -- ;                                                    \
+            {                                                           \
+              double a = *s1_it++ ;                                     \
+              double b = *s2_it++ ;                                     \
+              F(DOUBLE, a, b) ;                                         \
+              s1_ir_it ++ ;                                             \
+              s2_ir_it ++ ;                                             \
+              nz1 -- ;                                                  \
+              nz2 -- ;                                                  \
+            }                                                           \
           }                                                             \
           *pt = acc;                                                    \
         } else {                                                        \
