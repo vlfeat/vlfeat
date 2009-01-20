@@ -61,11 +61,11 @@
  Formally, for each pixel location @f$ (x,y) @f$ one has an occurence
  of the elementray feature vector @f$ (\angle \nabla I(x,y), x, y)
  @f$, composed of are the gradient orientation @f$ \angle \nalba
- I(x,y) @f$ and the pixel location @f$ (x, y) @f$. Such occurences are
+ I(x,y) @f$ and of the pixel location @f$ (x, y) @f$. Such occurences are
  weighed by the gradeint norm @f$ | I(x,y) | @f$ and accumulated in a
  three-dimensional histogram @f$ h(t,i,j) @f$ of size @f$ N_\theta
  \times N_x \times N_y @f$. Here @f$ N_\theta @f$ is the number of
- bins along the orientation dimension and @f$ N_x @f$ and @f$ N_y @f$
+ bins along the orientation dimension @$f \theta @$f and @f$ N_x @f$ and @f$ N_y @f$
  the number of bins along the @em x and @em y dimensions respectively
  (that is @f$ t \in [0, \dots, N_\theta-1] @f$, @f$ i \in [0, \dots,
  N_x-1] @f$, and @f$ j \in [0, \dots, N_y-1] @f$).
@@ -329,8 +329,8 @@ void _vl_dhog_update_buffers (VlDhogFilter *self)
   int y1 = self->boundMinY ;
   int y2 = self->boundMaxY ;
   
-  int rangeX =  x2 - x1 - (self->geom.numBinX - 1) * self->geom.binSizeX ;
-  int rangeY =  y2 - y1 - (self->geom.numBinY - 1) * self->geom.binSizeY ;
+  int rangeX = x2 - x1 - (self->geom.numBinX - 1) * self->geom.binSizeX ;
+  int rangeY = y2 - y1 - (self->geom.numBinY - 1) * self->geom.binSizeY ;
   
   int numFramesX = (rangeX >= 0) ? rangeX / self->stepX + 1 : 0 ;
   int numFramesY = (rangeY >= 0) ? rangeY / self->stepY + 1 : 0 ;
@@ -706,6 +706,5 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
         descrIter += descrSize ;
       } /* for framex */
     } /* for framey */
-    printf("total %d\n", frameIter - self->frames) ;
   }
 }

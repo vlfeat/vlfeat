@@ -4,13 +4,13 @@ I = single(vl_test_pattern(2))  ;
 [f,d] = vl_dhog(I,'step', step, 'size', siz, 'verbose') ;
 [f_,d_] = vl_dhog(I,'step', step, 'size', siz, 'fast', 'verbose') ;
 
-[Ix, Iy]  = vl_grad(I) ;
-mod       = sqrt(Ix.^2 + Iy.^2) ;
-ang       = atan2(Iy,Ix) ;
-grd       = shiftdim(cat(3,mod,ang),2) ;
-grd       = single(grd) ;
+[Ix, Iy] = vl_grad(I) ;
+mod      = sqrt(Ix.^2 + Iy.^2) ;
+ang      = atan2(Iy,Ix) ;
+grd      = shiftdim(cat(3,mod,ang),2) ;
+grd      = single(grd) ;
 
-f = [f  ; siz * ones(1,size(f,2)) / 3 ; zeros(1,size(f,2))] ;
+f = [f ; siz * ones(1,size(f,2)) / 3 ; zeros(1,size(f,2))] ;
 d__ = [] ;
 for f1=f 
   d__ = [d__ vl_siftdescriptor(grd, f1)] ;
