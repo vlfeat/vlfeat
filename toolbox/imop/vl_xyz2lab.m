@@ -50,8 +50,6 @@ end
 J=zeros(size(I)) ;
 
 % Reference white
-xw = 1/3 ;
-yw = 1/3 ;
 Yw = 1.0 ;
 Xw = xw/yw ;
 Zw = (1-xw-yw)/yw * Yw ;
