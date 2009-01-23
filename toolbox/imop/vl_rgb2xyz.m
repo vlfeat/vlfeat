@@ -1,7 +1,7 @@
 function J=vl_rgb2xyz(I,ws)
 % VL_RGB2XYZ  Convert RGB color space to XYZ
-%   J=VL_RGB2XYZ(I) converts the RGB image I to the image J in CIE XYZ
-%   format.
+%   J=VL_RGB2XYZ(I) converts the CIE RGB image I to the image J in 
+%   CIE XYZ format. CIE RGB has a white point of R=G=B=1.0
 %
 %   VL_RGB2XYZ(I,WS) uses the specified RGB working space WS. The
 %   function supports the following RGB working spaces:
