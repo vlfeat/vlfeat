@@ -164,6 +164,9 @@
  ** @{
  **/
 
+#define VL_TRUE 1   /**< @brief @c true (1) constant */
+#define VL_FALSE 0  /**< @brief @c false (0) constant */
+
 #if defined(VL_COMPILER_LP64) || defined(VL_COMPILER_LLP64)
 typedef long long           vl_int64 ;   /**< @brief Signed 64-bit integer. */
 typedef int                 vl_int32 ;   /**< @brief Signed 32-bit integer. */
