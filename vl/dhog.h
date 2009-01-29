@@ -110,6 +110,7 @@ VL_INLINE VlDhogDescriptorGeometry const* vl_dhog_get_geometry (VlDhogFilter con
 VL_INLINE vl_bool         vl_dhog_get_flat_window     (VlDhogFilter const *self) ;
 /** @} */
 
+VL_EXPORT
 void _vl_dhog_update_buffers (VlDhogFilter *self) ;
 
 /** ------------------------------------------------------------------
