@@ -26,7 +26,7 @@ function [tree,asgn] = vl_hikmeans(data,K,nleaves)
 %     that the datum X(:,7) corresponds to the branch
 %     ROOT->SUB(1)->SUB(5)->SUB(3).
 %
-%   See also:: VL_HELP()
+%   See also:: VL_HIKMEANSPUSH(), VL_HIKMEANSHIST(), VL_IKMEANS(), VL_HELP()
 
 % AUTORIGHTS
 % Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
