@@ -1,5 +1,5 @@
 % VL_IKMEANS  Integer K-means
-%   C = VL_IKMEANS(X,K) returns the centers of a K-menas paritioning of
+%   C = VL_IKMEANS(X,K) returns the centers of a K-means paritioning of
 %   the data space X. X must be of class UINT8. C is of class UINT32.
 %
 %   [C, I] = VL_IKMEANS(...) returns the cluster associations I of the
