@@ -103,10 +103,10 @@ mexFunction(int nout, mxArray *out[],
           mexErrMsgTxt("BOUNDS must be a 4-dimensional vector.") ;
         }
         bounds = boundBuffer ;
-        bounds [0] = data[0] ;
-        bounds [1] = data[1] ;
-        bounds [2] = data[2] ;
-        bounds [3] = data[3] ;
+        bounds [0] = mxGetPr(optarg)[0] - 1 ;
+        bounds [1] = mxGetPr(optarg)[1] - 1 ;
+        bounds [2] = mxGetPr(optarg)[2] - 1 ;
+        bounds [3] = mxGetPr(optarg)[3] - 1 ;
         break ;
 
       case opt_size :
@@ -221,7 +221,7 @@ mexFunction(int nout, mxArray *out[],
         /* We have an implied / 2 in the norm, because of the clipping
            below */
         if (norm)
-          *outFrameIter++ = frames [k].norm / 2 ;
+          *outFrameIter++ = frames [k].norm ;
 
         vl_dhog_transpose_descriptor (tmpDescr, 
                                       descrs + descrSize * k,
@@ -230,7 +230,7 @@ mexFunction(int nout, mxArray *out[],
                                       geom->numBinY) ;
         
         for (i = 0 ; i < descrSize ; ++i) {
-          *outDescrIter++ = (vl_uint8) (VL_MIN(512.0f * tmpDescr[i], 256.0f)) ;
+          *outDescrIter++ = (vl_uint8) (VL_MIN(512.0F * tmpDescr[i], 255.0F)) ;
         }
       }
       vl_free(tmpDescr) ;

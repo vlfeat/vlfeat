@@ -27,42 +27,44 @@ typedef struct VlDhogKeypoint_
 /** @brief SIFT descriptor geometry */
 typedef struct VlDhogDescriptorGeometry_
 {
-  int numBinT ;
-  int numBinX ;
-  int numBinY ;
-  int binSizeX ;
-  int binSizeY ;
+  int numBinT ;  /**< number of orientation bins */
+  int numBinX ;  /**< number of bins along X */
+  int numBinY ;  /**< number of bins along Y */
+  int binSizeX ; /**< size of bins along X */
+  int binSizeY ; /**< size of bins along Y */
 } VlDhogDescriptorGeometry ;
 
 /** @brief DHOG filter */
 typedef struct VlDhogFilter_ 
 {  
-  int imWidth ;            /**< image width */
-  int imHeight ;           /**< image height */
+  int imWidth ;            /**< @internal @brief image width */
+  int imHeight ;           /**< @internal @brief image height */
 
-  int stepX ;
-  int stepY ;
+  int stepX ;              /**< frame sampling step X */
+  int stepY ;              /**< frame sampling step Y */
 
-  int boundMinX ;
-  int boundMinY ;
-  int boundMaxX ;
-  int boundMaxY ;
+  int boundMinX ;          /**< frame bounding box min X */
+  int boundMinY ;          /**< frame bounding box min Y */
+  int boundMaxX ;          /**< frame bounding box max X */
+  int boundMaxY ;          /**< frame bounding box max Y */
    
+  /** descriptor parameters */
   VlDhogDescriptorGeometry geom ;
-  int useFlatWindow ;
 
-  int numFrames ;
-  int descrSize ;
-  VlDhogKeypoint *frames ; 
-  float *descrs ;
+  int useFlatWindow ;      /**< flag: whether to drop the Gaussian window */
 
-  int numBinAlloc ;  
-  int numFrameAlloc ;
-  int numGradAlloc ;
+  int numFrames ;          /**< number of sampled frames */
+  int descrSize ;          /**< size of a descriptor */
+  VlDhogKeypoint *frames ; /**< frame buffer */
+  float *descrs ;          /**< descriptor buffer */
 
-  float **grads ;
-  float *convTmp1 ;
-  float *convTmp2 ;
+  int numBinAlloc ;        /**< buffer allocated: descriptor size */
+  int numFrameAlloc ;      /**< buffer allocated: number of frames  */
+  int numGradAlloc ;       /**< buffer allocated: number of orientations */
+
+  float **grads ;          /**< gradient bufffer */
+  float *convTmp1 ;        /**< temporary buffer */
+  float *convTmp2 ;        /**< temporary buffer */
 }  VlDhogFilter ;
 
 VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height) ;
