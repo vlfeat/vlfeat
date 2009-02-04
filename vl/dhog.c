@@ -52,23 +52,23 @@
 
  A SIFT descriptor of an image region is an histogram of the local
  image gradients. The gradient at each pixel is regarded as a sample
- of a three-dimensional elementary feature vector, comprising the
- pixel location and the gradient orientation, weighed by the gradient
- norm. The occurences of such elmenetary features are accumulated in a
- 3-D histogram @em h, which (up to normalization and clamping) forms
- the SIFT descriptor of the region.
+ of a three-dimensional elementary feature vector, formed by the pixel
+ location and the gradient orientation. Samples are weighed by the
+ gradient norm and accumulated in a 3-D histogram @em h, which (up to
+ normalization and clamping) forms the SIFT descriptor of the region.
 
- Formally, for each pixel location @f$ (x,y) @f$ one has an occurence
- of the elementray feature vector @f$ (\angle \nabla I(x,y), x, y)
- @f$, composed of are the gradient orientation @f$ \angle \nalba
- I(x,y) @f$ and of the pixel location @f$ (x, y) @f$. Such occurences are
- weighed by the gradeint norm @f$ | I(x,y) | @f$ and accumulated in a
- three-dimensional histogram @f$ h(t,i,j) @f$ of size @f$ N_\theta
- \times N_x \times N_y @f$. Here @f$ N_\theta @f$ is the number of
- bins along the orientation dimension @$f \theta @$f and @f$ N_x @f$ and @f$ N_y @f$
- the number of bins along the @em x and @em y dimensions respectively
- (that is @f$ t \in [0, \dots, N_\theta-1] @f$, @f$ i \in [0, \dots,
- N_x-1] @f$, and @f$ j \in [0, \dots, N_y-1] @f$).
+ Formally, for each pixel location @f$ (x,y) @f$ we form the
+ elementray feature vector @f$ (\angle \nabla I(x,y), x, y) @f$,
+ composed of are the gradient orientation @f$ \angle \nalba I(x,y) @f$
+ and of the pixel location @f$ (x, y) @f$. Each occurency of such
+ vectors is weighed by the gradeint norm @f$ | I(x,y) | @f$ and
+ accumulated in a three-dimensional histogram @f$ h(t,i,j) @f$ of size
+ @f$ N_\theta \times N_x \times N_y @f$. Here @f$ N_\theta @f$ is the
+ number of bins along the orientation dimension @$f \theta @$f and @f$
+ N_x @f$ and @f$ N_y @f$ the number of bins along the @em x and @em y
+ dimensions respectively (that is @f$ t \in [0, \dots, N_\theta-1]
+ @f$, @f$ i \in [0, \dots, N_x-1] @f$, and @f$ j \in [0, \dots, N_y-1]
+ @f$).
 
  The association of elementary gradient features to the bins of the
  histogram @f$ h(t,i,j) @f$ is given by the multilinear weight @f$
@@ -85,9 +85,9 @@
  @f[
   \theta_t = t \Delta_\theta, 
   \qquad
-  x_i = \left(i - \frac{N_x + 1}{2} \right)\Delta_x,
+  x_i = \left(i - \frac{N_x - 1}{2} \right)\Delta_x,
   \qquad
-  y_j = \left(j - \frac{N_y + 1}{2} \right)\Delta_y,
+  y_j = \left(j - \frac{N_y - 1}{2} \right)\Delta_y,
  @f]
 
  The weight components are choosen so that they decrease linearly
@@ -174,15 +174,14 @@
 
  An additional advantage is that the filter @f$ w_x(x) @f$ (and
  similarly @f$ w_y(y) @f$) is a triangular signal of support @f$
- [-\Delta_x+1, \Delta_x-1] @f$ and decomposes decomposes as the
- convolution of two rectangular signals @f$ w_x =
- \mathrm{rect}_{[-\Delta_x+1,0]} * \mathrm{rect}_{{[0, \Delta_x-1]}}
- @f$. Thus computing each of the required @f$ N_\theta @f$
- convolutions can be done by convolving the gradient image @f$
- J_t(x,y) @f$ along the column and the rows by rectangular
- filters. This can be done (by means of integral images) in time
- independent of the spatial extend @f$\Delta_x, \Delta_y@f$ of the
- bins.
+ [-\Delta_x+1, \Delta_x-1] @f$ and decomposes as the convolution of
+ two rectangular signals @f$ w_x = \mathrm{rect}_{[-\Delta_x+1,0]} *
+ \mathrm{rect}_{{[0, \Delta_x-1]}} @f$. Thus computing each of the
+ required @f$ N_\theta @f$ convolutions can be done by convolving the
+ gradient image @f$ J_t(x,y) @f$ along the column and the rows by
+ rectangular filters. This can be done (by means of integral images)
+ in time independent of the spatial extend @f$\Delta_x, \Delta_y@f$ of
+ the bins.
 
  To avoid resampling and dealing with special boundary conditions, we
  impose some mild restrictions on the geometry of the descriptors that
@@ -252,14 +251,21 @@ float * _vl_dhog_new_kernel (int binSize, int numBins, int binIndex)
   int filtLen = 2 * binSize - 1 ;
   float * ker = vl_malloc (sizeof(float) * filtLen) ;
   float * kerIter = ker ;
-  float delta = binSize * (binIndex - 0.5F * (numBins + 1)) ;
-  float sigma = 0.5F * (numBins * binSize) ;
-  int k ;
+  float delta = binSize * (binIndex - 0.5F * (numBins - 1)) ;
+  float sigma = 0.5F * ((numBins - 1) * binSize + 1) ;
+  /* this is what standard SIFT would use. Above is what Oxford
+     uses 
+  float sigma = 0.5F * ((numBins) * binSize) ;
+  */
+  int x ;
   
-  for (k = - binSize + 1 ; k <= + binSize - 1 ; ++k) {
-    float z = (k - delta) / sigma ;
-    *kerIter++ = (1.0f - fabsf(k) / binSize) * 
-      ((binIndex >= 0) ? expf(- 0.5F * z*z) : 1.0f) ;
+  for (x = - binSize + 1 ; x <= + binSize - 1 ; ++ x) {
+    float z = (x - delta) / sigma ;
+    *kerIter++ = (1.0f - fabsf(x) / binSize) * 
+      ((binIndex >= 0) ? expf(- 0.5F * z*z) : 1.0F) ;
+
+    /* *kerIter++ = (1.0f - fabsf(x) / binSize)  ; */
+
   }
   return ker ;
 }
@@ -502,7 +508,7 @@ void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
       for (bint = 0 ; bint < self->geom.numBinT ; ++bint) {
 
         vl_imconvcol_vf (self->convTmp1, self->imHeight,
-                         self->grads [bint], self->imWidth, self->imHeight, 
+                         self->grads[bint], self->imWidth, self->imHeight, 
                          self->imWidth,
                          yker, -Wy, +Wy, 1,
                          VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
@@ -718,6 +724,9 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
         /* clamp */
         for(bint = 0 ; bint < descrSize ; ++ bint)
           if (descrIter[bint] > 0.2F) descrIter[bint] = 0.2F ;
+
+        /* L2 normalize */
+        _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
         
         frameIter ++ ;
         descrIter += descrSize ;
