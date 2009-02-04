@@ -26,7 +26,8 @@ SAMPLE (T* histPt,
       for (k = 0 ; k < numLabels ; ++k) {
         histPt [k] = 0 ;
       }
-      return ;
+      histPt += numLabels ;
+      continue ;
     }
     
     if (x1 < 1  || y1 < 1) {
