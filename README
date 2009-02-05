@@ -77,7 +77,7 @@ CREATING THE DOCUMENTATION
   (provided that everything is compiled and installed correctly)
   type
 
-  > vlfeat_demo
+  > vl_demo
 
   TUTORIAL. To compile the tutorial, issue
 
