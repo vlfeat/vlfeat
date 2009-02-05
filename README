@@ -52,7 +52,7 @@ INSTALLING
   MEX files are created in the toolbox/ directory and follow MATLAB
   naming conventions (so binaries for multiple architectures can
   co-exist). MEX files, along with the other M-files, should be added
-  to MATLAB path, for instance by using the provided vlfeat_setup.m
+  to MATLAB path, for instance by using the provided vl_setup.m
   command.
   
 CREATING THE DOCUMENTATION
