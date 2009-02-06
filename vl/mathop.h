@@ -88,23 +88,31 @@ static union { vl_uint64 raw ; float value ; }
 /** ------------------------------------------------------------------
  ** @{
  ** @brief Fast <code>mod(x, 2 * VL_PI)</code>
+ ** 
+ ** @param x input value.
  **
  ** The function is optimized for small absolute values of @a x.
- ** @return @c mod(x, 2 * VL_PI)
+ **
+ ** The result is guaranteed not to be smaller than 0. However, due to
+ ** finite numerical precision and rounding errors, the result can be
+ ** equal to 2 * VL_PI (for instance, if @c x is a very small negative
+ ** number).
+ ** 
+ ** @return <code>mod(x, 2 * VL_PI)</code>
  **/
 VL_INLINE
 float vl_mod_2pi_f (float x)
 {
-  while (x < 0.0      ) x += (float) (2 * VL_PI);
-  while (x > 2 * VL_PI) x -= (float) (2 * VL_PI);
+  while (x > 2 * VL_PI) x -= (float) (2 * VL_PI) ;
+  while (x < 0.0F     ) x += (float) (2 * VL_PI);
   return x ;
 }
 
 VL_INLINE
 double vl_mod_2pi_d (double x)
 {
-  while (x < 0.0      ) x += 2 * VL_PI ;
   while (x > 2 * VL_PI) x -= 2 * VL_PI ;
+  while (x < 0.0      ) x += 2 * VL_PI ;
   return x ;
 }
 /** @} */
