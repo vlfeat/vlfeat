@@ -85,8 +85,8 @@
 # == ABOUT DEBUGGING ==
 #
 # We use the older STABS+ debug format as MATLAB MEX command has buggy
-# support for DWARD-2. In particular, compiling a MEX file produces a DLL,
-# but removes the intermediate  object files, where DWARF-2 stores
+# support for DWARD-2. In particular, compiling a MEX file produces a
+# DLL, but removes the intermediate object files, where DWARF-2 stores
 # the actual debugging information. Since MEX uses the default
 # debugging format (-g option) and this corresponds often to DWARF-2,
 # this should be considered a bug.
@@ -114,6 +114,25 @@ HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 NDEBUG ?= YES
 VERB   ?= NO
 
+# programs required to build VLFeat
+CC         ?= cc
+MATLABEXE  ?= matlab
+MEX        ?= mex
+LIBTOOL    ?= libtool
+
+# programs required to build VLFeat documentation
+CONVERT    ?= convert
+DOXYGEN    ?= doxygen
+DVIPNG     ?= dvipng
+DVIPS      ?= dvips
+EPSTOPDF   ?= epstopdf
+FIG2DEV    ?= fig2dev
+LATEX      ?= latex
+PYTHON     ?= python
+
+# programs required to build VLFeat distribution
+GIT        ?= git
+
 .PHONY : all
 all : dll all-bin
 
@@ -131,7 +150,7 @@ err_internal  =$(shell echo Internal error)
 err_internal +=internal
 
 # --------------------------------------------------------------------
-#                                             Auto-detect Architecture
+#                                     Auto-detect Architecture, MATLAB
 # --------------------------------------------------------------------
 
 Darwin_PPC_ARCH             := mac
@@ -149,6 +168,9 @@ ARCH  := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 ifeq ($(ARCH),)
 die:=$(error $(err_no_arch))
 endif
+
+MATLABPATH := $(strip $(shell $(MEX) -v 2>&1 |                       \
+                sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 # --------------------------------------------------------------------
 #                                                            Functions
@@ -207,20 +229,6 @@ ifneq ($(VERB),NO)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
 endif
 
-CC              ?= cc
-CONVERT         ?= convert
-DOXYGEN         ?= doxygen
-DVIPNG          ?= dvipng
-DVIPS           ?= dvips
-EPSTOPDF        ?= epstopdf
-FIG2DEV         ?= fig2dev
-GIT             ?= git
-LATEX           ?= latex
-LIBTOOL         ?= libtool
-MATLABEXE       ?= matlab
-MEX             ?= mex
-PYTHON          ?= python
-
 CFLAGS          += -I$(CURDIR) -pedantic -std=c89 -O3
 CFLAGS          += -Wall -Wno-unused-function -Wno-long-long
 CFLAGS          += $(if $(DEBUG), -O0 -g)
@@ -232,8 +240,6 @@ DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 MEX_FLAGS        = $(if $(DEBUG), -g)
 MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
-MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
-                   sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 ifdef MATLABPATH
 all: all-mex
@@ -436,7 +442,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
@@ -456,8 +462,15 @@ m_lnk := $(addprefix toolbox/noprefix/,                              \
 m_lnk += $(addprefix toolbox/noprefix/,                              \
 	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
 
+# Put a link to the DLL in the MEX binary directory
 $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	ln -s "../../$<" "$@"
+
+# --------------------------------------------------------------------
+#                                          Prefix-less M and MEX files
+# --------------------------------------------------------------------
+# Populate the directory toolbox/noprefix with links to the MEX / M
+# files without the vl_ prefix.
 
 toolbox/noprefix/%.m : vl_%.m
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
