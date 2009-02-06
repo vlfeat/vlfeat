@@ -444,10 +444,18 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
+	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"       \
+	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" 
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
 	       $< -outdir $(dir $(@))
+
+# --------------------------------------------------------------------
+#                                          Prefix-less M and MEX files
+# --------------------------------------------------------------------
+# Populate the directory toolbox/noprefix with links to the MEX / M
+# files without the vl_ prefix.
 
 m_src := $(shell find toolbox -name "vl_*.m")
 m_lnk := $(addprefix toolbox/noprefix/,                              \
@@ -461,16 +469,6 @@ m_lnk := $(addprefix toolbox/noprefix/,                              \
           $(subst vl_,,$(notdir $(m_src)))))))))))
 m_lnk += $(addprefix toolbox/noprefix/,                              \
 	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
-
-# Put a link to the DLL in the MEX binary directory
-$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
-	ln -s "../../$<" "$@"
-
-# --------------------------------------------------------------------
-#                                          Prefix-less M and MEX files
-# --------------------------------------------------------------------
-# Populate the directory toolbox/noprefix with links to the MEX / M
-# files without the vl_ prefix.
 
 toolbox/noprefix/%.m : vl_%.m
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
