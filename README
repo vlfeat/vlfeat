@@ -8,12 +8,16 @@ COMPILING
   do) plus a few common extension (see APPENDIX). To compile the MEX
   files, MATLAB needs also to be installed.
 
-  LINUX AND MAC OS X. Make sure to have a recent version of GCC and
-  GNU make installed. Edit the Makefile to adjust the paths to MATLAB
-  and the mex command, or to disable MATLAB support. Then issue
+  LINUX AND MAC OS X. Make sure to have a recent version of GCC (at
+  least 4.0) and GNU make (at least 3.81) installed. Edit the
+  Makefile to adjust the paths to MATLAB and the mex command, or to
+  disable MATLAB support. Then issue
 
   > cd vlfeat
   > make
+ 
+  Earlier versions of GCC and make can be used, but this requires
+  hacking the Makefile.
 
   WINDOWS. We provide a Microsoft NMAKE Makefile (Makefile.mak) that
   has been tested under Visual C++ 2008 Express and Matlab R2008a (minor
