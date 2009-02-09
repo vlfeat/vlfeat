@@ -67,6 +67,11 @@ mexFunction(int nout, mxArray *out[],
   /** -----------------------------------------------------------------
    **                                               Check the arguments
    ** -------------------------------------------------------------- */
+  
+  if (nin < 1) {
+    mexErrMsgTxt("At least one input argument is required.") ;
+  }
+  
   if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
