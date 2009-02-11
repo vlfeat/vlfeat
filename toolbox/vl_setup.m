@@ -19,6 +19,7 @@ function path = vl_setup(varargin)
 noprefix = false ;
 quiet = false ;
 test = false ;
+demo = false ;
 
 for ai=1:length(varargin)
   opt = varargin{ai} ;
@@ -27,7 +28,9 @@ for ai=1:length(varargin)
       noprefix = true ;
     case {'test'}
       test = true ;
-    case 'quiet'
+    case {'demo'}
+      demo = true ;
+    case {'quiet'}
       quiet = true ;
   end
 end
@@ -59,6 +62,11 @@ end
 if test
   addpath(fullfile(root,'toolbox','test')) ;
 end
+
+if demo
+  addpath(fullfile(root,'toolbox','demo')) ;
+end
+
 
 fprintf('** Welcome to the VLFeat Toolbox **\n') ;
 
