@@ -12,20 +12,20 @@ the MSERs by fitting ellipses.</p>
 <li><a href="tut.mser.conventions">Conventions</a></li>
 </ul>
 
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.extract">Extracting MSERs</h1>
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <div class="figure">
-<image src="%root;demo/mser_basic_0.jpg"/>
+<image src="%pathto:root;demo/mser_basic_0.jpg"/>
 <div class="caption">
 A test image.
 </div>
 </div>
 
 <div class="figure">
-<image src="%root;demo/mser_basic_1.jpg"/>
-<image src="%root;demo/mser_basic_2.jpg"/>
+<image src="%pathto:root;demo/mser_basic_1.jpg"/>
+<image src="%pathto:root;demo/mser_basic_2.jpg"/>
 <div class="caption">
 Extracted MSERs (left) and fitted ellipses (right).
 </div>
@@ -96,9 +96,9 @@ hold on ;
 [c,h]=contourn(M,(0:max(M(:)))+.5) ;
 </pre>
 
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.param">MSER parameters</h1>
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>In the original formulation, MSERs are controlled by a single
 parameter <code>&Delta;</code>. Our implementation uses a few more
@@ -140,11 +140,11 @@ in the local). The interaction of the various parameters are
 illustrated next.</p>
 
 <div class="figure">
-<image src="%root;demo/mser_delta_0.jpg"/>
-<image src="%root;demo/mser_delta_1.jpg"/>
-<image src="%root;demo/mser_delta_2.jpg"/>
-<image src="%root;demo/mser_delta_3.jpg"/>
-<image src="%root;demo/mser_delta_4.jpg"/>
+<image src="%pathto:root;demo/mser_delta_0.jpg"/>
+<image src="%pathto:root;demo/mser_delta_1.jpg"/>
+<image src="%pathto:root;demo/mser_delta_2.jpg"/>
+<image src="%pathto:root;demo/mser_delta_3.jpg"/>
+<image src="%pathto:root;demo/mser_delta_4.jpg"/>
 <div class="caption">
 <b>Meaning of parameter <code>&Delta;</code>.</b>  The intensity
 profile. The bumps have heights equal to 32, 64, 96, 128 and 160
@@ -162,9 +162,9 @@ instance, one could define neighbors of an extremal region $R$ the
 parent extremal region <code>R(+1)</code> at level e would compare the region
 <code>R</code> with the region <code>R_{+1}</code>.
 
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.conventions">Conventions</h1>
-<!-- ------------------------------------------------------------- -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 
 <p>As mentioned in the introduction, the <code>mser</code> uses the

@@ -1,435 +1,333 @@
-html, body {
-  width: 100%;
-  height: 100%;
-  background-color: rgb(30,30,30);
-  color: black;
+//div, p, ul, li, ol, img {border: 1px solid red ;}
+html, body, div, img {
+    margin: 0px ;
+    padding: 0px ;    
 }
-
+pre, code { 
+    font-family: 'Andale Mono', monospaced ; 
+    color: rgb(255,69,0) ;
+}
+table {
+    font: inherit ;
+    color: inherit ;
+}
+html {
+    background-color: #ddd ;
+}
 body {
-  font-size: 10pt  ;
-  font-family: 'Lucida Grande', sans-serif ;
-  margin: auto;
-  width: auto;
+    border-bottom: 1px #aaa solid ;
+    border-left:   1px #aaa solid ;
+    border-right:  1px #aaa solid ;
+    margin-left: auto ;
+    margin-right: auto ;
+    margin-bottom: 0.5em ;
+    width: 65em ;
+    background-color: rgb(32,62,93) ;
+    font-family: Lucida, Helvetica, sans-serif ;
+    font-size: 14px ;
 }
-
-#frame {
-  height: 100%;
-  margin: 0 auto;
-  padding: 0;
-  border-style: none;
-  border-collapse: collapse;
+h1, h2, h3, h4, h5, h6 {
+    font-family: Georgia, serif ;
+    font-weight: normal ;
+    color: rgb(40,40,40) ;
 }
-
-#shl, #shr {
-  width: 29px;
-  padding: 0;
-  margin: 0;
+#pagebody {
+    background-color: rgb(255,255,255) ;
+    padding-bottom: 1px ;
 }
-
-#shl {background: url(images/shl.png) top left  repeat-y;}
-#shr {background: url(images/shr.png) top right repeat-y;}
-
-#page {
-  width: 65em;
-  vertical-align: top;
-  background-color:  #eee ;
-  padding: 0;
-  margin: 0;
-}
-
-#header {
-  background-color: #555 ; /*#B1BACC ;*/
-  padding: 0;
-  margin: 0;  
-}
-
-#header h1, 
-#header h2 {
-  padding: 4px;
-  margin: 0;
-  color: white;
-  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif ;
-  font-weight: normal;
-}
-
-#header h1 {
-    background: url(images/bk-ka.jpg) repeat ;
-    padding-top: 1em ;
-    font-family: "Georgia" ;
-}
-
-
-#header h1 { font-size: 2em; background-color: #777 ; }
-#header h2 { font-size: 1em; }
-
-#footer { 
-  clear: both ;
-  text-align: center;
-  border-top: 1px dotted gray ;
-  padding: 0.5em ;
-}
-
 #content {
-    margin-left: 203px ;
-    margin-right: 0px ;
-    margin-top: 10px ;
-    padding-left: 10px ;
-    padding-right: 4em ;
-    padding-top: 0.5em ;
-    padding-bottom: 0.5em ;
-    line-height: 1.3em;
-    background: url(images/cont-top-left.png) top left no-repeat white ;
+    padding-left: 150px ;
+    padding-right: 1em ;
+    /* needed to make sure content contains the margin of its content */
+    padding-top: 1px ; 
+    line-height: 1.3em ;
 }
-
-/* ---------------------------------------------------------------- */
-/*                               Index                              */
-/* ---------------------------------------------------------------- */
-
-#indexFrame {
-  float: left ;
-  width: 183px;
-  margin: 0 ;
-  margin-left: 10px ;
-  margin-top: 10px ;
-  padding: 0 ;
-  background: url(images/nav-header.png) top no-repeat #B1BACC ;
+#sidebar {
+    float: left ;
+    position: relative ; /* IE bug */
+    width: 149px ;
+    padding: 0em ;
 }
-
-#index {
-  padding: 0.5em 0 ;
-  margin:  0 ;
-  background: url(images/nav-footer.png) bottom no-repeat ;
+#sidebar ul {
+    margin: 0 ;
+    padding: 0 ;
+    margin: .7em ;
 }
-
-#index ul {
-  list-style-type: none;
-  margin: 0 ;
-  padding: 0 ;
+#sidebar ul ul {
+    margin: 0 ;
 }
-
-#index ul li {
-  display: block;
-  margin: 0 ;
-  padding: 0 ;
-  margin-bottom: 1em;
+#sidebar ul a {
+    color: inherit ! important ; 
+    color: rgb(60,60,60) ; /* for buggy IE */
+    text-decoration: none ;
 }
-
-#index ul ul li {
-  margin-bottom: 0px;
-}
-
-#index ul a {
-  display: block;
-  padding: 2px 0;
-  text-decoration: none;
-  font-weight: bold;
-  color: white ;
-}
-
-#index ul ul a {
-  font-weight: normal;
-  font-size: 0.9em;
-}
-
-#index ul a {padding-left: 0.5em;}
-#index ul ul a {padding-left: 1.5em;}
-#index ul ul ul a {padding-left: 2em;}
-#index ul ul ul ul a {padding-left: 2.5em;}
-
-#index a:hover,
-#index #current {
-  padding-top: 1px ;
-  padding-bottom: 1px ;
-  border-top: 1px dotted black ;
-  border-bottom: 1px dotted black ;
-  background-color: orange ;
-  font-weight: bold ;
-}
-
-#index a:active {}
-
-/* ---------------------------------------------------------------- */
-/*                             Breadcrumb                           */
-/* ---------------------------------------------------------------- */
-
-#breadcrumb, div.navigation {
-  margin: 0 ;
-  padding: 2px 0.5em ;
-  font-size: 0.8em ;
-}
-
-#breadcrumb ul, div.tabs ul {
-  display: inline ;
-}
-
-#breadcrumb li, div.tabs li {
-  display: inline ;
-  margin: 0 ;
-  padding: 0 ;
-  margin-right: 2em ;
-}
-
-#breadcrumb span.path, div.tabs li.current {
-  font-weight: bold ;
-}
-
-/* ---------------------------------------------------------------- */
-/*                              Content                             */
-/* ---------------------------------------------------------------- */
-
-#content p,
-#content ul,
-#content dl,
-#content table,
-#content pre {
+#sidebar li {
+    list-style: none ; /* for buggy IE */
+    display: block ;
+    margin: 0px ;
+    padding: 0px ;
+    margin-bottom: 1em ;
     margin-top: 0.5em ;
-    margin-bottom: 0.8em ;
+
+    font-size: 12px ;
+    font-weight: bold ;
+}
+#sidebar li li {
+    padding-left: 1em ;
+    font-weight: normal ;
+    text-transform: none ;
+    margin-bottom: 0.5em ;
+    margin-top: 0.5em ;  
+}
+#header {
+    padding-top: 1px ;
+    padding-left: 10px ;
+    padding-bottom: 5px ;
+    padding-top: 30px ;
+}
+#headbanner {   
+    background-color: rgb(74,125,178) ;
+    font-size: 8px ;
+}
+#header h1 {
+    margin: 0 ;
+    color:  rgb(255,255,255) ;
+}
+#footer {
+    clear: both ;
+    text-align: center ;
+    color: white ;
+    padding: 0.5em ;
+    font-size: 0.9em ;
+}
+.clear {
+    clear: both ;
+    margin: 0px ;
+    padding: 0px ;
+    font-size: 1px; 
 }
 
-#content h1, 
-#content h2, 
-#content h3, 
-#content h4, 
-#content h5 {
-  font-family: Helvetica;
-  font-size: 1em;
-  margin-top: 1.5em ;
-  margin-bottom: 0.5em ;
+.standout {
+    margin: 1em ! important ;
+    font-family: Georgia, serif ;
+    font-style: italic ;
+    color: red ! important ;
 }
 
-#content h1 {font-size:1.3em;}
-#content h2 {font-size:1.2em;}
-#content h3 {font-size:1.1em;}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                               Main content style */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6 {
+    margin: 1em 0 ;
+    margin-top: 1.5em ;
+}
+#content h1 {font-size:1.7em; margin-bottom: 0.59em;}
+#content h2 {font-size:1.5em; margin-bottom: 0.67em;}
+#content h3 {font-size:1.3em; margin-bottom: 0.77em;}
+#content h4 {font-size:1.2em; margin-bottom: 0.83em;}
+#content h5 {font-size:1.0em; margin-bottom: 1.00em;}
+#content h6 {font-size:0.8em; margin-bottom: 1.15em;}
+#content p,
+#content blockquote {
+    margin: 1em 0 ;
+    padding: 0 ;
+    padding-right: 10em ;
+}
+#content blockquote {
+    margin: 1em ;
+    font-family: Georgia, serif ;
+    font-style: italic ;
+}
+#content pre {
+    margin: 1em 0 ;
+    padding: 0 ;
+}
+#content ul {
+    margin-left: 0; 
+    padding-left: 0 ;
+}
+#content li {
+    margin-left: 1.2em ;
+    padding-left: 0 ;
+}
+/*
 #content dt {
-  color: DarkOrange  ;
-  margin: 0 ;
+    display: block ;
+    float: left ;
+    font-weight: bold ;
+    width: 7em ;
+    margin: 0 ;
+    padding: 0 ;
+    text-align: right;
 }
 #content dd {
-  margin: 0em 0em 0em 2em ;
+    display: block ;
+    margin: 0.1em  0 ;    
+    padding-left: 8em ;
 }
-#content dd p {
-  margin-top: 0 ;
+*/
+#content dt {
+    font-weight: bold ;
 }
-
-#content ul {
-  padding:0 ;
-  margin-top: 0.5em ;
-  margin-bottom: 1em ;
+#content dd {
+    padding-left: 0em ;
+    margin-left: 4em ;
 }
-
-#content li {
-  margin-left: 1.5em ;
-  margin-top: 0.2em ;
-  margin-bottom: 0.2em;
+#content dd p,
+#content dd ul {
+    margin-top: 0 ;
 }
-
-pre {
-  font-size: 1em ;
-  color: Teal ;
+#content .centered {
+    display: block ;
+    margin-left: 2em ;
 }
-
-code, pre {
-  color: #CF652A ;
+#content div.figure {
+    margin-left: 2em ;
+    margin-top: 1em ;
+    margin-bottom: 1em ;
 }
-
-div.figure {
-  margin-left: 2em ;
-  margin-bottom: 0.5em ;
-  margin-top: 1em ;
-  text-align: center ;
+#content div.caption {
+    font-family: Georgia, serif ;
+    font-style: italic ;
 }
-div.caption {  
-  font-size: 0.9em ;
-  color: #555 ;
+#content img.image-right {
+    float: right ;
 }
 
-/* ---------------------------------------------------------------- */
-/*                               MDoc                               */
-/* ---------------------------------------------------------------- */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                             Mdoc */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-div.documentation {
-  padding: 0em 2em 2em 2em ;
+#content div.mdoc ul.breadcrumb  {
+    float: right ;
+    width: 100% ;
+    margin: 1em 0 ;
+    padding: 0 ;
+    border-bottom: 1px solid #aaa ;
 }
-
-/* ---------------------------------------------------------------- */
-/*                                Doxygen                           */
-/* ---------------------------------------------------------------- */
-
-.mdescLeft {
-  padding: 0px 8px 4px 8px;
-  font-size: 80%;
-  font-style: italic;
-  background-color: #FAFAFA;
-  border-top: 1px none #E0E0E0;
-  border-right: 1px none #E0E0E0;
-  border-bottom: 1px none #E0E0E0;
-  border-left: 1px none #E0E0E0;
-  margin: 0px;
+#content div.mdoc ul.breadcrumb:after  {
+    content: "." ;
+    display: block ;
+    height: 0 ;
+    clear: right ;
+    visibility: hidden ;
 }
-.mdescRight {
-  padding: 0px 8px 4px 8px;
-  font-size: 80%;
-  font-style: italic;
-  background-color: #FAFAFA;
-  border-top: 1px none #E0E0E0;
-  border-right: 1px none #E0E0E0;
-  border-bottom: 1px none #E0E0E0;
-  border-left: 1px none #E0E0E0;
-  margin: 0px;
+#content div.mdoc ul.breadcrumb li {
+    display: block ;
+    float: left ;
+    width: 4em ;
+    margin: 0 0.5em ;
+    padding: .2em ;
+    font-size: .9em ;
+    font-weight: bold ;
+    border-top:   2px solid #aaa ;
+    border-left:  2px solid #aaa ;
+    border-right: 2px solid #aaa ;
+    text-align: center ;
 }
-.memItemLeft {
-  padding: 1px 0px 0px 8px;
-  margin: 4px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-top-color: #E0E0E0;
-  border-right-color: #E0E0E0;
-  border-bottom-color: #E0E0E0;
-  border-left-color: #E0E0E0;
-  border-top-style: solid;
-  border-right-style: none;
-  border-bottom-style: none;
-  border-left-style: none;
-  background-color: #FAFAFA;
-  font-size: 80%;
-}
-.memItemRight {
-  padding: 1px 8px 0px 8px;
-  margin: 4px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-top-color: #E0E0E0;
-  border-right-color: #E0E0E0;
-  border-bottom-color: #E0E0E0;
-  border-left-color: #E0E0E0;
-  border-top-style: solid;
-  border-right-style: none;
-  border-bottom-style: none;
-  border-left-style: none;
-  background-color: #FAFAFA;
-  font-size: 80%;
-}
-.memTemplItemLeft {
-  padding: 1px 0px 0px 8px;
-  margin: 4px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-top-color: #E0E0E0;
-  border-right-color: #E0E0E0;
-  border-bottom-color: #E0E0E0;
-  border-left-color: #E0E0E0;
-  border-top-style: none;
-  border-right-style: none;
-  border-bottom-style: none;
-  border-left-style: none;
-  background-color: #FAFAFA;
-  font-size: 80%;
-}
-.memTemplItemRight {
-  padding: 1px 8px 0px 8px;
-  margin: 4px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-top-color: #E0E0E0;
-  border-right-color: #E0E0E0;
-  border-bottom-color: #E0E0E0;
-  border-left-color: #E0E0E0;
-  border-top-style: none;
-  border-right-style: none;
-  border-bottom-style: none;
-  border-left-style: none;
-  background-color: #FAFAFA;
-  font-size: 80%;
-}
-.memTemplParams {
-  padding: 1px 0px 0px 8px;
-  margin: 4px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-top-color: #E0E0E0;
-  border-right-color: #E0E0E0;
-  border-bottom-color: #E0E0E0;
-  border-left-color: #E0E0E0;
-  border-top-style: solid;
-  border-right-style: none;
-  border-bottom-style: none;
-  border-left-style: none;
-  color: #606060;
-  background-color: #FAFAFA;
-  font-size: 80%;
+#content div.mdoc ul.breadcrumb a {
+    text-decoration : none ;
+    color: black ;
 }
 
-/* Style for detailed member documentation */
-.memtemplate {
-  font-size: 80%;
-  color: #606060;
-  font-weight: normal;
-  margin-left: 3px;
-} 
-.memnav { 
-  background-color: #e8eef2;
-  border: 1px solid #84b0c7;
-  text-align: center;
-  margin: 2px;
-  margin-right: 15px;
-  padding: 2px;
-}
-.memitem {
-  padding: 4px;
-  background-color: #eef3f5;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #dedeee;
-  -moz-border-radius: 8px 8px 8px 8px;
-}
-.memname {
-  white-space: nowrap;
-  font-weight: bold;
-}
-.memdoc{
-  padding-left: 10px;
-}
-.memproto {
-  background-color: #d5e1e8;
-  width: 100%;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #84b0c7;
-  font-weight: bold;
-  -moz-border-radius: 8px 8px 8px 8px;
-}
-.paramkey {
-  text-align: right;
-}
-.paramtype {
-  white-space: nowrap;
-}
-.paramname {
-  color: #602020;
-  font-style: italic;
-  white-space: nowrap;
-}
-/* End Styling for detailed member documentation */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                          Doxygen */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-/* for the tree view */
-.ftvtree {
-  font-family: sans-serif;
-  margin:0.5em;
+#content div.doxygen {
+    margin-right: 6em ;
 }
-.directory { font-size: 9pt; font-weight: bold; }
-.directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
-.directory > h3 { margin-top: 0; }
-.directory p { margin: 0px; white-space: nowrap; }
-.directory div { display: none; margin: 0px; }
-.directory img { vertical-align: -30%; }
+#content div.doxygen li {
+    margin-top: 0.1em ;
+    margin-bottom: 0.1em; 
+}
+#content div.doxygen p  {
+    margin-right: 0 ;
+    padding-right: 0 ;
+}
+#content div.doxygen div.groupHeader {
+    font-weight: bold ;
+}
+#content div.doxygen td.memItemLeft {
+}
+#content div.doxygen div.memitem {
+}
+#content div.doxygen div.memproto {
+    background-color: #eef ;
+    border: 1px dotted black ;
+    padding: 0.5em ;
+}
+#content div.doxygen td.memname {
+}
+#content div.doxygen td.paramkey {
+    color: blue ;
+}
+#content div.doxygen td.paramtype {
+}
+#content div.doxygen td.paramname {
+    color: green ;
+}
+#content div.doxygen div.navigation {
+    padding: 0 ;
+    margin: 0 ;
+    border: 1px solid white ;
+}
+#content div.doxygen div.navigation div.tabs {
+    padding: 0 ;
+    margin: 0 ;
+}
+#content div.doxygen div.navigation ul {
+    float: right ;
+    width: 100% ;
+    margin: 0.5em 0 ;
+    padding: 0 ;
+    border-bottom: 1px solid #aaa ;
+}
+#content div.doxygen div.navigation:after {
+    content: "." ;
+    display: block ;
+    height: 0 ;
+    clear: right ;
+    visibility: hidden ;
+}
+#content div.doxygen div.navigation li {
+    float: left ;
+    display: block ;
+    font-size: .9em ;
+    font-weight: bold ;
+    margin: 0 0.3em ;
+    padding: 0.2em ;
+    border-top: 2px solid #aaa ;
+    border-left: 2px solid #aaa ;
+    border-right: 2px solid #aaa ;
+    text-align: center ;
+}
+#content div.doxygen div.navigation li a {
+    text-decoration : none ;
+    color: black ;
+}
+#content div.doxygen div.navigation .current {
+    background-color: #eee ;
+}
+#content div.doxygen p.formulaDsp {
+    text-align: center ;
+}
+#content div.doxygen img.formulaDsp {
+    margin: 0.5em auto ;
+}
+#content div.doxygen table {
+    margin: 1em 0 ;
+}
+#content div.doxygen table tr {
+    margin: 0 ;
+}
+#content div.doxygen table td {
+    margin: 0 ;
+}

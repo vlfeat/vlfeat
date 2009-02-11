@@ -1,97 +1,101 @@
-<p>The latest version of VLFeat is <code>0.9.3</code>, released on November 3,
-2008.</p>
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<ul>
-  <li><b><a href="%root;download/vlfeat-0.9.3-bin.tar.gz">Download the
-      precompiled binaries</a></b></li>
-  <li><a href="%root;download/vlfeat-0.9.3.tar.gz">Download the source
-  code</a></li>
-</ul>
+<group>
 
-<p>Old versions may be obtained <a href="download/">here</a>.</p>
+ <p>The latest version of VLFeat is <code>0.9.3</code>, released on
+  November 3, 2008.</p>
 
-<h1 id="download.install">Installation</h1>
+ <ul>
+  <li><b><a href="%pathto:root;download/vlfeat-0.9.3-bin.tar.gz">Download
+     the precompiled binaries</a></b></li>
+  <li><a href="%pathto:root;download/vlfeat-0.9.3.tar.gz">Download the
+    source code</a></li>
+ </ul>
 
-<p>Installing VLFeat is very simple. After downloading and unpacking
-the most recent binary package (see above), follow these instructions
-(each item can be installed independently):</p>
+ <p>Old versions may be obtained <a href="download/">here</a>.</p>
 
-<dl>
-<dt>MATLAB Toolbox</dt>
-<dd>
- <p>
- Run the <code>vl_setup</code> command found in
- the <code>vlfeat/toolbox</code> directory. This command adds the
- necessary paths to MATLAB search path list.
- </p>
+ <h1 id="download.install">Installation</h1>
 
- <p>Notice that the paths are not saved. To automate this step, you
- can add the following fragment of code to your
- MATLAB <code>startup.m</code> file (on UNIX based system this file is
- located in <code>~/matlab/</code>, where <code>~</code> denotes your
- home directory):</p>
+ <p>Installing VLFeat is very simple. After downloading and unpacking
+  the most recent binary package (see above), follow these
+  instructions (each item can be installed independently):</p>
 
- <pre>
-  p=pwd ;
-  cd PATHTOVLFEAT ;
-  cd toolbox ;
-  vl_setup
-  cd(p) ;
-  clear p
- </pre>
+ <dl>
+  <dt>MATLAB Toolbox</dt>
+  <dd>
+   <p>
+    Run the <code>vl_setup</code> command found in
+    the <code>vlfeat/toolbox</code> directory. This command adds the
+    necessary paths to MATLAB search path list.
+   </p>
 
- <p>Alternatively, you can use 
- <a href="http://www.google.com/search?q=site:www.mathworks.com+savepath&btnI=I">MATLAB
- <code>savepath</code> command</a> to save the updated search
- paths.</p>
-</dd>
+   <p>Notice that the paths are not saved. To automate this step, you
+    can add the following fragment of code to your
+    MATLAB <code>startup.m</code> file (on UNIX based system this file is
+    located in <code>~/matlab/</code>, where <code>~</code> denotes your
+    home directory):</p>
 
-<dt>Command line utilities</dt>
-<dd>
- <p>
- Copy the content of the directory <code>vlfeat/bin/X</code> to a
- location in your operating system command search
- path. Here <code>X</code> denotes the subdirectory relative to your
- architecture (e.g. <code>mac</code> for Mac OS X
- PPC, <code>maci</code> for Mac OS X Intel</code>,
- <code>glx</code> for Linux, and so on).
- </p>
-</dd>
+   <pre>
+    p=pwd ;
+    cd PATHTOVLFEAT ;
+    cd toolbox ;
+    vl_setup
+    cd(p) ;
+    clear p
+   </pre>
 
-<dt>
+   <p>Alternatively, you can use 
+    <a href="http://www.google.com/search?q=site:www.mathworks.com+savepath&amp;btnI=I">MATLAB
+     <code>savepath</code> command</a> to save the updated search
+    paths.</p>
+  </dd>
+
+  <dt>Command line utilities</dt>
+  <dd>
+   <p>
+    Copy the content of the directory <code>vlfeat/bin/X</code> to a
+    location in your operating system command search
+    path. Here <code>X</code> denotes the subdirectory relative to
+    your architecture (e.g. <code>mac</code> for Mac OS X
+    PPC, <code>maci</code> for Mac OS X Intel,
+   <code>glx</code> for Linux, and so on).
+  </p>
+ </dd>
+
+ <dt>
  <dt>C library</dt>
  <dd>
   <p>Include in you C source code the appropriate files from
-  the <code>vlfeat/vl</code> hierarchy and link against the
-  library <code>vl</code> located the appropriate
-  subdirectory <code>vlfeat/bin/X</code>, where <code>X</code> depends
-  on your architecture and is defined above. The exact steps (and file
-  names) depend on the architecture and compiler that you are
-  using.</p>
- </d>
-</dt>
+   the <code>vlfeat/vl</code> hierarchy and link against the
+   library <code>vl</code> located the appropriate
+   subdirectory <code>vlfeat/bin/X</code>, where <code>X</code>
+   depends on your architecture and is defined above. The exact steps
+   (and file names) depend on the architecture and compiler that you
+   are using.</p>
+ </dd>
+ </dt>
 </dl>
-  
+
 <h1 id="download.compile">Compiling VLFeat</h1>
 
 <p><b>Note: Compiling is not necessary if you make use of the binary
-distribution.</b></p>
+  distribution.</b></p>
 
 <p>For <b>UNIX</b> based platforms (Mac OS X and Linux), the library
-bundles a GNU-Make makefile (<code>Makefile</code>). The makefile
-tries to auto-detect the environment and automatically configure
-itself. In most cases, typing <code>make</code> is all it is required
-to compile everything. If this does not work, please edit the makefile
-and make the necessary adjustment to the flags.</p>
+ bundles a GNU-Make makefile (<code>Makefile</code>). The makefile
+ tries to auto-detect the environment and automatically configure
+ itself. In most cases, typing <code>make</code> is all it is required
+ to compile everything. If this does not work, please edit the makefile
+ and make the necessary adjustment to the flags.</p>
 
 <p>For <b>Windows</b>, the library bundles a NMake makefile
-(<code>Makefile.mak</code>). In order to use it, you must open
-Makefile.mak and adjust the values of configuration variables to match
-your setup. Once you have done that, start the Visual Studio Command
-Prompt and type <code>nmake /f Makefile.mak</code>.</p>
+ (<code>Makefile.mak</code>). In order to use it, you must open
+ Makefile.mak and adjust the values of configuration variables to match
+ your setup. Once you have done that, start the Visual Studio Command
+ Prompt and type <code>nmake /f Makefile.mak</code>.</p>
 
 <p><b>Note: For Windows you can also compile only the mex files.</b> Start with
-our binary distribution.</p>
+ our binary distribution.</p>
 
 <p><b>Windows: Troubleshooting common problems:</b></p>
 <dl>
@@ -107,20 +111,21 @@ our binary distribution.</p>
 <h1 id="download.contrib">Contributing to VLFeat</h1>
 
 <p>
-We welcome contributions to both the documentation and the source code
-of VLFeat. To contribute to either the library or the documentation,
-you can create patches against our Git repository and send them to us
-for inclusion in the next version. The first step is to clone our
-public repository using:
+ We welcome contributions to both the documentation and the source code
+ of VLFeat. To contribute to either the library or the documentation,
+ you can create patches against our Git repository and send them to us
+ for inclusion in the next version. The first step is to clone our
+ public repository using:
 </p>
 
 <pre>git clone http://vlfeat.org/vlfeat.git</pre>
 
 <p>
-Once you have made and committed your changes locally, consider
-submitting them to the project via e-mail using a command
-like <code>git-format-patch</code>:
+ Once you have made and committed your changes locally, consider
+ submitting them to the project via e-mail using a command
+ like <code>git-format-patch</code>:
 </p>
 
 <pre>git-format-patch origin</pre>
 
+</group>

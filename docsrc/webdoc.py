@@ -1,58 +1,30 @@
 #!/usr/bin/python
-# file:        webdoc.py
-# authors:     Andrea Vedaldi and Brian Fulkerson
-# description: Utility to generate a website
+# -*- coding: latin-1 -*-
+## file:        webdoc.py
+## author:      Andrea Vedaldien
+## description: Implementation of webdoc.
 
-# AUTORIGHTS
-
-import sys, os, re, subprocess, signal, htmlentitydefs, shutil
-from wikidoc import wikidoc
-from optparse import OptionParser
-from HTMLParser import HTMLParser
-from xml.parsers.expat import ExpatError
-from xml.parsers.expat import ErrorString
-from xml.dom import minidom 
+import types
+import xml.sax
+import xml.sax.saxutils
+import re
+import os
+import sys 
 import random
+import copy
+import htmlentitydefs
 
-usage = """usage: %prog [options] DOCUMENT
+from xml.sax.handler import ContentHandler
+from xml.sax         import parse
+from urlparse        import urlparse
+from urlparse        import urlunparse
+from optparse        import OptionParser
 
-Webdoc parses a Webdoc document DOCUMENT and produces a website, ready
-for publication.
+usage = """webdoc [OPTIONS...] <DOC.XML>
 
-DOCUMENT is an XML file describing the website structure. DOCUMENT may
-look something like this:
-
-<site>
-  <stylesheet src="web.css">
-  <page id="google" href="http://www.google.com" title="Google">
-  <page id="index" title="Home page" src="index.html">
-    <page id="index.greetings" title="Greetings" src="greetings.html"/>
-  <page>
-</site>
-
-The site is a collection of files with a hierarchical structure. Files
-are things such as HTML pages, stylesheets and so on.
-
+--outdir   Set output directory
+--verbose  Be verbose
 """
-
-# default page template
-template = """
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
-  %stylesheet;
-</head>
-<body>
-&title;
-&subtitle;
-&index;
-&content;
-</body>
-"""
-
-verb = 0
-srcdir = ""
-outdir = ""
 
 parser = OptionParser(usage=usage)
 
@@ -66,549 +38,993 @@ parser.add_option(
 parser.add_option(
     "-o", "--outdir", 
     dest    = "outdir",
-    default = "",
+    default = "html",
     action  = "store",
     help    = "write output to this directory")
 
-# --------------------------------------------------------------------
-def xmkdir(newdir):
-# --------------------------------------------------------------------
+DOCTYPE_XHTML_TRANSITIONAL = \
+    '<!DOCTYPE html PUBLIC ' \
+    '"-//W3C//DTD XHTML 1.0 Transitional//EN" ' \
+    '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+
+# Create a dictonary that maps unicode characters to HTML entities
+mapUnicodeToHtmlEntity = { }
+for k, v in htmlentitydefs.name2codepoint.items():
+    c = unichr(v)
+    if c == u'&' or c == u'<' or c == u'>': continue
+    mapUnicodeToHtmlEntity [c] = "&%s;"  % k
+
+# This indexes the document nodes by ID
+nodeIndex = { }
+
+def getUniqueNodeID(id = None):
     """
-    xmkdir(NEWDIR) makes the directory NEWDIR if need, along with any
-    intermediate subpath. Overwriting existing files raises 
-    an exception.
+    getUniqueNodeID() generates an unique ID for a document node.
+    getUniqueNodeID(id) generates an unique ID adding a suffix to id.
     """
-    if os.path.isdir(newdir):
-        pass
-    elif os.path.isfile(newdir):
-        raise OSError("a file with the same name as the desired " \
-                      "dir, '%s', already exists." % newdir)
-    else:
-        head, tail = os.path.split(newdir)
-        if head and not os.path.isdir(head):
-            xmkdir(head)
-        if tail:
-            os.mkdir(newdir)
-
-# --------------------------------------------------------------------
-def readText(fileName):
-# --------------------------------------------------------------------
-  """
-  TEXT = readText(NAME) returns the content of file NAME.
-  """
-  text = ""
-  try:
-    file = open(fileName, 'r')
-    text = file.read()
-    file.close()
-  except IOError:
-    print "Warning! Could not open or read file '%s'" % fileName
-  return text
-  
-# --------------------------------------------------------------------
-def writeText(fileName, text):
-# --------------------------------------------------------------------
-  """
-  writeText(NAME, TEXT) writes TEXT to the file NAME.
-  """
-  try:
-    xmkdir(os.path.dirname(fileName))
-    file = open(fileName, 'w')
-    file.write(text)
-    file.close()
-  except IOError:
-    print "Warning! Could not write text file '%s'" % fileName
-
-# --------------------------------------------------------------------
-def iterateChildNodesByTag(node, tag):
-# --------------------------------------------------------------------
-  """
-  This generator iterates the childern of NODE that are XML elements
-  matching TAG.
-  """
-  n = node.firstChild
-  while n:
-    if n.nodeType == n.ELEMENT_NODE and n.nodeName == tag:
-      yield n
-    n = n.nextSibling
-
-# --------------------------------------------------------------------
-def iterateChildNodes(node):
-# --------------------------------------------------------------------
-  """
-  This generator iterates all the childern of NODE.
-  """
-  n = node.firstChild
-  while n:
-    if n.nodeType == n.ELEMENT_NODE:
-      yield n
-    n = n.nextSibling
-    
-# --------------------------------------------------------------------
-def getAttribute(element, attr, default=None):
-# --------------------------------------------------------------------
-  """
-  V=getAttribute(ELEMENT, ATTR) returns the value of the attribute
-  ATTR of the XML element ELEMENT. If ELEMENT has no such attribute,
-  the function returns None.
-  
-  V=getAttribute(ELEMENT, ATTR, DEFAULT) returns DEFAULT instead of
-  None if the attribute is not found.
-  """
-  if element.hasAttribute(attr):
-    return element.getAttribute(attr)
-  else:
-    return default
-
-# --------------------------------------------------------------------
-class MakeStatic:
-# --------------------------------------------------------------------
-  """
-  The instance MakeStatitc(CALLABLE) is a wrapper that calls
-  CALLABLE. It is used to define static methods in Python classes, such
-  as in:
-
-    class TheClass:
-      def theStaticMethod():
-        pass
-      theStaticMethod = MakeStatic(theStaticMethod)
-      
-  Now one can use the syntams TheClass.theStatitcMethod().
-  """
-  
-  def __init__(self, method):
-    self.__call__ = method
-  
-# --------------------------------------------------------------------
-class Thing:
-# --------------------------------------------------------------------
-  """
-  A THING is an object which has a unique identifier in the global namespace.
-  belongs to the global namespace. 
-
-THINGs are used as global
-  references to files and other objects. Example of THINGs include
-  HTML elements and files.
-  """
-  directory = {}
-
-  def genUniqueID():
-    "Generate an unique ID for a new THING"
+    if id is None: id = "id"
+    uniqueId = id
+    count = 0
     while 1:
-      id = "%010d" % int(random.random() * 1e10)
-      if id not in Thing.directory: break
-    return id
+        if uniqueId not in nodeIndex: break
+        count += 1
+        uniqueId = "%s-%d" % (id, count)
+    return uniqueId
 
-  def dumpDirectory():
-    "Dump all THINGs to stardard output"
-    for (id, file) in Thing.directory.iteritems():
-      print file
-
-  genUniqueID = MakeStatic(genUniqueID)
-  dumpDirectory = MakeStatic(dumpDirectory)
-
-  def __init__(self, id=None):
-    if id == None:
-      id = Thing.genUniqueID()
-    self.id = id
-    Thing.directory [self.id] = self
-
-  def __str__(self):
-    return "id:%s" % self.id
-
-# --------------------------------------------------------------------
-class HtmlElement(Thing):
-# --------------------------------------------------------------------
-  """
-  HTMLELEMENT represents an HTML element in a page of the
-  website. This is used only to create cross references and holds no
-  data.
-  """
-
-  def __init__(self, page, htmlId, id=None):
-    Thing.__init__(self, id)
-    self.htmlId = htmlId
-    self.page   = page
-    
-  def __str__(self):
-    return "%s htmlId:%s" % (Thing.__str__(self), self.htmlId)
-
-  def getPathFromRoot(self):
-    return self.page.getPathFromRoot() + "#" + self.htmlId
-
-  def getPathFrom(self, basedir):
-    return self.page.getPathFrom(basedir) + "#" + self.htmlId
-
-
-# --------------------------------------------------------------------
-class File(Thing):
-    # --------------------------------------------------------------------
-  """
-  A FILE instance represents a HTML page, stylesheet, or other data
-  file used by the website.
-  
-  A FILE instance may either contain some data or a pointer to some
-  external resource. For instance, a FILE instance may represent a
-  page of the website, or an anchor to an external page.
-
-pages of the website can either
-  contain actual HTML code (if generated), or simply a website page may be generated by
-  this program from data read from disk, or just reference to an
-  externally provided page. A File which does not hold data uses only
-  self.href to store a pointer to the external data. For a file that
-  holds data, baseName provides a name for the file that will be
-  eventually produced. Also, dirName optionally provide a
-  sub-directory name, if that file must generate a sub-directory.
-  
-  Files have a hierarchical structure which is used to construct
-  indexes and to create the final directory layout of the produced
-  website.
-  """
-  
-  SITE = 0
-  PAGE = 1
-  STYLESHEET = 2
-  SCRIPT = 3
-
-  def __init__(self, type, parent=None, id=None):
-    Thing.__init__(self, id)
-    self.parent    = parent
-    self.children  = []
-    self.depth     = 0
-    self.fileType  = type
-    self.dirName   = None
-    self.baseName  = None
-    self.data      = None
-    self.href      = None  
-    self.title     = 'untitled'
-    self.hide      = False
-    if parent: 
-      parent.addChild(self)
-      self.depth = parent.depth + 1
-    
-  def __str__(self):
-    return "%s type:%d path:%s" % (Thing.__str__(self), self.fileType, 
-                                   self.getPathFromRoot())
-
-  def addChild(self, file):
+def dumpIndex():
     """
-    F.addChild(G) adds file G as a child of file F. Both the parent
-    of G and the children of F are modified to relfect the addition.
+    Dump the node index, for debugging purposes.
     """
-    self.children.append(file)
-    file.parent = self
+    for x in nodeIndex.itervalues():
+      print x
 
-  def getPathFromRoot(self, dironly=False):
+def ensureDir(dirName):
     """
-    F.getPathFromRoot() compute the path of the file F in the output 
-    hierarchy. The path is a chain of sub-directories associated
-    to parent files, and the base name of F.
-    
-    F.getPathFromRoot(dironly=True) returns only the directory part
-    of the path.
+    Create the directory DIRNAME if it does not exsits.   
     """
-    
-    path = ""
-    if self.href: return self.href
-    if self.parent: path = self.parent.getPathFromRoot(dironly=True)
-    if self.dirName: path += self.dirName + "/"
-    if not dironly and self.baseName: path += self.baseName
-    return path
-
-  def getPathFrom(self, basedir, dironly=False):
-    """
-    F.getPathFrom(BASEDIR, DIRONLY) behaves as F.getPathFromRoot(DIRONLY),
-    but the path is computed relatively to BASEDIR.
-    """
-    path = self.getPathFromRoot(dironly)
-    c = 0
-    while c < len(path) and c < len(basedir) and path[c] == basedir[c]:
-      c = c + 1
-    return re.sub(r'\w*/','../',basedir[c:]) + path[c:]
-
-
-# --------------------------------------------------------------------
-def iterateFiles(parentPage):
-# --------------------------------------------------------------------
-  """
-  iterateFiles(parentPage) generates a depth first visit of the tree
-  of pages rooted at parentPage.
-  """
-  for p in parentPage.children:
-    yield p
-    for q in iterateFiles(p): yield q
-
-# --------------------------------------------------------------------
-def findStyles(file):
-# --------------------------------------------------------------------
-  """
-  A = findStyles(FILE) returns a list of stylesheets applicable to
-  file FILE. These are all stylesheets that are children of FILE 
-  or of any of its ancestors.
-  """  
-  styles = []
-  if file.parent: styles = findStyles(file.parent)
-  for x in file.children:
-    if x.fileType == File.STYLESHEET:
-      styles.append(x)
-  return styles
-
-# --------------------------------------------------------------------
-class WebSite:
-# --------------------------------------------------------------------
-  """
-  This class encapsulates a WEBSITE tree and other meta
-  information. The nodes of the WEBSITE tree correpsond to pages,
-  files, external references, and other objects. Additional meta
-  information include formatting templates.
-  """
-  
-  def __init__(self):
-    self.root       = File(File.SITE)
-    self.template   = template
-    self.src        = ""
-  
-  def genFullName(self, name):
-    """
-    site.genFullName(NAME) generates the path to the file NAME,
-    assumed relative to the XML file defining the website.
-    """
-    if name == None: return None
-    if (os.path.isabs(name)):
-      return name
+    if os.path.isdir(dirName):
+        pass
+    elif os.path.isfile(dirName):
+        raise OSError("cannot create the direcory '%s'"
+                      "because there exists already "
+                      "a file with that name" % newdir)
     else:
-      return os.path.join(os.path.dirname(self.src), name)
-        
-  def load(self, fileName):
-    """
-    Load a WEBSITE document by parsting the XML document FILENAME.
-    """
-    self.src = fileName
-    if verb:
-        print "webdoc: parsing WEBDOC document `%s'" % self.src
-    doc = minidom.parse(self.src).documentElement
-    self.xLoad(doc, self.root)
+        head, tail = os.path.split(dirName)
+        if head and not os.path.isdir(head):
+            ensureDir(head)
+        if tail:
+            os.mkdir(dirName)
 
-  def xLoad(self, doc, parent):
+def calcRelURL(toURL, fromURL):
     """
-    W.xLoad(DOC, PARENT) parses recursively the XML element DOC,
-    appending the results as childern of PARENT.
+    Calculates a relative URL.
     """
-    for e in iterateChildNodes(doc):
-      file = None
+    fromURL  = urlparse(fromURL)
+    toURL    = urlparse(toURL)
+    if not fromURL.scheme == toURL.scheme: return urlunparse(toURL)
+    if not fromURL.netloc == toURL.netloc: return urlunparse(toURL)
 
-      if   e.tagName == 'stylesheet': fileType = File.STYLESHEET
-      elif e.tagName == 'script':     fileType = File.SCRIPT
-      elif e.tagName == 'page':       fileType = File.PAGE
+    fromPath = fromURL.path.split("/") 
+    toPath   = toURL.path.split("/")
+    for j in xrange(len(fromPath) - 1): fromPath[j] += u"/"
+    for j in xrange(len(toPath)   - 1): toPath[j] += u"/"
 
-      if e.tagName == 'stylesheet' or \
-         e.tagName == 'page'       or \
-         e.tagName == 'script':
-        theId      = getAttribute(e, 'id')
-        file       = File(fileType, parent, theId)
-        file.src   = self.genFullName(getAttribute(e, 'src'))
-        file.href  = getAttribute(e, 'href')
-        file.title = getAttribute(e, 'title')
-        file.hide  = getAttribute(e, 'hide') == 'yes'
-        if file.src: 
-          file.baseName = os.path.basename(file.src)
-        
-      if e.tagName == 'template':
-        fileName = self.genFullName(e.getAttribute('src'))
-        if verb:
-          print "webdoc: setting template to `%s'" % fileName
-        self.template = readText(fileName)
+    # abs path: ['/', 'dir1/', ..., 'dirN/', 'file'] 
+    # rel path: ['dir1/', ..., 'dirN/', 'file'] 
+    # path with no file: ['dir1/', ..., 'dirN/', '']
 
-      # load children
-      if e.tagName == 'page':
-        self.xLoad(e, file)
-        if len(file.children) > 0:
-          file.dirName = os.path.splitext(file.baseName)[0]
-          if file.dirName == 'index':
-            file.dirName = None
+    # find common path (but do not count file name)
+    i = 0
+    while True:
+        if i >= len(fromPath) - 1: break
+        if i >= len(toPath) - 1: break
+        if not fromPath[i] == toPath[i]: break
+        i = i + 1
 
-      # extract refs
-      if e.tagName == 'page' and file.src:
-        file.data = readText(file.src)
-        extractor = RefExtractor()
-        extractor.feed(file.data)
-        for i in extractor.ids:
-          HtmlElement(file, i, i)
-          
-      # handle include 
-      if e.tagName == 'include':
-        if verb:
-          src = self.genFullName(getAttribute(e, 'src'))
-          print "webdoc: including `%s'\n" % src
-          site = WebSite()
-          try:
-            site.load(src)
-          except IOError, e:
-            print "Could not access file %s (%s)" % (filename, e)
-          except ExpatError, e:
-            print "Error parsing file %s (%s)" % (filename, e)
-          for x in iterateFiles(site.root):
-            x.depth = x.depth + parent.depth + 1
-          for x in site.root.children:
-            parent.addChild(x)
+    # a/b/c/d.html  --> ../../../d.html
+    # a/b//c/d.html --> ../../../d.html
+    for j in xrange(len(fromPath) - 1):
+        if len(fromPath[j]) > 1: fromPath[j] = u"../"
+        else:                    fromPath[j] = u""
 
-  def genHtmlIndex(self, parentPage):
-    """
-    W.genHtmlIndex(PARENT) generates the HTML index starting from
-    pate PARENT and down, recusrively.
-    """
-    html = ""
-    hasContent = False
-    if len(parentPage.children) == 0: return html
-    parentIndent = " " * parentPage.depth
-    html += parentIndent + "<ul>\n"
-    for page in parentPage.children:
-      if not (page.fileType == File.SITE or page.fileType == File.PAGE): continue
-      if page.hide: continue
-      indent = " " * page.depth
-      html += indent + "<li>\n"
-      html += indent + "<a href='%s'>%s</a>\n" % (page.id,page.title) 
-      html += self.genHtmlIndex(page)
-      html += indent + "</li>\n"
-      hasContent = True
-    html += parentIndent + "</ul>\n"
-    if not hasContent: return ""
-    return html
-        
-  def genSite(self):
-    """
-    W.genSite() generate the website, creating the file hierechiy
-    """
-    for file in iterateFiles(self.root):
+    fromPath = fromPath[i:-1]
+    toPath = toPath[i:]
+    relPath = u"".join(fromPath) + "".join(toPath)
     
-      dirName = file.getPathFromRoot(True)
-      fileName = os.path.join(outdir, file.getPathFromRoot())
+    return urlunparse(("", "", relPath, "", "", toURL.fragment))
 
-      if file.fileType == File.STYLESHEET:
-        print "webdoc: copying stylesheet `%s' from `%s'" % (fileName, file.src)
-        writeText(fileName, readText(file.src))
-        
-      if file.fileType == File.SCRIPT:
-        print "webdoc: copying script `%s' from `%s'" % (fileName, file.src)
-        writeText(fileName, readText(file.src))
-      
-      if file.fileType == File.PAGE:
-        page = file
-        if page.data:
-          text = self.template
-          rootpath = self.root.getPathFrom(dirName, True)
+def walkNodes(rootNode, nodeType = None):
+    for n in rootNode.getChildren():
+        for m in walkNodes(n, nodeType):
+            yield m
+    if not nodeType or rootNode.isA(nodeType):
+        yield rootNode
 
-          # stylesheets block
-          block = ""
-          for x in findStyles(page):
-            block += '<link rel="stylesheet" href="%s" type="text/css"/>\n' % \
-                x.getPathFrom(dirName)
-                       
-          text = re.sub("%stylesheet;", block, text)
-          text = re.sub("%pagetitle;", "%s - %s" % (self.root.title, page.title), text)
-          text = re.sub("%title;", "<h1>%s</h1>" % self.root.title, text)
-          text = re.sub("%subtitle;", "<h2>%s</h2>" % page.title, text)
-          text = re.sub("%index;", self.genHtmlIndex(self.root), text)
-          text = re.sub("%content;", page.data, text)
-          text = re.sub("%root;", rootpath, text)
-          
-          generator = PageGenerator(site, dirName)
-          generator.feed(text)
-          text = generator.output()
-
-          writeText(fileName, text)
-          print "webdoc: wrote page %s" % (fileName)
-        
-  def debug(self):
-    print "=== Index ==="
-    print self.genHtmlIndex(self.root)
-    print "=== IDs ==="
-    Thing.dumpDirectory()
-
+def walkAncestors(leafNode, nodeType = None):
+    if not nodeType or leafNode.isA(nodeType):
+        yield leafNode
+    p = leafNode.getParent()
+    if p: 
+        for m in walkAncestors(p, nodeType):
+            yield m
 
 # --------------------------------------------------------------------    
-class RefExtractor(HTMLParser):
+class DocBareParsingError(Exception):
 # --------------------------------------------------------------------
-  def __init__(self):
-    HTMLParser.__init__(self)
-    self.ids = []
+    def __init__(self, message):
+        self.message = message
 
-  def handle_starttag(self, tag, attrs):
-    for (k,i) in attrs:
-      if k == 'id':
-        self.ids.append(i)
-        
+    def __str__(self):
+        return self.message
+
 # --------------------------------------------------------------------    
-class PageGenerator(HTMLParser):
+class DocParsingError(Exception):
 # --------------------------------------------------------------------
-  def __init__(self, site, basedir):
-    HTMLParser.__init__(self)
-    self.pieces = []
-    self.site = site
-    self.basedir = basedir
+    def __init__(self, URL, row, column, message):
+        self.URL = URL
+        self.rowNumber = row
+        self.columnNumber = column
+        self.message = message
+
+    def __str__(self):
+        return "%s:%d:%d:%s" % (self.URL, 
+                                self.rowNumber, 
+                                self.columnNumber, 
+                                self.message)
+
+# --------------------------------------------------------------------    
+# Better error reporting
+# --------------------------------------------------------------------    
+
+class makeBareGuard(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, obj, *args, **keys):
+        try:
+            self.func(obj, *args, **keys)
+        except DocParsingError:
+            raise
+        except DocBareParsingError:
+            raise
+        except Exception, e:
+            raise obj.makeBareParsingError(e.__str__())
+
+    def __get__(self, obj, type=None):
+        return types.MethodType(self, obj, type)
+
+class makeGuard(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, obj, *args, **keys):
+        try:
+            self.func(obj, *args, **keys)
+        except DocParsingError:
+            raise
+        except DocBareParsingError, e:
+            raise obj.makeParsingError(e.message)
+        except Exception, e:
+            raise obj.makeParsingError(e.__str__())
+
+    def __get__(self, obj, type=None):
+        return types.MethodType(self, obj, type)
+
+# --------------------------------------------------------------------    
+class DocBareNode:
+# --------------------------------------------------------------------
+    """
+    A node of the document tree without parent, childnren, or any
+    other attribute. It is used to implement frequent leaf nodes such
+    as text chunks.
+    """
+    def __init__(self): pass
+
+    def isA(self, classInfo):
+        """
+        Returns TRUE if the node is of class CLASSINFO.
+        """
+        return isinstance(self, classInfo)
+
+    def getChildren(self):
+        """
+        Returs an empty list
+        """
+        return []
+
+    def setParent(self, parent): pass
+    def getPublishDirName(self): pass
+    def getPublishFileName(self): pass
+    def getPublishURL(self): pass
+    def publish(self, generator, pageNode = None): pass
+    def publishIndex(self, gen, pageNode, openNodeStack): pass
+
+    def makeBareParsingError(self, message):
+        """
+        Creates a DocParsingError with the specified message.  The
+        source code URL, row, and column are set to the node
+        corresponding values.
+        """
+        return DocBareParsingError(message)
+
+# --------------------------------------------------------------------    
+class DocNode(DocBareNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        self.parent = None
+        self.children = []
+        self.attrs = attrs
+        self.sourceURL = None
+        self.sourceRow = None
+        self.sourceColumn = None
+        if attrs.has_key('id'):
+            self.id = attrs['id']
+        else:
+            self.id = getUniqueNodeID()            
+        if URL:
+            if not URL is self.getSourceURL():
+                self.sourceURL = URL
+        if locator:
+            self.sourceRow = locator.getLineNumber()
+            self.sourceColumn = locator.getColumnNumber()
+        nodeIndex[self.id] = self
+
+    def __str__(self):
+        return "%s:%d:%d:%s" % (self.getSourceURL(),
+                                self.getSourceRow(),
+                                self.getSourceColumn(),
+                                self.getID())
+
+    def dump(self):
+        """
+        Recusively dump the tree, for debugging purposes.
+        """
+        depth = self.getDepth()
+        print " " * depth, self
+        for x in self.children: x.dump()
+
+
+
+    def getID(self):
+        """
+        Returns the node ID
+        """
+        return self.id
+
+    def getParent(self):
+        """
+        Return the node parent.
+        """
+        return self.parent
+
+    def getChildren(self):
+        """
+        Return the list of node children.
+        """
+        return self.children
+
+    def getAttributes(self):
+        """
+        Return the dictionary of node attributes.
+        """
+        return self.attrs
+
+    def getDepth(self):
+        """
+        Return the depth of the node in the tree.
+        """
+        if self.parent:
+            return self.parent.getDepth() + 1
+        else:
+            return 0
+
+    def setParent(self, parent):
+        """
+        Set the parent of the node.
+        """
+        self.parent = parent
+
+    def adopt(self, orfan):
+        """
+        Adds ORFAN to the node children and make the node the parent
+        of ORFAN. ORFAN can also be a sequence of orfans.
+        """
+        self.children.append(orfan)
+        orfan.setParent(self)
+
+    def findAncestors(self, nodeType = None):
+        """
+        Return the node ancestors of type NODETYPE. If NODETYPE is
+        None, returns all ancestors.
+        """
+        if nodeType is None:
+            nodeType = DocNode
+        if self.parent:
+            if self.parent.isA(nodeType):
+                found = [self.parent]
+            else:
+                found = []
+            found = found + self.parent.findAncestors(nodeType)
+            return found
+        return []
+
+    def findChildren(self, nodeType = None):
+        """
+        Returns the node chldren of type NODTYPE. If NODETYPE is None,
+        returns all children.
+        """
+        if nodeType is None:
+            nodeType = DocNode
+        return [x for x in self.children if x.isA(nodeType)]
+
+    def getSourceURL(self):
+        """
+        Get the URL of the source code file where the node was
+        instantiated.
+        """
+        if self.sourceURL: 
+            return self.sourceURL
+        elif self.parent:
+            return self.parent.getSourceURL()
+        else:
+            return ""
+        
+    def getSourceColumn(self):
+        """
+        Gets the column of the source code file where the node was
+        instantiated.
+        """
+        if not self.sourceColumn is None: 
+            return self.sourceColumn 
+        elif self.parent:
+            return self.parent.getSourceColumn()
+        else:
+            return -1 
+
+    def getSourceRow(self):
+        """
+        Gets the row (line) of the source code file where the node was
+        instantiated.
+        """
+        if not self.sourceRow is None: 
+            return self.sourceRow 
+        elif self.parent:
+            return self.parent.getSourceRow()
+        else:
+            return -1
+
+    def makeParsingError(self, message):
+        """
+        Creates a DocParsingError with the specified message.  The
+        source code URL, row, and column are set to the node
+        corresponding values.
+        """
+        return DocParsingError(
+            self.getSourceURL(), 
+            self.getSourceRow(),
+            self.getSourceColumn(),
+            message)
+
+    def getPublishDirName(self):
+        """
+        Returns the publish dir name of the parent.
+        """
+        if self.parent:
+            return self.parent.getPublishDirName()
+        return None
+
+    def getPublishFileName(self):
+        """
+        Returns NONE.
+        """
+        return None
+
+    def getPublishURL(self):
+        """
+        Returns NONE.
+        """
+        return None
+
+    def publish(self, generator, pageNode = None):
+        """
+        Recursively calls PUBLISH() on its children.
+        """
+        for c in self.getChildren():
+            c.publish(generator, pageNode)
+        return None
+
+    def publishIndex(self, gen, pageNode, openNodeStack):
+        """
+        Recursively calls PUBLISHINDEX() on its children.
+        """
+        for c in self.getChildren():
+            c.publishIndex(gen, pageNode, openNodeStack)
+        return None
+
+# --------------------------------------------------------------------    
+def expandAttr(value, pageNode):
+# --------------------------------------------------------------------
+    xvalue = ""
+    last = 0
+    for m in re.finditer("%[\w:\.]+;", value):
+        if last <= m.start() - 1:
+            xvalue += value[last:m.start()-1]
+        last = m.end()
+        directive = value[m.start()+1 : m.end()-1]
+        mo = re.match('pathto:([\w\.]*)', directive)
+        if mo: 
+            toNodeID = mo.group(1)
+            toNodeURL = None
+            if nodeIndex.has_key(toNodeID):
+                toNodeURL = nodeIndex[toNodeID].getPublishURL()
+            if toNodeURL is None:
+                print "warning: could not cross-reference '%s'" % toNodeID
+                toNodeURL = toNodeID
+            fromPageURL = pageNode.getPublishURL()
+            xvalue += calcRelURL(toNodeURL, fromPageURL)
+        else:
+            raise DocBareParsingError(
+                "Unknown directive '%s' while expanding attribute" % directive)
+    if last < len(value): xvalue += value[last:]
+    #print "EXPAND: ", value, " -> ", xvalue
+    return xvalue
+
+# --------------------------------------------------------------------    
+class Generator:
+# --------------------------------------------------------------------
+    def __init__(self, rootDir):
+        ensureDir(rootDir)
+        self.fileStack = []
+        self.dirStack = [rootDir]
+        ensureDir(rootDir)
+        #print "CD ", rootDir
+
+    def open(self, filePath):
+        filePath = os.path.join(self.dirStack[-1], filePath)
+        fid = open(filePath, "w")
+        self.fileStack.append(fid)
+        fid.write(DOCTYPE_XHTML_TRANSITIONAL)
+        #print "OPEN ", filePath
+        
+    def putString(self, str):
+        fid = self.fileStack[-1]
+        fid.write(str.encode('latin-1'))
+
+    def putXMLString(self, str):
+        fid = self.fileStack[-1]
+        xstr = xml.sax.saxutils.escape(str, mapUnicodeToHtmlEntity)
+        try:
+            fid.write(xstr.encode('latin-1'))
+        except:
+            print "OFFENDING", str, xstr
+            print mapUnicodeToHtmlEntity[str]
+            raise
+
+    def putXMLAttr(self, str):
+        fid = self.fileStack[-1]
+        xstr = xml.sax.saxutils.quoteattr(str)
+        fid.write(xstr.encode('latin-1'))
     
-  def handle_starttag(self, tag, attrs):
-    for n in range(len(attrs)):
-      (k,i) = attrs[n]
-      if k == 'href':
-        if i in Thing.directory:
-          path = ""
-          thing = Thing.directory [i]
-          path = thing.getPathFrom(self.basedir)
-          attrs[n] = (k, path)
-    strattrs = "".join([' %s="%s"' % (key, value) for 
-      key, value in attrs])
-    self.pieces.append("<%(tag)s%(strattrs)s>" % locals())
+    def close(self):
+        self.fileStack.pop().close()
+        #print "CLOSE"
+        
+    def changeDir(self, dirName):
+        currentDir = self.dirStack[-1]
+        newDir = os.path.join(currentDir, dirName)
+        ensureDir(newDir)
+        self.dirStack.append(newDir)
+        #print "CD ", newDir
+        
+    def parentDir(self):
+        self.dirStack.pop()
+        #print "CD .."
 
-  def handle_endtag(self, tag):
-    self.pieces.append("</%(tag)s>" % locals())
+# --------------------------------------------------------------------    
+class DocInclude(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+        if not attrs.has_key("src"):
+            raise self.makeParsingError("include missing 'src' attribute")
+        self.filePath = attrs["src"]
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":<web:include src=%s>" \
+            % xml.sax.saxutils.quoteattr(self.filePath)
+
+# --------------------------------------------------------------------    
+class DocDir(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+        if not attrs.has_key("name"):
+            raise self.makeParsingError("dir tag missing 'name' attribute")
+        self.dirName = attrs["name"]
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":<web:dir name=%s>" \
+            % xml.sax.saxutils.quoteattr(self.dirName)
+
+    def getPublishDirName(self):
+        return self.parent.getPublishDirName() + self.dirName + os.sep
+
+    def publish(self, generator, pageNode = None):
+        generator.changeDir(self.dirName)
+        DocNode.publish(self, generator, pageNode)
+        generator.parentDir()
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocGroup(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":<web:group>"
+
+# --------------------------------------------------------------------    
+class DocCDATAText(DocBareNode):
+# --------------------------------------------------------------------
+    def __init__(self, text):
+        DocBareNode.__init__(self)
+        self.text = text
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":CDATA text:" + self.text
+
+    def publish(self, gen, pageNode = None):
+        if pageNode is None: return
+        if not pageNode: return
+        gen.putString(self.text)
+
+    publish = makeBareGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocCDATA(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self):
+        DocNode.__init__(self, {}, None, None)
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":CDATA"
+
+    def publish(self, gen, pageNode = None):        
+        if pageNode is None: return
+        gen.putString("<![CDATA[")
+        DocNode.publish(self, gen, pageNode)
+        gen.putString("]]>") ;
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocHtmlText(DocBareNode):
+# --------------------------------------------------------------------
+    def __init__(self, text):
+        DocBareNode.__init__(self)
+        self.text = text
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":text:'" + \
+            self.text.encode('utf-8').encode('string_escape') + "'" 
+
+    def publish(self, gen, pageNode = None):
+        if pageNode is None: return
+        last = 0
+        for m in re.finditer("%\w+;", self.text):
+            if last <= m.start() - 1:
+                gen.putXMLString(self.text[last : m.start()-1])
+            last = m.end()            
+            directive = self.text[m.start()+1 : m.end()-1]
+
+            if   directive == "content":
+                pageNode.publish(gen, pageNode)
+            
+            elif directive == "pagestyle":
+                for s in pageNode.findChildren(DocPageStyle):
+                    s.publish(gen, pageNode)
+                    
+            elif directive == "pagescript":
+                for s in pageNode.findChildren(DocPageScript):
+                    s.publish(gen, pageNode)
+
+            elif directive == "navigation":
+                gen.putString("<ul>\n")
+                openNodeStack = [x for x in walkAncestors(pageNode, DocPage)]
+                siteNode = walkAncestors(pageNode, DocSite).next()
+                siteNode.publishIndex(gen, pageNode, openNodeStack)
+                gen.putString("</ul>\n")
+
+            elif directive == "pagetitle":
+                gen.putString(pageNode.title)
+
+            else:
+                print "warning: ignoring directive " + label            
+        if last < len(self.text):
+            gen.putXMLString(self.text[last:])
+
+    publish = makeBareGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocHtmlElement(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, tag, attrs, URL = None, locator = None):
+        DocNode.__init__(self, attrs, URL, locator)
+        self.tag = tag
+        
+    def __str__(self):
+        str = "<html:" + self.tag
+        for k, v in self.attrs.items():
+            str = str + " " + k + "='" + xml.sax.saxutils.escape(v) + "'"
+        str = str + ">"
+        return DocNode.__str__(self) + ":" + str
+
+    def getPublishURL(self):
+        anc = self.findAncestors(DocPage)
+        if len(anc) == 0: return None
+        return anc[0].getPublishURL() + "#" + self.id + ".html"
+
+    def publish(self, gen, pageNode = None):
+        if pageNode is None: return
+        gen.putString("<")
+        gen.putString(self.tag)
+        for name, value in self.attrs.items():
+            gen.putString(" ")
+            gen.putString(name)
+            gen.putString("=")
+            gen.putXMLAttr(expandAttr(value, pageNode))
+        gen.putString(">")
+        DocNode.publish(self, gen, pageNode)
+        gen.putString("</")
+        gen.putString(self.tag)
+        gen.putString(">")
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocTemplate(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+
+    def publish(self, generator, pageNode = None):
+        if pageNode is None: return
+        DocNode.publish(self, generator, pageNode)
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocPageStyle(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+
+    def publish(self, gen, pageNode = None):
+        if pageNode is None: return
+        sa = self.getAttributes()
+        gen.putString("<style rel=\"stylesheet\" type=")
+        if sa.has_key("type"):
+            gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+        else:
+            gen.putString("\"text/css\" ")
+        if sa.has_key("href"):
+            gen.putString("href=")
+            gen.putXMLAttr(expandAttr(sa["href"], pageNode))
+        gen.putString(">")
+        DocNode.publish(self, gen, pageNode)
+        gen.putString("</style>")
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------
+class DocPageScript(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+
+    def publish(self, gen, pageNode = None):
+        if pageNode is None: return
+        sa = self.getAttributes()
+        gen.putString("<script type=")
+        if sa.has_key("type"):
+            gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+        else:
+            gen.putString("\"text/javascript\" ")
+        if sa.has_key("src"):
+            gen.putString("src=")
+            gen.putXMLAttr(expandAttr(sa["src"], pageNode))
+        gen.putString(">")
+        DocNode.publish(self, gen, pageNode)
+        gen.putString("</script>")
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocPage(DocNode):
+# --------------------------------------------------------------------
+    counter = 0
+
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+        DocPage.counter = 1 + DocPage.counter
+        self.templateID = "template.default"
+        self.name  = "page%d" % DocPage.counter
+        self.title = "untitled"
+        self.hide = False
+
+        for k, v in self.attrs.items():
+            if k == 'src':
+                self.title = v
+            elif k == 'name':
+                self.name = v
+            elif k == 'id':
+                pass
+            elif k == 'title':
+                self.title = v
+            elif k == 'hide':
+                self.hide = (v.lower() == 'yes')
+            else:   
+                raise self.makeParsingError(
+                    "web:page cannot have '%s' attribute" % k)
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":<web:page name='%s' title='%s'>" \
+            % (xml.sax.saxutils.escape(self.name), 
+               xml.sax.saxutils.escape(self.title))
+
+    def getPublishFileName(self):
+        return self.name + ".html"
+
+    def getPublishURL(self):
+        siteNode = self.findAncestors(DocSite)[0]
+        return siteNode.getPublishURL() + \
+            self.getPublishDirName() + \
+            self.getPublishFileName()
+
+    def publish(self, generator, pageNode = None):
+        if not pageNode:
+            generator.open(self.getPublishFileName())
+            templateNode = nodeIndex[self.templateID]
+            templateNode.publish(generator, self)
+            generator.close()
+            DocNode.publish(self, generator, None)
+        elif pageNode is self:
+            DocNode.publish(self, generator, pageNode)
+
+    def publishIndex(self, gen, pageNode, openNodeStack):
+        if self.hide: return
+        gen.putString("<li><a href=")
+        gen.putXMLAttr(
+            expandAttr("%%pathto:%s;" % self.getID(), pageNode))
+        gen.putString(">")
+        gen.putXMLString(self.title)
+        gen.putString("</a>\n<ul>\n")
+        if len(openNodeStack) > 0 and self == openNodeStack[-1]:
+            openNodeStack.pop()
+            DocNode.publishIndex(self, gen, pageNode, openNodeStack)            
+        gen.putString("</ul></li>\n")
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocSite(DocNode):
+# --------------------------------------------------------------------
+    def __init__(self, attrs, URL, locator):
+        DocNode.__init__(self, attrs, URL, locator)
+        self.siteURL = "http://www.foo.org/"
+        self.outDir = "html"
+
+    def __str__(self):        
+        return DocNode.__str__(self) + ":<web:site>"
+
+    def getPublishURL(self):
+        return self.siteURL
+
+    def getPublishDirName(self):
+        return ""
+
+    def getOutDir(self):
+        return self.outDir
+
+    def setOutDir(self, outDir):
+        self.outDir = outDir
+
+    def publish(self):
+        generator = Generator(self.outDir) 
+        DocNode.publish(self, generator)
+
+    publish = makeGuard(publish)
+
+# --------------------------------------------------------------------    
+class DocHandler(ContentHandler):
+# --------------------------------------------------------------------
     
-  def handle_charref(self, ref):         
-    self.pieces.append("&#%(ref)s;" % locals())
+    def __init__(self):
+        ContentHandler.__init__(self)
+        self.rootNode = None
+        self.stack = []
+        self.locatorStack = []
+        self.filePathStack = []
+        self.verbosity = 1
+        self.inDTD = False
+
+    def resolveEntity(self, publicid, systemid):
+        """
+        Resolve XML entities by mapping to a local copy of the (X)HTML
+        DTDs.
+        """
+        return open(os.path.join(
+                os.path.dirname(__file__),
+                'dtd/xhtml1', 
+                systemid[systemid.rfind('/')+1:]), "rb")
+
+    def lookupFile(self, filePath):
+        if os.path.exists(filePath):
+            return filePath
+        if filePath[0] == '/':
+            return None
+        for path in self.filePathStack:
+            dir = os.path.dirname(path)
+            qualFilePath = os.path.join(dir, filePath)
+            if os.path.exists(qualFilePath):
+                return qualFilePath
+        return None
+
+    def startElement(self, name, attrs):
+        # convert attrs to an actual dictionary
+        attrs_ = {}
+        for k, v in attrs.items():
+            attrs_[k] = v
+        attrs = attrs_
+
+        URL = self.getCurrentFileName()
+        locator = self.getCurrentLocator()
+
+        
+        if name == "include":
+            if not attrs.has_key("src"):
+                raise DocParsingError(
+                    URL, 
+                    locator.getLineNumber(), 
+                    locator.getColumnNumber(),
+                    "<web:include> missing 'src' attribute")
+            filePath = attrs["src"]
+            qualFilePath = self.lookupFile(filePath)
+            if qualFilePath is None:
+                raise DocParsingError(
+                    URL, 
+                    locator.getLineNumber(), 
+                    locator.getColumnNumber(),
+                    "<web:include> could not find file '%s'" % filePath)
+            if self.verbosity > 0:
+                print "parsing '%s'" % qualFilePath
+            self.load(qualFilePath)
+            return
+
+        if len(self.stack) == 0:
+            parent = None
+        else:            
+            parent = self.stack[-1]
+        node = None
+
+        if   name == "site":
+            node = DocSite(attrs, URL, locator)
+        elif name == "page":
+            node = DocPage(attrs, URL, locator)
+        elif name == "dir":
+            node = DocDir(attrs, URL, locator)
+        elif name == "template":
+            node = DocTemplate(attrs, URL, locator)
+        elif name == "pagestyle":
+            node = DocPageStyle(attrs, URL, locator)
+        elif name == "pagescript":
+            node = DocPageScript(attrs, URL, locator)
+        elif name == "group":
+            node = DocGroup(attrs, URL, locator)
+        else:
+            node = DocHtmlElement(name, attrs, URL, locator)
+            
+        if parent: parent.adopt(node)
+        self.stack.append(node)
+        
+    def endElement(self, name):
+        if name == "include":
+            return
+        node = self.stack.pop()
+        if len(self.stack) == 0:
+            self.rootNode = node
+
+    def load(self, qualFilePath):
+        self.filePathStack.append(qualFilePath)
+        parser = xml.sax.make_parser()
+        parser.setContentHandler(self)
+        parser.setEntityResolver(self)
+        parser.setProperty(xml.sax.handler.property_lexical_handler, self)
+        parser.parse(qualFilePath)
+
+    def setDocumentLocator(self, locator):
+        self.locatorStack.append(locator)
+
+    def getCurrentLocator(self):
+        if len(self.locatorStack) > 0:
+            return self.locatorStack[-1]
+        else:
+            return None
+
+    def characters(self, content):
+        parent = self.stack[-1]
+        if parent.isA(DocCDATA):
+            node = DocCDATAText(content)
+        else:
+            node = DocHtmlText(content)
+        parent.adopt(node)
+
+    def ignorableWhitespace(self, ws):
+        self.characters(ws)
     
-  def handle_entityref(self, ref):       
-    self.pieces.append("&%(ref)s" % locals())
-    if htmlentitydefs.entitydefs.has_key(ref):
-        self.pieces.append(";")
+    def getCurrentFileName(self):
+        return self.filePathStack[-1]
 
-  def handle_data(self, text):           
-    self.pieces.append(text)
+    def endDocument(self):
+        self.locatorStack.pop()
+        self.filePathStack.pop()
 
-  def handle_comment(self, text):        
-    self.pieces.append("<!--%(text)s-->" % locals())
+    def startCDATA(self):
+        node = DocCDATA() 
+        self.stack[-1].adopt(node)
+        self.stack.append(node)
 
-  def handle_pi(self, text):             
-    self.pieces.append("<?%(text)s>" % locals())
+    def endCDATA(self):
+        node = self.stack.pop()
+        if len(self.stack) == 0:
+            self.rootNode = node
 
-  def handle_decl(self, text):
-    self.pieces.append("<!%(text)s>" % locals())
+    def comment(self, body):
+        if self.inDTD: return
+        node = DocCDATAText("<!--" + body + "-->")
+        self.stack[-1].adopt(node)
+        
+    def startEntity(self, name): pass
+    def endEntity(self, name): pass
 
-  def output(self):              
-    """Return processed HTML as a single string"""
-    return "".join(self.pieces)
+    def startDTD(self, name, public_id, system_id):
+        self.inDTD = True
+    
+    def endDTD(self):
+        self.inDTD = False
 
 # --------------------------------------------------------------------    
 if __name__ == '__main__':
 # --------------------------------------------------------------------
+    (opts, args) = parser.parse_args()
 
-  (options, args) = parser.parse_args()
-  filename = args[0]
-  
-  verb = options.verb
-  xmldoc = args[0]
-  outdir = options.outdir
+    filePath = args[0]
+    handler = DocHandler()
+    try:
+        handler.load(filePath)
+    except (DocParsingError, xml.sax.SAXParseException), (e):
+        print e
+        sys.exit(-1)
 
-  if verb:
-    print "webdoc: website document: `%s'" % xmldoc
-    print "webdoc: output path: `%s'" % outdir
+    # configure
+    handler.rootNode.setOutDir(opts.outdir)
 
-  site = WebSite()
-  try:
-      site.load(xmldoc)
-  except (ExpatError), e:
-      print "%s:%d:%d XML parsing error: %s" % (xmldoc, e.lineno, e.offset, 
-                                                ErrorString(e.code))
-      sys.exit(1)
-  site.debug()
-  site.genSite()
+    #print "== Index Content =="
+    # dumpIndex()
+    #print
+    #print "== Node Tree =="
+    #handler.rootNode.dump()    
 
+    print "== All pages =="
+    for x in walkNodes(handler.rootNode, DocPage):
+        print x
+
+    print "== Publish =="
+    try:
+        handler.rootNode.publish()
+    except (DocParsingError, xml.sax.SAXParseException), (e):
+        print e
+        sys.exit(-1)
+    sys.exit(0)
