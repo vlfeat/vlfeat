@@ -7,9 +7,9 @@
 #define INTEGRAL JOIN(integral_, SFX)
 
 /* 
-   This function is transpose safe. That is, the integral histogram
-   src can be either column major or row major, as long as width is
-   the fastest varying dimension.
+   This function is 'transpose safe': The integral histogram SRC can
+   be either column major or row major, as long as WIDTH is the
+   fastest varying dimension.
 */
 void INTEGRAL (T* dst, 
                int dstStride,
@@ -22,7 +22,7 @@ void INTEGRAL (T* dst,
   src += 1 ;
 
   for (x = 1 ; x < srcWidth ; ++ x) {
-    *dst += *(dst - 1)  + *src ;
+    *dst = *(dst - 1)  + *src ;
     dst += 1 ;
     src += 1 ;
   }
@@ -31,12 +31,12 @@ void INTEGRAL (T* dst,
     dst += dstStride - srcWidth ;
     src += srcStride - srcWidth ;
 
-    *dst = *src + *(dst - dstStride) ;
+    *dst = *(dst - dstStride) + *src ;
     dst += 1 ;
     src += 1 ;
     
     for (x = 1 ; x < srcWidth ; ++ x) {
-      *dst = *(dst - 1) + *(dst - dstStride) - *(dst - dstStride - 1) + *src ;
+      *dst =  *(dst - dstStride) - *(dst - dstStride - 1) +  *(dst - 1)  + *src ;
       dst += 1 ;
       src += 1 ;
     }
