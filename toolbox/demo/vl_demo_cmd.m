@@ -17,9 +17,12 @@ switch mexext
  case 'mexw32'
 	arch = 'win32' ;
 	ext ='.exe' ;
+ case 'mexw64'
+	arch = 'win64' ;    
+	ext ='.exe' ;
 end
 
 cmd = fullfile(vl_root,'bin',arch,[name ext]) ;
-str = [cmd ' ' args] ;
+str = ['"' cmd '" ' args] ;
 disp(str);
 [err,msg] = system(str) ;
