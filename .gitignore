@@ -21,6 +21,7 @@ toolbox/mexmaci
 toolbox/mexmac
 toolbox/mexglx
 toolbox/mexa64
+toolbox/mexw64
 toolbox/noprefix
 
 vlfeat.xcodeproj/*.mode1v3
