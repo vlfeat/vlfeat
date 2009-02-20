@@ -101,7 +101,7 @@ for idx=1:numel(update)
                       update(idx).(updateFieldName)) ;
     else
       if warn
-        warning(sprintf('copyed field ''%s'' which is in UPDATE but not in CONFIG', ...
+        warning(sprintf('copied field ''%s'' which is in UPDATE but not in CONFIG', ...
                         updateFieldName)) ;
       end
       if err
