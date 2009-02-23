@@ -1,8 +1,6 @@
 /** @file   mexutils.h
  ** @author Andrea Vedaldi
  ** @brief  MEX helper functions
- **
- ** This module provides helper functions for MATLAB MEX files.
  **/
 
 /* AUTORIGHTS
@@ -27,6 +25,20 @@ General Public License version 2.
 typedef int mwSize ;
 typedef int mwIndex ;
 #endif
+
+/** @file mexutils.h 
+
+This header file provides utility function that help writing MATLAB
+MEX files.
+
+@subsection mexutils-plain-matrix
+
+- It is numeric.
+- It has DOUBLE storage class.
+- It has only a real component.
+- It is full.
+
+ **/
 
 /** ------------------------------------------------------------------
  ** @brief Let VLFeat use MATLAB memory allocation/logging facilities
@@ -73,7 +85,7 @@ uCreateNumericArray (mwSize ndim, const mwSize * dims,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Create array with pre-allocated data
+ ** @brief Create an array with pre-allocated data
  **
  ** @param M       number of rows.
  ** @param N       number of columns.
@@ -105,7 +117,7 @@ uCreateNumericMatrix (int M, int N, mxClassID classid, void * data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Create scalar
+ ** @brief Create a plain scalar
  **
  ** @param x inital value.
  **
@@ -138,6 +150,60 @@ uIsScalar(const mxArray* A)
   return 
     mxIsNumeric (A) && mxGetNumberOfElements(A) == 1 ;
 }
+
+/** ------------------------------------------------------------------
+ ** @brief Is the array plain matrix?
+ **
+ ** @param A array to test.
+ ** @param M number of rows.
+ ** @param N number of columns.
+ **
+ ** The array @a A satisfies the test if:
+ **
+ ** - It is a @ref mexutils-plain-matrix "plain matrix"
+ ** - @a M < 0 or the number of rows is equal to @a M.
+ ** - @a N < 0 or the number of columns is equal to @a N.
+ **
+ ** @return test result.
+ **/
+
+static vl_bool 
+uIsPlainArray (const mxArray* A)
+{
+  return
+    mxGetClassID(A) == mxDOUBLE_CLASS &&
+    ! mxIsComplex(A) &&
+    ! mxIsSparse(A) ;
+}
+
+static vl_bool 
+uIsPlainMatrix (const mxArray* A, int M, int N)
+{
+  return
+    uIsPlainArray(A) &&
+    mxGetNumberOfDimensions(A) == 2 &&
+    (M < 0 || mxGetM(A) == M) &&
+    (N < 0 || mxGetN(A) == N) ;   
+}
+
+static vl_bool 
+uIsPlainVector (const mxArray* A, int M)
+{
+  return
+    uIsPlainArray(A) &&
+    mxGetNumberOfDimensions(A) == 2 &&
+    (mxGetM(A) == 1 || mxGetN(A) == 1) &&
+    (M < 0 || (mxGetM(A) == M || mxGetN(A) == M)) ;
+}
+
+static vl_bool 
+uIsPlainScalar (const mxArray* A)
+{
+  return
+    uIsPlainArray(A) &&
+    mxGetNumberOfElements(A) == 1 ;
+}
+
 
 /** ------------------------------------------------------------------
  ** @brief Is the array a numeric matrix?
@@ -203,7 +269,7 @@ uIsReal (const mxArray* A)
 {
   return 
     mxIsDouble(A) && 
-    !mxIsComplex(A) ;
+    ! mxIsComplex(A) ;
 }
 
 /** ------------------------------------------------------------------

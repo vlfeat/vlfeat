@@ -31,13 +31,14 @@ mexFunction(int nout, mxArray *out[],
   double *IDX ;
   
   if( nin != 2 ) {
-    mexErrMsgTxt("Two arguments required.") ;
+    mexErrMsgTxt("Exactly two arguments are required.") ;
   }
   
-  if(! uIsReal(in[IN_B]) ||
-     ! uIsReal(in[IN_X]))
-    mexErrMsgTxt("All arguments must be real.") ;
-  
+  if(! uIsPlainArray(in[IN_B]) ||
+     ! uIsPlainArray(in[IN_X])) {
+    mexErrMsgTxt("All arguments must be plain arrays.") ;
+  }
+    
   NX = mxGetNumberOfElements(in[IN_X]) ;
   NB = mxGetNumberOfElements(in[IN_B]) ;
 
