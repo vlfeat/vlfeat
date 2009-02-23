@@ -354,6 +354,9 @@ finding bugs in old versions of this program.
 #define EXPN_MAX 25.0         /**< ::fast_expn table max  @internal */
 double expn_tab [EXPN_SZ+1] ; /**< ::fast_expn table      @internal */
 
+#define NBO 8
+#define NBP 4
+
 #define log2(x) (log(x)/VL_LOG_OF_2)
 
 /** ------------------------------------------------------------------
@@ -372,7 +375,9 @@ fast_expn (double x)
 {
   double a,b,r ;
   int i ;
-  assert(0 <= x && x <= EXPN_MAX) ;
+  /*assert(0 <= x && x <= EXPN_MAX) ;*/
+
+  if (x > EXPN_MAX) return 0.0 ;
 
   x *= EXPN_SZ / EXPN_MAX ;
   i = vl_floor_d (x) ;
@@ -543,6 +548,7 @@ vl_sift_new (int width, int height,
   f-> edge_thresh = 10.0 ;
   f-> norm_thresh = 0.0 ;
   f-> magnif      = 3.0 ;
+  f-> windowSize  = NBP / 2 ;
 
   f-> grad_o  = o_min - 1 ;
 
@@ -1378,8 +1384,6 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
                              double angle0)
 {
   double const magnif = f-> magnif ;
-  int const    NBO    = 8 ;
-  int const    NBP    = 4 ;
 
   int          w      = width ;
   int          h      = height ;
@@ -1451,7 +1455,7 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
        * has a standard deviation equal to NBP/2. Note that dx and dy
        * are in the normalized frame, so that -NBP/2 <= dx <=
        * NBP/2. */
-      vl_sift_pix const wsigma = NBP/2 ;
+      vl_sift_pix const wsigma = f->windowSize ;
       vl_sift_pix win = fast_expn 
         ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
       
@@ -1559,8 +1563,6 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   */      
   
   double const magnif      = f-> magnif ;
-  int const    NBO         = 8 ;
-  int const    NBP         = 4 ;
 
   double       xper        = pow (2.0, f->o_cur) ;
 
@@ -1647,7 +1649,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
        * has a standard deviation equal to NBP/2. Note that dx and dy
        * are in the normalized frame, so that -NBP/2 <= dx <=
        * NBP/2. */
-      vl_sift_pix const wsigma = NBP/2 ;
+      vl_sift_pix const wsigma = f->windowSize ;
       vl_sift_pix win = fast_expn 
         ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
       

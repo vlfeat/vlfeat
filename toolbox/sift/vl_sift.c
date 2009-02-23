@@ -21,6 +21,7 @@ enum {
   opt_peak_thresh,
   opt_norm_thresh,
   opt_magnif,
+  opt_window_size,
   opt_orientations,
   opt_verbose 
 } ;
@@ -35,6 +36,7 @@ uMexOption options [] = {
   {"EdgeThresh",   1,   opt_edge_thresh   },
   {"NormThresh",   1,   opt_norm_thresh   },
   {"Magnif",       1,   opt_magnif        },
+  {"WindowSize",   1,   opt_window_size   },
   {"Orientations", 0,   opt_orientations  },
   {"Verbose",      0,   opt_verbose       },
   {0,              0,   0                 }
@@ -140,6 +142,7 @@ mexFunction(int nout, mxArray *out[],
   double             peak_thresh = -1 ;
   double             norm_thresh = -1 ;
   double             magnif      = -1 ;
+  double             window_size = -1 ;
 
   mxArray           *ikeys_array = 0 ;
   double            *ikeys = 0 ;
@@ -217,6 +220,12 @@ mexFunction(int nout, mxArray *out[],
       }
       break ;
 
+    case opt_window_size :
+      if (!uIsRealScalar(optarg) || (window_size = *mxGetPr(optarg)) < 0) {
+        mexErrMsgTxt("'WindowSize' must be a non-negative real.") ;
+      }
+      break ;
+
     case opt_frames :
       if (!uIsRealMatrix(optarg, 4, -1)) {
         mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
@@ -256,6 +265,7 @@ mexFunction(int nout, mxArray *out[],
     if (edge_thresh >= 0) vl_sift_set_edge_thresh (filt, edge_thresh) ;
     if (norm_thresh >= 0) vl_sift_set_norm_thresh (filt, norm_thresh) ;
     if (magnif      >= 0) vl_sift_set_magnif      (filt, magnif) ;
+    if (window_size >= 0) vl_sift_set_window_size (filt, window_size) ;
     
     if (verbose) {    
       mexPrintf("siftmx: filter settings:\n") ;
@@ -271,8 +281,8 @@ mexFunction(int nout, mxArray *out[],
                 vl_sift_get_peak_thresh   (filt)) ;
       mexPrintf("siftmx:   norm thresh           = %g\n",
                 vl_sift_get_norm_thresh   (filt)) ;
-      mexPrintf("siftmx:   magnif                = %g\n",
-                vl_sift_get_magnif        (filt)) ;
+      mexPrintf("siftmx:   window size           = %g\n",
+                vl_sift_get_window_size   (filt)) ;
 
       mexPrintf((nikeys >= 0) ? 
                 "siftmx: will source frames? yes (%d read)\n" :
