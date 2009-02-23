@@ -1,85 +1,84 @@
-<p>We exemplify linking <B>VLFeat</b> to an Apple X-Code project.  For
-the sake of simplicty, we are going to create a command line tool
-written in C. However these steps apply with minor modifications to
-other project types.</p>
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<p>First, let us create a new project
-called <code>vlfeat-client</code>. Open X-Code and select <b>File &gt;
-New Project &gt; Command Line Utility &gt; Standard Tool</b> and
-click <b>Choose</b>. Give a name to your project (in our
-case <code>vlfeat-client</code>), and click <b>Save</b>.</p>
+<group>
+ <p>We exemplify linking <b>VLFeat</b> to an Apple X-Code project.  For
+  the sake of simplicty, we are going to create a command line tool
+  written in C. However these steps apply with minor modifications to
+  other project types.</p>
 
-<img alt="X-Code new project" src="%root;images/using-xcode-new.png"/>
+ <p>First, let us create a new project
+  called <code>vlfeat-client</code>. Open X-Code and select <b>File &gt;
+   New Project &gt; Command Line Utility &gt; Standard Tool</b> and
+  click <b>Choose</b>. Give a name to your project (in our
+  case <code>vlfeat-client</code>), and click <b>Save</b>.</p>
 
-<p>Now we need to add <b>VLFeat</b> to the C compiler include seatch
-path. To do this, select the <code>vlfeat-client</code> target and
-open the information panel (the blue button,
-or <b>Command-i</b>). Then select the <b>Build</b> panel, search for
-the field <b>Header Search Paths</b>, and add
-<b>VLFeat</b> root path (in our case this is
-just <code>~/src/vlfeat</code>).</p>
+ <img alt="X-Code new project" src="%pathto:root;images/using-xcode-new.png"/>
 
-<img alt="X-Code info" src="%root;images/using-xcode-info.png"/>
+ <p>Now we need to add <b>VLFeat</b> to the C compiler include seatch
+  path. To do this, select the <code>vlfeat-client</code> target and
+  open the information panel (the blue button,
+  or <b>Command-i</b>). Then select the <b>Build</b> panel, search for
+  the field <b>Header Search Paths</b>, and add
+  <b>VLFeat</b> root path (in our case this is
+  just <code>~/src/vlfeat</code>).</p>
 
-<p>Next, we add the <code>libvl.dylib</code> library file to the
-project resources so that X-Code links against it. To do this, drag
-and drop the <code>libvl.dylib</code> file (in our example
-<code>~/src/vlfeat/bin/maci/libvl.dylib</code>) to the left panel and click
-<b>Add</b>.</p>
+ <img alt="X-Code info" src="%pathto:root;images/using-xcode-info.png"/>
 
-<img alt="X-Code dylib" src="%root;images/using-xcode-dylib.png"/>
+ <p>Next, we add the <code>libvl.dylib</code> library file to the
+  project resources so that X-Code links against it. To do this, drag
+  and drop the <code>libvl.dylib</code> file (in our example
+  <code>~/src/vlfeat/bin/maci/libvl.dylib</code>) to the left panel and click
+  <b>Add</b>.</p>
 
-<p>Next, edit the <code>main.c</code> source file and type the following code:</p>
+ <img alt="X-Code dylib" src="%pathto:root;images/using-xcode-dylib.png"/>
 
-<pre>
-#include &lt;vl/generic.h&gt;
+ <p>Next, edit the <code>main.c</code> source file and type the following code:</p>
 
-int main (int argc, const char * argv[]) {
+ <pre>
+  #include &lt;vl/generic.h&gt;
+
+  int main (int argc, const char * argv[]) {
   VL_PRINT ("Hellow, World!") ;
   return 0;
-}
-</pre>
+  }
+ </pre>
 
-<img alt="X-Code edit" src="%root;images/using-xcode-edit.png"/>
+ <img alt="X-Code edit" src="%pathto:root;images/using-xcode-edit.png"/>
 
-<p>If you try to build the project, it should compile without erros
-(if you are using C++, do not forget to wrap the <code>include</code>
-statements in a <code>extern "C" {}</code> block). However, if you try
-to run the program, it will fail, complaining that it cannot find the
-library image.</p>
+ <p>If you try to build the project, it should compile without erros
+  (if you are using C++, do not forget to wrap the <code>include</code>
+  statements in a <code>extern "C" {}</code> block). However, if you try
+  to run the program, it will fail, complaining that it cannot find the
+  library image.</p>
 
-<img alt="X-Code error" src="%root;images/using-xcode-err.png"/>
+ <img alt="X-Code error" src="%pathto:root;images/using-xcode-err.png"/>
 
-<p>The reason is that <code>libvl.dylib</code> is compiled with the
-library <code>install_name</code> equal
-to <code>@loader_path/libvl.dylib</code>. This causes the run-time
-loader to look for the library in the same directory of the
-exectuable. There are two ways around this problem: The first is to
-install the library in a standard location
-(e.g. <code>/usr/local/lib</code>) and use the <code>otool</code>
-command to change accordingly the
-library <code>install_name</code>. The other is to simply copy
-the <code>libvl.dylib</code> file in the executable directory. Here we
-demonstrate the second technique.</p>
+ <p>The reason is that <code>libvl.dylib</code> is compiled with the
+  library <code>install_name</code> equal
+  to <code>@loader_path/libvl.dylib</code>. This causes the run-time
+  loader to look for the library in the same directory of the
+  exectuable. There are two ways around this problem: The first is to
+  install the library in a standard location
+  (e.g. <code>/usr/local/lib</code>) and use the <code>otool</code>
+  command to change accordingly the
+  library <code>install_name</code>. The other is to simply copy
+  the <code>libvl.dylib</code> file in the executable directory. Here we
+  demonstrate the second technique.</p>
 
-<p>To copy <code>libvl.dylib</code> in the executable directory, we
-add a <b>Copy Files</b> build phase to the project. Right-click
-the <code>vlfeat-client</code> target in the project panel and select
-<b>Add &gt; New Build Phase &gt; New Copy Files Build
-Phase</b>. Select <b>Destination: Executables</b>. Then drag-and-drop
-the <code>libvl.dylib</code> item from the panel to the <b>Copy
-Files</b> build phase.</p>
+ <p>To copy <code>libvl.dylib</code> in the executable directory, we
+  add a <b>Copy Files</b> build phase to the project. Right-click
+  the <code>vlfeat-client</code> target in the project panel and select
+  <b>Add &gt; New Build Phase &gt; New Copy Files Build
+   Phase</b>. Select <b>Destination: Executables</b>. Then drag-and-drop
+  the <code>libvl.dylib</code> item from the panel to the <b>Copy
+   Files</b> build phase.</p>
 
-<img alt="X-Code copy" src="%root;images/using-xcode-copy.png"/>
-<img alt="X-Code copy" src="%root;images/using-xcode-copy-2.png"/>
+ <img alt="X-Code copy" src="%pathto:root;images/using-xcode-copy.png"/>
+ <img alt="X-Code copy" src="%pathto:root;images/using-xcode-copy-2.png"/>
 
-<p>Now build again the project, and run it. It should run correctly,
-and if you open the debugger console you should see this:</p>
+ <p>Now build again the project, and run it. It should run correctly,
+  and if you open the debugger console you should see this:</p>
 
-<img alt="X-Code copy" src="%root;images/using-xcode-ok.png"/>
+ <img alt="X-Code copy" src="%pathto:root;images/using-xcode-ok.png"/>
 
-
-
-
-
-
+</group>

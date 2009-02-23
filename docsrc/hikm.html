@@ -1,3 +1,7 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
 <p><b>VLFeat</b> offers a hierarchical version of integer k-means, which
 recursively apply \cmd{ikmeans} to compute finer and finer partitions.
 We demonstrates this by:</p>
@@ -14,14 +18,14 @@ AT       = vl_hikmeanspush(tree,datat) ;
 <p>Here <code>nleaves</code> is the desired number of leaf
 clusters. This is obtained by subdividing recursively each cluster in
 k sub-clusters. Therefore <code>depth = floor(log(K nleaves))</code>
-recursive subdivisions are sufficient and the algorithm terminates with
-clusters arranged in a k-tree of of depth
+recursive subdivisions are sufficient and the algorithm terminates
+with clusters arranged in a k-tree of of depth
 <code>depth</code> which has at least <code>nleaves</code> leaves (but
 it may have more).</p>
 
 <div class="figure">
-<image src="%root;demo/hikmeans-tree.jpg"/>
-<image src="%root;demo/hikmeans-clusters.jpg"/>
+<image src="%pathto:root;demo/hikmeans-tree.jpg"/>
+<image src="%pathto:root;demo/hikmeans-clusters.jpg"/>
 <div class="caption"><b>Hierarchical integer K-means.</b>  Left: A
 depiction of the recursive clusters. Each node is a cluster
 center. The root note is not depicted (its center would be the mean of
@@ -31,7 +35,7 @@ used).</div>
 </div>
 
 <p>The output <code>tree</code> is a MATLAB structure representing the tree of
-clusters:<p>
+clusters:</p>
 
 <pre>
 > tree
@@ -69,3 +73,5 @@ ans =
     centers: [2x3 int32]
         sub: []
 </pre>
+
+</group>

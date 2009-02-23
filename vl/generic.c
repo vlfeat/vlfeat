@@ -17,17 +17,17 @@ General Public License version 2.
  @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
  
- @par Copyright &copy; 2007-08 Andrea Vedaldi and Brian Fulkerson
+ @par Copyright &copy; 2007-09 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
  vision algorithms, with a special focus on visual features for
- matching image regions. Applications include structure from motion and
- object and category detection and recognition.
+ matching image regions. Applications include structure from motion
+ and object and category detection and recognition.
 
- The library is accurate and easy to use, understand and modify. In
- order to maximize simplicity, the library is free of clutter and
- different algorithms are only weakly dependent. The code is portable
- (largely C-89 compatible) and embeds extensive documentation.</em>
+ We strive to make the library free of clutter, portable (VLFeat is
+ largely C-89 compatible), and self- documented. Different parts of
+ the library are weakly interdependent, simplifying understanding and
+ extraction of code.</em>
 
  @section main-contents Contents
 

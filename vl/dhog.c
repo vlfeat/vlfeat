@@ -376,7 +376,7 @@ _vl_dhog_alloc_buffers (VlDhogFilter* self)
       
       self->frames = vl_malloc(sizeof(VlDhogKeypoint) * numFrameAlloc) ;
       self->descrs = vl_malloc(sizeof(float) * numBinAlloc * numFrameAlloc) ;
-      self->grads = vl_malloc(sizeof(float*) * numGradAlloc) ;
+      self->grads  = vl_malloc(sizeof(float*) * numGradAlloc) ;
       for (t = 0 ; t < numGradAlloc ; ++t) {
         self->grads[t] = 
           vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
@@ -631,11 +631,12 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
             sizeof(float) * self->imWidth * self->imHeight) ;
   
 #undef at
-#define at(u,v) (im[(v)*self->imWidth+(u)])
-  
-  /*  */
-  for (y = 0 ; y < self->imHeight ; ++y) {
-    for (x = 0 ; x < self->imWidth ; ++x) {      
+#define at(x,y) (im[(y)*self->imWidth+(x)])
+
+  /* Compute gradients, their norm, and their angle */
+
+  for (y = 0 ; y < self->imHeight ; ++ y) {
+    for (x = 0 ; x < self->imWidth ; ++ x) {      
       float gx, gy ;
       float angle, mod, nt, rbint ;
       int bint ;
@@ -666,7 +667,7 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
       nt = vl_mod_2pi_f (angle) * (self->geom.numBinT / (2*VL_PI)) ;
       bint = vl_floor_f (nt) ;
       rbint = nt - bint ;
-      
+
       /* write it back */
       self->grads [(bint    ) % self->geom.numBinT][x + y * self->imWidth] = (1 - rbint) * mod ;
       self->grads [(bint + 1) % self->geom.numBinT][x + y * self->imWidth] = (    rbint) * mod ;

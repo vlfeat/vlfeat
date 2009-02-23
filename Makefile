@@ -85,8 +85,8 @@
 # == ABOUT DEBUGGING ==
 #
 # We use the older STABS+ debug format as MATLAB MEX command has buggy
-# support for DWARD-2. In particular, compiling a MEX file produces a DLL,
-# but removes the intermediate  object files, where DWARF-2 stores
+# support for DWARD-2. In particular, compiling a MEX file produces a
+# DLL, but removes the intermediate object files, where DWARF-2 stores
 # the actual debugging information. Since MEX uses the default
 # debugging format (-g option) and this corresponds often to DWARF-2,
 # this should be considered a bug.
@@ -114,6 +114,25 @@ HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 NDEBUG ?= YES
 VERB   ?= NO
 
+# programs required to build VLFeat
+CC         ?= cc
+MATLABEXE  ?= matlab
+MEX        ?= mex
+LIBTOOL    ?= libtool
+
+# programs required to build VLFeat documentation
+CONVERT    ?= convert
+DOXYGEN    ?= doxygen
+DVIPNG     ?= dvipng
+DVIPS      ?= dvips
+EPSTOPDF   ?= epstopdf
+FIG2DEV    ?= fig2dev
+LATEX      ?= latex
+PYTHON     ?= python
+
+# programs required to build VLFeat distribution
+GIT        ?= git
+
 .PHONY : all
 all : dll all-bin
 
@@ -131,7 +150,7 @@ err_internal  =$(shell echo Internal error)
 err_internal +=internal
 
 # --------------------------------------------------------------------
-#                                             Auto-detect Architecture
+#                                     Auto-detect Architecture, MATLAB
 # --------------------------------------------------------------------
 
 Darwin_PPC_ARCH             := mac
@@ -149,6 +168,9 @@ ARCH  := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 ifeq ($(ARCH),)
 die:=$(error $(err_no_arch))
 endif
+
+MATLABPATH := $(strip $(shell $(MEX) -v 2>&1 |                       \
+                sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 # --------------------------------------------------------------------
 #                                                            Functions
@@ -207,20 +229,6 @@ ifneq ($(VERB),NO)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
 endif
 
-CC              ?= cc
-CONVERT         ?= convert
-DOXYGEN         ?= doxygen
-DVIPNG          ?= dvipng
-DVIPS           ?= dvips
-EPSTOPDF        ?= epstopdf
-FIG2DEV         ?= fig2dev
-GIT             ?= git
-LATEX           ?= latex
-LIBTOOL         ?= libtool
-MATLABEXE       ?= matlab
-MEX             ?= mex
-PYTHON          ?= python
-
 CFLAGS          += -I$(CURDIR) -pedantic -std=c89 -O3
 CFLAGS          += -Wall -Wno-unused-function -Wno-long-long
 CFLAGS          += $(if $(DEBUG), -O0 -g)
@@ -232,8 +240,6 @@ DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 MEX_FLAGS        = $(if $(DEBUG), -g)
 MEX_CFLAGS       = $(CFLAGS) -Itoolbox
 MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
-MATLABPATH      := $(strip $(shell $(MEX) -v 2>&1 |                  \
-                   sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 ifdef MATLABPATH
 all: all-mex
@@ -436,12 +442,20 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
+	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"       \
+	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" 
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
 	       $< -outdir $(dir $(@))
+
+# --------------------------------------------------------------------
+#                                          Prefix-less M and MEX files
+# --------------------------------------------------------------------
+# Populate the directory toolbox/noprefix with links to the MEX / M
+# files without the vl_ prefix.
 
 m_src := $(shell find toolbox -name "vl_*.m")
 m_lnk := $(addprefix toolbox/noprefix/,                              \
@@ -456,9 +470,6 @@ m_lnk := $(addprefix toolbox/noprefix/,                              \
 m_lnk += $(addprefix toolbox/noprefix/,                              \
 	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
 
-$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX) : $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
-	ln -s "../../$<" "$@"
-
 toolbox/noprefix/%.m : vl_%.m
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
 	echo "function varargout = $*(varargin)" > "$@" ;            \
@@ -468,137 +479,6 @@ toolbox/noprefix/%.m : vl_%.m
 
 .PHONY: noprefix
 noprefix: $(noprefix-dir) $(m_lnk)
-
-# --------------------------------------------------------------------
-#                                                  Build documentation
-# --------------------------------------------------------------------
-
-.PHONY: doc, doc-figures, doc-api, doc-toolbox
-.PHONY: doc-web, doc-demo
-.PHONY: doc-bindist, doc-distclean
-.PHONY: autorights
-
-fig_src  := $(wildcard docsrc/figures/*.fig)
-demo_src := $(wildcard doc/demo/*.eps)
-html_src := $(wildcard docsrc/*.html)
-
-pdf_tgt := #$(fig_src:.fig=.pdf) 
-eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
-png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
-jpg_tgt := $(demo_src:.eps=.jpg)
-img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
-
-VERSION: Makefile
-	echo "$(VER) (Generated on `date`)" > VERSION
-
-doc: doc-api doc-web
-doc-api: doc/api/index.html
-doc-web: doc/index.html
-doc-toolbox: doc/toolbox-src/mdoc.html
-
-doc-deep: all $(doc-dir) $(results-dir)
-	cd toolbox ; \
-	$(MATLABEXE) -nojvm -nodesktop -r 'vlfeat_setup;vlfeat_demo;exit'
-
-#
-# Use webdoc.py to generate the website
-#
-
-doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
- docsrc/web.xml docsrc/web.css docsrc/webdoc.py $(img_tgt)
-	$(PYTHON) docsrc/webdoc.py --outdir=doc \
-	     docsrc/web.xml --verbose
-	rsync -arv docsrc/images doc
-
-#
-# Use mdoc.py to create the toolbox documentation that will be
-# embedded in the website.
-#
-
-doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
-	          --format=web \
-	          --exclude='noprefix/.*' \
-	          --exclude='.*/vl_test_.*' \
-	          --exclude='.*/vl_demo_.*' \
-	          --verbose
-#
-# Generate the customized API documentation
-#
-
-doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
-	cat doc/api/api.html | \
-	sed -n '/<!-- Doc Here -->/q;p'  > doc/doxygen_header.html
-	cat doc/api/api.html | \
-	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
-
-doc/api/index.html: docsrc/doxygen.conf VERSION                      \
-  $(dll_src) $(dll_hdr) $(img_tgt)                                   \
-  doc/doxygen_header.html doc/doxygen_footer.html
-	$(call C,DOXYGEN) $<
-
-#
-# Convert figure formats
-#
-
-doc/figures/%.png : doc/figures/%.dvi
-	$(call C,DVIPNG) -D 75 -T tight -o $@ $<
-
-doc/figures/%.eps : doc/figures/%.dvi
-	$(call C,DVIPS) -E -o $@ $<
-
-doc/figures/%-raw.tex : docsrc/figures/%.fig
-	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@ 
-
-doc/figures/%-raw.ps : docsrc/figures/%.fig
-	$(call C,FIG2DEV) -L pstex $< $@
-
-doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :              \
-  doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
-	$(LATEX) -output-directory=$(dir $@) $<
-
-doc/figures/%.tex : $(doc-dir)
-	@$(print-command GEN, $@)
-	@/bin/echo '\documentclass[landscape]{article}' >$@
-	@/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
-	@/bin/echo '\usepackage{graphicx,color}'       >>$@
-	@/bin/echo '\begin{document}'                  >>$@
-	@/bin/echo '\pagestyle{empty}'                 >>$@
-	@/bin/echo '\input{doc/figures/$(*)-raw.tex}'  >>$@
-	@/bin/echo '\end{document}'	               >>$@
-
-doc/demo/%.jpg : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% jpg:$@
-
-doc/demo/%.png : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% png:$@
-
-doc/%.pdf : doc/%.eps
-	$(call C,EPSTOPDF) --outfile=$@ $<
-
-#
-# Other documentation related targets
-#
-
-doc-bindist: $(NAME) doc
-	rsync -arv doc $(NAME)/                                      \
-	  --exclude=doc/demo/*.eps                                   \
-	  --exclude=doc/toolbox-src*
-
-doc-distclean:
-	rm -f  docsrc/*.pyc
-	rm -rf doc
-
-autorights: distclean
-	autorights                                                   \
-	  toolbox vl                                                 \
-	  --recursive                                                \
-	  --verbose                                                  \
-	  --template doc/copylet.txt                                 \
-	  --years 2007-2008                                          \
-	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
-	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
-	  --program "VLFeat"
 
 # --------------------------------------------------------------------
 #                                                           Make clean
@@ -666,12 +546,16 @@ post-doc: doc
 	rsync -aP --exclude=*.eps doc/ $(HOST)
 
 # --------------------------------------------------------------------
-#                                               Automatic Dependencies
+#                                                             Includes
 # --------------------------------------------------------------------
 
+# Auto-deps
 ifeq ($(filter doc clean distclean info, $(MAKECMDGOALS)),)
 include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
+
+# Doc
+include Makefile.doc
 
 # --------------------------------------------------------------------
 #                                                       Debug Makefile

@@ -1,3 +1,7 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
 <p>The <b>Agglomerative Information Bottleneck (AIB)</b> algorithm
 greedily compresses discrete data by iteratively merging the two
 elements which cause the mutual information between the data and the
@@ -8,7 +12,7 @@ optimal quantization of a mixture of Gaussians. The data in this case
 is 2 dimensional:</p>
 
 <div class="figure">
-  <image src="%root;demo/aib_basic_data.jpg"/>
+  <image src="%pathto:root;demo/aib_basic_data.jpg"/>
   <div class="caption">Random data generated from a Gaussian mixture
     with three components (class labels are indicated by color).</div>
 </div>
@@ -38,9 +42,9 @@ forming a tree of merges. We can now "cut" this tree to obtain any number of
 clusters.</p>
 
 <div class="figure">
-<image src="%root;demo/aib_basic_clust_2.jpg"/>
-<image src="%root;demo/aib_basic_clust_3.jpg"/>
-<image src="%root;demo/aib_basic_clust_4.jpg"/>
+<image src="%pathto:root;demo/aib_basic_clust_2.jpg"/>
+<image src="%pathto:root;demo/aib_basic_clust_3.jpg"/>
+<image src="%pathto:root;demo/aib_basic_clust_4.jpg"/>
 <div class="caption">Three "cuts" of the merge tree, showing 10, 3, and 2
   clusters. The gray squares are nodes of the tree which did not have any data
   points which were quantized to them.</div>
@@ -48,3 +52,5 @@ clusters.</p>
 
 <p>Notice that the resulting clusters do not have to be contiguous in the
 original space.</p>
+
+</group>

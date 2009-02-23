@@ -11,7 +11,7 @@ import subprocess, signal
 from wikidoc import wikidoc
 from formatter import Formatter
 from optparse import OptionParser
-from webdoc import WebSite, readText, PageGenerator
+
 
 excludeRegexList = []
 format           = 'html' 
@@ -84,11 +84,19 @@ class MFile:
         self.next = None
         self.node = None
 
-    def getRef (self, format='html'):
+    def getId (self, format='html'):
         if format == 'html':
             return self.htmlname
         elif format == 'web':
             return self.webname
+        elif format == 'wiki':
+            return self.wikiname
+
+    def getRef (self, format='html'):
+        if format == 'html':
+            return self.htmlname
+        elif format == 'web':
+            return '%pathto:' + self.webname + ';'
         elif format == 'wiki':
             return self.wikiname
 
@@ -112,7 +120,7 @@ class Node:
         self.dirname = dirname
         self.children = []
         self.mfiles   = []
-
+        
     def addChildNode(self, node):
         "Add a child node (toolbox subdirectory) to this node"
         self.children.append(node)
@@ -125,7 +133,7 @@ class Node:
     def toIndexPage(self, format='html', depth=1):
         "Converts the node hierarchy rooted here into an index."
         page = ""
-        if format == 'html':
+        if format == 'html' or format == 'web':
             if len(self.mfiles) > 0:
                 page += "<b>%s</b>" % (self.dirname.upper())
                 page += "<ul>\n"
@@ -150,7 +158,21 @@ class Node:
     def toIndexXML(self):
         xml = ""
         for m in self.mfiles:
-            xml += "<page id='%s' src='%s' title='%s' hide='yes'/>\n" % (m.getRef('web'), m.htmlname, m.funcname)
+            dirname = m.node.dirname.upper()
+            if len(dirname) > 0:
+                xml += \
+                    "<page id='%s' name='%s' title='Matlab API: %s: %s' hide='yes'>" \
+                    "<div class='mdoc'>" \
+                    "<include src='%s'/></div></page>\n" % (m.getId('web'), m.funcname, 
+                                                            dirname, 
+                                                            m.funcname, m.htmlname)
+            else:
+                xml += \
+                    "<page id='%s' name='%s' title='Matlab API: %s' hide='yes'>" \
+                    "<div class='mdoc'>" \
+                    "<include src='%s'/></div></page>\n" % (m.getId('web'), m.funcname,
+                                                            m.funcname, m.htmlname)
+                
         for n in self.children:
             xml += n.toIndexXML() ;
         return xml
@@ -263,14 +285,15 @@ def xscan(baseDir, subDir=''):
 # --------------------------------------------------------------------
 def breadCrumb(m):
 # --------------------------------------------------------------------    
-    breadcrumb = "<div id='breadcrumb'>"
-    breadcrumb += "<ul>"
-    breadcrumb += "<li><a href='index.html'>Index</a></li>"
-    if m.prev: breadcrumb += "<li><a href='%s'>Prev</a></li>" % m.prev.htmlname
-    if m.next: breadcrumb += "<li><a href='%s'>Next</a></li>" % m.next.htmlname
+    breadcrumb = "<ul class='breadcrumb'>"
+    if format == 'web':
+        breadcrumb += "<li><a href='%pathto:mdoc;'>Index</a></li>"
+    else:
+        breadcrumb += "<li><a href='index.html'>Index</a></li>"
+    if m.prev: breadcrumb += "<li><a href='%s'>Prev</a></li>" % m.prev.getRef(format)
+    if m.next: breadcrumb += "<li><a href='%s'>Next</a></li>" % m.next.getRef(format)
     breadcrumb += "</ul>"
-    breadcrumb += "<span class='path'>%s</span>" % m.node.dirname.upper()
-    breadcrumb += "</div>"
+    #breadcrumb += "<span class='path'>%s</span>" % m.node.dirname.upper()
     
     return breadcrumb
 
@@ -298,12 +321,6 @@ if __name__ == '__main__':
     
     basedir = args[0]
     docdir  = args[1]
-    sitedir = basedir
-    if sitexml != "":
-      if verb: print "loading site", sitexml
-      site = WebSite()
-      site.load(sitexml, "../")
-      sitedir = os.path.dirname(sitexml)
 
     if not basedir.endswith('/'): basedir = basedir + "/"
     if not basedir.endswith('/'): docdir  = docdir + "/"
@@ -335,12 +352,7 @@ if __name__ == '__main__':
             prev = m            
             func = m.funcname
             mfiles[func] = m
-            if format == 'wiki':
-                linkdict[func] = m.wikiname
-            elif format == 'html':
-                linkdict[func] = m.htmlname
-            elif format == 'web' :
-                linkdict[func] = m.webname
+            linkdict[func] = m.getRef(format)
     if verb:
         print "mdoc: num mfiles: %d" % (len(mfiles))
 
@@ -378,10 +390,13 @@ if __name__ == '__main__':
 
             content = formatter.toDOM().toxml("UTF-8")
             content = content[content.find('?>')+2:]
-
+            
         # add decorations
         if not format == 'wiki':
             content = breadCrumb(m) + content
+
+        if format == 'web':
+            content = "<group>\n" + content + "</group>\n"
 
         # save the result to an html file
         if format == 'wiki':
@@ -401,12 +416,11 @@ if __name__ == '__main__':
         page += toolbox.toIndexPage('html')
     elif format == 'web':
         pagename = 'mdoc.html'
-        page += toolbox.toIndexPage('html')
+        page += '<group>\n' + toolbox.toIndexPage('web') + '</group>\n'
     elif format =='wiki' :
         pagename = 'MDoc'
         page = "== Documentation ==\n"
         page += toolbox.toIndexPage('wiki')
-
 
 
     f = open(os.path.join(docdir, pagename), 'w')
@@ -415,7 +429,7 @@ if __name__ == '__main__':
 
     if format == 'web':
         f = open(os.path.join(docdir, "mdoc.xml"), 'w')
-        f.write("<site>"+toolbox.toIndexXML()+"</site>")
+        f.write("<group>"+toolbox.toIndexXML()+"</group>\n")
         f.close()
 
     # ----------------------------------------------------------------

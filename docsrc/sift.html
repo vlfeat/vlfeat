@@ -1,213 +1,246 @@
-<p>The <em>Scale-Invariant Feature Transform (SIFT)</em> bundles a
-feature detector and a feature descriptor. The detector extracts from
-an image a number of frames (attributed regions) in a way which is
-consistent with (some) variations of the illumination, viewpoint and
-other viewing conditions. The descriptor associates to the regions a
-signature which identifies their appearance compactly and
-robustly.</p>
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<ul>
-<li><a href="tut.sift.extract">Extracting frames and descriptors</a></li>
-<li><a href="tut.sift.param">Detector parameters</a></li>
-<li><a href="tut.sift.custom">Custom frames</a></li>
-<li><a href="tut.sift.conventions">Conventions</a></li>
-</ul>
+<group>
+ 
+ <p>The <em>Scale-Invariant Feature Transform (SIFT)</em> bundles a
+  feature detector and a feature descriptor. The detector extracts
+  from an image a number of frames (attributed regions) in a way which
+  is consistent with (some) variations of the illumination, viewpoint
+  and other viewing conditions. The descriptor associates to the
+  regions a signature which identifies their appearance compactly and
+  robustly.</p>
+ 
+ <ul>
+  <li><a href="tut.sift.extract">Extracting frames and descriptors</a></li>
+  <li><a href="tut.sift.param">Detector parameters</a></li>
+  <li><a href="tut.sift.custom">Custom frames</a></li>
+  <li><a href="tut.sift.conventions">Conventions</a></li>
+ </ul>
+ 
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ <h1 id="tut.sift.extract">Extracting frames and descriptors</h1>
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ 
+ <p>Both the detector and descriptor are accessible by
+  the <code>vl_sift</code> MATLAB command (there is a similar command line
+  utility). Open MATLAB and load a test image</p>
+ 
+ <pre>
+  pfx = fullfile(vl_root,'data','a.jpg') ;
+  I = imread(pfx) ;
+  image(I) ;
+ </pre>
+ 
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_basic_0.jpg"/>
+  <div class="caption">
+   Input image.
+  </div>
+ </div>
+ 
+ <p>The <code>vl_sift</code> command requires an image in gray scale
+  format and single precision. It also expects the range to be normalized
+  in the [0,255] interval (while this is not strictly required, the
+  default values of some internal thresholds are tuned for this
+  case). The image <code>I</code> is converted in the appropriate format
+  by</p>
+ 
+ <pre>
+ I = float(rgb2gray(I)) ;
+ </pre>
+ 
+ <p>We compute the SIFT frames (keypoints) and descriptors by</p>
 
-<!-- ------------------------------------------------------------- -->
-<h1 id="tut.sift.extract">Extracting frames and descriptors</h1>
-<!-- ------------------------------------------------------------- -->
-
-<p>Both the detector and descriptor are accessible by
-the <code>vl_sift</code> MATLAB command (there is a similar command line
-utility). Open MATLAB and load a test image</p>
-<pre>
-pfx = fullfile(vl_root,'data','a.jpg') ;
-I = imread(pfx) ;
-image(I) ;
-</pre>
-<div class="figure">
-<img src="%root;demo/sift_basic_0.jpg"/>
-<div class="caption">
-Input image.
-</div>
-</div>
-<p>The <code>vl_sift</code> command requires an image in gray scale
-format and single precision. It also expects the range to be normalized
-in the [0,255] interval (while this is not strictly required, the
-default values of some internal thresholds are tuned for this
-case). The image <code>I</code> is converted in the appropriate format
-by</p>
-<pre>
-I = float(rgb2gray(I)) ;
-</pre>
-<p>We compute the SIFT frames (keypoints) and descriptors by<p>
-<pre>
+ <pre>
 [f,d] = vl_sift(I) ;
-</pre>
-<p>The matrix <code>f</code> has a column for each frame. A frame is a
-disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
-orientation <code>f(4)</code> . We visualize a random selection of 50
-features by:</p>
-<pre>
-perm = randperm(size(f,2)) ; 
-sel  = perm(1:50) ;
-h1   = vl_plotframe(f(:,sel)) ; 
-h2   = vl_plotframe(f(:,sel)) ; 
-set(h1,'color','y','linewidth',3) ;
-set(h2,'color','k','linewidth',1) ;
-</pre>
-<div class="figure">
-<img src="%root;demo/sift_basic_2.jpg"/>
-<div class="caption">
-Some of the detected SIFT frames.
-</div>
-</div>
-<p>We can also overlay the descriptors by</p>
-<pre>
-h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
-set(h3,'color','g') ;
-</pre>
-<div class="figure">
-<img src="%root;demo/sift_basic_3.jpg"/>
-<div class="caption">
-A test image for the peak threshold parameter.
-</div>
-</div>
+ </pre>
+ 
+ <p>The matrix <code>f</code> has a column for each frame. A frame is a
+  disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
+  orientation <code>f(4)</code> . We visualize a random selection of 50
+  features by:</p>
+ 
+ <pre>
+  perm = randperm(size(f,2)) ; 
+  sel  = perm(1:50) ;
+  h1   = vl_plotframe(f(:,sel)) ; 
+  h2   = vl_plotframe(f(:,sel)) ; 
+  set(h1,'color','y','linewidth',3) ;
+  set(h2,'color','k','linewidth',1) ;
+ </pre>
 
-<!-- ------------------------------------------------------------- -->
-<h1 id="tut.sift.param">Detector parameters</h1>
-<!-- ------------------------------------------------------------- -->
+ 
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_basic_2.jpg"/>
+  <div class="caption">
+   Some of the detected SIFT frames.
+  </div>
+ </div>
 
-<p>The SIFT detector is controlled mainly by two parameters: the peak
-threshold and the (non) edge threshold.</p>
+ <p>We can also overlay the descriptors by</p>
+ 
+ <pre>
+  h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
+  set(h3,'color','g') ;
+ </pre>
 
-<p>The <em>peak threshold</em> filters peaks of the DoG scale space
-that are too small (in absolute value). For instance, consider the
-test image obtained as a gradient of Gaussian blobs:</p>
-<pre>
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_basic_3.jpg"/>
+  <div class="caption">
+   A test image for the peak threshold parameter.
+  </div>
+ </div>
+ 
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ <h1 id="tut.sift.param">Detector parameters</h1>
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+ <p>The SIFT detector is controlled mainly by two parameters: the peak
+  threshold and the (non) edge threshold.</p>
+
+ <p>The <em>peak threshold</em> filters peaks of the DoG scale space
+  that are too small (in absolute value). For instance, consider the
+  test image obtained as a gradient of Gaussian blobs:</p>
+ <pre>
+  <![CDATA[
 I = double(rand(100,500) <= .005) ;
 I = (ones(100,1) * linspace(0,1,500)) .* I ;
 I(:,1) = 0 ; I(:,end) = 0 ;
 I(1,:) = 0 ; I(end,:) = 0 ;
 I = 2*pi*4^2 * vl_imsmooth(I,4)
 I = single(255 * I) ;
-</pre>
-<div class="figure">
-<img src="%root;demo/sift_peak_0.jpg/"/>
-</div>
-<p>We run the detector with peak threshold \verb$x$ by</p>
-<pre>
-f = vl_sift(I, 'PeakThresh', x) ;
-</pre>
-<p>obtaining less and less features</p>
-<div class="figure">
-<img src="%root;demo/sift_peak_1.jpg"/>
-<img src="%root;demo/sift_peak_2.jpg"/>
-<img src="%root;demo/sift_peak_3.jpg"/>
-<img src="%root;demo/sift_peak_4.jpg"/>
-<div class="caption">
-Selected frames for varying peak threshold.
-</div>
-</div>
+]]>
+ </pre>
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_peak_0.jpg/"/>
+ </div>
 
-<p> Similarly, the <em>edge threshold</em> instead eliminates peaks of
-the DoG scale space whose curvature is too small (the reason is that
-such peaks yields badly localized frames). For instance, consider the
-test image
-<pre>
+ <p>We run the detector with peak threshold \verb$x$ by</p>
+
+ <pre>
+f = vl_sift(I, 'PeakThresh', x) ;
+ </pre>
+
+ <p>obtaining less and less features</p>
+
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_peak_1.jpg"/>
+  <img src="%pathto:root;demo/sift_peak_2.jpg"/>
+  <img src="%pathto:root;demo/sift_peak_3.jpg"/>
+  <img src="%pathto:root;demo/sift_peak_4.jpg"/>
+  <div class="caption">
+   Selected frames for varying peak threshold.
+  </div>
+ </div>
+
+ <p> Similarly, the <em>edge threshold</em> instead eliminates peaks of
+  the DoG scale space whose curvature is too small (the reason is that
+  such peaks yields badly localized frames). For instance, consider the
+  test image</p>
+ 
+  <pre>
 I = zeros(100,500) ;
 for i=[10 20 30 40 50 60 70 80 90]
-  I(50-round(i/3):50+round(i/3),i*5) = 1 ;
+I(50-round(i/3):50+round(i/3),i*5) = 1 ;
 end
 I = 2*pi*8^2 * vl_imsmooth(I,8) ;
 I = single(255 * I) ;
-</pre>
-<div class="figure">
-<img src="%root;demo/sift_edge_0.jpg"/>
-<div class="caption">
-A test image for the edge threshold parameter.
-</div>
-</div>
+  </pre>
 
-<p>We run the detector with edge threshold <code>x</code> by</p>
-<pre>
-f = vl_sift(I, 'EdgeThresh', x) ;
-</pre>
-<p>obtaining more and more features:
-<div class="figure">
-<img src="%root;demo/sift_edge_1.jpg"/>
-<img src="%root;demo/sift_edge_2.jpg"/>
-<img src="%root;demo/sift_edge_3.jpg"/>
-<img src="%root;demo/sift_edge_4.jpg"/>
-<div class="caption">
-Selected frames for varying edge threshold.
-</div>
-</div>
+  <div class="figure">
+   <img src="%pathto:root;demo/sift_edge_0.jpg"/>
+   <div class="caption">
+    A test image for the edge threshold parameter.
+   </div>
+  </div>
 
-<!-- ------------------------------------------------------------- -->
-<h1 id="tut.sift.custom">Custom frames</h1>
-<!-- ------------------------------------------------------------- -->
+ <p>We run the detector with edge threshold <code>x</code> by</p>
 
-<p>The MATLAB command <code>sift</code> (and the command line utility)
-can bypass the detector and run the descriptor on custom frames by
-means of the <ode>Frames</code> option.</o>
+ <pre>
+  f = vl_sift(I, 'EdgeThresh', x) ;
+ </pre>
 
-<div class="figure">
-<img src="%root;demo/sift_or.jpg"/>
-<div class="caption">Custom frames with computed orientations.</div>
-</div>
+ <p>obtaining more and more features:</p>
+  <div class="figure">
+   <img src="%pathto:root;demo/sift_edge_1.jpg"/>
+   <img src="%pathto:root;demo/sift_edge_2.jpg"/>
+   <img src="%pathto:root;demo/sift_edge_3.jpg"/>
+   <img src="%pathto:root;demo/sift_edge_4.jpg"/>
+   <div class="caption">
+    Selected frames for varying edge threshold.
+   </div>
+  </div>
 
-<p>For instance, we can compute the descriptor of a SIFT frame centered
-at position <code>(100,100)</code>, of scale 10 and orientation
-<code>pi/8</code> by
-<pre>
-fc = [100;100;10;pi/8] ;
-[f,d] = vl_sift(I,'frames',fc) ;
-</pre>
-<p>Multiple frames <code>fc</code> an be specified as well. In this
-case they are re-ordered by increasing
-scale. Th <code>Orientations</code> option instructs the program to
-use the custom position and scale but to compute the keypoint
-orientations, as in</p>
-<pre>
-fc = [100;100;10;0] ;
-[f,d] = vl_sift(I,'frames',fc,'orientations') ;
-</pre>
-<p>Notice that, depending on the local appearance, a keypoint may
-have <em>multiple</em> orientations.  Moreover, a keypoint computed on
-a constant image region (such as one big as one pixel) has no
-orientations!</p>
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <h1 id="tut.sift.custom">Custom frames</h1>
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<!-- ------------------------------------------------------------- -->
-<h1 id="tut.sift.conventions">Conventions</h1>
-<!-- ------------------------------------------------------------- -->
+ <p>The MATLAB command <code>sift</code> (and the command line utility)
+  can bypass the detector and run the descriptor on custom frames by
+  means of the <code>Frames</code> option.</p>
 
-<p>In our implementation SIFT frames are expressed in the standard
-image reference.  The only difference between the command line and
-MATLAB drivers is that the latter assumes that the image origin
-(top-left corner) has coordinate (1,1) as opposed to (0,0). Lowe's
-original implementation uses a different reference system, illustrated 
-next:</p>
+ <div class="figure">
+  <img src="%pathto:root;demo/sift_or.jpg"/>
+  <div class="caption">Custom frames with computed orientations.</div>
+ </div>
 
-<div class="figure">
-<img src="%root;figures/sift-conv.png"/>
-<div class="caption">Our conventions (top) compared to Lowe's
-(bottom).</div>
-</div>
+ <p>For instance, we can compute the descriptor of a SIFT frame centered
+  at position <code>(100,100)</code>, of scale 10 and orientation
+  <code>pi/8</code> by</p>
+ 
+ <pre>
+  fc = [100;100;10;pi/8] ;
+  [f,d] = vl_sift(I,'frames',fc) ;
+ </pre>
+ 
+ <p>Multiple frames <code>fc</code> an be specified as well. In this
+  case they are re-ordered by increasing
+  scale. Th <code>Orientations</code> option instructs the program to
+  use the custom position and scale but to compute the keypoint
+  orientations, as in</p>
 
-<p>Our implementation uses the standard image reference system, with
-the <code>y</code> axis pointing downward. The frame
-orientation <code>&theta;</code> and descriptor use the same reference
-system (i.e. a small positive rotation of the <code>x</code> moves it
-towards the <code>y</code> axis). Recall that each descriptor element
-is a bin indexed by <code>(&theta;,x,y)</code>; the histogram is
-vectorized in such a way that <code>&theta;</code> is the fastest
-varying index and <code>y</code> the slowest.<p>
+ <pre>
+  fc = [100;100;10;0] ;
+  [f,d] = vl_sift(I,'frames',fc,'orientations') ;
+ </pre>
+ 
+ <p>Notice that, depending on the local appearance, a keypoint may
+  have <em>multiple</em> orientations.  Moreover, a keypoint computed on
+  a constant image region (such as one big as one pixel) has no
+  orientations!</p>
 
-<p>By comparison, D. Lowe's implementation (see bottom half of the
-figure) uses a slightly different convention: Frames centers are
-expressed relatively to the standard image reference system, but the
-frames orientation and the descriptor assume that the $y$ axis points
-upward. Consequently, to map from our to D. Lowe's convention, frames
-orientations need to be negated and the descriptor elements must be
-re-arranged.</p>
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ <h1 id="tut.sift.conventions">Conventions</h1>
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+ <p>In our implementation SIFT frames are expressed in the standard
+  image reference.  The only difference between the command line and
+  MATLAB drivers is that the latter assumes that the image origin
+  (top-left corner) has coordinate (1,1) as opposed to (0,0). Lowe's
+  original implementation uses a different reference system, illustrated 
+  next:</p>
+ 
+ <div class="figure">
+  <img src="%pathto:root;figures/sift-conv.png"/>
+  <div class="caption">Our conventions (top) compared to Lowe's
+   (bottom).</div>
+ </div>
+ 
+ <p>Our implementation uses the standard image reference system, with
+  the <code>y</code> axis pointing downward. The frame
+  orientation <code>&theta;</code> and descriptor use the same reference
+  system (i.e. a small positive rotation of the <code>x</code> moves it
+  towards the <code>y</code> axis). Recall that each descriptor element
+  is a bin indexed by <code>(&theta;,x,y)</code>; the histogram is
+  vectorized in such a way that <code>&theta;</code> is the fastest
+  varying index and <code>y</code> the slowest.</p>
+
+ <p>By comparison, D. Lowe's implementation (see bottom half of the
+  figure) uses a slightly different convention: Frames centers are
+  expressed relatively to the standard image reference system, but the
+  frames orientation and the descriptor assume that the <em> y </em>
+  axis points upward. Consequently, to map from our to D. Lowe's
+  convention, frames orientations need to be negated and the descriptor
+  elements must be re-arranged.</p>
+
+</group>
