@@ -522,6 +522,7 @@ dist: $(NAME)
 	tar czvf $(DIST).tar.gz $(NAME)
 
 bindist: $(NAME) all doc-bindist
+	find . -iname *.[ed][xl][el] -exec chmod a+x {} \;
 	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)/
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
