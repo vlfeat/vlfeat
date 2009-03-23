@@ -473,8 +473,8 @@ m_lnk += $(addprefix toolbox/noprefix/,                              \
 toolbox/noprefix/%.m : vl_%.m
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
 	echo "function varargout = $*(varargin)" > "$@" ;            \
-	echo "% $${upperName}  Stub function" >> "$@" ;              \
-	echo "%   See:: VL_$${upperName}()" >> "$@" ;                \
+	cat "$<" | sed -n -e '/^function/b' -e '/^%.*$$/p'           \
+             -e '/^%.*$$/b' -e q >> "$@" ;                           \
 	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ; 
 
 .PHONY: noprefix
