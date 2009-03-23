@@ -82,8 +82,8 @@ h1, h2, h3, h4, h5, h6 {
 #header {
     padding-top: 1px ;
     padding-left: 10px ;
-    padding-bottom: 5px ;
-    padding-top: 30px ;
+    padding-bottom: 10px ;
+    padding-top: 10px ;
 }
 #headbanner {   
     background-color: rgb(74,125,178) ;
