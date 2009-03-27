@@ -24,6 +24,8 @@ vl_test_imintegral ;
 
 vl_demo_aib ;
 
+vl_demo_quickshift ;
+
 rmpath(demo_path);
 rmpath(test_path);
 

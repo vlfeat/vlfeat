@@ -1,0 +1,27 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p><b>Quick Shift</b> is a mode seeking algorithm (like mean shift) which
+instead of iteratively shifting each point towards a local mean instead forms a tree of links to the nearest neighbor which increases the density.</p>
+
+<p>This demo shows Quick Shift in a simple superpixelization problem where we seek to segment this image:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/quickshift_image.jpg"/>
+  <div class="caption">The image we wish to segment</div>
+</div>
+
+<p>As a feature vector, we choose the LAB colorspace representation of the image augmented with the x,y location of the pixel. vl_quickseg is a convenient wrapper function which takes care of the transformation of the image to LAB and performs a segmentation, making our job as easy as:</p>
+
+<pre>
+Iseg = vl_quickseg(I, ratio, sigma, tau);
+</pre>
+
+<div class="figure">
+<image src="%pathto:root;demo/quickshift_qseg_1.jpg"/>
+<image src="%pathto:root;demo/quickshift_qseg_2.jpg"/>
+<div class="caption">Two segmentations of the original image with differing vaues for tau. On the left, tau = 10, the right, tau = 30.</div>
+</div>
+
+</group>
