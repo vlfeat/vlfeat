@@ -536,8 +536,9 @@ vl_aib_delete (VlAIB * aib)
     if (aib-> Pc)      vl_free (aib-> Pc);
     if (aib-> parents) vl_free (aib-> parents);
     if (aib-> costs)   vl_free (aib-> costs);
+
+    vl_free (aib) ;
   }
-  vl_free (aib) ;
 }
 
 /** ------------------------------------------------------------------
