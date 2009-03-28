@@ -32,7 +32,7 @@ Enable/specify meta output.
 Specify delta parameter.
 .TP
 .BI \-\^\-min-area \fR=\fPREAL
-Specifiy minimum region area.
+Specify minimum region area.
 .TP
 .BI \-\^\-max-area \fR=\fPREAL
 Specify maximum region area.
@@ -47,24 +47,33 @@ Specify minimum region diversity.
 .\" ------------------------------------------------------------------
 .B mser
 computes the 
-.I Maximally Stalbe Extremal Regions (MSER)
+.I Maximally Stable Extremal Regions (MSER)
 \. In the simplest case,
 .B mser 
-reads an image file (in PGM format), computes the MSERs and write them
-as a file of region seeds. Alternatively, the
+reads an image file (in PGM format), computes the MSERs, and writes
+them to a file of region seeds. Alternatively, the
 .B --frames
 option can be used to compute elliptical frames instead of region seeds.
-It is also possible to use 
+It is also possible to use
 .B --frames
 and
 .B --seeds
 in combination to save both seeds and frames.
 .
 .P
-A region seed is and index of the image pixels and is specified by a
-  non negative integer number. A frame is an oriented ellipse and is
-specified by 5 floating point numbers (in order: coordinate of the
-center
+A 
+.IR region\ seed 
+is and index pointing to one of the image pixels (pixels are
+enumerated in row major order, with 0 corresponding to the upper-left
+corner of the image). An MSER containing a given seed is the largest
+connect subset of pixels whose value is not smaller than the seed
+value.
+.
+.P
+A 
+.IR frame 
+is an ellipse approximating an MSER and is specified by 5 floating
+point numbers: coordinate of the center
 .I x
 and
 .I y,
@@ -72,15 +81,13 @@ and elements
 .IR S11 ,
 .IR S12 ,
 .IR S22
-of the co-variance matrix). 
+of the co-variance matrix. 
 .P
-.B mser
-can process multiple images and derive the names of the various output
-files by means of
-.I FILESPEC
+Both seeds and frames can be saved either in ascii or binary format, based
+on the specified 
+.IR FILESPEC s
 (see also
-.BR vlfeat (7)).
-Both seeds and frames can be saved either in ascii or binary format.
+.BR vlfeat (7)):
 .
 .TP
 Ascii format
@@ -92,10 +99,15 @@ frame is a list of 6 floating point numbers, one per line of text.
 Binary format
 .
 The binary format is similar to the ascii format, except that each
-seed is stored as a unsigned interger (four bytes) and each frame
+seed is stored as a unsigned integer (four bytes) and each frame
 component is stored as an IEEE double (eight bytes). The data is
 written in little endian order.
 .
+.P
+.B mser
+can process multiple images. In this case the names of the
+corresponding output files are calculated based on
+.IR FILESPEC s.
 .\" ------------------------------------------------------------------
 .SH EXAMPLES
 .\" ------------------------------------------------------------------
@@ -138,7 +150,3 @@ Robust wide baseline stereo from maximally stable extremal regions. In
 .IR "Proc. BMVC" , 
 2002.
 .
-.P
-A. Vedaldi and B. Fulkerson.
-VLFeat Library.
-.IR http://vision.ucla.edu/~vedaldi/code/vlfeat/vlfeat.html
