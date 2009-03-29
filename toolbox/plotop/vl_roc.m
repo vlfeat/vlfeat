@@ -145,7 +145,7 @@ if nargout == 0
 	cla ; hold on ;
 	plot(tn,tp,'linewidth',2) ;
 
-	if ~ opts.falsePoisitive
+	if ~ opts.falsePositive
     line(eer             * [0 1 1], ...
          eer             * [1 1 0], ...
          'color','r', 'linestyle', '--','linewidth', 1) ;
