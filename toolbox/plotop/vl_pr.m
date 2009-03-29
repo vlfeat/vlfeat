@@ -6,13 +6,13 @@ function [recall, precision, info] = vl_pr(y, scores)
 %  data by a classifier (lager scores correspond to positive
 %  guesses). 
 %
-%  Remark:: You can assign -INF score to data which is never retrieved
+%  Remark:: Assign -INF score to data which is never retrieved
 %    (this will result in maximum recall < 1).
 %
 %  RECALL and PRECISION are the recall and the precision for
 %  increasing values of the decision threshold.
 %
-%  About the VL_PR curve::
+%  About the PR curve::
 %    We use the same symbols as for the VL_ROC() function. We define the
 %    quantities
 %
