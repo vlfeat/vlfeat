@@ -1,9 +1,9 @@
-% VL_DHOG Dense Histogram of Gradients
-%   [F,D] = VL_DHOG(I) calculates the Dense Histogram of Gradients
-%   (DHOG) descriptors for the image I. I must be grayscale in SINGLE
+% VL_DHOG Dense SIFT
+%   [F,D] = VL_DSIFT(I) calculates the Dense Histogram of Gradients
+%   (DSIFT) descriptors for the image I. I must be grayscale in SINGLE
 %   format.
 %
-%   In this implementation, a DHOG descriptor is equivalent to a SIFT
+%   In this implementation, a DSIFT descriptor is equivalent to a SIFT
 %   descriptor (see VL_SIFT()). This function calculates quickly a
 %   large number of such descriptors, for a dense covering of the image
 %   with features of the same size and orientation.
@@ -13,19 +13,19 @@
 %   (for the X and Y center coordinates). The orientation is fixed to
 %   zero. The scale is related to the SIZE of the spatial bins, which
 %   by default is equal to 3 pixels (see below). If NS is the number of
-%   bins in each spatial direction (by default 4), then a DHOG keypoint
+%   bins in each spatial direction (by default 4), then a DSIFT keypoint
 %   covers a square patch of NS by SIZE pixels.
 %
 %   Remark:: The size of a SIFT bin is equal to the magnification
 %     factor MAGNIF (usually 3) by the scale of the SIFT
 %     keypoint. This means that the scale of the SIFT keypoints
-%     corresponding to the DHOG descriptors is SIZE / MAGNIF.
+%     corresponding to the DSIFT descriptors is SIZE / MAGNIF.
 %
-%   Remark:: In the literature, DHOG is often used to mean a related
+%   Remark:: In the literature, DSIFT is often used to mean a related
 %     but different descriptor by [1]. This descriptor is equivalent to
 %     SIFT instead.
 %
-%   VL_DHOG() accepts the following options:
+%   VL_DSIFT() accepts the following options:
 %
 %   Step STEP [1]::
 %     Extract a descriptor each STEP pixels.

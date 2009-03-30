@@ -1,5 +1,5 @@
 /** @internal
- ** @file     dhog.c
+ ** @file     dsift.c
  ** @author   Andrea Vedaldi
  ** @brief    Dense Feature Transform (SIFT) - MEX
  **/
@@ -8,7 +8,7 @@
 
 #include <mexutils.h>
 #include <vl/mathop.h>
-#include <vl/dhog.h>
+#include <vl/dsift.h>
 
 #include <math.h>
 #include <assert.h>
@@ -133,25 +133,25 @@ mexFunction(int nout, mxArray *out[],
   {
     int numFrames ;
     int descrSize ;
-    VlDhogKeypoint const *frames ;
-    VlDhogDescriptorGeometry const *geom ;
+    VlDsiftKeypoint const *frames ;
+    VlDsiftDescriptorGeometry const *geom ;
     float const *descrs ;
     int k, i ;
 
-    VlDhogFilter *dhog ;    
-    dhog = vl_dhog_new_basic (M, N, step, size) ; 
+    VlDsiftFilter *dsift ;    
+    dsift = vl_dsift_new_basic (M, N, step, size) ; 
     if (bounds) {
-      vl_dhog_set_bounds(dhog, 
+      vl_dsift_set_bounds(dsift, 
                          VL_MAX(bounds[0], 0),
                          VL_MAX(bounds[1], 0),
                          VL_MIN(bounds[2], M - 1),
                          VL_MIN(bounds[3], N - 1));
     }
-    vl_dhog_set_flat_window(dhog, useFlatWindow) ;
+    vl_dsift_set_flat_window(dsift, useFlatWindow) ;
     
-    numFrames = vl_dhog_get_keypoint_num (dhog) ;
-    descrSize = vl_dhog_get_descriptor_size (dhog) ;
-    geom = vl_dhog_get_geometry (dhog) ;
+    numFrames = vl_dsift_get_keypoint_num (dsift) ;
+    descrSize = vl_dsift_get_descriptor_size (dsift) ;
+    geom = vl_dsift_get_geometry (dsift) ;
     
     if (verbose) {
       int stepX ;
@@ -162,11 +162,11 @@ mexFunction(int nout, mxArray *out[],
       int maxY ;
       vl_bool useFlatWindow ;
       
-      vl_dhog_get_steps (dhog, &stepX, &stepY) ;
-      vl_dhog_get_bounds (dhog, &minX, &minY, &maxX, &maxY) ;
-      useFlatWindow = vl_dhog_get_flat_window(dhog) ;
+      vl_dsift_get_steps (dsift, &stepX, &stepY) ;
+      vl_dsift_get_bounds (dsift, &minX, &minY, &maxX, &maxY) ;
+      useFlatWindow = vl_dsift_get_flat_window(dsift) ;
       
-      mexPrintf("dhog: image size:        %d x %d\n", N, M) ;
+      mexPrintf("dsift: image size:        %d x %d\n", N, M) ;
       mexPrintf("      bounds:            [%d, %d, %d, %d]\n", minY, minX, maxY, maxX) ;
       mexPrintf("      subsampling steps: %d, %d\n", stepY, stepX) ;
       mexPrintf("      num bins:          [%d, %d, %d]\n", 
@@ -181,10 +181,10 @@ mexFunction(int nout, mxArray *out[],
       mexPrintf("      number of frames:  %d\n", numFrames) ;
     }
     
-    vl_dhog_process (dhog, data) ;
+    vl_dsift_process (dsift, data) ;
     
-    frames = vl_dhog_get_keypoints (dhog) ;
-    descrs = vl_dhog_get_descriptors (dhog) ;
+    frames = vl_dsift_get_keypoints (dsift) ;
+    descrs = vl_dsift_get_descriptors (dsift) ;
     
     /* ---------------------------------------------------------------
      *                                            Create output arrays
@@ -223,7 +223,7 @@ mexFunction(int nout, mxArray *out[],
         if (norm)
           *outFrameIter++ = frames [k].norm ;
 
-        vl_dhog_transpose_descriptor (tmpDescr, 
+        vl_dsift_transpose_descriptor (tmpDescr, 
                                       descrs + descrSize * k,
                                       geom->numBinT,
                                       geom->numBinX,
@@ -235,6 +235,6 @@ mexFunction(int nout, mxArray *out[],
       }
       vl_free(tmpDescr) ;
     }
-    vl_dhog_delete (dhog) ;
+    vl_dsift_delete (dsift) ;
   }
 }

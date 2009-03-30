@@ -1,6 +1,6 @@
-/** @file     dhog.h
- ** @author   Andrea Vedaldi
- ** @brief    Dense Feature Transform (DHOG)
+/** @file     dsift.h
+ ** #brief    Dense SIFT (DSIFT)
+ ** #author   Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -10,32 +10,32 @@
  General Public License version 2.
  */
 
-#ifndef VL_DHOG_H 
-#define VL_DHOG_H 
+#ifndef VL_DSIFT_H 
+#define VL_DSIFT_H 
 
 #include "generic.h"
 
-/** @brief DHOG keypoint */
-typedef struct VlDhogKeypoint_
+/** @brief Dense SIFT keypoint */
+typedef struct VlDsiftKeypoint_
 {
   double x ; /**< x coordinate */
   double y ; /**< y coordinate */
   double s ; /**< scale */
   double norm ; /**< norm */
-} VlDhogKeypoint ;
+} VlDsiftKeypoint ;
 
-/** @brief SIFT descriptor geometry */
-typedef struct VlDhogDescriptorGeometry_
+/** @brief Dense SIFT descriptor geometry */
+typedef struct VlDsiftDescriptorGeometry_
 {
   int numBinT ;  /**< number of orientation bins */
   int numBinX ;  /**< number of bins along X */
   int numBinY ;  /**< number of bins along Y */
   int binSizeX ; /**< size of bins along X */
   int binSizeY ; /**< size of bins along Y */
-} VlDhogDescriptorGeometry ;
+} VlDsiftDescriptorGeometry ;
 
-/** @brief DHOG filter */
-typedef struct VlDhogFilter_ 
+/** @brief Dense SIFT filter */
+typedef struct VlDsiftFilter_ 
 {  
   int imWidth ;            /**< @internal @brief image width */
   int imHeight ;           /**< @internal @brief image height */
@@ -49,13 +49,13 @@ typedef struct VlDhogFilter_
   int boundMaxY ;          /**< frame bounding box max Y */
    
   /** descriptor parameters */
-  VlDhogDescriptorGeometry geom ;
+  VlDsiftDescriptorGeometry geom ;
 
   int useFlatWindow ;      /**< flag: whether to drop the Gaussian window */
 
   int numFrames ;          /**< number of sampled frames */
   int descrSize ;          /**< size of a descriptor */
-  VlDhogKeypoint *frames ; /**< frame buffer */
+  VlDsiftKeypoint *frames ; /**< frame buffer */
   float *descrs ;          /**< descriptor buffer */
 
   int numBinAlloc ;        /**< buffer allocated: descriptor size */
@@ -65,13 +65,13 @@ typedef struct VlDhogFilter_
   float **grads ;          /**< gradient bufffer */
   float *convTmp1 ;        /**< temporary buffer */
   float *convTmp2 ;        /**< temporary buffer */
-}  VlDhogFilter ;
+}  VlDsiftFilter ;
 
-VL_EXPORT VlDhogFilter *vl_dhog_new (int width, int height) ;
-VL_EXPORT VlDhogFilter *vl_dhog_new_basic (int width, int height, int step, int binSize) ;
-VL_EXPORT void vl_dhog_delete (VlDhogFilter *self) ;
-VL_EXPORT void vl_dhog_process (VlDhogFilter *self, float const* im) ;
-VL_INLINE void vl_dhog_transpose_descriptor (float* dst, 
+VL_EXPORT VlDsiftFilter *vl_dsift_new (int width, int height) ;
+VL_EXPORT VlDsiftFilter *vl_dsift_new_basic (int width, int height, int step, int binSize) ;
+VL_EXPORT void vl_dsift_delete (VlDsiftFilter *self) ;
+VL_EXPORT void vl_dsift_process (VlDsiftFilter *self, float const* im) ;
+VL_INLINE void vl_dsift_transpose_descriptor (float* dst, 
                                              float const* src,                                             
                                              int numBinT,
                                              int numBinX,
@@ -80,90 +80,90 @@ VL_INLINE void vl_dhog_transpose_descriptor (float* dst,
 /** @name Setting parameters
  ** @{
  **/
-VL_INLINE void vl_dhog_set_steps (VlDhogFilter *self,
+VL_INLINE void vl_dsift_set_steps (VlDsiftFilter *self,
                                   int stepX,
                                   int stepY) ;
-VL_INLINE void vl_dhog_set_bounds (VlDhogFilter *self,
+VL_INLINE void vl_dsift_set_bounds (VlDsiftFilter *self,
                                    int minX,
                                    int minY,
                                    int maxX,
                                    int maxY) ;
-VL_INLINE void vl_dhog_set_geometry (VlDhogFilter *self,
-                                     VlDhogDescriptorGeometry const* geom) ;
-VL_INLINE void vl_dhog_set_flat_window (VlDhogFilter *self, vl_bool flatWindow) ;
+VL_INLINE void vl_dsift_set_geometry (VlDsiftFilter *self,
+                                     VlDsiftDescriptorGeometry const* geom) ;
+VL_INLINE void vl_dsift_set_flat_window (VlDsiftFilter *self, vl_bool flatWindow) ;
 /** @} */
 
 /** @name Retrieving data and parameters
  ** @{
  **/
-VL_INLINE float const    *vl_dhog_get_descriptors     (VlDhogFilter const *self) ;
-VL_INLINE int             vl_dhog_get_descriptor_size (VlDhogFilter const *self) ;
-VL_INLINE int             vl_dhog_get_keypoint_num    (VlDhogFilter const *self) ;
-VL_INLINE VlDhogKeypoint const *vl_dhog_get_keypoints (VlDhogFilter const *self) ;
-VL_INLINE void            vl_dhog_get_bounds          (VlDhogFilter const *self,
+VL_INLINE float const    *vl_dsift_get_descriptors     (VlDsiftFilter const *self) ;
+VL_INLINE int             vl_dsift_get_descriptor_size (VlDsiftFilter const *self) ;
+VL_INLINE int             vl_dsift_get_keypoint_num    (VlDsiftFilter const *self) ;
+VL_INLINE VlDsiftKeypoint const *vl_dsift_get_keypoints (VlDsiftFilter const *self) ;
+VL_INLINE void            vl_dsift_get_bounds          (VlDsiftFilter const *self,
                                                        int* minX,
                                                        int* minY,
                                                        int* maxX,
                                                        int* maxY) ;
-VL_INLINE void            vl_dhog_get_steps           (VlDhogFilter const*self, 
+VL_INLINE void            vl_dsift_get_steps           (VlDsiftFilter const*self, 
                                                        int* stepX, 
                                                        int* stepY) ;
-VL_INLINE VlDhogDescriptorGeometry const* vl_dhog_get_geometry (VlDhogFilter const *self) ;
-VL_INLINE vl_bool         vl_dhog_get_flat_window     (VlDhogFilter const *self) ;
+VL_INLINE VlDsiftDescriptorGeometry const* vl_dsift_get_geometry (VlDsiftFilter const *self) ;
+VL_INLINE vl_bool         vl_dsift_get_flat_window     (VlDsiftFilter const *self) ;
 /** @} */
 
 VL_EXPORT
-void _vl_dhog_update_buffers (VlDhogFilter *self) ;
+void _vl_dsift_update_buffers (VlDsiftFilter *self) ;
 
 /** ------------------------------------------------------------------
  ** @brief Get descriptor size.
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @return size of a descriptor.
  **/
 
 int
-vl_dhog_get_descriptor_size (VlDhogFilter const *self) 
+vl_dsift_get_descriptor_size (VlDsiftFilter const *self) 
 {
   return self->descrSize ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get descriptors.
- ** @param f DHOG filter.
+ ** @param f DSIFT filter.
  ** @return descriptors.
  **/
 
 float const *
-vl_dhog_get_descriptors (VlDhogFilter const *self)
+vl_dsift_get_descriptors (VlDsiftFilter const *self)
 {
   return self->descrs ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get keypoints
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  **/
 
-VlDhogKeypoint const *
-vl_dhog_get_keypoints (VlDhogFilter const *self)
+VlDsiftKeypoint const *
+vl_dsift_get_keypoints (VlDsiftFilter const *self)
 {
   return self->frames ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get number of keypoints
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  **/
 
 int
-vl_dhog_get_keypoint_num (VlDhogFilter const *self)
+vl_dsift_get_keypoint_num (VlDsiftFilter const *self)
 {
   return self->numFrames ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get SIFT descriptor geometry
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param numBinT
  ** @param numBinX
  ** @parma numBinY
@@ -171,14 +171,14 @@ vl_dhog_get_keypoint_num (VlDhogFilter const *self)
  ** @param binSizeY
  **/
 
-VlDhogDescriptorGeometry const* vl_dhog_get_geometry (VlDhogFilter const *self)
+VlDsiftDescriptorGeometry const* vl_dsift_get_geometry (VlDsiftFilter const *self)
 {
   return &self->geom ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get bounds
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param minX bounding box minimum X coordinate.
  ** @parma minY bounding box minimum Y coordinate.
  ** @param maxX bounding box maximum X coordinate.
@@ -186,7 +186,7 @@ VlDhogDescriptorGeometry const* vl_dhog_get_geometry (VlDhogFilter const *self)
  **/
 
 void
-vl_dhog_get_bounds (VlDhogFilter const* self, 
+vl_dsift_get_bounds (VlDsiftFilter const* self, 
                     int *minX, int *minY, int *maxX, int *maxY)
 {
   *minX = self->boundMinX ;
@@ -197,25 +197,25 @@ vl_dhog_get_bounds (VlDhogFilter const* self,
 
 /** ------------------------------------------------------------------
  ** @brief Get flat window flag
- ** @param self DHOG filter.
- ** @return @c TRUE if the DHOG filter uses a flat window.
+ ** @param self DSIFT filter.
+ ** @return @c TRUE if the DSIFT filter uses a flat window.
  **/
 
 int
-vl_dhog_get_flat_window (VlDhogFilter const* self)
+vl_dsift_get_flat_window (VlDsiftFilter const* self)
 {
   return self->useFlatWindow ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Get steps
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param stepX sampling step along X.
  ** @param stepY sampling step along Y.
  **/
 
 void
-vl_dhog_get_steps (VlDhogFilter const* self, 
+vl_dsift_get_steps (VlDsiftFilter const* self, 
                    int* stepX,
                    int* stepY)
 {
@@ -225,63 +225,63 @@ vl_dhog_get_steps (VlDhogFilter const* self,
 
 /** ------------------------------------------------------------------
  ** @brief Set steps
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param stepX sampling step along X.
  ** @param stepY sampling step along Y.
  **/
 
 void
-vl_dhog_set_steps (VlDhogFilter* self, 
+vl_dsift_set_steps (VlDsiftFilter* self, 
                    int stepX,
                    int stepY)
 {
   self->stepX = stepX ;
   self->stepY = stepY ;
-  _vl_dhog_update_buffers(self) ;
+  _vl_dsift_update_buffers(self) ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Set bounds
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param minX bounding box minimum X coordinate.
- ** @parma minY bounding box minimum Y coordinate.
+ ** @param minY bounding box minimum Y coordinate.
  ** @param maxX bounding box maximum X coordinate.
  ** @param maxY bounding box maximum Y coordinate.
  **/
 
 void
-vl_dhog_set_bounds (VlDhogFilter* self, 
+vl_dsift_set_bounds (VlDsiftFilter* self, 
                     int minX, int minY, int maxX, int maxY)
 {
   self->boundMinX = minX ;
   self->boundMinY = minY ;
   self->boundMaxX = maxX ;
   self->boundMaxY = maxY ;
-  _vl_dhog_update_buffers(self) ;
+  _vl_dsift_update_buffers(self) ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Set SIFT descriptor geometry
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  ** @param geom descriptor geometry parameters.
  **/
 
 void
-vl_dhog_set_geometry (VlDhogFilter *self, 
-                      VlDhogDescriptorGeometry const *geom)
+vl_dsift_set_geometry (VlDsiftFilter *self, 
+                      VlDsiftDescriptorGeometry const *geom)
 {
   self->geom = *geom ;
-  _vl_dhog_update_buffers(self) ;
+  _vl_dsift_update_buffers(self) ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Set flat window flag
- ** @param self DHOG filter.
- ** @param useFilatWindow TRUE if the DHOG filter uses a flat window.
+ ** @param self DSIFT filter.
+ ** @param useFlatWindow @c true if the DSIFT filter should use a flat window.
  **/
 
 void
-vl_dhog_set_flat_window (VlDhogFilter* self, 
+vl_dsift_set_flat_window (VlDsiftFilter* self, 
                          int useFlatWindow)
 {
   self->useFlatWindow = useFlatWindow ;
@@ -298,12 +298,12 @@ vl_dhog_set_flat_window (VlDhogFilter* self,
  **
  ** The function writes to @a dst the transpose of the SIFT descriptor
  ** @a src. Let <code>I</code> be an image. The transpose operator
- ** satisfies the equation <code>transpose(dhog(I,x,y)) =
- ** dhog(transpose(I),y,x)</code>
+ ** satisfies the equation <code>transpose(dsift(I,x,y)) =
+ ** dsift(transpose(I),y,x)</code>
  **/
 
 VL_INLINE void 
-vl_dhog_transpose_descriptor (float* dst, 
+vl_dsift_transpose_descriptor (float* dst, 
                               float const* src,
                               int numBinT,
                               int numBinX,
@@ -324,5 +324,5 @@ vl_dhog_transpose_descriptor (float* dst,
   }
 }
 
-/*  VL_DHOG_H */
+/*  VL_DSIFT_H */
 #endif

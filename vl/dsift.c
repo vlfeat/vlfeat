@@ -1,12 +1,12 @@
 /** @internal
- ** @file   dhog.c
+ ** @file   dsift.c
+ ** @brief  Dense SIFT (DSIFT) - Definition
  ** @author Andrea Vedaldi
- ** @brief  Dense Histogram of Oriented Gradients (DHOG) - Definition
  **/
 
 /* AUTORIGHTS */
 
-#include "dhog.h"
+#include "dsift.h"
 #include "pgm.h"
 #include "mathop.h"
 #include "imopv.h"
@@ -14,227 +14,225 @@
 #include <string.h>
 
 /** 
- @file dhog.h
+@file dsift.h
+@brief Dense SIFT
+@author Andrea Vedaldi
+@author Brian Fulkerson
  
- This module implements a dense version of @ref sift.h "SIFT" where
- features of fixed scale and orientation are computed on a regular
- (and dense) grid.
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dsift Dense Scale Invariant Feature Transform
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- @remark This descriptor is <em>not</em> equivalent to N. Dalal and
- B. Triggs. <em>Histograms of Oriented Gradients for Human
- Detection.</em> CVPR 2005. It is instead just a dense version of
- SIFT.
+This module implements a dense version of @ref sift.h "SIFT". This is
+an object that can quickly computes descriptor for densely sampled
+keypoints with identical size and orientation. It can be reused for
+multiple images of the same size.
  
- - @ref dhog-usage
- - @ref dhog-detector
- - @ref dhog-descriptor
+- @ref dsift-intro
+- @ref dsift-usage 
+- @ref dsift-tech
+  - @ref dsift-tech-descriptor-dense
+  - @ref dsift-tech-sampling
 
- @section dhog-usage Usage
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dsift-intro Overview
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- <p>DHOG is implemented by a filter, i.e. an object which can be
- reused to process sequentially similar images. To use the <b>DHOG
- filter</b>:</p>
+@sa @ref sift "The SIFT module", @ref dsift-tech "Technical details"
+
+This module implements a fast algorithm for the calculation of a large
+number of SIFT descriptor of densely sampled keypoints of the same
+scale and orientation. See the @ref sift "SIFT section" for an
+overview of SIFT.
+
+The keypoints are indirectly specified by the sampling steps
+(::vl_dsift_set_steps). The descriptor geometry (number and size of
+the spatial bins and number of orientation bins) can be customized
+(::vl_dsift_set_geometry).
+
+@image html dsift-geom.png "Dense SIFT descriptor geometry"
+
+By default, SIFT uses a Gaussian windowing function that discounts
+contributions of gradients farther away from the descriptor
+centers. This functions can be changed to flat by invoking
+::vl_dsift_set_flat_window (this greatly speeds-up the calculation).
+
+Keypoints are sampled in such a way that all bin centers are at
+integer coordinates within the image boundaries.
+::vl_dsift_set_bounds can be used to further restrict sampling the
+keypoints in an image subregion.
+
+@remark This descriptor is <em>not</em> equivalent to N. Dalal and
+B. Triggs. <em>Histograms of Oriented Gradients for Human
+Detection.</em> CVPR 2005. It is instead just a dense version of SIFT.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ @section dsift-usage Usage
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+DSIFT is implemented by a filter, i.e. an object which can be reused
+to process sequentially similar images. To use the <b>DSIFT filter
+object</b>:
+
+- Initialize the DSIFT filter with ::vl_dsift_new() (or the simplified
+::vl_dsift_new_basic()). Customize the descriptor parameters by
+::vl_dsift_set_steps, ::vl_dsfit_set_geometry, etc.
+- Process an image by ::vl_dsift_process().
+- Retrieve the number of keypoints (::vl_dsift_get_nkeypoint), the
+  keypoints (::vl_dsift_get_keypoints), and their descriptors
+  (::vl_dsift_get_descriptors).
+- Optionally repeat for more images.
+- Delete the DSIFT filter by ::vl_dsift_delete().
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dsift-tech Technical details
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The calculation of the SIFT descriptor is discussed in 
+the @ref sift-tech-descriptor "SIFT descriptor section"
+and this section follows that notation.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection dsift-tech-descriptor-dense Dense descriptors
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+When computing descriptors form many keypoints differing only by their
+position (and with null rotation), further simplifications are
+possible. In this case, in fact,
+
+@f{eqnarray*}
+     \mathbf{x} &=& m \sigma \hat \mathbf{x} + T,\\
+ h(t,i,j) 
+ &=& 
+ m \sigma \int 
+ g_{\sigma_\mathrm{win}}(\mathbf{x} - T)\,
+ w_\mathrm{ang}(\angle J(\mathbf{x}) - \theta_t)\,
+ w\left(\frac{x - T_x}{m\sigma} - \hat{x}_i\right)\,
+ w\left(\frac{y - T_y}{m\sigma} - \hat{y}_j\right)\,
+ |J(\mathbf{x})|\,
+ d\mathbf{x}.
+@f}
+
+Since many different values of @e T are samped, this is convenientely
+expressed as a separable convolution. First, we translate by @f$
+\mathbf{x}_{ij} = m\sigma(\hat x_i,\ \hat y_i)^\top @f$ and we use the
+symmetry of the various binning and windowing functions to write
+
+@f{eqnarray*}
+ h(t,i,j) 
+ &=& 
+ m \sigma \int 
+ g_{\sigma_\mathrm{win}}(T' - \mathbf{x} - \mathbf{x}_{ij})\,
+ w_\mathrm{ang}(\angle J(\mathbf{x}) - \theta_t)\,
+ w\left(\frac{T'_x - x}{m\sigma}\right)\,
+ w\left(\frac{T'_y - y}{m\sigma}\right)\,
+ |J(\mathbf{x})|\,
+ d\mathbf{x}, 
+\\
+T' &=& T + m\sigma
+\left[\begin{array}{cc} x_i \\ y_j \end{array}\right].
+@f}
+
+Then we define kernels
+
+@f{eqnarray*}
+ k_i(x) &=& 
+ \frac{1}{\sqrt{2\pi} \sigma_{\mathrm{win}}}
+ \exp\left(
+ -\frac{1}{2} 
+ \frac{(x-x_i)^2}{\sigma_{\mathrm{win}}^2}
+ \right)
+ w\left(\frac{x}{m\sigma}\right), 
+ \\
+ k_j(y) &=& 
+ \frac{1}{\sqrt{2\pi} \sigma_{\mathrm{win}}}
+ \exp\left(
+ -\frac{1}{2} 
+ \frac{(y-y_j)^2}{\sigma_{\mathrm{win}}^2}
+ \right)
+ w\left(\frac{y}{m\sigma}\right), 
+@f}
+
+and obtain
+
+@f{eqnarray*}
+ h(t,i,j) &=& (k_ik_j * \bar J_t)\left( T + m\sigma
+\left[\begin{array}{cc} x_i \\ y_j \end{array}\right] \right), 
+\\
+\bar J_t(\mathbf{x}) &=&  w_\mathrm{ang}(\angle J(\mathbf{x}) - \theta_t)\,|J(\mathbf{x})|.
+@f}
+
+Furthermore, if we use a flat rather than Gaussian windowing function,
+the kernels do not depend on the bin anymore, and we have
+
+@f{eqnarray*}
+ k(z) &=& 
+ \frac{1}{\sigma_{\mathrm{win}}}
+ w\left(\frac{z}{m\sigma}\right), 
+\\
+ h(t,i,j) &=& (k(x)k(y) * \bar J_t)\left( T + m\sigma
+\left[\begin{array}{cc} x_i \\ y_j \end{array}\right] \right), 
+@f}
+
+(here @f$ \sigma_\mathrm{win} @f$ is the side of the flat window). 
+
+@note In this case the binning functions @f$ k(z) @f$ are triangular
+and the convolution can be computed in time indepnedent on the filter
+(i.e. descriptor bin) support size by integral signals.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection dsift-tech-sampling Sampling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+To avoid resampling and dealing with special boundary conditions, we
+impose some mild restrictions on the geometry of the descriptors that
+can be computed. In particular, we impose that the bin centers @f$ T +
+m\sigma (x_i,\ y_j) @f$ are always at integer coordinates within the
+image boundaries, avoiding to interpolate/extraploate the iamge. 
+This condition amounts to (for the @e x coordiante, being the @e y
+coordinate analogous)
+
+@f[
+ \{0,\dots, W-1\} \ni T_x + m\sigma x_i = 
+ T_x + m\sigma i - \frac{N_x-1}{2}
+ = \bar T_x + m\sigma i,
+ \qquad i = 0,\dots,N_x-1.
+@f]
+
+Notice that for this condition to be satisied, the @em descriptor
+center @f$ T_x @f$ needs to be either fractional or integer depending
+on @f$ N_x @f$ being even or odd. To eliminate this complication,
+it is simpler to use as a reference not the descriptor center @e T,
+but the coordinates of the upper-left bin @f$ \bar T @f$. Thus we
+sample the latter on a regular (integer) grid
+
+@f[
+ \left[\begin{array}{cc}
+   0 \\
+   0
+ \end{array}\right]
+ \leq
+ \bar T = 
+ \left[\begin{array}{cc}
+   \bar T_x^{\min} + p \Delta_x \\
+   \bar T_y^{\min} + q \Delta_y \\
+ \end{array}\right]
+ \leq
+ \left[\begin{array}{cc}
+   W - 1 - m\sigma N_x \\
+   H - 1 - m\sigma N_y
+ \end{array}\right],
+ \quad
+ \bar T = 
+ \left[\begin{array}{cc}
+   T_x - \frac{N_x - 1}{2} \\
+   T_y - \frac{N_y - 1}{2} \\
+  \end{array}\right]
+@f]
+
+and we impose that the bin size @f$ m \sigma @f$ is integer as well.
  
- - Initialize the DHOG filter with ::vl_dhog_new(). The
-   filter can be reused if the image size does not change.
- - 
- - Delete the DHOG filter by ::vl_dhog_delete().
-
- To use o
-
- @section dhog-algo Algorithm
-
- The program decomposes a given image @em I(x,y) in a set of equally
- sized regions (feature frames) sampled on a regular grid and computes
- a SIFT descripor for each one of these.
- 
- @subsection dhog-algo-sift The SIFT descriptor
-
- A SIFT descriptor of an image region is an histogram of the local
- image gradients. The gradient at each pixel is regarded as a sample
- of a three-dimensional elementary feature vector, formed by the pixel
- location and the gradient orientation. Samples are weighed by the
- gradient norm and accumulated in a 3-D histogram @em h, which (up to
- normalization and clamping) forms the SIFT descriptor of the region.
-
- Formally, for each pixel location @f$ (x,y) @f$ we form the
- elementray feature vector @f$ (\angle \nabla I(x,y), x, y) @f$,
- composed of are the gradient orientation @f$ \angle \nalba I(x,y) @f$
- and of the pixel location @f$ (x, y) @f$. Each occurency of such
- vectors is weighed by the gradeint norm @f$ | I(x,y) | @f$ and
- accumulated in a three-dimensional histogram @f$ h(t,i,j) @f$ of size
- @f$ N_\theta \times N_x \times N_y @f$. Here @f$ N_\theta @f$ is the
- number of bins along the orientation dimension @$f \theta @$f and @f$
- N_x @f$ and @f$ N_y @f$ the number of bins along the @em x and @em y
- dimensions respectively (that is @f$ t \in [0, \dots, N_\theta-1]
- @f$, @f$ i \in [0, \dots, N_x-1] @f$, and @f$ j \in [0, \dots, N_y-1]
- @f$).
-
- The association of elementary gradient features to the bins of the
- histogram @f$ h(t,i,j) @f$ is given by the multilinear weight @f$
- w_\theta(\theta-\theta_t) w_x(x - x_c - x_i) w_y(y - y_c -
- y_j)@f$. The weight is a windowing function centered at each bin
- center @f$ (\theta_t, x_c + x_i, y_c + y_i) @f$, where @f$ (x_c, y_c)
- @f$ is the center of the region being processed and @f$(\theta_t,
- x_i, y_j)@f$ are offsets obtained next. Let @f$ \Delta_\theta,
- \Delta_x, \Delta_y @f$ be the (nominal) size of each bin support
- along each dimenson (here @f$ \Delta_\theta = 2\pi / N_\theta @f$ and
- @f$\Delta_x@f$ and @f$ \Delta_y @f$ are proportional to the size of
- the region). Each bin center is then given by the offsets
- 
- @f[
-  \theta_t = t \Delta_\theta, 
-  \qquad
-  x_i = \left(i - \frac{N_x - 1}{2} \right)\Delta_x,
-  \qquad
-  y_j = \left(j - \frac{N_y - 1}{2} \right)\Delta_y,
- @f]
-
- The weight components are choosen so that they decrease linearly
- moving towards the center of a neighboring bin. Formally, they are
- given by
- 
- @f[ 
-  w_\theta(\theta) = \max\left(0, 1 - 
-  \mathrm{mod}(\theta, 2\pi) / \Delta_\theta \right),
-  \quad
-  w_x(x) = \max\left(0, 1 - |x|/\Delta_x \right),
- @f]
-
- and similarly for @f$ w_y(y) @f$. 
-
- And additional Gaussian weighing factor @f$
- g_{\sigma_x}(x)g_{\sigma_y}(y) @f$ is applied to diminish the
- impotrance of gradients far from the center of the region. The
- variances are set to @f$ \sigma_x = N_x \Delta_x / 2 @f$ and
- @f$\sigma_y = N_y \Delta_y / 2@f$).
-
- We can now calculate the SIFT histogram as
-
- @f[
-   h(t,i,j) = 
-   \sum_{x,y} g_{\sigma_x}(x-x_c) g_{\sigma_y}(y-y_c) 
-   w_{\theta}(\angle \nabla I(x,y) - \theta_t) 
-   w_x(x - x_c - x_i) 
-   w_y(y - y_c - x_j) | \nabla I(x,y) | 
- @f]
-
- @subsection dhog-algo-dense Dense sampling of descriptors
- 
- We are interested in computing SIFT descriptors (with the same
- geometry) for densely sampled image regions.  We can speed-up
- significantly the computation by reducing the calculation of the
- histograms to a number of separable convolutions:
-
- @f{eqnarray*}
-   h(t,i,j ; x_c,y_c) &=& 
-   \sum_{x,y} 
-   J_t(x,y)
-   k_{i}(x_c+x_i-x) k_{j}(y_c+y_i-y) 
-   \\
-   &=& (J_t * k_ik_j)(x_c+x_i,y_c+x_i),
-   \\
-   J_t(x,y) 
-   &=&
-   | \nabla I(x,y) | w_\theta(\angle \nabla I(x,y) - \theta_t),
-   \\
-   k_{i}(x)
-   &=&   
-   g_{\sigma_x}(x - x_i)
-   w_x(x),
-   \\
-   k_{j}(y) 
-   &=&
-   g_{\sigma_y}(y - y_j)
-   w_y(y) 
- @f}
- 
- where we used the symmetry of the various kernels. In this way
- computing the value of the histogram bin @f$ h(t,i,j|x_c,y_c) @f$ for
- all possible region centers @f$ (x_c, y_c) @f$ reduces to one
- convolution, and computing all the bins reduces to @f$ N_\theta N_x
- N_y @f$ convolutions.
-
- The number of convolutions can be reduced to @f$ N_\theta @f$ by
- dropping the Gaussian window @f$ g_\sigma(x,y) @f$, as in this
- case we have
-
- @f{eqnarray*}
-   h(t,i,j ; x_c,y_c) &=& 
-   \sum_{x,y} 
-   J_t(x,y)
-   w_{x}(x_c+x_i - x) w_{y}(y_c+y_i - y)
-   \\
-   &=& (J_t * w_xw_y)(x_c+x_i,y_c+y_i),
-   \\
-   J_t(x,y) 
-   &=&
-   | \nabla I(x,y) | w_\theta(\angle \nabla I(x,y) - \theta_t),
- @f}
-
- An additional advantage is that the filter @f$ w_x(x) @f$ (and
- similarly @f$ w_y(y) @f$) is a triangular signal of support @f$
- [-\Delta_x+1, \Delta_x-1] @f$ and decomposes as the convolution of
- two rectangular signals @f$ w_x = \mathrm{rect}_{[-\Delta_x+1,0]} *
- \mathrm{rect}_{{[0, \Delta_x-1]}} @f$. Thus computing each of the
- required @f$ N_\theta @f$ convolutions can be done by convolving the
- gradient image @f$ J_t(x,y) @f$ along the column and the rows by
- rectangular filters. This can be done (by means of integral images)
- in time independent of the spatial extend @f$\Delta_x, \Delta_y@f$ of
- the bins.
-
- To avoid resampling and dealing with special boundary conditions, we
- impose some mild restrictions on the geometry of the descriptors that
- can be computed. In particular, we make sure that the all bin centers
- @f$ x_c + x_i @f$ and @f$ y_c + y_i @f$ are integer coordinates
- within the image domain.  It is easier to take as reference the
- coordinates @f$ (x_d,y_d) = (x_c + x_0, y_c + y_0) @f$ of the
- upper-left bin center rather the center of the descriptor. We have
- the conditions
- 
- @f{eqnarray*}
-   x_d &\in& \mathbb{Z} \cap [0, W - 1 - \Delta_x (N_x - 1)], \\
-   y_d &\in& \mathbb{Z} \cap [0, H - 1 - \Delta_y (N_y - 1)], \\
-   (x_c,y_c) &=& \left(x_d + \frac{N_x\Delta_x}{2},\ y_d + \frac{N_y\Delta_y}{2}\right)
- @f}
-
- where @f$ (W,H) @f$ is the widht and height of the image (in pixels).
-
- Usually features are sampled not every pixels, but on a subgrid with
- steps @f$ T_x, T_y @f$. In particular, we define
- 
- @f[
-   x_d = x_{d0} + pT_x, \qquad y_d = y_{d0} + qT_x
- @f]
- 
- @section dhog-descriptor Descriptor
- 
- Each DHOG descriptor is an histogram of the gradient orientations
- inside a square image patch, very similar to a @ref sift-descriptor
- "SIFT descriptor". The histogram has @f$N_b@f$ bins along each
- spatial direction @e x and @e y and @f$N_o@f$ bins along the
- orientation dimension. Each spatial bin corresponds a portion of image
- which has size equal to @f$\Delta@f$ pixels (along @e x and @e y),
- where @f$\Delta@f$ is an even number. In addition, bins are
- bilinearly interpolated and partially overlap. The following figure
- illustrates which pixels (tick marks along the axis) are associated
- to one of two bins, and with weights (triangular signals).
- 
- @image html dhog-bins.png
- 
- The top row shows bins of extension @f$\Delta=2@f$ whose center is
- aligned to a pixel. The bottom row shows the same bins, but whose
- center sits in between two adjacent pixels. Notice that while the bin
- extent is always the same, in the first case the pixels that actually
- contributes to a bin (i.e. the ones with weights greater than zero)
- are @f$2\Delta -1@f$, while in the second case they are
- @f$2\Delta@f$.
- 
- While both arrangements could be used, this implementation uses only
- the first (centers aligned to pixels), which is valid also for the
- case @f$\Delta=1@f$.
- 
- **/
+**/
 
 /** ------------------------------------------------------------------
  ** @internal
@@ -246,7 +244,7 @@
  ** @return a pointer to new filter.
  **/
 
-float * _vl_dhog_new_kernel (int binSize, int numBins, int binIndex)
+float * _vl_dsift_new_kernel (int binSize, int numBins, int binIndex)
 {  
   int filtLen = 2 * binSize - 1 ;
   float * ker = vl_malloc (sizeof(float) * filtLen) ;
@@ -278,7 +276,7 @@ float * _vl_dhog_new_kernel (int binSize, int numBins, int binIndex)
  **/
 
 VL_INLINE float
-_vl_dhog_normalize_histogram 
+_vl_dsift_normalize_histogram 
 (float *begin, float *end)
 {
   float* iter ;
@@ -298,11 +296,11 @@ _vl_dhog_normalize_histogram
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Free internal buffers
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  **/
 
 void
-_vl_dhog_free_buffers (VlDhogFilter* self)
+_vl_dsift_free_buffers (VlDsiftFilter* self)
 {
   if (self->frames) { 
     vl_free(self->frames) ; 
@@ -328,7 +326,7 @@ _vl_dhog_free_buffers (VlDhogFilter* self)
 /** ------------------------------------------------------------------
  ** @internal
  **/
-void _vl_dhog_update_buffers (VlDhogFilter *self) 
+void _vl_dsift_update_buffers (VlDsiftFilter *self) 
 {
   int x1 = self->boundMinX ;
   int x2 = self->boundMaxX ;
@@ -350,19 +348,19 @@ void _vl_dhog_update_buffers (VlDhogFilter *self)
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Allocate internal buffers
- ** @param self DHOG filter.
+ ** @param self DSIFT filter.
  **
  ** The function (re)allocates the internal buffers in accordance with
  ** the current image and descriptor geometry.
  **/
 
 void
-_vl_dhog_alloc_buffers (VlDhogFilter* self)
+_vl_dsift_alloc_buffers (VlDsiftFilter* self)
 {
-  _vl_dhog_update_buffers (self) ;  
+  _vl_dsift_update_buffers (self) ;  
   {
-    int numFrameAlloc = vl_dhog_get_keypoint_num (self) ;   
-    int numBinAlloc   = vl_dhog_get_descriptor_size (self) ;
+    int numFrameAlloc = vl_dsift_get_keypoint_num (self) ;   
+    int numBinAlloc   = vl_dsift_get_descriptor_size (self) ;
     int numGradAlloc  = self->geom.numBinT ;
     
     /* see if we need to update the buffers */
@@ -372,9 +370,9 @@ _vl_dhog_alloc_buffers (VlDhogFilter* self)
       
       int t ;
       
-      _vl_dhog_free_buffers(self) ;
+      _vl_dsift_free_buffers(self) ;
       
-      self->frames = vl_malloc(sizeof(VlDhogKeypoint) * numFrameAlloc) ;
+      self->frames = vl_malloc(sizeof(VlDsiftKeypoint) * numFrameAlloc) ;
       self->descrs = vl_malloc(sizeof(float) * numBinAlloc * numFrameAlloc) ;
       self->grads  = vl_malloc(sizeof(float*) * numGradAlloc) ;
       for (t = 0 ; t < numGradAlloc ; ++t) {
@@ -389,19 +387,19 @@ _vl_dhog_alloc_buffers (VlDhogFilter* self)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Create a new DHOG filter
+ ** @brief Create a new DSIFT filter
  **
- ** @param width width of the image.
- ** @param height height of the image
+ ** @param imWidth width of the image.
+ ** @param imHeight height of the image
  **
  ** @return new filter.
  **/
   
 VL_EXPORT
-VlDhogFilter* 
-vl_dhog_new (int imWidth, int imHeight)
+VlDsiftFilter* 
+vl_dsift_new (int imWidth, int imHeight)
 {
-  VlDhogFilter* self = vl_malloc (sizeof(VlDhogFilter)) ;    
+  VlDsiftFilter* self = vl_malloc (sizeof(VlDsiftFilter)) ;    
   self->imWidth  = imWidth ;
   self->imHeight = imHeight ;
 
@@ -434,44 +432,46 @@ vl_dhog_new (int imWidth, int imHeight)
   self->frames = NULL ;
   self->descrs = NULL ;
   
-  _vl_dhog_update_buffers(self) ;  
+  _vl_dsift_update_buffers(self) ;  
   return self ;
 }
  
 /** ------------------------------------------------------------------
- ** @brief Create a new DHOG filter (basic interface)
+ ** @brief Create a new DSIFT filter (basic interface)
  **
- ** @param width width of the image.
- ** @param height height of the image.
+ ** @param imWidth width of the image.
+ ** @param imHeight height of the image.
  ** @param step sampling step.
  ** @param binSize bin size.
+ **
+ ** The descriptor geometry matches the standard SIFT descriptor.
  **
  ** @return new filter.
  **/
  
 VL_EXPORT
-VlDhogFilter* 
-vl_dhog_new_basic (int imWidth, int imHeight, int step, int binSize) 
+VlDsiftFilter* 
+vl_dsift_new_basic (int imWidth, int imHeight, int step, int binSize) 
 {
-  VlDhogFilter* self = vl_dhog_new(imWidth, imHeight) ;
-  VlDhogDescriptorGeometry geom = *vl_dhog_get_geometry(self) ;
+  VlDsiftFilter* self = vl_dsift_new(imWidth, imHeight) ;
+  VlDsiftDescriptorGeometry geom = *vl_dsift_get_geometry(self) ;
   geom.binSizeX = binSize ;
   geom.binSizeY = binSize ;
-  vl_dhog_set_geometry(self, &geom) ;
-  vl_dhog_set_steps(self, step, step) ;
+  vl_dsift_set_geometry(self, &geom) ;
+  vl_dsift_set_steps(self, step, step) ;
   return self ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Delete DHOG filter
- ** @param f filter to delete.
+ ** @brief Delete DSIFT filter
+ ** @param self filter to delete.
  **/
 
 VL_EXPORT
 void
-vl_dhog_delete (VlDhogFilter *self)
+vl_dsift_delete (VlDsiftFilter *self)
 {
-  _vl_dhog_free_buffers (self) ;
+  _vl_dsift_free_buffers (self) ;
   if (self->convTmp2) vl_free(self->convTmp2) ;
   if (self->convTmp1) vl_free(self->convTmp1) ;
   vl_free (self) ;
@@ -479,12 +479,13 @@ vl_dhog_delete (VlDhogFilter *self)
 
 
 /** ------------------------------------------------------------------
- ** @internal@brief Process with Gaussian window
- ** @param f filter to delete.
+ ** @internal
+ ** @brief Process with Gaussian window
+ ** @param self filter to delete.
  **/
 
 VL_INLINE 
-void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
+void _vl_dsift_with_gaussian_window (VlDsiftFilter* self)
 {
   int binx, biny, bint ;
   int framex, framey ;
@@ -495,13 +496,13 @@ void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
     
   for (biny = 0 ; biny < self->geom.numBinY ; ++biny) {
 
-    yker = _vl_dhog_new_kernel(self->geom.binSizeY,
+    yker = _vl_dsift_new_kernel(self->geom.binSizeY,
                                self->geom.numBinY, 
                                biny) ;
     
     for (binx = 0 ; binx < self->geom.numBinX ; ++binx) {
 
-      xker = _vl_dhog_new_kernel(self->geom.binSizeX,
+      xker = _vl_dsift_new_kernel(self->geom.binSizeX,
                                  self->geom.numBinX,
                                  binx) ;
       
@@ -529,7 +530,7 @@ void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
           
           int frameSizeX = self->geom.binSizeX * (self->geom.numBinX - 1) + 1 ;
           int frameSizeY = self->geom.binSizeY * (self->geom.numBinY - 1) + 1 ;
-          int descrSize = vl_dhog_get_descriptor_size (self) ;
+          int descrSize = vl_dsift_get_descriptor_size (self) ;
 
           for (framey  = self->boundMinY ;
                framey <= self->boundMaxY - frameSizeY + 1 ;
@@ -557,7 +558,7 @@ void _vl_dhog_with_gaussian_window (VlDhogFilter* self)
  **/
 
 VL_INLINE 
-void _vl_dhog_with_flat_window (VlDhogFilter* self)
+void _vl_dsift_with_flat_window (VlDsiftFilter* self)
 {
   int binx, biny, bint ;
   int framex, framey ;
@@ -591,7 +592,7 @@ void _vl_dhog_with_flat_window (VlDhogFilter* self)
         
         int frameSizeX = self->geom.binSizeX * (self->geom.numBinX - 1) + 1 ;
         int frameSizeY = self->geom.binSizeY * (self->geom.numBinY - 1) + 1 ;
-        int descrSize = vl_dhog_get_descriptor_size (self) ;
+        int descrSize = vl_dsift_get_descriptor_size (self) ;
         
         for (framey  = self->boundMinY ;
              framey <= self->boundMaxY - frameSizeY + 1 ;
@@ -610,20 +611,18 @@ void _vl_dhog_with_flat_window (VlDhogFilter* self)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Compute Dense Feature Transform
+ ** @brief Compute keypoints and descriptors
  **
- ** @param f    DHOG filter. 
+ ** @param self DSIFT filter. 
  ** @param im   image data.
- ** @param fast speed up computation by replacing a gaussian window with
- **             a flat one 
  **/
 
-void vl_dhog_process (VlDhogFilter* self, float const* im)
+void vl_dsift_process (VlDsiftFilter* self, float const* im)
 {
   int t, x, y ;
 
   /* update buffers */
-  _vl_dhog_alloc_buffers (self) ;
+  _vl_dsift_alloc_buffers (self) ;
 
   /* clear integral images */
   for (t = 0 ; t < self->geom.numBinT ; ++t)
@@ -675,19 +674,19 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
   }
 
   if (self->useFlatWindow) {
-    _vl_dhog_with_flat_window(self) ;
+    _vl_dsift_with_flat_window(self) ;
   } else {
-    _vl_dhog_with_gaussian_window(self) ;
+    _vl_dsift_with_gaussian_window(self) ;
   }
   
   {
-    VlDhogKeypoint* frameIter = self->frames ;
+    VlDsiftKeypoint* frameIter = self->frames ;
     float * descrIter = self->descrs ;
     int framex, framey, bint ;
     
     int frameSizeX = self->geom.binSizeX * (self->geom.numBinX - 1) + 1 ;
     int frameSizeY = self->geom.binSizeY * (self->geom.numBinY - 1) + 1 ;
-    int descrSize = vl_dhog_get_descriptor_size (self) ;
+    int descrSize = vl_dsift_get_descriptor_size (self) ;
     
     float deltaCenterX = 0.5F * self->geom.binSizeX * (self->geom.numBinX - 1) ;
     float deltaCenterY = 0.5F * self->geom.binSizeY * (self->geom.numBinY - 1) ;
@@ -720,14 +719,14 @@ void vl_dhog_process (VlDhogFilter* self, float const* im)
         }
 
         /* L2 normalize */
-        _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
+        _vl_dsift_normalize_histogram (descrIter, descrIter + descrSize) ;
 
         /* clamp */
         for(bint = 0 ; bint < descrSize ; ++ bint)
           if (descrIter[bint] > 0.2F) descrIter[bint] = 0.2F ;
 
         /* L2 normalize */
-        _vl_dhog_normalize_histogram (descrIter, descrIter + descrSize) ;
+        _vl_dsift_normalize_histogram (descrIter, descrIter + descrSize) ;
         
         frameIter ++ ;
         descrIter += descrSize ;
