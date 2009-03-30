@@ -6,7 +6,7 @@
 
 # This makefile should not be called directly.
 
-.PHONY: doc, doc-figures, doc-api, doc-toolbox
+.PHONY: doc, doc-api, doc-toolbox, doc-figures
 .PHONY: doc-web, doc-demo
 .PHONY: doc-bindist, doc-distclean
 .PHONY: autorights
@@ -74,6 +74,8 @@ doc/api/index.html: docsrc/doxygen.conf VERSION                      \
 #
 # Convert figure formats
 #
+
+doc-figures: $(img_tgt)
 
 doc/figures/%.png : doc/figures/%.dvi
 	$(call C,DVIPNG) -D 75 -T tight -o $@ $<
