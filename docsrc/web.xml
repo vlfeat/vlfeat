@@ -21,7 +21,7 @@
  <body>
   <div id="header">
 <!--   <img style="width:130px;" src="%pathto:root;images/vlfeat-logo-dark.png"></img> -->
-    VLFeat.org
+    <h1>VLFeat.org</h1>
   </div>
   <div id="headbanner">
    %pagetitle;
