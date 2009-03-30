@@ -1,4 +1,5 @@
 % VL_DEMO_SIFT_BASIC  Demo: SIFT: basic functionality
+
 pfx = fullfile(vl_root,'figures','demo') ;
 randn('state',0) ;
 rand('state',0) ;
@@ -23,7 +24,7 @@ axis equal ; axis off ; axis tight ;
 vl_demo_print('sift_basic_1') ;
 
 % --------------------------------------------------------------------
-%                                                             Run VL_SIFT
+%                                                             Run SIFT
 % --------------------------------------------------------------------
 [f,d] = vl_sift(I) ;
 
@@ -67,4 +68,3 @@ h2   = vl_plotframe(f) ; set(h2,'color','k','linewidth',1) ;
 h3   = vl_plotsiftdescriptor(d,f) ;  set(h3,'color','g') ;
 
 vl_demo_print('sift_basic_5') ;
-
