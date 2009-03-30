@@ -5,10 +5,9 @@
 %   is the (fractional) center of the frame, S is the scale and TH is
 %   the orientation (in radians).
 %
-%   [F,D] = VL_SIFT(I) computes the SIFT descriptors [1] D as
-%   well. Each column of D is the descriptor of the corresponding
-%   frame in F. A descriptor is a 128-dimensional vector of class
-%   UINT8.
+%   [F,D] = VL_SIFT(I) computes the SIFT descriptors [1] as well. Each
+%   column of D is the descriptor of the corresponding frame in F. A
+%   descriptor is a 128-dimensional vector of class UINT8.
 %
 %   Options:
 %
@@ -17,15 +16,19 @@
 %
 %   Levels::
 %     Set the number of levels per octave of the DoG scale space.
+%     The default value is 3.
 %
 %   FirstOctave::
 %     Set the index of the first octave of the DoG scale space.
+%     The default value is 0.
 %
 %   PeakThresh::
 %     Set the peak selection threshold.
+%     The default value is 0.
 %
 %   EdgeThresh::
 %     Set the non-edge selection threshold.
+%     The default value is 10.
 %
 %   NormThresh::
 %     Set the minimum l2-norm of the descriptor before
@@ -35,9 +38,15 @@
 %   Magnif::
 %     Set the descriptor magnification factor. The scale of the
 %     keypoint is multiplied by this factor to obtain the width (in
-%     pixels) of the spatial bins. For instance, since by default
-%     there are 4 spatial bins along each spatial direction, the
+%     pixels) of the spatial bins. For instance, if there are there
+%     are 4 spatial bins along each spatial direction, the
 %     ``diameter'' of the descriptor is approximatively 4 * MAGNIF.
+%     The default value is 3.
+%
+%   WindowSize::
+%     Set the variance of the Gaussian window that determines the
+%     descriptor support. It is expressend in units of spatial
+%     bins and the default value is 2.
 %
 %   Frames::
 %     Set the frames to use (bypass the detector). If frames are not
