@@ -149,7 +149,7 @@ MEX_FLAGS = -I"$(MATLABROOT)\extern\include" -Itoolbox
 
 libsrc =                \
  vl\aib.c               \
- vl\dhog.c              \
+ vl\dsift.c             \
  vl\generic.c           \
  vl\getopt_long.c       \
  vl\hikmeans.c          \
@@ -167,49 +167,47 @@ libsrc =                \
  vl\stringop.c
  
 cmdsrc =                \
- src\sift.c             \
- src\mser.c             \
  src\aib.c              \
+ src\mser.c             \
+ src\sift.c             \
  src\test_getopt_long.c \
- src\test_stringop.c    \
- src\test_nan.c         \
- src\test_mathop.c      \
- src\test_rand.c        \
+ src\test_host.c        \
  src\test_imopv.c       \
- src\test_host.c
+ src\test_mathop.c      \
+ src\test_nan.c         \
+ src\test_rand.c        \
+ src\test_stringop.c
 
 mexsrc =                          \
- toolbox\sift\vl_sift.c           \
- toolbox\sift\vl_ubcmatch.c       \
- toolbox\sift\vl_dhog.c           \
- toolbox\sift\vl_siftdescriptor.c \
- \
- toolbox\mser\vl_mser.c           \
- toolbox\mser\vl_erfill.c         \
- \
- toolbox\imop\vl_imsmooth.c       \
+ toolbox\aib\vl_aib.c             \
+ toolbox\aib\vl_aibhist.c         \
+ toolbox\geometry\vl_irodr.c      \
+ toolbox\geometry\vl_rodr.c       \
  toolbox\imop\vl_imintegral.c     \
+ toolbox\imop\vl_imsmooth.c       \
  toolbox\imop\vl_imwbackwardmx.c  \
  toolbox\imop\vl_tpsumx.c         \
- \
- toolbox\geometry\vl_rodr.c       \
- toolbox\geometry\vl_irodr.c      \
- \
- toolbox\kmeans\vl_ikmeans.c      \
- toolbox\kmeans\vl_ikmeanspush.c  \
  toolbox\kmeans\vl_hikmeans.c     \
  toolbox\kmeans\vl_hikmeanspush.c \
- \
+ toolbox\kmeans\vl_ikmeans.c      \
+ toolbox\kmeans\vl_ikmeanspush.c  \
  toolbox\misc\vl_alldist2.c       \
+ toolbox\misc\vl_binsearch.c      \
  toolbox\misc\vl_binsum.c         \
+ toolbox\misc\vl_getpid.c         \
  toolbox\misc\vl_ihashfind.c      \
  toolbox\misc\vl_ihashsum.c       \
- toolbox\misc\vl_localmax.c       \
- toolbox\misc\vl_whistc.c         \
  toolbox\misc\vl_inthist.c        \
- \
- toolbox\aib\vl_aib.c             \
- toolbox\aib\vl_aibhist.c
+ toolbox\misc\vl_localmax.c       \
+ toolbox\misc\vl_samplinthist.c   \
+ toolbox\misc\vl_twister.c        \
+ toolbox\misc\vl_whistc.c         \
+ toolbox\mser\vl_erfill.c         \
+ toolbox\mser\vl_mser.c           \
+ toolbox\sift\vl_dsift.c          \
+ toolbox\sift\vl_sift.c           \
+ toolbox\sift\vl_siftdescriptor.c \
+ toolbox\sift\vl_ubcmatch.c
 
 
 # horrible Make program, horrible code:
