@@ -10,12 +10,12 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
+#ifndef VL_PGM_H
+#define VL_PGM_H
+
 #include "generic.h"
 #include "mathop.h"
 #include <stdio.h>
-
-#ifndef VL_PGM
-#define VL_PGM
 
 /** @name PGM parser error codes */
 /*@{*/
@@ -72,5 +72,6 @@ VL_EXPORT int vl_pgm_read_new_f    (char const *name,
                                     float **data) ;
 
 /** @} */
-/* VL_PGM */
+
+/* VL_PGM_H */
 #endif
