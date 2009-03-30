@@ -1,18 +1,21 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <group>
- <p>We exemplify linking <b>VLFeat</b> to an Apple X-Code project.  For
-  the sake of simplicty, we are going to create a command line tool
-  written in C. However these steps apply with minor modifications to
-  other project types.</p>
+
+ <p>These instructions show how to setup a basic <b>VLFeat</b> project
+  with Apple X-Code.  For the sake of simplicty, we create a command
+  line tool written in C. However, these steps apply with minor
+  modifications to other project types and to the C++ lanuage.</p>
 
  <p>First, let us create a new project
-  called <code>vlfeat-client</code>. Open X-Code and select <b>File &gt;
-   New Project &gt; Command Line Utility &gt; Standard Tool</b> and
-  click <b>Choose</b>. Give a name to your project (in our
+  called <code>vlfeat-client</code>. Open X-Code and select <b>File
+  &gt; New Project &gt; Command Line Utility &gt; Standard Tool</b>
+  and click <b>Choose</b>. Give a name to your project (in our
   case <code>vlfeat-client</code>), and click <b>Save</b>.</p>
 
+ <div class="figure">
  <img alt="X-Code new project" src="%pathto:root;images/using-xcode-new.png"/>
+ </div>
 
  <p>Now we need to add <b>VLFeat</b> to the C compiler include seatch
   path. To do this, select the <code>vlfeat-client</code> target and

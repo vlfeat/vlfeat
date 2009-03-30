@@ -1,3 +1,7 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
 <p><em>Maximally Stable Extremal Regions (MSER)</em> is a feature
 detector; Analogously to the <a href="tut.sift">SIFT detector</a>, the
 MSER algorithm extracts from an image <code>I</code> a number of
@@ -7,29 +11,14 @@ image <code>I</code>. Optionally, elliptical frames are attached to
 the MSERs by fitting ellipses.</p>
 
 <ul>
-<li><a href="tut.mser.extract">Extracting MSERs</a></li>
-<li><a href="tut.mser.param">MSER parameters</a></li>
-<li><a href="tut.mser.conventions">Conventions</a></li>
+<li><a href="%pathto:tut.mser.extract;">Extracting MSERs</a></li>
+<li><a href="%pathto:tut.mser.param;">MSER parameters</a></li>
+<li><a href="%pathto:tut.mser.conventions;">Conventions</a></li>
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.extract">Extracting MSERs</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<div class="figure">
-<image src="%pathto:root;demo/mser_basic_0.jpg"/>
-<div class="caption">
-A test image.
-</div>
-</div>
-
-<div class="figure">
-<image src="%pathto:root;demo/mser_basic_1.jpg"/>
-<image src="%pathto:root;demo/mser_basic_2.jpg"/>
-<div class="caption">
-Extracted MSERs (left) and fitted ellipses (right).
-</div>
-</div>
 
 <p>Each MSERs can be identified uniquely by (at least) one of its
 pixels <code>x</code>, as the connected component of the level set at
@@ -39,11 +28,22 @@ called <em>seed</em> of the region.</p>
 <p>To demonstrate the usage of the MATLAB command <code>mser</code>
 (there is a similarly named command line utility as well), we open
 MATLAB and we load a test image</p>
+
 <pre>
 pfx = fullfile(vl_root,'data','spots.jpg') ;
 I = imread(pfx) ;
 image(I) ; 
 </pre>
+
+<div class="figure">
+<image src="%pathto:root;demo/mser_basic_0.jpg"/>
+<div class="caption">
+<span class="content">
+A test image.
+</span>
+</div>
+</div>
+
 <p>We then convert the image to a format that is suitable for the
 <code>mser</code> command.</p>
 
@@ -52,6 +52,7 @@ I = uint8(rgb2gray(I)) ;
 </pre>
 
 <p>We compute the region seeds and the elliptical frames by</p>
+
 <pre>
 [r,f] = vl_mser(I,'MinDiversity',0.7,...
                 'MaxVariation',0.2,...
@@ -67,16 +68,18 @@ f = vl_ertr(f) ;
 vl_plotframe(f) ;
 </pre>
 
-<p>The <code>vl_ertr</code> transposes the elliptical frame and is needed
-because the <code>mser</code> code assumes that the row index is the
-first index, but the normal image convention assumes that this is the
+<p>The <code>vl_ertr</code> transposes the elliptical frame and is
+needed because the <code>mser</code> code assumes that the row index
+is the first index, but the normal image convention assumes that this
+is the
 <code>x</code> (column) index.</p>
 
 <p>Plotting the MSERs themselves is a bit more involved as they have
-arbitrary shape.  To this end, we exploit two functions: <code>vl_erfill</code>,
-which, given an image and a region seed, returns a list of the pixels
-belonging to that region, and MATLAB built-in <code>contourn</code>, which
-draws the contour lines of a function. We start by</o>
+arbitrary shape.  To this end, we exploit two
+functions: <code>vl_erfill</code>, which, given an image and a region
+seed, returns a list of the pixels belonging to that region, and
+MATLAB built-in <code>contourn</code>, which draws the contour lines
+of a function. We start by</p>
 
 <pre>
 M = zeros(size(I)) ;
@@ -86,9 +89,19 @@ for x=r'
 end
 </pre>
 
+<div class="figure">
+<image src="%pathto:root;demo/mser_basic_1.jpg"/>
+<image src="%pathto:root;demo/mser_basic_2.jpg"/>
+<div class="caption">
+<span class="content">
+Extracted MSERs (left) and fitted ellipses (right).
+</span>
+</div>
+</div>
+
 <p>which computes a matrix <code>M</code> whose value are equal to the
 number of overlapping extremal regions. Next, we use <code>M</code>
-and <code>contourn</code> to display the region boundaries:</o>
+and <code>contourn</code> to display the region boundaries:</p>
 
 <pre>
 clf ; imagesc(I) ;
@@ -117,20 +130,20 @@ contains <code>R</code> and <code>R(+&Delta;) - R</code> is the set
 difference of the two regions. If the are variation is small, then the
 region is deemed stable.</p>
 
-<p>Based on the stability score, the algorithm keeps the extremal regions
-which are maximally stable, meaning that they have minimum variation
-compared to the extremal region one intensity level below and one
-intensity level up\footnote{Due to the discrete nature of the image,
-  the region below/up may be coincident with the actual region, in
-  which case the region is still deemed maximal.}. Even if an extremal
-region is maximally stable, it might be rejected if
+<p>Based on the stability score, the algorithm keeps the extremal
+regions which are maximally stable, meaning that they have minimum
+variation compared to the extremal region one intensity level below
+and one intensity level up\footnote{Due to the discrete nature of the
+image, the region below/up may be coincident with the actual region,
+in which case the region is still deemed maximal.}. Even if an
+extremal region is maximally stable, it might be rejected if</p>
 
 <ul>
 <li>it is too big (see the parameter <code>MaxArea</code>);</li>
 <li>it is too small (see the parameter <code>MinArea</code>);</li>
 <li>it is too unstable (see the parameter <code>MaxVariation</code>);</li>
 <li>it is too similar to another MSER (see the
-paramter <code>MinDiversity</code>).</li>
+parameter <code>MinDiversity</code>).</li>
 </ul>
 
 <p>The interpretation of the parameters <code>MaxArea</code> and
@@ -146,12 +159,14 @@ illustrated next.</p>
 <image src="%pathto:root;demo/mser_delta_3.jpg"/>
 <image src="%pathto:root;demo/mser_delta_4.jpg"/>
 <div class="caption">
+<span class="content">
 <b>Meaning of parameter <code>&Delta;</code>.</b>  The intensity
 profile. The bumps have heights equal to 32, 64, 96, 128 and 160
 intensity levels. The variation score of a bump is either 0 if &Delta;
 is smaller than the bump height or very large otherwise (as the next
 extremal region is as big as the whole
 image). <code>MaxVariation</code> is set to 0.25.
+</span>
 </div>
 </div>
 
@@ -160,7 +175,7 @@ complication that we did not address yet, i.e. how to define
 ``locality'' in the comparison of extremal regions. For
 instance, one could define neighbors of an extremal region $R$ the
 parent extremal region <code>R(+1)</code> at level e would compare the region
-<code>R</code> with the region <code>R_{+1}</code>.
+<code>R</code> with the region <code>R_{+1}</code>.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.conventions">Conventions</h1>
@@ -217,3 +232,5 @@ f_(1:2,:) = f_(1:2,:) + 1 ;
 <p>produces identical (up to numerical noise) region
 seeds <code>r</code> and <code>r_</code> and frames <code>f</code>
 and <code>f_</code>.</p>
+
+</group>

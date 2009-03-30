@@ -237,7 +237,7 @@ class DocBareNode:
     def getPublishFileName(self): pass
     def getPublishURL(self): pass
     def publish(self, generator, pageNode = None): pass
-    def publishIndex(self, gen, pageNode, openNodeStack): pass
+    def publishIndex(self, gen, pageNode, openNodeStack): return False
 
     def makeBareParsingError(self, message):
         """
@@ -437,21 +437,23 @@ class DocNode(DocBareNode):
         """
         Recursively calls PUBLISHINDEX() on its children.
         """
+        hasIndexedChildren = False
         for c in self.getChildren():
-            c.publishIndex(gen, pageNode, openNodeStack)
-        return None
+            hasIndexedChildren = c.publishIndex(gen, pageNode, openNodeStack) \
+                or hasIndexedChildren
+        return hasIndexedChildren
 
 # --------------------------------------------------------------------    
 def expandAttr(value, pageNode):
 # --------------------------------------------------------------------
     xvalue = ""
     last = 0
-    for m in re.finditer("%[\w:\.]+;", value):
+    for m in re.finditer("%[-\w._#:]+;", value):
         if last <= m.start() - 1:
             xvalue += value[last:m.start()-1]
         last = m.end()
         directive = value[m.start()+1 : m.end()-1]
-        mo = re.match('pathto:([\w\.]*)', directive)
+        mo = re.match('pathto:(.*)', directive)
         if mo: 
             toNodeID = mo.group(1)
             toNodeURL = None
@@ -519,6 +521,14 @@ class Generator:
     def parentDir(self):
         self.dirStack.pop()
         #print "CD .."
+
+    def tell(self):
+        fid = self.fileStack[-1]
+        return fid.tell()
+
+    def seek(self, pos):
+        fid = self.fileStack[-1]
+        fid.seek(pos)
 
 # --------------------------------------------------------------------    
 class DocInclude(DocNode):
@@ -664,7 +674,7 @@ class DocHtmlElement(DocNode):
     def getPublishURL(self):
         anc = self.findAncestors(DocPage)
         if len(anc) == 0: return None
-        return anc[0].getPublishURL() + "#" + self.id + ".html"
+        return anc[0].getPublishURL() + "#" + self.id
 
     def publish(self, gen, pageNode = None):
         if pageNode is None: return
@@ -798,13 +808,23 @@ class DocPage(DocNode):
         gen.putString("<li><a href=")
         gen.putXMLAttr(
             expandAttr("%%pathto:%s;" % self.getID(), pageNode))
+        if len(openNodeStack) == 1 and self == openNodeStack[0]:
+            gen.putString(" class='active' ")
         gen.putString(">")
         gen.putXMLString(self.title)
-        gen.putString("</a>\n<ul>\n")
+        gen.putString("</a>\n")
+        pos = gen.tell()
+        gen.putString("<ul>\n")
+        hasIndexedChildren = False
         if len(openNodeStack) > 0 and self == openNodeStack[-1]:
             openNodeStack.pop()
-            DocNode.publishIndex(self, gen, pageNode, openNodeStack)            
-        gen.putString("</ul></li>\n")
+            hasIndexedChildren = DocNode.publishIndex(self, gen, pageNode, openNodeStack)
+        if hasIndexedChildren:
+            gen.putString("</ul>")
+        else:
+            gen.seek(pos)
+        gen.putString("</li>\n")
+        return True
 
     publish = makeGuard(publish)
 

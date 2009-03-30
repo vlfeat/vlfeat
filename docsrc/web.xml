@@ -20,9 +20,12 @@
  <!-- Body Start -->
  <body>
   <div id="header">
-   <h1>%pagetitle;</h1>
+<!--   <img style="width:130px;" src="%pathto:root;images/vlfeat-logo-dark.png"></img> -->
+    VLFeat.org
   </div>
-  <div id="headbanner">&nbsp;</div>
+  <div id="headbanner">
+   %pagetitle;
+  </div>
   <div id="pagebody">
    <div id="sidebar"> <!-- Navigation Start -->
     %navigation;
@@ -62,7 +65,7 @@
  <!-- Site contents                                                -->
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- <page id="home"    name="index"    title="VLFeat"> <include src="index.html"/>  
+ <page id="home"    name="index"    title="Home"> <include src="index.html"/>  
   <pagestyle>
    #content p.widePar {
    padding-right: 1em ;
@@ -71,7 +74,7 @@
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
-  <page id="xcode" name="xcode" title="Using with X-Code"><include src="using-xcode.html"/></page>
+  <page id="xcode" name="xcode" title="X-Code use"><include src="using-xcode.html"/></page>
  </page>
 
  <dir name="api">
@@ -93,6 +96,7 @@
   <page id="tut"       name="tut"       title="Overview"> 
    <include src="tutorials.html"/>
    <page id="tut.sift"  name="sift"      title="SIFT"> <include src="sift.html"/></page>
+   <page id="tut.mser"  name="mser"      title="MSER"> <include src="mser.html"/></page>
    <page id="tut.ikm"   name="ikm"       title="IKM">  <include src="ikm.html"/></page>
    <page id="tut.hikm"  name="hikm"      title="HIKM"> <include src="hikm.html"/></page>
    <page id="tut.aib"   name="aib"       title="AIB">  <include src="aib.html"/></page>

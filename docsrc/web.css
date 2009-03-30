@@ -1,11 +1,7 @@
-//div, p, ul, li, ol, img {border: 1px solid red ;}
+/* div, p, ul, li, ol, img {border: 1px solid red ;} */
 html, body, div, img {
     margin: 0px ;
     padding: 0px ;    
-}
-pre, code { 
-    font-family: 'Andale Mono', monospaced ; 
-    color: rgb(255,69,0) ;
 }
 table {
     font: inherit ;
@@ -22,62 +18,78 @@ body {
     margin-right: auto ;
     margin-bottom: 0.5em ;
     width: 65em ;
-    background-color: rgb(32,62,93) ;
+    background-color: #325799;
     font-family: Lucida, Helvetica, sans-serif ;
     font-size: 14px ;
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: Georgia, serif ;
     font-weight: normal ;
-    color: rgb(40,40,40) ;
+    color: #325799;
+}
+a {
+	color: #325799;
+}
+b {
+	color: rgb(40,40,40) ;
+}
+pre, code { 
+    font-family: 'Andale Mono', monospaced ; 
+    color: #ff6f00;
 }
 #pagebody {
-    background-color: rgb(255,255,255) ;
+    background-color: white ;
     padding-bottom: 1px ;
 }
 #content {
-    padding-left: 150px ;
-    padding-right: 1em ;
-    /* needed to make sure content contains the margin of its content */
-    padding-top: 1px ; 
+    overflow: hidden ;
+    float: right ;
+    width: 55em ;
     line-height: 1.3em ;
+    padding-right: 1em ;
 }
 #sidebar {
     float: left ;
-    position: relative ; /* IE bug */
-    width: 149px ;
+    width: 8em ;
     padding: 0em ;
 }
 #sidebar ul {
     margin: 0 ;
     padding: 0 ;
-    margin: .7em ;
+    margin-left: 1em ;
+    margin-top: 1em ;
+    margin-bottom: 0em ;
 }
 #sidebar ul ul {
-    margin: 0 ;
-}
-#sidebar ul a {
-    color: inherit ! important ; 
-    color: rgb(60,60,60) ; /* for buggy IE */
-    text-decoration: none ;
+    margin-top: 0em ;
+    margin-bottom: 1em ;
 }
 #sidebar li {
     list-style: none ; /* for buggy IE */
     display: block ;
     margin: 0px ;
     padding: 0px ;
-    margin-bottom: 1em ;
     margin-top: 0.5em ;
-
+    margin-bottom: 1em ;
     font-size: 12px ;
     font-weight: bold ;
 }
 #sidebar li li {
-    padding-left: 1em ;
     font-weight: normal ;
     text-transform: none ;
     margin-bottom: 0.5em ;
-    margin-top: 0.5em ;  
+}
+#sidebar li .active {
+    background: #d7e0f1;
+    padding: 3px ;
+}
+#sidebar li a {
+    color: rgb(40,40,40) ;    
+    text-decoration: none ;
+}
+#sidebar li .active a {
+    color: white ;
+    text-decoration: none ;
 }
 #header {
     padding-top: 1px ;
@@ -85,13 +97,17 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 10px ;
     padding-top: 10px ;
 }
-#headbanner {   
-    background-color: rgb(74,125,178) ;
-    font-size: 8px ;
-}
+#headbanner {
+    background-color: #d7e0f1;
+    font-size: 1em ;
+    padding: 2px 1em ;
+    font-family: Helvetica ;
+    border-bottom: 1px solid gray ;
+    border-style: none;
+} 
 #header h1 {
     margin: 0 ;
-    color:  rgb(255,255,255) ;
+    color:  white ;
 }
 #footer {
     clear: both ;
@@ -135,7 +151,8 @@ h1, h2, h3, h4, h5, h6 {
 #content h5 {font-size:1.0em; margin-bottom: 1.00em;}
 #content h6 {font-size:0.8em; margin-bottom: 1.15em;}
 #content p,
-#content blockquote {
+#content blockquote,
+#content div.figure {
     margin: 1em 0 ;
     padding: 0 ;
     padding-right: 10em ;
@@ -149,7 +166,8 @@ h1, h2, h3, h4, h5, h6 {
     margin: 1em 0 ;
     padding: 0 ;
 }
-#content ul {
+#content ul,
+#content ol {
     margin-left: 0; 
     padding-left: 0 ;
 }
@@ -157,28 +175,22 @@ h1, h2, h3, h4, h5, h6 {
     margin-left: 1.2em ;
     padding-left: 0 ;
 }
-/*
+#content ol li { 
+    margin-left: 2em ;
+}
 #content dt {
     display: block ;
     float: left ;
     font-weight: bold ;
-    width: 7em ;
-    margin: 0 ;
+    width: auto ;
+    margin-right: 1em ;
     padding: 0 ;
-    text-align: right;
+    text-align: left; 
 }
 #content dd {
     display: block ;
     margin: 0.1em  0 ;    
-    padding-left: 8em ;
-}
-*/
-#content dt {
-    font-weight: bold ;
-}
-#content dd {
-    padding-left: 0em ;
-    margin-left: 4em ;
+    padding-left: 2em ;
 }
 #content dd p,
 #content dd ul {
@@ -189,13 +201,23 @@ h1, h2, h3, h4, h5, h6 {
     margin-left: 2em ;
 }
 #content div.figure {
-    margin-left: 2em ;
     margin-top: 1em ;
     margin-bottom: 1em ;
+    text-align: center ;
 }
 #content div.caption {
     font-family: Georgia, serif ;
     font-style: italic ;
+}
+/* for buggy IE 6 */
+#content div.caption span.content {
+    display: inline ;
+    zoom: 1 ;
+}
+#content div.caption span.content {
+    display: inline-block ;
+    text-align: left ;
+    max-width: 40em ;
 }
 #content img.image-right {
     float: right ;
@@ -260,7 +282,7 @@ h1, h2, h3, h4, h5, h6 {
 #content div.doxygen div.memitem {
 }
 #content div.doxygen div.memproto {
-    background-color: #eef ;
+    background-color: #d7e0f1;
     border: 1px dotted black ;
     padding: 0.5em ;
 }
@@ -314,7 +336,7 @@ h1, h2, h3, h4, h5, h6 {
     color: black ;
 }
 #content div.doxygen div.navigation .current {
-    background-color: #eee ;
+    background-color: #d7e0f1;
 }
 #content div.doxygen p.formulaDsp {
     text-align: center ;
@@ -330,4 +352,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 #content div.doxygen table td {
     margin: 0 ;
+}
+/* unfortunately doxygen uses compact hardoced attributes */
+#content div.doxygen dl,
+#content div.doxygen dl.note,
+#content div.doxygen dl.see,
+#content div.doxygen dl.remark {
+    display: block ;
+}
+#content div.doxygen dl dt,
+#content div.doxygen dl.note dt,
+#content div.doxygen dl.remark dt,
+#content div.doxygen dl.see dt {
+    width: auto ;
+    margin-right: 0.5em ;
+    padding: 0 ;
+    text-align: left ;
+}
+#content div.doxygen dl dd,
+#content div.doxygen dl.note dd,
+#content div.doxygen dl.remark dd,
+#content div.doxygen dl.see dd {
+    margin: 0 ;
+    padding: 0 ;
+    margin-left: 2em ;
 }

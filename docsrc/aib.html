@@ -12,9 +12,13 @@ optimal quantization of a mixture of Gaussians. The data in this case
 is 2 dimensional:</p>
 
 <div class="figure">
-  <image src="%pathto:root;demo/aib_basic_data.jpg"/>
-  <div class="caption">Random data generated from a Gaussian mixture
-    with three components (class labels are indicated by color).</div>
+<image src="%pathto:root;demo/aib_basic_data.jpg"/>
+<div class="caption">
+<span class="content">
+Random data generated from a Gaussian mixture with three components
+(class labels are indicated by color).
+</span>
+</div>
 </div>
 
 <p>We quantize this data on a fixed lattice (a 20x20 grid shown in the
@@ -36,21 +40,24 @@ Pcx(3,:) = vl_binsum(Pcx(3,:), ones(size(f3)), f3) ;
 [parents, cost] = vl_aib(Pcx) ;
 </pre>
 
-<p>
-This provides us with a list of parents of each column in <code>Pcx</code>,
-forming a tree of merges. We can now "cut" this tree to obtain any number of
-clusters.</p>
+<p>This provides us with a list of parents of each column
+in <code>Pcx</code>, forming a tree of merges. We can now "cut" this
+tree to obtain any number of clusters.</p>
 
 <div class="figure">
 <image src="%pathto:root;demo/aib_basic_clust_2.jpg"/>
 <image src="%pathto:root;demo/aib_basic_clust_3.jpg"/>
 <image src="%pathto:root;demo/aib_basic_clust_4.jpg"/>
-<div class="caption">Three "cuts" of the merge tree, showing 10, 3, and 2
-  clusters. The gray squares are nodes of the tree which did not have any data
-  points which were quantized to them.</div>
+<div class="caption">
+<span class="content">
+Three "cuts" of the merge tree, showing 10, 3, and 2 clusters. The
+gray squares are nodes of the tree which did not have any data points
+which were quantized to them.
+</span>
+</div>
 </div>
 
-<p>Notice that the resulting clusters do not have to be contiguous in the
-original space.</p>
+<p>Notice that the resulting clusters do not have to be contiguous in
+the original space.</p>
 
 </group>
