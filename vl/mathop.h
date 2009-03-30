@@ -65,7 +65,7 @@ static union { vl_uint64 raw ; double value ; }
 #endif
 
 /** @brief IEEE double precision infinity constant */
-static union { vl_uint64 raw ; float value ; } 
+static union { vl_uint64 raw ; double value ; } 
   const vl_infinity_d = 
 #ifdef VL_COMPILER_MSC
     { 0x7FF0000000000000ui64 } ;
