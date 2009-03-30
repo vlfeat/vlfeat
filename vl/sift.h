@@ -10,8 +10,10 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-#include <stdio.h>
+#ifndef VL_SIFT_H
+#define VL_SIFT_H
 
+#include <stdio.h>
 #include "generic.h"
 
 /** @brief SIFT filter pixel type */
@@ -404,3 +406,5 @@ vl_sift_set_window_size (VlSiftFilt *f, double x)
   f -> windowSize = x ;
 }
 
+/* VL_SIFT_H */
+#endif
