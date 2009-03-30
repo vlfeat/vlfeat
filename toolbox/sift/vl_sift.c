@@ -317,10 +317,10 @@ mexFunction(int nout, mxArray *out[],
       if (err) break ;
       
       if (verbose > 1) {
-        printf("siftmx: GSS octave %d computed\n",
-               vl_sift_get_octave_index (filt));
+        mexPrintf("siftmx: GSS octave %d computed\n",
+                  vl_sift_get_octave_index (filt));
       }
-
+      
       /* Run detector ............................................. */
       if (nikeys < 0) {
         vl_sift_detect (filt) ;
