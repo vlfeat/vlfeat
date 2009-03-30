@@ -11,21 +11,25 @@ General Public License version 2.
 */
 
 /** 
- @file pgm.h
- 
- To extract a PGM image from an input stream, 
- first call ::vl_pgm_extract_head() to extract
- the image meta data (size and bit-depth). Then allocate the
- appropriate buffer to hold the image pixels and then 
- call ::vl_pgm_extract_data().
- 
- To insert a PGM image to a file stream use ::vl_pgm_insert().
- 
- To quickly read/write a PGM image from/to a given file, use
- ::vl_pgm_read_new() and ::vl_pgm_write(). To to the same
- from a buffer in floating point format use ::vl_pgm_read_new_f() and 
- ::vl_pgm_write_f().
- **/
+
+@file pgm.h
+
+This module implements basic input and ouptut of images in PGM
+format.
+
+To extract a PGM image from an input stream, first call
+::vl_pgm_extract_head() to extract the image meta data (size and
+bit-depth). Then allocate the appropriate buffer to hold the image
+pixels and then call ::vl_pgm_extract_data().
+
+To insert a PGM image to a file stream use ::vl_pgm_insert().
+
+To quickly read/write a PGM image from/to a given file, use
+::vl_pgm_read_new() and ::vl_pgm_write(). To to the same from a
+buffer in floating point format use ::vl_pgm_read_new_f() and
+::vl_pgm_write_f().
+
+**/
 
 #include "pgm.h"
 
