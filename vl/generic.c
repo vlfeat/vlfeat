@@ -48,11 +48,11 @@ General Public License version 2.
    - @ref mexutils.h  "MATLAB MEX helper functions"
  - Algorithms
    - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
+   - @ref dsift.h    "Dense SIFT (DSIFT)"
    - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
    - @ref ikmeans.h  "Integer K-means (IKM)"
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
-   - @ref dhog.h     "Dense Histogram of Oriented Gradients (DHOG)"
 
  @section design VLFeat Design Concepts
 
@@ -148,7 +148,7 @@ General Public License version 2.
   VLFeat uses processor specific features (e.g. Intel SSE) if those
   are available at compile time.
  
-  @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0
+  <!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
 
   @section main-glossary Glossary
 
