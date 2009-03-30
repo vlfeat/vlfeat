@@ -1,6 +1,6 @@
 /** @file     sift.h
- ** @author   Andrea Vedaldi
- ** @brief    Scale Invariant Feature Transform (SIFT)
+ ** #brief    Scale Invariant Feature Transform (SIFT)
+ ** #author   Andrea Vedaldi
  **/
  
 /* AUTORIGHTS
