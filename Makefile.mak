@@ -145,8 +145,6 @@ MEX_LFLAGS = $(LFLAGS) \
              /LIBPATH:"$(bindir)" vl.lib \
              /LIBPATH:"$(MATLABLIB)" libmx.lib libmex.lib libmat.lib
 
-MEX_FLAGS = -I"$(MATLABROOT)\extern\include" -Itoolbox
-
 libsrc =                \
  vl\aib.c               \
  vl\dsift.c             \
