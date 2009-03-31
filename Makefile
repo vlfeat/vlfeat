@@ -497,7 +497,7 @@ clean:
 
 distclean: clean doc-distclean
 	rm -rf bin
-	for i in mexmac mexmaci mexglx mexw32 mexa64 ;               \
+	for i in mexmac mexmaci mexglx mexw32 mexa64 mexw64 ;        \
 	do                                                           \
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
