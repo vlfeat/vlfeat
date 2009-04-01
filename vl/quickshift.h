@@ -1,7 +1,7 @@
 /** @file     quickshift.h
+ ** @brief    Quick shift image segmentation
  ** @author   Andrea Vedaldi
  ** @author   Brian Fulkerson
- ** @brief    Quick Shift and Kernelized Medoid Shift
  **/
  
 /* AUTORIGHTS
@@ -14,8 +14,6 @@ General Public License version 2.
 #ifndef VL_QUICKSHIFT_H
 #define VL_QUICKSHIFT_H
 
-#include <stdio.h>
-
 #include "generic.h"
 #include "mathop.h"
 
@@ -23,7 +21,7 @@ General Public License version 2.
 typedef double vl_qs_type ;
 
 /** @brief Quick Shift infinity constant */
-#define VL_QS_INF 100000000000000000000000000000000000. /* Change to _F for float math */
+#define VL_QS_INF VL_INFINITY_D /* Change to _F for float math */
 
 /** ------------------------------------------------------------------
  ** @brief Quick Shift results
@@ -45,7 +43,6 @@ typedef struct _VlQS
   int *parents ;
   vl_qs_type *dists ;
   vl_qs_type *density ;
-
 } VlQS ;
 
 /** @name Create and destroy
@@ -71,8 +68,8 @@ void   vl_quickshift_process (VlQS *q) ;
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_INLINE vl_qs_type    vl_quickshift_get_tau      (VlQS const *q) ;
-VL_INLINE vl_qs_type    vl_quickshift_get_sigma    (VlQS const *q) ;
+VL_INLINE vl_qs_type    vl_quickshift_get_max_dist      (VlQS const *q) ;
+VL_INLINE vl_qs_type    vl_quickshift_get_kernel_size    (VlQS const *q) ;
 VL_INLINE vl_bool       vl_quickshift_get_medoid   (VlQS const *q) ;
 
 VL_INLINE int *        vl_quickshift_get_parents  (VlQS const *q) ;
@@ -83,8 +80,8 @@ VL_INLINE vl_qs_type * vl_quickshift_get_density  (VlQS const *q) ;
 /** @name Set parameters
  ** @{
  **/
-VL_INLINE void vl_quickshift_set_tau    (VlQS *f, vl_qs_type tau) ;
-VL_INLINE void vl_quickshift_set_sigma  (VlQS *f, vl_qs_type sigma) ;
+VL_INLINE void vl_quickshift_set_max_dist    (VlQS *f, vl_qs_type tau) ;
+VL_INLINE void vl_quickshift_set_kernel_size  (VlQS *f, vl_qs_type sigma) ;
 VL_INLINE void vl_quickshift_set_medoid (VlQS *f, vl_bool medoid) ;
 /** @} */
 
@@ -100,7 +97,7 @@ VL_INLINE void vl_quickshift_set_medoid (VlQS *f, vl_bool medoid) ;
  **/
 
 VL_INLINE vl_qs_type
-vl_quickshift_get_tau (VlQS const *q) 
+vl_quickshift_get_max_dist (VlQS const *q) 
 {
   return q->tau ;
 }
@@ -113,9 +110,21 @@ vl_quickshift_get_tau (VlQS const *q)
  **/
 
 VL_INLINE vl_qs_type
-vl_quickshift_get_sigma (VlQS const *q) 
+vl_quickshift_get_kernel_size (VlQS const *q) 
 {
   return q->sigma ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get medoid.
+ ** @param q Quick Shift object.
+ ** @return @c true if medoid shift is used instead of quick shift.
+ **/
+
+VL_INLINE vl_bool
+vl_quickshift_get_medoid (VlQS const *q) 
+{
+  return q->medoid ;
 }
 
 /** ------------------------------------------------------------------
@@ -164,7 +173,7 @@ vl_quickshift_get_density (VlQS const *q)
  **/
 
 VL_INLINE void
-vl_quickshift_set_sigma (VlQS *q, vl_qs_type sigma) 
+vl_quickshift_set_kernel_size (VlQS *q, vl_qs_type sigma) 
 {
   q -> sigma = sigma ;
 }
@@ -176,7 +185,7 @@ vl_quickshift_set_sigma (VlQS *q, vl_qs_type sigma)
  **/
 
 VL_INLINE void
-vl_quickshift_set_tau (VlQS *q, vl_qs_type tau) 
+vl_quickshift_set_max_dist (VlQS *q, vl_qs_type tau) 
 {
   q -> tau = tau ;
 }
@@ -184,8 +193,8 @@ vl_quickshift_set_tau (VlQS *q, vl_qs_type tau)
 /** ------------------------------------------------------------------
  ** @brief Set medoid
  ** @param q Quick Shift object.
- ** @param medoid true to use kernelized medoid shift, false (default) uses
- **        quick shift.  
+ ** @param medoid @c true to use kernelized medoid shift, @c false (default) uses
+ **        quick shift.
  **/
 
 VL_INLINE void

@@ -1,8 +1,8 @@
 /** @internal
  ** @file     quickshift.c
- ** @author   Andrea Vedaldi
  ** @author   Brian Fulkerson
- ** @brief    Quick Shift - Definition
+ ** @author   Andrea Vedaldi
+ ** @brief    Quick shift image segmentation - Definition
  **/
 
 /* AUTORIGHTS
@@ -12,12 +12,108 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-/** @file   quickshift.c
- ** @author Andrea Vedaldi
- ** @author Brian Fulkerson
- ** @brief  Quick Shift
+/** 
 
- Quick Shift is a fast mode seeking algorithm, similar to mean shift.
+@file   quickshift.h
+@author Brian Fulkerson
+@author Andrea Vedaldi
+@brief  Quick shift image segmentation
+
+- @ref quickshift-intro
+- @ref quickshift-usage
+- @ref qucikshift-tech
+
+@section quickshift-intro Overview
+
+Quick shift [1] is a fast mode seeking algorithm, similar to mean
+shift. The algorithm segments a color image (or any image with more
+than one component) by identifying cluster of pixels in the joint
+spatial and color dimensions. Segments are local (superpixels) and can
+be used as a basis for further processing.
+
+Given an image, the algorithm calculates a forest of pixels whose
+branches are labeled with a distance value
+(::vl_quickshift_get_parents, ::vl_quickshift_get_dists). This
+specifies a hyerarchical segmentation of the image, with segments
+corresponding to subtrees. Useful superpixels can be identified by
+cutting the branches whose distance label is above a given threshold
+(the threshold can be either fixed by hand, or determined by cross
+validation).
+
+Parameter influencing the algorithm are:
+
+- <b>Kernel size.</b> The pixel density (and so its modes) is
+estimated by using a Parzen window estimator with a Gaussian kernel of
+the specified size (::vl_quickshift_set_kernel_size). The larger the
+size, the larger the neighborhoods of pixels considered.
+- <b>Maxium distance.</b> This (::vl_set_max_dist) is the maxium
+distance between two pixels that the algorithm considres when building
+the forest. In principe, it can be infinity (so that a tree is
+returned), but in practice it is much faster to consider relatively
+small distances only (the maximum distance can be set to a small
+multiple of the kernel size).
+
+[1] A. Vedaldi and S. Soatto. &ldquo;Quick Shift and Kernel Methods
+for Mode Seeking&rdquo;, in <em>Proc. ECCV</em>, 2008.
+
+@section qucikshift-usage Usage
+
+- Create a new quick shift object (::vl_quickshift_new). The object
+  can be reused for multiple images of the same size.
+- Configure quick shift by setting the kernel size
+  (::vl_quickshift_set_kernel_size) and the maximum gap
+  (::vl_quickshift_max_dist). The latter is in principle not
+  necessary, but useful to speedup processing.
+- Process an image (::vl_quickshift_process).
+- Retrieve the parents (::vl_quickshift_get_parents) and the distances
+  (::vl_quickshift_get_dists). These can be readily used to segment
+  the image in super-pixels.
+- Delete the quick shift object (::vl_quickshift_delete).
+
+@section quickshift-tech Technical details
+
+For each pixel <em>(x,y)</em>, quick shift regards @f$ (x,y,I(x,y))
+@f$ as a sample from a <em>d + 2</em> dimensional vector space. It
+then calculates the Parzen density estiamte (with a Gaussian kernel of
+standard deviation @f$ \sigma @f$)
+
+@f[
+E(x,y) = P(x,y,I(x,y)) = \sum_{x'y'} 
+\frac{1}{(2\pi\sigma)^{d+2}}
+\exp
+\left(
+-\frac{1}{2\sigma^2} 
+\left[
+\begin{array}{c}
+x - x' \\
+y - y' \\
+I(x,y) - I(x',y') \\
+\end{array}
+\right] 
+\right)
+@f]
+
+Then quick shift construct a tree connecting each image pixel to its
+nearest neighbor which has greater density value. Formally, write @f$
+(x',y') >_P (x,y) @f$ if, and only if,
+
+@f[
+  P(x',y',I(x',y')) > P(x,y,I(x,y))}.
+@f]
+
+Each pixel <em>(x, y)</em> is connected to the closest higher density
+pixel <em>parent(x,y)</em> that achieves the mimimum distance in
+
+@f[
+ \mathrm{dist)(x,y) = 
+ \mathrm{min}_{(x',y') >_P (x,y)}
+\left(
+(x - x')^2 +
+(y - y')^2 +
+\| I(x,y) - I(x',y') \|_2^2 
+\right).
+@f]
+
     
 **/
   
@@ -87,9 +183,9 @@ vl_quickshift_distance(vl_qs_type const * I,
  ** @param j1   index of the second pixel to compare
  ** @param j2   second dimension of the second pixel
  **
- ** Takes the channel-wise inner product between the values in I at pixel i and
- ** j, accumulating along K channels and adding in the inner product between i,j in
- ** the image.
+ ** Takes the channel-wise inner product between the values in I at
+ ** pixel i and j, accumulating along K channels and adding in the
+ ** inner product between i,j in the image.
  ** 
  ** @return the inner product as described above
  **/
@@ -112,7 +208,15 @@ vl_quickshift_inner(vl_qs_type const * I,
   return ker ;
 }
 
-
+/** -----------------------------------------------------------------
+ ** @brief Create a quick shift objet
+ ** @param height
+ ** @param width
+ ** @param channels
+ **
+ ** @return New quick shift object.
+ **/
+ 
 VL_EXPORT
 VlQS *
 vl_quickshift_new(vl_qs_type const * image, int height, int width,
@@ -135,6 +239,11 @@ vl_quickshift_new(vl_qs_type const * image, int height, int width,
 
   return q;
 }
+
+/** -----------------------------------------------------------------
+ ** @brief Create a quick shift objet
+ ** @param q quick shift object.
+ **/
 
 VL_EXPORT
 void vl_quickshift_process(VlQS * q)
@@ -330,6 +439,11 @@ void vl_quickshift_process(VlQS * q)
   if (M) vl_free(M) ;
   if (n) vl_free(n) ;
 }
+
+/** -----------------------------------------------------------------
+ ** @brief Delete quick shift object
+ ** @param q quick shift object.
+ **/
 
 void vl_quickshift_delete(VlQS * q)
 {

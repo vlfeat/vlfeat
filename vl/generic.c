@@ -53,6 +53,7 @@ General Public License version 2.
    - @ref ikmeans.h  "Integer K-means (IKM)"
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
+   - @ref quickshift.h "Quick shift image segmentation"
 
  @section design VLFeat Design Concepts
 

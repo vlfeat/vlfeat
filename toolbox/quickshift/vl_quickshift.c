@@ -31,8 +31,8 @@ mexFunction(int nout, mxArray *out[],
 {  
   enum { 
     IN_I=0,     /* Input image */    
-    IN_SIGMA,   /* Sigma is the bandwidth parameter for density estimation */
-    IN_TAU,     /* Tau is the maximum distance to a neighbor which increases
+    IN_KERNEL_SIZE,   /* Sigma is the bandwidth parameter for density estimation */
+    IN_MAX_DIST,     /* Tau is the maximum distance to a neighbor which increases
                    the density */
     IN_END
   } ;
@@ -92,10 +92,10 @@ mexFunction(int nout, mxArray *out[],
   K = (ndims == 3) ? dims [2] : 1 ;
   
   I     =  mxGetPr (in[IN_I]) ;
-  sigma = *mxGetPr (in[IN_SIGMA]) ;
+  sigma = *mxGetPr (in[IN_KERNEL_SIZE]) ;
   tau   = 3*sigma;
   if (nin > 2)
-    tau = *mxGetPr (in[IN_TAU]) ;
+    tau = *mxGetPr (in[IN_MAX_DIST]) ;
 
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
@@ -121,16 +121,16 @@ mexFunction(int nout, mxArray *out[],
   if (verb) {
     mexPrintf("quickshift: [N1,N2,K]: [%d,%d,%d]\n", N1,N2,K) ;
     mexPrintf("quickshift: type: %s\n", medoid ? "medoid" : "quick");
-    mexPrintf("quickshift: sigma:   %g\n", sigma) ;
-    mexPrintf("quickshift: tau:     %g\n", tau) ;
+    mexPrintf("quickshift: kernel size:  %g\n", sigma) ;
+    mexPrintf("quickshift: maximum gap:  %g\n", tau) ;
   }
 
   /* Do job */
   q = vl_quickshift_new(I, N1, N2, K);
 
-  vl_quickshift_set_sigma (q, sigma);
-  vl_quickshift_set_tau   (q, tau);
-  vl_quickshift_set_medoid(q, medoid);
+  vl_quickshift_set_kernel_size (q, sigma) ;
+  vl_quickshift_set_max_dist     (q, tau) ;
+  vl_quickshift_set_medoid      (q, medoid) ;
 
   vl_quickshift_process(q);
 
