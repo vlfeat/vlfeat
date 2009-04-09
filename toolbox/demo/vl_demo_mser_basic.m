@@ -21,7 +21,6 @@ I = uint8(rgb2gray(I)) ;
 
 clf ; imagesc(I) 
 axis equal ; axis off ; axis tight ;
-vl_demo_print('mser_basic_1') ;
 
 % --------------------------------------------------------------------
 %                                                             Run VL_MSER
@@ -42,11 +41,13 @@ figure(1) ;
 hold on ;
 h1 = vl_plotframe(f) ; set(h1,'color','y','linewidth',3) ;
 h2 = vl_plotframe(f) ; set(h2,'color','k','linewidth',1) ;
+vl_demo_print('mser_basic_frames') ;
 
 figure(2) ; clf ; imagesc(I) ; hold on ; colormap gray ;
 [c,h]=contour(M,(0:max(M(:)))+.5) ;
 set(h,'color','y','linewidth',3) ;
 axis equal ; axis off ;
+vl_demo_print('mser_basic_contours') ;
 
 % --------------------------------------------------------------------
 %                                                       Run VL_MSER again
@@ -68,12 +69,14 @@ figure(1) ;
 hold on ;
 h1 = vl_plotframe(f) ; set(h1,'color','g','linewidth',3) ;
 h2 = vl_plotframe(f) ; set(h2,'color','k','linewidth',1) ;
-
-vl_demo_print('mser_basic_2') ;
+vl_demo_print('mser_basic_frames_both') ;
 
 figure(2) ;
 [c,h]=contour(M,(0:max(M(:)))+.5) ;
 set(h,'color','g','linewidth',3) ;
 
 hold on ; axis equal ; axis off ;
-vl_demo_print('mser_basic_1') ;
+vl_demo_print('mser_basic_contours_both') ;
+
+
+keyboard;

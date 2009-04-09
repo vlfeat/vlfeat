@@ -3,12 +3,12 @@
 <group>
 
 <p><em>Maximally Stable Extremal Regions (MSER)</em> is a feature
-detector; Analogously to the <a href="tut.sift">SIFT detector</a>, the
+detector; Like the <a href="tut.sift">SIFT detector</a>, the
 MSER algorithm extracts from an image <code>I</code> a number of
 co-variant regions, called MSERs. An MSER is a <em>stable</em>
 connected component of some level sets of the
 image <code>I</code>. Optionally, elliptical frames are attached to
-the MSERs by fitting ellipses.</p>
+the MSERs by fitting ellipses to the regions.</p>
 
 <ul>
 <li><a href="%pathto:tut.mser.extract;">Extracting MSERs</a></li>
@@ -25,9 +25,8 @@ pixels <code>x</code>, as the connected component of the level set at
 level <code>I(x)</code> which contains <code>x</code>. Such a pixel is
 called <em>seed</em> of the region.</p>
 
-<p>To demonstrate the usage of the MATLAB command <code>mser</code>
-(there is a similarly named command line utility as well), we open
-MATLAB and we load a test image</p>
+<p>To demonstrate the usage of the MATLAB command <code>vl_mser</code>
+we open MATLAB and load a test image</p>
 
 <pre>
 pfx = fullfile(vl_root,'data','spots.jpg') ;
@@ -45,7 +44,7 @@ A test image.
 </div>
 
 <p>We then convert the image to a format that is suitable for the
-<code>mser</code> command.</p>
+<code>vl_mser</code> command.</p>
 
 <pre>
 I = uint8(rgb2gray(I)) ;
@@ -62,23 +61,20 @@ I = uint8(rgb2gray(I)) ;
 <p>We plot the region frames by</p>
 
 <pre>
-clf ; imagesc(I) ; 
-hold on ;
 f = vl_ertr(f) ;
 vl_plotframe(f) ;
 </pre>
 
-<p>The <code>vl_ertr</code> transposes the elliptical frame and is
-needed because the <code>mser</code> code assumes that the row index
-is the first index, but the normal image convention assumes that this
-is the
+<p><code>vl_ertr</code> transposes the elliptical frame and is
+required here because the <code>vl_mser</code> code assumes that the row index
+is the first index, but the normal image convention assumes that this is the
 <code>x</code> (column) index.</p>
 
 <p>Plotting the MSERs themselves is a bit more involved as they have
 arbitrary shape.  To this end, we exploit two
 functions: <code>vl_erfill</code>, which, given an image and a region
 seed, returns a list of the pixels belonging to that region, and
-MATLAB built-in <code>contourn</code>, which draws the contour lines
+the MATLAB built-in <code>contour</code>, which draws the contour lines
 of a function. We start by</p>
 
 <pre>
@@ -89,9 +85,20 @@ for x=r'
 end
 </pre>
 
+<p>which computes a matrix <code>M</code> whose value are equal to the
+number of overlapping extremal regions. Next, we use <code>M</code>
+and <code>contour</code> to display the region boundaries:</p>
+
+<pre>
+figure(2) ;
+clf ; imagesc(I) ; hold on ; axis equal off; colormap gray ;
+[c,h]=contour(M,(0:max(M(:)))+.5) ;
+set(h,'color','y','linewidth',3) ;
+</pre>
+
 <div class="figure">
-<image src="%pathto:root;demo/mser_basic_1.jpg"/>
-<image src="%pathto:root;demo/mser_basic_2.jpg"/>
+<image src="%pathto:root;demo/mser_basic_contours.jpg"/>
+<image src="%pathto:root;demo/mser_basic_frames.jpg"/>
 <div class="caption">
 <span class="content">
 Extracted MSERs (left) and fitted ellipses (right).
@@ -99,58 +106,32 @@ Extracted MSERs (left) and fitted ellipses (right).
 </div>
 </div>
 
-<p>which computes a matrix <code>M</code> whose value are equal to the
-number of overlapping extremal regions. Next, we use <code>M</code>
-and <code>contourn</code> to display the region boundaries:</p>
+<p>Notice that we only find dark-on-bright regions by default. To include
+bright-on-dark regions we simply repeat the process with <code>255-I</code>.
+</p>
 
 <pre>
-clf ; imagesc(I) ;
-hold on ;
-[c,h]=contourn(M,(0:max(M(:)))+.5) ;
+[r,f] = vl_mser(uint8(255-I),'MinDiversity',0.7,'MaxVariation',0.2,'Delta',10) ;
 </pre>
+
+<div class="figure">
+<image src="%pathto:root;demo/mser_basic_contours_both.jpg"/>
+<image src="%pathto:root;demo/mser_basic_frames_both.jpg"/>
+<div class="caption">
+<span class="content">
+Extracted MSERs (left) and fitted ellipses (right) for both bright-on-dark
+(green) and dark-on-bright (yellow).  
+</span>
+</div>
+</div>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.param">MSER parameters</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>In the original formulation, MSERs are controlled by a single
-parameter <code>&Delta;</code>. Our implementation uses a few more
-parameters to refine even more the selection of the useful extremal
-regions.</p>
-
-<p>Understanding the parameters requires to know how ``stability'' of
-an extremal region is defined. The stability of an extremal
-region <code>R</code> is the inverse of the relative area variation of
-the region <code>R</code> when the intensity level is increased by
-<code>&Delta;</code>. Formally, the area variation is defined as 
-<code>|R(+&Delta;) - R(-&Delta;)|/|R|</code>, where $|R|$ denotes the
-area of the extremal region <code>R</code>, <code>R(+&Delta;)</code>
-is the extremal region <code>+&Delta;</code> levels up which
-contains <code>R</code> and <code>R(+&Delta;) - R</code> is the set
-difference of the two regions. If the are variation is small, then the
-region is deemed stable.</p>
-
-<p>Based on the stability score, the algorithm keeps the extremal
-regions which are maximally stable, meaning that they have minimum
-variation compared to the extremal region one intensity level below
-and one intensity level up\footnote{Due to the discrete nature of the
-image, the region below/up may be coincident with the actual region,
-in which case the region is still deemed maximal.}. Even if an
-extremal region is maximally stable, it might be rejected if</p>
-
-<ul>
-<li>it is too big (see the parameter <code>MaxArea</code>);</li>
-<li>it is too small (see the parameter <code>MinArea</code>);</li>
-<li>it is too unstable (see the parameter <code>MaxVariation</code>);</li>
-<li>it is too similar to another MSER (see the
-parameter <code>MinDiversity</code>).</li>
-</ul>
-
-<p>The interpretation of the parameters <code>MaxArea</code> and
-<code>MinArea</code>. The parameter <code>MaxVariation</code> removes
-regions that are too unstable (even if they might be maximally stable
-in the local). The interaction of the various parameters are
-illustrated next.</p>
+parameter <code>&Delta;</code>, which controls how the stability is
+calculated. Its effect is shown in the figure below.</p>
 
 <div class="figure">
 <image src="%pathto:root;demo/mser_delta_0.jpg"/>
@@ -160,34 +141,62 @@ illustrated next.</p>
 <image src="%pathto:root;demo/mser_delta_4.jpg"/>
 <div class="caption">
 <span class="content">
-<b>Meaning of parameter <code>&Delta;</code>.</b>  The intensity
-profile. The bumps have heights equal to 32, 64, 96, 128 and 160
-intensity levels. The variation score of a bump is either 0 if &Delta;
-is smaller than the bump height or very large otherwise (as the next
-extremal region is as big as the whole
-image). <code>MaxVariation</code> is set to 0.25.
+  <b>Effect of <code>&Delta;</code>.</b> We start with a synthetic
+  image which has an intensity profile as shown.  The bumps have
+  heights equal to 32, 64, 96, 128 and 160. As we increase
+  <code>&Delta;</code>, fewer and fewer regions are detected until
+  finally at <code>&Delta;=160</code> there is no region
+  <code>R</code> which is stable at <code>R(+&Delta;)</code>.
 </span>
 </div>
 </div>
 
-<p>While the concept of local stability is simple to grasp, there is a
-complication that we did not address yet, i.e. how to define
-``locality'' in the comparison of extremal regions. For
-instance, one could define neighbors of an extremal region $R$ the
-parent extremal region <code>R(+1)</code> at level e would compare the region
-<code>R</code> with the region <code>R_{+1}</code>.</p>
+<p>The stability of an extremal region <code>R</code> is the inverse
+of the relative area variation of the region <code>R</code> when the
+intensity level is increased by <code>&Delta;</code>. Formally, the
+variation is defined as:</p>
+
+<pre>
+|R(+&Delta;) - R|
+-----------
+    |R|
+</pre>
+
+<p>where <code>|R|</code> denotes the area of the extremal region
+<code>R</code>, <code>R(+&Delta;)</code> is the extremal region
+<code>+&Delta;</code> levels up which contains <code>R</code> and
+<code>|R(+&Delta;) - R|</code> is the area difference of the two
+regions. </p>
+
+<p>A stable region has a small variation. The algorithm finds regions which
+are "maximally stable", meaning that they have a lower variation
+than the regions one level below or above. Note that due to the
+discrete nature of the image, the region below / above may be
+coincident with the actual region, in which case the region is still
+deemed maximal.</p>
+
+<p>However, even if an extremal region is maximally stable, it might be
+rejected if:</p>
+
+<ul>
+<li>it is too big (see the parameter <code>MaxArea</code>);</li>
+<li>it is too small (see the parameter <code>MinArea</code>);</li>
+<li>it is too unstable (see the parameter <code>MaxVariation</code>);</li>
+<li>it is too similar to its parent MSER (see the
+parameter <code>MinDiversity</code>).</li>
+</ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.conventions">Conventions</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 
-<p>As mentioned in the introduction, the <code>mser</code> uses the
+<p>As mentioned in the introduction, <code>vl_mser</code> uses
 matrix indices as image coordinates. Compared to the usual MATLAB
 convention for images, this means that the <code>x</code>
 and <code>y</code> axis are swapped (this has been done to make the
 convention consistent with images with three or more dimensions). Thus
-the frames computed by the program may need to be ``transposed'' as
+the frames computed by the program may need to be "transposed" as
 in:</p>
 
 <pre>
@@ -196,13 +205,13 @@ f = vl_ertr(f) ;
 </pre>
 
 <p>On the other hand, the region seeds <code>r</code> are already in
-row major format, which is how MATLAB standard format for pixel
+row major format, which is the standard MATLAB format for pixel
 indices.</p>
 
 <p>Instead of transposing the frames, one can start by transposing
 the image. In this case, the frames <code>f</code> have the standard
 image convention, but the region seeds are in column-major format and
-may need to be ``transposed'' as in:</p>
+may need to be "transposed" as in:</p>
 
 <pre>
 [r,f] = vl_mser(I') ;
@@ -215,7 +224,7 @@ convention (because images are rasterized in column-major
 order). Therefore the image frames are in the standard format, and the
 region seeds are in column major format.</p>
 
-<p>In order to convert from the command line utility convention and
+<p>In order to convert from the command line utility convention to
 the MATLAB convention one needs also to recall that MATLAB coordinates
 starts from (1,1), but the command line utility uses the more common
 convention (0,0). For instance, let the files <code>image.frame</code>
