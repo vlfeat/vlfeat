@@ -170,7 +170,7 @@ typedef struct _VlMserReg VlMserReg ;
  ** level set of intensity VlMserExtrReg::value and containing the
  ** pixel VlMserExtReg::index.
  **
- ** VlMserExtrReg::area is the are of the extremal region and
+ ** VlMserExtrReg::area is the area of the extremal region and
  ** VlMserExtrReg::area_top is the area of the extremal region
  ** containing this region in the level set of intensity
  ** VlMserExtrReg::area + @c delta.
@@ -220,7 +220,7 @@ struct _VlMserFilt
   /*@{*/
   VlMserReg         *r ;       /**< basic regions                           */
   VlMserExtrReg     *er ;      /**< extremal tree                           */
-  vl_uint           *mer ;     /**< maximally stalbe extremal regions       */
+  vl_uint           *mer ;     /**< maximally stable extremal regions       */
   int                ner ;     /**< number of extremal regions              */
   int                nmer ;    /**< number of maximally stable extr. reg.   */
   int                rer ;     /**< size of er buffer                       */

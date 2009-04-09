@@ -225,7 +225,7 @@ mexFunction(int nout, mxArray *out[],
       REMAIN("stable enough,",    s-> num_abs_unstable) ;
       REMAIN("small enough,",     s-> num_too_big     ) ;
       REMAIN("big enough,",       s-> num_too_small   ) ;
-      REMAIN("diverse enogh.",    s-> num_duplicates  ) ;
+      REMAIN("diverse enough.",    s-> num_duplicates  ) ;
       
     }
 

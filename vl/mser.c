@@ -544,7 +544,7 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
               IDX is extending an extremal region with the same
               intensity value. Since ROOT(NR_IDX) will NOT be an
               extremal region of the full image, ROOT(IDX) can be
-              safely addedd as children of ROOT(NR_IDX) if this
+              safely added as children of ROOT(NR_IDX) if this
               reduces the height according to the union rank
               heuristic.
                
