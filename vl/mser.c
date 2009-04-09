@@ -360,6 +360,8 @@ vl_mser_delete (VlMserFilt* f)
     if(f-> dsubs  ) vl_free( f-> dsubs  ) ;
     if(f-> subs   ) vl_free( f-> subs   ) ;
     if(f-> dims   ) vl_free( f-> dims   ) ;
+
+    if(f-> mer    ) vl_free( f-> mer    ) ;
     vl_free (f) ;
   }
 }
