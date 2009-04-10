@@ -74,7 +74,7 @@
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
-  <page id="xcode" name="xcode" title="X-Code use"><include src="using-xcode.html"/></page>
+  <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
  </page>
 
  <dir name="api">

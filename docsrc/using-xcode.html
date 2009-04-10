@@ -3,18 +3,18 @@
 <group>
 
  <p>These instructions show how to setup a basic <b>VLFeat</b> project
-  with Apple X-Code.  For the sake of simplicty, we create a command
+  with Apple Xcode.  For the sake of simplicty, we create a command
   line tool written in C. However, these steps apply with minor
   modifications to other project types and to the C++ lanuage.</p>
 
  <p>First, let us create a new project
-  called <code>vlfeat-client</code>. Open X-Code and select <b>File
+  called <code>vlfeat-client</code>. Open Xcode and select <b>File
   &gt; New Project &gt; Command Line Utility &gt; Standard Tool</b>
   and click <b>Choose</b>. Give a name to your project (in our
   case <code>vlfeat-client</code>), and click <b>Save</b>.</p>
 
  <div class="figure">
- <img alt="X-Code new project" src="%pathto:root;images/using-xcode-new.png"/>
+ <img alt="Xcode new project" src="%pathto:root;images/using-xcode-new.png"/>
  </div>
 
  <p>Now we need to add <b>VLFeat</b> to the C compiler include seatch
@@ -25,15 +25,15 @@
   <b>VLFeat</b> root path (in our case this is
   just <code>~/src/vlfeat</code>).</p>
 
- <img alt="X-Code info" src="%pathto:root;images/using-xcode-info.png"/>
+ <img alt="Xcode info" src="%pathto:root;images/using-xcode-info.png"/>
 
  <p>Next, we add the <code>libvl.dylib</code> library file to the
-  project resources so that X-Code links against it. To do this, drag
+  project resources so that Xcode links against it. To do this, drag
   and drop the <code>libvl.dylib</code> file (in our example
   <code>~/src/vlfeat/bin/maci/libvl.dylib</code>) to the left panel and click
   <b>Add</b>.</p>
 
- <img alt="X-Code dylib" src="%pathto:root;images/using-xcode-dylib.png"/>
+ <img alt="Xcode dylib" src="%pathto:root;images/using-xcode-dylib.png"/>
 
  <p>Next, edit the <code>main.c</code> source file and type the following code:</p>
 
@@ -46,7 +46,7 @@
   }
  </pre>
 
- <img alt="X-Code edit" src="%pathto:root;images/using-xcode-edit.png"/>
+ <img alt="Xcode edit" src="%pathto:root;images/using-xcode-edit.png"/>
 
  <p>If you try to build the project, it should compile without erros
   (if you are using C++, do not forget to wrap the <code>include</code>
@@ -54,7 +54,7 @@
   to run the program, it will fail, complaining that it cannot find the
   library image.</p>
 
- <img alt="X-Code error" src="%pathto:root;images/using-xcode-err.png"/>
+ <img alt="Xcode error" src="%pathto:root;images/using-xcode-err.png"/>
 
  <p>The reason is that <code>libvl.dylib</code> is compiled with the
   library <code>install_name</code> equal
@@ -76,12 +76,12 @@
   the <code>libvl.dylib</code> item from the panel to the <b>Copy
    Files</b> build phase.</p>
 
- <img alt="X-Code copy" src="%pathto:root;images/using-xcode-copy.png"/>
- <img alt="X-Code copy" src="%pathto:root;images/using-xcode-copy-2.png"/>
+ <img alt="Xcode copy" src="%pathto:root;images/using-xcode-copy.png"/>
+ <img alt="Xcode copy" src="%pathto:root;images/using-xcode-copy-2.png"/>
 
  <p>Now build again the project, and run it. It should run correctly,
   and if you open the debugger console you should see this:</p>
 
- <img alt="X-Code copy" src="%pathto:root;images/using-xcode-ok.png"/>
+ <img alt="Xcode ok" src="%pathto:root;images/using-xcode-ok.png"/>
 
 </group>
