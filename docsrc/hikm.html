@@ -3,25 +3,44 @@
 <group>
 
 <p><b>VLFeat</b> offers a hierarchical version of integer k-means, which
-recursively apply \cmd{ikmeans} to compute finer and finer partitions.
-We demonstrates this by:</p>
+recursively applies <code>vl_ikmeans</code> to compute finer and finer
+partitions.</p> 
+
+<ul>
+  <li><a href="%pathto:tut.hikm.usage;">Usage</a></li>
+  <li><a href="%pathto:tut.hikm.tree;">Tree structure</a></li>
+  <li><a href="%pathto:tut.hikm.elkan;">Elkan</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hikm.usage">Usage</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>First, we generate some random data to cluster in <code>[0,255]^2</code>:</p>
+
+<pre>
+data     = uint8(rand(2,10000) * 255) ;
+datat    = uint8(rand(2,100000)* 255) ;
+</pre>
+
+<p>To cluster this data, we simply use <code>vl_hikmeans</code>:</p>
 
 <pre>
 K        = 3 ;
 nleaves  = 100 ;
-data     = uint8(rand(2,10000) * 255) ;
-datat    = uint8(rand(2,100000)* 255) ;
 [tree,A] = vl_hikmeans(data,K,nleaves) ;
-AT       = vl_hikmeanspush(tree,datat) ;
 </pre>
 
 <p>Here <code>nleaves</code> is the desired number of leaf
-clusters. This is obtained by subdividing recursively each cluster in
-k sub-clusters. Therefore <code>depth = floor(log(K nleaves))</code>
-recursive subdivisions are sufficient and the algorithm terminates
-with clusters arranged in a k-tree of of depth
-<code>depth</code> which has at least <code>nleaves</code> leaves (but
-it may have more).</p>
+clusters. The algorithm terminates when there are at least
+<code>nleaves</code> nodes, creating a tree with <code>depth =
+  floor(log(K nleaves))</code></p>
+
+<p>To assign labels to the new data, we use <code>vl_hikmeanspush</code>:</p>
+
+<pre>
+AT       = vl_hikmeanspush(tree,datat) ;
+</pre>
 
 <div class="figure">
 <image src="%pathto:root;demo/hikmeans-tree.jpg"/>
@@ -32,10 +51,14 @@ it may have more).</p>
 recursive clusters. Each node is a cluster center. The root note is
 not depicted (its center would be the mean of the dataset).  Right:
 Clusters are represented as different colors (here are more than 100
-clusters, but only tree colors are used).
+clusters, but only three colors are used).
 </span>
 </div>
 </div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hikm.tree">Tree structure</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>The output <code>tree</code> is a MATLAB structure representing the tree of
 clusters:</p>
@@ -53,7 +76,7 @@ tree =
 <p>The field <code>centers</code> is the matrix of the cluster centers at the
 root node.  If the depth of the tree is larger than 1, then the field
 <code>sub</code> is a structure array with one entry for each cluster. Each
-element is in turn a structure such as</p>
+element is in turn a tree:</p>
 
 <pre>
 > tree.sub
@@ -64,9 +87,9 @@ ans =
     sub
 </pre>
 
-<p>with the cluster centers for that recursive partitions and a field
-\verb$sub$ for the recursive children. When there are no children,
-this field is equal to the empty matrix</p>
+<p>with a field <code>centers</code> for its clusters and a field
+<code>sub</code> for its children. When there are no children, this
+field is equal to the empty matrix</p>
 
 <pre>
 > tree.sub(1).sub(1).sub(1).sub(1)
@@ -75,6 +98,34 @@ ans =
 
     centers: [2x3 int32]
         sub: []
+</pre>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hikm.elkan">Elkan</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>VLFeat supports two different implementations of k-means. While they
+produce identical output, the Elkan method is sometimes faster.
+The <code>method</code> parameters controls which method is used. Consider the case when <code>K=10</code> and our data is now 128 dimensional (e.g. SIFT descriptors):</p>
+
+<pre>
+K=10;
+nleaves = 1000;
+data = uint8(rand(128,10000) * 255);
+tic;
+[tree,A] = vl_hikmeans(data,K,nleaves,'method', 'lloyd') ; % default
+t_lloyd = toc
+tic;
+[tree,A] = vl_hikmeans(data,K,nleaves,'method', 'elkan') ;
+t_elkan = toc
+
+t_lloyd =
+
+    8.0743
+
+t_elkan =
+
+    3.0427
 </pre>
 
 </group>
