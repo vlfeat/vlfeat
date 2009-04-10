@@ -10,26 +10,22 @@ this is limiting for some application, it works well for clustering
 image descriptors, where very high precision is usually unnecessary.
 For more details, see the 
 <a href="%pathto:root;api/ikmeans_8h.html">Integer k-means API
-reference</a>.</p>
+  reference</a>.</p>
 
-<div class="figure">
-<image src="%pathto:root;demo/ikmeans_lloyd.jpg"/>
-<div class="caption">
-<span class="content">
-<b>Integer k-means.</b> We show clusters of 2-D points obtained by
-integer k-means.  There are <code>k=3</code> clusters represented with
-different colors. The clusters have been estimated from 1000 points
-(displayed as dots). Then other 10000 points have been projected on
-the same clusters (displayed as crosses). The three big markers
-represent the cluster centers.
-</span>
-</div>
-</div>
+
+<ul>
+  <li><a href="%pathto:tut.ikm.usage;">Usage</a></li>
+  <li><a href="%pathto:tut.ikm.elkan;">Elkan</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.ikm.usage">Usage</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>Integer k-means (IKM) is run by the command
 <code>vl_ikmeans</code>. In order to demonstrate the usage of this
-command, we sample 10000 random points in the <code>[0,255]^2</code>
-integer square and launch the <code>vl_ikmeans</code> to get k=3
+command, we sample 1000 random points in the <code>[0,255]^2</code>
+integer square and use <code>vl_ikmeans</code> to get k=3
 clusters:</p>
 
 <pre>
@@ -63,5 +59,49 @@ for k=1:K
        'Color',cl(mod(k,ncl)+1,:)) ;  
 end
 </pre>
+
+<div class="figure">
+<image src="%pathto:root;demo/ikmeans_lloyd.jpg"/>
+<div class="caption">
+<span class="content">
+<b>Integer k-means.</b> We show clusters of 2-D points obtained by
+integer k-means.  There are <code>k=3</code> clusters represented with
+different colors. The clusters have been estimated from 1000 points
+(displayed as dots). Then 10000 different points have been projected on
+the same clusters (displayed as crosses). The three big markers
+represent the cluster centers.
+</span>
+</div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.ikm.elkan">Elkan</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>VLFeat supports two different implementations of k-means. While
+they produce identical output, the Elkan method requires fewer
+distance computations.  The <code>method</code> parameters controls
+which method is used. Consider the case when <code>K=100</code> and our
+data is now 128 dimensional (e.g. SIFT descriptors):</p>
+
+<pre>
+K=100;
+data = uint8(rand(128,10000) * 255);
+tic;
+[C,A] = vl_ikmeans(data,K,'method', 'lloyd') ; % default
+t_lloyd = toc
+tic;
+[C,A] = vl_ikmeans(data,K,'method', 'elkan') ;
+t_elkan = toc
+
+t_lloyd =
+
+   10.2884
+
+t_elkan =
+
+    5.1405
+</pre>
+
 
 </group>
