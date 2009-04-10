@@ -153,7 +153,7 @@ vl_ikm_get_centers (VlIKMFilt const* f)
 VL_INLINE void
 vl_ikm_set_verbosity (VlIKMFilt *f, int verb)
 {
-  f-> verb = verb ;
+  f-> verb = VL_MAX(0,verb) ;
 }
 
 /** ------------------------------------------------------------------
