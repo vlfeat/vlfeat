@@ -17,7 +17,7 @@
  <img alt="Xcode new project" src="%pathto:root;images/using-xcode-new.png"/>
  </div>
 
- <p>Now we need to add <b>VLFeat</b> to the C compiler include seatch
+ <p>Now we need to add <b>VLFeat</b> to the C compiler include search
   path. To do this, select the <code>vlfeat-client</code> target and
   open the information panel (the blue button,
   or <b>Command-i</b>). Then select the <b>Build</b> panel, search for
@@ -41,14 +41,14 @@
   #include &lt;vl/generic.h&gt;
 
   int main (int argc, const char * argv[]) {
-  VL_PRINT ("Hellow, World!") ;
+  VL_PRINT ("Hello world!") ;
   return 0;
   }
  </pre>
 
  <img alt="Xcode edit" src="%pathto:root;images/using-xcode-edit.png"/>
 
- <p>If you try to build the project, it should compile without erros
+ <p>If you try to build the project, it should compile without errors
   (if you are using C++, do not forget to wrap the <code>include</code>
   statements in a <code>extern "C" {}</code> block). However, if you try
   to run the program, it will fail, complaining that it cannot find the
@@ -60,10 +60,10 @@
   library <code>install_name</code> equal
   to <code>@loader_path/libvl.dylib</code>. This causes the run-time
   loader to look for the library in the same directory of the
-  exectuable. There are two ways around this problem: The first is to
+  executable. There are two ways around this problem: The first is to
   install the library in a standard location
   (e.g. <code>/usr/local/lib</code>) and use the <code>otool</code>
-  command to change accordingly the
+  command to change the
   library <code>install_name</code>. The other is to simply copy
   the <code>libvl.dylib</code> file in the executable directory. Here we
   demonstrate the second technique.</p>
@@ -79,7 +79,7 @@
  <img alt="Xcode copy" src="%pathto:root;images/using-xcode-copy.png"/>
  <img alt="Xcode copy" src="%pathto:root;images/using-xcode-copy-2.png"/>
 
- <p>Now build again the project, and run it. It should run correctly,
+ <p>Now rebuild the project, and run it. It should run correctly,
   and if you open the debugger console you should see this:</p>
 
  <img alt="Xcode ok" src="%pathto:root;images/using-xcode-ok.png"/>
