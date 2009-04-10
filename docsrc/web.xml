@@ -93,7 +93,7 @@
  </dir>
 
  <dir name="overview">
-  <page id="tut"       name="tut"       title="Overview"> 
+  <page id="tut"       name="tut"       title="Tutorials"> 
    <include src="tutorials.html"/>
    <page id="tut.sift"  name="sift"      title="SIFT"> <include src="sift.html"/></page>
    <page id="tut.mser"  name="mser"      title="MSER"> <include src="mser.html"/></page>
