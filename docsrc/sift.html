@@ -8,7 +8,8 @@ an image a number of frames (attributed regions) in a way which is
 consistent with (some) variations of the illumination, viewpoint and
 other viewing conditions. The descriptor associates to the regions a
 signature which identifies their appearance compactly and
-robustly.</p>
+robustly. For a more in-depth description of the algorithm, see our
+<a href="%pathto:root;api/sift_8h.html">API reference for SIFT</a>.</p>
  
 <ul>
  <li><a href="%pathto:tut.sift.extract;">Extracting frames and descriptors</a></li>
@@ -40,12 +41,11 @@ image(I) ;
  </div>
 </div>
 
-<p>The <code>vl_sift</code> command requires an image in gray scale
-format and single precision. It also expects the range to be
-normalized in the [0,255] interval (while this is not strictly
-required, the default values of some internal thresholds are tuned for
-this case). The image <code>I</code> is converted in the appropriate
-format by</p>
+<p>The <code>vl_sift</code> command requires a single precision gray
+scale image. It also expects the range to be normalized in the [0,255]
+interval (while this is not strictly required, the default values of
+some internal thresholds are tuned for this case). The image
+<code>I</code> is converted in the appropriate format by</p>
 
 <pre>
 I = single(rgb2gray(I)) ;
@@ -67,8 +67,8 @@ perm = randperm(size(f,2)) ;
 sel  = perm(1:50) ;
 h1   = vl_plotframe(f(:,sel)) ; 
 h2   = vl_plotframe(f(:,sel)) ; 
-set(h1,'color','y','linewidth',3) ;
-set(h2,'color','k','linewidth',1) ;
+set(h1,'color','k','linewidth',3) ;
+set(h2,'color','y','linewidth',2) ;
 </pre>
 
  
@@ -89,7 +89,7 @@ set(h3,'color','g') ;
  <div class="figure">
   <img src="%pathto:root;demo/sift_basic_3.jpg"/>
   <div class="caption">
-   A test image for the peak threshold parameter.
+   Some of the detected SIFT frames with their associated descriptors.
   </div>
  </div>
  
@@ -101,8 +101,8 @@ set(h3,'color','g') ;
   threshold and the (non) edge threshold.</p>
 
  <p>The <em>peak threshold</em> filters peaks of the DoG scale space
-  that are too small (in absolute value). For instance, consider the
-  test image obtained as a gradient of Gaussian blobs:</p>
+  that are too small (in absolute value). For instance, consider a
+  test image of 2D Gaussian blobs:</p>
 
 <pre><![CDATA[
 I = double(rand(100,500) <= .005) ;
@@ -115,15 +115,18 @@ I = single(255 * I) ;]]>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_peak_0.jpg/"/>
+  <div class="caption">
+   A test image for the peak threshold parameter.
+  </div>
 </div>
 
-<p>We run the detector with peak threshold \verb$x$ by</p>
+<p>We run the detector with peak threshold <code>peak_thresh</code> by</p>
  
 <pre>
-f = vl_sift(I, 'PeakThresh', x) ;
+f = vl_sift(I, 'PeakThresh', peak_thresh) ;
 </pre>
 
-<p>obtaining less and less features</p>
+<p>obtaining fewer features as <code>peak_thresh</code> is increased.</p>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_peak_1.jpg"/>
@@ -131,16 +134,16 @@ f = vl_sift(I, 'PeakThresh', x) ;
  <img src="%pathto:root;demo/sift_peak_3.jpg"/>
  <img src="%pathto:root;demo/sift_peak_4.jpg"/>
  <div class="caption">
-  <span class="content">
-   Selected frames for varying peak threshold.
+   <span class="content">
+     Detected frames for increasing peak threshold.<br/>
+     From top: <code>peak_thresh = {0, 10, 20, 30}</code>.
   </span>
  </div>
 </div>
 
-<p> Similarly, the <em>edge threshold</em> instead eliminates peaks of
-the DoG scale space whose curvature is too small (the reason is that
-such peaks yields badly localized frames). For instance, consider the
-test image</p>
+<p>The <em>edge threshold</em> eliminates peaks of
+the DoG scale space whose curvature is too small (such peaks yield
+badly localized frames). For instance, consider the test image</p>
  
 <pre>
 I = zeros(100,500) ;
@@ -160,13 +163,13 @@ A test image for the edge threshold parameter.
 </div>
 </div>
 
-<p>We run the detector with edge threshold <code>x</code> by</p>
+<p>We run the detector with edge threshold <code>edge_thresh</code> by</p>
 
 <pre>
-f = vl_sift(I, 'EdgeThresh', x) ;
+f = vl_sift(I, 'edgethresh', edge_thresh) ;
 </pre>
 
-<p>obtaining more and more features:</p>
+<p>obtaining more features as <code>edge_thresh</code> is increased:</p>
 
 <div class="figure">
 <img src="%pathto:root;demo/sift_edge_1.jpg"/>
@@ -175,7 +178,8 @@ f = vl_sift(I, 'EdgeThresh', x) ;
 <img src="%pathto:root;demo/sift_edge_4.jpg"/>
 <div class="caption">
 <span class="content">
-Selected frames for varying edge threshold.
+  Detected frames for increasing edge threshold.<br/>
+  From top: <code>edge_thresh = {3.5, 5, 7.5, 10}</code>
 </span>
 </div>
 </div>
@@ -184,32 +188,31 @@ Selected frames for varying edge threshold.
 <h1 id="tut.sift.custom">Custom frames</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>The MATLAB command <code>sift</code> (and the command line utility)
-can bypass the detector and run the descriptor on custom frames by
-means of the <code>Frames</code> option.</p>
+<p>The MATLAB command <code>vl_sift</code> (and the command line utility)
+can bypass the detector and compute the descriptor on custom frames using
+the <code>Frames</code> option.</p>
+
+<p>For instance, we can compute the descriptor of a SIFT frame
+centered at position <code>(100,100)</code>, of scale <code>10</code>
+and orientation <code>-pi/8</code> by</p>
+ 
+<pre>
+fc = [100;100;10;-pi/8] ;
+[f,d] = vl_sift(I,'frames',fc) ;
+</pre>
 
 <div class="figure">
-<img src="%pathto:root;demo/sift_or.jpg"/>
+<img src="%pathto:root;demo/sift_basic_4.jpg"/>
 <div class="caption">
 <span class="content">
-Custom frames with computed orientations.
+  Custom frame at with fixed orientation.
 </span>
 </div>
 </div>
-
-<p>For instance, we can compute the descriptor of a SIFT frame
-centered at position <code>(100,100)</code>, of scale 10 and
-orientation
-<code>pi/8</code> by</p>
  
-<pre>
-fc = [100;100;10;pi/8] ;
-[f,d] = vl_sift(I,'frames',fc) ;
-</pre>
- 
- <p>Multiple frames <code>fc</code> an be specified as well. In this
+ <p>Multiple frames <code>fc</code> may be specified as well. In this
   case they are re-ordered by increasing
-  scale. Th <code>Orientations</code> option instructs the program to
+  scale. The <code>Orientations</code> option instructs the program to
   use the custom position and scale but to compute the keypoint
   orientations, as in</p>
 
@@ -217,10 +220,19 @@ fc = [100;100;10;pi/8] ;
 fc = [100;100;10;0] ;
 [f,d] = vl_sift(I,'frames',fc,'orientations') ;
 </pre>
+
+ <div class="figure">
+<img src="%pathto:root;demo/sift_basic_5.jpg"/>
+<div class="caption">
+<span class="content">
+Custom frame with computed orientations.
+</span>
+</div>
+</div>
  
 <p>Notice that, depending on the local appearance, a keypoint may
 have <em>multiple</em> orientations.  Moreover, a keypoint computed on
-a constant image region (such as one big as one pixel) has no
+a constant image region (such as a one pixel region) has no
 orientations!</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -235,7 +247,8 @@ original implementation uses a different reference system, illustrated
 next:</p>
  
 <div class="figure">
-<img src="%pathto:root;figures/sift-conv.png"/>
+  <img src="%pathto:root;figures/sift-conv-vlfeat.png"/><br/>
+  <img src="%pathto:root;figures/sift-conv.png"/>
 <div class="caption">
 <span class="content">
 Our conventions (top) compared to Lowe's (bottom).
@@ -253,9 +266,9 @@ Our conventions (top) compared to Lowe's (bottom).
   varying index and <code>y</code> the slowest.</p>
 
  <p>By comparison, D. Lowe's implementation (see bottom half of the
-  figure) uses a slightly different convention: Frames centers are
+  figure) uses a slightly different convention: Frame centers are
   expressed relatively to the standard image reference system, but the
-  frames orientation and the descriptor assume that the <em> y </em>
+  frame orientation and the descriptor assume that the <em> y </em>
   axis points upward. Consequently, to map from our to D. Lowe's
   convention, frames orientations need to be negated and the descriptor
   elements must be re-arranged.</p>

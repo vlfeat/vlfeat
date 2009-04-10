@@ -14,8 +14,8 @@ f = vl_sift(single(I), 'frames', f, 'orientations') ;
 
 figure(1) ; clf ;
 imagesc(I) ; colormap gray ; hold on ;
-vl_plotframe(f,'color','y','linewidth',3) ;
-vl_plotframe(f,'color','k','linewidth',1) ; axis equal ; axis off ;
+vl_plotframe(f,'color','k','linewidth',3) ;
+vl_plotframe(f,'color','y','linewidth',2) ; axis equal ; axis off ;
 
 vl_demo_print('sift_or') ;
 
