@@ -24,7 +24,7 @@
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 This module implements a dense version of @ref sift.h "SIFT". This is
-an object that can quickly computes descriptor for densely sampled
+an object that can quickly compute descriptors for densely sampled
 keypoints with identical size and orientation. It can be reused for
 multiple images of the same size.
  
@@ -41,7 +41,7 @@ multiple images of the same size.
 @sa @ref sift "The SIFT module", @ref dsift-tech "Technical details"
 
 This module implements a fast algorithm for the calculation of a large
-number of SIFT descriptor of densely sampled keypoints of the same
+number of SIFT descriptors of densely sampled keypoints of the same
 scale and orientation. See the @ref sift "SIFT section" for an
 overview of SIFT.
 
@@ -53,13 +53,13 @@ the spatial bins and number of orientation bins) can be customized
 @image html dsift-geom.png "Dense SIFT descriptor geometry"
 
 By default, SIFT uses a Gaussian windowing function that discounts
-contributions of gradients farther away from the descriptor
-centers. This functions can be changed to flat by invoking
+contributions of gradients further away from the descriptor
+centers. This function can be changed to a flat window by invoking
 ::vl_dsift_set_flat_window (this greatly speeds-up the calculation).
 
 Keypoints are sampled in such a way that all bin centers are at
 integer coordinates within the image boundaries.
-::vl_dsift_set_bounds can be used to further restrict sampling the
+::vl_dsift_set_bounds can be used to further restrict sampling to the
 keypoints in an image subregion.
 
 @remark This descriptor is <em>not</em> equivalent to N. Dalal and
@@ -96,7 +96,7 @@ and this section follows that notation.
 @subsection dsift-tech-descriptor-dense Dense descriptors
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-When computing descriptors form many keypoints differing only by their
+When computing descriptors for many keypoints differing only by their
 position (and with null rotation), further simplifications are
 possible. In this case, in fact,
 
@@ -113,7 +113,7 @@ possible. In this case, in fact,
  d\mathbf{x}.
 @f}
 
-Since many different values of @e T are samped, this is convenientely
+Since many different values of @e T are sampled, this is conveniently
 expressed as a separable convolution. First, we translate by @f$
 \mathbf{x}_{ij} = m\sigma(\hat x_i,\ \hat y_i)^\top @f$ and we use the
 symmetry of the various binning and windowing functions to write
@@ -163,7 +163,7 @@ and obtain
 @f}
 
 Furthermore, if we use a flat rather than Gaussian windowing function,
-the kernels do not depend on the bin anymore, and we have
+the kernels do not depend on the bin, and we have
 
 @f{eqnarray*}
  k(z) &=& 
@@ -177,7 +177,7 @@ the kernels do not depend on the bin anymore, and we have
 (here @f$ \sigma_\mathrm{win} @f$ is the side of the flat window). 
 
 @note In this case the binning functions @f$ k(z) @f$ are triangular
-and the convolution can be computed in time indepnedent on the filter
+and the convolution can be computed in time independent on the filter
 (i.e. descriptor bin) support size by integral signals.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -188,9 +188,9 @@ To avoid resampling and dealing with special boundary conditions, we
 impose some mild restrictions on the geometry of the descriptors that
 can be computed. In particular, we impose that the bin centers @f$ T +
 m\sigma (x_i,\ y_j) @f$ are always at integer coordinates within the
-image boundaries, avoiding to interpolate/extraploate the iamge. 
-This condition amounts to (for the @e x coordiante, being the @e y
-coordinate analogous)
+image boundaries. This eliminates the need for costly interpolation.
+This condition amounts to (expressed in terms of the @e x coordinate,
+and equally applicable to @e y)
 
 @f[
  \{0,\dots, W-1\} \ni T_x + m\sigma x_i = 
@@ -199,7 +199,7 @@ coordinate analogous)
  \qquad i = 0,\dots,N_x-1.
 @f]
 
-Notice that for this condition to be satisied, the @em descriptor
+Notice that for this condition to be satisfied, the @em descriptor
 center @f$ T_x @f$ needs to be either fractional or integer depending
 on @f$ N_x @f$ being even or odd. To eliminate this complication,
 it is simpler to use as a reference not the descriptor center @e T,

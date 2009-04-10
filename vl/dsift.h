@@ -62,7 +62,7 @@ typedef struct VlDsiftFilter_
   int numFrameAlloc ;      /**< buffer allocated: number of frames  */
   int numGradAlloc ;       /**< buffer allocated: number of orientations */
 
-  float **grads ;          /**< gradient bufffer */
+  float **grads ;          /**< gradient buffer */
   float *convTmp1 ;        /**< temporary buffer */
   float *convTmp2 ;        /**< temporary buffer */
 }  VlDsiftFilter ;
