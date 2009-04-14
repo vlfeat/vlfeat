@@ -75,6 +75,7 @@
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
   <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
+  <page id="vsexpress" name="vsexpress" title="Using VC++"><include src="using-vsexpress.html"/></page>
  </page>
 
  <dir name="api">

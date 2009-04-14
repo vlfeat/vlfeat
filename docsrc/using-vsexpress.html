@@ -1,0 +1,75 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+
+  <p>These instructions show how to setup a basic <b>VLFeat</b>
+  project with Visual C++ Express 2008 on Windows XP (32 bit).
+  Instructions for other versions of Visual Studio should be
+  similar.</p>
+
+  <p>First, we create a new project called <code>vlfeat-client</code>.
+  Open Visual C++ Express 2008 and select <b>File &gt; New &gt; Project</b>
+  and choose <b>General &gt; Empty Project</b>. Give your project a
+  name and location (here <code>vlfeat-client</code>) and click OK.</p>
+  
+ <img alt="New Project" src="%pathto:root;images/using-vs-new-project.png"/>
+ 
+ <img alt="Empty Project" src="%pathto:root;images/using-vs-empty-project.png"/>
+
+  <p>Next, we have to modify the project properties to include the
+  <b>VLFeat</b> library and include directories. Right click on the
+  project and select properties.</p>
+
+ <img alt="Properties" src="%pathto:root;images/using-vs-project-properties.png"/>
+
+ <p>We want these settings to apply to both Debug and Release builds, so
+ switch to all configurations.</p>
+ 
+ <img alt="All Configurations" src="%pathto:root;images/using-vs-all-configurations.png"/>
+
+ <p>Add an additional include path which points to the root of the
+ VLFeat folder:</p>
+
+ <img alt="Additional Includes" src="%pathto:root;images/using-vs-additional-include.png"/>
+
+  <p>Add an additional library include path pointing to the bin/win32
+  folder in the distribution, and add <code>vl.dll</code> as a
+  dependency:</p>
+
+ <img alt="Additional LIBDIR" src="%pathto:root;images/using-vs-additional-libdir.png"/>
+
+ <img alt="Additional Dependencies" src="%pathto:root;images/using-vs-additional-deps.png"/>
+
+ <p>This will allow us to compile, but we will not be able to run,
+ getting  because <code>vl.dll</code> will not be found:</p>
+
+ <img alt="vl.dll was not found" src="%pathto:root;images/using-vs-nodll.png"/>
+ 
+ <p>To remedy this, we add a post-build step which copies vl.dll to
+ the debug or release folder.  Since this only needs to be done once
+ for each project, we could instead copy the file manually.</p>
+
+ <img alt="Post-build step" src="%pathto:root;images/using-vs-post-step.png"/>
+ 
+ <p>Now that we have created our project, add a new .cpp file (right
+ click on Source Files and choose <b>Add &gt; New Item</b>) with
+ this code:</p>
+
+  <pre>
+extern "C" {
+#include &lt;vl/generic.h&gt;
+}
+
+int main (int argc, const char * argv[]) {
+  VL_PRINT ("Hello world!\n") ;
+  return 0;
+}
+ </pre>
+
+ <p>Build and run the project (Ctrl+F5). It should run correctly, and
+ you should see this:</p>
+
+ <img alt="Visual C++ OK" src="%pathto:root;images/using-vs-ok.png"/>
+
+</group>
