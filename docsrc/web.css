@@ -23,7 +23,7 @@ body {
     font-size: 14px ;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: Georgia, serif ;
+    font-family: Lucida, Helvetica, sans-serif ;
     font-weight: normal ;
     color: #325799;
 }
@@ -101,7 +101,7 @@ pre, code {
     background-color: #d7e0f1;
     font-size: 1em ;
     padding: 2px 1em ;
-    font-family: Helvetica ;
+    font-family: Lucida, Helvetica, sans-serif ;
     border-bottom: 1px solid gray ;
     border-style: none;
 } 
@@ -125,7 +125,7 @@ pre, code {
 
 .standout {
     margin: 1em ! important ;
-    font-family: Georgia, serif ;
+    font-family: Lucida, Helvetica, sans-serif ;
     font-style: italic ;
     color: red ! important ;
 }
@@ -159,7 +159,7 @@ pre, code {
 }
 #content blockquote {
     margin: 1em ;
-    font-family: Georgia, serif ;
+    font-family: Lucida, Helvetica, sans-serif ;
     font-style: italic ;
 }
 #content pre {
@@ -206,7 +206,7 @@ pre, code {
     text-align: center ;
 }
 #content div.caption {
-    font-family: Georgia, serif ;
+    font-family: Lucida, Helvetica, sans-serif ;
     font-style: italic ;
 }
 /* for buggy IE 6 */
