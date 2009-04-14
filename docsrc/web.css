@@ -56,40 +56,37 @@ pre, code {
 #sidebar ul {
     margin: 0 ;
     padding: 0 ;
-    margin-left: 1em ;
-    margin-top: 1em ;
+    margin-left: .5em ;
+    margin-top: .5em ;
     margin-bottom: 0em ;
 }
 #sidebar ul ul {
-    margin-top: 0em ;
-    margin-bottom: 1em ;
+    margin-top: .3em ;
+    margin-bottom: .3em ;
 }
 #sidebar li {
     list-style: none ; /* for buggy IE */
     display: block ;
     margin: 0px ;
-    padding: 0px ;
-    margin-top: 0.5em ;
-    margin-bottom: 1em ;
-    font-size: 12px ;
+    padding: .2em ;
+    font-size: 14px ;
     font-weight: bold ;
 }
 #sidebar li li {
     font-weight: normal ;
     text-transform: none ;
-    margin-bottom: 0.5em ;
 }
 #sidebar li .active {
     background: #d7e0f1;
-    padding: 3px ;
 }
 #sidebar li a {
     color: rgb(40,40,40) ;    
     text-decoration: none ;
+    padding: .2em;
 }
 #sidebar li .active a {
-    color: white ;
     text-decoration: none ;
+    padding: .2em;
 }
 #header {
     padding-top: 1px ;
@@ -99,8 +96,8 @@ pre, code {
 }
 #headbanner {
     background-color: #d7e0f1;
-    font-size: 1em ;
-    padding: 2px 1em ;
+    font-size: 1.2em ;
+    padding: .2em .7em ;
     font-family: Lucida, Helvetica, sans-serif ;
     border-bottom: 1px solid gray ;
     border-style: none;
