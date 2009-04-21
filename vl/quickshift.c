@@ -27,14 +27,14 @@ General Public License version 2.
 
 Quick shift [1] is a fast mode seeking algorithm, similar to mean
 shift. The algorithm segments a color image (or any image with more
-than one component) by identifying cluster of pixels in the joint
+than one component) by identifying clusters of pixels in the joint
 spatial and color dimensions. Segments are local (superpixels) and can
 be used as a basis for further processing.
 
 Given an image, the algorithm calculates a forest of pixels whose
 branches are labeled with a distance value
 (::vl_quickshift_get_parents, ::vl_quickshift_get_dists). This
-specifies a hyerarchical segmentation of the image, with segments
+specifies a hierarchical segmentation of the image, with segments
 corresponding to subtrees. Useful superpixels can be identified by
 cutting the branches whose distance label is above a given threshold
 (the threshold can be either fixed by hand, or determined by cross
@@ -42,15 +42,15 @@ validation).
 
 Parameter influencing the algorithm are:
 
-- <b>Kernel size.</b> The pixel density (and so its modes) is
+- <b>Kernel size.</b> The pixel density and its modes are
 estimated by using a Parzen window estimator with a Gaussian kernel of
 the specified size (::vl_quickshift_set_kernel_size). The larger the
 size, the larger the neighborhoods of pixels considered.
-- <b>Maxium distance.</b> This (::vl_set_max_dist) is the maxium
-distance between two pixels that the algorithm considres when building
-the forest. In principe, it can be infinity (so that a tree is
-returned), but in practice it is much faster to consider relatively
-small distances only (the maximum distance can be set to a small
+- <b>Maximum distance.</b> This (::vl_set_max_dist) is the maximum
+distance between two pixels that the algorithm considers when building
+the forest. In principle, it can be infinity (so that a tree is
+returned), but in practice it is much faster to consider only
+relatively small distances (the maximum distance can be set to a small
 multiple of the kernel size).
 
 [1] A. Vedaldi and S. Soatto. &ldquo;Quick Shift and Kernel Methods
@@ -66,15 +66,15 @@ for Mode Seeking&rdquo;, in <em>Proc. ECCV</em>, 2008.
   necessary, but useful to speedup processing.
 - Process an image (::vl_quickshift_process).
 - Retrieve the parents (::vl_quickshift_get_parents) and the distances
-  (::vl_quickshift_get_dists). These can be readily used to segment
-  the image in super-pixels.
+  (::vl_quickshift_get_dists). These can be used to segment
+  the image in superpixels.
 - Delete the quick shift object (::vl_quickshift_delete).
 
 @section quickshift-tech Technical details
 
 For each pixel <em>(x,y)</em>, quick shift regards @f$ (x,y,I(x,y))
 @f$ as a sample from a <em>d + 2</em> dimensional vector space. It
-then calculates the Parzen density estiamte (with a Gaussian kernel of
+then calculates the Parzen density estimate (with a Gaussian kernel of
 standard deviation @f$ \sigma @f$)
 
 @f[
@@ -102,7 +102,7 @@ nearest neighbor which has greater density value. Formally, write @f$
 @f]
 
 Each pixel <em>(x, y)</em> is connected to the closest higher density
-pixel <em>parent(x,y)</em> that achieves the mimimum distance in
+pixel <em>parent(x,y)</em> that achieves the minimum distance in
 
 @f[
  \mathrm{dist)(x,y) = 
