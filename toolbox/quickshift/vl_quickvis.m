@@ -1,89 +1,90 @@
-function [Iedge taus map gaps] = vl_quickvis(I, ratio, sigma, tau_max, maxcuts)
-% QUICKVIS Create an edge image from a Quickshift segmentation.
-%   IEDGE = QUICKVIS(I, RATIO, SIGMA, TAU_MAX, MAXCUTS) creates an edge
+function [Iedge dists map gaps] = vl_quickvis(I, ratio, kernelsize, maxdist, maxcuts)
+% VL_QUICKVIS Create an edge image from a Quickshift segmentation.
+%   IEDGE = VL_QUICKVIS(I, RATIO, KERNELSIZE, MAXDIST, MAXCUTS) creates an edge
 %   stability image from a Quickshift segmentation. RATIO controls the tradeoff
-%   between color consistency and spatial consistency (See QUICKSEG) and SIGMA
-%   controls the bandwidth of the density estimator (See QUICKSEG,
-%   QUICKSHIFT). TAU_MAX is the maximum distance between neighbors which
+%   between color consistency and spatial consistency (See VL_QUICKSEG) and
+%   KERNELSIZE controls the bandwidth of the density estimator (See VL_QUICKSEG,
+%   VL_QUICKSHIFT). MAXDIST is the maximum distance between neighbors which
 %   increase the density. 
 %
-%   QUICKVIS takes at most MAXCUTS thresholds less than TAU_MAX, forming at most
-%   MAXCUTS segmentations. The edges between regions in each of these
+%   VL_QUICKVIS takes at most MAXCUTS thresholds less than MAXDIST, forming at
+%   most MAXCUTS segmentations. The edges between regions in each of these
 %   segmentations are labeled in IEDGE, where the label corresponds to the
-%   largest TAU which preserves the edge. 
+%   largest DIST which preserves the edge. 
 %
-%   [IEDGE,TAUS] = QUICKVIS(I, RATIO, SIGMA, TAU_MAX, MAXCUTS) also returns the
-%   TAU thresholds that were chosen.
+%   [IEDGE,DISTS] = VL_QUICKVIS(I, RATIO, KERNELSIZE, MAXDIST, MAXCUTS) also
+%   returns the DIST thresholds that were chosen.
 %   
-%   IEDGE = QUICKVIS(I, RATIO, SIGMA, TAUS) will use the TAUS specified
+%   IEDGE = VL_QUICKVIS(I, RATIO, KERNELSIZE, DISTS) will use the DISTS
+%   specified
 %
-%   [IEDGE,TAUS,MAP,GAPS] = QUICKVIS(I, RATIO, SIGMA, TAU_MAX, MAXCUTS) also
-%   returns the MAP and GAPS from QUICKSHIFT.
+%   [IEDGE,DISTS,MAP,GAPS] = VL_QUICKVIS(I, RATIO, KERNELSIZE, MAXDIST, MAXCUTS)
+%   also returns the MAP and GAPS from VL_QUICKSHIFT.
 %
-% See Also: QUICKSHIFT, QUICKSEG
+% See Also: VL_QUICKSHIFT, VL_QUICKSEG
 
 if nargin == 4
-  taus = tau_max;
-  tau_max = max(taus);
-  [Iseg labels map gaps E] = vl_quickseg(I, ratio, sigma, tau_max);
+  dists = maxdist;
+  maxdist = max(dists);
+  [Iseg labels map gaps E] = vl_quickseg(I, ratio, kernelsize, maxdist);
 else
-  [Iseg labels map gaps E] = vl_quickseg(I, ratio, sigma, tau_max);
-  taus = unique(floor(gaps(:)));
-  taus = taus(2:end-1); % remove the inf thresh and the lowest level thresh
-  if length(taus) > maxcuts
-    ind = round(linspace(1,length(taus), maxcuts));
-    taus = taus(ind);
+  [Iseg labels map gaps E] = vl_quickseg(I, ratio, kernelsize, maxdist);
+  dists = unique(floor(gaps(:)));
+  dists = dists(2:end-1); % remove the inf thresh and the lowest level thresh
+  if length(dists) > maxcuts
+    ind = round(linspace(1,length(dists), maxcuts));
+    dists = dists(ind);
   end
 end
 
-[Iedge taus] = mapvis(map, gaps, taus);
+[Iedge dists] = mapvis(map, gaps, dists);
 
-function [Iedge taus] = mapvis(map, gaps, tau_max, maxcuts)
+function [Iedge dists] = mapvis(map, gaps, maxdist, maxcuts)
 % MAPVIS Create an edge image from a Quickshift segmentation.
-%   IEDGE = MAPVIS(MAP, GAPS, TAU_MAX, MAXCUTS) creates an edge
-%   stability image from a Quickshift segmentation. TAU_MAX is the maximum
+%   IEDGE = MAPVIS(MAP, GAPS, MAXDIST, MAXCUTS) creates an edge
+%   stability image from a Quickshift segmentation. MAXDIST is the maximum
 %   distance between neighbors which increase the density. 
 %
-%   MAPVIS takes at most MAXCUTS thresholds less than TAU_MAX, forming at most
+%   MAPVIS takes at most MAXCUTS thresholds less than MAXDIST, forming at most
 %   MAXCUTS segmentations. The edges between regions in each of these
 %   segmentations are labeled in IEDGE, where the label corresponds to the
-%   largest TAU which preserves the edge. 
+%   largest DIST which preserves the edge. 
 %
-%   [IEDGE,TAUS] = MAPVIS(MAP, GAPS, TAU_MAX, MAXCUTS) also returns the
-%   TAU thresholds that were chosen.
+%   [IEDGE,DISTS] = MAPVIS(MAP, GAPS, MAXDIST, MAXCUTS) also returns the DIST
+%   thresholds that were chosen.
 %   
-%   IEDGE = MAPVIS(MAP, GAPS, TAUS) will use the TAUS specified
+%   IEDGE = MAPVIS(MAP, GAPS, DISTS) will use the DISTS specified
 %
-% See Also: QUICKVIS, QUICKSHIFT, QUICKSEG
+% See Also: VL_QUICKVIS, VL_QUICKSHIFT, VL_QUICKSEG
 
 if nargin == 3
-  taus = tau_max;
-  tau_max = max(taus);
+  dists = maxdist;
+  maxdist = max(dists);
 else
-  taus = unique(floor(gaps(:)));
-  taus = taus(2:end-1); % remove the inf thresh and the lowest level thresh
-  % throw away min region size instead of tau_max?
-  ind = find(taus < tau_max);
-  taus = taus(ind);
-  if length(taus) > maxcuts
-    ind = round(linspace(1,length(taus), maxcuts));
-    taus = taus(ind);
+  dists = unique(floor(gaps(:)));
+  dists = dists(2:end-1); % remove the inf thresh and the lowest level thresh
+  % throw away min region size instead of maxdist?
+  ind = find(dists < maxdist);
+  dists = dists(ind);
+  if length(dists) > maxcuts
+    ind = round(linspace(1,length(dists), maxcuts));
+    dists = dists(ind);
   end
 end
 
 
 Iedge = zeros(size(map));
 
-for i = 1:length(taus)
-  s = find(gaps >= taus(i));
-  maptau = map;  
-  maptau(s) = s;
-  [mapped labels] = flatmap(maptau);
-  fprintf('%d/%d %d regions\n', i, length(taus), length(unique(mapped)))
+for i = 1:length(dists)
+  s = find(gaps >= dists(i));
+  mapdist = map;  
+  mapdist(s) = s;
+  [mapped labels] = vl_flatmap(mapdist);
+  fprintf('%d/%d %d regions\n', i, length(dists), length(unique(mapped)))
 
   borders = getborders(mapped);
   
-  Iedge(borders) = taus(i);
+  Iedge(borders) = dists(i);
   %Iedge(borders) = Iedge(borders) + 1;
   %Iedge(borders) = i;
 end

@@ -1,6 +1,6 @@
 function [map, C] = vl_flatmap(map)
-% FLATMAP
-%   [LABELS CLUSTERS] = FLATMAP(MAP) labels each tree of the forest contained
+% VL_FLATMAP
+%   [LABELS CLUSTERS] = VL_FLATMAP(MAP) labels each tree of the forest contained
 %   in MAP. LABELS contains the linear index of the root node in MAP, CLUSTERS
 %   instead contains a label between 1 and the number of clusters.
 
@@ -12,6 +12,3 @@ while 1
 end
 
 [drop,drop,C] = unique(map)  ;
-
-
-

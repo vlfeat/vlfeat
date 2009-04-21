@@ -1,14 +1,14 @@
-% QUICKSHIFT Quick shift image segmentation
+% VL_QUICKSHIFT Quick shift image segmentation
 %   Quick shift is a mode seeking algorithm which links each pixel to
 %   its nearest neighbor which has an increase in the estimate of the
 %   density. These links form a tree, where the root of the tree is
 %   the pixel which correspond to the highest mode in the image.
 %
-%   [MAP,GAPS] = QUICKSHIFT(I, SIGMA, TAU) computes quick shift on the
-%   image I. SIGMA is the bandwidth of the Parzen window estimator of
+%   [MAP,GAPS] = VL_QUICKSHIFT(I, KERNELSIZE, MAXDIST) computes quick shift on the
+%   image I. KERNELSIZE is the bandwidth of the Parzen window estimator of
 %   the density. Since searching over all pixels for the nearest
 %   neighbor which increases the density would be prohibitively
-%   expensive, TAU controls the maximum L2 distance between neighbors
+%   expensive, MAXDIST controls the maximum L2 distance between neighbors
 %   that should be linked. MAP and GAP represent the resulting forest
 %   of trees. They are array of the same size of I.  Each element
 %   (pixel) of MAP is and index to the parent elemen in the forest and
@@ -16,10 +16,10 @@
 %   the root of their respective tree have MAP(x) = x and GAPS(x) =
 %   inf.
 %
-%   [MAP,GAPS,E] = QUICKSHIFT(I, SIGMA, TAU) also returns the estimate
+%   [MAP,GAPS,E] = VL_QUICKSHIFT(I, KERNELSIZE, MAXDIST) also returns the estimate
 %   of the density E.
 %   
-%   [MAP,GAPS] = QUICKSHIFT(I, SIGMA) uses a default TAU of 3 * SIGMA.
+%   [MAP,GAPS] = VL_QUICKSHIFT(I, KERNELSIZE) uses a default MAXDIST of 3 * KERNELSIZE.
 %
 %   Notes:
 %     The distance between pixels is always measured in image

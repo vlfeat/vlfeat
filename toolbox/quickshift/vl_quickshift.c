@@ -31,8 +31,8 @@ mexFunction(int nout, mxArray *out[],
 {  
   enum { 
     IN_I=0,     /* Input image */    
-    IN_KERNEL_SIZE,   /* Sigma is the bandwidth parameter for density estimation */
-    IN_MAX_DIST,     /* Tau is the maximum distance to a neighbor which increases
+    IN_KERNEL_SIZE,  /* The bandwidth parameter for density estimation */
+    IN_MAX_DIST,     /* The maximum distance to a neighbor which increases
                    the density */
     IN_END
   } ;
