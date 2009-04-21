@@ -11,6 +11,7 @@
  <meta>
   <!-- Stylesheets -->
   <link href="%pathto:root;web.css" rel="stylesheet" type="text/css"/>
+  <title>VLFeat -  %pagetitle;</title>
   %pagestyle; 
   
   <!-- Scripts-->
