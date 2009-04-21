@@ -17,16 +17,16 @@ General Public License version 2.
 #include "generic.h"
 #include "mathop.h"
 
-/** @brief Quick Shift datatype */
+/** @brief quick shift datatype */
 typedef double vl_qs_type ;
 
-/** @brief Quick Shift infinity constant */
+/** @brief quick shift infinity constant */
 #define VL_QS_INF VL_INFINITY_D /* Change to _F for float math */
 
 /** ------------------------------------------------------------------
- ** @brief Quick Shift results
+ ** @brief quick shift results
  **
- ** This implements Quick Shift mode seeking.
+ ** This implements quick shift mode seeking.
  **/
 
 typedef struct _VlQS
@@ -91,9 +91,9 @@ VL_INLINE void vl_quickshift_set_medoid (VlQS *f, vl_bool medoid) ;
 
 /** ------------------------------------------------------------------
  ** @brief Get tau.
- ** @param q Quick Shift object.
- ** @return the maximal distance between nodes in the 
- **         Quick Shift tree.
+ ** @param q quick shift object.
+ ** @return the maximum distance in the feature space between nodes in the
+ **         quick shift tree.  
  **/
 
 VL_INLINE vl_qs_type
@@ -104,9 +104,9 @@ vl_quickshift_get_max_dist (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Get sigma.
- ** @param q Quick Shift object.
- ** @return the standard deviation of the gaussian which is applied to
- **         feature distances.
+ ** @param q quick shift object.
+ ** @return the standard deviation of the kernel used in the Parzen density
+ **         estimate.  
  **/
 
 VL_INLINE vl_qs_type
@@ -117,7 +117,7 @@ vl_quickshift_get_kernel_size (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Get medoid.
- ** @param q Quick Shift object.
+ ** @param q quick Shift object.
  ** @return @c true if medoid shift is used instead of quick shift.
  **/
 
@@ -129,9 +129,9 @@ vl_quickshift_get_medoid (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Get parents.
- ** @param q Quick Shift object.
+ ** @param q quick shift object.
  ** @return a height x width matrix containing linearized links to the
- **         parents in the quickshift tree. If there is no parent, the
+ **         parents in the quick shift tree. If there is no parent, the
  **         parent will be set to the index of the node.
  **/
 
@@ -143,9 +143,9 @@ vl_quickshift_get_parents (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Get dists.
- ** @param q Quick Shift object.
+ ** @param q quick shift object.
  ** @return for each pixel, the distance in feature space to the pixel
- **         that is its parent in the Quick Shift tree.
+ **         that is its parent in the quick shift tree.
  **/
 
 VL_INLINE vl_qs_type *
@@ -156,7 +156,7 @@ vl_quickshift_get_dists (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Get density.
- ** @param q Quick Shift object.
+ ** @param q quick shift object.
  ** @return the estimate of the density at each pixel.
  **/
 
@@ -168,8 +168,9 @@ vl_quickshift_get_density (VlQS const *q)
 
 /** ------------------------------------------------------------------
  ** @brief Set sigma
- ** @param q Quick Shift object.
- ** @param sigma sigma.
+ ** @param q quick shift object.
+ ** @param sigma standard deviation of the kernel used in the Parzen density
+ **        estimate.  
  **/
 
 VL_INLINE void
@@ -179,9 +180,10 @@ vl_quickshift_set_kernel_size (VlQS *q, vl_qs_type sigma)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Set tau
- ** @param q Quick Shift object.
- ** @param tau tau.
+ ** @brief Set max distance 
+ ** @param q quick shift object.
+ ** @param tau the maximum distance in the feature space between nodes in the
+ **            quick shift tree.  
  **/
 
 VL_INLINE void
@@ -192,7 +194,7 @@ vl_quickshift_set_max_dist (VlQS *q, vl_qs_type tau)
 
 /** ------------------------------------------------------------------
  ** @brief Set medoid
- ** @param q Quick Shift object.
+ ** @param q quick shift object.
  ** @param medoid @c true to use kernelized medoid shift, @c false (default) uses
  **        quick shift.
  **/

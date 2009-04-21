@@ -21,7 +21,7 @@ General Public License version 2.
 
 - @ref quickshift-intro
 - @ref quickshift-usage
-- @ref qucikshift-tech
+- @ref quickshift-tech
 
 @section quickshift-intro Overview
 
@@ -56,7 +56,7 @@ multiple of the kernel size).
 [1] A. Vedaldi and S. Soatto. &ldquo;Quick Shift and Kernel Methods
 for Mode Seeking&rdquo;, in <em>Proc. ECCV</em>, 2008.
 
-@section qucikshift-usage Usage
+@section quickshift-usage Usage
 
 - Create a new quick shift object (::vl_quickshift_new). The object
   can be reused for multiple images of the same size.
@@ -102,11 +102,11 @@ nearest neighbor which has greater density value. Formally, write @f$
 @f]
 
 Each pixel <em>(x, y)</em> is connected to the closest higher density
-pixel <em>parent(x,y)</em> that achieves the minimum distance in
+pixel <em>parent(x, y)</em> that achieves the minimum distance in
 
 @f[
- \mathrm{dist)(x,y) = 
- \mathrm{min}_{(x',y') >_P (x,y)}
+ \mathrm{dist}(x,y) = 
+ \mathrm{min}_{(x',y') > P(x,y)}
 \left(
 (x - x')^2 +
 (y - y')^2 +
