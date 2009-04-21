@@ -2,26 +2,63 @@
 
 <group>
 
-<p><b>Quick Shift</b> is a mode seeking algorithm (like mean shift) which
+<p><b>Quick shift</b> is a mode seeking algorithm (like mean shift) which
 instead of iteratively shifting each point towards a local mean instead forms a tree of links to the nearest neighbor which increases the density.</p>
 
-<p>This demo shows Quick Shift in a simple superpixelization problem where we seek to segment this image:</p>
+
+ 
+<ul>
+ <li><a href="%pathto:tut.qs.superpixels;">Using quick shift to find superpixels</a></li>
+ <li><a href="%pathto:tut.qs.multi;">Multiple segmentations</a></li>
+</ul>
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.qs.superpixels">Using quick shift to find superpixels</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>This demo shows quick shift in a simple superpixelization problem where we seek to segment this image:</p>
 
 <div class="figure">
   <image src="%pathto:root;demo/quickshift_image.jpg"/>
   <div class="caption">The image we wish to segment</div>
 </div>
 
-<p>As a feature vector, we choose the LAB colorspace representation of the image augmented with the x,y location of the pixel. vl_quickseg is a convenient wrapper function which takes care of the transformation of the image to LAB and performs a segmentation, making our job as easy as:</p>
+<p>As a feature vector, we choose the LAB colorspace representation of the image augmented with the x,y location of the pixel. <code>vl_quickseg</code> is a convenient wrapper function which takes care of the transformation of the image to LAB and performs segmentation, making our job as easy as:</p>
 
 <pre>
-Iseg = vl_quickseg(I, ratio, sigma, tau);
+ratio = 1;
+kernelsize = 2;
+Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 </pre>
+
+<p>where <code>ratio</code> is the tradeoff between color importance and spatial importance (larger values give more importance to color), <code>kernelsize</code> is the size of the kernel used to estimate the density, and <code>maxdist</code> is the maximum distance between points in the feature space that may be linked if the density is increased.</p>
 
 <div class="figure">
 <image src="%pathto:root;demo/quickshift_qseg_1.jpg"/>
 <image src="%pathto:root;demo/quickshift_qseg_2.jpg"/>
-<div class="caption">Two segmentations of the original image with differing vaues for tau. On the left, tau = 10, the right, tau = 30.</div>
+<div class="caption">The effect of <code>maxdist</code> on the superpixelization. As we increase <code>maxdist</code>, superpixels become larger and larger since we can link less similar points. Left: <code>maxdist=10</code>. Right: <code>maxdist=30</code>.</div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.qs.multi">Multiple segmentations</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Quick shift arranges all of the data points into a tree where parents in the tree are the nearest neighbors in the feature space which increase the estimate of the density. By imposing a limit on the distance between nearest neighbors (<code>maxdist</code>), we decrease the amount of computation required to search for the nearest neighbors. However, we also break our tree into a forest, because local modes of the density will now have no neighbor which is close enough in the feature space to form a link.</p>
+
+<p>In the previous section, we created a superpixel segmentation by taking each of the trees in this forest as a distinct cluster. However, since <code>maxdist</code> simply prevents new links from forming, the segmentation formed by every <code>dist &lt; maxdist</code> is contained in the result. <code>vl_quickvis</code> lets us visualize this by running quick shift once and forming multiple segmentations by cutting links in the tree which are smaller and smaller.</p>
+
+<pre>
+maxdist = 50;
+ndists = 5;
+Iedge = vl_quickvis(I, ratio, kernelsize, maxdist, ndists)
+imagesc(Iedge);
+axis equal off tight;
+colormap gray;
+</pre>
+
+<div class="figure">
+<image src="%pathto:root;demo/quickshift_qvis.jpg"/>
+<div class="caption">A visualization of multiple <code>maxdist</code> thresholds on a single image. Here, boundaries are colored by the largest <code>maxdist</code> where the boundary is preserved.</div>
 </div>
 
 </group>

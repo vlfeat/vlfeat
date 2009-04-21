@@ -1,4 +1,4 @@
-% VL_DEMO_MSER_BASIC  Demo: MSER: basic functionality
+% VL_DEMO_QUICKSHIFT  Demo: Quick shift: basic functionality
 
 pfx = fullfile(vl_root,'figures','demo') ;
 randn('state',0) ;
@@ -19,25 +19,26 @@ vl_demo_print('quickshift_image') ;
 % --------------------------------------------------------------------
 
 ratio = 1;
-sigma = 2;
-tau = 10;
+kernelsize = 2;
+maxdist = 10;
 
-Iseg = vl_quickseg(I, ratio, sigma, tau);
+Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 image(Iseg);
 axis equal off tight;
 vl_demo_print('quickshift_qseg_1') ;
 
-sigma = 2;
-tau = 30;
-Iseg = vl_quickseg(I, ratio, sigma, tau);
+kernelsize = 2;
+maxdist = 30;
+Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 image(Iseg);
 axis equal off tight;
 vl_demo_print('quickshift_qseg_2') ;
 
 
-tau_max = 50;
-ntaus = 5;
-Iedge = vl_quickvis(I, ratio, sigma, tau_max, ntaus);
+maxdist = 50;
+ndists = 5;
+Iedge = vl_quickvis(I, ratio, kernelsize, maxdist, ndists);
 imagesc(Iedge); 
 axis equal off tight;
+colormap gray;
 vl_demo_print('quickshift_qvis') ;

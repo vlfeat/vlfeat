@@ -112,7 +112,7 @@
    <page id="tut.ikm"   name="ikm"       title="IKM">  <include src="ikm.html"/></page>
    <page id="tut.hikm"  name="hikm"      title="HIKM"> <include src="hikm.html"/></page>
    <page id="tut.aib"   name="aib"       title="AIB">  <include src="aib.html"/></page>
-   <page id="tut.quickshift"   name="quickshift" title="Quick Shift">  <include src="quickshift.html"/></page>
+   <page id="tut.quickshift"   name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
    <page id="tut.utils" name="utils"     title="Utils"> <include src="utils.html"/></page>
   </page>
  </dir>
