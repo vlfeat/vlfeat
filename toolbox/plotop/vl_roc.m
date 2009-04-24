@@ -1,5 +1,5 @@
 function [tp,tn,info] = vl_roc(y, score, varargin)
-% VL_ROC Compute VL_ROC curve
+% VL_ROC Compute the ROC curve
 %  [TP,TN] = VL_ROC(Y, SCORE) computes the VL_ROC curve of the specified
 %  data. Y are the ground thruth labels (+1 or -1) and SCORE is the
 %  discriminant score associated to the data by a classifier (higher
