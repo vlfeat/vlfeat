@@ -2,64 +2,64 @@
 
 <group>
  
- <img style="float:left;margin-right:1em;margin-bottom:1em; position:relative;"
-      src="%pathto:root;images/cover.jpg" 
-      width="320" height="229" alt="VLFeat"/>
- 
- <p class="widePar"><b>VLFeat</b> is a MATLAB-compatible implementation common
-  computer vision algorithms such
+ <p>The <b>VLFeat</b> <a
+  href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">open
+  source</a> library implements popular computer vision algorithms
+  such
   as <em>SIFT</em>, <em>MSER</em>, <em>k-means</em>, <em>hierarchical
-   k-means</em>, and <em>agglomerative information bottleneck</em>.</p>
- 
- <p class="widePar"><b>VLFeat</b> is easily portable and supports natively <em>Mac OS
-   X</em>, <em>Linux</em>, and <em>Windows</em>.</p>
- 
- <p class="widePar"><b>VLFeat</b> is <em>open source</em> software released under the
-  <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU
-   GPL V2 license</a>.</p>
+  k-means</em>, and <em>agglomerative information bottleneck</em>.  It
+  his written in C for efficiencly, but it is fully interfaced to
+  MATLAB for ease of use, and it is thorughly documented. It supports
+  <em>Mac OS X</em>, <em>Linux</em>, and <em>Windows</em>.</p>
 
- <h2 style="clear:both;" id="getting-started">Getting started</h2>
+ <div class="box">
+  <h1>Download</h1>
+  <ul>
+   <li><a href="">Latest binaries and source code</a></li>
+   <li><a href="">Latest source code only</a></li>   
+   <li><a href="%pathto:download;">Insturctions, all versions, GIT repository</a></li>
+  </ul>
+ </div>
 
- <p>You can obtain <b>VLFeat</b> source code or precompiled binaries
-  from <a href="%pathto:download;">here</a>. To start using the MATLAB
-  toolbox, you can read some of
-  the <a href="%pathto:tut;">tutorials</a> and have a look at
-  the <a href="%pathto:mdoc;">list of MATLAB functions</a>.</p>
+ <div class="box">
+  <h1>Reference</h1>
+  <ul>
+   <li><a href="%pathto:mdoc;">MATLAB API</a> -- MATLAB commands</li>
+   <li><a href="%pathto:api;">C API</a> -- describes the algorithms as well</li>
+   <li><a href="%pathto:about;">About</a> the authors and the library</li>
+  </ul>
+ </div><div class="box">
+  <h1>Tutorials</h1>
+  <ul>
+   <li><a href="%pathto:tut.sift;">SIFT</a> -- Scale Invariant Feature Transform</li>
+   <li><a href="%pathto:tut.mser;">MSER</a> -- Maximally Stable Extremal Regions</li>
+   <li><a href="%pathto:tut.ikm;">IKM</a> -- Integer Optimized K-Means</li>
+   <li><a href="%pathto:tut.hikm;">HIKM</a> -- Hyerarchical K-Means</li>
+   <li><a href="%pathto:tut.aib;">AIB</a> -- Agglom. info. bottleneck</li>
+   <li><a href="%pathto:tut.quickshift;">Quick shift</a> -- superpixels</li>
+   <li><a href="%pathto:tut;">More ...</a></li>
+  </ul>
+ </div>
 
- <p>Some algorithms (SIFT and MSER) have command line interfaces as
-  well (which do not require MATLAB). To learn about the command line
-  utilities please refer to the relative <a href="man">manual
-  pages</a>.</p>
-
- <p>The core of VLFeat is a clean C library. To learn about the C API
-  and the details of the implemented algorithms, please refer to
-  the <a href="%pathto:api;">C library documentation</a>.</p>
-
- <h2 id="citing-vlfeat">Citing</h2>
-
- <p>If you use VLFeat in your research work, please consider citing
-  us. If you use BibTex, you can use the following entry:</p>
-
-<pre>
+ <div class="box">
+  <h1>BibTeX entry</h1>
+<pre style="font-size: .8em; color: black;">
 @misc{vedaldi08vlfeat,
-  Author       = {A. Vedaldi and B. Fulkerson},
-  Howpublished = {\url{http://www.vlfeat.org/}},
-  Title        = {{VLFeat}: An Open and Portable Library 
-                  of Computer Vision Algorithms},
-  Year         = {2008}}
+ Author = {A. Vedaldi and B. Fulkerson},
+ Title = {{VLFeat}: An Open and Portable Library 
+          of Computer Vision Algorithms},
+ Year  = {2008},
+ Howpublished = {\url{http://www.vlfeat.org/}}
 </pre>
+ </div>
+
 
  <h2>Acknowledgments</h2>
 
- <p>
- <a href="http://vision.ucla.edu">
-  <img style="height:1.5em" src="%pathto:root;images/ucla-visionlab.png"></img>
- </a>
- &nbsp;
- &nbsp;
- <a href="http://www.robots.ox.ac.uk/~vgg/">
-  <img style="height:1.5em" src="%pathto:root;images/oxford-vgg.png"></img>
- </a>
- </p>
+ <p>Part of this work was supported by
+ the <a href="http://vision.ucla.edu">UCLA VisionLab</a> and 
+ the <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG Lab</a>. The
+ authors would like to thank the many colleagues that have contributed to
+ VLFeat by testing and providing helpful suggestions and comments.</p>
 
 </group>

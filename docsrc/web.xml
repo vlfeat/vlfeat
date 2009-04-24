@@ -79,7 +79,22 @@
  <page id="home"    name="index"    title="Home"> <include src="index.html"/>  
   <pagestyle>
    #content p.widePar {
-   padding-right: 1em ;
+     padding-right: 1em ;
+   }
+   #content div.box {
+     display: inline-block ;
+     border: 1px solid #aaa ;
+     background-color: #eee ;
+     padding: 0.5em ;
+     width: 24em ;
+     margin-right: 1em ;
+     margin-bottom: 1em ;
+   }
+   #content div.box h1 {
+     background-color: #eeeeee ;
+     font-size: 1.2em ;
+     text-align: center ;
+     margin: 0px ;
    }
   </pagestyle>
   <page id="about" name="about" title="About"><include src="about.html"/></page>
