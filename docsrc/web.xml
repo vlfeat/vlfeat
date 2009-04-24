@@ -82,7 +82,7 @@
      padding-right: 1em ;
    }
    #content div.box {
-     display: inline-block ;
+     float: left ;
      border: 1px solid #aaa ;
      background-color: #eee ;
      padding: 0.5em ;
