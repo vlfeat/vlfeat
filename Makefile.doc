@@ -22,7 +22,7 @@ jpg_tgt := $(demo_src:.eps=.jpg)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 
 VERSION: Makefile
-	echo "$(VER) (Generated on `date`)" > VERSION
+	echo "$(VER) (`date "+%B %d, %Y"`)" > VERSION
 
 doc: doc-api doc-web
 doc-api: doc/api/index.html
