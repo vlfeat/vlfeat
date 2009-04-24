@@ -22,16 +22,16 @@ body {
     font-family: Lucida, Helvetica, sans-serif ;
     font-size: 14px ;
 }
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 { 
     font-family: Lucida, Helvetica, sans-serif ;
     font-weight: normal ;
     color: #325799;
 }
-a {
-	color: #325799;
+a {	
+    color: #325799;
 }
 b {
-	color: rgb(40,40,40) ;
+    color: rgb(40,40,40) ; 
 }
 pre, code { 
     font-family: 'Andale Mono', monospaced ; 
@@ -57,7 +57,7 @@ pre, code {
     margin: 0 ;
     padding: 0 ;
     margin-left: .5em ;
-    margin-top: .5em ;
+    margin-top: 1em ;
     margin-bottom: 0em ;
 }
 #sidebar ul ul {
