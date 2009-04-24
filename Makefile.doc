@@ -24,6 +24,9 @@ img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 VERSION: Makefile
 	echo "$(VER) (`date "+%B %d, %Y"`)" > VERSION
 
+docsrc/version.html: Makefile
+	echo "<code>$(VER) (`date "+%B %d, %Y"`)</code>" > docsrc/version.html
+
 doc: doc-api doc-web
 doc-api: doc/api/index.html
 doc-web: doc/index.html
@@ -66,7 +69,7 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
-doc/api/index.html: docsrc/doxygen.conf VERSION                      \
+doc/api/index.html: docsrc/doxygen.conf VERSION docsrc/version.html  \
   $(dll_src) $(dll_hdr) $(img_tgt)                                   \
   doc/doxygen_header.html doc/doxygen_footer.html
 	$(call C,DOXYGEN) $<
