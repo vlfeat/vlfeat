@@ -97,11 +97,10 @@ set(h3,'color','g') ;
 <h1 id="tut.sift.match">Basic matching</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>SIFT descriptors are used to match keypoints with similar
-appearance, hopefully matching corresponding world structures.
-<code>vl_ubcmatch</code> implements a basic matching algorithm. Let 
-<code>Ia</code> and <code>Ib</code> be images of the same object or
-scene.  We extract and match the descriptors by:
+<p>SIFT descriptors are often used find similar regions in two
+images. <code>vl_ubcmatch</code> implements a basic matching
+algorithm. Let <code>Ia</code> and <code>Ib</code> be images of the
+same object or scene. We extract and match the descriptors by:
 </p>
 
 <pre>
@@ -110,26 +109,30 @@ scene.  We extract and match the descriptors by:
 [matches, scores] = vl_ubcmatch(da, db) ;
 </pre>
 
-<p>The following figure shows an example:</p>
-
 <div class="figure">
  <img src="%pathto:root;demo/sift_match_1.jpg"/>
  <div class="caption">
-  Matching of SIFT descriptors with <code>vl_ubcmatch</code>.
+  Matching of SIFT descriptors with <code>vl_ubcmatch</code>. Notice
+  that SIFT is able to cope with a large change in scale and image
+  rotation.
  </div>
 </div>
 
-<p>Note how SIFT is able to cope with a large change in scale and
-image rotation.</p>
-
 <p>
 For each descriptor in <code>da</code>, <code>vl_ubcmatch</code> finds
-the closes descriptor (in L2 norm) in <code>db</code> and returns the
-corresponding pair of indexes as a column of <code>matches</code>.
-Matches are scored by uniqueness, calculated as the ratio of the
-distance to the best matching keypoint and the distance to the second
-best one (see <code>vl_ubcmatch</code> for further details). This can
-be used to pre-filter matches by likelihood of being correct.
+the closest descriptor in <code>db</code> (as measured by the L2 norm
+of the difference between them). The index of the original match and
+the closest descriptor is stored in each column of
+<code>matches</code> and the distance between the pair is stored in
+<code>scores</code>. 
+</p>
+
+<p>
+Matches also can be filtered for uniqueness by passing a third
+parameter to <code>vl_ubcmatch</code> which specifies a threshold.
+Here, the uniqueness of a pair is measured as the ratio of the
+distance between the best matching keypoint and the distance to the
+second best one (see <code>vl_ubcmatch</code> for further details).
 </p>
 
 
