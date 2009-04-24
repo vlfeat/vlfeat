@@ -13,6 +13,7 @@ robustly. For a more in-depth description of the algorithm, see our
  
 <ul>
  <li><a href="%pathto:tut.sift.extract;">Extracting frames and descriptors</a></li>
+ <li><a href="%pathto:tut.sift.match;">Basic matching</a></li>
  <li><a href="%pathto:tut.sift.param;">Detector parameters</a></li>
  <li><a href="%pathto:tut.sift.custom;">Custom frames</a></li>
  <li><a href="%pathto:tut.sift.conventions;">Conventions</a></li>
@@ -57,10 +58,10 @@ I = single(rgb2gray(I)) ;
 [f,d] = vl_sift(I) ;
 </pre>
  
- <p>The matrix <code>f</code> has a column for each frame. A frame is a
-  disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
-  orientation <code>f(4)</code> . We visualize a random selection of 50
-  features by:</p>
+<p>The matrix <code>f</code> has a column for each frame. A frame is a
+disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
+orientation <code>f(4)</code> . We visualize a random selection of 50
+features by:</p>
  
 <pre>
 perm = randperm(size(f,2)) ; 
@@ -71,13 +72,12 @@ set(h1,'color','k','linewidth',3) ;
 set(h2,'color','y','linewidth',2) ;
 </pre>
 
- 
- <div class="figure">
-  <img src="%pathto:root;demo/sift_basic_2.jpg"/>
-  <div class="caption">
-   Some of the detected SIFT frames.
-  </div>
+<div class="figure">
+ <img src="%pathto:root;demo/sift_basic_2.jpg"/>
+ <div class="caption">
+  Some of the detected SIFT frames.
  </div>
+</div>
 
 <p>We can also overlay the descriptors by</p>
  
@@ -86,21 +86,62 @@ h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;
 set(h3,'color','g') ;
 </pre>
 
- <div class="figure">
-  <img src="%pathto:root;demo/sift_basic_3.jpg"/>
-  <div class="caption">
-   Some of the detected SIFT frames with their associated descriptors.
-  </div>
+<div class="figure">
+ <img src="%pathto:root;demo/sift_basic_3.jpg"/>
+ <div class="caption">
+  A test image for the peak threshold parameter.
  </div>
- 
- <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
- <h1 id="tut.sift.param">Detector parameters</h1>
- <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+</div>
 
- <p>The SIFT detector is controlled mainly by two parameters: the peak
-  threshold and the (non) edge threshold.</p>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.sift.matching">Basic matching</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- <p>The <em>peak threshold</em> filters peaks of the DoG scale space
+<p>SIFT descriptors are used to match keypoints with similar
+appearance, hopefully matching corresponding world structures.
+<code>vl_ubcmatch</code> implements a basic matching algorithm. Let 
+<code>Ia</code> and <code>Ib</code> be images of the same object or
+scene.  We extract and match the descriptors by:
+</p>
+
+<pre>
+[fa, da] = vl_sift(Ia) ;
+[fb, db] = vl_sift(Ib) ;
+[matches, scores] = vl_ubcmatch(da, db) ;
+</pre>
+
+<p>The following figure shows an example:</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/sift_match_1.jpg"/>
+ <div class="caption">
+  Matching of SIFT descriptors with <code>vl_ubcmatch</code>.
+ </div>
+</div>
+
+<p>Note how SIFT is able to cope with a large change in scale and
+image rotation.</p>
+
+<p>
+For each descriptor in <code>da</code>, <code>vl_ubcmatch</code> finds
+the closes descriptor (in L2 norm) in <code>db</code> and returns the
+corresponding pair of indexes as a column of <code>matches</code>.
+Matches are scored by uniqueness, calculated as the ratio of the
+distance to the best matching keypoint and the distance to the second
+best one (see <code>vl_ubcmatch</code> for further details). This can
+be used to pre-filter matches by likelihood of being correct.
+</p>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.sift.param">Detector parameters</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>The SIFT detector is controlled mainly by two parameters: the peak
+ threshold and the (non) edge threshold.</p>
+
+
+<p>The <em>peak threshold</em> filters peaks of the DoG scale space
   that are too small (in absolute value). For instance, consider a
   test image of 2D Gaussian blobs:</p>
 
@@ -247,8 +288,8 @@ original implementation uses a different reference system, illustrated
 next:</p>
  
 <div class="figure">
-  <img src="%pathto:root;figures/sift-conv-vlfeat.png"/><br/>
-  <img src="%pathto:root;figures/sift-conv.png"/>
+<img src="%pathto:root;figures/sift-conv-vlfeat.png"/> <br/>
+<img src="%pathto:root;figures/sift-conv.png"/>
 <div class="caption">
 <span class="content">
 Our conventions (top) compared to Lowe's (bottom).
