@@ -12,6 +12,7 @@ vl_demo_sift_peak ;
 vl_demo_sift_edge ;
 vl_demo_sift_cmd ;
 vl_demo_sift_or ;
+vl_demo_sift_match ;
 
 vl_demo_mser_basic ;
 vl_demo_mser_delta ;
