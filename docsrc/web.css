@@ -44,13 +44,13 @@ pre, code {
 #content {
     overflow: hidden ;
     float: right ;
-    width: 55em ;
+    width: 53em ;
     line-height: 1.3em ;
     padding-right: 1em ;
 }
 #sidebar {
     float: left ;
-    width: 8em ;
+    width: 10em ;
     padding: 0em ;
 }
 #sidebar ul {
@@ -68,13 +68,15 @@ pre, code {
     list-style: none ; /* for buggy IE */
     display: block ;
     margin: 0px ;
+    margin-bottom: 0.5em ;
     padding: .2em ;
-    font-size: 14px ;
+    font-size: 1em ;
     font-weight: bold ;
 }
 #sidebar li li {
     font-weight: normal ;
     text-transform: none ;
+    margin-bottom: 0em ;
 }
 #sidebar li .active {
     background: #d7e0f1;
