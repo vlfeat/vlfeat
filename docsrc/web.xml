@@ -81,21 +81,6 @@
    #content p.widePar {
      padding-right: 1em ;
    }
-   #content div.box {
-     float: left ;
-     border: 1px solid #aaa ;
-     background-color: #eee ;
-     padding: 0.5em ;
-     width: 24em ;
-     margin-right: 1em ;
-     margin-bottom: 1em ;
-   }
-   #content div.box h1 {
-     background-color: #eeeeee ;
-     font-size: 1.2em ;
-     text-align: center ;
-     margin: 0px ;
-   }
   </pagestyle>
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>

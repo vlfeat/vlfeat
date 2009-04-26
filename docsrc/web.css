@@ -222,6 +222,20 @@ pre, code {
 #content img.image-right {
     float: right ;
 }
+#content div.box {
+    float: left ;
+    border: 1px solid #aaa ;
+    background-color: #f8f8ee ;
+    padding: 0.5em ;
+    width: 24em ;
+    margin-right: 1em ;
+    margin-bottom: 1em ;
+}
+#content div.box h1 {
+    font-size: 1.2em ;
+    text-align: center ;
+    margin: 0px ;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                             Mdoc */
