@@ -1,3 +1,5 @@
+/* @override http://127.0.0.1/~vedaldi/vlfeat/web.css */
+
 /* div, p, ul, li, ol, img {border: 1px solid red ;} */
 html, body, div, img {
     margin: 0px ;
@@ -18,17 +20,17 @@ body {
     margin-right: auto ;
     margin-bottom: 0.5em ;
     width: 65em ;
-    background-color: #325799;
+    background-color: #184860;
     font-family: Lucida, Helvetica, sans-serif ;
     font-size: 14px ;
 }
 h1, h2, h3, h4, h5, h6 { 
     font-family: Lucida, Helvetica, sans-serif ;
     font-weight: normal ;
-    color: #325799;
+    color: #184860;
 }
 a {	
-    color: #325799;
+    color: #004fdc;
 }
 b {
     color: rgb(40,40,40) ; 
@@ -79,7 +81,7 @@ pre, code {
     margin-bottom: 0em ;
 }
 #sidebar li .active {
-    background: #d7e0f1;
+    background: #e4e4cf;
 }
 #sidebar li a {
     color: rgb(40,40,40) ;    
@@ -97,12 +99,12 @@ pre, code {
     padding-top: 10px ;
 }
 #headbanner {
-    background-color: #d7e0f1;
-    font-size: 1.2em ;
+    background-color: #e4e4cf;
     padding: .2em .7em ;
-    font-family: Lucida, Helvetica, sans-serif ;
     border-bottom: 1px solid gray ;
     border-style: none;
+	font: bold 1.1em Lucida, Helvetica, sans-serif;
+	color: #707070;
 } 
 #header h1 {
     margin: 0 ;
@@ -296,8 +298,8 @@ pre, code {
 #content div.doxygen div.memitem {
 }
 #content div.doxygen div.memproto {
-    background-color: #d7e0f1;
-    border: 1px dotted black ;
+    background-color: #e4e4cf;
+    border: 1px solid #aaa ;
     padding: 0.5em ;
 }
 #content div.doxygen td.memname {
@@ -350,7 +352,7 @@ pre, code {
     color: black ;
 }
 #content div.doxygen div.navigation .current {
-    background-color: #d7e0f1;
+    background-color: #e4e4cf;
 }
 #content div.doxygen p.formulaDsp {
     text-align: center ;
@@ -390,4 +392,7 @@ pre, code {
     margin: 0 ;
     padding: 0 ;
     margin-left: 2em ;
+}
+#content div.doxygen a.anchor {
+    color: inherit ! important ;
 }
