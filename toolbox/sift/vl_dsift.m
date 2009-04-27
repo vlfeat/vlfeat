@@ -36,7 +36,7 @@
 %   Norm::
 %     Append the frames with the normalization factor applied to each
 %     descriptor. In this case, F has 3 rows and this value is the 3rd
-%     row. This information can be used to supporess descriptors
+%     row. This information can be used to suppress descriptors
 %     with low contrast.
 %
 %   Fast::
