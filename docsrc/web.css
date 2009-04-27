@@ -96,6 +96,10 @@ pre, code {
     padding-bottom: 10px ;
     padding-top: 10px ;
 }
+#header #cse-search-box {
+    float: right ;
+    margin-right: 1em ;
+}
 #headbanner {
     background-color: #e4e4cf;
     padding: .2em .7em ;
@@ -133,7 +137,6 @@ pre, code {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                               Main content style */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
 
 #content h1,
 #content h2,

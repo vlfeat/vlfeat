@@ -21,8 +21,19 @@
  <!-- Body Start -->
  <body>
   <div id="header">
-<!--   <img style="width:130px;" src="%pathto:root;images/vlfeat-logo-dark.png"></img> -->
-    <h1>VLFeat.org</h1>
+   <!-- Google CSE Search Box Begins -->
+   <form action=" http://www.vlfeat.org/search.html" id="cse-search-box">
+    <div>
+     <input type="hidden" name="cx" value="003215582122030917471:oq23albfeam" />
+     <input type="hidden" name="cof" value="FORID:11" />
+     <input type="hidden" name="ie" value="UTF-8" />
+     <input type="text" name="q" size="31" />
+     <input type="submit" name="sa" value="Search" />
+    </div>
+   </form>
+   <script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
+   <!-- Google CSE Search Box Ends -->
+   <h1>VLFeat.org</h1>
   </div>
   <div id="headbanner">
    %pagetitle;
@@ -128,5 +139,19 @@
    <page id="tut.utils" name="utils"     title="Utils"> <include src="utils.html"/></page>
   </page>
  </dir>
+
+ <page name="search" id="search" title="Search" hide="yes">
+  <!-- Google CSE Search Results Begins -->
+  <div id="cse-search-results"></div>
+  <script type="text/javascript">
+   var googleSearchIframeName = "cse-search-results";
+   var googleSearchFormName = "cse-search-box";
+   var googleSearchFrameWidth = 600;
+   var googleSearchDomain = "www.google.com";
+   var googleSearchPath = "/cse";
+  </script>
+  <script type="text/javascript" src="http://www.google.com/afsonline/show_afs_search.js"></script>
+  <!-- Google CSE Search Results Ends -->
+ </page>
 
 </site>
