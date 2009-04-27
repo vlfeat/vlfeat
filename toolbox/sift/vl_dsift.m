@@ -21,8 +21,8 @@
 %     keypoint. This means that the scale of the SIFT keypoints
 %     corresponding to the DSIFT descriptors is SIZE / MAGNIF.
 %
-%   Remark:: In the literature, DSIFT is often used to mean a related
-%     but different descriptor by [1]. This descriptor is equivalent to
+%   Remark:: Although related, DSIFT is not the same as the HOG
+%     descriptor used in [1]. This descriptor is equivalent to
 %     SIFT instead.
 %
 %   VL_DSIFT() accepts the following options:
