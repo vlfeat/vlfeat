@@ -25,7 +25,7 @@ instead of iteratively shifting each point towards a local mean instead forms a 
 <p>As a feature vector, we choose the LAB colorspace representation of the image augmented with the x,y location of the pixel. <code>vl_quickseg</code> is a convenient wrapper function which takes care of the transformation of the image to LAB and performs segmentation, making our job as easy as:</p>
 
 <pre>
-ratio = 1;
+ratio = 0.5;
 kernelsize = 2;
 Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 </pre>
@@ -35,7 +35,7 @@ Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 <div class="figure">
 <image src="%pathto:root;demo/quickshift_qseg_1.jpg"/>
 <image src="%pathto:root;demo/quickshift_qseg_2.jpg"/>
-<div class="caption">The effect of <code>maxdist</code> on the superpixelization. As we increase <code>maxdist</code>, superpixels become larger and larger since we can link less similar points. Left: <code>maxdist=10</code>. Right: <code>maxdist=30</code>.</div>
+<div class="caption">The effect of <code>maxdist</code> on the superpixelization. As we increase <code>maxdist</code>, superpixels become larger and larger since we can link less similar points. Top: <code>maxdist=10</code>. Bottom: <code>maxdist=20</code>.</div>
 </div>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -48,7 +48,7 @@ Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 
 <pre>
 maxdist = 50;
-ndists = 5;
+ndists = 10;
 Iedge = vl_quickvis(I, ratio, kernelsize, maxdist, ndists)
 imagesc(Iedge);
 axis equal off tight;
