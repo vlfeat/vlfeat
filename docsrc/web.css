@@ -181,8 +181,8 @@ pre, code {
     margin-left: 2em ;
 }
 #content dt {
-    display: block ;
-    float: left ;
+    /*display: block ;
+    float: left ;*/
     font-weight: bold ;
     width: auto ;
     margin-right: 1em ;
