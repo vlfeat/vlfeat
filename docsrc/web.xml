@@ -85,8 +85,20 @@
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
-  <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
-  <page id="vsexpress" name="vsexpress" title="Using VC++"><include src="using-vsexpress.html"/></page>
+  <page id="install.matlab" name="install-matlab" title="Matlab install">
+   <include src="install-matlab.html"/>
+  </page>
+  <page id="install.shell" name="install-shell" title="Shell install">
+   <include src="install-shell.html"/>
+  </page>
+  <page id="install.c" name="install-c" title="C library install">
+   <include src="install-c.html"/>
+   <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
+   <page id="vsexpress" name="vsexpress" title="Using VC++"><include src="using-vsexpress.html"/></page>
+  </page>
+  <page id="compiling" name="compiling" title="Compiling VLFeat">
+   <include src="compiling.html"/>
+  </page>
  </page>
 
  <dir name="api">

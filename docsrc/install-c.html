@@ -1,0 +1,31 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>These instructions explain how to use VLFeat from your C
+programs.</p>
+
+<p><a href="%pathto:download;">Download</a> and unpack the latest
+VLFeat binary distribution in a directory of your choice
+(e.g. <code>~/src/vlfeat</code>). The following tutorials provide
+step-by-step instructions for typical usage cases:</p>
+
+<ul>
+<li><a href="%pathto:xcode;">Apple X-Code tutorial</a></li>
+<li><a href="%pathto:vsexpress;">Microsoft Visual Studio tutorial</a></li>
+</ul>
+
+<p>In general, let <code>VLFEATROOT</code> denote the path to the
+directory where you unpacked VLFeat. To compile and link your C
+program against VLFeat, include in your C source code the appropriate
+files from the <code>VLFEATROOT/vl</code> hierarchy and link against
+the library <code>vl</code> located in the appropriate
+subdirectory <code>vlfeat/bin/ARCH</code>, where <code>ARCH</code>
+depends on your architecture.</p>
+
+<p>VLFeat is a C library. To use it from a C++ program, do not forget
+to encolse your <code>#include</code> statements in a <code>extern
+"C"</code> block.</p>
+
+
+</group>

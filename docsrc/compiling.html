@@ -1,0 +1,37 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>These instructions explain how to compile VLFeat on your own. This
+can be useful to customize or contribute to VLFeat, but it is
+otherwise not necessary (<b>use of the
+<a href="%pathto:download;"> binary distribution</a> instead</b>).</p>
+
+<p>For <b>UNIX</b> based platforms (Mac OS X and Linux), the library
+ bundles a GNU-Make makefile (<code>Makefile</code>). The makefile
+ tries to auto-detect the environment and automatically configure
+ itself. In most cases, typing <code>make</code> is all it is required
+ to compile everything. If this does not work, please edit the
+ makefile and make the necessary adjustment to the flags.</p>
+
+<p>For <b>Windows</b>, the library bundles a NMake makefile
+ (<code>Makefile.mak</code>). In order to use it, you must open
+ Makefile.mak and adjust the values of configuration variables to match
+ your setup. Once you have done that, start the Visual Studio Command
+ Prompt and type <code>nmake /f Makefile.mak</code>.</p>
+
+<p><b>Note: For Windows you can also compile only the mex files.</b> Start with
+ our binary distribution.</p>
+
+<p><b>Windows: Troubleshooting common problems:</b></p>
+<dl>
+ <dt>syntax error: '=' unexpected:</dt>
+ <dd><p>Use <code>nmake /f Makefile.mak</code>.
+   Without <code>/f</code>, nmake will default to the wrong
+   makefile.</p></dd>
+ <dt>'long' followed by 'long' is illegal:</dt>
+ <dd><p>This error is usually caused by
+   attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
+</dl>
+
+</group>

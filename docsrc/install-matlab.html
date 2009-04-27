@@ -1,0 +1,53 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>These instructions explain how to use VLFeat from
+MATLAB.</p>
+
+<p><a href="%pathto:download;">Download</a> and unpack the latest
+VLFeat binary distribution in a directory of your choice
+(e.g. <code>~/src/vlfeat</code>). Let <code>VLFEATROOT</code> denote
+this directory.</p>
+
+<p>VLFeat must be added to MATLAB search path by running
+the <code>vl_setup</code> command found in
+the <code>VLFEATROOT/toolbox</code> directory. From MATLAB propmpt
+enter</p>
+
+<pre>
+> cd VLFEATROOT
+> cd toolbox
+> vl_setup
+</pre>
+
+<p>To avoid name conflicts with other MATLAB commands, all VLFeat
+commands start with the <code>vl_</code> prefix (for instance the SIFT
+feature extractor command is called <code>vl_sift</code>). The prefix
+can be omitted by calling
+<code>vl_setup('noprefix')</code> in the above.</p>
+
+<p><code>vl_setup</code> alters the search path for the current MATLAB
+session only (it does not save the changes). To make the change
+permanent, add the following fragment to your
+<a href="http://www.google.com/search?q=site:www.mathworks.com+startup.m&amp;btnI=I"><code>startup.m</code> file</a>:</p>
+
+<pre>
+p=pwd ;
+cd VLFEATROOT ;
+cd toolbox ;
+vl_setup ;
+cd(p) ;
+clear p
+</pre>
+
+<p>Alternatively, you can use the
+<a href="http://www.google.com/search?q=site:www.mathworks.com+savepath&amp;btnI=I"><code>savepath</code>
+command</a> to save the updated search paths.</p>
+
+<p>All commands embed interface documentation that can be viewed with
+the
+builtin <a href="http://www.google.com/search?q=site:www.mathworks.com+help&amp;btnI=I"><code>help</code>
+command</a> (e.g. <code>help vl_sift</code>).</p>
+
+</group>

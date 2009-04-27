@@ -1,0 +1,77 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>These instructions explain how to use VLFeat from the command line
+(shell).</p>
+
+<p><a href="%pathto:download;">Download</a> and unpack the latest
+VLFeat binary distribution in a directory of your choice
+(e.g. <code>~/src/vlfeat</code>). Let <code>VLFEATROOT</code> denote
+this directory.</p>
+
+<p>The command line tools are located
+in <code>VLFEATROOT/bin/ARCH</code>. Here <code>ARCH</code> denotes
+the subdirectory relative to your architecture (e.g. <code>mac</code>
+for Mac OS X PPC, <code>maci</code> for Mac OS X
+Intel, <code>glx</code> for Linux, and so on). For instance, to run
+the SIFT feature extraction code type</p>
+
+<table class="checker">
+<tr>
+<th>Platform</th>
+<th><code>ARCH</code></th>
+<th>Command to type</th>
+</tr>
+<tr>
+<td>Mac Intel</td>
+<td><code>maci</code></td>
+<td><code>VLFEATROOT/bin/maci/sift</code></td>
+</tr>
+<tr>
+<td>Linux 32</td>
+<td><code>glx</code></td>
+<td><code>VLFEATROOT/bin/glx/sift</code></td>
+</tr>
+<tr>
+<td>Linux 64</td>
+<td><code>a64</code></td>
+<td><code>VLFEATROOT/bin/a64/sift</code></td>
+</tr>
+<tr>
+<td>Windows 32</td>
+<td><code>w32</code></td>
+<td><code>VLFEATROOT\bin\w32\sift.exe</code></td>
+</tr>
+<tr>
+<td>Windows 64</td>
+<td><code>w64</code></td>
+<td><code>VLFEATROOT\bin\w64\sift.exe</code></td>
+</tr>
+</table>
+
+<p>All commands have a corresponding man page found
+in <code>VLFEATROOT/src</code>.  For UNIX based systems, the man pages
+can be viewed with the <code>man</code> utility. For instance
+</p>
+
+<pre>
+> man VLFEATROOT/src/sift.1
+</pre>
+
+
+<p>It might be convenient to add VLFeat to the system search paths. In
+Linux and Mac OS X thismodify the <code>PATH</code>
+and <code>MANPATH</code> environment variables. The exact details may
+vary, but it should be enough toa add to
+your <code>~/.bash_profile</code> file the line</p>
+
+<pre>
+export PATH=VLFEATROOT/bin/ARCH:$PATH
+export MANPATH=VLFEATROOT/src:$MANPATH
+</pre>
+
+<p>Alternatively, you can copy the executables and man pages to
+appropriate system-wide directories.</p>
+
+</group>

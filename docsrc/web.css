@@ -9,6 +9,15 @@ table {
     font: inherit ;
     color: inherit ;
 }
+table.checker {
+    border-collapse: collapse ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+table.checker td {
+    border: 1px solid black ;
+    padding: .2em ;
+}
 html {
     background-color: #ddd ;
 }
