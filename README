@@ -49,6 +49,7 @@ INSTALLING
   - glx     GNU Linux i386
   - g64     GNU Linux x64
   - win32   Windows
+  - win64   Windows (64 bit)
 
   The executable binaries can be installed anywhere in the command
   line path (the directory contains also the static library).
