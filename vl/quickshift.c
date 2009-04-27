@@ -209,7 +209,8 @@ vl_quickshift_inner(vl_qs_type const * I,
 }
 
 /** -----------------------------------------------------------------
- ** @brief Create a quick shift objet
+ ** @brief Create a quick shift object
+ ** @param image
  ** @param height
  ** @param width
  ** @param channels
