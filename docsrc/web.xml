@@ -96,7 +96,7 @@
    <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
    <page id="vsexpress" name="vsexpress" title="Using VC++"><include src="using-vsexpress.html"/></page>
   </page>
-  <page id="compiling" name="compiling" title="Compiling VLFeat">
+  <page id="compiling" name="compiling" title="Compiling">
    <include src="compiling.html"/>
   </page>
  </page>
