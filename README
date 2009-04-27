@@ -105,9 +105,12 @@ APPENDIX
   - variadic macro support
 
 CHANGES
-  0.9.3      Namespace change (everything begins with a vl_ prefix now). Many 
-             other changes to provide compilation support on Windows with
-             Matlab 7.
+  0.9.4      Added quick shift. Renamed dhog to dsift and improved
+             implementation and documentation. Improved tutorials.
+             Added 64 bit Windows binaries. Many other small changes.
+  0.9.3      Namespace change (everything begins with a vl_ prefix
+             now). Many other changes to provide compilation support
+             on Windows with Matlab 7.
   beta-3     Completions to the ikmeans code.
   beta-2     Many completions.
   beta-1     Initial public release.
