@@ -527,6 +527,7 @@ bindist: $(NAME) all doc-bindist
 	rsync -arv --include=*mexmaci                                \
 	           --include=*mexmac                                 \
 	           --include=*mexw32                                 \
+	           --include=*mexw64                                 \
 	           --include=*mexglx                                 \
 	           --include=*mexa64                                 \
 	           --include=noprefix**                              \
