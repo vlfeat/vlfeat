@@ -129,6 +129,8 @@ EPSTOPDF   ?= epstopdf
 FIG2DEV    ?= fig2dev
 LATEX      ?= latex
 PYTHON     ?= python
+GROFF      ?= groff
+TIDY       ?= tidy
 
 # programs required to build VLFeat distribution
 GIT        ?= git
@@ -338,7 +340,7 @@ define gendir
 $(1)-dir=$(foreach x,$(2),$(x)/.dirstamp)
 endef
 
-$(eval $(call gendir, doc,     doc doc/demo doc/figures             ))
+$(eval $(call gendir, doc,     doc doc/demo doc/figures doc/man-src ))
 $(eval $(call gendir, results, results                              ))
 $(eval $(call gendir, bin,     $(BINDIR) $(BINDIR)/objs             ))
 $(eval $(call gendir, mex,     $(MEX_BINDIR)                        ))
@@ -556,7 +558,7 @@ ifeq ($(filter doc clean distclean info, $(MAKECMDGOALS)),)
 include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
 
-# Doc
+# Makefile for documentation
 include Makefile.doc
 
 # --------------------------------------------------------------------
@@ -573,15 +575,10 @@ info :
 	$(call dump-var,mex_dep)
 	$(call dump-var,mex_tgt)
 	$(call dump-var,m_src)
-	$(call dump-var,fig_src)
 	$(call dump-var,demo_src)
 	$(call dump-var,bin_src)
 	$(call dump-var,bin_tgt)
 	$(call dump-var,bin_dep)
-	$(call dump-var,pdf_tgt)
-	$(call dump-var,eps_tgt)
-	$(call dump-var,png_tgt)
-	$(call dump-var,jpg_tgt)
 	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"

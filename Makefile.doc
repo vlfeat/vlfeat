@@ -6,7 +6,7 @@
 
 # This makefile should not be called directly.
 
-.PHONY: doc, doc-api, doc-toolbox, doc-figures
+.PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
 .PHONY: doc-web, doc-demo
 .PHONY: doc-bindist, doc-distclean
 .PHONY: autorights
@@ -14,12 +14,15 @@
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
 html_src := $(wildcard docsrc/*.html)
+man_src  := $(wildcard src/*.1)
+man_src  += $(wildcard src/*.7)
 
 pdf_tgt := #$(fig_src:.fig=.pdf) 
 eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
 png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
 jpg_tgt := $(demo_src:.eps=.jpg)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
+man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
 
 VERSION: Makefile
 	echo "$(VER) (`date "+%B %d, %Y"`)" > VERSION
@@ -27,7 +30,8 @@ VERSION: Makefile
 docsrc/version.html: Makefile
 	echo "<code>$(VER) (`date "+%B %d, %Y"`)</code>" > docsrc/version.html
 
-doc: doc-api doc-web
+doc: doc-api doc-man doc-web
+doc-man: doc/man-src/man.xml doc/man-src/man.html 
 doc-api: doc/api/index.html
 doc-web: doc/index.html
 doc-toolbox: doc/toolbox-src/mdoc.html
@@ -40,8 +44,14 @@ doc-deep: all $(doc-dir) $(results-dir)
 # Use webdoc.py to generate the website
 #
 
-doc/index.html: doc/toolbox-src/mdoc.html $(html_src) \
- docsrc/web.xml docsrc/web.css docsrc/webdoc.py $(img_tgt)
+doc/index.html: \
+ doc/toolbox-src/mdoc.html \
+ doc/man-src/man.xml \
+ doc/man-src/man.html \
+ docsrc/web.xml \
+ docsrc/web.css \
+ docsrc/webdoc.py \
+ $(img_tgt) $(html_src) 
 	$(PYTHON) docsrc/webdoc.py --outdir=doc \
 	     docsrc/web.xml --verbose
 	rsync -arv docsrc/images doc
@@ -60,7 +70,7 @@ doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
 	          --exclude='.*/vl_demo_.*' \
 	          --verbose
 #
-# Generate the customized API documentation
+# Generate C API documentation
 #
 
 doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
@@ -73,6 +83,48 @@ doc/api/index.html: docsrc/doxygen.conf VERSION docsrc/version.html  \
   $(dll_src) $(dll_hdr) $(img_tgt)                                   \
   doc/doxygen_header.html doc/doxygen_footer.html
 	$(call C,DOXYGEN) $<
+
+#
+# Generate Man documentation
+#
+
+doc/man-src/man.xml : $(man_tgt) $(doc-dir)
+	echo "<group>" > "$@"
+	for fullName in $(man_src) ; \
+	do  \
+	  fileName=$${fullName#src/} ; \
+	  stem=$${fileName%.*} ; \
+	  ( \
+	    echo "<page id='man.$${stem}' name='$${stem}' title='$${stem}'>" ; \
+	    echo "<include src='doc/man-src/$${fileName}.html'/>" ; \
+	    echo "</page>" \
+	  ) >> "$@" ; \
+	done
+	echo "</group>" >> "$@"
+
+doc/man-src/man.html : $(man_tgt) $(doc-dir)
+	echo "<ul>" > "$@"
+	for fullName in $(man_src) ; \
+	do  \
+	  fileName=$${fullName#src/} ; \
+	  stem=$${fileName%.*} ; \
+	  echo "<li><a href='%pathto:man.$${stem};'>$${stem}</a></li>" >> "$@" ; \
+	done
+	echo "</ul>" >> "$@"
+
+doc/man-src/%.html : src/% $(doc-dir)
+	( \
+	  echo '<!DOCTYPE group PUBLIC ' ; \
+	  echo '  "-//W3C//DTD XHTML 1.0 Transitional//EN"' ; \
+	  echo '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' ; \
+	  echo "<group>" ; \
+	  $(GROFF) -mandoc -Thtml < "$<" | \
+	    $(TIDY) -asxhtml | \
+	    sed -e '1,/<body>/ d' -e '/<\/body>/,$$ d' ; \
+	  echo "</group>" \
+	)  > "$@"
+
+doc/man-src/index.html : $(doc-dir)
 
 #
 # Convert figure formats
@@ -138,3 +190,22 @@ autorights: distclean
 	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
 	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
 	  --program "VLFeat"
+
+# --------------------------------------------------------------------
+#                                                       Debug Makefile
+# --------------------------------------------------------------------
+
+.PHONY: doc-info
+doc-info :
+	@echo "=== DOCUMENTATION RELATED VARIABLES ==="
+	$(call dump-var,man_src)
+	$(call dump-var,fig_src)
+	$(call dump-var,demo_src)
+	$(call dump-var,bin_src)
+	$(call dump-var,bin_tgt)
+	$(call dump-var,bin_dep)
+	$(call dump-var,pdf_tgt)
+	$(call dump-var,eps_tgt)
+	$(call dump-var,png_tgt)
+	$(call dump-var,jpg_tgt)
+	$(call dump-var,man_tgt)

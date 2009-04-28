@@ -126,6 +126,14 @@
   </page>
  </dir>
 
+ <dir name="man">
+  <page id="man" name="man" title="Man pages">
+   <p>These man pages describe VLFeat command line utilities.</p>
+   <include src="doc/man-src/man.html"/>
+   <include src="doc/man-src/man.xml"/>
+  </page>
+ </dir>
+
  <dir name="overview">
   <page id="tut"       name="tut"       title="Tutorials"> 
    <include src="tutorials.html"/>
