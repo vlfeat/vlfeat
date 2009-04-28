@@ -25,7 +25,7 @@ mkd(mexw32Dir) ;
 subDirs = dir(toolboxDir) ;
 subDirs = subDirs([subDirs.isdir]) ;
 discard = regexp({subDirs.name}, '^(.|..|noprefix|mex.*)$', 'start') ;
-keep    = cellfun(@isempty, discard) ;
+keep    = cellfun('isempty', discard) ;
 subDirs = subDirs(keep) ;
 subDirs = {subDirs.name} ;
 
