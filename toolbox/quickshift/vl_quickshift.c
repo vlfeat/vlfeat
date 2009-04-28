@@ -57,7 +57,7 @@ mexFunction(int nout, mxArray *out[],
 
   int medoid = 0 ;
 
-  int const *dims ;
+  mwSize const *dims ;
   int ndims ;
   
   int i;
