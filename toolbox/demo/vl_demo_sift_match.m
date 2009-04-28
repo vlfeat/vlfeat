@@ -49,9 +49,9 @@ hold on ;
 h = line([xa ; xb], [ya ; yb]) ;
 set(h,'linewidth', 2, 'color', 'b') ;
 
-plotframe(fa(:,matches(1,:))) ;
+vl_plotframe(fa(:,matches(1,:))) ;
 fb(1,:) = fb(1,:) + size(Ia,2) ;
-plotframe(fb(:,matches(2,:))) ;
+vl_plotframe(fb(:,matches(2,:))) ;
 axis equal ;
 axis off  ;
 
