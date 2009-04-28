@@ -162,6 +162,7 @@ libsrc =                \
  vl\random.c            \
  vl\rodrigues.c         \
  vl\sift.c              \
+ vl\quickshift.c        \
  vl\stringop.c
  
 cmdsrc =                \
@@ -202,6 +203,7 @@ mexsrc =                          \
  toolbox\misc\vl_whistc.c         \
  toolbox\mser\vl_erfill.c         \
  toolbox\mser\vl_mser.c           \
+ toolbox\quickshift\vl_quickshift.c \
  toolbox\sift\vl_dsift.c          \
  toolbox\sift\vl_sift.c           \
  toolbox\sift\vl_siftdescriptor.c \
@@ -219,6 +221,7 @@ mexdll = $(mexdll:toolbox\geometry=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\misc=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\aib=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw32)
 mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
@@ -233,6 +236,7 @@ mexdll = $(mexdll:toolbox\geometry=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\misc=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\aib=toolbox\mexw64)
+mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw64)
 mexres = $(mexdll:.mexw64=.res)
 mexpdb = $(mexdll:.mexw64=.pdb)
 !endif
@@ -371,6 +375,9 @@ $(bindir)\vl.lib : $(libobj)
 	$(BUILD_MEX)
 
 {toolbox\aib}.c{$(mexdir)}.$(MEX_SFX):
+	$(BUILD_MEX)
+
+{toolbox\quickshift}.c{$(mexdir)}.$(MEX_SFX):
 	$(BUILD_MEX)
 
 {toolbox\misc}.c{$(mexdir)}.$(MEX_SFX):
