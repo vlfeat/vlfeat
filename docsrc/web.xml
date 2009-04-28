@@ -51,7 +51,7 @@
    &copy; 2005-09 Andrea Vedaldi and Brian Fulkerson
   </div> <!-- footer -->
   
-  <!-- Google Analytics Tracker -->
+  <!-- Google Analytics Begins -->
   <script type="text/javascript">
    //<![CDATA[
     var localre = /vlfeat.org/;
@@ -62,7 +62,6 @@
    }
    //]]>
   </script>
-
   <script type="text/javascript">
     //<![CDATA[
     var localre = /vlfeat.org/;
@@ -77,7 +76,7 @@
    }
    //]]>
   </script>
-
+  <!-- Google Analytics Ends -->
  </body>
 </html>
 
@@ -140,6 +139,7 @@
   </page>
  </dir>
 
+ <!-- Generate an additional page to hold search results -->
  <page name="search" id="search" title="Search" hide="yes">
   <!-- Google CSE Search Results Begins -->
   <div id="cse-search-results"></div>
