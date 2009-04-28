@@ -1,6 +1,27 @@
                      VisionLab Features Library
                   Andrea Vedaldi and Brian Fulkerson
 
+INSTALLING
+  In most cases, you do not need to compile or build the documentation
+  as described below. Instead, to use with MATLAB, simply cd to the
+  toolbox directory and type vl_setup.
+
+  Binaries are created in the bin/XXX directory, where XXX changes
+  depending on the architecture. We support the following (the naming
+  reflects MATLAB naming for MEX files):
+
+  - mac     Mac OS X PPC
+  - maci    Mac OS X Intel
+  - glx     GNU Linux i386
+  - g64     GNU Linux x64
+  - win32   Windows
+  - win64   Windows (64 bit)
+
+  The executable binaries can be installed anywhere in the command
+  line path (the directory contains also the static library).
+
+  More details may be found in the provided HTML documentation
+  (doc/index.html).
 
 COMPILING
   The core library and command line utilities require a common C
@@ -38,27 +59,6 @@ COMPILING
 
   This has been tested with Matlab R14 and lcc, but other configurations should
   only require minor tweaking.
-
-INSTALLING
-  Binaries are created in the bin/XXX directory, where XXX changes
-  depending on the architecture. We support the following (the naming
-  reflects MATLAB naming for MEX files):
-
-  - mac     Mac OS X PPC
-  - maci    Mac OS X Intel
-  - glx     GNU Linux i386
-  - g64     GNU Linux x64
-  - win32   Windows
-  - win64   Windows (64 bit)
-
-  The executable binaries can be installed anywhere in the command
-  line path (the directory contains also the static library).
-
-  MEX files are created in the toolbox/ directory and follow MATLAB
-  naming conventions (so binaries for multiple architectures can
-  co-exist). MEX files, along with the other M-files, should be added
-  to MATLAB path, for instance by using the provided vl_setup.m
-  command.
   
 CREATING THE DOCUMENTATION
   This task is handled by various Makefile that have been tested
