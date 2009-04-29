@@ -547,7 +547,13 @@ post:
 	    $(HOST)/download
 
 post-doc: doc
-	rsync -aP --exclude=*.eps doc/ $(HOST)
+	rsync --recursive                                            \
+	      --perms                                                \
+	      --group=lab                                            \
+	      --chmod=Dg+s,g+w,o-w                                   \
+	      --exclude=*.eps                                        \
+	      --progress                                             \
+	      doc/ $(HOST)
 
 # --------------------------------------------------------------------
 #                                                             Includes
