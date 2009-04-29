@@ -640,15 +640,20 @@ class DocHtmlText(DocBareNode):
                 for s in pageNode.findChildren(DocPageScript):
                     s.publish(gen, pageNode)
 
+            elif directive == "pagetitle":
+                gen.putString(pageNode.title)
+
+            elif directive == "path":
+                ancPages = [x for x in walkAncestors(pageNode, DocPage)]
+                ancPages.reverse()
+                gen.putString(" - ".join([x.title for x in ancPages]))
+
             elif directive == "navigation":
                 gen.putString("<ul>\n")
                 openNodeStack = [x for x in walkAncestors(pageNode, DocPage)]
                 siteNode = walkAncestors(pageNode, DocSite).next()
                 siteNode.publishIndex(gen, pageNode, openNodeStack)
                 gen.putString("</ul>\n")
-
-            elif directive == "pagetitle":
-                gen.putString(pageNode.title)
 
             else:
                 print "warning: ignoring directive " + label            
