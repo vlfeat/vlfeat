@@ -161,14 +161,14 @@ class Node:
             dirname = m.node.dirname.upper()
             if len(dirname) > 0:
                 xml += \
-                    "<page id='%s' name='%s' title='Matlab API: %s: %s' hide='yes'>" \
+                    "<page id='%s' name='%s' title='%s - %s' hide='yes'>" \
                     "<div class='mdoc'>" \
                     "<include src='%s'/></div></page>\n" % (m.getId('web'), m.funcname, 
                                                             dirname, 
                                                             m.funcname, m.htmlname)
             else:
                 xml += \
-                    "<page id='%s' name='%s' title='Matlab API: %s' hide='yes'>" \
+                    "<page id='%s' name='%s' title='%s' hide='yes'>" \
                     "<div class='mdoc'>" \
                     "<include src='%s'/></div></page>\n" % (m.getId('web'), m.funcname,
                                                             m.funcname, m.htmlname)
