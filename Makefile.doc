@@ -25,7 +25,7 @@ img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
 
 VERSION: Makefile
-	echo "$(VER) (`date "+%B %d, %Y"`)" > VERSION
+	echo "$(VER)" > VERSION
 
 docsrc/version.html: Makefile
 	echo "<code>$(VER) (`date "+%B %d, %Y"`)</code>" > docsrc/version.html
