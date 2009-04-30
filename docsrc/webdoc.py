@@ -622,11 +622,13 @@ class DocHtmlText(DocBareNode):
 
     def publish(self, gen, pageNode = None):
         if pageNode is None: return
-        last = 0
+        # find occurences of %directive; in the text node and do the
+        # appropriate substitutions
+        next = 0
         for m in re.finditer("%\w+;", self.text):
-            if last <= m.start() - 1:
-                gen.putXMLString(self.text[last : m.start()-1])
-            last = m.end()            
+            if next < m.start():
+                gen.putXMLString(self.text[next : m.start()])
+            next = m.end()
             directive = self.text[m.start()+1 : m.end()-1]
 
             if   directive == "content":
@@ -657,8 +659,8 @@ class DocHtmlText(DocBareNode):
 
             else:
                 print "warning: ignoring directive " + label            
-        if last < len(self.text):
-            gen.putXMLString(self.text[last:])
+        if next < len(self.text):
+            gen.putXMLString(self.text[next:])
 
     publish = makeBareGuard(publish)
 
