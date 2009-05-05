@@ -28,7 +28,7 @@ VERSION: Makefile
 	echo "$(VER)" > VERSION
 
 docsrc/version.html: Makefile
-	echo "<code>$(VER) (`date "+%B %d, %Y"`)</code>" > docsrc/version.html
+	echo "<code>$(VER)</code>" > docsrc/version.html
 
 doc: doc-api doc-man doc-web
 doc-man: doc/man-src/man.xml doc/man-src/man.html 
