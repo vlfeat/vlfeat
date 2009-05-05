@@ -553,6 +553,11 @@ post-doc: doc
 	      --chmod=Dg+s,g+w,o-w                                   \
 	      --exclude=*.eps                                        \
 	      --progress                                             \
+	      --exclude=download                                     \
+	      --exclude=man-src                                      \
+	      --exclude=toolbox-src                                  \
+	      --exclude=.htaccess                                    \
+	      --delete                                               \
 	      doc/ $(HOST)
 
 # --------------------------------------------------------------------
