@@ -111,28 +111,34 @@
   </page>
  </page>
 
- <dir name="api">
-  <page id="api" name="index" title="C API">
-   <div class="doxygen">
-    <!-- Doc Here -->
-   </div>
-  </page>
- </dir>
- 
- <dir name="mdoc">
-  <page id="mdoc" name="mdoc" title="Matlab API">
-   <include src="doc/toolbox-src/mdoc.html"/>
-   <include src="doc/toolbox-src/mdoc.xml"/>
-  </page>
- </dir>
+ <page id="doc" name="doc" title="Documentation">
 
- <dir name="man">
-  <page id="man" name="man" title="Man pages">
-   <p>These man pages describe VLFeat command line utilities.</p>
-   <include src="doc/man-src/man.html"/>
-   <include src="doc/man-src/man.xml"/>
-  </page>
- </dir>
+  <include src="doc.html"/>
+
+  <dir name="mdoc">
+   <page id="mdoc" name="mdoc" title="Matlab API">
+    <include src="doc/toolbox-src/mdoc.html"/>
+    <include src="doc/toolbox-src/mdoc.xml"/>
+   </page>
+  </dir>
+
+  <dir name="api">
+   <page id="api" name="index" title="C API">
+    <div class="doxygen">
+     <!-- Doc Here -->
+    </div>
+   </page>
+  </dir>
+  
+  <dir name="man">
+   <page id="man" name="man" title="Man pages">
+    <p>These man pages describe VLFeat command line utilities.</p>
+    <include src="doc/man-src/man.html"/>
+    <include src="doc/man-src/man.xml"/>
+   </page>
+  </dir>
+  
+ </page>
 
  <dir name="overview">
   <page id="tut"       name="tut"       title="Tutorials"> 
