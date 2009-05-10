@@ -35,8 +35,8 @@ typedef struct _VlSiftKeypoint
   int is ;          /**< Integer s coordinate. */
   
   float x ;     /**< x coordinate. */
-  float y ;     /**< u coordinate. */
-  float s ;     /**< x coordinate. */
+  float y ;     /**< y coordinate. */
+  float s ;     /**< s coordinate. */
   float sigma ; /**< scale. */
 } VlSiftKeypoint ;
 
