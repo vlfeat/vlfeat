@@ -404,7 +404,7 @@ uIsString(const mxArray* A, int L)
   return 
     mxIsChar(A) &&
     mxGetNumberOfDimensions(A) == 2 &&
-    M == 1 &&
+    (M == 1 || (M == 0 && N == 0)) &&
     (L < 0 || N == L) ;
 }
 
