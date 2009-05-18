@@ -22,7 +22,7 @@
  <body>
   <div id="header">
    <!-- Google CSE Search Box Begins -->
-   <form action=" http://www.vlfeat.org/search.html" id="cse-search-box">
+   <form action="http://www.vlfeat.org/search.html" id="cse-search-box">
     <div>
      <input type="hidden" name="cx" value="003215582122030917471:oq23albfeam" />
      <input type="hidden" name="cof" value="FORID:11" />
