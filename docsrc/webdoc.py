@@ -447,14 +447,14 @@ class DocNode(DocBareNode):
 def expandAttr(value, pageNode):
 # --------------------------------------------------------------------
     xvalue = ""
-    last = 0
+    next = 0
     for m in re.finditer("%[-\w._#:]+;", value):
-        if last <= m.start() - 1:
-            xvalue += value[last:m.start()-1]
-        last = m.end()
+        if next < m.start():
+            xvalue += value[next : m.start()]
+        next = m.end()
         directive = value[m.start()+1 : m.end()-1]
         mo = re.match('pathto:(.*)', directive)
-        if mo: 
+        if mo:
             toNodeID = mo.group(1)
             toNodeURL = None
             if nodeIndex.has_key(toNodeID):
@@ -467,7 +467,7 @@ def expandAttr(value, pageNode):
         else:
             raise DocBareParsingError(
                 "Unknown directive '%s' while expanding attribute" % directive)
-    if last < len(value): xvalue += value[last:]
+    if next < len(value): xvalue += value[next:]
     #print "EXPAND: ", value, " -> ", xvalue
     return xvalue
 
