@@ -20,8 +20,8 @@ General Public License version 2.
  ** @param nin number of input arguments.
  ** @param in input arguments.
  **/
-void 
-mexFunction(int nout, mxArray *out[], 
+void
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum { IN_B=0, IN_X, IN_END } ;
@@ -29,16 +29,16 @@ mexFunction(int nout, mxArray *out[],
   int NX, NB ;
   const double *X, *B ;
   double *IDX ;
-  
+
   if( nin != 2 ) {
     mexErrMsgTxt("Exactly two arguments are required.") ;
   }
-  
+
   if(! uIsPlainArray(in[IN_B]) ||
      ! uIsPlainArray(in[IN_X])) {
     mexErrMsgTxt("All arguments must be plain arrays.") ;
   }
-    
+
   NX = mxGetNumberOfElements(in[IN_X]) ;
   NB = mxGetNumberOfElements(in[IN_B]) ;
 
@@ -48,7 +48,7 @@ mexFunction(int nout, mxArray *out[],
   B = mxGetPr(in[IN_B]) ;
 
   {
-    int i ;    
+    int i ;
     for (i = 0 ; i < NX ; ++i) {
       double x = X[i] ;
       int blower = 0 ;
@@ -60,11 +60,11 @@ mexFunction(int nout, mxArray *out[],
         continue ;
       }
 
-      if (x > B[NB-1]) {
+      if (x >= B[NB-1]) {
         IDX [i] = NB ;
         continue ;
       }
-      
+
       while (blower + 1 < bupper) {
         bsplit = (bupper + blower) / 2 ;
         if (x < B[bsplit]) bupper = bsplit ;
@@ -72,5 +72,5 @@ mexFunction(int nout, mxArray *out[],
       }
       IDX [i] = blower + 1 ;
     }
-  }  
+  }
 }
