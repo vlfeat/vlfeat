@@ -33,7 +33,7 @@ switch mexext
     arch = 'win32\sift.exe' ;
 end
 
-pfx = fullfile(vlfeat_root,'results') ;
+pfx = fullfile(vl_root,'results') ;
 if ~ exist(pfx, 'dir')
   mkdir(pfx) ;
 end

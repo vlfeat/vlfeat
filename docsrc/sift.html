@@ -17,6 +17,7 @@ robustly. For a more in-depth description of the algorithm, see our
  <li><a href="%pathto:tut.sift.param;">Detector parameters</a></li>
  <li><a href="%pathto:tut.sift.custom;">Custom frames</a></li>
  <li><a href="%pathto:tut.sift.conventions;">Conventions</a></li>
+ <li><a href="%pathto:tut.sift.ubc;">Comparison with D. Lowe's SIFT</a></li>
 </ul>
  
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -316,5 +317,57 @@ Our conventions (top) compared to Lowe's (bottom).
   axis points upward. Consequently, to map from our to D. Lowe's
   convention, frames orientations need to be negated and the descriptor
   elements must be re-arranged.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.sift.ubc">Comparison with D. Lowe's SIFT</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>VLFeat SIFT implementation is largerly compatible with
+<a href="http://www.cs.ubc.ca/~lowe/keypoints/">UBC (D. Lowe's)
+implementation</a> (note however that the keypoints are stored in a
+slightly different format, see <code>vl_ubcread</code>). The following
+figure compares SIFT keypoints computed by the VLFeat (blue) and UBC
+(red) implementations.</p>
+
+<div class="figure">
+<img src="%pathto:root;demo/sift_vs_ubc_1.jpg"/>
+<div class="caption">
+<span class="content">
+VLFeat keypoints (blue) superimposed to D. Lowe's keypoints
+(red). Most keypoints match nearly exactly.
+</span>
+</div>
+</div>
+
+<p>The large majority of the keypoints correspond nearly exactly. The
+following figure shows the percentage of keypoints computed by the two
+implementations whose center matches with a precision of at least 0.01
+pixels and 0.05 pixels respectively.</p>
+
+<div class="figure">
+<img src="%pathto:root;demo/sift_vs_ubc_2.jpg"/>
+<div class="caption">
+<span class="content">
+Percentage of keypoints obtained from the VLFeat and UBC implementations
+that match up to 0.01 pixels and 0.05 pixels.
+</span>
+</div>
+</div>
+
+<p>Descriptors are also very similar. The following figure shows the
+percentage of descriptors computed by the two implementations whose
+distance is less than 10% and 20% of the average descriptor
+distance.</p>
+
+<div class="figure">
+<img src="%pathto:root;demo/sift_vs_ubc_3.jpg"/>
+<div class="caption">
+<span class="content">
+Percentage of descriptors obtained from the VLFeat and UBC
+implementations whose distance is within 10% and 20% of the average
+descriptor distance.
+</span>
+</div>
+</div>
 
 </group>
