@@ -38,9 +38,10 @@ vl_demo_print('sift_vs_ubc_1') ;
 
 figure(2) ; clf ;
 pie(h) ;
+colormap hot(3) ;
 legend({'0.01 pixels', '0.05 pixels', 'others'}, ...
        'location', 'northeastoutside') ;
-set(findobj(2, '-property', 'fontsize'), 'fontsize', 12)
+set(findobj(2, '-property', 'fontsize'), 'fontsize', 11) ;
 vl_demo_print('sift_vs_ubc_2') ;
 
 % --------------------------------------------------------------------
@@ -64,7 +65,8 @@ h = h(1:end-1) ;
 
 figure(3) ; clf ;
 pie(h) ;
+colormap hot(4) ;
 legend({'5% differnce', '10% difference', '20% difference', 'others'}, ...
        'location', 'northeastoutside') ;
-set(findobj(3, '-property', 'fontsize'), 'fontsize', 12)
+set(findobj(3, '-property', 'fontsize'), 'fontsize', 11) ;
 vl_demo_print('sift_vs_ubc_3') ;

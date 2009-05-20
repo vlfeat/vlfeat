@@ -19,7 +19,7 @@ vl_demo_print('mser_basic_0') ;
 % --------------------------------------------------------------------
 I = uint8(rgb2gray(I)) ;
 
-clf ; imagesc(I) 
+clf ; imagesc(I) ; colormap(gray(256)) ;
 axis equal ; axis off ; axis tight ;
 
 % --------------------------------------------------------------------
@@ -43,7 +43,8 @@ h1 = vl_plotframe(f) ; set(h1,'color','y','linewidth',3) ;
 h2 = vl_plotframe(f) ; set(h2,'color','k','linewidth',1) ;
 vl_demo_print('mser_basic_frames') ;
 
-figure(2) ; clf ; imagesc(I) ; hold on ; colormap gray ;
+figure(2) ; clf ; imagesc(I) ; hold on ; 
+colormap(gray(256)) ;
 [c,h]=contour(M,(0:max(M(:)))+.5) ;
 set(h,'color','y','linewidth',3) ;
 axis equal ; axis off ;

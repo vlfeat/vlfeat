@@ -46,7 +46,7 @@ axis equal ; axis off ; axis tight ;
 vl_demo_print('sift_cmd_1') ;
 
 figure(2) ; clf ;
-imagesc(I) ; colormap gray ; hold on ;
+imagesc(I) ; colormap(gray(256)) ; hold on ;
 s      = m0(1,perm(1:20)) ;
 s0     = m0(2,perm(1:20)) ;
 [dr,a] = intersect(m1(1,:),s) ;
@@ -84,7 +84,7 @@ d1        = uint8(data(:,5:end)') ;
 [dr,perm]  = sort(sc0,'ascend') ;
 
 figure(3) ; clf ;
-imagesc(I) ; colormap gray ; hold on ;
+imagesc(I) ; colormap(gray(256)) ; hold on ;
 h = vl_plotframe(f) ;  set(h,'color','g','linewidth',4) ;
 h = vl_plotframe(f1) ; set(h,'color','b','linewidth',2) ;
 h = vl_plotframe(f0) ; set(h,'color','r','linewidth',1) ;
@@ -95,7 +95,7 @@ axis equal ; axis off ; axis tight ;
 vl_demo_print('sift_cmd_3') ;
 
 figure(4) ; clf ;
-imagesc(I) ; colormap gray ; hold on ;
+imagesc(I) ; colormap(gray(256)) ; hold on ;
 s      = m0(1,perm(1:20)) ;
 s0     = m0(2,perm(1:20)) ;
 [dr,a] = intersect(m1(1,:),s) ;

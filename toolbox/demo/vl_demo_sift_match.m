@@ -55,4 +55,4 @@ vl_plotframe(fb(:,matches(2,:))) ;
 axis equal ;
 axis off  ;
 
-vl_demo_print('sift_match_1', 1.5) ;
+vl_demo_print('sift_match_1', 1) ;

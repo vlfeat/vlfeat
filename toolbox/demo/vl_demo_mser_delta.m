@@ -20,6 +20,7 @@ vl_demo_print('mser_delta_0') ;
 
 figure(2) ; clf ; 
 imagesc(I) ; axis off ; axis equal ; axis tight ;
+colormap(gray(256)) ;
 set(gca,'fontsize',20) ;
 
 deltar = [1 32 159 160] ;

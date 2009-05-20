@@ -11,6 +11,9 @@
 .PHONY: doc-bindist, doc-distclean
 .PHONY: autorights
 
+# 95 DPI make a letter page 808 pixels large
+screen_dpi := 95
+
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
 html_src := $(wildcard docsrc/*.html)
@@ -133,7 +136,7 @@ doc/man-src/index.html : $(doc-dir)
 doc-figures: $(img_tgt)
 
 doc/figures/%.png : doc/figures/%.dvi
-	$(call C,DVIPNG) -D 75 -T tight -o $@ $<
+	$(call C,DVIPNG) -D $(screen_dpi) -T tight -o $@ $<
 
 doc/figures/%.eps : doc/figures/%.dvi
 	$(call C,DVIPS) -E -o $@ $<
@@ -159,10 +162,10 @@ doc/figures/%.tex : $(doc-dir)
 	@/bin/echo '\end{document}'	               >>$@
 
 doc/demo/%.jpg : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% jpg:$@
+	$(call C,CONVERT) -density 400 -resample $(screen_dpi)  "$<" -colorspace rgb jpg:$@
 
 doc/demo/%.png : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 $< -colorspace rgb -resize 15% png:$@
+	$(call C,CONVERT) -density 400 -resample $(screen_dpi)  "$<" -colorspace rgb png:$@
 
 doc/%.pdf : doc/%.eps
 	$(call C,EPSTOPDF) --outfile=$@ $<
