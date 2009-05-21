@@ -1,40 +1,41 @@
 /* div, p, ul, li, ol, img {border: 1px solid red ;} */
 html, body, div, img {
     margin: 0px ;
-    padding: 0px ;    
+    padding: 0px ;
 }
 table {
     font: inherit ;
     color: inherit ;
 }
 html {
-    background-color: #ddd ;
+    background-color: #5d564e;
 }
 body {
-    border-bottom: 1px #aaa solid ;
+    border-bottom: 2px #aaa solid ;
     border-left:   1px #aaa solid ;
-    border-right:  1px #aaa solid ;
+    border-right:  2px #aaa solid ;
     margin-left: auto ;
     margin-right: auto ;
     margin-bottom: 0.5em ;
     width: 65em ;
-    background-color: #184860;
+    background-color: #183a60;
     font-family: Lucida, Helvetica, sans-serif ;
     font-size: 14px ;
+    border-color: #454545;
 }
-h1, h2, h3, h4, h5, h6 { 
+h1, h2, h3, h4, h5, h6 {
     font-family: Lucida, Helvetica, sans-serif ;
     font-weight: normal ;
-    color: #184860;
+    color: #183a60;
 }
-a {	
+a {
     color: #004fdc;
 }
 b {
-    color: rgb(40,40,40) ; 
+    color: rgb(40,40,40) ;
 }
-pre, code { 
-    font-family: 'Andale Mono', monospaced ; 
+pre, code {
+    font-family: 'Andale Mono', monospaced ;
     color: #ff6f00;
 }
 #pagebody {
@@ -79,10 +80,10 @@ pre, code {
     margin-bottom: 0em ;
 }
 #sidebar li .active {
-    background: #e4e4cf;
+    background-color: #d7d4d8;
 }
 #sidebar li a {
-    color: rgb(40,40,40) ;    
+    color: rgb(40,40,40) ;
     text-decoration: none ;
     padding: .2em;
 }
@@ -91,23 +92,22 @@ pre, code {
     padding: .2em;
 }
 #header {
-    padding-top: 1px ;
     padding-left: 10px ;
     padding-bottom: 10px ;
-    padding-top: 10px ;
+    padding-top: 10px;
 }
 #header #cse-search-box {
     float: right ;
     margin-right: 1em ;
 }
 #headbanner {
-    background-color: #e4e4cf;
+    background-color: #d7d4d8;
     padding: .2em .7em ;
     border-bottom: 1px solid gray ;
     border-style: none;
-	font: bold 1.1em Lucida, Helvetica, sans-serif;
-	color: #333;
-} 
+    font: bold 1.1em Lucida, Helvetica, sans-serif;
+    color: #5a5a5e;
+}
 #header h1 {
     margin: 0 ;
     color:  white ;
@@ -124,9 +124,8 @@ pre, code {
     clear: both ;
     margin: 0px ;
     padding: 0px ;
-    font-size: 1px; 
+    font-size: 1px;
 }
-
 .standout {
     margin: 1em ! important ;
     font-family: Lucida, Helvetica, sans-serif ;
@@ -171,28 +170,28 @@ pre, code {
 }
 #content ul,
 #content ol {
-    margin-left: 0; 
+    margin-left: 0;
     padding-left: 0 ;
 }
 #content li {
     margin-left: 1.2em ;
     padding-left: 0 ;
 }
-#content ol li { 
+#content ol li {
     margin-left: 2em ;
 }
 #content dt {
     /*display: block ;
-    float: left ;*/
+      float: left ;*/
     font-weight: bold ;
     width: auto ;
     margin-right: 1em ;
     padding: 0 ;
-    text-align: left; 
+    text-align: left;
 }
 #content dd {
     display: block ;
-    margin: 0.1em  0 ;    
+    margin: 0.1em  0 ;
     padding-left: 2em ;
 }
 #content dd p,
@@ -227,12 +226,18 @@ pre, code {
 }
 #content div.box {
     float: left ;
-    border: 1px solid #aaa ;
-    background-color: #f8f8ee ;
     padding: 0.5em ;
     width: 24em ;
     margin-right: 1em ;
     margin-bottom: 1em ;
+
+    background-color: #f3f0f5;
+
+    border-bottom-style: solid;
+    border-bottom-color: #a7a5a8;
+
+/*    border-top-style: solid;
+      border-top-color: #a7a5a8;*/
 }
 #content div.box h1 {
     font-size: 1.2em ;
@@ -294,7 +299,7 @@ pre, code {
 }
 #content div.doxygen li {
     margin-top: 0.1em ;
-    margin-bottom: 0.1em; 
+    margin-bottom: 0.1em;
 }
 #content div.doxygen p  {
     margin-right: 0 ;
@@ -306,21 +311,30 @@ pre, code {
 #content div.doxygen td.memItemLeft {
 }
 #content div.doxygen div.memitem {
+    border-color: #d7d4d8;
+    padding: 0;
 }
 #content div.doxygen div.memproto {
-    background-color: #e4e4cf;
-    border: 1px solid #aaa ;
+    background-color: #f3f0f5;
     padding: 0.5em ;
+    border-bottom-style: solid;
+    border-bottom-color: #a7a5a8;
+}
+#content div.doxygen table.memname td {
+    vertical-align: top ;
 }
 #content div.doxygen td.memname {
 }
 #content div.doxygen td.paramkey {
     color: blue ;
+    white-space: nowrap;
 }
 #content div.doxygen td.paramtype {
+    white-space: nowrap;
 }
 #content div.doxygen td.paramname {
     color: green ;
+    white-space: nowrap;
 }
 #content div.doxygen div.navigation {
     padding: 0 ;
@@ -362,7 +376,7 @@ pre, code {
     color: black ;
 }
 #content div.doxygen div.navigation .current {
-    background-color: #e4e4cf;
+    background-color: #d7d4d8;
 }
 #content div.doxygen p.formulaDsp {
     text-align: center ;
