@@ -31,8 +31,8 @@ h = h(1:end-1) ;
 
 figure(1) ; clf ;
 imagesc(im) ; colormap(gray(256)) ; hold on ;
-plotframe(f1, 'linewidth', 3, 'color', 'r') ;
-plotframe(f2, 'linewidth',  1, 'color', 'b') ;
+vl_plotframe(f1, 'linewidth', 3, 'color', 'r') ;
+vl_plotframe(f2, 'linewidth',  1, 'color', 'b') ;
 axis off ;
 vl_demo_print('sift_vs_ubc_1') ;
 
