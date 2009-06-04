@@ -211,7 +211,7 @@ mexFunction(int nout, mxArray *out[],
      *                                                       Copy back
      * ------------------------------------------------------------ */
     {
-      float *tmpDescr = vl_malloc(sizeof(float) * descrSize) ;
+      float *tmpDescr = mxMalloc(sizeof(float) * descrSize) ;
       double *outFrameIter = mxGetPr(out[OUT_FRAMES]) ;
       vl_uint8  *outDescrIter = mxGetData(out[OUT_DESCRIPTORS]) ;
       for (k = 0 ; k < numFrames ; ++k) {
@@ -233,7 +233,7 @@ mexFunction(int nout, mxArray *out[],
           *outDescrIter++ = (vl_uint8) (VL_MIN(512.0F * tmpDescr[i], 255.0F)) ;
         }
       }
-      vl_free(tmpDescr) ;
+      mxFree(tmpDescr) ;
     }
     vl_dsift_delete (dsift) ;
   }

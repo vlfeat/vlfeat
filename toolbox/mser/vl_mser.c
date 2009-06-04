@@ -150,10 +150,10 @@ mexFunction(int nout, mxArray *out[],
     
     /* new filter */
     {
-      int * vlDims = vl_malloc(sizeof(int) * ndims) ;
+      int * vlDims = mxMalloc(sizeof(int) * ndims) ;
       for (i = 0 ; i < ndims ; ++i) vlDims [i] = dims [i] ;
       filt = vl_mser_new (ndims, vlDims) ;
-      vl_free(vlDims) ;
+      mxFree(vlDims) ;
     }
 
     if (!filt) {
