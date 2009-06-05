@@ -16,7 +16,7 @@ vlDir      = vl_root ;
 toolboxDir = fullfile(vlDir, 'toolbox') ;
 mexw32Dir  = fullfile(toolboxDir,   'mexw32') ;
 binw32Dir  = fullfile(vlDir, 'bin', 'win32') ;
-impLibDir  = fullfile(binw32Dir, 'vl.lib') ;
+impLibPath = fullfile(binw32Dir, 'vl.lib') ;
 libDir     = fullfile(binw32Dir, 'vl.dll') ;
 
 mkd(mexw32Dir) ;
