@@ -234,9 +234,9 @@ vl_quickshift_new(vl_qs_type const * image, int height, int width,
   q->tau      = VL_MAX(height,width)/50;
   q->sigma    = VL_MAX(2, q->tau/3);
 
-  q->dists    = vl_malloc(sizeof(vl_qs_type)*height*width);
-  q->parents  = vl_malloc(sizeof(int)*height*width); 
-  q->density  = vl_malloc(sizeof(vl_qs_type)*height*width);
+  q->dists    = vl_calloc(height*width, sizeof(vl_qs_type));
+  q->parents  = vl_calloc(height*width, sizeof(int)); 
+  q->density  = vl_calloc(height*width, sizeof(vl_qs_type)) ;
 
   return q;
 }
