@@ -9,7 +9,7 @@ function [tp,tn,info] = vl_roc(y, score, varargin)
 %  incereasing values of the decision threshold.
 %
 %  [TP,TN,INFO] = VL_ROC(...) returns the following additional
-%  informations:
+%  information:
 %
 %  INFO.EER::       Equal error rate.
 %  INFO.AUC::       Area under the VL_ROC (AUC).
