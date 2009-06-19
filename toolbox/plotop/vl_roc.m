@@ -62,6 +62,13 @@ function [tp,tn,info] = vl_roc(y, score, varargin)
 %     Natural operating point:: Assumes P[Y=+1] = P/(P+N).
 %     Uniform operating point:: Assumes P[Y=+1] = 1/2.
 %
+%   Options:
+%
+%   Plot::
+%     'truenegative' plots the true positives vs. the true negatives.
+%     'falsenegative' plots the true positives vs. the false 
+%     negatives.
+%
 %  See also:: VL_HELP().
 
 % AUTORIGHTS
@@ -69,6 +76,21 @@ function [tp,tn,info] = vl_roc(y, score, varargin)
 % 
 % This file is part of VLFeat, available in the terms of the GNU
 % General Public License version 2.
+
+plotenable = (nargout == 0);
+plotstyle = 'truenegative';
+for k=1:2:length(varargin)
+  switch lower(varargin{k}) 
+    case 'plot'
+      plotenable = 1;
+      plotstyle = varargin{k+1} ;
+    otherwise
+      error(['Uknown option ''', varargin{k}, '''.']) ;
+  end
+end
+
+y = y(:);
+score = score(:); % vectors
 
 [score, perm] = sort(score) ;
 
@@ -87,11 +109,11 @@ end
 % fliplr(perm) move the high scored ones to the beginning
 tp = cumsum( y(fliplr(perm)) == +1 ) / (Np + eps) ;
 tp = fliplr(tp) ;
-tp = [tp 0] ;
+tp = [tp; 0] ;
 
 % true negative rate
 tn = cumsum(y(perm) == -1) / (Nn + eps)  ;
-tn = [0 tn] ;
+tn = [0; tn] ;
 
 % voc style
 %[tp, tn] = roc_pascal05(y, score) ;
@@ -116,7 +138,7 @@ if nargout > 0 | nargout == 0
   ur = tp(upoint) * 1/2  + tn(upoint) * 1/2 ;
   nr = tp(npoint) * Np/N + tn(npoint) * Nn/N ;
   
-  score_ = [-inf score] ;
+  score_ = [-inf; score] ;
   ut = score_(upoint) ;
   nt = score_(npoint) ;
   
@@ -137,12 +159,13 @@ end
 % --------------------------------------------------------------------
 
 % plot?
-if nargout == 0
+if plotenable
 		
 	cla ; hold on ;
 	plot(tn,tp,'linewidth',2) ;
 
-	if ~ opts.falsePositive
+  switch plotstyle
+  case 'truenegative'
     line(eer             * [0 1 1], ...
          eer             * [1 1 0], ...
          'color','r', 'linestyle', '--','linewidth', 1) ;
@@ -157,7 +180,7 @@ if nargout == 0
     
     xlim([0 1]) ; xlabel('true negative rate') ;
     ylim([0 1]) ; ylabel('true positve rate') ;
-  else
+  case 'falsenegative'
     line(1 - eer             * [0 1 1], ...
              eer             * [1 1 0], ...
          'color','r', 'linestyle', '--','linewidth', 1) ;
@@ -172,6 +195,8 @@ if nargout == 0
     
     xlim([0 1]) ; xlabel('false negative rate') ;
     ylim([0 1]) ; ylabel('true positve rate') ;    
+  otherwise
+    error(sprintf('Unrecognized plotting style: %s', plotstyle));
   end
   axis square ;
 	title(sprintf('VL_ROC (AUC = %.3g)', area)) ;
