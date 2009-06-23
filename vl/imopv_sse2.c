@@ -4,6 +4,13 @@
  ** @brief    Vectorized image operations - SSE2 - Definition
  **/
 
+/* AUTORIGHTS
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+ This file is part of VLFeat, available in the terms of the GNU
+ General Public License version 2.
+ */
+
 #if defined(VL_SUPPORT_SSE2) & ! defined(__SSE2__)
 #error "Compiling with VL_SUPPORT_SSE2, but no __SSE2__ defined"
 #endif

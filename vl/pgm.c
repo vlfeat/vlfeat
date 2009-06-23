@@ -1,18 +1,16 @@
 /** @file    pgm.c
- ** @author  Andrea Vedaldi
  ** @brief   Portable graymap format (PGM) parser - Definition
+ ** @author  Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
-Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-/** 
-
-@file pgm.h
+/** @file pgm.h
 
 This module implements basic input and ouptut of images in PGM
 format.

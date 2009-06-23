@@ -5,7 +5,7 @@
  **/
 
 /* AUTORIGHTS
-Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
@@ -58,13 +58,11 @@ typedef struct _VlAIB
 /** @name Create and destroy
  ** @{
  **/
-
 VL_EXPORT
 VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels);
 
 VL_EXPORT 
 void vl_aib_delete (VlAIB * aib);
-
 /** @} */
 
 /** @name Process data
@@ -72,7 +70,6 @@ void vl_aib_delete (VlAIB * aib);
  **/
 VL_EXPORT 
 void vl_aib_process(VlAIB * aib);
-
 /** @} */
 
 /** @name Retrieve results
@@ -80,7 +77,6 @@ void vl_aib_process(VlAIB * aib);
  **/
 VL_INLINE vl_uint * vl_aib_get_parents(VlAIB const * aib);
 VL_INLINE double  * vl_aib_get_costs(VlAIB const * aib);
-
 /** @} */
 
 

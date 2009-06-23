@@ -4,7 +4,12 @@
  ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS */
+/* AUTORIGHTS
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+ This file is part of VLFeat, available in the terms of the GNU
+ General Public License version 2.
+ */
 
 #include "dsift.h"
 #include "pgm.h"
@@ -554,7 +559,7 @@ void _vl_dsift_with_gaussian_window (VlDsiftFilter* self)
 
 /** ------------------------------------------------------------------
  ** @internal@brief Process with flat window.
- ** @param f filter to delete.
+ ** @param self DSIFT filter object.
  **/
 
 VL_INLINE 

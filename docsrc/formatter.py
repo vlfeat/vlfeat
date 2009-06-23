@@ -4,6 +4,10 @@
 # description: Utility to format MATLAB comments.
 
 # AUTORIGHTS
+# Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available in the terms of the GNU
+# General Public License version 2.
 
 """
 MDOC fromats the help block of a MATLAB M-file based on a simple set

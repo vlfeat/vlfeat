@@ -4,7 +4,7 @@
  **/
 
 /* AUTORIGHTS
-Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
@@ -411,8 +411,8 @@ uIsString(const mxArray* A, int L)
 /** ------------------------------------------------------------------
  ** @brief Formatted @c mexErrMsgTxt() 
  **
- ** @param args     Format string (for sprintf).
- ** @param ...      format string arguments.
+ ** @param format format string (for sprintf).
+ ** @param ...    format string arguments.
  **/
 
 void

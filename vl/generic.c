@@ -4,7 +4,7 @@
  **/
 
 /* AUTORIGHTS
-Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
@@ -41,9 +41,11 @@ General Public License version 2.
    - @ref host.h      "Platform abstraction"
    - @ref generic.h   "Errors, memory, logging, and others"
    - @ref mathop.h    "Math operations"
+   - @ref heap.h      "Heap (priority queue)"
    - @ref random.h    "Random number generator"
    - @ref stringop.h  "String operations"
    - @ref imop.h      "Image operations"
+   - @ref pgm.h       "PGM reading and writing"
    - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
  - Algorithms

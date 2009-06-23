@@ -1,3 +1,10 @@
+/* AUTORIGHTS
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+ This file is part of VLFeat, available in the terms of the GNU
+ General Public License version 2.
+ */
+
 {                                                                 
   FLT* I_pt   = (FLT*) mxGetData (in[IN_I]) ;                     
   FLT* J_pt   = (FLT*) mxGetData (out[OUT_J]) ;                   

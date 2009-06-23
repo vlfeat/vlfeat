@@ -1,17 +1,17 @@
 /** @file    mathop.h
- ** @author  Andrea Vedaldi
  ** @brief   Math operations
+ ** @author  Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
-Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-#ifndef VL_MATHOP
-#define VL_MATHOP
+#ifndef VL_MATHOP_H
+#define VL_MATHOP_H
 
 #include "generic.h"
 
@@ -377,15 +377,13 @@ vl_fast_resqrt_d (double x)
  ** @return Approximation of @c sqrt(x).
  **/
 
-VL_INLINE
-float
+VL_INLINE float
 vl_fast_sqrt_f (float x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_f (x) ;
 }
 
-VL_INLINE
-double
+VL_INLINE double
 vl_fast_sqrt_d (float x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_d (x) ;
@@ -397,8 +395,6 @@ VL_INLINE vl_uint8  vl_fast_sqrt_ui8  (vl_uint8  x) ;
 
 /** @} */
 
-/** @internal
- ** @{ */
 #define VL_FAST_SQRT_UI(T, SFX)                 \
   T                                             \
   vl_fast_sqrt_ ## SFX (T x)                    \
@@ -423,7 +419,6 @@ VL_INLINE vl_uint8  vl_fast_sqrt_ui8  (vl_uint8  x) ;
 VL_FAST_SQRT_UI(vl_uint32, ui32)
 VL_FAST_SQRT_UI(vl_uint16, ui16)
 VL_FAST_SQRT_UI(vl_uint8,  ui8 )
-/** @} */
 
 /** ------------------------------------------------------------------
  ** @{
@@ -446,5 +441,5 @@ vl_dist_l2_d (double * dist, int M, int NX, int NY,
 
 /** @} */
 
-/* VL_MATHOP */
+/* VL_MATHOP_H */
 #endif 

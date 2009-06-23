@@ -4,7 +4,7 @@
  **/
 
 /* AUTORIGHTS
- Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
  
  This file is part of VLFeat, available in the terms of the GNU
  General Public License version 2.
@@ -117,7 +117,7 @@ void _vl_dsift_update_buffers (VlDsiftFilter *self) ;
 
 /** ------------------------------------------------------------------
  ** @brief Get descriptor size.
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @return size of a descriptor.
  **/
 
@@ -129,7 +129,7 @@ vl_dsift_get_descriptor_size (VlDsiftFilter const *self)
 
 /** ------------------------------------------------------------------
  ** @brief Get descriptors.
- ** @param f DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @return descriptors.
  **/
 
@@ -141,7 +141,7 @@ vl_dsift_get_descriptors (VlDsiftFilter const *self)
 
 /** ------------------------------------------------------------------
  ** @brief Get keypoints
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  **/
 
 VlDsiftKeypoint const *
@@ -152,7 +152,7 @@ vl_dsift_get_keypoints (VlDsiftFilter const *self)
 
 /** ------------------------------------------------------------------
  ** @brief Get number of keypoints
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  **/
 
 int
@@ -163,12 +163,8 @@ vl_dsift_get_keypoint_num (VlDsiftFilter const *self)
 
 /** ------------------------------------------------------------------
  ** @brief Get SIFT descriptor geometry
- ** @param self DSIFT filter.
- ** @param numBinT
- ** @param numBinX
- ** @parma numBinY
- ** @param binSizeX
- ** @param binSizeY
+ ** @param self DSIFT filter object.
+ ** @return DSIFT descriptor geometry.
  **/
 
 VlDsiftDescriptorGeometry const* vl_dsift_get_geometry (VlDsiftFilter const *self)
@@ -178,9 +174,9 @@ VlDsiftDescriptorGeometry const* vl_dsift_get_geometry (VlDsiftFilter const *sel
 
 /** ------------------------------------------------------------------
  ** @brief Get bounds
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param minX bounding box minimum X coordinate.
- ** @parma minY bounding box minimum Y coordinate.
+ ** @param minY bounding box minimum Y coordinate.
  ** @param maxX bounding box maximum X coordinate.
  ** @param maxY bounding box maximum Y coordinate.
  **/
@@ -197,7 +193,7 @@ vl_dsift_get_bounds (VlDsiftFilter const* self,
 
 /** ------------------------------------------------------------------
  ** @brief Get flat window flag
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @return @c TRUE if the DSIFT filter uses a flat window.
  **/
 
@@ -209,7 +205,7 @@ vl_dsift_get_flat_window (VlDsiftFilter const* self)
 
 /** ------------------------------------------------------------------
  ** @brief Get steps
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param stepX sampling step along X.
  ** @param stepY sampling step along Y.
  **/
@@ -225,7 +221,7 @@ vl_dsift_get_steps (VlDsiftFilter const* self,
 
 /** ------------------------------------------------------------------
  ** @brief Set steps
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param stepX sampling step along X.
  ** @param stepY sampling step along Y.
  **/
@@ -242,7 +238,7 @@ vl_dsift_set_steps (VlDsiftFilter* self,
 
 /** ------------------------------------------------------------------
  ** @brief Set bounds
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param minX bounding box minimum X coordinate.
  ** @param minY bounding box minimum Y coordinate.
  ** @param maxX bounding box maximum X coordinate.
@@ -262,7 +258,7 @@ vl_dsift_set_bounds (VlDsiftFilter* self,
 
 /** ------------------------------------------------------------------
  ** @brief Set SIFT descriptor geometry
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param geom descriptor geometry parameters.
  **/
 
@@ -276,7 +272,7 @@ vl_dsift_set_geometry (VlDsiftFilter *self,
 
 /** ------------------------------------------------------------------
  ** @brief Set flat window flag
- ** @param self DSIFT filter.
+ ** @param self DSIFT filter object.
  ** @param useFlatWindow @c true if the DSIFT filter should use a flat window.
  **/
 

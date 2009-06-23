@@ -4,6 +4,10 @@
 # description: MDoc main
 
 # AUTORIGHTS
+# Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available in the terms of the GNU
+# General Public License version 2.
 
 import sys, os, re, shutil
 import subprocess, signal

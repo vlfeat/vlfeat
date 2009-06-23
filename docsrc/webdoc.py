@@ -1,8 +1,13 @@
 #!/usr/bin/python
-# -*- coding: latin-1 -*-
-## file:        webdoc.py
-## author:      Andrea Vedaldien
-## description: Implementation of webdoc.
+# file:        webdoc.py
+# author:      Andrea Vedaldien
+# description: Implementation of webdoc.
+
+# AUTORIGHTS
+# Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available in the terms of the GNU
+# General Public License version 2.
 
 import types
 import xml.sax

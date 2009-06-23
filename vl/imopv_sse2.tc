@@ -4,6 +4,13 @@
  ** @brief   Vectorized image operations - SSE2 - Definition Template
  **/
 
+/* AUTORIGHTS
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+ This file is part of VLFeat, available in the terms of the GNU
+ General Public License version 2.
+ */
+
 #define JOIN_(a,b) a ## b
 #define JOIN(a,b) JOIN_(a,b)
 #define JOIN3_(a,b,c) a ## b ## c

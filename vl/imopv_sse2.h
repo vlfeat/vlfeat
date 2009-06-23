@@ -4,6 +4,13 @@
  ** @brief    Vectorized image operations - SSE2
  **/
 
+/* AUTORIGHTS
+ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+ This file is part of VLFeat, available in the terms of the GNU
+ General Public License version 2.
+ */
+
 #ifndef VL_IMOPV_SSE2_H
 #define VL_IMOPV_SSE2_H
 
