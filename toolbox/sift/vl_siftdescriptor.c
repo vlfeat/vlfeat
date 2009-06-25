@@ -1,7 +1,7 @@
 /** @internal
  ** @file     siftdescriptor.c
  ** @author   Andrea Vedaldi
- ** @brief    SIFT descriptor - MEX
+ ** @brief    vl_siftdescriptor - MEX definition
  **/
 
 /* AUTORIGHTS
@@ -21,14 +21,16 @@
 /* option codes */
 enum {
   opt_magnif,
-  opt_verbose 
+  opt_float_descriptors,
+  opt_verbose
 } ;
 
 /* options */
 uMexOption options [] = {
-  {"Magnif",       1,   opt_magnif        },
-  {"Verbose",      0,   opt_verbose       },
-  {0,              0,   0                 }
+  {"Magnif",           1,   opt_magnif            },
+  {"Verbose",          0,   opt_verbose           },
+  {"FloatDescriptors", 0,   opt_float_descriptors },
+  {0,              0,   0                         }
 } ;
 
 /** ------------------------------------------------------------------
@@ -44,20 +46,20 @@ uMexOption options [] = {
  ** image.
  **/
 
-VL_INLINE void 
-transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
+VL_INLINE void
+transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
   int i, j, t ;
-  
+
   for (j = 0 ; j < BP ; ++j) {
     int jp = BP - 1 - j ;
     for (i = 0 ; i < BP ; ++i) {
       int o  = BO * i + BP*BO * j  ;
-      int op = BO * i + BP*BO * jp ;      
-      dst [op] = src[o] ;      
-      for (t = 1 ; t < BO ; ++t) 
+      int op = BO * i + BP*BO * jp ;
+      dst [op] = src[o] ;
+      for (t = 1 ; t < BO ; ++t)
         dst [BO - t + op] = src [t + o] ;
     }
   }
@@ -68,7 +70,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
  **/
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_GRAD=0,IN_FRAMES,IN_END} ;
@@ -78,19 +80,20 @@ mexFunction(int nout, mxArray *out[],
   int                opt ;
   int                next = IN_END ;
   mxArray const     *optarg ;
-     
+
   mxArray           *grad_array ;
   vl_sift_pix       *grad ;
   int                M, N ;
 
+  vl_bool            floatDescriptors = 0 ;
   double             magnif = -1 ;
   double            *ikeys = 0 ;
   int                nikeys = 0 ;
 
   int i,j ;
-  
+
   VL_USE_MATLAB_ENV ;
-  
+
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -100,7 +103,7 @@ mexFunction(int nout, mxArray *out[],
   } else if (nout > 1) {
     mexErrMsgTxt("Too many output arguments.");
   }
-  
+
   if (mxGetNumberOfDimensions (in[IN_GRAD])    != 3              ||
       mxGetClassID            (in[IN_GRAD])    != mxSINGLE_CLASS ||
       mxGetDimensions         (in[IN_GRAD])[0] != 2              ) {
@@ -112,27 +115,31 @@ mexFunction(int nout, mxArray *out[],
   }
   nikeys = mxGetN (in[IN_FRAMES]) ;
   ikeys  = mxGetPr(in[IN_FRAMES]) ;
-  
+
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
-        
+
       case opt_verbose :
         ++ verbose ;
         break ;
-        
+
       case opt_magnif :
         if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
           mexErrMsgTxt("MAGNIF must be a non-negative scalar.") ;
         }
         break ;
-        
+
+      case opt_float_descriptors :
+        floatDescriptors = 1 ;
+        break ;
+
       default :
         assert(0) ;
         break ;
     }
   }
-  
-  grad_array = mxDuplicateArray(in[IN_GRAD]) ;  
+
+  grad_array = mxDuplicateArray(in[IN_GRAD]) ;
   grad = (vl_sift_pix*) mxGetData (grad_array) ;
   M    = mxGetDimensions(in[IN_GRAD])[1] ;
   N    = mxGetDimensions(in[IN_GRAD])[2] ;
@@ -146,31 +153,35 @@ mexFunction(int nout, mxArray *out[],
    *                                                            Do job
    * -------------------------------------------------------------- */
   {
-    VlSiftFilt *filt = 0 ;    
-    vl_uint8   *descr = 0 ;
+    VlSiftFilt * filt = 0 ;
+    void * descr = 0 ;
 
     /* create a filter to process the image */
     filt = vl_sift_new (M, N, -1, -1, 0) ;
-    
+
     if (magnif >= 0) vl_sift_set_magnif (filt, magnif) ;
-    
-    if (verbose) {    
-      mexPrintf("siftdescriptor: filter settings:\n") ;
-      mexPrintf("siftdescriptor:   magnif                = %g\n",
+
+    if (verbose) {
+      mexPrintf("vl_siftdescriptor: filter settings:\n") ;
+      mexPrintf("vl_siftdescriptor:   magnif                = %g\n",
                 vl_sift_get_magnif (filt)) ;
-      mexPrintf("siftdescriptor:   num of frames         = %d\n",
+      mexPrintf("vl_siftdescriptor:   num of frames         = %d\n",
                 nikeys) ;
+      mexPrintf("vl_siftdescriptor:   float descriptor      = %d\n",
+                floatDescriptors) ;
     }
 
     {
       mwSize dims [2] ;
       dims [0] = 128 ;
       dims [1] = nikeys ;
-      out[OUT_DESCRIPTORS]= mxCreateNumericArray 
-        (2, dims, mxUINT8_CLASS,  mxREAL) ;
+      out[OUT_DESCRIPTORS]= mxCreateNumericArray
+        (2, dims,
+         floatDescriptors ? mxSINGLE_CLASS : mxUINT8_CLASS,
+         mxREAL) ;
       descr = mxGetData(out[OUT_DESCRIPTORS]) ;
     }
-    
+
     /* ...............................................................
      *                                             Process each octave
      * ............................................................ */
@@ -182,22 +193,32 @@ mexFunction(int nout, mxArray *out[],
       double s  = *ikeys++ ;
       double th = VL_PI / 2 - *ikeys++ ;
 
-      vl_sift_calc_raw_descriptor (filt, 
-                                   grad, 
+      vl_sift_calc_raw_descriptor (filt,
+                                   grad,
                                    buf,
                                    M, N,
                                    x, y, s, th) ;
-      
+
       transpose_descriptor (rbuf, buf) ;
-      
-      for (j = 0 ; j < 128 ; ++j) {
-        double x = 512.0 * rbuf [j] ;
-        x = (x < 255.0) ? x : 255.0 ;
-        *descr++ = (vl_uint8) (x) ;
+
+      if (! floatDescriptors) {
+        vl_uint8 * descr_ = descr ;
+        for (j = 0 ; j < 128 ; ++j) {
+          float x = 512.0F * rbuf [j] ;
+          x = (x < 255.0F) ? x : 255.0F ;
+          *descr_++ = (vl_uint8) (x) ;
+        }
+        descr = descr_ ;
+      } else {
+        float * descr_ = descr ;
+        for (j = 0 ; j < 128 ; ++j) {
+          *descr_++ = 512.0F * rbuf [j] ;
+        }
+        descr = descr_ ;
       }
-    }    
+    }
     /* cleanup */
     mxDestroyArray (grad_array) ;
     vl_sift_delete (filt) ;
-  } /* job done */    
+  } /* job done */
 }

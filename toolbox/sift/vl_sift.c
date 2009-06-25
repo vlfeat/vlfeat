@@ -30,23 +30,25 @@ enum {
   opt_magnif,
   opt_window_size,
   opt_orientations,
-  opt_verbose 
+  opt_float_descriptors,
+  opt_verbose
 } ;
 
 /* options */
 uMexOption options [] = {
-  {"Octaves",      1,   opt_octaves       },
-  {"Levels",       1,   opt_levels        },
-  {"FirstOctave",  1,   opt_first_octave  },
-  {"Frames",       1,   opt_frames        },
-  {"PeakThresh",   1,   opt_peak_thresh   },
-  {"EdgeThresh",   1,   opt_edge_thresh   },
-  {"NormThresh",   1,   opt_norm_thresh   },
-  {"Magnif",       1,   opt_magnif        },
-  {"WindowSize",   1,   opt_window_size   },
-  {"Orientations", 0,   opt_orientations  },
-  {"Verbose",      0,   opt_verbose       },
-  {0,              0,   0                 }
+  {"Octaves",          1,   opt_octaves           },
+  {"Levels",           1,   opt_levels            },
+  {"FirstOctave",      1,   opt_first_octave      },
+  {"Frames",           1,   opt_frames            },
+  {"PeakThresh",       1,   opt_peak_thresh       },
+  {"EdgeThresh",       1,   opt_edge_thresh       },
+  {"NormThresh",       1,   opt_norm_thresh       },
+  {"Magnif",           1,   opt_magnif            },
+  {"WindowSize",       1,   opt_window_size       },
+  {"Orientations",     0,   opt_orientations      },
+  {"FloatDescriptors", 0,   opt_float_descriptors },
+  {"Verbose",          0,   opt_verbose           },
+  {0,                  0,   0                     }
 } ;
 
 /** ------------------------------------------------------------------
@@ -62,20 +64,20 @@ uMexOption options [] = {
  ** image.
  **/
 
-VL_INLINE void 
-transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src) 
+VL_INLINE void
+transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
   int i, j, t ;
-  
+
   for (j = 0 ; j < BP ; ++j) {
     int jp = BP - 1 - j ;
     for (i = 0 ; i < BP ; ++i) {
       int o  = BO * i + BP*BO * j  ;
-      int op = BO * i + BP*BO * jp ;      
-      dst [op] = src[o] ;      
-      for (t = 1 ; t < BO ; ++t) 
+      int op = BO * i + BP*BO * jp ;
+      dst [op] = src[o] ;
+      for (t = 1 ; t < BO ; ++t)
         dst [BO - t + op] = src [t + o] ;
     }
   }
@@ -84,7 +86,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
 /** -------------------------------------------------------------------
  ** @internal
  ** @brief Ordering of tuples by increasing scale
- ** 
+ **
  ** @param a tuple.
  ** @param b tuble.
  **
@@ -102,7 +104,7 @@ korder (void const* a, void const* b) {
 /** -------------------------------------------------------------------
  ** @internal
  ** @brief Check for sorted keypoints
- ** 
+ **
  ** @param keys keypoint list to check
  ** @param nkeys size of the list.
  **
@@ -110,7 +112,7 @@ korder (void const* a, void const* b) {
  **/
 
 int
-check_sorted (double const * keys, int unsigned nkeys) 
+check_sorted (double const * keys, int unsigned nkeys)
 {
   int k ;
   for (k = 0 ; k < nkeys-1 ; ++ k) {
@@ -127,7 +129,7 @@ check_sorted (double const * keys, int unsigned nkeys)
  **/
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_I=0,IN_END} ;
@@ -137,13 +139,13 @@ mexFunction(int nout, mxArray *out[],
   int                opt ;
   int                next = IN_END ;
   mxArray const     *optarg ;
-     
+
   vl_sift_pix const *data ;
   int                M, N ;
 
   int                O     = - 1 ;
   int                S     =   3 ;
-  int                o_min =   0 ; 
+  int                o_min =   0 ;
 
   double             edge_thresh = -1 ;
   double             peak_thresh = -1 ;
@@ -155,9 +157,10 @@ mexFunction(int nout, mxArray *out[],
   double            *ikeys = 0 ;
   int                nikeys = -1 ;
   vl_bool            force_orientations = 0 ;
+  vl_bool            floatDescriptors = 0 ;
 
   VL_USE_MATLAB_ENV ;
- 
+
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -167,16 +170,16 @@ mexFunction(int nout, mxArray *out[],
   } else if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
-  
+
   if (mxGetNumberOfDimensions (in[IN_I]) != 2              ||
       mxGetClassID            (in[IN_I]) != mxSINGLE_CLASS  ) {
     mexErrMsgTxt("I must be a matrix of class SINGLE") ;
   }
-  
+
   data = (vl_sift_pix*) mxGetData (in[IN_I]) ;
   M    = mxGetM (in[IN_I]) ;
   N    = mxGetN (in[IN_I]) ;
-  
+
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
 
@@ -189,13 +192,13 @@ mexFunction(int nout, mxArray *out[],
         mexErrMsgTxt("'Octaves' must be a positive integer.") ;
       }
       break ;
-      
+
     case opt_levels :
       if (! uIsRealScalar(optarg) || (S = (int) *mxGetPr(optarg)) < 1) {
         mexErrMsgTxt("'Levels' must be a positive integer.") ;
       }
       break ;
-      
+
     case opt_first_octave :
       if (!uIsRealScalar(optarg)) {
         mexErrMsgTxt("'FirstOctave' must be an integer") ;
@@ -244,27 +247,31 @@ mexFunction(int nout, mxArray *out[],
         qsort (ikeys, nikeys, 4 * sizeof(double), korder) ;
       }
       break ;
-      
+
     case opt_orientations :
       force_orientations = 1 ;
       break ;
-      
+
+    case opt_float_descriptors :
+      floatDescriptors = 1 ;
+      break ;
+
     default :
       assert(0) ;
       break ;
     }
   }
-  
+
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
   {
-    VlSiftFilt        *filt ;    
+    VlSiftFilt        *filt ;
     vl_bool            first ;
     double            *frames = 0 ;
-    vl_uint8          *descr  = 0 ;
+    void              *descr  = 0 ;
     int                nframes = 0, reserved = 0, i,j,q ;
-    
+
     /* create a filter to process the image */
     filt = vl_sift_new (M, N, O, S, o_min) ;
 
@@ -273,31 +280,33 @@ mexFunction(int nout, mxArray *out[],
     if (norm_thresh >= 0) vl_sift_set_norm_thresh (filt, norm_thresh) ;
     if (magnif      >= 0) vl_sift_set_magnif      (filt, magnif) ;
     if (window_size >= 0) vl_sift_set_window_size (filt, window_size) ;
-    
-    if (verbose) {    
-      mexPrintf("siftmx: filter settings:\n") ;
-      mexPrintf("siftmx:   octaves      (O)      = %d\n", 
-                vl_sift_get_noctaves      (filt)) ;
-      mexPrintf("siftmx:   levels       (S)      = %d\n",
-                vl_sift_get_nlevels       (filt)) ;
-      mexPrintf("siftmx:   first octave (o_min)  = %d\n", 
-                vl_sift_get_octave_first  (filt)) ;
-      mexPrintf("siftmx:   edge thresh           = %g\n",
-                vl_sift_get_edge_thresh   (filt)) ;
-      mexPrintf("siftmx:   peak thresh           = %g\n",
-                vl_sift_get_peak_thresh   (filt)) ;
-      mexPrintf("siftmx:   norm thresh           = %g\n",
-                vl_sift_get_norm_thresh   (filt)) ;
-      mexPrintf("siftmx:   window size           = %g\n",
-                vl_sift_get_window_size   (filt)) ;
 
-      mexPrintf((nikeys >= 0) ? 
-                "siftmx: will source frames? yes (%d read)\n" :
-                "siftmx: will source frames? no\n", nikeys) ;
-      mexPrintf("siftmx: will force orientations? %s\n",
-                force_orientations ? "yes" : "no") ;      
+    if (verbose) {
+      mexPrintf("vl_sift: filter settings:\n") ;
+      mexPrintf("vl_sift:   octaves      (O)      = %d\n",
+                vl_sift_get_noctaves      (filt)) ;
+      mexPrintf("vl_sift:   levels       (S)      = %d\n",
+                vl_sift_get_nlevels       (filt)) ;
+      mexPrintf("vl_sift:   first octave (o_min)  = %d\n",
+                vl_sift_get_octave_first  (filt)) ;
+      mexPrintf("vl_sift:   edge thresh           = %g\n",
+                vl_sift_get_edge_thresh   (filt)) ;
+      mexPrintf("vl_sift:   peak thresh           = %g\n",
+                vl_sift_get_peak_thresh   (filt)) ;
+      mexPrintf("vl_sift:   norm thresh           = %g\n",
+                vl_sift_get_norm_thresh   (filt)) ;
+      mexPrintf("vl_sift:   window size           = %g\n",
+                vl_sift_get_window_size   (filt)) ;
+      mexPrintf("vl_sift:   float descriptor      = %d\n",
+                floatDescriptors) ;
+
+      mexPrintf((nikeys >= 0) ?
+                "vl_sift: will source frames? yes (%d read)\n" :
+                "vl_sift: will source frames? no\n", nikeys) ;
+      mexPrintf("vl_sift: will force orientations? %s\n",
+                force_orientations ? "yes" : "no") ;
     }
-    
+
     /* ...............................................................
      *                                             Process each octave
      * ............................................................ */
@@ -307,9 +316,9 @@ mexFunction(int nout, mxArray *out[],
       int                   err ;
       VlSiftKeypoint const *keys  = 0 ;
       int                   nkeys = 0 ;
-      
+
       if (verbose) {
-        mexPrintf ("siftmx: processing octave %d\n",
+        mexPrintf ("vl_sift: processing octave %d\n",
                    vl_sift_get_octave_index (filt)) ;
       }
 
@@ -319,25 +328,25 @@ mexFunction(int nout, mxArray *out[],
         first = 0 ;
       } else {
         err   = vl_sift_process_next_octave  (filt) ;
-      }        
+      }
 
       if (err) break ;
-      
+
       if (verbose > 1) {
-        mexPrintf("siftmx: GSS octave %d computed\n",
+        mexPrintf("vl_sift: GSS octave %d computed\n",
                   vl_sift_get_octave_index (filt));
       }
-      
+
       /* Run detector ............................................. */
       if (nikeys < 0) {
         vl_sift_detect (filt) ;
-        
+
         keys  = vl_sift_get_keypoints  (filt) ;
         nkeys = vl_sift_get_nkeypoints (filt) ;
         i     = 0 ;
-        
+
         if (verbose > 1) {
-          printf ("siftmx: detected %d (unoriented) keypoints\n", nkeys) ;
+          printf ("vl_sift: detected %d (unoriented) keypoints\n", nkeys) ;
         }
       } else {
         nkeys = nikeys ;
@@ -352,28 +361,28 @@ mexFunction(int nout, mxArray *out[],
 
         /* Obtain keypoint orientations ........................... */
         if (nikeys >= 0) {
-          vl_sift_keypoint_init (filt, &ik, 
+          vl_sift_keypoint_init (filt, &ik,
                                  ikeys [4 * i + 1] - 1,
                                  ikeys [4 * i + 0] - 1,
                                  ikeys [4 * i + 2]) ;
-          
+
           if (ik.o != vl_sift_get_octave_index (filt)) {
             break ;
           }
 
           k = &ik ;
-          
+
           /* optionally compute orientations too */
           if (force_orientations) {
-            nangles = vl_sift_calc_keypoint_orientations 
-              (filt, angles, k) ;            
+            nangles = vl_sift_calc_keypoint_orientations
+              (filt, angles, k) ;
           } else {
             angles [0] = VL_PI / 2 - ikeys [4 * i + 3] ;
             nangles    = 1 ;
           }
         } else {
           k = keys + i ;
-          nangles = vl_sift_calc_keypoint_orientations 
+          nangles = vl_sift_calc_keypoint_orientations
             (filt, angles, k) ;
         }
 
@@ -384,8 +393,7 @@ mexFunction(int nout, mxArray *out[],
 
           /* compute descriptor (if necessary) */
           if (nout > 1) {
-            vl_sift_calc_keypoint_descriptor 
-              (filt, buf, k, angles [q]) ;
+            vl_sift_calc_keypoint_descriptor (filt, buf, k, angles [q]) ;
             transpose_descriptor (rbuf, buf) ;
           }
 
@@ -394,7 +402,11 @@ mexFunction(int nout, mxArray *out[],
             reserved += 2 * nkeys ;
             frames = mxRealloc (frames, 4 * sizeof(double) * reserved) ;
             if (nout > 1) {
-              descr  = mxRealloc (descr,  128 * sizeof(vl_uint8) * reserved) ;
+              if (! floatDescriptors) {
+                descr  = mxRealloc (descr,  128 * sizeof(vl_uint8) * reserved) ;
+              } else {
+                descr  = mxRealloc (descr,  128 * sizeof(float) * reserved) ;
+              }
             }
           }
 
@@ -404,12 +416,19 @@ mexFunction(int nout, mxArray *out[],
           frames [4 * nframes + 1] = k -> x + 1 ;
           frames [4 * nframes + 2] = k -> sigma ;
           frames [4 * nframes + 3] = VL_PI / 2 - angles [q] ;
-          
+
           if (nout > 1) {
-            for (j = 0 ; j < 128 ; ++j) {
-              double x = 512.0 * rbuf [j] ;
-              x = (x < 255.0) ? x : 255.0 ;
-              descr [128 * nframes + j] = (vl_uint8) (x) ;
+            if (! floatDescriptors) {
+              for (j = 0 ; j < 128 ; ++j) {
+                float x = 512.0F * rbuf [j] ;
+                x = (x < 255.0F) ? x : 255.0F ;
+                ((vl_uint8*)descr) [128 * nframes + j] = (vl_uint8) x ;
+              }
+            } else {
+              for (j = 0 ; j < 128 ; ++j) {
+                float x = 512.0F * rbuf [j] ;
+                ((float*)descr) [128 * nframes + j] = x ;
+              }
             }
           }
 
@@ -417,9 +436,9 @@ mexFunction(int nout, mxArray *out[],
         } /* next orientation */
       } /* next keypoint */
     } /* next octave */
-    
+
     if (verbose) {
-      mexPrintf ("siftmx: found %d keypoints\n", nframes) ;
+      mexPrintf ("vl_sift: found %d keypoints\n", nframes) ;
     }
 
     /* ...............................................................
@@ -428,11 +447,11 @@ mexFunction(int nout, mxArray *out[],
 
     {
       mwSize dims [2] ;
-      
+
       /* create an empty array */
       dims [0] = 0 ;
-      dims [1] = 0 ;      
-      out[OUT_FRAMES] = mxCreateNumericArray 
+      dims [1] = 0 ;
+      out[OUT_FRAMES] = mxCreateNumericArray
         (2, dims, mxDOUBLE_CLASS, mxREAL) ;
 
       /* set array content to be the frames buffer */
@@ -440,14 +459,16 @@ mexFunction(int nout, mxArray *out[],
       dims [1] = nframes ;
       mxSetPr         (out[OUT_FRAMES], frames) ;
       mxSetDimensions (out[OUT_FRAMES], dims, 2) ;
-      
+
       if (nout > 1) {
-        
+
         /* create an empty array */
         dims [0] = 0 ;
         dims [1] = 0 ;
-        out[OUT_DESCRIPTORS]= mxCreateNumericArray 
-          (2, dims, mxUINT8_CLASS,  mxREAL) ;
+        out[OUT_DESCRIPTORS]= mxCreateNumericArray
+          (2, dims,
+           floatDescriptors ? mxSINGLE_CLASS : mxUINT8_CLASS,
+           mxREAL) ;
 
         /* set array content to be the descriptors buffer */
         dims [0] = 128 ;
@@ -456,11 +477,11 @@ mexFunction(int nout, mxArray *out[],
         mxSetDimensions (out[OUT_DESCRIPTORS], dims, 2) ;
       }
     }
-    
+
     /* cleanup */
     vl_sift_delete (filt) ;
-    
-    if (ikeys_array) 
+
+    if (ikeys_array)
       mxDestroyArray(ikeys_array) ;
 
   } /* end: do job */
