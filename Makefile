@@ -24,7 +24,7 @@
 # DIST:         Package name for the source distr. ('vlfeat-1.0')
 # BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
 # HOST:         Where to pulbish the package.
-# NDEBUG:       Set this flag to YES to remove debugging support (default YES)
+# NDEBUG:       Define this flag to remove debugging support (default undefined)
 # VERB:         Set this flag to YES to provide extra information (default NO)
 #
 # == PROGRAMS REQUIRED FOR BUILDING ==
@@ -111,7 +111,6 @@ NAME   := vlfeat
 VER    := 0.9.4
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 
-NDEBUG ?= YES
 VERB   ?= NO
 
 # programs required to build VLFeat
@@ -223,8 +222,8 @@ endef
 #                                            Common UNIX Configuration
 # --------------------------------------------------------------------
 
-ifneq ($(NDEBUG),YES)
-DEBUG=yes
+ifndef NDEBUG
+DEBUG := yes
 endif
 
 ifneq ($(VERB),NO)
