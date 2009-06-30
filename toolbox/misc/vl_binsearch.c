@@ -1,7 +1,7 @@
 /** @internal
  ** @file     binsearch.c
+ ** @brief    vl_binsearch - MEX definition
  ** @author   Andrea Vedaldi
- ** @brief    BINSEARCH - MEX
  **/
 
 /* AUTORIGHTS
@@ -42,7 +42,15 @@ mexFunction(int nout, mxArray *out[],
   NX = mxGetNumberOfElements(in[IN_X]) ;
   NB = mxGetNumberOfElements(in[IN_B]) ;
 
-  out[OUT_IDX] = mxDuplicateArray(in[IN_X]) ;
+  {
+    mwSize const * dims = mxGetDimensions(in[IN_X]) ;
+    int unsigned ndims = mxGetNumberOfDimensions(in[IN_X]) ;
+    out[OUT_IDX] = mxCreateNumericArray (ndims, dims, mxDOUBLE_CLASS, mxREAL) ;
+  }
+
+  /* if B is empty it defines only [-inf, +inf) */
+  if (NB == 0) return ;
+
   IDX = mxGetPr(out[OUT_IDX]) ;
   X = mxGetPr(in[IN_X]) ;
   B = mxGetPr(in[IN_B]) ;
