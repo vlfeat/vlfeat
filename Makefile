@@ -58,16 +58,22 @@
 # CONVERT:      ImageMagick convert utility
 # FIG2DEV:      X-Fig conversion program
 #
+# == BUILDING ===
+#
+# You can use CFLAGS and LDFLAGS to pass additional flags to the C
+# compiler and linker. These are in turn passed to the various flags
+# defined below.
+#
 # == BUILDING THE SHARED LIBRARY ==
 #
-# DLL_CLFAGS:   flags passed to $(CC) to compile a DLL C source
+# DLL_CLFAGS:   Aflags passed to $(CC) to compile a DLL C source
 # DLL_SUFFIX:   suffix of a DLL (.so, .dylib)
-# 
+#
 # == BUILDING THE COMMAND LINE UTILITIES ==
 #
 # BINDIR:       where to put the exec (and libraries)
-# CLFAGS:       flags passed to $(CC) to compile a C source
-# LDFLAGS:      flags passed to $(CC) to link C objects into an exec
+# C_CLFAGS:     flags passed to $(CC) to compile a C source
+# C_LDFLAGS:    flags passed to $(CC) to link C objects into an exec
 #
 # == BUILDING THE MEX FILES ==
 #
@@ -94,17 +100,17 @@
 # As a workaround, we pass the -gstabs+ flag to MEX
 #
 # An alternative workaround is the following hack.
-# Fist we compile the MEX file without linking and then we linking in a 
-# second pass, effectively preserving an intermediate object file 
+# Fist we compile the MEX file without linking and then we linking in a
+# second pass, effectively preserving an intermediate object file
 # (but not all of them).  E.g., on Mac OS X
 #
-# > mex -c -g mymex.c ; mex -g mymex.o ; 
+# > mex -c -g mymex.c ; mex -g mymex.o ;
 #
 # does preserve debugging information. In fact is also possible to run
 #
 # > dsymutil mymex.mexmaci
 #
-# does produce a mymex.mexmaci.dSYM bundle with (almost complete) 
+# does produce a mymex.mexmaci.dSYM bundle with (almost complete)
 # debugging information.
 
 NAME   := vlfeat
@@ -194,7 +200,7 @@ endef
 
 # $(call C, CMD) runs $(CMD) silently
 define C
-@$(call print-command, $(1), "$(@)")                                 
+@$(call print-command, $(1), "$(@)")
 @quiet ()                                                            \
 {                                                                    \
     local cmd out err ;					             \
@@ -226,17 +232,20 @@ ifndef NDEBUG
 DEBUG := yes
 endif
 
-override CFLAGS  += -I$(CURDIR) -pedantic -std=c89 -O3
-override CFLAGS  += -Wall -Wno-unused-function -Wno-long-long
-override CFLAGS  += $(if $(DEBUG), -O0 -g)
-override LDFLAGS += -L$(BINDIR) -l$(DLL_NAME)
+C_CFLAGS     = $(CFLAGS)
+C_CFLAGS    += -I$(CURDIR) -pedantic -std=c89 -O3
+C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long
+C_CFLAGS    += $(if $(DEBUG), -O0 -g)
 
-DLL_NAME         = vl
-DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
+C_LDFLAGS    = $(LDFLAGS)
+C_LDFLAGS   += -L$(BINDIR) -l$(DLL_NAME)
 
-MEX_FLAGS        = $(if $(DEBUG), -g)
-MEX_CFLAGS       = $(CFLAGS) -Itoolbox
-MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
+DLL_NAME     = vl
+DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
+
+MEX_FLAGS    = $(if $(DEBUG), -g)
+MEX_CFLAGS   = $(C_CFLAGS) -Itoolbox
+MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
 
 ifdef MATLABPATH
 all: all-mex
@@ -251,12 +260,12 @@ ifeq ($(ARCH),mac)
 BINDIR          := bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
-CFLAGS          += -D__BIG_ENDIAN__ -Wno-variadic-macros 
-CFLAGS          += $(if $(DEBUG), -gstabs+)
-LDFLAGS         += -lm
+C_CFLAGS        += -D__BIG_ENDIAN__ -Wno-variadic-macros
+C_CFLAGS        += $(if $(DEBUG), -gstabs+)
+C_LDFLAGS       += -lm
 DLL_CFLAGS      += -fvisibility=hidden
 MEX_FLAGS       += -lm CC='gcc' CXX='g++' LD='gcc'
-MEX_CFLAGS      += 
+MEX_CFLAGS      +=
 MEX_LDFLAGS     +=
 endif
 
@@ -265,14 +274,14 @@ ifeq ($(ARCH),mci)
 BINDIR          := bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
-CFLAGS          += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
-CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
+C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
+C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
 MEX_FLAGS       += -lm
-MEX_CFLAGS      += 
-MEX_LDFLAGS     += 
+MEX_CFLAGS      +=
+MEX_LDFLAGS     +=
 endif
 
 # Linux-32
@@ -280,12 +289,12 @@ ifeq ($(ARCH),glx)
 BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
-CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
+C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
+C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
-MEX_CFLAGS      += 
+MEX_CFLAGS      +=
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
@@ -294,12 +303,12 @@ ifeq ($(ARCH),g64)
 BINDIR          := bin/g64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
-CFLAGS          += -D__LITTLE_ENDIAN__ -std=c99
-CFLAGS          += -DVL_SUPPORT_SSE2
-CFLAGS          += $(call if-like,%_sse2,$*,-msse2)
+C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
+C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm -largeArrayDims
-MEX_CFLAGS      += 
+MEX_CFLAGS      +=
 MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
@@ -318,6 +327,7 @@ $(info * Version:    $(VER)                                          )
 $(info * Auto arch:  $(ARCH)                                         )
 $(info * Debug mode: $(if $(DEBUG),yes,no)                           )
 $(info * CFLAGS:     $(CFLAGS)                                       )
+$(info * C_CFLAGS:   $(C_CFLAGS)                                     )
 ifdef MATLABPATH
 $(info * MATLABPATH: $(MATLABPATH)                                   )
 $(info * MEX_SUFFIX: $(MEX_SUFFIX)                                   )
@@ -360,7 +370,7 @@ $(eval $(call gendir, noprefix, toolbox/noprefix                    ))
 #   the library for any binary which is linked against it. The
 #   install_name can be modified later by install_name_tool.
 #
-# LINUX: 
+# LINUX:
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_src := $(wildcard vl/*.c)
@@ -409,10 +419,10 @@ all-bin: $(bin_tgt)
 
 $(BINDIR)/% : src/%.c $(bin-dir)
 	@make -s $(dll_tgt)
-	$(call C,CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+	$(call C,CC) $(C_CFLAGS) $< $(C_LDFLAGS) -o $@
 
 $(BINDIR)/%.d : src/%.c $(bin-dir)
-	$(call C,CC) $(CFLAGS) -M -MT                                \
+	$(call C,CC) $(C_CFLAGS) -M -MT                              \
 	       '$(BINDIR)/$* $(MEX_BINDIR)/$*.d'                     \
 	       $< -MF $@
 
@@ -436,7 +446,6 @@ mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 vpath %.c $(shell find toolbox -type d)
 vpath vl_%.m $(shell find toolbox -type d)
 
-
 .PHONY: all-mex
 all-mex : $(mex_tgt) noprefix
 
@@ -449,7 +458,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
 	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"       \
-	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" 
+	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
@@ -479,7 +488,7 @@ toolbox/noprefix/%.m : vl_%.m
 	echo "function varargout = $*(varargin)" > "$@" ;            \
 	cat "$<" | sed -n -e '/^function/b' -e '/^%.*$$/p'           \
              -e '/^%.*$$/b' -e q >> "$@" ;                           \
-	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ; 
+	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ;
 
 .PHONY: noprefix
 noprefix: $(noprefix-dir) $(m_lnk)
@@ -540,7 +549,7 @@ bindist: $(NAME) all doc-bindist
 	           --include=*.dylib                                 \
 	           --include=*.so                                    \
 		   --exclude=*                                       \
-	           toolbox/ $(NAME)/toolbox 
+	           toolbox/ $(NAME)/toolbox
 	tar czvf $(BINDIST).tar.gz $(NAME)/
 
 
@@ -600,6 +609,8 @@ info :
 	@echo "MEX_SUFFIX   = $(MEX_SUFFIX)"
 	@echo "CFLAGS       = $(CFLAGS)"
 	@echo "LDFLAGS      = $(LDFLAGS)"
+	@echo "C_CFLAGS     = $(C_CFLAGS)"
+	@echo "C_LDFLAGS    = $(C_LDFLAGS)"
 	@echo "MATLABEXE    = $(MATLABEXE)"
 	@echo "MEX          = $(MEX)"
 	@echo "MATLABPATH   = $(MATLABPATH)"
