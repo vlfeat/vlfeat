@@ -40,9 +40,9 @@ General Public License version 2.
  - Support functionalities
    - @ref host.h      "Platform abstraction"
    - @ref generic.h   "Errors, memory, logging, and others"
+   - @ref random.h    "Random number generator"
    - @ref mathop.h    "Math operations"
    - @ref heap.h      "Heap (priority queue)"
-   - @ref random.h    "Random number generator"
    - @ref stringop.h  "String operations"
    - @ref imop.h      "Image operations"
    - @ref pgm.h       "PGM reading and writing"
@@ -56,6 +56,7 @@ General Public License version 2.
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
    - @ref quickshift.h "Quick shift image segmentation"
+   - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
 
  @section design VLFeat Design Concepts
 
