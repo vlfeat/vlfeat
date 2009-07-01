@@ -1,6 +1,7 @@
-/** @file   mexutils.h
- ** @author Andrea Vedaldi
- ** @brief  MEX helper functions
+/** @internal
+ ** @file    mexutils.h
+ ** @brief   MEX utilities
+ ** @author  Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -9,6 +10,9 @@ Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
+
+#ifndef MEXUTILS_H
+#define MEXUTILS_H
 
 #include"mex.h"
 #include<vl/generic.h>
@@ -564,3 +568,6 @@ static int uNextOption(mxArray const *args[], int nargs,
   ++ (*next) ;
   return opt ;  
 }
+
+/* MEXUTILS_H */
+#endif
