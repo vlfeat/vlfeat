@@ -213,8 +213,10 @@ define C
 } ; quiet
 endef
 
-# Uncomment this line to unsuppress printing commands:
-# C = $($(1))
+# If verbose print everything
+ifdef VERB
+C = $($(1))
+endif
 
 # --------------------------------------------------------------------
 #                                            Common UNIX Configuration
