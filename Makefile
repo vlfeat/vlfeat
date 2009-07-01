@@ -230,10 +230,10 @@ ifneq ($(VERB),NO)
 $(info * Debug mode: $(if $(DEBUG),yes,no))
 endif
 
-CFLAGS          += -I$(CURDIR) -pedantic -std=c89 -O3
-CFLAGS          += -Wall -Wno-unused-function -Wno-long-long
-CFLAGS          += $(if $(DEBUG), -O0 -g)
-LDFLAGS         += -L$(BINDIR) -l$(DLL_NAME)
+override CFLAGS  += -I$(CURDIR) -pedantic -std=c89 -O3
+override CFLAGS  += -Wall -Wno-unused-function -Wno-long-long
+override CFLAGS  += $(if $(DEBUG), -O0 -g)
+override LDFLAGS += -L$(BINDIR) -l$(DLL_NAME)
 
 DLL_NAME         = vl
 DLL_CFLAGS       = $(CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
