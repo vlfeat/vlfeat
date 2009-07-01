@@ -1,6 +1,6 @@
 /** @file    random.h
- ** @author  Andrea Vedaldi
  ** @brief   Random
+ ** @author  Andrea Vedaldi
  **/
 
 /* AUTORIGHTS

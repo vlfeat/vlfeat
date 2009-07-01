@@ -1,6 +1,6 @@
 /* file:        tpsumx.c
 ** author:      Andrea Vedaldi
-** description: Compute the matrix U for a TPS.
+** description: vl_tpsumx - MEX definition
 **/
 
 /* AUTORIGHTS

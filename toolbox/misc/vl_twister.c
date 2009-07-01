@@ -1,7 +1,8 @@
-/* file:        twister.c
-** description: All pairwise distances
-** author:      Andrea Vedaldi
-**/
+/** @internal
+ ** @file    vl_twister.c
+ ** @brief   vl_twister - MEX definition
+ ** @author  Andrea Vedaldi
+ **/
 
 /* AUTORIGHTS
 Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson

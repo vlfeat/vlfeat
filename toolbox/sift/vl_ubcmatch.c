@@ -1,7 +1,9 @@
-/* file:        siftmatch.c
-** author:      Andrea Vedaldi
-** description: SIFT descriptor matching.
-**/
+/** @internal
+ ** @file    vl_siftmatch.c
+ ** @brief   vl_sitfmatch - MEX definition
+ ** @author  Andrea Vedaldi
+ **/
+
 
 /* AUTORIGHTS
 Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson

@@ -1,7 +1,9 @@
-/* file:        whistc.c
-** description: MEX weighted histc function.
-** author:      Andrea Vedaldi
-**/
+/** @internal
+ ** @file    vl_whistc.c
+ ** @brief   vl_whistc - MEX definition
+ ** @author  Andrea Vedaldi
+ **/
+
 
 /* AUTORIGHTS
 Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
