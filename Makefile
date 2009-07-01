@@ -25,7 +25,7 @@
 # BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
 # HOST:         Where to pulbish the package.
 # NDEBUG:       Define this flag to remove debugging support (default undefined)
-# VERB:         Set this flag to YES to provide extra information (default NO)
+# VERB:         Define this flag to provide extra information (default NO)
 #
 # == PROGRAMS REQUIRED FOR BUILDING ==
 #
@@ -110,8 +110,6 @@
 NAME   := vlfeat
 VER    := 0.9.4
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
-
-VERB   ?= NO
 
 # programs required to build VLFeat
 CC         ?= cc
@@ -226,10 +224,6 @@ ifndef NDEBUG
 DEBUG := yes
 endif
 
-ifneq ($(VERB),NO)
-$(info * Debug mode: $(if $(DEBUG),yes,no))
-endif
-
 override CFLAGS  += -I$(CURDIR) -pedantic -std=c89 -O3
 override CFLAGS  += -Wall -Wno-unused-function -Wno-long-long
 override CFLAGS  += $(if $(DEBUG), -O0 -g)
@@ -244,11 +238,6 @@ MEX_LDFLAGS      = -L$(BINDIR) -l$(DLL_NAME)
 
 ifdef MATLABPATH
 all: all-mex
-ifeq ($(VERB),YES)
-$(info * Compiling MATLAB MEX files (MATLABPATH=$(MATLABPATH)))
-endif
-else
-$(info * Not compiling MATLAB MEX files (mex command not found))
 endif
 
 # --------------------------------------------------------------------
@@ -321,8 +310,20 @@ ifeq ($(DLL_SUFFIX),)
 die:=$(error $(err_internal))
 endif
 
-ifeq ($(VERB),YES)
-$(info * Auto-detected architecture: $(ARCH))
+ifdef VERB
+$(info * *********************************************************** )
+$(info * Version:    $(VER)                                          )
+$(info * Auto arch:  $(ARCH)                                         )
+$(info * Debug mode: $(if $(DEBUG),yes,no)                           )
+$(info * CFLAGS:     $(CFLAGS)                                       )
+ifdef MATLABPATH
+$(info * MATLABPATH: $(MATLABPATH)                                   )
+$(info * MEX_SUFFIX: $(MEX_SUFFIX)                                   )
+$(info * MEX_CFLAGS: $(MEX_CFLAGS)                                   )
+else
+$(info * MATLAB not found. Will not compile MEX files.               )
+endif
+$(info * *********************************************************** )
 endif
 
 # --------------------------------------------------------------------
