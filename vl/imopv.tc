@@ -59,7 +59,7 @@ VL_IMCONVCOL (FLT* dst, int dst_stride,
   /* dispatch to accelerated version */
 #ifdef VL_SUPPORT_SSE2
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
-    JOIN3(_,VL_IMCONVCOL,_sse2) 
+    JOIN3(_,VL_IMCONVCOL,_sse2)
     (dst,dst_stride,
      src,src_width,src_height,src_stride,
      filt,filt_begin,filt_end,
@@ -67,14 +67,14 @@ VL_IMCONVCOL (FLT* dst, int dst_stride,
     return ;
   }
 #endif
-  
+
   /* let filt point to the last sample of the filter */
   filt += filt_end - filt_begin ;
-  
+
   while (x < src_width) {
     /* Calculate dest[x,y] = sum_p image[x,p] filt[y - p]
      * where supp(filt) = [filt_begin, filt_end] = [fb,fe].
-     * 
+     *
      * CHUNK_A: y - fe <= p < 0
      *          completes VL_MAX(fe - y, 0) samples
      * CHUNK_B: VL_MAX(y - fe, 0) <= p < VL_MIN(y - fb, height - 1)
@@ -82,46 +82,46 @@ VL_IMCONVCOL (FLT* dst, int dst_stride,
      * CHUNK_C: completes all samples
      */
     FLT const *filti ;
-    int stop ; 
-    
+    int stop ;
+
     for (y = 0 ; y < src_height ; y += step) {
-      FLT acc = 0 ;  
+      FLT acc = 0 ;
       FLT v = 0, c ;
       FLT const* srci ;
-      
+
       filti = filt ;
       stop = filt_end - y ;
       srci = src + x - stop * src_stride ;
-      
-      if (stop > 0) {   
+
+      if (stop > 0) {
         if (zeropad) {
           v = 0 ;
         } else {
           v = *(src + x) ;
         }
-        while (filti > filt - stop) { 
+        while (filti > filt - stop) {
           c = *filti-- ;
           acc += v * c ;
           srci += src_stride ;
         }
       }
-      
+
       stop = filt_end - VL_MAX(filt_begin, y - src_height + 1) + 1 ;
       while (filti > filt - stop) {
-        v = *srci ; 
+        v = *srci ;
         c = *filti-- ;
         acc += v * c ;
         srci += src_stride ;
       }
-      
+
       if (zeropad) v = 0 ;
-      
+
       stop = filt_end - filt_begin + 1 ;
       while (filti > filt - stop) {
         c = *filti-- ;
         acc += v * c ;
       }
-      
+
       if (transp) {
         *dst = acc ; dst += 1 ;
       } else {
@@ -160,7 +160,14 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
   while (x < src_width) {
     FLT const *srci ;
     srci = src + x + src_stride * (src_height - 1) ;
-    
+
+    /* We decompose the convolution by a triangluar signal as the convolution
+     * by two rectangular signals. The rectangular convolutions are computed
+     * quickly by computing the integral signals. Each rectangular convolution
+     * introduces a delay, which is compensated by convolving each in opposite
+     * directions.
+     */
+
     /* integrate backward the column */
     buff [src_height - 1] = *srci ;
     for (y = src_height-2 ; y >=  0 ; --y) {
@@ -169,30 +176,30 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
     }
     if (zeropad) {
       for ( ; y >= - filt_size ; --y) {
-        buff [y] = buff [y+1] ;          
+        buff [y] = buff [y+1] ;
       }
     } else {
       for ( ; y >= - filt_size ; --y) {
         buff [y] = buff[y+1] + *srci ;
       }
     }
-    
+
     /* compute the filter forward */
     for (y = - filt_size ; y < src_height - filt_size ; ++y) {
       buff [y] = buff [y] - buff [y + filt_size] ;
     }
     if (! zeropad) {
       for (y = src_height - filt_size ; y < src_height ; ++y) {
-        buff [y] = buff [y] - buff [src_height-1]  * 
+        buff [y] = buff [y] - buff [src_height-1]  *
         (src_height - filt_size - y) ;
-      } 
+      }
     }
-    
+
     /* integrate forward the column */
     for (y = - filt_size + 1 ; y < src_height ; ++y) {
       buff [y] += buff [y - 1] ;
     }
-    
+
     /* compute the filter backward */
     {
       int stride = transp ? 1 : dst_stride ;
@@ -203,7 +210,7 @@ VL_IMCONVCOLTRI (FLT* dst, int dst_stride,
       }
     }
     x += 1 ;
-    dst += transp ? dst_stride : 1 ;    
-  } /* next x */ 
+    dst += transp ? dst_stride : 1 ;
+  } /* next x */
   vl_free (buff - filt_size) ;
 }

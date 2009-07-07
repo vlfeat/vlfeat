@@ -26,7 +26,7 @@
 /** @name Image convolution
  ** @{ */
 VL_EXPORT
-void vl_imconvcol_vf (float* dst, int dst_stride,                 
+void vl_imconvcol_vf (float* dst, int dst_stride,
                       float const* src,
                       int src_width, int src_height, int src_stride,
                       float const* filt, int filt_begin, int filt_end,

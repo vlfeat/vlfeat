@@ -11,7 +11,7 @@
  */
 
 /** @file imopv.h
- ** 
+ **
  ** This module provides image operations such as convolution.
  **
  ** Some operations are optimized to exploit possible SIMD
@@ -87,7 +87,7 @@
  **/
 
 /** @fn vl_imconvcoltri_vf(float*,int,float const*,int,int,int,int,int,unsigned int)
- ** @brief Convolve image along the columns by a triangular kernel
+ ** @brief Convolve an image along the columns with a triangular kernel
  **
  ** @param dst destination image.
  ** @param dst_stride width of the destination image including padding.
@@ -99,14 +99,22 @@
  ** @param step sub-sampling step.
  ** @param flags operation modes.
  **
- ** The function convolves the column of the image @a src by a
- ** triangular filter whose support is <code>2*filt_size</code> pixels
- ** long. The minimum filter size is 1, which corresponds to a delta
+ ** The function convolves the column of the image @a src by
+ ** the kernel
+ **
+ ** @f[
+ **   k(x) = \frac{1}{\Delta} \max\{ \Delta -  |x|, 0 \},
+ **   \quad x \in \mathbb{Z}
+ ** @f]
+ **
+ ** where @f$ \Delta @f$ is the half filter length @a filt_size.
+ ** The smallest filter has @a filt_size equal to one and
+ ** corresponds to a delta
  ** function. The filter is normalized to have unit area.
  **
  ** The operation of the function is otherwise similar to
  ** ::vl_imconvocl().
- **/ 
+ **/
 
 /** @fn vl_imconvcoltri_vd(double*,int,double const*,int,int,int,int,int,unsigned int)
  ** @see ::vl_imconvcoltri_vf()
