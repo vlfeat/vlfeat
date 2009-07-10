@@ -63,11 +63,11 @@ end
 % compute auc according to PA08 challenge
 ap=0;
 for t=0:0.1:1
-  p=max(precision(recall>=t));
-  if isempty(p)
-    p=0;
+  p_=max(precision(recall>=t));
+  if isempty(p_)
+    p_=0;
   end
-  ap=ap+p/11;
+  ap=ap+p_/11;
 end
 
 info.auc      = auc ;
@@ -87,6 +87,6 @@ if nargout == 0
 	ylim([0 1]) ; ylabel('precision') ;
 	title(sprintf('precision-recall (AUC = %.2f %%)', info.auc * 100)) ;
 	legend('PR', 'random classifier', 'location', 'northwestoutside') ;
-  
+
   clear recall precision info ;
 end
