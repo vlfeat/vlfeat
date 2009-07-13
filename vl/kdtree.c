@@ -121,7 +121,7 @@ vl_kdtree_node_new (VlKDTree * tree, int unsigned parentIndex)
   int unsigned nodeIndex = tree->numUsedNodes ;
   tree -> numUsedNodes += 1 ;
 
-  assert (tree->numUsedNodes <= 2 * tree->numAllocatedNodes) ;
+  assert (tree->numUsedNodes <= tree->numAllocatedNodes) ;
 
   node = tree->nodes + nodeIndex ;
   node -> parent = parentIndex ;
@@ -243,9 +243,14 @@ vl_kdtree_build_recursively
       for (splitIndex = dataBegin ;
            splitIndex < dataEnd && tree->dataIndex[splitIndex].value <= node->splitThreshold ;
            ++ splitIndex) ;
-      /* if the mean does not provide a proper partition, fall back to median */
       splitIndex -= 1 ;
-      if (splitIndex + 1 < dataEnd) break ;
+      /* If the mean does not provide a proper partition, fall back to
+       * median. This usually happens if all points have the same
+       * value and the zero variance test fails for numerical accuracy
+       * reasons. In this case, also due to numerical accuracy, the
+       * mean value can be smaller, equal, or larger than all
+       * points. */
+      if (dataBegin <= splitIndex && splitIndex + 1 < dataEnd) break ;
 
     case VL_KDTREE_MEDIAN :
       medianIndex = (dataBegin + dataEnd - 1) / 2 ;
@@ -350,7 +355,8 @@ vl_kdforest_build (VlKDForest * self, int numData, float const * data)
       self->trees[ti]->dataIndex[di].index = di ;
     }
     self->trees[ti]->numUsedNodes = 0 ;
-    self->trees[ti]->numAllocatedNodes = 2 * self->numData ;
+    /* num. nodes of a complete binary tree with numData leaves */
+    self->trees[ti]->numAllocatedNodes = 2 * self->numData - 1 ;
     self->trees[ti]->nodes = vl_malloc (sizeof(VlKDTreeNode) * self->trees[ti]->numAllocatedNodes) ;
     self->trees[ti]->depth = 0 ;
     vl_kdtree_build_recursively (self, self->trees[ti],
