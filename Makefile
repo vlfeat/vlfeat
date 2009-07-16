@@ -233,9 +233,9 @@ DEBUG := yes
 endif
 
 C_CFLAGS     = $(CFLAGS)
-C_CFLAGS    += -I$(CURDIR) -pedantic -std=c89 -O3
+C_CFLAGS    += -I$(CURDIR) -pedantic -std=c99 -O3
 C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long
-C_CFLAGS    += $(if $(DEBUG), -O0 -g)
+C_CFLAGS    += $(if $(DEBUG), -O0 -g -std=c89)
 
 C_LDFLAGS    = $(LDFLAGS)
 C_LDFLAGS   += -L$(BINDIR) -l$(DLL_NAME)
