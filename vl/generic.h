@@ -109,8 +109,24 @@ General Public License version 2.
  **/
 #define VL_YESNO(x) ((x)?"yes":"no")
 
+/** @name Type identidifers for atomic data types
+ ** @{ */
+
+#define VL_TYPE_FLOAT   1
+#define VL_TYPE_DOUBLE  2
+#define VL_TYPE_INT8    3
+#define VL_TYPE_UINT8   4
+#define VL_TYPE_INT16   5
+#define VL_TYPE_UINT16  6
+#define VL_TYPE_INT32   7
+#define VL_TYPE_UINT32  8
+#define VL_TYPE_INT64   9
+#define VL_TYPE_UINT64  10
+
+/** @} */
+
 /** ------------------------------------------------------------------
- ** @name Heap allocation
+ ** @name Memory allocation
  ** @{ */
 
 VL_EXPORT
