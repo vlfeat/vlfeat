@@ -13,9 +13,9 @@
 #ifndef VL_HOST_H
 #define VL_HOST_H
 
-/* 
- The following macros identify the host OS, architecture and compiler. 
- They are derived from http://predef.sourceforge.net/ 
+/*
+ The following macros identify the host OS, architecture and compiler.
+ They are derived from http://predef.sourceforge.net/
  */
 
 /** @name Identifying the host operating system
@@ -84,11 +84,13 @@
 #define VL_ARCH_IX86 _M_IX86
 #endif
 
-#if defined(__ia64__) || \
-    defined(_IA64)    || \
-    defined(__IA64)   || \
-    defined(__ia64)   || \
-    defined(_M_IA64)  || \
+#if defined(__ia64__)   || \
+    defined(_IA64)      || \
+    defined(__IA64)     || \
+    defined(__ia64)     || \
+    defined(_M_IA64)    || \
+    defined(__x86_64)   || \
+    defined(__x86_64__) || \
     defined(__DOXYGEN__)
 #define VL_ARCH_IA64
 #endif
@@ -152,7 +154,7 @@
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __declspec(dllexport)
 #else
-#define VL_EXPORT 
+#define VL_EXPORT
 #endif
 #endif
 
@@ -191,35 +193,41 @@ typedef unsigned int        vl_uint ;    /**< @brief Same as <code>unsigned int<
 typedef int                 vl_bool ;    /**< @brief Boolean. */
 typedef vl_int64            vl_intptr ;  /**< @brief Integer holding a pointer. */
 typedef vl_uint64           vl_uintptr ; /**< @brief Unsigned integer holding a pointer. */
+typedef vl_uint64           vl_size ;    /**< @brief Unsigned integer holding the size of a memory block. */
+typedef vl_int64            vl_index ;   /**< @brief Signed version of ::vl_size and ::vl_uindex */
+typedef vl_uint64           vl_uindex ;  /**< @brief Same as ::vl_size */
 #endif
 
 #if defined(VL_COMPILER_ILP32)
 
 #ifdef VL_COMPILER_MSC
-typedef __int64             vl_int64 ;  
+typedef __int64             vl_int64 ;
 #else
-typedef long long           vl_int64 ;  
+typedef long long           vl_int64 ;
 #endif
 
-typedef int                 vl_int32 ;  
-typedef short               vl_int16 ;  
-typedef char                vl_int8  ;  
+typedef int                 vl_int32 ;
+typedef short               vl_int16 ;
+typedef char                vl_int8  ;
 
 #ifdef VL_COMPILER_MSC
-typedef __int64   unsigned  vl_uint64 ; 
+typedef __int64   unsigned  vl_uint64 ;
 #else
-typedef long long unsigned  vl_uint64 ; 
+typedef long long unsigned  vl_uint64 ;
 #endif
-typedef int       unsigned  vl_uint32 ; 
-typedef short     unsigned  vl_uint16 ; 
-typedef char      unsigned  vl_uint8 ;  
+typedef int       unsigned  vl_uint32 ;
+typedef short     unsigned  vl_uint16 ;
+typedef char      unsigned  vl_uint8 ;
 
-typedef int                 vl_int ;    
-typedef unsigned int        vl_uint ;   
+typedef int                 vl_int ;
+typedef unsigned int        vl_uint ;
 
-typedef int                 vl_bool ;   
-typedef vl_int32            vl_intptr ; 
+typedef int                 vl_bool ;
+typedef vl_int32            vl_intptr ;
 typedef vl_uint32           vl_uintptr ;
+typedef vl_uint32           vl_size ;
+typedef vl_int32            vl_index ;
+typedef vl_uint32           vl_uindex ;
 #endif
 /** @} */
 
@@ -228,20 +236,20 @@ typedef vl_uint32           vl_uintptr ;
  ** @{ */
 
 
-/** @def VL_FL_INT64 
- ** @brief @c prinf length flag for ::vl_int64 and ::vl_uint64. 
+/** @def VL_FL_INT64
+ ** @brief @c prinf length flag for ::vl_int64 and ::vl_uint64.
  **/
 
-/** @def VL_FL_INT32 
- ** @brief @c prinf length flag for ::vl_int32 and ::vl_uint32. 
+/** @def VL_FL_INT32
+ ** @brief @c prinf length flag for ::vl_int32 and ::vl_uint32.
  **/
 
-/** @def VL_FL_INT16 
- ** @brief @c prinf length flag for ::vl_int16 and ::vl_uint16. 
+/** @def VL_FL_INT16
+ ** @brief @c prinf length flag for ::vl_int16 and ::vl_uint16.
  **/
 
-/** @def VL_FL_INT8  
- ** @brief @c prinf length flag for ::vl_int8 and ::vl_uint8.  
+/** @def VL_FL_INT8
+ ** @brief @c prinf length flag for ::vl_int8 and ::vl_uint8.
  **/
 #ifdef VL_COMPILER_MSC
 #define VL_FL_INT64  "I64"
@@ -310,7 +318,7 @@ vl_swap_host_big_endianness_8 (void *dst, void* src)
     dst_ [5] = src_ [5] ;
     dst_ [6] = src_ [6] ;
     dst_ [7] = src_ [7] ;
-#else 
+#else
     dst_ [0] = src_ [7] ;
     dst_ [1] = src_ [6] ;
     dst_ [2] = src_ [5] ;
@@ -340,7 +348,7 @@ vl_swap_host_big_endianness_4 (void *dst, void* src)
     dst_ [1] = src_ [1] ;
     dst_ [2] = src_ [2] ;
     dst_ [3] = src_ [3] ;
-#else 
+#else
     dst_ [0] = src_ [3] ;
     dst_ [1] = src_ [2] ;
     dst_ [2] = src_ [1] ;
