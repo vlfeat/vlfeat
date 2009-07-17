@@ -266,7 +266,7 @@ custom keypoints).
 To use a <b>SIFT filter</b> object:
  
 - Initialize a SIFT filter object with ::vl_sift_new(). The filter can
-  be reused for multiple images of the same size (e.g. for an entiere
+  be reused for multiple images of the same size (e.g. for an entire
   video sequence).
 - For each octave in the scale space:
   - Compute the next octave of the DOG scale space using either
