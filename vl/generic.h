@@ -23,7 +23,7 @@ General Public License version 2.
 #define VL_VERSION_STRING "0.9.4"
 
 /** ------------------------------------------------------------------
- ** @name C preprocssor
+ ** @name C preprocessor helper macros
  ** @{ */
 
 /** @brief Convert the argument to a string
@@ -35,7 +35,7 @@ General Public License version 2.
  **
  ** The standard C preprocessor does not prescan arguments which are
  ** stringified, so
- ** 
+ **
  ** @code
  ** #define A B
  ** char const * str = VL_STRINGIFY(A) ;
@@ -170,7 +170,7 @@ VL_EXPORT void vl_set_printf_func (printf_func_t printf_func) ;
 /** @} */
 
 /** ------------------------------------------------------------------
- ** @name Error handling 
+ ** @name Error handling
  ** @{ */
 
 /** @brief The number of the last error */
@@ -214,7 +214,7 @@ extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] ;
  **
  ** The macro is equivalent to the builtin @c << operator, but it
  ** supports negative shifts too.
- ** 
+ **
  ** @param x value.
  ** @param n number of shift positions.
  ** @return @c x << n .
@@ -241,9 +241,9 @@ extern VL_EXPORT int   (*vl_printf_func)  (char const * format, ...) ;
 extern VL_EXPORT void *(*vl_malloc_func)  (size_t) ;
 extern VL_EXPORT void *(*vl_realloc_func) (void*,size_t) ;
 extern VL_EXPORT void *(*vl_calloc_func)  (size_t, size_t) ;
-extern VL_EXPORT void  (*vl_free_func)    (void*) ;          
+extern VL_EXPORT void  (*vl_free_func)    (void*) ;
 
-VL_INLINE 
+VL_INLINE
 void* vl_malloc (size_t n)
 {
   return (*vl_malloc_func)(n) ;

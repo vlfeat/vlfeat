@@ -10,13 +10,13 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-/** 
- @mainpage VLFeat -- Vision Lab Features Library 
+/**
+ @mainpage VLFeat -- Vision Lab Features Library
 
  @version __VLFEAT_VERSION__
  @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
- 
+
  @par Copyright &copy; 2007-09 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
@@ -32,8 +32,8 @@ General Public License version 2.
  @section main-contents Contents
 
  - @ref design          "Design Concepts"
-   - @ref design-objects     "Objects" 
-   - @ref design-resources   "Memory and resource management" 
+   - @ref design-objects     "Objects"
+   - @ref design-resources   "Memory and resource management"
    - @ref design-threads     "Multi-threading"
    - @ref design-portability "Portability"
  - @ref main-glossary "Glossary"
@@ -83,12 +83,12 @@ General Public License version 2.
  functionality at all. Objects or memory blocks allocated by the
  library but owned by the client must be explicitly disposed. The
  following rule helps identifying such blocks and objects:
- 
+
  <b> The client owns a memory block or object if, and only if, it is
    returned by a library call containing the keywords @c _new or @c
    _copy, or by the allocator functions ::vl_malloc, ::vl_calloc,
    ::vl_realloc.</b>
- 
+
  More in detail, the following rules apply:
 
  - Memory is the only managed resource. Other resources used by the
@@ -146,12 +146,12 @@ General Public License version 2.
   - Atomic types (e.g. ::vl_int32).
   - Special syntaxes for the declaration of symbols exported by the library
     and inline functions (e.g. ::VL_EXPORT).
-  - Host-dependent conversion of data endianess 
+  - Host-dependent conversion of data endianess
     (e.g. ::vl_swap_host_big_endianness_8()).
 
   VLFeat uses processor specific features (e.g. Intel SSE) if those
   are available at compile time.
- 
+
   <!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
 
   @section main-glossary Glossary
@@ -170,7 +170,7 @@ General Public License version 2.
   dimensional array this indicates that the last index is the one
   varying most quickly, with the other followed in reverse order.
   - <b>Feature frame.</b> A <em>feature frame</em> is the geometrical
-  description of a visual features. For instance, the frame of 
+  description of a visual features. For instance, the frame of
   a @ref sift.h "SIFT feature" is oriented disk and the frame of
   @ref mser.h "MSER feature" is either a compact and connected set or
   a disk.
@@ -179,14 +179,14 @@ General Public License version 2.
   image region (usually corresponding to a feature frame).
 **/
 
-/** 
+/**
  @file generic.h
 
  This module provides the following functionalities:
- 
+
  - @ref generic-preproc
- - @ref generic-error  
- - @ref generic-heap
+ - @ref generic-error
+ - @ref generic-memory
  - @ref generic-logging
  - @ref generic-time
 
@@ -204,13 +204,13 @@ General Public License version 2.
   occurred. This variable is never set on success and should be
   examined right after an error had occurred.
 
-  @section generic-heap Heap allocation
+  @section generic-memory Memory allocation
 
   VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
-  ::vl_free() functions to allocate the heap. Normally these functions
+  ::vl_free() functions to allocate memory. Normally these functions
   are mapped to the underlying standard C library implementations. However
   ::vl_set_alloc_func() can be used to map them to other implementations.
-  For instance, in MATALB MEX files these functions are mapped to 
+  For instance, in MATALB MEX files these functions are mapped to
   the MATLAB equivalent which has a garbage collection mechanism to cope
   with interruptions during execution.
 
@@ -225,7 +225,7 @@ General Public License version 2.
   logging.
 
   @section generic-time Measruing time
-  
+
   VLFeat provides ::vl_tic() and ::vl_toc() as an easy way of
   measuring elapsed time.
 
@@ -262,7 +262,7 @@ char const * vl_get_version_string ()
  **/
 
 VL_EXPORT
-void vl_print_info () 
+void vl_print_info ()
 {
   VL_PRINTF ("VLFeat version %s\n", vl_get_version_string()) ;
   vl_print_host_info () ;
@@ -277,7 +277,7 @@ do_nothing_printf (char const* format, ...)
 
 /** @internal@brief Customizable @c malloc function pointer */
 void *(*vl_malloc_func)  (size_t)          = &malloc ;
-                                            
+
 /** @internal@brief Customizable @c realloc function pointer */
 void *(*vl_realloc_func) (void*,size_t)    = &realloc ;
 
@@ -286,7 +286,7 @@ void *(*vl_calloc_func)  (size_t, size_t) = &calloc ;
 
 /** @internal@brief Customizable @c free function pointer */
 void  (*vl_free_func)    (void*)            = &free ;
-                                            
+
 /** @internal@brief Customizable @c printf function pointer */
 int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*/
 
@@ -352,14 +352,14 @@ void vl_set_alloc_func (void *(*malloc_func)  (size_t),
 }
 
 VL_EXPORT
-void 
+void
 vl_set_printf_func (printf_func_t printf_func)
 {
   vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
 }
 
 #ifdef VL_OS_WIN
-LARGE_INTEGER tic_freq ; 
+LARGE_INTEGER tic_freq ;
 LARGE_INTEGER tic_mark ;
 #else
 clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
@@ -369,7 +369,7 @@ clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
  ** @brief Set time reference
  **/
 
-void vl_tic() 
+void vl_tic()
 {
 #ifdef VL_OS_WIN
   QueryPerformanceFrequency(&tic_freq) ;
