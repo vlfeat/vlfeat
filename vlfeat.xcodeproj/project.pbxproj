@@ -7,9 +7,20 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		2D0E6C4A1003DFA300F0864E /* mathop.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = mathop.tc; sourceTree = "<group>"; };
+		2D0E6C4B1003E0DF00F0864E /* float.th */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = float.th; sourceTree = "<group>"; };
+		2D13EEE1100A511200C072E8 /* mathop_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mathop_sse2.c; sourceTree = "<group>"; };
+		2D13EEE2100A512C00C072E8 /* mathop_sse2.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c; fileEncoding = 4; path = mathop_sse2.tc; sourceTree = "<group>"; };
+		2D13EEE3100A51F000C072E8 /* mathop_sse2.th */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = mathop_sse2.th; sourceTree = "<group>"; };
+		2D13EEE4100A539200C072E8 /* mathop_sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mathop_sse2.h; sourceTree = "<group>"; };
+		2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_vec_comp.c; sourceTree = "<group>"; };
+		2D13F028100A6E8800C072E8 /* vl_alldist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist.c; path = toolbox/misc/vl_alldist.c; sourceTree = "<group>"; };
+		2D13F02C100A718600C072E8 /* vl_simdctrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
+		2D13F039100A733D00C072E8 /* vl_simdctrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
 		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/MATLAB7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
-		2D624AD20FF927E300DB3122 /* heap-t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "heap-t.h"; path = "vl/heap-t.h"; sourceTree = "<group>"; };
+		2D624AD20FF927E300DB3122 /* heap-t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-t.h"; sourceTree = "<group>"; };
 		2D624AD60FF9306700DB3122 /* test_heap-t.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-t.c"; sourceTree = "<group>"; };
+		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D6F09EC0E4C6ACA00B77055 /* imopv.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv.tc; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
@@ -67,7 +78,7 @@
 		2D7AD0AC0E38C18600783252 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doxygen.conf; path = docsrc/doxygen.conf; sourceTree = "<group>"; };
 		2D7AD0AD0E38C18600783252 /* hikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = hikm.html; path = docsrc/hikm.html; sourceTree = "<group>"; };
 		2D7AD0AE0E38C18600783252 /* ikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ikm.html; path = docsrc/ikm.html; sourceTree = "<group>"; };
-		2D7AD0AF0E38C18600783252 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = docsrc/index.html; sourceTree = "<group>"; };
+		2D7AD0AF0E38C18600783252 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = docsrc/index.html; sourceTree = "<group>"; };
 		2D7AD0B00E38C18600783252 /* mser.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = mser.html; path = docsrc/mser.html; sourceTree = "<group>"; };
 		2D7AD0B10E38C18600783252 /* sift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = sift.html; path = docsrc/sift.html; sourceTree = "<group>"; };
 		2D7AD0B20E38C18600783252 /* template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = template.html; path = docsrc/template.html; sourceTree = "<group>"; };
@@ -139,7 +150,6 @@
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D7AD0870E38C15700783252 /* doc */,
-				2D624AD20FF927E300DB3122 /* heap-t.h */,
 			);
 			name = vlfeat;
 			sourceTree = "<group>";
@@ -176,6 +186,8 @@
 				2D732DED0CF8C2E40099B03C /* test_stringop.c */,
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
 				2D624AD60FF9306700DB3122 /* test_heap-t.c */,
+				2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */,
+				2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -195,6 +207,7 @@
 				2D732E830CF8C2E40099B03C /* getopt_long.h */,
 				2DD6700B0FEFE56C005A3664 /* heap.h */,
 				2DD6700C0FEFE56C005A3664 /* heap.c */,
+				2D624AD20FF927E300DB3122 /* heap-t.h */,
 				2D732E840CF8C2E40099B03C /* hikmeans.c */,
 				2D732E850CF8C2E40099B03C /* hikmeans.h */,
 				2D732E860CF8C2E40099B03C /* ikmeans.c */,
@@ -213,8 +226,14 @@
 				2DD99CC70E58A90F00CE1DA1 /* imopv_sse2.tc */,
 				2D765BAD0FEC076700D08578 /* kdtree.c */,
 				2D765BAE0FEC076700D08578 /* kdtree.h */,
-				2D732E8E0CF8C2E40099B03C /* mathop.c */,
+				2D0E6C4B1003E0DF00F0864E /* float.th */,
 				2D732E8F0CF8C2E40099B03C /* mathop.h */,
+				2D732E8E0CF8C2E40099B03C /* mathop.c */,
+				2D0E6C4A1003DFA300F0864E /* mathop.tc */,
+				2D13EEE4100A539200C072E8 /* mathop_sse2.h */,
+				2D13EEE1100A511200C072E8 /* mathop_sse2.c */,
+				2D13EEE3100A51F000C072E8 /* mathop_sse2.th */,
+				2D13EEE2100A512C00C072E8 /* mathop_sse2.tc */,
 				2D732E900CF8C2E40099B03C /* mser.c */,
 				2D732E910CF8C2E40099B03C /* mser.h */,
 				2D732E920CF8C2E40099B03C /* pgm.c */,
@@ -239,6 +258,9 @@
 				2D86B1080F24CC9B00E625D6 /* vl_aib.c */,
 				2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */,
 				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
+				2D13F028100A6E8800C072E8 /* vl_alldist.c */,
+				2D13F02C100A718600C072E8 /* vl_simdctrl.c */,
+				2D13F039100A733D00C072E8 /* vl_simdctrl.m */,
 				2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */,
 				2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */,
 				2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */,

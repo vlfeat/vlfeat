@@ -1,0 +1,63 @@
+/** @file    float.th
+ ** @brief   Float - Template
+ ** @author  Andrea Vedaldi
+ **/
+
+/* AUTORIGHTS
+Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+
+This file is part of VLFeat, available in the terms of the GNU
+General Public License version 2.
+*/
+
+#include "generic.h"
+
+#undef  T
+#undef  SFX
+#undef  VSIZE
+#undef  VSFX
+#undef  VTYPE
+
+#if (FLT == VL_TYPE_FLOAT)
+#  define T      float
+#  define SFX    f
+#else
+#  define T      double
+#  define SFX    d
+#endif
+
+#ifdef  __SSE2__
+
+#if (FLT == VL_TYPE_FLOAT)
+#  define T      float
+#  define SFX    f
+#  define VSIZE  4
+#  define VSFX   s
+#  define VTYPE  __m128
+#else
+#  define T      double
+#  define SFX    d
+#  define VSIZE  2
+#  define VSFX   d
+#  define VTYPE  __m128d
+#endif
+
+#define VALIGNED(x) (! (((vl_uintptr)x) & 0xF))
+
+#define VMAX  VL_XCAT(_mm_max_p,     VSFX)
+#define VMUL  VL_XCAT(_mm_mul_p,     VSFX)
+#define VDIV  VL_XCAT(_mm_div_p,     VSFX)
+#define VADD  VL_XCAT(_mm_add_p,     VSFX)
+#define VSUB  VL_XCAT(_mm_sub_p,     VSFX)
+#define VSTZ  VL_XCAT(_mm_setzero_p, VSFX)
+#define VLD1  VL_XCAT(_mm_load1_p,   VSFX)
+#define VLDU  VL_XCAT(_mm_loadu_p,   VSFX)
+#define VST1  VL_XCAT(_mm_store_s,   VSFX)
+#define VSET1 VL_XCAT(_mm_set_s,     VSFX)
+#define VSHU  VL_XCAT(_mm_shuffle_p, VSFX)
+#define VNEQ  VL_XCAT(_mm_cmpneq_p,  VSFX)
+#define VAND  VL_XCAT(_mm_and_p,     VSFX)
+#define VANDN VL_XCAT(_mm_andnot_p,  VSFX)
+
+/* __SSE2__ */
+#endif

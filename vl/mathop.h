@@ -14,6 +14,7 @@ General Public License version 2.
 #define VL_MATHOP_H
 
 #include "generic.h"
+#include <math.h>
 
 /** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945
@@ -93,7 +94,7 @@ static union { vl_uint64 raw ; double value ; }
  **
  ** The function is optimized for small absolute values of @a x.
  **
- ** The result is guaranteed not to be smaller than 0. However, due to
+ ** The result is guaranteed to be not smaller than 0. However, due to
  ** finite numerical precision and rounding errors, the result can be
  ** equal to 2 * VL_PI (for instance, if @c x is a very small negative
  ** number).
@@ -150,18 +151,24 @@ vl_floor_d (double x)
  ** @return @c abs(x)
  **/
 
-VL_INLINE
-float
+VL_INLINE float
 vl_abs_f (float x)
 {
-  return (x >= 0) ? x : -x ;
+#ifdef VL_COMPILER_GNU
+  return __builtin_fabsf (x) ;
+#else
+  return fabsf(x) ;
+#endif
 }
 
-VL_INLINE
-double
+VL_INLINE double
 vl_abs_d (double x)
 {
-  return (x >= 0) ? x : -x ;
+#ifdef VL_COMPILER_GNU
+  return __builtin_fabs (x) ;
+#else
+  return fabs(x) ;
+#endif
 }
 /** @} */
 
@@ -333,6 +340,7 @@ vl_fast_resqrt_d (double x)
  ** @{
  ** @brief Fast @c sqrt approximation
  ** @param x argument.
+ ** @return Approximation of @c sqrt(x).
  **
  ** The function computes a fast approximation of @c sqrt(x). 
  **
@@ -373,8 +381,6 @@ vl_fast_resqrt_d (double x)
  ** stored.  Thus initially, @f$ w = 0 @f$ and @f$ k = m - 1 = n/2 - 1
  ** @f$. Then, at each iteration the equation is tested, determining
  ** @f$ b_{m-1}, b_{m-2}, ... @f$ in this order.
- **
- ** @return Approximation of @c sqrt(x).
  **/
 
 VL_INLINE float
@@ -415,31 +421,57 @@ VL_INLINE vl_uint8  vl_fast_sqrt_ui8  (vl_uint8  x) ;
     return y ;                                  \
   }
 
+#ifdef __DOXYGEN__
+#undef VL_FAST_SQRT_UI
+#define VL_FAST_SQRT_UI(T,SFX)
+#endif
 
 VL_FAST_SQRT_UI(vl_uint32, ui32)
 VL_FAST_SQRT_UI(vl_uint16, ui16)
 VL_FAST_SQRT_UI(vl_uint8,  ui8 )
 
-/** ------------------------------------------------------------------
- ** @{
- ** @brief Auto distances.
- ** @param dist pointer to the distance matrix (out).
- ** @param M number of dimensions
- ** @param NX number of data points in X.
- ** @param NY number of data points in Y.
- ** @param X first data set.
- ** @param Y second data set.
- **/
-
-float
-vl_dist_l2_f (float * dist, int M, int NX, int NY,
-              float const* x, float const* y) ;
-
-float
-vl_dist_l2_d (double * dist, int M, int NX, int NY,
-              double const* x, double const* y) ;
-
 /** @} */
+
+/* ---------------------------------------------------------------- */
+
+#ifndef __DOXYGEN__
+typedef float (*VlFloatVectorComparisonFunction)(vl_size dimension, float const * X, float const * Y) ;
+typedef double (*VlDoubleVectorComparisonFunction)(vl_size dimension, double const * X, double const * Y) ;
+#else
+typedef void VlFloatVectorComparisonFunction ;
+typedef void VlDoubleVectorComparisonFunction ;
+#endif
+
+/** @brief Vector comparison types */
+enum _VlVectorComparisonType {
+  VlDistanceL1,   /**< l1 distance */
+  VlDistanceL2,   /**< l2 distance */
+  VlDistanceChi2, /**< Chi2 distance */
+  VlKernelL1,     /**< l1 kernel */
+  VlKernelL2,     /**< l2 kernel */
+  VlKernelChi2    /**< Chi2 kernel */
+} ;
+
+/** @brief Vector comparison types */
+typedef enum _VlVectorComparisonType VlVectorComparisonType ;
+
+VL_EXPORT VlFloatVectorComparisonFunction
+vl_get_vector_comparison_function_f (VlVectorComparisonType type) ;
+
+VL_EXPORT VlDoubleVectorComparisonFunction
+vl_get_vector_comparison_function_d (VlVectorComparisonType type) ;
+
+VL_EXPORT void
+vl_eval_vector_comparison_on_all_pairs_f (float * result, vl_size dimension,
+                                          float const * X, vl_size numDataX, 
+                                          float const * Y, vl_size numDataY,
+                                          VlFloatVectorComparisonFunction function) ;
+
+VL_EXPORT void
+vl_eval_vector_comparison_on_all_pairs_d (double * result, vl_size dimension,
+                                          double const * X, vl_size numDataX, 
+                                          double const * Y, vl_size numDataY,
+                                          VlDoubleVectorComparisonFunction) ;
 
 /* VL_MATHOP_H */
 #endif 

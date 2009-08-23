@@ -157,6 +157,7 @@ libsrc =                \
  vl\imopv.c             \
  vl\imopv_sse2.c        \
  vl\mathop.c            \
+ vl\mathop_sse2.c       \
  vl\mser.c              \
  vl\pgm.c               \
  vl\random.c            \
@@ -190,6 +191,7 @@ mexsrc =                          \
  toolbox\kmeans\vl_hikmeanspush.c \
  toolbox\kmeans\vl_ikmeans.c      \
  toolbox\kmeans\vl_ikmeanspush.c  \
+ toolbox\misc\vl_alldist.c        \
  toolbox\misc\vl_alldist2.c       \
  toolbox\misc\vl_binsearch.c      \
  toolbox\misc\vl_binsum.c         \
@@ -199,6 +201,7 @@ mexsrc =                          \
  toolbox\misc\vl_inthist.c        \
  toolbox\misc\vl_localmax.c       \
  toolbox\misc\vl_samplinthist.c   \
+ toolbox\misc\vl_simdctrl.c       \
  toolbox\misc\vl_twister.c        \
  toolbox\misc\vl_whistc.c         \
  toolbox\mser\vl_erfill.c         \
@@ -321,6 +324,10 @@ $(mexdir) :
 # --------------------------------------------------------------------
 
 # special sources with SSE2 support
+$(objdir)\mathop_sse2.obj : vl\mathop_sse2.c
+	@echo .... CC [+SSE2] $(@)
+	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
+	
 $(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
 	@echo .... CC [+SSE2] $(@)
 	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
