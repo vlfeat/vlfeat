@@ -136,7 +136,7 @@ VL_INLINE VlKDTreeThresholdingMethod vl_kdforest_get_thresholding_method (VlKDFo
 /** ------------------------------------------------------------------
  ** @brief Get the number of nodes of a given tree
  ** @param self KDForest object.
- ** @pparm treeIndex index of the tree.
+ ** @param treeIndex index of the tree.
  ** @return number of trees.
  **/
 
