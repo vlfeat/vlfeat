@@ -83,7 +83,7 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
 doc/api/index.html: docsrc/doxygen.conf VERSION docsrc/version.html  \
-  $(dll_src) $(dll_hdr) $(img_tgt)                                   \
+  $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
   doc/doxygen_header.html doc/doxygen_footer.html
 	$(call C,DOXYGEN) $<
 
