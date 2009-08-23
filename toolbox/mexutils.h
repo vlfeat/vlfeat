@@ -1,5 +1,4 @@
-/** @internal
- ** @file    mexutils.h
+/** @file    mexutils.h
  ** @brief   MEX utilities
  ** @author  Andrea Vedaldi
  **/
@@ -25,24 +24,290 @@ General Public License version 2.
 #define vsnprintf _vsnprintf
 #endif
 
-#if !defined(MX_API_VER) | (MX_API_VER < 0x07030000) 
-typedef int mwSize ;
-typedef int mwIndex ;
+#if ! defined (MX_API_VER) | (MX_API_VER < 0x07030000)
+typedef vl_uint32 mwSize ;
+typedef vl_int32 mwIndex ;
 #endif
 
-/** @file mexutils.h 
+/** @file mexutils.h
 
-This header file provides utility function that help writing MATLAB
-MEX files.
+ This header file provides helper functions for writing MATLAB MEX
+ files.
 
-@subsection mexutils-plain-matrix
+ - @ref mexutils-env "VLFeat environment"
+ - @ref mexutils-array-test "Array tests"
+ - @ref mexutils-options "Parsing options"
 
-- It is numeric.
-- It has DOUBLE storage class.
-- It has only a real component.
-- It is full.
+ @section mexutils-env VLFeat environment
+
+ When the VLFeat DLL is linked to a MATLAB MEX files, at run time the
+ MEX file must configure VLFeat to use MATLAB memory allocation and
+ logging functions. This can be obtained by calling the macro
+ ::VL_USE_MATLAB_ENV as the first line of each MEX file which is
+ linked to the VLFeat DLL.
+
+ @section mexutils-array-test Array tests
+
+ MATLAB supports a variety of array types. Most MEX file arguments are
+ restricted to a few types and must be properly checked at run time.
+ ::mexutils.h provides some helper functions to make it simpler to
+ check such arguments. MATLAB basic array types are:
+
+ - Numeric array:
+   @c mxDOUBLE_CLASS, @c mxSINGLE_CLASS,
+   @c mxINT8_CLASS, @c mxUINT8_CLASS,
+   @c mxINT16_CLASS, @c mxUINT16_CLASS,
+   @c mxINT32_CLASS, @c mxUINT32_CLASS. Moreover:
+   - all such types have a @e real component
+   - all such types may have a @e imaginary component
+   - @c mxDOUBLE_LCASS arrays with two dimensions can be @e sparse.
+ - Logical array (@c mxLOGICAL_CLASS).
+ - Character array (@c mxCHAR_CLASS).
+
+ The other MATLAB array types are:
+
+ - Struct array (@c mxSTRUCT_CLASS).
+ - Cell array (@c mxCELL_CLASS).
+ - Custom class array (@c mxCLASS_CLASS).
+ - Unkown type array (@c mxUNKNOWN_CLASS).
+
+ VLFeat defines a number of common classes of arrays and corresponding
+ tests.
+
+ - <b>Scalar array</b> is a non-sparse array with exactly one element.
+   Note that the array may have an arbitrary number of dimensions, and
+   be of any numeric or other type. All dimensions are singleton
+   (which is implied by having exactly one element). Use ::mxuIsScalar
+   to test if an array is scalar.
+
+ - <b>Vector array</b> is a non-sparse array which is either empty
+   (empty vector) or has at most one non-singleton dimension. The
+   array can be of any numeric or other type. The elements of such a
+   MATLAB array are stored as a plain C array with a number of
+   elements equal to the number of elements in the array (obtained
+   with @c mxGetNumberOfElements). Use ::mxuIsVector to test if an
+   array is a vector.
+
+ - <b>Matrix array</b> is a non-sparse array for which all dimensions
+   beyond the first two are singleton, or a non-sparse array which is
+   empty and for which at least one of the first two dimensions is
+   zero. The array can be of any numeric or other type.  The
+   non-singleton dimensions can be zero (empty matrix), one, or
+   more. The element of such a MATLAB array are stored as a C array in
+   column major order and its dimensions can be obtained by @c mxGetM
+   and @c mxGetN.  Use ::mxuIsMatrix to test if an array is a mtarix.
+
+ - <b>Real array</b> is a numeric array (as for @c mxIsNumeric)
+   without a complex component. Use ::mxuIsReal to check if an array
+   is real.
+
+ - Use ::mxuIsOfClass to check if an array is of a prescribed
+   (storage) class, such as @c mxDOUBLE_CLASS.
+
+ - <b>Plain scalar, vector, and matrix</b> are a scalar, vector, and
+   matrix arrays which are <em>real</em> and of class @c
+   mxDOUBLE_CLASS.  Use ::mxuIsPlainScalar, ::mxuIsPlainVector and
+   ::mxuIsPlainMatrix to check this.
+
+ @section mexutils-options Parsing options
+
+ It is common to pass optional arguments to a MEX file as option
+ type-value pairs. Here type is a string identifying the option and
+ value is a MATLAB array specifing its value. The function
+ ::uNextOption can be used to simplify parsing a list of such
+ arguments (similar to UNIX @c getopt).
 
  **/
+
+/** @name Check for array attributes
+ ** @{ */
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is of a prescribed class
+ ** @param array MATLAB array.
+ ** @param classId prescribed class of the array.
+ ** @return ::VL_TRUE if the class is of the array is of the prescribed class.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsOfClass (mxArray const * array, mxClassID classId)
+{
+  return mxGetClassID (array) == classId ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is real
+ ** @param array MATLAB array.
+ ** @return ::VL_TRUE if the array is real.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsReal (mxArray const * array)
+{
+  return mxIsNumeric (array) && ! mxIsComplex (array) ;
+}
+
+/** @} */
+
+/** @name Check for scalar, vector and matrix arrays
+ ** @{ */
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is scalar
+ ** @param array MATLAB array.
+ ** @return ::VL_TRUE if the array is scalar.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsScalar (mxArray const * array)
+{
+  return (! mxIsSparse (array)) && (mxGetNumberOfElements (array) == 1)  ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is a vector.
+ ** @param array MATLAB array.
+ ** @param numElements number of elements (negative for any).
+ ** @return ::VL_TRUE if the array is a vecotr of the prescribed size.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsVector (mxArray const * array, vl_index numElements)
+{
+  mwSize numDimensions = mxGetNumberOfDimensions (array) ;
+  mwSize const * dimensions = mxGetDimensions (array) ;
+  vl_uindex di ;
+
+  /* check that it is not sparse */
+  if (mxIsSparse (array)) {
+    return VL_FALSE ;
+  }
+
+  /* check that the number of elements is the prescribed one */
+  if ((numElements >= 0) && (mxGetNumberOfElements (array) != numElements)) {
+    return VL_FALSE ;
+  }
+
+  /* ok if empty */
+  if (mxGetNumberOfElements (array) == 0) {
+    return VL_TRUE ;
+  }
+
+  /* find first non-singleton dimension */
+  for (di = 0 ; (dimensions[di] == 1) && di < numDimensions ; ++ di) ;
+
+  /* skip it */
+  if (di < numDimensions) ++ di ;
+
+  /* find next non-singleton dimension */
+  for (; (dimensions[di] == 1) && di < numDimensions ; ++ di) ;
+
+  /* if none found, then ok */
+  return di == numDimensions ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is a matrix.
+ ** @param array MATLAB array.
+ ** @param M number of rows (negative for any).
+ ** @param N number of columns (negative for any).
+ ** @return ::VL_TRUE if the array is a matrix of the prescribed size.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsMatrix (mxArray const * array, vl_index M, vl_index N)
+{
+  mwSize numDimensions = mxGetNumberOfDimensions (array) ;
+  mwSize const * dimensions = mxGetDimensions (array) ;
+  vl_uindex di ;
+
+  /* check that it is not sparse */
+  if (mxIsSparse (array)) {
+    return VL_FALSE ;
+  }
+
+  /* check that the number of elements is the prescribed one */
+  if ((M >= 0) && (mxGetM (array) != M)) {
+    return VL_FALSE;
+  }
+  if ((N >= 0) && (mxGetN (array) != N)) {
+    return VL_FALSE;
+  }
+
+  /* ok if empty and either M = 0 or N = 0 */
+  if ((mxGetNumberOfElements (array) == 0) && (mxGetM (array) == 0 || mxGetN (array) == 0)) {
+    return VL_TRUE ;
+  }
+
+  /* ok if any dimension beyond the first two is singleton */
+  for (di = 2 ; (dimensions[di] == 1) && di < numDimensions ; ++ di) ;
+  return di == numDimensions ;
+}
+/** @} */
+
+/** @name Check for plain arrays
+ ** @{ */
+
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is plain scalar
+ ** @param array MATLAB array.
+ ** @return ::VL_TRUE if the array is plain scalar.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsPlainScalar (mxArray const * array)
+{
+  return
+  mxuIsReal (array) &&
+  mxuIsOfClass(array, mxDOUBLE_CLASS)  &&
+  mxuIsScalar (array) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is a plain vector.
+ ** @param array MATLAB array.
+ ** @param numElements number of elements (negative for any).
+ ** @return ::VL_TRUE if the array is a plain vecotr of the prescribed size.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsPlainVector
+(mxArray const * array, vl_index numElements)
+{
+  return
+  mxuIsReal (array) &&
+  mxuIsOfClass (array, mxDOUBLE_CLASS) &&
+  mxuIsVector (array, numElements) ;
+}
+
+
+/** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is a plain matrix.
+ ** @param array MATLAB array.
+ ** @param M number of rows (negative for any).
+ ** @param N number of columns (negative for any).
+ ** @return ::VL_TRUE if the array is a plain matrix of the prescribed size.
+ ** @sa @ref mexutils-array-test
+ **/
+
+VL_INLINE vl_bool
+mxuIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
+{
+  return
+  mxuIsReal (array) &&
+  mxuIsOfClass (array, mxDOUBLE_CLASS) &&
+  mxuIsMatrix (array, M, N) ;
+}
+
+/** @} */
 
 /** ------------------------------------------------------------------
  ** @brief Let VLFeat use MATLAB memory allocation/logging facilities
@@ -71,7 +336,7 @@ MEX files.
  **/
 
 static mxArray *
-uCreateNumericArray (mwSize ndim, const mwSize * dims, 
+uCreateNumericArray (mwSize ndim, const mwSize * dims,
                      mxClassID classid, void * data)
 {
   mxArray *A ;
@@ -84,7 +349,7 @@ uCreateNumericArray (mwSize ndim, const mwSize * dims,
   } else {
     A = mxCreateNumericArray (ndim, dims, classid, mxREAL) ;
   }
-  
+
   return A ;
 }
 
@@ -137,6 +402,7 @@ uCreateScalar (double x)
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a numeric scalar?
  **
  ** @param A array to test.
@@ -151,16 +417,15 @@ uCreateScalar (double x)
 static int
 uIsScalar(const mxArray* A)
 {
-  return 
+  return
     mxIsNumeric (A) && mxGetNumberOfElements(A) == 1 ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array plain matrix?
  **
  ** @param A array to test.
- ** @param M number of rows.
- ** @param N number of columns.
  **
  ** The array @a A satisfies the test if:
  **
@@ -171,7 +436,7 @@ uIsScalar(const mxArray* A)
  ** @return test result.
  **/
 
-static vl_bool 
+static vl_bool
 uIsPlainArray (const mxArray* A)
 {
   return
@@ -180,17 +445,17 @@ uIsPlainArray (const mxArray* A)
     ! mxIsSparse(A) ;
 }
 
-static vl_bool 
+static vl_bool
 uIsPlainMatrix (const mxArray* A, int M, int N)
 {
   return
     uIsPlainArray(A) &&
     mxGetNumberOfDimensions(A) == 2 &&
     (M < 0 || mxGetM(A) == M) &&
-    (N < 0 || mxGetN(A) == N) ;   
+    (N < 0 || mxGetN(A) == N) ;
 }
 
-static vl_bool 
+static vl_bool
 uIsPlainVector (const mxArray* A, int M)
 {
   return
@@ -200,7 +465,7 @@ uIsPlainVector (const mxArray* A, int M)
     (M < 0 || (mxGetM(A) == M || mxGetN(A) == M)) ;
 }
 
-static vl_bool 
+static vl_bool
 uIsPlainScalar (const mxArray* A)
 {
   return
@@ -210,6 +475,7 @@ uIsPlainScalar (const mxArray* A)
 
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a numeric matrix?
  **
  ** @param A array to test.
@@ -232,10 +498,11 @@ uIsMatrix (const mxArray* A, int M, int N)
     mxIsNumeric(A) &&
     mxGetNumberOfDimensions(A) == 2 &&
     (M < 0 || mxGetM(A) == M) &&
-    (N < 0 || mxGetN(A) == N) ;   
+    (N < 0 || mxGetN(A) == N) ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a vector?
  **
  ** @param A array to test.
@@ -252,11 +519,12 @@ uIsMatrix (const mxArray* A, int M, int N)
 static int
 uIsVector(const mxArray* A, int N)
 {
-  return  
+  return
     uIsMatrix(A, 1, N) || uIsMatrix(A, N, 1) ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array real?
  **
  ** @param A array to test.
@@ -271,12 +539,13 @@ uIsVector(const mxArray* A, int N)
 static int
 uIsReal (const mxArray* A)
 {
-  return 
-    mxIsDouble(A) && 
+  return
+    mxIsDouble(A) &&
     ! mxIsComplex(A) ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array real and scalar?
  **
  ** @param A array to test.
@@ -291,11 +560,12 @@ uIsReal (const mxArray* A)
 static int
 uIsRealScalar(const mxArray* A)
 {
-  return 
+  return
     uIsReal (A) && mxGetNumberOfElements(A) == 1 ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a real matrix?
  **
  ** @param A array to test.
@@ -314,15 +584,16 @@ uIsRealScalar(const mxArray* A)
 static int
 uIsRealMatrix(const mxArray* A, int M, int N)
 {
-  return  
+  return
     mxIsDouble(A) &&
     !mxIsComplex(A) &&
     mxGetNumberOfDimensions(A) == 2 &&
     (M < 0 || mxGetM(A) == M) &&
-    (N < 0 || mxGetN(A) == N) ;   
+    (N < 0 || mxGetN(A) == N) ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a real vector?
  **
  ** @param A array to test.
@@ -339,11 +610,12 @@ uIsRealMatrix(const mxArray* A, int M, int N)
 static int
 uIsRealVector(const mxArray* A, int N)
 {
-  return  
+  return
     uIsRealMatrix(A, 1, N) || uIsRealMatrix(A, N, 1) ;
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array real with specified dimensions?
  **
  ** @param A array to check.
@@ -373,7 +645,7 @@ uIsRealArray(const mxArray* A, int D, int* dims)
       return 0 ;
 
     return 1 ;
-    
+
     if(dims != NULL) {
       for(d = 0 ; d < D ; ++d) {
         if(dims[d] >= 0 && dims[d] != actual_dims[d])
@@ -385,6 +657,7 @@ uIsRealArray(const mxArray* A, int D, int* dims)
 }
 
 /** ------------------------------------------------------------------
+ ** @deprecated @ref mexutils-array-test
  ** @brief Is the array a string?
  **
  ** @param A array to test.
@@ -405,7 +678,7 @@ uIsString(const mxArray* A, int L)
   int M = mxGetM(A) ;
   int N = mxGetN(A) ;
 
-  return 
+  return
     mxIsChar(A) &&
     mxGetNumberOfDimensions(A) == 2 &&
     (M == 1 || (M == 0 && N == 0)) &&
@@ -413,7 +686,7 @@ uIsString(const mxArray* A, int L)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Formatted @c mexErrMsgTxt() 
+ ** @brief Formatted @c mexErrMsgTxt()
  **
  ** @param format format string (for sprintf).
  ** @param ...    format string arguments.
@@ -437,7 +710,7 @@ uErrMsgTxt(char const * format, ...)
 
 
 /** -------------------------------------------------------------------
- ** @brief MEX option 
+ ** @brief MEX option
  **/
 
 struct _uMexOption
@@ -465,7 +738,7 @@ typedef struct _uMexOption uMexOption ;
 static int
 uStrICmp(const char *s1, const char *s2)
 {
-  while (tolower((unsigned char)*s1) == 
+  while (tolower((unsigned char)*s1) ==
          tolower((unsigned char)*s2))
   {
     if (*s1 == 0)
@@ -473,8 +746,8 @@ uStrICmp(const char *s1, const char *s2)
     s1++;
     s2++;
   }
-  return 
-    (int)tolower((unsigned char)*s1) - 
+  return
+    (int)tolower((unsigned char)*s1) -
     (int)tolower((unsigned char)*s2) ;
 }
 
@@ -502,9 +775,9 @@ uStrICmp(const char *s1, const char *s2)
  ** prints an error message and quits the MEX file.
  **/
 
-static int uNextOption(mxArray const *args[], int nargs, 
-                       uMexOption const *options, 
-                       int *next, 
+static int uNextOption(mxArray const *args[], int nargs,
+                       uMexOption const *options,
+                       int *next,
                        mxArray const **optarg)
 {
   char err_msg [1024] ;
@@ -514,7 +787,7 @@ static int uNextOption(mxArray const *args[], int nargs,
   if (*next >= nargs) {
     return opt ;
   }
-  
+
   /* check the array is a string */
   if (! uIsString (args [*next], -1)) {
     snprintf(err_msg, sizeof(err_msg),
@@ -525,25 +798,25 @@ static int uNextOption(mxArray const *args[], int nargs,
 
   /* retrieve option name */
   len = mxGetNumberOfElements (args [*next]) ;
-  
+
   if (mxGetString (args [*next], name, sizeof(name))) {
     snprintf(err_msg, sizeof(err_msg),
-             "The option name is too long (argument number %d).", 
+             "The option name is too long (argument number %d).",
              *next + 1) ;
-    mexErrMsgTxt(err_msg) ;    
+    mexErrMsgTxt(err_msg) ;
   }
-  
+
   /* advance argument list */
   ++ (*next) ;
-        
+
   /* now lookup the string in the option table */
-  for (i = 0 ; options[i].name != 0 ; ++i) {    
+  for (i = 0 ; options[i].name != 0 ; ++i) {
     if (uStrICmp(name, options[i].name) == 0) {
       opt = options[i].val ;
       break ;
     }
   }
-  
+
   /* unknown argument */
   if (opt < 0) {
     snprintf(err_msg, sizeof(err_msg),
@@ -556,17 +829,17 @@ static int uNextOption(mxArray const *args[], int nargs,
     if (optarg) *optarg = 0 ;
     return opt ;
   }
-  
+
   /* argument */
   if (*next >= nargs) {
     snprintf(err_msg, sizeof(err_msg),
              "Option '%s' requires an argument.", options[i].name) ;
-    mexErrMsgTxt(err_msg) ;        
+    mexErrMsgTxt(err_msg) ;
   }
 
   if (optarg) *optarg = args [*next] ;
   ++ (*next) ;
-  return opt ;  
+  return opt ;
 }
 
 /* MEXUTILS_H */
