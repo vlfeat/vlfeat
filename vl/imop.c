@@ -43,8 +43,7 @@ General Public License version 2.
  ** @param mode       mode flags.
  **/
 
-/** @fn ::vl_imsmooth_f(
- ** float*,float*,float const*,int,int,double)
+/** @fn ::vl_imsmooth_f(float*,float*,float const*,int,int,double)
  **
  ** @brief Smooth image by Gaussian kernel
  **
