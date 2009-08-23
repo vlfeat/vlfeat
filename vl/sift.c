@@ -488,7 +488,7 @@ weighing contributions by the <em>binning functions</em>
   w(z) &=& \mathrm{max}(0, 1 - |z|), 
   \\
   \displaystyle
-  w_\mathrm{ang}(z) &=& \sum_{k=-\inf}^{+\inf} 
+  w_\mathrm{ang}(z) &=& \sum_{k=-\infty}^{+\infty}
   w\left(
   \frac{N_\theta}{2\pi} z + N_\theta k
   \right).
