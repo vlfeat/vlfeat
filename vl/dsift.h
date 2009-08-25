@@ -21,7 +21,7 @@ typedef struct VlDsiftKeypoint_
   double x ; /**< x coordinate */
   double y ; /**< y coordinate */
   double s ; /**< scale */
-  double norm ; /**< norm */
+  double norm ; /**< SIFT descriptor norm */
 } VlDsiftKeypoint ;
 
 /** @brief Dense SIFT descriptor geometry */
@@ -51,7 +51,8 @@ typedef struct VlDsiftFilter_
   /** descriptor parameters */
   VlDsiftDescriptorGeometry geom ;
 
-  int useFlatWindow ;      /**< flag: whether to drop the Gaussian window */
+  int useFlatWindow ;      /**< flag: whether to approximate the Gaussian window with a flat one */
+  double windowSize ;      /**< size of the Gaussian window */
 
   int numFrames ;          /**< number of sampled frames */
   int descrSize ;          /**< size of a descriptor */
@@ -91,6 +92,7 @@ VL_INLINE void vl_dsift_set_bounds (VlDsiftFilter *self,
 VL_INLINE void vl_dsift_set_geometry (VlDsiftFilter *self,
                                      VlDsiftDescriptorGeometry const* geom) ;
 VL_INLINE void vl_dsift_set_flat_window (VlDsiftFilter *self, vl_bool flatWindow) ;
+VL_INLINE void vl_dsift_set_window_size (VlDsiftFilter *self, double windowSize) ;
 /** @} */
 
 /** @name Retrieving data and parameters
@@ -105,11 +107,12 @@ VL_INLINE void            vl_dsift_get_bounds          (VlDsiftFilter const *sel
                                                        int* minY,
                                                        int* maxX,
                                                        int* maxY) ;
-VL_INLINE void            vl_dsift_get_steps           (VlDsiftFilter const*self,
+VL_INLINE void            vl_dsift_get_steps           (VlDsiftFilter const* self,
                                                        int* stepX,
                                                        int* stepY) ;
 VL_INLINE VlDsiftDescriptorGeometry const* vl_dsift_get_geometry (VlDsiftFilter const *self) ;
 VL_INLINE vl_bool         vl_dsift_get_flat_window     (VlDsiftFilter const *self) ;
+VL_INLINE double          vl_dsift_get_window_size     (VlDsiftFilter const *self) ;
 /** @} */
 
 VL_EXPORT
@@ -318,6 +321,31 @@ vl_dsift_transpose_descriptor (float* dst,
       }
     }
   }
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set SIFT descriptor Gaussian window size
+ ** @param self DSIFT filter object.
+ ** @param windowSize window size.
+ **/
+
+void
+vl_dsift_set_window_size(VlDsiftFilter * self, double windowSize)
+{
+  assert(windowSize >= 0.0) ;
+  self->windowSize = windowSize ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get SIFT descriptor Gaussian window size
+ ** @param self DSIFT filter object.
+ ** @return window size.
+ **/
+
+VL_INLINE double
+vl_dsift_get_window_size(VlDsiftFilter const * self)
+{
+  return self->windowSize ;
 }
 
 /*  VL_DSIFT_H */

@@ -46,12 +46,13 @@ multiple images of the same size.
 @sa @ref sift "The SIFT module", @ref dsift-tech "Technical details"
 
 This module implements a fast algorithm for the calculation of a large
-number of SIFT descriptors of densely sampled keypoints of the same
-scale and orientation. See the @ref sift "SIFT section" for an
+number of SIFT descriptors of densely sampled features of the same
+scale and orientation. See the @ref sift "SIFT module" for an
 overview of SIFT.
 
-The keypoints are indirectly specified by the sampling steps
-(::vl_dsift_set_steps). The descriptor geometry (number and size of
+The feature frames (keypoints) are indirectly specified by the sampling steps
+(::vl_dsift_set_steps) and the sampling bounds (::vl_dsift_set_bounds).
+The descriptor geometry (number and size of
 the spatial bins and number of orientation bins) can be customized
 (::vl_dsift_set_geometry).
 
@@ -75,11 +76,11 @@ Detection.</em> CVPR 2005. It is instead just a dense version of SIFT.
  @section dsift-usage Usage
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-DSIFT is implemented by a filter, i.e. an object which can be reused
-to process sequentially similar images. To use the <b>DSIFT filter
-object</b>:
+DSIFT is implemented by a ::VlDsiftFilter object that can be used
+to process a sequence of images of a given geometry.
+To use the <b>DSIFT filter</b>:
 
-- Initialize the DSIFT filter with ::vl_dsift_new() (or the simplified
+- Initialize a new DSIFT filter object by ::vl_dsift_new() (or the simplified
 ::vl_dsift_new_basic()). Customize the descriptor parameters by
 ::vl_dsift_set_steps, ::vl_dsfit_set_geometry, etc.
 - Process an image by ::vl_dsift_process().
@@ -93,9 +94,8 @@ object</b>:
 @section dsift-tech Technical details
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-The calculation of the SIFT descriptor is discussed in
-the @ref sift-tech-descriptor "SIFT descriptor section"
-and this section follows that notation.
+This section extends the @ref sift-tech-descriptor "SIFT descriptor section"
+and specialzies it to the case of dense keypoints.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection dsift-tech-descriptor-dense Dense descriptors
@@ -240,43 +240,44 @@ and we impose that the bin size @f$ m \sigma @f$ is integer as well.
 **/
 
 /** ------------------------------------------------------------------
- ** @internal
- ** @brief Initialize new convolution kernel
+ ** @internal @brief Initialize new convolution kernel
  **
  ** @param binSize
  ** @param numBins
  ** @param binIndex negative to use flat window.
+ ** @param windowSize
  ** @return a pointer to new filter.
  **/
 
-float * _vl_dsift_new_kernel (int binSize, int numBins, int binIndex)
+float *
+_vl_dsift_new_kernel (int binSize, int numBins, int binIndex, double windowSize)
 {
   int filtLen = 2 * binSize - 1 ;
   float * ker = vl_malloc (sizeof(float) * filtLen) ;
   float * kerIter = ker ;
   float delta = binSize * (binIndex - 0.5F * (numBins - 1)) ;
+  /*
   float sigma = 0.5F * ((numBins - 1) * binSize + 1) ;
-  /* this is what standard SIFT would use. Above is what Oxford
-     uses
   float sigma = 0.5F * ((numBins) * binSize) ;
   */
+  float sigma = (float) binSize * (float) windowSize ;
   int x ;
 
   for (x = - binSize + 1 ; x <= + binSize - 1 ; ++ x) {
     float z = (x - delta) / sigma ;
     *kerIter++ = (1.0F - fabsf(x) / binSize) *
       ((binIndex >= 0) ? expf(- 0.5F * z*z) : 1.0F) ;
-
-    /* *kerIter++ = (1.0f - fabsf(x) / binSize)  ; */
-
   }
   return ker ;
 }
 
-float _vl_dsift_get_bin_window_mean (int binSize, int numBins, int binIndex)
+static float
+_vl_dsift_get_bin_window_mean
+(int binSize, int numBins, int binIndex, double windowSize)
 {
   float delta = binSize * (binIndex - 0.5F * (numBins - 1)) ;
-  float sigma = 0.5F * ((numBins - 1) * binSize + 1) ;
+  /*float sigma = 0.5F * ((numBins - 1) * binSize + 1) ;*/
+  float sigma = (float) binSize * (float) windowSize ;
   int x ;
 
   float acc = 0.0 ;
@@ -339,7 +340,6 @@ _vl_dsift_free_buffers (VlDsiftFilter* self)
   self->numBinAlloc = 0 ;
   self->numGradAlloc = 0 ;
 }
-
 
 /** ------------------------------------------------------------------
  ** @internal @brief Updates internal buffers to current geometry
@@ -436,6 +436,7 @@ vl_dsift_new (int imWidth, int imHeight)
   self->geom.binSizeY = 5 ;
 
   self->useFlatWindow = VL_FALSE ;
+  self->windowSize = 2.0 ;
 
   self->convTmp1 = vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
   self->convTmp2 = vl_malloc(sizeof(float) * self->imWidth * self->imHeight) ;
@@ -513,13 +514,15 @@ _vl_dsift_with_gaussian_window (VlDsiftFilter * self)
 
     yker = _vl_dsift_new_kernel (self->geom.binSizeY,
                                  self->geom.numBinY,
-                                 biny) ;
+                                 biny,
+                                 self->windowSize) ;
 
     for (binx = 0 ; binx < self->geom.numBinX ; ++binx) {
 
       xker = _vl_dsift_new_kernel(self->geom.binSizeX,
-                                 self->geom.numBinX,
-                                 binx) ;
+                                  self->geom.numBinX,
+                                  binx,
+                                  self->windowSize) ;
 
       for (bint = 0 ; bint < self->geom.numBinT ; ++bint) {
 
@@ -581,26 +584,25 @@ void _vl_dsift_with_flat_window (VlDsiftFilter* self)
   /* for each orientation bin */
   for (bint = 0 ; bint < self->geom.numBinT ; ++bint) {
 
-
-
     vl_imconvcoltri_vf (self->convTmp1, self->imHeight,
                         self->grads [bint], self->imWidth, self->imHeight,
                         self->imWidth,
-                        self->geom.binSizeY - 1, /* filt size */
+                        self->geom.binSizeY, /* filt size */
                         1, /* subsampling step */
                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
 
     vl_imconvcoltri_vf (self->convTmp2, self->imWidth,
                         self->convTmp1, self->imHeight, self->imWidth,
                         self->imHeight,
-                        self->geom.binSizeX - 1,
+                        self->geom.binSizeX,
                         1,
                         VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
 
     for (biny = 0 ; biny < self->geom.numBinY ; ++biny) {
       float wy = _vl_dsift_get_bin_window_mean (self->geom.binSizeY,
                                                 self->geom.numBinY,
-                                                biny) ;
+                                                biny,
+                                                self->windowSize) ;
 
       /* The convolution function uses triangualr wave with unit integral (hence height
        * equal to half the bin size). Instead
@@ -615,7 +617,8 @@ void _vl_dsift_with_flat_window (VlDsiftFilter* self)
         float w ;
         float wx = _vl_dsift_get_bin_window_mean (self->geom.binSizeX,
                                                   self->geom.numBinX,
-                                                  binx) ;
+                                                  binx,
+                                                  self->windowSize) ;
 
         float *dst = self->descrs
           + bint
