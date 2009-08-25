@@ -95,22 +95,30 @@
  ** @param src_width width of the source image.
  ** @param src_height height of the source image.
  ** @param src_stride width of the source image including padding.
- ** @param filt_size half length of the filter support.
+ ** @param filt_size size of the triangular filter.
  ** @param step sub-sampling step.
  ** @param flags operation modes.
  **
- ** The function convolves the column of the image @a src by
- ** the kernel
+ ** The function convolves the column of the image @a src by the
+ ** discrete kernel
  **
  ** @f[
- **   k(x) = \frac{1}{\Delta} \max\{ \Delta -  |x|, 0 \},
- **   \quad x \in \mathbb{Z}
+ **   k(t) = \frac{1}{\Delta^2} \max\{ \Delta -  |t|, 0 \},
+ **   \quad t \in \mathbb{Z}
  ** @f]
  **
- ** where @f$ \Delta @f$ is the half filter length @a filt_size.
- ** The smallest filter has @a filt_size equal to one and
- ** corresponds to a delta
- ** function. The filter is normalized to have unit area.
+ ** where @f$ \Delta @f$ is equal to the parameter @a filt_size. The
+ ** normalization factor is selected such that
+ **
+ ** @f[
+ **   \sum_{t=-\infty}^{+\infty} k(t) = 1
+ ** @f]
+ **
+ ** for all @f$ \Delta \in \mathbb{Z}_+ @f$. Notice that the support
+ ** of @f$ k(x) @f$ as a continuous function is @f$ (-\Delta,\Delta)
+ ** @f$ and has length @f$ 2\Delta @f$ and as a discrete function is
+ ** @f$ [-\Delta + 1, \Delta-1] @f$ which has length @f$ 2 \Delta - 1
+ ** @f$.
  **
  ** The operation of the function is otherwise similar to
  ** ::vl_imconvocl().
