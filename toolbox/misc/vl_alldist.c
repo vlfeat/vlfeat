@@ -1,11 +1,9 @@
-/*
- *  vl_alldist.c
- *  vlfeat
- *
- *  Created by Andrea Vedaldi on 12/07/2009.
- *  Copyright 2009 UCLA. All rights reserved.
- *
- */
+/** @file   vl_alldist.c
+ ** @brief  vl_alldist - MEX implementation
+ ** @author Andrea Vedaldi
+ **/
+
+/* AUTORIGHTS */
 
 #include "mexutils.h"
 #include <vl/mathop.h>
@@ -64,31 +62,31 @@ mexFunction(int nout, mxArray *out[],
   mxArray const *optarg ;
 
   if (nin < 1) {
-    mexErrMsgTxt("At least one argument required") ;
+    VLMX_EIA("At least one argument required.") ;
   }
 
-  if (! (mxuIsMatrix (in[IN_X],-1,-1) && mxuIsReal(in[IN_X]))) {
-    mexErrMsgTxt ("X must be a real matrix") ;
+  if (! (vlmxIsMatrix (in[IN_X],-1,-1) && vlmxIsReal(in[IN_X]))) {
+    VLMX_EIA("X must be a real matrix.") ;
   }
   next = 1 ;
   classId = mxGetClassID(in[IN_X]) ;
   numDimensions = mxGetM(in[IN_X]) ;
   numDataX = mxGetN(in[IN_X]) ;
 
-  if (nin > 1 && mxuIsMatrix (in[IN_Y],-1,-1) && mxuIsReal(in[IN_Y])) {
+  if (nin > 1 && vlmxIsMatrix (in[IN_Y],-1,-1) && vlmxIsReal(in[IN_Y])) {
     next = 2 ;
     autoComparison = VL_FALSE ;
     numDataY = mxGetN(in[IN_Y]) ;
     if (mxGetClassID(in[IN_Y]) != classId) {
-      mexErrMsgTxt ("X and Y must have the same class") ;
+      VLMX_EIA("X and Y must have the same class.") ;
     }
     if (numDimensions != mxGetM(in[IN_Y])) {
-      mexErrMsgTxt ("X and Y must have the same number of rows") ;
+      VLMX_EIA("X and Y must have the same number of rows.") ;
     }
   }
 
   if (classId != mxSINGLE_CLASS && classId != mxDOUBLE_CLASS) {
-    mexErrMsgTxt ("X must be either of class SINGLE or DOUBLE");
+    VLMX_EIA("X must be either of class SINGLE or DOUBLE.");
   }
 
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
