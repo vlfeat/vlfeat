@@ -12,7 +12,7 @@
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 # - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
-ARCH = win32
+ARCH = w32
 
 VCROOT     = C:\Program Files\Microsoft Visual Studio 9.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
@@ -29,10 +29,10 @@ MATLABLIB  = $(MATLABROOT)\extern\lib\win32\microsoft
 MEX_SFX    = mexw32
 
 LFLAGS     = /MACHINE:X86 \
-	     /LIBPATH:"$(VCROOT)\lib" \
-	     /LIBPATH:"$(WINSDKROOT)\lib"
+             /LIBPATH:"$(VCROOT)\lib"
+             /LIBPATH:"$(WINSDKROOT)\lib"
 
-!if "$(ARCH)" == "win64"
+!if "$(ARCH)" == "w64"
 !message === COMPILING FOR 64-BIT ===
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
@@ -214,8 +214,8 @@ mexsrc =                          \
 
 
 # horrible Make program, horrible code:
-libobj = $(libsrc:vl\=bin\win32\objs\)
-cmdexe = $(cmdsrc:src\=bin\win32\)
+libobj = $(libsrc:vl\=bin\w32\objs\)
+cmdexe = $(cmdsrc:src\=bin\w32\)
 mexdll = $(mexsrc:.c=.mexw32)
 mexdll = $(mexdll:toolbox\sift=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\mser=toolbox\mexw32)
@@ -228,9 +228,9 @@ mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw32)
 mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
-!if "$(ARCH)" == "win64"
-libobj = $(libsrc:vl\=bin\win64\objs\)
-cmdexe = $(cmdsrc:src\=bin\win64\)
+!if "$(ARCH)" == "w64"
+libobj = $(libsrc:vl\=bin\w64\objs\)
+cmdexe = $(cmdsrc:src\=bin\w64\)
 mexdll = $(mexsrc:.c=.mexw64)
 mexdll = $(mexdll:toolbox\sift=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\mser=toolbox\mexw64)
