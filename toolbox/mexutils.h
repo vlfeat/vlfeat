@@ -77,7 +77,7 @@ typedef vl_int32 mwIndex ;
  - <b>Scalar array</b> is a non-sparse array with exactly one element.
    Note that the array may have an arbitrary number of dimensions, and
    be of any numeric or other type. All dimensions are singleton
-   (which is implied by having exactly one element). Use ::mxuIsScalar
+   (which is implied by having exactly one element). Use ::vlmxIsScalar
    to test if an array is scalar.
 
  - <b>Vector array</b> is a non-sparse array which is either empty
@@ -85,7 +85,7 @@ typedef vl_int32 mwIndex ;
    array can be of any numeric or other type. The elements of such a
    MATLAB array are stored as a plain C array with a number of
    elements equal to the number of elements in the array (obtained
-   with @c mxGetNumberOfElements). Use ::mxuIsVector to test if an
+   with @c mxGetNumberOfElements). Use ::vlmxIsVector to test if an
    array is a vector.
 
  - <b>Matrix array</b> is a non-sparse array for which all dimensions
@@ -95,19 +95,19 @@ typedef vl_int32 mwIndex ;
    non-singleton dimensions can be zero (empty matrix), one, or
    more. The element of such a MATLAB array are stored as a C array in
    column major order and its dimensions can be obtained by @c mxGetM
-   and @c mxGetN.  Use ::mxuIsMatrix to test if an array is a mtarix.
+   and @c mxGetN.  Use ::vlmxIsMatrix to test if an array is a mtarix.
 
  - <b>Real array</b> is a numeric array (as for @c mxIsNumeric)
-   without a complex component. Use ::mxuIsReal to check if an array
+   without a complex component. Use ::vlmxIsReal to check if an array
    is real.
 
- - Use ::mxuIsOfClass to check if an array is of a prescribed
+ - Use ::vlmxIsOfClass to check if an array is of a prescribed
    (storage) class, such as @c mxDOUBLE_CLASS.
 
  - <b>Plain scalar, vector, and matrix</b> are a scalar, vector, and
    matrix arrays which are <em>real</em> and of class @c
-   mxDOUBLE_CLASS.  Use ::mxuIsPlainScalar, ::mxuIsPlainVector and
-   ::mxuIsPlainMatrix to check this.
+   mxDOUBLE_CLASS.  Use ::vlmxIsPlainScalar, ::vlmxIsPlainVector and
+   ::vlmxIsPlainMatrix to check this.
 
  @section mexutils-options Parsing options
 
@@ -115,7 +115,8 @@ typedef vl_int32 mwIndex ;
  type-value pairs. Here type is a string identifying the option and
  value is a MATLAB array specifing its value. The function
  ::uNextOption can be used to simplify parsing a list of such
- arguments (similar to UNIX @c getopt).
+ arguments (similar to UNIX @c getopt). The functions ::mxuError
+ and ::mxuWarning are shortcuts to specify VLFeat formatted errors.
 
  **/
 
@@ -131,7 +132,7 @@ typedef vl_int32 mwIndex ;
  **/
 
 VL_INLINE vl_bool
-mxuIsOfClass (mxArray const * array, mxClassID classId)
+vlmxIsOfClass (mxArray const * array, mxClassID classId)
 {
   return mxGetClassID (array) == classId ;
 }
@@ -144,7 +145,7 @@ mxuIsOfClass (mxArray const * array, mxClassID classId)
  **/
 
 VL_INLINE vl_bool
-mxuIsReal (mxArray const * array)
+vlmxIsReal (mxArray const * array)
 {
   return mxIsNumeric (array) && ! mxIsComplex (array) ;
 }
@@ -162,7 +163,7 @@ mxuIsReal (mxArray const * array)
  **/
 
 VL_INLINE vl_bool
-mxuIsScalar (mxArray const * array)
+vlmxIsScalar (mxArray const * array)
 {
   return (! mxIsSparse (array)) && (mxGetNumberOfElements (array) == 1)  ;
 }
@@ -176,7 +177,7 @@ mxuIsScalar (mxArray const * array)
  **/
 
 VL_INLINE vl_bool
-mxuIsVector (mxArray const * array, vl_index numElements)
+vlmxIsVector (mxArray const * array, vl_index numElements)
 {
   mwSize numDimensions = mxGetNumberOfDimensions (array) ;
   mwSize const * dimensions = mxGetDimensions (array) ;
@@ -220,7 +221,7 @@ mxuIsVector (mxArray const * array, vl_index numElements)
  **/
 
 VL_INLINE vl_bool
-mxuIsMatrix (mxArray const * array, vl_index M, vl_index N)
+vlmxIsMatrix (mxArray const * array, vl_index M, vl_index N)
 {
   mwSize numDimensions = mxGetNumberOfDimensions (array) ;
   mwSize const * dimensions = mxGetDimensions (array) ;
@@ -262,12 +263,12 @@ mxuIsMatrix (mxArray const * array, vl_index M, vl_index N)
  **/
 
 VL_INLINE vl_bool
-mxuIsPlainScalar (mxArray const * array)
+vlmxIsPlainScalar (mxArray const * array)
 {
   return
-  mxuIsReal (array) &&
-  mxuIsOfClass(array, mxDOUBLE_CLASS)  &&
-  mxuIsScalar (array) ;
+  vlmxIsReal (array) &&
+  vlmxIsOfClass(array, mxDOUBLE_CLASS)  &&
+  vlmxIsScalar (array) ;
 }
 
 /** ------------------------------------------------------------------
@@ -279,13 +280,13 @@ mxuIsPlainScalar (mxArray const * array)
  **/
 
 VL_INLINE vl_bool
-mxuIsPlainVector
+vlmxIsPlainVector
 (mxArray const * array, vl_index numElements)
 {
   return
-  mxuIsReal (array) &&
-  mxuIsOfClass (array, mxDOUBLE_CLASS) &&
-  mxuIsVector (array, numElements) ;
+  vlmxIsReal (array) &&
+  vlmxIsOfClass (array, mxDOUBLE_CLASS) &&
+  vlmxIsVector (array, numElements) ;
 }
 
 
@@ -299,12 +300,12 @@ mxuIsPlainVector
  **/
 
 VL_INLINE vl_bool
-mxuIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
+vlmxIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
 {
   return
-  mxuIsReal (array) &&
-  mxuIsOfClass (array, mxDOUBLE_CLASS) &&
-  mxuIsMatrix (array, M, N) ;
+  vlmxIsReal (array) &&
+  vlmxIsOfClass (array, mxDOUBLE_CLASS) &&
+  vlmxIsMatrix (array, M, N) ;
 }
 
 /** @} */
@@ -684,6 +685,52 @@ uIsString(const mxArray* A, int L)
     (M == 1 || (M == 0 && N == 0)) &&
     (L < 0 || N == L) ;
 }
+
+/** ------------------------------------------------------------------
+ ** @brief Generate MEX error with VLFeat format
+ **
+ ** @param errorId      error ID string.
+ ** @param errorMessage error message C-style format string.
+ ** @param ...          format string arguments.
+ **
+ ** The function invokes @c mxErrMsgTxtAndId.
+ **/
+
+void
+mxuError(char const * errorId, char const * errorMessage, ...)
+{
+  char formattedErrorId [512] ;
+  char formattedErrorMessage [1024] ;
+  va_list args;
+  va_start(args, errorMessage) ;
+
+  if (! errorId) {
+    errorId = "undefinedError" ;
+  }
+
+  if (! errorMessage) {
+    errorMessage = "Undefined error description" ;
+  }
+
+#ifdef VL_COMPILER_LCC
+  sprintf(formattedErrorId,
+          "VLFeat:%s", errorId) ;
+  vsprintf(formattedErrorMessage,
+           errorMessage, args) ;
+#else
+  snprintf(formattedErrorId,
+           sizeof(formattedErrorId)/sizeof(char),
+           "VLFeat:%s", errorId) ;
+  vsnprintf(formattedErrorMessage,
+            sizeof(formattedErrorMessage)/sizeof(char),
+            errorMessage, args) ;
+#endif
+  va_end(args) ;
+  mexErrMsgIdAndTxt(formattedErrorId, formattedErrorMessage) ;
+}
+
+/** @brief Generate invalid argument error */
+#define VLMX_EIA(...) mxuError("invalidArgument", __VA_ARGS__)
 
 /** ------------------------------------------------------------------
  ** @brief Formatted @c mexErrMsgTxt()
