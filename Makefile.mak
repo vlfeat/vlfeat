@@ -29,7 +29,7 @@ MATLABLIB  = $(MATLABROOT)\extern\lib\win32\microsoft
 MEX_SFX    = mexw32
 
 LFLAGS     = /MACHINE:X86 \
-             /LIBPATH:"$(VCROOT)\lib"
+             /LIBPATH:"$(VCROOT)\lib" \
              /LIBPATH:"$(WINSDKROOT)\lib"
 
 !if "$(ARCH)" == "w64"
@@ -81,7 +81,7 @@ LFLAGS     = /MACHINE:X64 \
 #   /TC                : Source code is C (not C++)
 #   /W3                : Usa all warnings
 #   /Zp8               : Align structures to 8 bytes
-#   /O2                : Optimize for speed
+#   /Ox                : Turn on optimizations
 #
 # LFLAGS
 #   /NOLOGO            : LINK does not display splash
@@ -120,17 +120,17 @@ CFLAGS     = /nologo /TC /MD \
              /D"__LITTLE_ENDIAN__" \
              /D"VL_SUPPORT_SSE2" \
              /I. \
-             /W1 /Z7 /Zp8 /O2
+             /W1 /Z7 /Zp8 /Ox
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 
 LFLAGS     = $(LFLAGS) /NOLOGO \
-	     /INCREMENTAL:NO \
-	     /MANIFEST \
+             /INCREMENTAL:NO \
+             /MANIFEST \
              /DEBUG
 
 EXE_LFLAGS = $(LFLAGS) \
-	     /LIBPATH:"$(bindir)" vl.lib
+             /LIBPATH:"$(bindir)" vl.lib
 
 MEX_RC     = "$(MATLABROOT)\extern\include\mexversion.rc"
 
