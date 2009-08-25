@@ -37,7 +37,7 @@ VL_XCAT(_vl_vhsum_sse2_, SFX)(VTYPE x)
     VTYPE shuffle ;
     /* acc     = [1   0  ] */
     /* shuffle = [0   1  ] */
-    /* sum     = [1+0 0+1] */   
+    /* sum     = [1+0 0+1] */
     shuffle = VSHU (x, x, _MM_SHUFFLE2(0, 1)) ;
     x       = VADD (x, shuffle) ;
   }
@@ -55,14 +55,14 @@ VL_XCAT(_vl_distance_l2_sse2_, SFX)
   T acc ;
   VTYPE vacc = VSTZ() ;
   vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
-  
+
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
       VTYPE b = *(VTYPE*)Y ;
       VTYPE delta = VSUB(a, b) ;
-      VTYPE delta2 = VMUL(delta, delta) ;      
-      vacc = VADD(vacc, delta2) ;      
+      VTYPE delta2 = VMUL(delta, delta) ;
+      vacc = VADD(vacc, delta2) ;
       X += VSIZE ;
       Y += VSIZE ;
     }
@@ -71,22 +71,22 @@ VL_XCAT(_vl_distance_l2_sse2_, SFX)
       VTYPE a = VLDU(X) ;
       VTYPE b = VLDU(Y) ;
       VTYPE delta = VSUB(a, b) ;
-      VTYPE delta2 = VMUL(delta, delta) ;      
-      vacc = VADD(vacc, delta2) ;      
+      VTYPE delta2 = VMUL(delta, delta) ;
+      vacc = VADD(vacc, delta2) ;
       X += VSIZE ;
       Y += VSIZE ;
     }
   }
- 
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
     T delta = a - b ;
     acc += delta * delta ;
   }
-  
+
   return acc ;
 }
 
@@ -100,12 +100,12 @@ VL_XCAT(_vl_distance_l1_sse2_, SFX)
   VTYPE vacc = VSTZ() ;
   VTYPE vminus = VL_XCAT(_mm_set1_p, VSFX) ((T) -0.0) ; /* sign bit */
   vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
-  
+
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
       VTYPE b = *(VTYPE*)Y ;
-      VTYPE delta = VSUB(a, b) ;    
+      VTYPE delta = VSUB(a, b) ;
       vacc = VADD(vacc, VANDN(vminus, delta)) ;
       X += VSIZE ;
       Y += VSIZE ;
@@ -114,22 +114,22 @@ VL_XCAT(_vl_distance_l1_sse2_, SFX)
     while (X < X_vec_end) {
       VTYPE a = VLDU(X) ;
       VTYPE b = VLDU(Y) ;
-      VTYPE delta = VSUB(a, b) ;    
+      VTYPE delta = VSUB(a, b) ;
       vacc = VADD(vacc, VANDN(vminus, delta)) ;
       X += VSIZE ;
       Y += VSIZE ;
     }
   }
-  
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
     T delta = a - b ;
     acc += VL_MAX(delta, - delta) ;
   }
-  
+
   return acc ;
 }
 
@@ -146,7 +146,7 @@ VL_XCAT(_vl_distance_chi2_sse2_, SFX)
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
-      VTYPE b = *(VTYPE*)Y ;      
+      VTYPE b = *(VTYPE*)Y ;
       VTYPE delta = VSUB(a, b) ;
       VTYPE denom = VADD(a, b) ;
       VTYPE numer = VMUL(delta, delta) ;
@@ -167,12 +167,12 @@ VL_XCAT(_vl_distance_chi2_sse2_, SFX)
       ratio = VAND(ratio, VNEQ(denom, VSTZ())) ;
       vacc = VADD(vacc, ratio) ;
       X += VSIZE ;
-      Y += VSIZE ;      
+      Y += VSIZE ;
     }
   }
-  
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
@@ -183,7 +183,7 @@ VL_XCAT(_vl_distance_chi2_sse2_, SFX)
       T ratio = numer / denom ;
       acc += ratio ;
     }
-  }  
+  }
   return acc ;
 }
 
@@ -197,12 +197,12 @@ VL_XCAT(_vl_kernel_l2_sse2_, SFX)
   T acc ;
   VTYPE vacc = VSTZ() ;
   vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
-  
+
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
       VTYPE b = *(VTYPE*)Y ;
-      vacc = VADD(vacc, VMUL(a,b)) ;      
+      vacc = VADD(vacc, VMUL(a,b)) ;
       X += VSIZE ;
       Y += VSIZE ;
     }
@@ -210,20 +210,20 @@ VL_XCAT(_vl_kernel_l2_sse2_, SFX)
     while (X < X_vec_end) {
       VTYPE a = VLDU(X) ;
       VTYPE b = VLDU(Y) ;
-      vacc = VADD(vacc, VMUL(a,b)) ;      
+      vacc = VADD(vacc, VMUL(a,b)) ;
       X += VSIZE ;
       Y += VSIZE ;
     }
   }
-  
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
     acc += a * b ;
   }
-  
+
   return acc ;
 }
 
@@ -237,7 +237,7 @@ VL_XCAT(_vl_kernel_l1_sse2_, SFX)
   VTYPE vacc = VSTZ() ;
   VTYPE vminus = VL_XCAT(_mm_set1_p, VSFX) ((T) -0.0) ;
   vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
-  
+
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
@@ -260,22 +260,22 @@ VL_XCAT(_vl_kernel_l1_sse2_, SFX)
       VTYPE sum = VADD(a_,b_) ;
       VTYPE diff = VSUB(a, b) ;
       VTYPE diff_ = VANDN(vminus, diff) ;
-      vacc = VADD(vacc, VSUB(sum, diff_)) ;     
+      vacc = VADD(vacc, VSUB(sum, diff_)) ;
       X += VSIZE ;
-      Y += VSIZE ;      
+      Y += VSIZE ;
     }
   }
-  
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
     T a_ = VL_XCAT(vl_abs_, SFX) (a) ;
     T b_ = VL_XCAT(vl_abs_, SFX) (b) ;
-    acc += a_ + b_ - VL_XCAT(vl_abs_, SFX) (a - b) ;  
+    acc += a_ + b_ - VL_XCAT(vl_abs_, SFX) (a - b) ;
   }
-    
+
   return acc / ((T)2) ;
 }
 
@@ -288,12 +288,12 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
   T acc ;
   VTYPE vacc = VSTZ() ;
   vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
-  
+
   if (dataAligned) {
     while (X < X_vec_end) {
       VTYPE a = *(VTYPE*)X ;
-      VTYPE b = *(VTYPE*)Y ;      
-      VTYPE denom = VADD(a, b) ;      
+      VTYPE b = *(VTYPE*)Y ;
+      VTYPE denom = VADD(a, b) ;
       VTYPE numer = VMUL(a,b) ;
       VTYPE ratio = VDIV(numer, denom) ;
       ratio = VAND(ratio, VNEQ(denom, VSTZ())) ;
@@ -311,12 +311,12 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
       ratio = VAND(ratio, VNEQ(denom, VSTZ())) ;
       vacc = VADD(vacc, ratio) ;
       X += VSIZE ;
-      Y += VSIZE ;    
+      Y += VSIZE ;
     }
   }
-  
+
   acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
-  
+
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
@@ -325,6 +325,6 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
       T ratio = a * b / denom ;
       acc += ratio ;
     }
-  }  
+  }
   return ((T)2) * acc ;
 }

@@ -22,7 +22,7 @@ General Public License version 2.
 /** @brief Pi (math constant) */
 #define VL_PI 3.141592653589793
 
-/** @brief IEEE single precision epsilon (math constant) 
+/** @brief IEEE single precision epsilon (math constant)
  **
  ** <code>1.0F + VL_EPSILON_F</code> is the smallest representable
  ** single precision number greater than @c 1.0F. Numerically,
@@ -31,7 +31,7 @@ General Public License version 2.
  **/
 #define VL_EPSILON_F 1.19209290E-07F
 
-/** @brief IEEE double precision epsilon (math constant) 
+/** @brief IEEE double precision epsilon (math constant)
  **
  ** <code>1.0 + VL_EPSILON_D</code> is the smallest representable
  ** double precision number greater than @c 1.0. Numerically,
@@ -39,7 +39,7 @@ General Public License version 2.
  **/
 #define VL_EPSILON_D 2.220446049250313e-16
 
-/* 
+/*
    For the code below: An ANSI C compiler takes the two expressions,
    LONG_VAR and CHAR_VAR, and implicitly casts them to the type of the
    first member of the union. Refer to K&R Second Edition Page 148,
@@ -47,18 +47,18 @@ General Public License version 2.
 */
 
 /** @brief IEEE single precision quiet NaN constant */
-static union { vl_uint32 raw ; float value ; } 
-  const vl_nan_f = 
+static union { vl_uint32 raw ; float value ; }
+  const vl_nan_f =
     { 0x7FC00000UL } ;
 
 /** @brief IEEE single precision infinity constant */
-static union { vl_uint32 raw ; float value ; } 
-  const vl_infinity_f = 
+static union { vl_uint32 raw ; float value ; }
+  const vl_infinity_f =
     { 0x7F800000UL } ;
 
 /** @brief IEEE double precision quiet NaN constant */
-static union { vl_uint64 raw ; double value ; } 
-  const vl_nan_d = 
+static union { vl_uint64 raw ; double value ; }
+  const vl_nan_d =
 #ifdef VL_COMPILER_MSC
     { 0x7FF8000000000000ui64 } ;
 #else
@@ -66,8 +66,8 @@ static union { vl_uint64 raw ; double value ; }
 #endif
 
 /** @brief IEEE double precision infinity constant */
-static union { vl_uint64 raw ; double value ; } 
-  const vl_infinity_d = 
+static union { vl_uint64 raw ; double value ; }
+  const vl_infinity_d =
 #ifdef VL_COMPILER_MSC
     { 0x7FF0000000000000ui64 } ;
 #else
@@ -89,7 +89,7 @@ static union { vl_uint64 raw ; double value ; }
 /** ------------------------------------------------------------------
  ** @{
  ** @brief Fast <code>mod(x, 2 * VL_PI)</code>
- ** 
+ **
  ** @param x input value.
  **
  ** The function is optimized for small absolute values of @a x.
@@ -98,7 +98,7 @@ static union { vl_uint64 raw ; double value ; }
  ** finite numerical precision and rounding errors, the result can be
  ** equal to 2 * VL_PI (for instance, if @c x is a very small negative
  ** number).
- ** 
+ **
  ** @return <code>mod(x, 2 * VL_PI)</code>
  **/
 VL_INLINE
@@ -177,7 +177,7 @@ vl_abs_d (double x)
  ** @brief Fast @c atan2 approximation
  ** @param y argument.
  ** @param x argument.
- ** 
+ **
  ** The function computes a relatively rough but fast approximation of
  ** @c atan2(y,x).
  **
@@ -187,7 +187,7 @@ vl_abs_d (double x)
  ** @f$, @f$ r \in [-1,1] @f$ with a third order polynomial @f$
  ** f(r)=c_0 + c_1 r + c_2 r^2 + c_3 r^3 @f$.  To fit the polynomial
  ** we impose the constraints
- ** 
+ **
  ** @f{eqnarray*}
  ** f(+1) &=& c_0 + c_1 + c_2 + c_3  = atan(0)       = 0,\\
  ** f(-1) &=& c_0 - c_1 + c_2 - c_3  = atan(\infty)  = \pi/2,\\
@@ -217,15 +217,15 @@ vl_fast_atan2_f (float y, float x)
   float const c3 = 0.1821F ;
   float const c1 = 0.9675F ;
   float abs_y    = vl_abs_f (y) + VL_EPSILON_F ;
-  
+
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
     angle = (float) (VL_PI / 4) ;
   } else {
     r = (x + abs_y) / (abs_y - x) ;
     angle = (float) (3 * VL_PI / 4) ;
-  } 
-  angle += (c3*r*r - c1) * r ; 
+  }
+  angle += (c3*r*r - c1) * r ;
   return (y < 0) ? - angle : angle ;
 }
 
@@ -237,15 +237,15 @@ vl_fast_atan2_d (double y, double x)
   double const c3 = 0.1821 ;
   double const c1 = 0.9675 ;
   double abs_y    = vl_abs_d (y) + VL_EPSILON_D ;
-  
+
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
     angle = VL_PI / 4 ;
   } else {
     r = (x + abs_y) / (abs_y - x) ;
     angle = 3 * VL_PI / 4 ;
-  } 
-  angle += (c3*r*r - c1) * r ; 
+  }
+  angle += (c3*r*r - c1) * r ;
   return (y < 0) ? - angle : angle ;
 }
 /** @} */
@@ -266,7 +266,7 @@ vl_fast_atan2_d (double y, double x)
  **
  ** @f[
  **   y \leftarrow
- **   y - \frac{f(y)}{\dot f(y)} = 
+ **   y - \frac{f(y)}{\dot f(y)} =
  **   y + \frac{1}{2} (y-xy^3) =
  **   \frac{y}{2} \left( 3 - xy^2 \right)
  ** @f]
@@ -290,18 +290,18 @@ vl_fast_resqrt_f (float x)
     float x ;
     vl_int32  i ;
   } u ;
-  
+
   float xhalf = (float) 0.5 * x ;
 
   /* convert floating point value in RAW integer */
-  u.x = x ;                   
-  
+  u.x = x ;
+
   /* gives initial guess y0 */
-  u.i = 0x5f3759df - (u.i >> 1);  
+  u.i = 0x5f3759df - (u.i >> 1);
   /*u.i = 0xdf59375f - (u.i>>1);*/
-  
+
   /* two Newton steps */
-  u.x = u.x * ( (float) 1.5  - xhalf*u.x*u.x) ; 
+  u.x = u.x * ( (float) 1.5  - xhalf*u.x*u.x) ;
   u.x = u.x * ( (float) 1.5  - xhalf*u.x*u.x) ;
   return u.x ;
 }
@@ -315,21 +315,21 @@ vl_fast_resqrt_d (double x)
     double x ;
     vl_int64  i ;
   } u ;
-  
+
   double xhalf = (double) 0.5 * x ;
-  
+
   /* convert floating point value in RAW integer */
-  u.x = x ;                   
-  
+  u.x = x ;
+
   /* gives initial guess y0 */
 #ifdef VL_COMPILER_MSC
-  u.i = 0x5fe6ec85e7de30dai64 - (u.i >> 1) ; 
+  u.i = 0x5fe6ec85e7de30dai64 - (u.i >> 1) ;
 #else
   u.i = 0x5fe6ec85e7de30daLL - (u.i >> 1) ;
 #endif
 
   /* two Newton steps */
-  u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ; 
+  u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ;
   u.x = u.x * ( (double) 1.5  - xhalf*u.x*u.x) ;
   return u.x ;
 }
@@ -342,7 +342,7 @@ vl_fast_resqrt_d (double x)
  ** @param x argument.
  ** @return Approximation of @c sqrt(x).
  **
- ** The function computes a fast approximation of @c sqrt(x). 
+ ** The function computes a fast approximation of @c sqrt(x).
  **
  ** @par Floating-point algorithm
  **
@@ -351,7 +351,7 @@ vl_fast_resqrt_d (double x)
  ** vl_fast_resqrt_f(x)</code>.
  **
  ** @par Integer algorithm
- ** 
+ **
  ** We seek for the largest integer @e y such that @f$ y^2 \leq x @f$.
  ** Write @f$ y = w + b_k 2^k + z @f$ where the binary expansion of the
  ** various variable is
@@ -361,7 +361,7 @@ vl_fast_resqrt_d (double x)
  **  w = \sum_{i=k+1}^{m-1} 2^i b_i, \qquad
  **  z = \sum_{i=0}^{k-1} 2^i b_i.
  ** @f]
- ** 
+ **
  ** Assume @e w known. Expanding the square and using the fact that
  ** @f$ b_k^2=b_k @f$, we obtain the following constraint for @f$ b_k
  ** @f$ and @e z:
@@ -463,15 +463,15 @@ vl_get_vector_comparison_function_d (VlVectorComparisonType type) ;
 
 VL_EXPORT void
 vl_eval_vector_comparison_on_all_pairs_f (float * result, vl_size dimension,
-                                          float const * X, vl_size numDataX, 
+                                          float const * X, vl_size numDataX,
                                           float const * Y, vl_size numDataY,
                                           VlFloatVectorComparisonFunction function) ;
 
 VL_EXPORT void
 vl_eval_vector_comparison_on_all_pairs_d (double * result, vl_size dimension,
-                                          double const * X, vl_size numDataX, 
+                                          double const * X, vl_size numDataX,
                                           double const * Y, vl_size numDataY,
                                           VlDoubleVectorComparisonFunction) ;
 
 /* VL_MATHOP_H */
-#endif 
+#endif

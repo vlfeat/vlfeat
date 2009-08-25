@@ -48,7 +48,7 @@ General Public License version 2.
  ** from matrices @a X and @a Y, filling a @a numDataX by @a numDataY
  ** matrix.
  **
- ** If @a Y is a null pointer the function compares all columns from 
+ ** If @a Y is a null pointer the function compares all columns from
  ** @a X with themselves.
  **/
 

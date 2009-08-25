@@ -25,13 +25,13 @@ main(int argc, char**argv)
     X[i] = vl_rand_real1() - .5 ;
     Y[i] = 0 ;
   }
-  
+
   {
     float * Xi = X ;
     float * Yi = Y ;
     vl_tic() ;
     while (Xi < X_end) {
-      *Yi++ = fabsf (*Xi++) ;    
+      *Yi++ = fabsf (*Xi++) ;
     }
     VL_PRINTF("fabsf: %.3f\n", vl_toc()) ;
   }
@@ -40,19 +40,19 @@ main(int argc, char**argv)
     X[i] = vl_rand_real1() - .5 ;
     X[i] = 0 ;
   }
-  
+
   {
     float * Xi = X ;
     float * Yi = Y ;
     vl_tic() ;
     while (Xi < X_end) {
-      *Yi++ = vl_abs_f (*Xi++) ;    
+      *Yi++ = vl_abs_f (*Xi++) ;
     }
     VL_PRINTF("vl_abs_f: %.3f\n", vl_toc()) ;
   }
-  
+
   vl_free (Y) ;
   vl_free (X) ;
-  
+
   return 0 ;
 }

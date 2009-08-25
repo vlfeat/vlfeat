@@ -21,8 +21,8 @@ MATLABROOT = C:\Program Files\MATLAB\R2008b
 CC         = "$(VCROOT)\bin\cl.exe"
 LINK       = "$(VCROOT)\bin\link.exe"
 MSVCRLOC   = $(VCROOT)\redist\x86\Microsoft.VC90.CRT
-MSVCR      = msvcr90.dll 
-MSVCP      = msvcp90.dll 
+MSVCR      = msvcr90.dll
+MSVCP      = msvcp90.dll
 MSVCM      = msvcm90.dll
 MSMANIFEST = Microsoft.VC90.CRT.manifest
 MATLABLIB  = $(MATLABROOT)\extern\lib\win32\microsoft
@@ -42,8 +42,8 @@ MATLABROOT = C:\Program Files\MATLAB\R2008b
 CC         = "$(VCROOT)\bin\amd64\cl.exe"
 LINK       = "$(VCROOT)\bin\amd64\link.exe"
 MSVCRLOC   = $(VCROOT)\redist\amd64\Microsoft.VC90.CRT
-MSVCR      = msvcr90.dll 
-MSVCP      = msvcp90.dll 
+MSVCR      = msvcr90.dll
+MSVCP      = msvcp90.dll
 MSVCM      = msvcm90.dll
 MSMANIFEST = Microsoft.VC90.CRT.manifest
 MATLABLIB  = $(MATLABROOT)\extern\lib\win64\microsoft
@@ -56,8 +56,8 @@ LFLAGS     = /MACHINE:X64 \
 
 # Here is an example of how the variables might look with a different version
 # of Visual Studio and an alternate location for Matlab
-#MSVCR      = msvcr80.dll 
-#MSVCP      = msvcp80.dll 
+#MSVCR      = msvcr80.dll
+#MSVCP      = msvcp80.dll
 #MSVCM      = msvcm80.dll
 #MSMANIFEST = Microsoft.VC80.CRT.manifest
 #MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
@@ -102,7 +102,7 @@ LFLAGS     = /MACHINE:X64 \
 #
 # ======================= ABOUT THE DLL HELL =========================
 #
-# This makefile compiles VLFeat to make use of the side-by-side 
+# This makefile compiles VLFeat to make use of the side-by-side
 # deployment model. In other words, the C runtime library is
 # re-distributed with the application and the appropriate manifest
 # file is embedded in the binaries.
@@ -130,7 +130,7 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
              /DEBUG
 
 EXE_LFLAGS = $(LFLAGS) \
-	     /LIBPATH:"$(bindir)" vl.lib 
+	     /LIBPATH:"$(bindir)" vl.lib
 
 MEX_RC     = "$(MATLABROOT)\extern\include\mexversion.rc"
 
@@ -165,7 +165,7 @@ libsrc =                \
  vl\sift.c              \
  vl\quickshift.c        \
  vl\stringop.c
- 
+
 cmdsrc =                \
  src\aib.c              \
  src\mser.c             \
@@ -216,7 +216,7 @@ mexsrc =                          \
 # horrible Make program, horrible code:
 libobj = $(libsrc:vl\=bin\win32\objs\)
 cmdexe = $(cmdsrc:src\=bin\win32\)
-mexdll = $(mexsrc:.c=.mexw32) 
+mexdll = $(mexsrc:.c=.mexw32)
 mexdll = $(mexdll:toolbox\sift=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\mser=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\imop=toolbox\mexw32)
@@ -231,7 +231,7 @@ mexpdb = $(mexdll:.dll=.pdb)
 !if "$(ARCH)" == "win64"
 libobj = $(libsrc:vl\=bin\win64\objs\)
 cmdexe = $(cmdsrc:src\=bin\win64\)
-mexdll = $(mexsrc:.c=.mexw64) 
+mexdll = $(mexsrc:.c=.mexw64)
 mexdll = $(mexdll:toolbox\sift=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\mser=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\imop=toolbox\mexw64)
@@ -327,7 +327,7 @@ $(mexdir) :
 $(objdir)\mathop_sse2.obj : vl\mathop_sse2.c
 	@echo .... CC [+SSE2] $(@)
 	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
-	
+
 $(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
 	@echo .... CC [+SSE2] $(@)
 	@$(CC) $(CFLAGS) $(DLL_CFLAGS) /arch:SSE2 /D"__SSE2__" /c /Fo"$(@)" "vl\$(@B).c"
