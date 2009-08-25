@@ -291,6 +291,7 @@ MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
 C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += -march=i686
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/
 MEX_FLAGS       += -lm
