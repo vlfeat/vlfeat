@@ -397,7 +397,10 @@ vl_sift_set_magnif (VlSiftFilt *f, double m)
 /** ------------------------------------------------------------------
  ** @brief Set the Gaussian window size
  ** @param f SIFT filter.
- ** @param x Gaussian window size (in spatial bin units).
+ ** @param x Gaussian window size (in units of spatial bin).
+ **
+ ** This is the parameter @f$ \hat \sigma_{\text{win}} @f$ of
+ ** the standard SIFT descriptor @ref sift-tech-descriptor-std.
  **/
 
 VL_INLINE void

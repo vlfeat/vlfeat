@@ -11,7 +11,7 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-/** 
+/**
 
 @file   sift.h
 @brief  Scale Invariant Feature Transform (SIFT)
@@ -26,11 +26,11 @@ P. Ivanov, and Q. S. Luo.
 @section sift Scale Invariant Feature Transform
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-This library module implements a 
-@ref sift-filter-usage "SIFT filter object", 
+This library module implements a
+@ref sift-filter-usage "SIFT filter object",
 a reusable object to extract SIFT features from one or
 multiple images of the same size.
-    
+
 - @ref sift-intro
   - @ref sift-intro-detector
   - @ref sift-intro-descriptor
@@ -63,7 +63,7 @@ descriptors of custom keypoints).
 @subsection sift-intro-detector SIFT detector
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@sa 
+@sa
 @ref sift-tech-ss "Scale space technical details",
 @ref sift-tech-detector "Detector technical details"
 
@@ -264,7 +264,7 @@ SIFT algorithm (for instance, to compute the SIFT descriptors of
 custom keypoints).
 
 To use a <b>SIFT filter</b> object:
- 
+
 - Initialize a SIFT filter object with ::vl_sift_new(). The filter can
   be reused for multiple images of the same size (e.g. for an entire
   video sequence).
@@ -326,12 +326,12 @@ I_\sigma = g_{\sqrt{\sigma^2 - \sigma_n^2}} * I_{\sigma_n},
 Scales are sampled at logarithmic steps given by
 
 @f[
-\sigma = \sigma_0 2^{o+s/S}, 
-\quad s = 0,\dots,S-1, 
+\sigma = \sigma_0 2^{o+s/S},
+\quad s = 0,\dots,S-1,
 \quad o = o_{\min}, \dots, o_{\min}+O-1,
 @f]
 
-being @f$ \sigma_0 = 1.6 @f$ is the <em>base scale</em>, @f$ o_{\min}
+where @f$ \sigma_0 = 1.6 @f$ is the <em>base scale</em>, @f$ o_{\min}
 @f$ is the <em>first octave index</em>, @em O the <em>number of
 octaves</em> and @em S the <em>number of scales per octave</em>.
 
@@ -393,10 +393,10 @@ Given a peak @f$x,y,\sigma@f$, the algorithm evaluates the @em x,@em y
 Hessian of of the DoG scale space at the scale @f$\sigma@f$.  Then the
 following score (similar to the Harris function) is computed:
 
-@f[ 
+@f[
 \frac{(\mathrm{tr}\,D(x,y,\sigma))^2}{\det D(x,y,\sigma)},
 \quad
-D = 
+D =
 \left[
 \begin{array}{cc}
 \frac{\partial^2 \mathrm{DoG}}{\partial x^2} &
@@ -454,13 +454,13 @@ center.
 
 Denote the gradient vector field computed at the scale @f$ \sigma @f$ by
 @f[
-  J(x,y) = \nalba I_\sigma(x,y) 
-  = 
+  J(x,y) = \nalba I_\sigma(x,y)
+  =
   \left[\begin{array}{cc}
   \frac{\partial I_\sigma}{\partial x} &
   \frac{\partial I_\sigma}{\partial y} &
   \end{array}\right]
-@f] 
+@f]
 
 The descriptor is a 3-D spatial histogram capturing the distribution
 of @f$ J(x,y) @f$. It is convenient to describe its construction in
@@ -485,7 +485,7 @@ weighing contributions by the <em>binning functions</em>
 
 @f{eqnarray*}
   \displaystyle
-  w(z) &=& \mathrm{max}(0, 1 - |z|), 
+  w(z) &=& \mathrm{max}(0, 1 - |z|),
   \\
   \displaystyle
   w_\mathrm{ang}(z) &=& \sum_{k=-\infty}^{+\infty}
@@ -506,13 +506,13 @@ of standard deviation @f$ \sigma_{\mathrm{win}} @f$. The histogram is
 then given by
 
 @f{eqnarray*}
- h(t,i,j) &=& \int 
+ h(t,i,j) &=& \int
  g_{\sigma_\mathrm{win}}(x,y)
  w_\mathrm{ang}(\theta - \theta_t) w(x-x_i) w(y-y_j)
  f(\theta,x,y)
  d\theta\,dx\,dy
 \\
-&=& \int 
+&=& \int
  g_{\sigma_\mathrm{win}}(x,y)
  w_\mathrm{ang}(\angle J(x,y) - \theta_t) w(x-x_i) w(y-y_j)
  |J(x,y)|\,dx\,dy
@@ -535,19 +535,19 @@ directly in the image frame. To do this, denote with a hat quantities
 relative to the canonical frame and without a hat quantities relative
 to the image frame (so for instance @f$ \hat x @f$ is the @e
 x-coordinate in the canonical frame and @f$ x @f$ the x-coordinate in
-the image frame). Assume that canonical and image frame are 
+the image frame). Assume that canonical and image frame are
 related by an affinity:
 
 @f[
-  \mathbf{x} = A \hat\mathbf{x} + T, 
+  \mathbf{x} = A \hat\mathbf{x} + T,
   \qquad
-  \mathbf{x} = 
+  \mathbf{x} =
   \left[\begin{array}{cc}
     x \\
     y
   \end{arraty}\right],
   \quad
-  \hat\mathbf{x} = 
+  \hat\mathbf{x} =
   \left[\begin{array}{cc}
     \hat x \\
     \hat y
@@ -566,11 +566,11 @@ the image at infinite resolution in the two frames are related by
 The canonized image at scale @f$ \hat \sigma @f$ is in relation with the scaled image
 
 @f[
- \hat I_{\hat{\sigma}}(\hat\mathbf{x})  = I_{A\hat{\sigma}}(\mathbf{x}), 
+ \hat I_{\hat{\sigma}}(\hat\mathbf{x})  = I_{A\hat{\sigma}}(\mathbf{x}),
  \qquad \mathbf{x} = A \hat\mathbf{x} + T
 @f]
 
-where by generalizing the previous definitions we have
+where, by generalizing the previous definitions, we have
 
 @f[
  I_{A\hat \sigma}(\mathbf{x}) = (g_{A\hat\sigma} * I_0)(\mathbf{x}),
@@ -588,24 +588,24 @@ where by generalizing the previous definitions we have
 Deriving shows that the gradient fileds are in relation
 
 @f[
-  \hat J(\hat \mathbf{x}) = J(\mathbf{x}) A, 
+  \hat J(\hat \mathbf{x}) = J(\mathbf{x}) A,
  \quad J(\mathbf{x}) = (\nabla I_{A\hat\sigma})(\mathbf{x}),
  \qquad \mathbf{x} = A \hat\mathbf{x} + T.
 @f]
 
-So we can compute the descriptor either in the image or canonical frame as:
+Therefore we can compute the descriptor either in the image or canonical frame as:
 
 @f{eqnarray*}
- h(t,i,j) 
+ h(t,i,j)
  &=&
- \int 
+ \int
  g_{\hat \sigma_\mathrm{win}}(\hat \mathbf{x})\,
  w_\mathrm{ang}(\angle \hat J(\hat\mathbf{x}) - \theta_t)\,
  w_{ij}(\hat\mathbf{x})\,
  |\hat J(\hat \mathbf{x})|\,
  d\hat \mathbf{x}
  \\
- &=& \int 
+ &=& \int
  g_{A \hat \sigma_\mathrm{win}}(\mathbf{x} - T)\,
  w_\mathrm{ang}(\angle J(\mathbf{x})A - \theta_t)\,
  w_{ij}(A^{-1}(\mathbf{x} - T))\,
@@ -640,28 +640,30 @@ and orientation @f$ \theta @f$, the affine transformation @f$ (A,T)
 @f]
 
 where @f$ R(\theta) @f$ is a counter-clockwise rotation of @f$ \theta
-@f$ radians, and @e m is the <b>descriptor magnification factor</b>
-which expresses how much larger the descriptor window is compared to
-the scale of the keypoint (a common value is @e m = 3). Moreover, the
+@f$ radians, @f$ m \mathcal{\sigma} @f$ is the size of a descriptor
+bin in pixels, and @e m is the <b>descriptor magnification factor</b>
+which expresses how much larger a descriptor bin is compared to
+the scale of the keypoint @f$ \sigma @f$
+(the default value is @e m = 3). Moreover, the
 standard SIFT descriptor computes the image gradient at the scale of
 the keypoints, which in the canonical frame is equivalent to a
-smoothing of @f$ \hat \sigma = 1/m @f$. Finally, the Gaussian window
-is set to have standard deviation @f$ \hat \sigma_\mathrm{win} = 2
-@f$. This yields the formula
+smoothing of @f$ \hat \sigma = 1/m @f$. Finally, the default
+Gaussian window size is set to have standard deviation
+ @f$ \hat \sigma_\mathrm{win} = 2 @f$. This yields the formula
 
 @f{eqnarray*}
- h(t,i,j) 
- &=& 
- m \sigma \int 
+ h(t,i,j)
+ &=&
+ m \sigma \int
  g_{\sigma_\mathrm{win}}(\mathbf{x} - T)\,
  w_\mathrm{ang}(\angle J(\mathbf{x}) - \theta  - \theta_t)\,
  w_{ij}\left(\frac{R(\theta)^\top \mathbf{x} - T}{m\sigma}\right)\,
  |J(\mathbf{x})|\,
- d\mathbf{x}, 
+ d\mathbf{x},
 \\
 \sigma_{\mathrm{win}} &=& m\sigma\hat \sigma_{\mathrm{win}},
 \\
- J(\mathbf{x}) 
+ J(\mathbf{x})
  &=& \nabla (g_{m \sigma \hat \sigma} * I)(\mathbf{x})
  = \nabla (g_{\sigma} * I)(\mathbf{x})
  = \nabla I_{\sigma} (\mathbf{x}).
@@ -670,7 +672,7 @@ is set to have standard deviation @f$ \hat \sigma_\mathrm{win} = 2
 
 
 **/
-  
+
 #include "sift.h"
 #include "imop.h"
 #include "mathop.h"
@@ -684,7 +686,7 @@ is set to have standard deviation @f$ \hat \sigma_\mathrm{win} = 2
 /** @internal @brief Use bilinear interpolation to compute orientations */
 #define VL_SIFT_BILINEAR_ORIENTATIONS 1
 
-#define EXPN_SZ  256          /**< ::fast_expn table size @internal */ 
+#define EXPN_SZ  256          /**< ::fast_expn table size @internal */
 #define EXPN_MAX 25.0         /**< ::fast_expn table max  @internal */
 double expn_tab [EXPN_SZ+1] ; /**< ::fast_expn table      @internal */
 
@@ -694,7 +696,7 @@ double expn_tab [EXPN_SZ+1] ; /**< ::fast_expn table      @internal */
 #define log2(x) (log(x)/VL_LOG_OF_2)
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Fast @f$exp(-x)@f$ approximation
  **
  ** @param x argument.
@@ -722,7 +724,7 @@ fast_expn (double x)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Initialize tables for ::fast_expn
  **/
 
@@ -736,7 +738,7 @@ fast_expn_init ()
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Copy image, upsample rows and take transpose
  **
  ** @param dst     output image buffer.
@@ -751,9 +753,9 @@ fast_expn_init ()
  ** Upsampling is performed by linear interpolation.
  **/
 
-static void 
-copy_and_upsample_rows 
-(vl_sift_pix       *dst, 
+static void
+copy_and_upsample_rows
+(vl_sift_pix       *dst,
  vl_sift_pix const *src, int width, int height)
 {
   int x, y ;
@@ -770,11 +772,11 @@ copy_and_upsample_rows
     *dst = b ; dst += height ;
     *dst = b ; dst += height ;
     dst += 1 - width * 2 * height ;
-  }  
+  }
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Copy and downsample an image
  **
  ** @param dst    output imgae buffer.
@@ -782,7 +784,7 @@ copy_and_upsample_rows
  ** @param width  input  image width.
  ** @param height input  image height.
  ** @param d      octaves (non negative).
- ** 
+ **
  ** The function downsamples the image @a d times, reducing it to @c
  ** 1/2^d of its original size. The parameters @a width and @a height
  ** are the size of the input image. The destination image @a dst is
@@ -790,18 +792,18 @@ copy_and_upsample_rows
  ** <code>floor(height/2^d)</code> pixels high.
  **/
 
-static void 
+static void
 copy_and_downsample
-(vl_sift_pix       *dst, 
- vl_sift_pix const *src, 
+(vl_sift_pix       *dst,
+ vl_sift_pix const *src,
  int width, int height, int d)
 {
   int x, y ;
 
   d = 1 << d ; /* d = 2^d */
   for(y = 0 ; y < height ; y+=d) {
-    vl_sift_pix const * srcrowp = src + y * width ;    
-    for(x = 0 ; x < width - (d-1) ; x+=d) {     
+    vl_sift_pix const * srcrowp = src + y * width ;
+    for(x = 0 ; x < width - (d-1) ; x+=d) {
       *dst++ = *srcrowp ;
       srcrowp += d ;
     }
@@ -854,16 +856,16 @@ vl_sift_new (int width, int height,
   f-> o_cur   = o_min ;
 
   f-> temp    = vl_malloc (sizeof(vl_sift_pix) * nel    ) ;
-  f-> octave  = vl_malloc (sizeof(vl_sift_pix) * nel 
+  f-> octave  = vl_malloc (sizeof(vl_sift_pix) * nel
                         * (f->s_max - f->s_min + 1)  ) ;
-  f-> dog     = vl_malloc (sizeof(vl_sift_pix) * nel 
+  f-> dog     = vl_malloc (sizeof(vl_sift_pix) * nel
                         * (f->s_max - f->s_min    )  ) ;
-  f-> grad    = vl_malloc (sizeof(vl_sift_pix) * nel * 2 
+  f-> grad    = vl_malloc (sizeof(vl_sift_pix) * nel * 2
                         * (f->s_max - f->s_min    )  ) ;
 
   f-> sigman  = 0.5 ;
-  f-> sigma0  = 1.6 * pow (2.0, 1.0 / nlevels) ;      
-  f-> sigmak  =       pow (2.0, 1.0 / nlevels) ;
+  f-> sigmak  = pow (2.0, 1.0 / nlevels) ;
+  f-> sigma0  = 1.6 * f->sigmak ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak)) ;
 
   /*
@@ -937,7 +939,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
   int o, s, h, w ;
   double sa, sb ;
   vl_sift_pix *octave ;
-  
+
   /* shortcuts */
   vl_sift_pix *temp   = f-> temp ;
   int width           = f-> width ;
@@ -948,7 +950,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
   double sigma0       = f-> sigma0 ;
   double sigmak       = f-> sigmak ;
   double sigman       = f-> sigman ;
-  double dsigma0      = f-> dsigma0 ; 
+  double dsigma0      = f-> dsigma0 ;
 
   /* restart from the first */
   f->o_cur = o_min ;
@@ -963,15 +965,15 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
   /* ------------------------------------------------------------------
    *                     Compute the first sublevel of the first octave
    * --------------------------------------------------------------- */
-  
-  /* 
+
+  /*
    * If the first octave has negative index, we upscale the image; if
    * the first octave has positive index, we downscale the image; if
    * the first octave has index zero, we just copy the image.
    */
-  
+
   octave = vl_sift_get_octave (f, s_min) ;
-  
+
   if (o_min < 0) {
     /* double once */
     copy_and_upsample_rows (temp,   im,   width,      height) ;
@@ -979,27 +981,27 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 
     /* double more */
     for(o = -1 ; o > o_min ; --o) {
-      copy_and_upsample_rows (temp, octave, 
-                              width << -o,      height << -o ) ; 
-      copy_and_upsample_rows (octave, temp,   
-                              width << -o, 2 * (height << -o)) ; 
-    }        
-  } 
+      copy_and_upsample_rows (temp, octave,
+                              width << -o,      height << -o ) ;
+      copy_and_upsample_rows (octave, temp,
+                              width << -o, 2 * (height << -o)) ;
+    }
+  }
   else if (o_min > 0) {
     /* downsample */
     copy_and_downsample (octave, im, width, height, o_min) ;
-  } 
+  }
   else {
     /* direct copy */
     memcpy(octave, im, sizeof(vl_sift_pix) * width * height) ;
   }
-  
-  /* 
+
+  /*
    * Here we adjust the smoothing of the first level of the octave.
    * The input image is assumed to have nominal smoothing equal to
    * f->simgan.
    */
-  
+
   sa = sigma0 * pow (sigmak,   s_min) ;
   sb = sigman * pow (2.0,    - o_min) ;
 
@@ -1007,17 +1009,17 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
     double sd = sqrt (sa*sa - sb*sb) ;
     vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
   }
-  
+
   /* -----------------------------------------------------------------
    *                                          Compute the first octave
    * -------------------------------------------------------------- */
-  
+
   for(s = s_min + 1 ; s <= s_max ; ++s) {
     double sd = dsigma0 * pow (sigmak, s) ;
-    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp, 
+    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp,
                    vl_sift_get_octave(f, s - 1), w, h, sd) ;
   }
-  
+
   return VL_ERR_OK ;
 }
 
@@ -1044,7 +1046,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   int s, h, w, s_best ;
   double sa, sb ;
   vl_sift_pix *octave, *pt ;
-  
+
   /* shortcuts */
   vl_sift_pix *temp   = f-> temp ;
   int O               = f-> O ;
@@ -1054,7 +1056,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   int s_max           = f-> s_max ;
   double sigma0       = f-> sigma0 ;
   double sigmak       = f-> sigmak ;
-  double dsigma0      = f-> dsigma0 ; 
+  double dsigma0      = f-> dsigma0 ;
 
   /* is there another octave ? */
   if (f->o_cur == o_min + O - 1)
@@ -1074,7 +1076,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   f-> nkeys             = 0 ;
   w = f-> octave_width  = VL_SHIFT_LEFT(f->width,  - f->o_cur) ;
   h = f-> octave_height = VL_SHIFT_LEFT(f->height, - f->o_cur) ;
-  
+
   sa = sigma0 * powf (sigmak, s_min     ) ;
   sb = sigma0 * powf (sigmak, s_best - S) ;
 
@@ -1086,10 +1088,10 @@ vl_sift_process_next_octave (VlSiftFilt *f)
   /* ------------------------------------------------------------------
    *                                                        Fill octave
    * --------------------------------------------------------------- */
-  
+
   for(s = s_min + 1 ; s <= s_max ; ++s) {
     double sd = dsigma0 * pow (sigmak, s) ;
-    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp, 
+    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp,
                    vl_sift_get_octave(f, s - 1), w, h, sd) ;
   }
 
@@ -1109,7 +1111,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
 VL_EXPORT
 void
 vl_sift_detect (VlSiftFilt * f)
-{  
+{
   vl_sift_pix* dog   = f-> dog ;
   int          s_min = f-> s_min ;
   int          s_max = f-> s_max ;
@@ -1117,7 +1119,7 @@ vl_sift_detect (VlSiftFilt * f)
   int          h     = f-> octave_height ;
   double       te    = f-> edge_thresh ;
   double       tp    = f-> peak_thresh ;
-  
+
   int const    xo    = 1 ;      /* x-stride */
   int const    yo    = w ;      /* y-stride */
   int const    so    = w * h ;  /* s-stride */
@@ -1130,8 +1132,8 @@ vl_sift_detect (VlSiftFilt * f)
 
   /* clear current list */
   f-> nkeys = 0 ;
-    
-  /* compute difference of gaussian (DoG) */  
+
+  /* compute difference of gaussian (DoG) */
   pt = f-> dog ;
   for (s = s_min ; s <= s_max - 1 ; ++s) {
     vl_sift_pix* src_a = vl_sift_get_octave (f, s    ) ;
@@ -1141,19 +1143,19 @@ vl_sift_detect (VlSiftFilt * f)
       *pt++ = *src_b++ - *src_a++ ;
     }
   }
-  
+
   /* -----------------------------------------------------------------
    *                                          Find local maxima of DoG
    * -------------------------------------------------------------- */
 
   /* start from dog [1,1,s_min+1] */
   pt  = dog + xo + yo + so ;
-  
+
   for(s = s_min + 1 ; s <= s_max - 2 ; ++s) {
     for(y = 1 ; y < h - 1 ; ++y) {
-      for(x = 1 ; x < w - 1 ; ++x) {          
+      for(x = 1 ; x < w - 1 ; ++x) {
         v = *pt ;
-               
+
 #define CHECK_NEIGHBORS(CMP,SGN)                    \
         ( v CMP ## = SGN 0.8 * tp &&                \
           v CMP *(pt + xo) &&                       \
@@ -1185,36 +1187,36 @@ vl_sift_detect (VlSiftFilt * f)
           v CMP *(pt + yo - xo - so) &&             \
           v CMP *(pt - yo + xo - so) &&             \
           v CMP *(pt - yo - xo - so) )
-        
-        if (CHECK_NEIGHBORS(>,+) || 
+
+        if (CHECK_NEIGHBORS(>,+) ||
             CHECK_NEIGHBORS(<,-) ) {
-          
+
           /* make room for more keypoints */
           if (f->nkeys >= f->keys_res) {
             f->keys_res += 500 ;
             if (f->keys) {
               f->keys = vl_realloc (f->keys,
-                                    f->keys_res * 
+                                    f->keys_res *
                                     sizeof(VlSiftKeypoint)) ;
             } else {
-              f->keys = vl_malloc (f->keys_res * 
+              f->keys = vl_malloc (f->keys_res *
                                    sizeof(VlSiftKeypoint)) ;
             }
           }
 
           k = f->keys + (f->nkeys ++) ;
-          
+
           k-> ix = x ;
           k-> iy = y ;
           k-> is = s ;
-        }                 
+        }
         pt += 1 ;
       }
       pt += 2 ;
     }
     pt += 2 * yo ;
   }
-  
+
   /* -----------------------------------------------------------------
    *                                               Refine local maxima
    * -------------------------------------------------------------- */
@@ -1223,49 +1225,49 @@ vl_sift_detect (VlSiftFilt * f)
   k = f->keys ;
 
   for (i = 0 ; i < f->nkeys ; ++i) {
-        
+
     int x = f-> keys [i] .ix ;
     int y = f-> keys [i] .iy ;
     int s = f-> keys [i]. is ;
-    
+
     double Dx=0,Dy=0,Ds=0,Dxx=0,Dyy=0,Dss=0,Dxy=0,Dxs=0,Dys=0 ;
     double A [3*3], b [3] ;
-    
+
     int dx = 0 ;
     int dy = 0 ;
-    
+
     int iter, i, j ;
-    
+
     for (iter = 0 ; iter < 5 ; ++iter) {
-      
+
       x += dx ;
       y += dy ;
-      
-      pt = dog 
+
+      pt = dog
         + xo * x
         + yo * y
         + so * (s - s_min) ;
 
-      /** @brief Index GSS @internal */      
+      /** @brief Index GSS @internal */
 #define at(dx,dy,ds) (*( pt + (dx)*xo + (dy)*yo + (ds)*so))
 
       /** @brief Index matrix A @internal */
-#define Aat(i,j)     (A[(i)+(j)*3])    
-      
+#define Aat(i,j)     (A[(i)+(j)*3])
+
       /* compute the gradient */
       Dx = 0.5 * (at(+1,0,0) - at(-1,0,0)) ;
       Dy = 0.5 * (at(0,+1,0) - at(0,-1,0));
       Ds = 0.5 * (at(0,0,+1) - at(0,0,-1)) ;
-      
+
       /* compute the Hessian */
       Dxx = (at(+1,0,0) + at(-1,0,0) - 2.0 * at(0,0,0)) ;
       Dyy = (at(0,+1,0) + at(0,-1,0) - 2.0 * at(0,0,0)) ;
       Dss = (at(0,0,+1) + at(0,0,-1) - 2.0 * at(0,0,0)) ;
-      
+
       Dxy = 0.25 * ( at(+1,+1,0) + at(-1,-1,0) - at(-1,+1,0) - at(+1,-1,0) ) ;
       Dxs = 0.25 * ( at(+1,0,+1) + at(-1,0,-1) - at(-1,0,+1) - at(+1,0,-1) ) ;
       Dys = 0.25 * ( at(0,+1,+1) + at(0,-1,-1) - at(0,-1,+1) - at(0,+1,-1) ) ;
-      
+
       /* solve linear system ....................................... */
       Aat(0,0) = Dxx ;
       Aat(1,1) = Dyy ;
@@ -1273,18 +1275,18 @@ vl_sift_detect (VlSiftFilt * f)
       Aat(0,1) = Aat(1,0) = Dxy ;
       Aat(0,2) = Aat(2,0) = Dxs ;
       Aat(1,2) = Aat(2,1) = Dys ;
-      
+
       b[0] = - Dx ;
       b[1] = - Dy ;
       b[2] = - Ds ;
-      
+
       /* Gauss elimination */
-      for(j = 0 ; j < 3 ; ++j) {        
+      for(j = 0 ; j < 3 ; ++j) {
         double maxa    = 0 ;
         double maxabsa = 0 ;
         int    maxi    = -1 ;
         double tmp ;
-        
+
         /* look for the maximally stable pivot */
         for (i = j ; i < 3 ; ++i) {
           double a    = Aat (i,j) ;
@@ -1295,7 +1297,7 @@ vl_sift_detect (VlSiftFilt * f)
             maxi    = i ;
           }
         }
-        
+
         /* if singular give up */
         if (maxabsa < 1e-10f) {
           b[0] = 0 ;
@@ -1303,9 +1305,9 @@ vl_sift_detect (VlSiftFilt * f)
           b[2] = 0 ;
           break ;
         }
-        
+
         i = maxi ;
-        
+
         /* swap j-th row with i-th row and normalize j-th row */
         for(jj = j ; jj < 3 ; ++jj) {
           tmp = Aat(i,jj) ; Aat(i,jj) = Aat(j,jj) ; Aat(j,jj) = tmp ;
@@ -1313,17 +1315,17 @@ vl_sift_detect (VlSiftFilt * f)
         }
         tmp = b[j] ; b[j] = b[i] ; b[i] = tmp ;
         b[j] /= maxa ;
-        
+
         /* elimination */
         for (ii = j+1 ; ii < 3 ; ++ii) {
           double x = Aat(ii,j) ;
           for (jj = j ; jj < 3 ; ++jj) {
-            Aat(ii,jj) -= x * Aat(j,jj) ;                
+            Aat(ii,jj) -= x * Aat(j,jj) ;
           }
           b[ii] -= x * b[j] ;
         }
       }
-      
+
       /* backward substitution */
       for (i = 2 ; i > 0 ; --i) {
         double x = b[i] ;
@@ -1332,44 +1334,44 @@ vl_sift_detect (VlSiftFilt * f)
         }
       }
 
-      /* .......................................................... */      
+      /* .......................................................... */
       /* If the translation of the keypoint is big, move the keypoint
        * and re-iterate the computation. Otherwise we are all set.
        */
 
       dx= ((b[0] >  0.6 && x < w - 2) ?  1 : 0)
         + ((b[0] < -0.6 && x > 1    ) ? -1 : 0) ;
-      
+
       dy= ((b[1] >  0.6 && y < h - 2) ?  1 : 0)
         + ((b[1] < -0.6 && y > 1    ) ? -1 : 0) ;
-            
+
       if (dx == 0 && dy == 0) break ;
     }
-        
+
     /* check threshold and other conditions */
     {
-      double val   = at(0,0,0) 
-        + 0.5 * (Dx * b[0] + Dy * b[1] + Ds * b[2]) ; 
-      double score = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ; 
+      double val   = at(0,0,0)
+        + 0.5 * (Dx * b[0] + Dy * b[1] + Ds * b[2]) ;
+      double score = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
       double xn = x + b[0] ;
       double yn = y + b[1] ;
       double sn = s + b[2] ;
 
-      vl_bool good = 
+      vl_bool good =
         vl_abs_d (val)  > tp                  &&
-        score           < (te+1)*(te+1)/te    &&          
+        score           < (te+1)*(te+1)/te    &&
         score           >= 0                  &&
-        vl_abs_d (b[0]) <  1.5                &&         
-        vl_abs_d (b[1]) <  1.5                &&         
+        vl_abs_d (b[0]) <  1.5                &&
+        vl_abs_d (b[1]) <  1.5                &&
         vl_abs_d (b[2]) <  1.5                &&
-        xn              >= 0                  &&         
-        xn              <= w - 1              &&         
-        yn              >= 0                  &&         
-        yn              <= h - 1              &&         
-        sn              >= s_min              &&     
+        xn              >= 0                  &&
+        xn              <= w - 1              &&
+        yn              >= 0                  &&
+        yn              <= h - 1              &&
+        sn              >= s_min              &&
         sn              <= s_max ;
 
-      if (good) {                       
+      if (good) {
         k-> o     = f->o_cur ;
         k-> ix    = x ;
         k-> iy    = y ;
@@ -1377,7 +1379,7 @@ vl_sift_detect (VlSiftFilt * f)
         k-> s     = sn ;
         k-> x     = xn * xper ;
         k-> y     = yn * xper ;
-        k-> sigma = f->sigma0 * pow (2.0, sn/f->S) * xper ;        
+        k-> sigma = f->sigma0 * pow (2.0, sn/f->S) * xper ;
         ++ k ;
       }
 
@@ -1403,7 +1405,7 @@ vl_sift_detect (VlSiftFilt * f)
 
 static void
 update_gradient (VlSiftFilt *f)
-{ 
+{
   int       s_min = f->s_min ;
   int       s_max = f->s_max ;
   int       w     = vl_sift_get_octave_width  (f) ;
@@ -1414,9 +1416,9 @@ update_gradient (VlSiftFilt *f)
   int y, s ;
 
   if (f->grad_o == f->o_cur) return ;
-  
-  for (s  = s_min + 1 ; 
-       s <= s_max - 2 ; ++ s) {    
+
+  for (s  = s_min + 1 ;
+       s <= s_max - 2 ; ++ s) {
 
     vl_sift_pix *src, *end, *grad, gx, gy ;
 
@@ -1424,10 +1426,10 @@ update_gradient (VlSiftFilt *f)
     *grad++ = vl_fast_sqrt_f (gx*gx + gy*gy) ;                          \
     *grad++ = vl_mod_2pi_f   (vl_fast_atan2_f (gy, gx) + 2*VL_PI) ;     \
     ++src ;                                                             \
-    
+
     src  = vl_sift_get_octave (f,s) ;
     grad = f->grad + 2 * so * (s - s_min -1) ;
-    
+
     /* first pixel of the first row */
     gx = src[+xo] - src[0] ;
     gy = src[+yo] - src[0] ;
@@ -1440,12 +1442,12 @@ update_gradient (VlSiftFilt *f)
       gy =        src[+yo] - src[0] ;
       SAVE_BACK ;
     }
-    
+
     /* last pixel of the first row */
     gx = src[0]   - src[-xo] ;
     gy = src[+yo] - src[0] ;
     SAVE_BACK ;
-    
+
     for (y = 1 ; y < h -1 ; ++y) {
 
       /* first pixel of the middle rows */
@@ -1460,7 +1462,7 @@ update_gradient (VlSiftFilt *f)
         gy = 0.5 * (src[+yo] - src[-yo]) ;
         SAVE_BACK ;
       }
-      
+
       /* last pixel of the middle row */
       gx =        src[0]   - src[-xo] ;
       gy = 0.5 * (src[+yo] - src[-yo]) ;
@@ -1471,7 +1473,7 @@ update_gradient (VlSiftFilt *f)
     gx = src[+xo] - src[0] ;
     gy = src[  0] - src[-yo] ;
     SAVE_BACK ;
-    
+
     /* middle pixels of the last row */
     end = (src - 1) + w - 1 ;
     while (src < end) {
@@ -1479,12 +1481,12 @@ update_gradient (VlSiftFilt *f)
       gy =        src[0]   - src[-yo] ;
       SAVE_BACK ;
     }
-    
+
     /* last pixel of the last row */
     gx = src[0]   - src[-xo] ;
     gy = src[0]   - src[-yo] ;
     SAVE_BACK ;
-  }  
+  }
   f->grad_o = f->o_cur ;
 }
 
@@ -1514,7 +1516,7 @@ update_gradient (VlSiftFilt *f)
 
 VL_EXPORT
 int
-vl_sift_calc_keypoint_orientations (VlSiftFilt *f, 
+vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
                                     double angles [4],
                                     VlSiftKeypoint const *k)
 {
@@ -1530,7 +1532,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
   double       y      = k-> y     / xper ;
   double       sigma  = k-> sigma / xper ;
 
-  int          xi     = (int) (x + 0.5) ; 
+  int          xi     = (int) (x + 0.5) ;
   int          yi     = (int) (y + 0.5) ;
   int          si     = k-> is ;
 
@@ -1544,40 +1546,40 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
   double hist [nbins], maxh ;
   vl_sift_pix const * pt ;
   int xs, ys, iter, i ;
-  
+
   /* skip if the keypoint octave is not current */
   if(k->o != f->o_cur)
     return 0 ;
-  
+
   /* skip the keypoint if it is out of bounds */
-  if(xi < 0            || 
-     xi > w - 1        || 
-     yi < 0            || 
-     yi > h - 1        || 
-     si < f->s_min + 1 || 
+  if(xi < 0            ||
+     xi > w - 1        ||
+     yi < 0            ||
+     yi > h - 1        ||
+     si < f->s_min + 1 ||
      si > f->s_max - 2  ) {
     return 0 ;
   }
-  
+
   /* make gradient up to date */
   update_gradient (f) ;
 
   /* clear histogram */
   memset (hist, 0, sizeof(double) * nbins) ;
-  
+
   /* compute orientation histogram */
   pt = f-> grad + xo*xi + yo*yi + so*(si - f->s_min - 1) ;
 
 #undef  at
 #define at(dx,dy) (*(pt + xo * (dx) + yo * (dy)))
 
-  for(ys  =  VL_MAX (- W,       - yi) ; 
+  for(ys  =  VL_MAX (- W,       - yi) ;
       ys <=  VL_MIN (+ W, h - 1 - yi) ; ++ys) {
-    
-    for(xs  = VL_MAX (- W,       - xi) ; 
+
+    for(xs  = VL_MAX (- W,       - xi) ;
         xs <= VL_MIN (+ W, w - 1 - xi) ; ++xs) {
 
-      
+
       double dx = (double)(xi + xs) - x;
       double dy = (double)(yi + ys) - y;
       double r2 = dx*dx + dy*dy ;
@@ -1590,7 +1592,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
       mod  = *(pt + xs*xo + ys*yo    ) ;
       ang  = *(pt + xs*xo + ys*yo + 1) ;
       fbin = nbins * ang / (2 * VL_PI) ;
-       
+
 #if defined(VL_SIFT_BILINEAR_ORIENTATIONS)
       {
         int    bin  = vl_floor_d (fbin - 0.5) ;
@@ -1602,10 +1604,10 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
       {
         int    bin  = vl_floor_d (fbin) ;
         bin = vl_floor_d (nbins * ang / (2*VL_PI)) ;
-        hist [(bin) % nbins] += mod * wgt ;        
+        hist [(bin) % nbins] += mod * wgt ;
       }
 #endif
-      
+
     } /* for xs */
   } /* for ys */
 
@@ -1621,10 +1623,10 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
     }
     hist[i] = (prev + hist[i] + first) / 3.0 ;
   }
-  
+
   /* find the histogram maximum */
   maxh = 0 ;
-  for (i = 0 ; i < nbins ; ++i) 
+  for (i = 0 ; i < nbins ; ++i)
     maxh = VL_MAX (maxh, hist [i]) ;
 
   /* find peaks within 80% from max */
@@ -1633,13 +1635,13 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
     double h0 = hist [i] ;
     double hm = hist [(i - 1 + nbins) % nbins] ;
     double hp = hist [(i + 1 + nbins) % nbins] ;
-    
+
     /* is this a peak? */
     if (h0 > 0.8*maxh && h0 > hm && h0 > hp) {
-      
+
       /* quadratic interpolation */
-      double di = - 0.5 * (hp - hm) / (hp + hm - 2 * h0) ; 
-      double th = 2 * VL_PI * (i + di + 0.5) / nbins ;      
+      double di = - 0.5 * (hp - hm) / (hp + hm - 2 * h0) ;
+      double th = 2 * VL_PI * (i + di + 0.5) / nbins ;
       angles [ nangles++ ] = th ;
       if( nangles == 4 )
         goto enough_angles ;
@@ -1651,14 +1653,14 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Normalizes in norm L_2 a descriptor
  ** @param begin begin of histogram.
  ** @param end   end of histogram.
  **/
 
 VL_INLINE vl_sift_pix
-normalize_histogram 
+normalize_histogram
 (vl_sift_pix *begin, vl_sift_pix *end)
 {
   vl_sift_pix* iter ;
@@ -1682,7 +1684,7 @@ normalize_histogram
  ** @param grad     image gradients.
  ** @param descr    SIFT descriptor (output).
  ** @param width    image width.
- ** @param height   image height. 
+ ** @param height   image height.
  ** @param x        keypoint x coordinate.
  ** @param y        keypoint y coordinate.
  ** @param sigma    keypoint scale.
@@ -1708,12 +1710,12 @@ normalize_histogram
  **/
 
 VL_EXPORT
-void               
+void
 vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
                              vl_sift_pix const* grad,
                              vl_sift_pix *descr,
                              int width, int height,
-                             double x, double y, 
+                             double x, double y,
                              double sigma,
                              double angle0)
 {
@@ -1723,35 +1725,35 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
   int          h      = height ;
   int const    xo     = 2 ;         /* x-stride */
   int const    yo     = 2 * w ;     /* y-stride */
-  
-  int          xi     = (int) (x + 0.5) ; 
+
+  int          xi     = (int) (x + 0.5) ;
   int          yi     = (int) (y + 0.5) ;
-  
+
   double const st0    = sin (angle0) ;
   double const ct0    = cos (angle0) ;
   double const SBP    = magnif * sigma + VL_EPSILON_D ;
   int    const W      = floor
     (sqrt(2.0) * SBP * (NBP + 1) / 2.0 + 0.5) ;
-  
+
   int const binto = 1 ;          /* bin theta-stride */
   int const binyo = NBO * NBP ;  /* bin y-stride */
   int const binxo = NBO ;        /* bin x-stride */
-  
+
   int bin, dxi, dyi ;
-  vl_sift_pix const *pt ; 
+  vl_sift_pix const *pt ;
   vl_sift_pix       *dpt ;
-  
+
   /* check bounds */
-  if(xi    <  0               || 
-     xi    >= w               || 
-     yi    <  0               || 
+  if(xi    <  0               ||
+     xi    >= w               ||
+     yi    <  0               ||
      yi    >= h -    1        )
     return ;
-  
+
   /* clear descriptor */
   memset (descr, 0, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
-  
-  /* Center the scale space and the descriptor on the current keypoint. 
+
+  /* Center the scale space and the descriptor on the current keypoint.
    * Note that dpt is pointing to the bin of center (SBP/2,SBP/2,0).
    */
   pt  = grad + xi*xo + yi*yo ;
@@ -1759,40 +1761,40 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
 
 #undef atd
 #define atd(dbinx,dbiny,dbint) *(dpt + (dbint)*binto + (dbiny)*binyo + (dbinx)*binxo)
-  
+
   /*
    * Process pixels in the intersection of the image rectangle
    * (1,1)-(M-1,N-1) and the keypoint bounding box.
    */
-  for(dyi =  VL_MAX(- W,   - yi   ) ; 
+  for(dyi =  VL_MAX(- W,   - yi   ) ;
       dyi <= VL_MIN(+ W, h - yi -1) ; ++ dyi) {
-    
-    for(dxi =  VL_MAX(- W,   - xi   ) ; 
+
+    for(dxi =  VL_MAX(- W,   - xi   ) ;
         dxi <= VL_MIN(+ W, w - xi -1) ; ++ dxi) {
 
       /* retrieve */
       vl_sift_pix mod   = *( pt + dxi*xo + dyi*yo + 0 ) ;
       vl_sift_pix angle = *( pt + dxi*xo + dyi*yo + 1 ) ;
       vl_sift_pix theta = vl_mod_2pi_f (angle - angle0) ;
-      
+
       /* fractional displacement */
       vl_sift_pix dx = xi + dxi - x;
       vl_sift_pix dy = yi + dyi - y;
-      
+
       /* get the displacement normalized w.r.t. the keypoint
          orientation and extension */
       vl_sift_pix nx = ( ct0 * dx + st0 * dy) / SBP ;
-      vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
+      vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ;
       vl_sift_pix nt = NBO * theta / (2 * VL_PI) ;
-      
+
       /* Get the Gaussian weight of the sample. The Gaussian window
        * has a standard deviation equal to NBP/2. Note that dx and dy
        * are in the normalized frame, so that -NBP/2 <= dx <=
        * NBP/2. */
       vl_sift_pix const wsigma = f->windowSize ;
-      vl_sift_pix win = fast_expn 
+      vl_sift_pix win = fast_expn
         ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
-      
+
       /* The sample will be distributed in 8 adjacent bins.
          We start from the ``lower-left'' bin. */
       int         binx = vl_floor_f (nx - 0.5) ;
@@ -1804,28 +1806,28 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
       int         dbinx ;
       int         dbiny ;
       int         dbint ;
-      
+
       /* Distribute the current sample into the 8 adjacent bins*/
       for(dbinx = 0 ; dbinx < 2 ; ++dbinx) {
         for(dbiny = 0 ; dbiny < 2 ; ++dbiny) {
           for(dbint = 0 ; dbint < 2 ; ++dbint) {
-            
+
             if (binx + dbinx >= - (NBP/2) &&
                 binx + dbinx <    (NBP/2) &&
                 biny + dbiny >= - (NBP/2) &&
                 biny + dbiny <    (NBP/2) ) {
-              vl_sift_pix weight = win 
-                * mod 
+              vl_sift_pix weight = win
+                * mod
                 * vl_abs_f (1 - dbinx - rbinx)
                 * vl_abs_f (1 - dbiny - rbiny)
                 * vl_abs_f (1 - dbint - rbint) ;
-              
+
               atd(binx+dbinx, biny+dbiny, (bint+dbint) % NBO) += weight ;
             }
-          }            
+          }
         }
       }
-    }  
+    }
   }
 
   /* Standard SIFT descriptors are normalized, truncated and normalized again */
@@ -1834,26 +1836,26 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
     /* normalize L2 norm */
     vl_sift_pix norm = normalize_histogram (descr, descr + NBO*NBP*NBP) ;
 
-    /* 
+    /*
        Set the descriptor to zero if it is lower than our
        norm_threshold.  We divide by the number of samples in the
        descriptor region becasue the Gaussian window used in the
        calculation fo the descriptor is not normalized.
      */
-    int numSamples = 
-      (VL_MIN(W, w - xi -1) - VL_MAX(-W, - xi) + 1) * 
+    int numSamples =
+      (VL_MIN(W, w - xi -1) - VL_MAX(-W, - xi) + 1) *
       (VL_MIN(W, h - yi -1) - VL_MAX(-W, - yi) + 1) ;
 
     if(f-> norm_thresh && norm < f-> norm_thresh * numSamples) {
         for(bin = 0; bin < NBO*NBP*NBP ; ++ bin)
             descr [bin] = 0;
     }
-    else {    
+    else {
       /* truncate at 0.2. */
       for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
         if (descr [bin] > 0.2) descr [bin] = 0.2;
       }
-      
+
       /* normalize again. */
       normalize_histogram (descr, descr + NBO*NBP*NBP) ;
     }
@@ -1883,12 +1885,12 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
                                   VlSiftKeypoint const* k,
                                   double angle0)
 {
-  /* 
+  /*
      The SIFT descriptor is a three dimensional histogram of the
      position and orientation of the gradient.  There are NBP bins for
      each spatial dimension and NBO bins for the orientation dimension,
      for a total of NBP x NBP x NBO bins.
-     
+
      The support of each spatial bin has an extension of SBP = 3sigma
      pixels, where sigma is the scale of the keypoint.  Thus all the
      bins together have a support SBP x NBP pixels wide. Since
@@ -1897,8 +1899,8 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
      SBP x (NBP + 1) pixels. Finally, since the patch can be
      arbitrarily rotated, we need to consider a window 2W += sqrt(2) x
      SBP x (NBP + 1) pixels wide.
-  */      
-  
+  */
+
   double const magnif      = f-> magnif ;
 
   double       xper        = pow (2.0, f->o_cur) ;
@@ -1912,7 +1914,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   double       y           = k-> y     / xper ;
   double       sigma       = k-> sigma / xper ;
 
-  int          xi          = (int) (x + 0.5) ; 
+  int          xi          = (int) (x + 0.5) ;
   int          yi          = (int) (y + 0.5) ;
   int          si          = k-> is ;
 
@@ -1927,19 +1929,19 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   int const binxo = NBO ;        /* bin x-stride */
 
   int bin, dxi, dyi ;
-  vl_sift_pix const *pt ; 
+  vl_sift_pix const *pt ;
   vl_sift_pix       *dpt ;
-  
+
   /* check bounds */
   if(k->o  != f->o_cur        ||
-     xi    <  0               || 
-     xi    >= w               || 
-     yi    <  0               || 
+     xi    <  0               ||
+     xi    >= w               ||
+     yi    <  0               ||
      yi    >= h -    1        ||
      si    <  f->s_min + 1    ||
      si    >  f->s_max - 2     )
     return ;
-  
+
   /* synchronize gradient buffer */
   update_gradient (f) ;
 
@@ -1948,48 +1950,48 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
   /* clear descriptor */
   memset (descr, 0, sizeof(vl_sift_pix) * NBO*NBP*NBP) ;
 
-  /* Center the scale space and the descriptor on the current keypoint. 
+  /* Center the scale space and the descriptor on the current keypoint.
    * Note that dpt is pointing to the bin of center (SBP/2,SBP/2,0).
    */
   pt  = f->grad + xi*xo + yi*yo + (si - f->s_min - 1)*so ;
   dpt = descr + (NBP/2) * binyo + (NBP/2) * binxo ;
-     
+
 #undef atd
 #define atd(dbinx,dbiny,dbint) *(dpt + (dbint)*binto + (dbiny)*binyo + (dbinx)*binxo)
-      
+
   /*
    * Process pixels in the intersection of the image rectangle
    * (1,1)-(M-1,N-1) and the keypoint bounding box.
    */
-  for(dyi =  VL_MAX (- W, 1 - yi    ) ; 
+  for(dyi =  VL_MAX (- W, 1 - yi    ) ;
       dyi <= VL_MIN (+ W, h - yi - 2) ; ++ dyi) {
 
-    for(dxi =  VL_MAX (- W, 1 - xi    ) ; 
+    for(dxi =  VL_MAX (- W, 1 - xi    ) ;
         dxi <= VL_MIN (+ W, w - xi - 2) ; ++ dxi) {
-      
+
       /* retrieve */
       vl_sift_pix mod   = *( pt + dxi*xo + dyi*yo + 0 ) ;
       vl_sift_pix angle = *( pt + dxi*xo + dyi*yo + 1 ) ;
       vl_sift_pix theta = vl_mod_2pi_f (angle - angle0) ;
-      
+
       /* fractional displacement */
       vl_sift_pix dx = xi + dxi - x;
       vl_sift_pix dy = yi + dyi - y;
-      
+
       /* get the displacement normalized w.r.t. the keypoint
          orientation and extension */
       vl_sift_pix nx = ( ct0 * dx + st0 * dy) / SBP ;
-      vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ; 
+      vl_sift_pix ny = (-st0 * dx + ct0 * dy) / SBP ;
       vl_sift_pix nt = NBO * theta / (2 * VL_PI) ;
-      
+
       /* Get the Gaussian weight of the sample. The Gaussian window
        * has a standard deviation equal to NBP/2. Note that dx and dy
        * are in the normalized frame, so that -NBP/2 <= dx <=
        * NBP/2. */
       vl_sift_pix const wsigma = f->windowSize ;
-      vl_sift_pix win = fast_expn 
+      vl_sift_pix win = fast_expn
         ((nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
-      
+
       /* The sample will be distributed in 8 adjacent bins.
          We start from the ``lower-left'' bin. */
       int         binx = vl_floor_f (nx - 0.5) ;
@@ -2001,34 +2003,34 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
       int         dbinx ;
       int         dbiny ;
       int         dbint ;
-      
+
       /* Distribute the current sample into the 8 adjacent bins*/
       for(dbinx = 0 ; dbinx < 2 ; ++dbinx) {
         for(dbiny = 0 ; dbiny < 2 ; ++dbiny) {
           for(dbint = 0 ; dbint < 2 ; ++dbint) {
-            
+
             if (binx + dbinx >= - (NBP/2) &&
                 binx + dbinx <    (NBP/2) &&
                 biny + dbiny >= - (NBP/2) &&
                 biny + dbiny <    (NBP/2) ) {
-              vl_sift_pix weight = win 
-                * mod 
+              vl_sift_pix weight = win
+                * mod
                 * vl_abs_f (1 - dbinx - rbinx)
                 * vl_abs_f (1 - dbiny - rbiny)
                 * vl_abs_f (1 - dbint - rbint) ;
-              
+
               atd(binx+dbinx, biny+dbiny, (bint+dbint) % NBO) += weight ;
             }
-          }            
+          }
         }
       }
-    }  
+    }
   }
 
   /* Standard SIFT descriptors are normalized, truncated and normalized again */
   if(1) {
 
-    /* Normalize the histogram to L2 unit length. */        
+    /* Normalize the histogram to L2 unit length. */
     vl_sift_pix norm = normalize_histogram (descr, descr + NBO*NBP*NBP) ;
 
     /* Set the descriptor to zero if it is lower than our norm_threshold */
@@ -2037,12 +2039,12 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
             descr [bin] = 0;
     }
     else {
-    
+
       /* Truncate at 0.2. */
       for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
         if (descr [bin] > 0.2) descr [bin] = 0.2;
       }
-    
+
       /* Normalize again. */
       normalize_histogram (descr, descr + NBO*NBP*NBP) ;
     }
@@ -2055,80 +2057,75 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  **
  ** @param f     SIFT filter.
  ** @param k     SIFT keypoint (output).
- ** @param x     x coordinate of the center.
- ** @param y     y coordinate of the center.
- ** @param sigma scale.
+ ** @param x     x coordinate of the keypoint center.
+ ** @param y     y coordinate of the keypoint center.
+ ** @param sigma keypoint scale.
  **
- ** The function initializes the structure @a k from the location @a x
- ** and @a y and scale @a sigma of the keypoint.
+ ** The function initializes a keypoint structure @a k from
+ ** the location @a x
+ ** and @a y and the scale @a sigma of the keypoint. The keypoint structure
+ ** maps the keypoint to an octave and scale level of the discretized
+ ** Gaussian scale space, which is required for instance to compute the
+ ** keypoint SIFT descriptor.
+ **
+ ** @par Algorithm
+ **
+ ** The formula linking the keypoint scale sigma to the octave and
+ ** scale indexes is
+ **
+ ** @f[ \sigma(o,s) = \sigma_0 2^{o+s/S} @f]
+ **
+ ** In addition to the scale index @e s (which can be fractional due
+ ** to scale interpolation) a keypoint has an integer scale index @e
+ ** is too (which is the index of the scale level where it was
+ ** detected in the DoG scale space). We have the constraints (@ref
+ ** sift-tech-detector see also the "SIFT detector"):
+ **
+ ** - @e o is integer in the range @f$ [o_\mathrm{min},
+ **   o_{\mathrm{min}}+O-1] @f$.
+ ** - @e is is integer in the range @f$ [s_\mathrm{min}+1,
+ **   s_\mathrm{max}-2] @f$.  This depends on how the scale is
+ **   determined during detection, and must be so here because
+ **   gradients are computed only for this range of scale levels and
+ **   and are required for the calculation of the SIFT descriptor.
+ ** - @f$ |s - is| < 0.5 @f$ for detected keypoints in most cases due
+ **   to the interpolation technique used during detection. However
+ **   this is not neceserray.
+ **
+ ** Thus octave o represents scales @f$ \{ \sigma(o, s) : s \in
+ ** [s_\mathrm{min}+1-.5, s_\mathrm{max}-2+.5] \} @f$. Note that some
+ ** scales may be represented more than once. For each scale, we
+ ** select the largest possible octave that contains it, i.e.
+ **
+ ** @f[
+ **  o(\sigma)
+ **  = \max \{ o \in \mathbb{Z} :
+ **    \sigma_0 2^{\frac{s_\mathrm{min}+1-.5}{S}} \leq \sigma \}
+ **  = \mathrm{floor}\,\left[
+ **    \log_2(\sigma / \sigma_0) - \frac{s_\mathrm{min}+1-.5}{S}\right]
+ ** @f]
+ **
+ ** and then
+ **
+ ** @f[
+ ** s(\sigma) = S  \left[\log_2(\sigma / \sigma_0) - o(\sigma)\right],
+ ** \quad
+ ** is(\sigma) = \mathrm{round}\,(s(\sigma))
+ ** @f]
+ **
+ ** In practice, both @f$ o(\sigma) @f$ and @f$ is(\sigma) @f$ are
+ ** clamped to their feasible range as determined by the SIFT filter
+ ** paramteres.
  **/
 
 VL_EXPORT
 void
 vl_sift_keypoint_init (VlSiftFilt const *f,
-                       VlSiftKeypoint *k, 
+                       VlSiftKeypoint *k,
                        double x,
                        double y,
                        double sigma)
 {
-
-  /*
-    The formula linking the keypoint scale sigma to the octave and
-    scale index is
-
-    (1) sigma(o,s) = sigma0 2^(o+s/S)
-
-    for which
-    
-    (2) o + s/S = log2 sigma/sigma0 == phi.
-
-    In addition to the scale index s (which can be fractional due to
-    scale interpolation) a keypoint has an integer scale index is too
-    (which is the index of the scale level where it was detected in
-    the DoG scale space). We have the constraints:
- 
-    - o and is are integer
-
-    - is is in the range [smin+1, smax-2  ]
-
-    - o  is in the range [omin,   omin+O-1]
-
-    - is = rand(s) most of the times (but not always, due to the way s
-      is obtained by quadratic interpolation of the DoG scale space).
-
-    Depending on the values of smin and smax, often (2) has multiple
-    solutions is,o that satisfy all constraints.  In this case we
-    choose the one with biggest index o (this saves a bit of
-    computation).
-
-    DETERMINING THE OCTAVE INDEX O
-
-    From (2) we have o = phi - s/S and we want to pick the biggest
-    possible index o in the feasible range. This corresponds to
-    selecting the smallest possible index s. We write s = is + ds
-    where in most cases |ds|<.5 (but in general |ds|<1). So we have
-
-       o = phi - s/S,   s = is + ds ,   |ds| < .5 (or |ds| < 1).
-
-    Since is is in the range [smin+1,smax-2], s is in the range
-    [smin+.5,smax-1.5] (or [smin,smax-1]), the number o is an integer
-    in the range phi+[-smax+1.5,-smin-.5] (or
-    phi+[-smax+1,-smin]). Thus the maximum value of o is obtained for
-    o = floor(phi-smin-.5) (or o = floor(phi-smin)).
-
-    Finally o is clamped to make sure it is contained in the feasible
-    range.
-
-    DETERMINING THE SCALE INDEXES S AND IS
-
-    Given o we can derive is by writing (2) as
-
-      s = is + ds = S(phi - o).
-
-    We then take is = round(s) and clamp its value to be in the
-    feasible range.
-  */
-
   int    o, ix, iy, is ;
   double s, phi, xper ;
 
@@ -2141,11 +2138,11 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   is  = (int)(s + 0.5) ;
   is  = VL_MIN(is, f->s_max - 2) ;
   is  = VL_MAX(is, f->s_min + 1) ;
-  
+
   xper = pow (2.0, o) ;
   ix   = (int)(x / xper + 0.5) ;
   iy   = (int)(y / xper + 0.5) ;
-  
+
   k -> o  = o ;
 
   k -> ix = ix ;
@@ -2155,17 +2152,6 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   k -> x = x ;
   k -> y = y ;
   k -> s = s ;
-  
+
   k->sigma = sigma ;
-  
-  /*
-  VL_PRINTF ("k.ix     = %d\n", ix) ;
-  VL_PRINTF ("k.iy     = %d\n", iy) ;
-  VL_PRINTF ("k.is     = %d\n", is) ;
-  VL_PRINTF ("k.o      = %d\n", o ) ;
-  VL_PRINTF ("k.s      = %g\n", s ) ;
-  VL_PRINTF ("k.x      = %g\n", x ) ;
-  VL_PRINTF ("k.y      = %g\n", y ) ;
-  VL_PRINTF ("k.sigma  = %g\n", sigma) ;
-  */
 }

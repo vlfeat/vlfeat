@@ -83,7 +83,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
   }
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @internal
  ** @brief Ordering of tuples by increasing scale
  **
@@ -101,7 +101,7 @@ korder (void const* a, void const* b) {
   return 0 ;
 }
 
-/** -------------------------------------------------------------------
+/** ------------------------------------------------------------------
  ** @internal
  ** @brief Check for sorted keypoints
  **
