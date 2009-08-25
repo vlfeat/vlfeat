@@ -163,10 +163,10 @@ mexFunction(int nout, mxArray *out[],
     dsift = vl_dsift_new_basic (M, N, step, size) ;
     if (bounds) {
       vl_dsift_set_bounds(dsift,
-                          VL_MAX(bounds[0], 0),
                           VL_MAX(bounds[1], 0),
-                          VL_MIN(bounds[2], M - 1),
-                          VL_MIN(bounds[3], N - 1));
+                          VL_MAX(bounds[0], 0),
+                          VL_MIN(bounds[3], M - 1),
+                          VL_MIN(bounds[2], N - 1));
     }
     vl_dsift_set_flat_window(dsift, useFlatWindow) ;
 
@@ -191,15 +191,16 @@ mexFunction(int nout, mxArray *out[],
       vl_dsift_get_bounds (dsift, &minX, &minY, &maxX, &maxY) ;
       useFlatWindow = vl_dsift_get_flat_window(dsift) ;
 
-      mexPrintf("dsift: image size:        %d x %d\n", N, M) ;
-      mexPrintf("       bounds:            [%d, %d, %d, %d]\n", minY, minX, maxY, maxX) ;
-      mexPrintf("       subsampling steps: %d, %d\n", stepY, stepX) ;
-      mexPrintf("       num bins:          [%d, %d, %d]\n",
+      mexPrintf("dsift: image size         [H, W] = [%d, %d]\n", N, M) ;
+      mexPrintf("       bounds:            [minX,minY,maxX,maxY] = [%d, %d, %d, %d]\n",
+                minX+1, minY+1, maxX+1, maxY+1) ;
+      mexPrintf("       subsampling steps: stepX=%d, stepY=%d\n", stepX, stepY) ;
+      mexPrintf("       num bins:          [numBinT, numBinX, numBinY] = [%d, %d, %d]\n",
                 geom->numBinT,
                 geom->numBinX,
                 geom->numBinY) ;
       mexPrintf("       descriptor size:   %d\n", descrSize) ;
-      mexPrintf("       bin sizes:         [%d, %d]\n",
+      mexPrintf("       bin sizes:         [binSizeX, binSizeY] = [%d, %d]\n",
                 geom->binSizeX,
                 geom->binSizeY) ;
       mexPrintf("       flat window:       %s\n", VL_YESNO(useFlatWindow)) ;
