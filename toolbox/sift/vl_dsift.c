@@ -160,13 +160,15 @@ mexFunction(int nout, mxArray *out[],
     int k, i ;
 
     VlDsiftFilter *dsift ;
+
+    /* note that the image received from MATLAB is transposed */
     dsift = vl_dsift_new_basic (M, N, step, size) ;
     if (bounds) {
       vl_dsift_set_bounds(dsift,
                           VL_MAX(bounds[1], 0),
                           VL_MAX(bounds[0], 0),
-                          VL_MIN(bounds[3], M - 1),
-                          VL_MIN(bounds[2], N - 1));
+                          VL_MIN(bounds[3], N - 1),
+                          VL_MIN(bounds[2], M - 1));
     }
     vl_dsift_set_flat_window(dsift, useFlatWindow) ;
 
@@ -187,8 +189,8 @@ mexFunction(int nout, mxArray *out[],
       int maxY ;
       vl_bool useFlatWindow ;
 
-      vl_dsift_get_steps (dsift, &stepX, &stepY) ;
-      vl_dsift_get_bounds (dsift, &minX, &minY, &maxX, &maxY) ;
+      vl_dsift_get_steps (dsift, &stepY, &stepX) ;
+      vl_dsift_get_bounds (dsift, &minY, &minX, &maxY, &maxX) ;
       useFlatWindow = vl_dsift_get_flat_window(dsift) ;
 
       mexPrintf("dsift: image size         [H, W] = [%d, %d]\n", N, M) ;
