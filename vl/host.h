@@ -84,13 +84,19 @@
 #define VL_ARCH_IX86 _M_IX86
 #endif
 
+#if defined(_M_X64)    || \
+    defined(__amd64__) || \
+    defined(__amd64)   || \
+    defined(__x86_64)  || \
+    defined(__x86_64)
+#define VL_ARCH_X64
+#endif
+
 #if defined(__ia64__)   || \
     defined(_IA64)      || \
     defined(__IA64)     || \
     defined(__ia64)     || \
     defined(_M_IA64)    || \
-    defined(__x86_64)   || \
-    defined(__x86_64__) || \
     defined(__DOXYGEN__)
 #define VL_ARCH_IA64
 #endif
@@ -126,6 +132,7 @@
 #if defined(__LITTLE_ENDIAN__) || \
     defined(VL_ARCH_IX86)      || \
     defined(VL_ARCH_IA64)      || \
+    defined(VL_ARCH_X68)       || \
     defined(__DOXYGEN__)
 #define VL_ARCH_LITTLE_ENDIAN
 #endif

@@ -318,7 +318,7 @@
 
 /** --------------------------------------------------------------- */
 
-#if defined(VL_ARCH_IX86) || defined(VL_ARCH_IA64)
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_IA64) || defined(VL_ARCH_X64)
 #define HAS_CPUID
 #endif
 
@@ -458,6 +458,9 @@ void vl_print_host_info ()
 {
   char const *arch = 0, *endian = 0, *comp = 0, *dm = 0 ;
   int compver ;
+#ifdef VL_ARCH_X64
+  arch = "X64" ;
+#endif
 #ifdef VL_ARCH_IA64
   arch = "IA64" ;
 #endif
