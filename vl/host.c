@@ -501,8 +501,8 @@ void vl_print_host_info ()
 
   VL_PRINTF("Host: Compiler: %s %d\n", comp, compver) ;
   VL_PRINTF("      Compiler data model: %s\n", dm) ;
-  VL_PRINTF("      CPU architecture: %s\n", arch) ;
-  VL_PRINTF("      CPU endianness: %s\n", endian) ;
+  VL_PRINTF("      Compiler CPU architecture: %s\n", arch) ;
+  VL_PRINTF("      Compiler CPU endianness: %s\n", endian) ;
 
 #ifdef HAS_CPUID
   {
