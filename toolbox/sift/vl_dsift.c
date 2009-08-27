@@ -167,8 +167,8 @@ mexFunction(int nout, mxArray *out[],
       vl_dsift_set_bounds(dsift,
                           VL_MAX(bounds[1], 0),
                           VL_MAX(bounds[0], 0),
-                          VL_MIN(bounds[3], N - 1),
-                          VL_MIN(bounds[2], M - 1));
+                          VL_MIN(bounds[3], M - 1),
+                          VL_MIN(bounds[2], N - 1));
     }
     vl_dsift_set_flat_window(dsift, useFlatWindow) ;
 
@@ -193,7 +193,7 @@ mexFunction(int nout, mxArray *out[],
       vl_dsift_get_bounds (dsift, &minY, &minX, &maxY, &maxX) ;
       useFlatWindow = vl_dsift_get_flat_window(dsift) ;
 
-      mexPrintf("dsift: image size         [H, W] = [%d, %d]\n", N, M) ;
+      mexPrintf("dsift: image size         [W, H] = [%d, %d]\n", N, M) ;
       mexPrintf("       bounds:            [minX,minY,maxX,maxY] = [%d, %d, %d, %d]\n",
                 minX+1, minY+1, maxX+1, maxY+1) ;
       mexPrintf("       subsampling steps: stepX=%d, stepY=%d\n", stepX, stepY) ;
