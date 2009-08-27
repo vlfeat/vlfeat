@@ -25,9 +25,9 @@ INSTALLING
 
 COMPILING
   The core library and command line utilities require a common C
-  compiler supporting the (old) C-90 standard (GCC and Visual C will
-  do) plus a few common extension (see APPENDIX). To compile the MEX
-  files, MATLAB needs also to be installed.
+  compiler supporting the C-90 standard and some C-99 extension (GCC
+  and Visual C will do) plus a few common extension (see APPENDIX). To
+  compile the MEX files, MATLAB needs also to be installed.
 
   LINUX AND MAC OS X. Make sure to have a recent version of GCC (at
   least 4.0) and GNU make (at least 3.81) installed. Edit the
@@ -36,7 +36,7 @@ COMPILING
 
   > cd vlfeat
   > make
- 
+
   Earlier versions of GCC and make can be used, but this requires
   hacking the Makefile.
 
@@ -44,12 +44,16 @@ COMPILING
   has been tested under Visual C++ 2008 Express and Matlab R2008a (minor
   adjustments may be required for other versions). Open the Visual C terminal,
   cd into the VLFeat directory and issue.
-  
+
   > nmake /f Makefile.mak
 
-  If you do not have Visual C++ 2008, or you have an older version of Matlab
-  and wish to compile the mex files _only_, then you may start from our binary
-  distribution. Enter the toolbox directory:
+  For Windows 64 use
+
+  > make /f Makefile.mak ARCH=w64
+
+  If you do not have Visual C++ 2008, or you have an older version of
+  Matlab and wish to compile the mex files _only_, then you may start
+  from our binary distribution. Enter the toolbox directory:
 
   > cd toolbox
 
@@ -57,14 +61,14 @@ COMPILING
 
   > vl_compile
 
-  This has been tested with Matlab R14 and lcc, but other configurations should
-  only require minor tweaking.
-  
+  This has been tested with Matlab R14 and lcc, but other
+  configurations should only require minor tweaking.
+
 CREATING THE DOCUMENTATION
-  This task is handled by various Makefile that have been tested
-  under Mac OS X and Linux only. Compiling the documentation
-  requires the following additional tools
-  
+  This task is handled by various Makefile that have been tested under
+  Mac OS X and Linux only. Compiling the documentation requires the
+  following additional tools
+
   - fig2dev (part of transfig)
   - a modern LaTeX with
     + pdflatex
@@ -77,10 +81,9 @@ CREATING THE DOCUMENTATION
 
   > make -C doc/figures
 
-  However you need to run some MATLAB code to generate part
-  of the figures to start with. To this end, load MATLAB and
-  (provided that everything is compiled and installed correctly)
-  type
+  However you need to run some MATLAB code to generate part of the
+  figures to start with. To this end, load MATLAB and (provided that
+  everything is compiled and installed correctly) type
 
   > vl_demo
 
@@ -89,13 +92,12 @@ CREATING THE DOCUMENTATION
   > make doc-deep
   > make doc
 
-  SOURCE CODE DOCUMENTATION. To compile the source code
-  documentation type
+  SOURCE CODE DOCUMENTATION. To compile the source code documentation
+  type
 
   > make doc-api
-  
-See the file doc/index.html for an overview.
 
+  See the file doc/index.html for an overview.
 
 APPENDIX
   CODE COMPATIBILITY. In addition to the C-90 standard, the C compiler
@@ -104,7 +106,12 @@ APPENDIX
   - long int (64 bit integer) support
   - variadic macro support
 
+  The SSE accelerated code requires the compiler to support Intel
+  intrisic. GCC and Visual C both satisfy all the requirements.
+
 CHANGES
+  0.9.5      Added kd-tree and new SSE-accelerated vector/histogram
+             comparison code.  Improved dense SIFT (dsift) implementation.
   0.9.4      Added quick shift. Renamed dhog to dsift and improved
              implementation and documentation. Improved tutorials.
              Added 64 bit Windows binaries. Many other small changes.
