@@ -19,7 +19,7 @@ vl_demo_print('sift_basic_0') ;
 % --------------------------------------------------------------------
 I = single(rgb2gray(I)) ;
 
-clf ; imagesc(I) 
+clf ; imagesc(I)
 axis equal ; axis off ; axis tight ;
 vl_demo_print('sift_basic_1') ;
 
@@ -29,7 +29,7 @@ vl_demo_print('sift_basic_1') ;
 [f,d] = vl_sift(I) ;
 
 hold on ;
-perm = randperm(size(f,2)) ; 
+perm = randperm(size(f,2)) ;
 sel  = perm(1:50) ;
 h1   = vl_plotframe(f(:,sel)) ; set(h1,'color','k','linewidth',3) ;
 h2   = vl_plotframe(f(:,sel)) ; set(h2,'color','y','linewidth',2) ;
@@ -50,7 +50,7 @@ vl_demo_print('sift_basic_3') ;
 % --------------------------------------------------------------------
 %                                                      Custom keypoint
 % --------------------------------------------------------------------
-clf ; imagesc(I(1:200,1:200,:)) 
+clf ; imagesc(I(1:200,1:200,:))
 axis equal ; axis off ; axis tight ;
 hold on;
 

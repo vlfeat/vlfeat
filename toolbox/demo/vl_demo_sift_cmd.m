@@ -20,7 +20,7 @@ I = single(I) ;
 % --------------------------------------------------------------------
 
 [err,msg] = vl_demo_cmd('sift',['"' p_img '" --output=ascii://"' p_txt ...
-                   '" --peak-thresh=3.4 --edge-thresh=10']) ;
+                   '" --peak-thresh=3.4 --edge-thresh=10 --first-octave=-1']) ;
 if (err), error(msg) ; end
 
 data      = load(p_txt,'-ASCII') ;
