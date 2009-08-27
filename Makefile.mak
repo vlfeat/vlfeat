@@ -156,6 +156,7 @@ libsrc =                \
  vl\imop.c              \
  vl\imopv.c             \
  vl\imopv_sse2.c        \
+ vl\kdtree.c            \
  vl\mathop.c            \
  vl\mathop_sse2.c       \
  vl\mser.c              \
@@ -199,6 +200,8 @@ mexsrc =                          \
  toolbox\misc\vl_ihashfind.c      \
  toolbox\misc\vl_ihashsum.c       \
  toolbox\misc\vl_inthist.c        \
+ toolbox\misc\vl_kdtreebuild.c    \
+ toolbox\misc\vl_kdtreequery.c    \
  toolbox\misc\vl_localmax.c       \
  toolbox\misc\vl_samplinthist.c   \
  toolbox\misc\vl_simdctrl.c       \
