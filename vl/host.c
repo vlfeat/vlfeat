@@ -335,8 +335,12 @@ _vl_cpuid (vl_int32* info, int function)
 VL_INLINE void
 _vl_cpuid (vl_int32* info, int function)
 {
-  /* this version is compatible with -fPIC */
-#if defined(VL_ARCH_IX86)
+#if defined(VL_ARCH_IX86) && (defined(__PIC__) || defined(__pic__))
+  /* This version is compatible with -fPIC on x386 targets. This special
+   * case is required becaus
+   * on such platform -fPIC alocates ebx as global offset table pointer.
+   * Note that =r below will be mapped to a register different from ebx,
+   * so the code is sound. */
   __asm__ __volatile__
   ("pushl %%ebx      \n" /* save %ebx */
    "cpuid            \n"
@@ -344,14 +348,11 @@ _vl_cpuid (vl_int32* info, int function)
    "popl %%ebx       \n" /* restore the old %ebx */
    : "=a"(info[0]), "=r"(info[1]), "=c"(info[2]), "=d"(info[3])
    : "a"(function)
-   : "cc") ;
-#else /* defined(VL_ARCH_IA64)*/
+   : "cc") ; /* clobbered (cc=condition codes) */
+#else /* no -fPIC or -fPIC with a 64-bit target */
   __asm__ __volatile__
-  ("pushq %%rbx      \n" /* save %ebx */
-   "cpuid            \n"
-   "movl %%ebx, %1   \n" /* save what cpuid just put in %ebx */
-   "popq %%rbx       \n" /* restore the old %ebx */
-   : "=a"(info[0]), "=r"(info[1]), "=c"(info[2]), "=d"(info[3])
+  ("cpuid"
+   : "=a"(info[0]), "=b"(info[1]), "=c"(info[2]), "=d"(info[3])
    : "a"(function)
    : "cc") ;
 #endif

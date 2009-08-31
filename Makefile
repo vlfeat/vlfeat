@@ -612,6 +612,8 @@ info :
 	@echo "LDFLAGS      = $(LDFLAGS)"
 	@echo "C_CFLAGS     = $(C_CFLAGS)"
 	@echo "C_LDFLAGS    = $(C_LDFLAGS)"
+	@echo "DLL_NAME     = $(DLL_NAME)"
+	@echo "DLL_CFLAGS   = $(DLL_CFLAGS)"
 	@echo "MATLABEXE    = $(MATLABEXE)"
 	@echo "MEX          = $(MEX)"
 	@echo "MATLABPATH   = $(MATLABPATH)"
