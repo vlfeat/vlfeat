@@ -1,4 +1,4 @@
-# file:        Makfile
+# file:        Makefile
 # author:      Andrea Vedaldi
 # description: Build everything
 
