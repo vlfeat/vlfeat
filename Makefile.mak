@@ -468,7 +468,10 @@ bin-commit: bin-release
 	echo Commiting changes && \
 	$(GIT) commit -m "$(ARCH) binaries for version $(VER)" && \
 	echo Commiting and pushing to server the binaries && \
-	$(GIT) push -v --force bin $(BRANCH):$(BRANCH)
+	$(GIT) push -v --force bin $(BRANCH):$(BRANCH) && \
+    $(GIT) checkout v$(VER) && \
+    $(GIT) branch -D $(BRANCH)
+
 
 
 
