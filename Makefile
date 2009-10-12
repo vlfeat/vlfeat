@@ -164,7 +164,7 @@ Darwin_i386_ARCH            := maci
 Linux_i386_ARCH             := glx
 Linux_i686_ARCH             := glx
 Linux_unknown_ARCH          := glx
-Linux_x86_64_ARCH           := g64
+Linux_x86_64_ARCH           := a64
 
 UNAME := $(shell uname -sm)
 ARCH  := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
@@ -300,8 +300,8 @@ MEX_LDFLAGS     += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
 # Linux-64
-ifeq ($(ARCH),g64)
-BINDIR          := bin/g64
+ifeq ($(ARCH),a64)
+BINDIR          := bin/a64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
@@ -570,7 +570,7 @@ bin-merge:
 	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
 	git branch -f $$BRANCH v$(VER) ; \
 	git checkout $$BRANCH ; \
-	for ALT_ARCH in maci glx ; \
+	for ALT_ARCH in maci glx a64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
 	  echo Merging in $$MERGE_BRANCH ; \
