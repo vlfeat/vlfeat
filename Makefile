@@ -541,7 +541,7 @@ bin-release:
 	git checkout v$(VER)
 	echo Rebuilding binaries for release
 	rm -rf bin/$(ARCH)
-	rm -rf toolbox/$(ARCH)
+	rm -rf toolbox/mex$(ARCH)
 	make NDEBUG=yes
 
 bin-commit: bin-release

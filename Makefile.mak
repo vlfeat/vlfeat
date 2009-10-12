@@ -12,6 +12,7 @@
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 # - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
+VER  = 0.9.5
 ARCH = w32
 
 VCROOT     = C:\Program Files\Microsoft Visual Studio 9.0\VC
@@ -27,6 +28,9 @@ MSVCM      = msvcm90.dll
 MSMANIFEST = Microsoft.VC90.CRT.manifest
 MATLABLIB  = $(MATLABROOT)\extern\lib\win32\microsoft
 MEX_SFX    = mexw32
+
+GIT        = git
+BRANCH     = v$(VER)-$(ARCH)
 
 LFLAGS     = /MACHINE:X86 \
              /LIBPATH:"$(VCROOT)\lib" \
@@ -426,4 +430,45 @@ $(mexdir)\$(MSVCP): "$(MSVCRLOC)\$(MSVCP)"
 
 $(mexdir)\$(MSVCM): "$(MSVCRLOC)\$(MSVCM)"
 	copy $(**) "$(@)"
+
+# --------------------------------------------------------------------
+#                                       Rules to post the binary files
+# --------------------------------------------------------------------
+
+bin-release:
+	echo Checking out v$(VER) ; \
+	$(GIT) checkout v$(VER)
+	echo Rebuilding binaries for release
+	if exist "bin\$(ARCH)" del /f /Q "bin\$(ARCH)"
+	if exist "bin\mex$(ARCH)" del /f /Q "toolbox\mex$(ARCH)"
+	nmake /f Makefile.mak ARCH=$(ARCH)
+
+bin-commit: bin-release
+	echo Crearing/resetting and checking out branch $(BRANCH) to v$(VER) && \
+	$(GIT) branch -f $(BRANCH) v$(VER) && \
+	$(GIT) checkout $(BRANCH) && \
+	\
+	echo Adding binaries && \
+	$(GIT) add -f $(bindir)\vl.lib && \
+	$(GIT) add -f $(bindir)\vl.dll && \
+	$(GIT) add -f $(cmdexe) && \
+	$(GIT) add -f $(bindir)\$(MSANIFEST)  && \
+	$(GIT) add -f $(bindir)\$(MSVCP) && \
+	$(GIT) add -f $(bindir)\$(MSVCR) && \
+	$(GIT) add -f $(bindir)\$(MSVCM) && \
+	\
+	$(GIT) add -f $(mexdll) && \
+	$(GIT) add -f $(mexdir)\$(MSANIFEST)  && \
+	$(GIT) add -f $(mexdir)\$(MSVCP)  && \
+	$(GIT) add -f $(mexdir)\$(MSVCR)  && \
+	$(GIT) add -f $(mexdir)\$(MSVCM)  && \
+	$(GIT) add -f $(mexdir)\$(MSVCP)  && \
+	$(GIT) add -f $(mexdir)\$(MSVCR)  && \
+	\
+	echo Commiting changes && \
+	$(GIT) commit -m "$(ARCH) binaries for version $(VER)" && \
+	echo Commiting and pushing to server the binaries && \
+	$(GIT) push -v --force bin $(BRANCH):$(BRANCH)
+
+
 
