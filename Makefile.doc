@@ -8,7 +8,7 @@
 
 .PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
 .PHONY: doc-web, doc-demo
-.PHONY: doc-bindist, doc-distclean
+.PHONY: doc-dist, doc-distclean
 .PHONY: autorights
 
 # 95 DPI make a letter page 808 pixels large
@@ -174,7 +174,7 @@ doc/%.pdf : doc/%.eps
 # Other documentation related targets
 #
 
-doc-bindist: $(NAME) doc
+doc-dist: $(NAME) doc
 	rsync -arv doc $(NAME)/                                      \
 	  --exclude=doc/demo/*.eps                                   \
 	  --exclude=doc/toolbox-src*

@@ -160,7 +160,7 @@ err_internal +=internal
 
 Darwin_PPC_ARCH             := mac
 Darwin_Power_Macintosh_ARCH := mac
-Darwin_i386_ARCH            := mci
+Darwin_i386_ARCH            := maci
 Linux_i386_ARCH             := glx
 Linux_i686_ARCH             := glx
 Linux_unknown_ARCH          := glx
@@ -270,7 +270,7 @@ MEX_LDFLAGS     +=
 endif
 
 # Mac OS X on Intel processor
-ifeq ($(ARCH),mci)
+ifeq ($(ARCH),maci)
 BINDIR          := bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
@@ -522,37 +522,78 @@ distclean: clean doc-distclean
 #                                          Build distribution packages
 # --------------------------------------------------------------------
 
+# bin-release: Rebuild binaries with optimizations and no debug symbols
+# bin-commit:  Creates a new vXX.XX.XX-ARCH branch with the binaries 
+#              and pushes it to the remote called bin
+# bin-merge:   Creates a new vXX.XX.XX-bin branch by merging
+#              the architecture specific binary branches and
+#              adding additional files. It then pushes the result
+#              to the remote called bin.
+# bin-dist:    Packs the commit remotes/bin/vXX.XX.XX-bin.
+# src-dist:    Packs the commit vXX.XX.XX.
+
 .PHONY: $(NAME), dist, bindist
 .PHONY: post, post-doc
+.PHONY: bin-release, bin-commit, bin-dist, src-dist
 
-$(NAME): VERSION
-	rm -rf $(NAME)
-	$(GIT) archive --prefix=$(NAME)/ HEAD | tar xvf -
-	rsync -arv VERSION $(NAME)/
+bin-release:
+	echo Checking out v$(VER) ; \
+	git checkout v$(VER)
+	echo Rebuilding binaries for release
+	rm -rf bin/$(ARCH)
+	rm -rf toolbox/$(ARCH)
+	make NDEBUG=yes
 
-dist: $(NAME)
+bin-commit: bin-release
+	@set -e ; \
+	BRANCH=v$(VER)-$(ARCH)  ; \
+	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
+	git branch -f $$BRANCH v$(VER) ; \
+	git checkout $$BRANCH ; \
+	echo Adding binaries ; \
+	git add -f $(dll_tgt) $(bin_tgt) $(mex_tgt) ; \
+	if test -z "$$(git diff --cached)" ; \
+	then \
+	  echo No changes to commit ; \
+	else \
+	  echo Commiting changes ; \
+	  git commit -m "$(ARCH) binaries for version $(VER)" ; \
+	fi ; \
+	echo Commiting and pushing to server the binaries ; \
+	git push -v --force bin $$BRANCH:$$BRANCH
+
+bin-merge:
+	set -e ; \
+	echo Checking out $(VER) ; \
+	git checkout v$(VER) ; \
+	BRANCH=v$(VER)-bin ; \
+	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
+	git branch -f $$BRANCH v$(VER) ; \
+	git checkout $$BRANCH ; \
+	for ALT_ARCH in maci glx ; \
+	do \
+	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
+	  echo Merging in $$MERGE_BRANCH ; \
+	  $(GIT) fetch -f bin $$MERGE_BRANCH:remotes/bin/$$MERGE_BRANCH ; \
+	  $(GIT) merge bin/$$MERGE_BRANCH ; \
+	done ; \
+	echo Adding common binary distribution files ; \
+	git add $(m_lnk) ; \
+	git commit -m "adds common binary distribution files" ; \
+	echo Pushing to server the merged binaries ; \
+	git push -v --force bin $$BRANCH:$$BRANCH
+
+src-dist:
 	COPYFILE_DISABLE=1                                           \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1                           \
-	tar czvf $(DIST).tar.gz $(NAME)
+	$(GIT) archive --prefix=$(NAME)/ v$(VER) | gzip > $(DIST).tar.gz
 
-bindist: $(NAME) all doc-bindist
-	find . -iname *.[ed][xl][el] -exec chmod a+x {} \;
-	rsync -arv --exclude=objs --exclude=*.pdb bin $(NAME)/
-	rsync -arv --include=*mexmaci                                \
-	           --include=*mexmac                                 \
-	           --include=*mexw32                                 \
-	           --include=*mexw64                                 \
-	           --include=*mexglx                                 \
-	           --include=*mexa64                                 \
-	           --include=noprefix**                              \
-	           --include=*dll                                    \
-	           --include=*.manifest                              \
-	           --include=*.dylib                                 \
-	           --include=*.so                                    \
-		   --exclude=*                                       \
-	           toolbox/ $(NAME)/toolbox
-	tar czvf $(BINDIST).tar.gz $(NAME)/
-
+bin-dist:
+	echo Fetchign binaries ; \
+	BRANCH=v$(VER)-bin ; \
+	git fetch -f bin $$BRANCH:remotes/bin/$$BRANCH ; \
+	echo Creating archive ; \
+	$(GIT) archive --prefix=$(NAME)/ bin/v$(VER)-bin | gzip > $(BINDIST).tar.gz
 
 post:
 	rsync -aP $(DIST).tar.gz $(BINDIST).tar.gz                   \
