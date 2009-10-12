@@ -436,7 +436,9 @@ $(mexdir)\$(MSVCM): "$(MSVCRLOC)\$(MSVCM)"
 # --------------------------------------------------------------------
 
 bin-release:
-	echo Checking out v$(VER) ; \
+	echo Fetching remote tags && \
+	git fetch --tags && \
+	echo Checking out v$(VER) && \
 	$(GIT) checkout v$(VER)
 	echo Rebuilding binaries for release
 	if exist "bin\$(ARCH)" del /f /Q "bin\$(ARCH)"
@@ -444,6 +446,8 @@ bin-release:
 	nmake /f Makefile.mak ARCH=$(ARCH)
 
 bin-commit: bin-release
+	echo Fetching remote tags && \
+	git fetch --tags && \
 	echo Crearing/resetting and checking out branch $(BRANCH) to v$(VER) && \
 	$(GIT) branch -f $(BRANCH) v$(VER) && \
 	$(GIT) checkout $(BRANCH) && \
