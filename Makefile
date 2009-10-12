@@ -536,7 +536,11 @@ distclean: clean doc-distclean
 .PHONY: post, post-doc
 .PHONY: bin-release, bin-commit, bin-dist, src-dist
 
+GIT_ORIG_HEAD := $(shell cat .git/HEAD)
+
 bin-release:
+	echo Fetching remote tags ; \
+	git fetch --tags ; \
 	echo Checking out v$(VER) ; \
 	git checkout v$(VER)
 	echo Rebuilding binaries for release
@@ -546,6 +550,8 @@ bin-release:
 
 bin-commit: bin-release
 	@set -e ; \
+	echo Fetching remote tags ; \
+	git fetch --tags ; \
 	BRANCH=v$(VER)-$(ARCH)  ; \
 	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
 	git branch -f $$BRANCH v$(VER) ; \
@@ -560,9 +566,13 @@ bin-commit: bin-release
 	  git commit -m "$(ARCH) binaries for version $(VER)" ; \
 	fi ; \
 	echo Commiting and pushing to server the binaries ; \
-	git push -v --force bin $$BRANCH:$$BRANCH
+	git push -v --force bin $$BRANCH:$$BRANCH ; \
+	git checkout v$(VER) ; \
+	git branch -D $$BRANCH ;
 
 bin-merge: $(m_lnk)
+	echo Fetching remote tags ; \
+	git fetch --tags ; \
 	set -e ; \
 	echo Checking out $(VER) ; \
 	git checkout v$(VER) ; \
@@ -570,18 +580,23 @@ bin-merge: $(m_lnk)
 	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
 	git branch -f $$BRANCH v$(VER) ; \
 	git checkout $$BRANCH ; \
-	for ALT_ARCH in maci glx a64 ; \
+	MERGE_BRANCHES=; \
+	for ALT_ARCH in maci glx a64 w32 w64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
-	  echo Merging in $$MERGE_BRANCH ; \
+	  echo Fetching $$MERGE_BRANCH ; \
 	  $(GIT) fetch -f bin $$MERGE_BRANCH:remotes/bin/$$MERGE_BRANCH ; \
-	  $(GIT) merge bin/$$MERGE_BRANCH ; \
+	  MERGE_BRANCHES="$$MERGE_BRANCHES bin/$$MERGE_BRANCH" ; \
 	done ; \
+	echo merging $$MERGE_BRANCHES ; \
+	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ; \
 	echo Adding common binary distribution files ; \
 	git add $(m_lnk) ; \
 	git commit -m "adds common binary distribution files" ; \
 	echo Pushing to server the merged binaries ; \
-	git push -v --force bin $$BRANCH:$$BRANCH
+	git push -v --force bin $$BRANCH:$$BRANCH ; \
+	git checkout v$(VER) ; \
+	git branch -D $$BRANCH ;
 
 src-dist:
 	COPYFILE_DISABLE=1                                           \
