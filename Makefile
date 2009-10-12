@@ -562,7 +562,7 @@ bin-commit: bin-release
 	echo Commiting and pushing to server the binaries ; \
 	git push -v --force bin $$BRANCH:$$BRANCH
 
-bin-merge:
+bin-merge: $(m_lnk)
 	set -e ; \
 	echo Checking out $(VER) ; \
 	git checkout v$(VER) ; \
