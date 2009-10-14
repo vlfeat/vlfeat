@@ -1,6 +1,6 @@
 /** @file     dsift.h
- ** #brief    Dense SIFT (DSIFT)
- ** #author   Andrea Vedaldi
+ ** @brief    Dense SIFT (DSIFT)
+ ** @author   Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
