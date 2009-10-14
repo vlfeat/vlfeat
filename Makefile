@@ -625,6 +625,7 @@ post-doc: doc
 	      --exclude=man-src                                      \
 	      --exclude=toolbox-src                                  \
 	      --exclude=.htaccess                                    \
+	      --exclude=favicon.ico                                  \
 	      --delete                                               \
 	      doc/ $(HOST)
 
