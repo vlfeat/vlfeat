@@ -138,7 +138,7 @@ mexFunction(int nout, mxArray *out[],
 
   parentsi = vl_quickshift_get_parents(q);
   /* Copy results */
-  for(i = 0; i < N1*N2; i++) parents[i] = parentsi[i];
+  for(i = 0; i < N1*N2; i++) parents[i] = parentsi[i] + 1;
   memcpy(dists, vl_quickshift_get_dists(q), sizeof(double)*N1*N2);
   memcpy(density, vl_quickshift_get_density(q), sizeof(double)*N1*N2);
 

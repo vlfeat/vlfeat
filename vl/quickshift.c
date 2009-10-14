@@ -387,11 +387,10 @@ void vl_quickshift_process(VlQS * q)
           }
         }
 
-        /* parents_i is the linear index of j which is the best pair (in matlab
-         * notation
+        /* parents_i is the linear index of j which is the best pair 
          * dists_i is the score of the best match
          */
-        parents [i1 + N1 * i2] = j1_best + N1 * j2_best + 1 ;
+        parents [i1 + N1 * i2] = j1_best + N1 * j2_best ;
         dists[i1 + N1 * i2] = sc_best ;
       }
     }  
@@ -431,7 +430,7 @@ void vl_quickshift_process(VlQS * q)
         /* parents is the index of the best pair */
         /* dists_i is the minimal distance, inf implies no Ej > Ei within
          * distance tau from the point */
-        parents [i1 + N1 * i2] = j1_best + N1 * j2_best + 1 ;
+        parents [i1 + N1 * i2] = j1_best + N1 * j2_best ;
         dists[i1 + N1 * i2] = sqrt(d_best) ;
       }
     }  
