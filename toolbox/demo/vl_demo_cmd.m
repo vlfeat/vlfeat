@@ -10,7 +10,7 @@ switch mexext
  case 'mexglx'
 	arch = 'glx' ;
  case 'mexa64'
-	arch = 'g64' ;
+	arch = 'a64' ;
  case 'dll'
 	arch = 'w32' ;
 	ext = '.exe' ;
