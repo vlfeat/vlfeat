@@ -730,7 +730,12 @@ mxuError(char const * errorId, char const * errorMessage, ...)
 }
 
 /** @brief Generate invalid argument error */
+#ifdef VL_COMPILER_LCC
+#define VLMX_EIA(msg) mxuError("invalidArgument", msg)
+#else
 #define VLMX_EIA(...) mxuError("invalidArgument", __VA_ARGS__)
+#endif
+
 
 /** ------------------------------------------------------------------
  ** @brief Formatted @c mexErrMsgTxt()

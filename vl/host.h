@@ -158,6 +158,7 @@
 #define VL_INLINE static __inline
 #define snprintf _snprintf
 #define isnan _isnan
+VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __declspec(dllexport)
 #else
