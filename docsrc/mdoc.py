@@ -104,6 +104,9 @@ class MFile:
         elif format == 'wiki':
             return self.wikiname
 
+    def __cmp__(self, other):
+        return cmp(self.webname, other.webname)
+
     def __str__(self):
         str  = "MFile: %s\n" % (self.funcname)
         str += "  path    : %s\n" % (self.path)
