@@ -263,6 +263,7 @@ def xscan(baseDir, subDir=''):
                   os.path.join(baseDir, subDir, f))]
     subSubDirs = [s for s in dir if os.path.isdir (
                   os.path.join(baseDir, subDir, s))]
+    fileNames.sort()
 
     # Scan M-FileNames
     for fileName in fileNames:
