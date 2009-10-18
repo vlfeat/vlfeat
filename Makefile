@@ -604,7 +604,7 @@ src-dist:
 	$(GIT) archive --prefix=$(NAME)/ v$(VER) | gzip > $(DIST).tar.gz
 
 bin-dist:
-	echo Fetchign binaries ; \
+	echo Fetching binaries ; \
 	BRANCH=v$(VER)-bin ; \
 	git fetch -f bin $$BRANCH:remotes/bin/$$BRANCH ; \
 	echo Creating archive ; \
