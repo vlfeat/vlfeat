@@ -149,13 +149,13 @@ second best one (see <code>vl_ubcmatch</code> for further details).
   that are too small (in absolute value). For instance, consider a
   test image of 2D Gaussian blobs:</p>
 
-<pre><![CDATA[
+<pre>
 I = double(rand(100,500) <= .005) ;
 I = (ones(100,1) * linspace(0,1,500)) .* I ;
 I(:,1) = 0 ; I(:,end) = 0 ;
 I(1,:) = 0 ; I(end,:) = 0 ;
-I = 2*pi*4^2 * vl_imsmooth(I,4)
-I = single(255 * I) ;]]>
+I = 2*pi*4^2 * vl_imsmooth(I,4) ;
+I = single(255 * I) ;
 </pre>
 
 <div class="figure">
