@@ -7,6 +7,8 @@ switch mexext
 	arch = 'mac' ;
  case 'mexmaci'
 	arch = 'maci' ;
+ case 'mexmaci64'
+  arch = 'maci';
  case 'mexglx'
 	arch = 'glx' ;
  case 'mexa64'
