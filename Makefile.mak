@@ -475,7 +475,3 @@ bin-commit: bin-release
 	$(GIT) push -v --force bin $(BRANCH):$(BRANCH) && \
     $(GIT) checkout v$(VER) && \
     $(GIT) branch -D $(BRANCH)
-
-
-
-

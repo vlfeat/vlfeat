@@ -47,17 +47,6 @@
 #
 # GIT:          Version system (you also need the full GIT repository).
 #
-# The following programs are needed only to generate the
-# documentation:
-#
-# PYTHON:       Python interpreter
-# DOXYGEN:      Doxygen documentation system
-# DVIPNG:       TeX DVI to PNG converter
-# DVIPS:        TeX DVI to PS converter
-# EPS2PDF:      EPS to PDF converter
-# CONVERT:      ImageMagick convert utility
-# FIG2DEV:      X-Fig conversion program
-#
 # == BUILDING ===
 #
 # You can use CFLAGS and LDFLAGS to pass additional flags to the C
@@ -123,18 +112,6 @@ MATLABEXE  ?= matlab
 MEX        ?= mex
 LIBTOOL    ?= libtool
 
-# programs required to build VLFeat documentation
-CONVERT    ?= convert
-DOXYGEN    ?= doxygen
-DVIPNG     ?= dvipng
-DVIPS      ?= dvips
-EPSTOPDF   ?= epstopdf
-FIG2DEV    ?= fig2dev
-LATEX      ?= latex
-PYTHON     ?= python
-GROFF      ?= groff
-TIDY       ?= tidy
-
 # programs required to build VLFeat distribution
 GIT        ?= git
 
@@ -155,7 +132,7 @@ err_internal  =$(shell echo Internal error)
 err_internal +=internal
 
 # --------------------------------------------------------------------
-#                                     Auto-detect Architecture, MATLAB
+#                                     Auto-detect architecture, MATLAB
 # --------------------------------------------------------------------
 
 Darwin_PPC_ARCH             := mac
@@ -167,7 +144,7 @@ Linux_unknown_ARCH          := glx
 Linux_x86_64_ARCH           := a64
 
 UNAME := $(shell uname -sm)
-ARCH  := $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+ARCH  ?= $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 # sanity check
 ifeq ($(ARCH),)
@@ -535,11 +512,11 @@ distclean: clean doc-distclean
 	rm -rf toolbox/noprefix
 
 # --------------------------------------------------------------------
-#                                          Build distribution packages
+#                                                            Packaging
 # --------------------------------------------------------------------
 
 # bin-release: Rebuild binaries with optimizations and no debug symbols
-# bin-commit:  Creates a new vXX.XX.XX-ARCH branch with the binaries 
+# bin-commit:  Creates a new vXX.XX.XX-ARCH branch with the binaries
 #              and pushes it to the remote called bin
 # bin-merge:   Creates a new vXX.XX.XX-bin branch by merging
 #              the architecture specific binary branches and
@@ -556,9 +533,9 @@ GIT_ORIG_HEAD := $(shell cat .git/HEAD)
 
 bin-release:
 	echo Fetching remote tags ; \
-	git fetch --tags ; \
+	$(GIT) fetch --tags ; \
 	echo Checking out v$(VER) ; \
-	git checkout v$(VER)
+	$(GIT) checkout v$(VER)
 	echo Rebuilding binaries for release
 	rm -rf bin/$(ARCH)
 	rm -rf toolbox/mex$(ARCH)
@@ -567,35 +544,35 @@ bin-release:
 bin-commit: bin-release
 	@set -e ; \
 	echo Fetching remote tags ; \
-	git fetch --tags ; \
+	$(GIT) fetch --tags ; \
 	BRANCH=v$(VER)-$(ARCH)  ; \
 	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
-	git branch -f $$BRANCH v$(VER) ; \
-	git checkout $$BRANCH ; \
+	$(GIT) branch -f $$BRANCH v$(VER) ; \
+	$(GIT) checkout $$BRANCH ; \
 	echo Adding binaries ; \
-	git add -f $(dll_tgt) $(bin_tgt) $(mex_tgt) ; \
-	if test -z "$$(git diff --cached)" ; \
+	$(GIT) add -f $(dll_tgt) $(bin_tgt) $(mex_tgt) ; \
+	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
 	  echo No changes to commit ; \
 	else \
 	  echo Commiting changes ; \
-	  git commit -m "$(ARCH) binaries for version $(VER)" ; \
+	  $(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
 	fi ; \
 	echo Commiting and pushing to server the binaries ; \
-	git push -v --force bin $$BRANCH:$$BRANCH ; \
-	git checkout v$(VER) ; \
-	git branch -D $$BRANCH ;
+	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ; \
+	$(GIT) checkout v$(VER) ; \
+	$(GIT) branch -D $$BRANCH ;
 
 bin-merge: $(m_lnk)
 	echo Fetching remote tags ; \
-	git fetch --tags ; \
+	$(GIT) fetch --tags ; \
 	set -e ; \
 	echo Checking out $(VER) ; \
-	git checkout v$(VER) ; \
+	$(GIT) checkout v$(VER) ; \
 	BRANCH=v$(VER)-bin ; \
 	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
-	git branch -f $$BRANCH v$(VER) ; \
-	git checkout $$BRANCH ; \
+	$(GIT) branch -f $$BRANCH v$(VER) ; \
+	$(GIT) checkout $$BRANCH ; \
 	MERGE_BRANCHES=; \
 	for ALT_ARCH in maci glx a64 w32 w64 ; \
 	do \
@@ -607,12 +584,12 @@ bin-merge: $(m_lnk)
 	echo merging $$MERGE_BRANCHES ; \
 	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ; \
 	echo Adding common binary distribution files ; \
-	git add $(m_lnk) ; \
-	git commit -m "adds common binary distribution files" ; \
+	$(GIT) add $(m_lnk) ; \
+	$(GIT) commit -m "adds common binary distribution files" ; \
 	echo Pushing to server the merged binaries ; \
-	git push -v --force bin $$BRANCH:$$BRANCH ; \
-	git checkout v$(VER) ; \
-	git branch -D $$BRANCH ;
+	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ; \
+	$(GIT) checkout v$(VER) ; \
+	$(GIT) branch -D $$BRANCH ;
 
 src-dist:
 	COPYFILE_DISABLE=1                                           \

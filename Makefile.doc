@@ -4,6 +4,28 @@
 
 # AUTORIGHTS
 
+# The following programs are needed only to generate the
+# documentation:
+#
+# PYTHON:       Python interpreter
+# DOXYGEN:      Doxygen documentation system
+# DVIPNG:       TeX DVI to PNG converter
+# DVIPS:        TeX DVI to PS converter
+# EPS2PDF:      EPS to PDF converter
+# CONVERT:      ImageMagick convert utility
+# FIG2DEV:      X-Fig conversion program
+
+CONVERT    ?= convert
+DOXYGEN    ?= doxygen
+DVIPNG     ?= dvipng
+DVIPS      ?= dvips
+EPSTOPDF   ?= epstopdf
+FIG2DEV    ?= fig2dev
+LATEX      ?= latex
+PYTHON     ?= python
+GROFF      ?= groff
+TIDY       ?= tidy
+
 # This makefile should not be called directly.
 
 .PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
