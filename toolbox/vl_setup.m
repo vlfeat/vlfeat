@@ -37,7 +37,6 @@ end
 
 bindir = mexext ;
 if strcmp(bindir, 'dll'), bindir = 'mexw32' ; end
-if strcmp(bindir, 'mexmaci64'), bindir = 'mexmaci' ; end
 
 [a,b,c] = fileparts(mfilename('fullpath')) ;
 [a,b,c] = fileparts(a) ;

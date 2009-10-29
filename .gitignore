@@ -5,6 +5,7 @@
 *.mexglx
 *.mexmac
 *.mexmaci
+*.mexmaci64
 *.mexa64
 
 # Python complied files
@@ -19,6 +20,7 @@ doc
 build
 toolbox/mexw32
 toolbox/mexmaci
+toolbox/mexmaci64
 toolbox/mexmac
 toolbox/mexglx
 toolbox/mexa64

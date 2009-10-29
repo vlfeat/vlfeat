@@ -279,7 +279,22 @@ C_CFLAGS        += -DVL_SUPPORT_SSE2 -m32
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
 LDFLAGS         += -lm
-MEX_FLAGS       += -lm
+MEX_FLAGS       += -lm -maci
+MEX_CFLAGS      +=
+MEX_LDFLAGS     +=
+endif
+
+# Mac OS X on Intel 64 processor
+ifeq ($(ARCH),maci64)
+BINDIR          := bin/maci64
+DLL_SUFFIX      := dylib
+MEX_SUFFIX      := mexmaci64
+C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
+C_CFLAGS        += -DVL_SUPPORT_SSE2 -m64
+C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
+CFLAGS          += $(if $(DEBUG), -gstabs+)
+LDFLAGS         += -lm
+MEX_FLAGS       += -lm -maci64
 MEX_CFLAGS      +=
 MEX_LDFLAGS     +=
 endif
@@ -511,7 +526,8 @@ clean:
 
 distclean: clean doc-distclean
 	rm -rf bin
-	for i in mexmac mexmaci mexglx mexw32 mexa64 mexw64 ;        \
+	for i in mexmac mexmaci mexmaci64 mexglx                     \
+                 mexw32 mexa64 mexw64 ;                              \
 	do                                                           \
 	   rm -rf "toolbox/$${i}" ;                                  \
 	done
