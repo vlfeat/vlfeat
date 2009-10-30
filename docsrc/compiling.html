@@ -34,4 +34,36 @@ otherwise not necessary (<b>use the
    attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
 </dl>
 
+<p><b>Compiling for Snow Leopard (64-bit) and MATLAB 2009b:</b> MATLAB 2009b for Snow Leopard has added 64 bit mex support and the extension mexmaci64. VLFeat now supports compiling for this platform, but the architecture must be specified manually when compiling, either like:
+
+<pre>
+MEX=/Applications/MATLAB_R2009b.app/bin/mex ARCH=maci64 NDEBUG=y make
+</pre>
+
+<pre>
+MEX=/Applications/MATLAB_R2009b.app/bin/mex ARCH=maci NDEBUG=y make
+</pre>
+
+Unfortunately, MATLAB 2009b has a bug in inclued the mex script, so if you wish to compile yourself, you will need to modify it. We recommend making a backup before making any changes to this file. To fix the bug, you need to cut this line:
+
+<pre>
+get_arch    # Call $MATLAB/bin/util/arch.sh  
+</pre>
+
+and paste it after the processing of options:
+
+<pre>
+...
+shift
+done
+
+#PASTE get_arch call here
+get_arch    # Call $MATLAB/bin/util/arch.sh
+
+if [ $v7_compat -eq 1 ] ; then
+fc_flags="$fc_flags -DMX_COMPAT_32"
+...
+</pre>
+</p>
+
 </group>
