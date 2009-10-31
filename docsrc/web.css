@@ -253,6 +253,17 @@ pre, code {
     border: 1px solid black ;
     padding: .2em ;
 }
+#content div.parbox {
+    border: 1px dotted #333 ;
+    padding: 0em 1em ;
+    margin-right: 10em ;
+}
+#content div.parbox p,
+#content div.parbox blockquote,
+#content div.pargox div.figure
+{
+    padding-right: 0em ;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                             Mdoc */
