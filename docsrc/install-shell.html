@@ -14,14 +14,15 @@ this directory.</p>
 in <code>VLFEATROOT/bin/ARCH</code>. Here <code>ARCH</code> denotes
 the subdirectory relative to your architecture (e.g. <code>mac</code>
 for Mac OS X PPC, <code>maci</code> for Mac OS X
-Intel, <code>glx</code> for Linux, and so on). For instance, to run
-the SIFT feature extraction code type</p>
+Intel, <code>glx</code> for Linux, and so on). For the sake of
+illustration, the following table gives the path to the SIFT feature
+extraction program for the varius architectures:</p>
 
 <table class="checker">
 <tr>
 <th>Platform</th>
 <th><code>ARCH</code></th>
-<th>Example</th>
+<th>Path to command</th>
 </tr>
 <tr>
 <td>Windows 32</td>
@@ -34,9 +35,14 @@ the SIFT feature extraction code type</p>
 <td><code>VLFEATROOT\bin\w64\sift.exe</code></td>
 </tr>
 <tr>
-<td>Mac Intel</td>
+<td>Mac Intel 32</td>
 <td><code>maci</code></td>
 <td><code>VLFEATROOT/bin/maci/sift</code></td>
+</tr>
+<tr>
+<td>Mac Intel 64</td>
+<td><code>maci64</code></td>
+<td><code>VLFEATROOT/bin/maci64/sift</code></td>
 </tr>
 <tr>
 <td>Mac PPC</td>
@@ -63,7 +69,6 @@ can be viewed with the <code>man</code> utility. For instance
 <pre>
 > man VLFEATROOT/src/sift.1
 </pre>
-
 
 <p>It might be convenient to add VLFeat to the system search paths. In
 Linux and Mac OS X this involves modifying the <code>PATH</code>
