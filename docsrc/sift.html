@@ -10,7 +10,7 @@ other viewing conditions. The descriptor associates to the regions a
 signature which identifies their appearance compactly and
 robustly. For a more in-depth description of the algorithm, see our
 <a href="%pathto:root;api/sift_8h.html">API reference for SIFT</a>.</p>
- 
+
 <ul>
  <li><a href="%pathto:tut.sift.extract;">Extracting frames and descriptors</a></li>
  <li><a href="%pathto:tut.sift.match;">Basic matching</a></li>
@@ -150,7 +150,7 @@ second best one (see <code>vl_ubcmatch</code> for further details).
   test image of 2D Gaussian blobs:</p>
 
 <pre>
-I = double(rand(100,500) <= .005) ;
+I = double(rand(100,500) &lt;= .005) ;
 I = (ones(100,1) * linspace(0,1,500)) .* I ;
 I(:,1) = 0 ; I(:,end) = 0 ;
 I(1,:) = 0 ; I(end,:) = 0 ;
