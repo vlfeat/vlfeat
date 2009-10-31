@@ -112,6 +112,7 @@ APPENDIX
 CHANGES
   0.9.5      Added kd-tree and new SSE-accelerated vector/histogram
              comparison code.  Improved dense SIFT (dsift) implementation.
+             Added Snow Leopard and MATLAB R2009b support.
   0.9.4      Added quick shift. Renamed dhog to dsift and improved
              implementation and documentation. Improved tutorials.
              Added 64 bit Windows binaries. Many other small changes.
