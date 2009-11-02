@@ -23,12 +23,15 @@ switch lower(method)
     J = I(1:2:floor(end-.5),1:2:floor(end-.5),:) ;
     
   case 'avg'
+    Iclass = class(I);
+    I = double(I);
     J = ...
         I(1:2:end-1,1:2:end-1,:) + ...
         I(2:2:end,1:2:end-1,:) + ...
         I(1:2:end-1,2:2:end,:) + ...
         I(2:2:end,2:2:end,:) ;
     J = J / 4 ;
+    eval(sprintf('J=%s(J);', Iclass));
     
   otherwise
     error(sprintf('Unknown downsampling method ''%s''.', method)) ;
