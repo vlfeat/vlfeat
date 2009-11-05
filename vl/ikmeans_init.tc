@@ -147,14 +147,14 @@ vl_ikm_init_rand_data
       for (prevk = 0 ; prevk < k ; ++ prevk) {
         vl_uint32 dist = calc_dist2
           (f-> centers + prevk * M, 
-           data + pairs[j].j * M, M) ;
+           data + (vl_uint64)pairs[j].j * M, M) ;
         if (dist == 0)  break ;       
       }
       if (prevk == k) break ;
     }
 
     for (i = 0 ; i < M ; ++ i) {
-      f-> centers [k * M + i] = data [pairs[j].j * M + i] ;
+      f-> centers [k * M + i] = data [(vl_uint64)pairs[j].j * M + i] ;
     }
 
     if (j < N - 1) ++ j ;
