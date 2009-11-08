@@ -444,12 +444,14 @@ typedef void VlDoubleVectorComparisonFunction ;
 
 /** @brief Vector comparison types */
 enum _VlVectorComparisonType {
-  VlDistanceL1,   /**< l1 distance */
-  VlDistanceL2,   /**< l2 distance */
-  VlDistanceChi2, /**< Chi2 distance */
-  VlKernelL1,     /**< l1 kernel */
-  VlKernelL2,     /**< l2 kernel */
-  VlKernelChi2    /**< Chi2 kernel */
+  VlDistanceL1,        /**< l1 distance */
+  VlDistanceL2,        /**< l2 distance */
+  VlDistanceChi2,      /**< Chi2 distance */
+  VlDistanceHellinger, /**< Hellinger's distance */
+  VlKernelL1,          /**< l1 kernel */
+  VlKernelL2,          /**< l2 kernel */
+  VlKernelChi2,        /**< Chi2 kernel */
+  VlKernelHellinger    /**< Hellinger's kernel */
 } ;
 
 /** @brief Vector comparison types */

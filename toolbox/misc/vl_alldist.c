@@ -94,9 +94,11 @@ mexFunction(int nout, mxArray *out[],
       case opt_L2    : comparisonType = VlDistanceL2 ; break ;
       case opt_L1    : comparisonType = VlDistanceL1 ; break ;
       case opt_CHI2  : comparisonType = VlDistanceChi2 ; break ;
+      case opt_HELL  : comparisonType = VlDistanceHellinger ; break ;
       case opt_KL2   : comparisonType = VlKernelL2 ; break ;
       case opt_KL1   : comparisonType = VlKernelL1 ; break ;
       case opt_KCHI2 : comparisonType = VlKernelChi2 ; break ;
+      case opt_KHELL : comparisonType = VlKernelHellinger ; break ;
       default:
         assert(0) ;
     }

@@ -4,6 +4,7 @@
  **/
 
 #include "float.th"
+#include <math.h>
 
 #undef COMPARISONFUNCTION_TYPE
 
@@ -62,6 +63,24 @@ VL_XCAT(_vl_distance_chi2_, SFX)
 }
 
 VL_EXPORT T
+VL_XCAT(_vl_distance_hellinger_, SFX)
+(vl_size dimension, T const * X, T const * Y)
+{
+  T const * X_end = X + dimension ;
+  T acc = 0.0 ;
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *Y++ ;
+#if (T == float)
+    acc += a + b - 2.0 * sqrtf (a*b) ;
+#else
+    acc += a + b - 2.0 * sqrt (a*b) ;
+#endif
+  }
+  return acc ;
+}
+
+VL_EXPORT T
 VL_XCAT(_vl_kernel_l2_, SFX)
 (vl_size dimension, T const * X, T const * Y)
 {
@@ -110,6 +129,24 @@ VL_XCAT(_vl_kernel_chi2_, SFX)
   return acc ;
 }
 
+VL_EXPORT T
+VL_XCAT(_vl_kernel_hellinger_, SFX)
+(vl_size dimension, T const * X, T const * Y)
+{
+  T const * X_end = X + dimension ;
+  T acc = 0.0 ;
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *Y++ ;
+#if (T == float)
+    acc += sqrtf (a*b) ;
+#else
+    acc += sqrt (a*b) ;
+#endif
+  }
+  return acc ;
+}
+
 /* ---------------------------------------------------------------- */
 
 VL_EXPORT COMPARISONFUNCTION_TYPE
@@ -117,12 +154,14 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
 {
   COMPARISONFUNCTION_TYPE function = 0 ;
   switch (type) {
-    case VlDistanceL2   : function = VL_XCAT(_vl_distance_l2_,   SFX) ; break ;
-    case VlDistanceL1   : function = VL_XCAT(_vl_distance_l1_,   SFX) ; break ;
-    case VlDistanceChi2 : function = VL_XCAT(_vl_distance_chi2_, SFX) ; break ;
-    case VlKernelL2     : function = VL_XCAT(_vl_kernel_l2_,     SFX) ; break ;
-    case VlKernelL1     : function = VL_XCAT(_vl_kernel_l1_,     SFX) ; break ;
-    case VlKernelChi2   : function = VL_XCAT(_vl_kernel_chi2_,   SFX) ; break ;
+    case VlDistanceL2        : function = VL_XCAT(_vl_distance_l2_,        SFX) ; break ;
+    case VlDistanceL1        : function = VL_XCAT(_vl_distance_l1_,        SFX) ; break ;
+    case VlDistanceChi2      : function = VL_XCAT(_vl_distance_chi2_,      SFX) ; break ;
+    case VlDistanceHellinger : function = VL_XCAT(_vl_distance_hellinger_, SFX) ; break ;
+    case VlKernelL2          : function = VL_XCAT(_vl_kernel_l2_,          SFX) ; break ;
+    case VlKernelL1          : function = VL_XCAT(_vl_kernel_l1_,          SFX) ; break ;
+    case VlKernelChi2        : function = VL_XCAT(_vl_kernel_chi2_,        SFX) ; break ;
+    case VlKernelHellinger   : function = VL_XCAT(_vl_kernel_hellinger_,   SFX) ; break ;
     default: assert(0) ; break ;
   }
 

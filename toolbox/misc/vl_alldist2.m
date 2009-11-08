@@ -19,7 +19,7 @@
 %    L1     sum |X  - Y|
 %    L0     sum (X ~= Y)
 %    CHI2   sum (X  - Y).^2 ./ (X + Y)
-%    HELL   sum (X^.5 + Y^.5) .^ 2
+%    HELL   sum (X^.5 - Y^.5) .^ 2
 %
 %  (Notice that the standard definition of chi2 is half of what is
 %  computed here).
