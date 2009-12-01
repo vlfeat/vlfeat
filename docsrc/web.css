@@ -196,8 +196,9 @@ pre, code {
 }
 #content dd {
     display: block ;
-    margin: 0.1em  0 ;
+    margin: 0.1em 0 ;
     padding-left: 2em ;
+    padding-right: 10em ;
 }
 #content dd p,
 #content dd ul {
