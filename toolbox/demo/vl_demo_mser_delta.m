@@ -26,7 +26,7 @@ set(gca,'fontsize',20) ;
 deltar = [1 32 159 160] ;
 clear h ;
 for delta=deltar
-  [r,f] = vl_mser(I, 'Delta', delta, 'verbose') ;
+  [r,f] = vl_mser(I, 'Delta', delta, 'BrightOnDark', 0, 'verbose') ;
     
   if exist('h','var'), delete(h) ; end
   h = vl_plotframe(vl_ertr(f)) ; 

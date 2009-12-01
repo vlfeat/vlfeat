@@ -50,6 +50,14 @@
 %       area variation of two nested regions is below this threshold,
 %       then only the most stable one is selected.
 %
+%   BrightOnDark [1]::
+%       Detect bright-on-dark MSERs. This corresponds to MSERs of the
+%       inverted image.
+%
+%   DarkOnBright [1]::
+%       Detect dark-on-bright MSERs. This corresponds to MSERs of the
+%       original image.
+%
 %   Verbose::
 %       Be verbose.
 %
