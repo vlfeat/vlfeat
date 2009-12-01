@@ -26,7 +26,7 @@ GNU GPLv2, or (at your option) any later version.
 #define MAX(x,y) (((x)>(y))?(x):(y))
 
 typedef char unsigned val_t ;
-typedef int  unsigned idx_t ;
+typedef int           idx_t ;
 typedef vl_uint64 acc_t ;
 
 /* advance N-dimensional subscript */
@@ -64,6 +64,7 @@ mexFunction(int nout, mxArray *out[],
   idx_t* strides_pt ;    /* strides to move in image array          */
   val_t* visited_pt ;    /* flag                                    */
   idx_t* members_pt ;    /* region members                          */
+  bool invert = false;
 
   /** -----------------------------------------------------------------
    **                                               Check the arguments
@@ -107,6 +108,10 @@ mexFunction(int nout, mxArray *out[],
   memset(visited_pt, 0, sizeof(val_t) * nel) ;
   {
     idx_t idx = (idx_t) *er_pt ;
+    if (idx < 0) {
+      idx = -idx;
+      invert = true;
+    }
     if( idx < 1 || idx > nel ) {
       char buff[80] ;
       snprintf(buff,80,"ER=%d out of range [1,%d]",idx,nel) ;    
@@ -158,7 +163,8 @@ mexFunction(int nout, mxArray *out[],
       */
       if(good 
          && nindex != index 
-         && I_pt [nindex] <= value
+         && ((!invert && I_pt [nindex] <= value) ||
+             ( invert && I_pt [nindex] >= value))
          && ! visited_pt [nindex] ) {
         
         /* mark as visited */
