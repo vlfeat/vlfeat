@@ -24,8 +24,8 @@ body {
     border-color: #454545;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: Lucida, Helvetica, sans-serif ;
-    font-weight: normal ;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif ;
+    font-weight: bold ;
     color: #183a60;
 }
 a {
@@ -99,19 +99,24 @@ pre, code {
 #header #cse-search-box {
     float: right ;
     margin-right: 1em ;
+    margin-top: auto ;
+    margin-bottom: auto ;
 }
 #headbanner {
     background-color: #d7d4d8;
     padding: .2em .7em ;
     border-bottom: 1px solid gray ;
     border-style: none;
-    font: bold 1.1em Lucida, Helvetica, sans-serif;
+    font: bold 1.1em 'Trebuchet MS', Helvetica, sans-serif;
     color: #5a5a5e;
 }
 #header h1 {
     margin: 0 ;
     color:  white ;
-    font-family: Lucida, Helvetica, sans-serif ;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif ;
+}
+#dotorg {
+    color: #ccc ;
 }
 #footer {
     clear: both ;
@@ -146,12 +151,12 @@ pre, code {
     margin: 1em 0 ;
     margin-top: 1.5em ;
 }
-#content h1 {font-size:1.7em; margin-bottom: 0.59em;}
-#content h2 {font-size:1.5em; margin-bottom: 0.67em;}
+#content h1 {font-size:1.5em; margin-bottom: 0.59em;}
+#content h2 {font-size:1.4em; margin-bottom: 0.67em;}
 #content h3 {font-size:1.3em; margin-bottom: 0.77em;}
 #content h4 {font-size:1.2em; margin-bottom: 0.83em;}
-#content h5 {font-size:1.0em; margin-bottom: 1.00em;}
-#content h6 {font-size:0.8em; margin-bottom: 1.15em;}
+#content h5 {font-size:1.1em; margin-bottom: 1.00em;}
+#content h6 {font-size:1.0em; margin-bottom: 1.15em;}
 #content p,
 #content blockquote,
 #content div.figure {

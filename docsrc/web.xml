@@ -1,23 +1,23 @@
 <!DOCTYPE site PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<site id='root'> 
+<site id='root'>
 
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
  <!-- Site template                                                -->
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
  <template id="template.default">
 
-<html>   
+<html>
  <meta>
   <!-- Stylesheets -->
   <link href="%pathto:root;web.css" rel="stylesheet" type="text/css"/>
   <title>VLFeat - %path;</title>
-  %pagestyle; 
-  
+  %pagestyle;
+
   <!-- Scripts-->
   %pagescript;
  </meta>
- 
+
  <!-- Body Start -->
  <body>
   <div id="header">
@@ -33,7 +33,7 @@
    </form>
    <script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
    <!-- Google CSE Search Box Ends -->
-   <h1>VLFeat.org</h1>
+   <h1><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></h1>
   </div>
   <div id="headbanner">
    %path;
@@ -50,7 +50,7 @@
   <div id="footer">
    &copy; 2005-09 Andrea Vedaldi and Brian Fulkerson
   </div> <!-- footer -->
-  
+
   <!-- Google Analytics Begins -->
   <script type="text/javascript">
    //<![CDATA[
@@ -86,7 +86,7 @@
  <!-- Site contents                                                -->
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- <page id="home"    name="index"    title="Home"> <include src="index.html"/>  
+ <page id="home"    name="index"    title="Home"> <include src="index.html"/>
   <pagestyle>
    #content p.widePar {
      padding-right: 1em ;
@@ -129,7 +129,7 @@
     </div>
    </page>
   </dir>
-  
+
   <dir name="man">
    <page id="man" name="man" title="Man pages">
     <p>These man pages describe VLFeat command line utilities.</p>
@@ -137,11 +137,11 @@
     <include src="doc/man-src/man.xml"/>
    </page>
   </dir>
-  
+
  </page>
 
  <dir name="overview">
-  <page id="tut"       name="tut"       title="Tutorials"> 
+  <page id="tut"       name="tut"       title="Tutorials">
    <include src="tutorials.html"/>
    <page id="tut.sift"  name="sift"      title="SIFT"> <include src="sift.html"/></page>
    <page id="tut.mser"  name="mser"      title="MSER"> <include src="mser.html"/></page>
