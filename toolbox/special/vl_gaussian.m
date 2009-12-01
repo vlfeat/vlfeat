@@ -10,10 +10,10 @@ function y = vl_gaussian(x)
 %   See also:: VL_DGAUSSIAN(), VL_DDGAUSSIAN(), VL_HELP().
 
 % AUTORIGHTS
-% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 % 
-% This file is part of VLFeat, available in the terms of the GNU
-% General Public License version 2.
+% This file is part of VLFeat, available under the terms of the
+% GNU GPLv2, or (at your option) any later version.
 
 y = 1/sqrt(2*pi)*exp(-0.5*x.^2) ;
 

@@ -14,10 +14,10 @@ function J=vl_rgb2xyz(I,ws)
 %   See also:: VL_XYZ2RGB(), VL_HELP().
 
 % AUTORIGHTS
-% Copyright 2007 (c) Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
 % 
-% This file is part of VLFeat, available in the terms of the GNU
-% General Public License version 2.
+% This file is part of VLFeat, available under the terms of the
+% GNU GPLv2, or (at your option) any later version.
 
 [M,N,K] = size(I) ;
 

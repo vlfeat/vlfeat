@@ -210,8 +210,8 @@ autorights: distclean
 	  toolbox vl                                                 \
 	  --recursive                                                \
 	  --verbose                                                  \
-	  --template doc/copylet.txt                                 \
-	  --years 2007-2008                                          \
+	  --template docsrc/copylet.txt                              \
+	  --years 2007-09                                            \
 	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
 	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
 	  --program "VLFeat"
