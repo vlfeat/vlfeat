@@ -54,7 +54,8 @@ vl_demo_print('mser_basic_contours') ;
 %                                                       Run VL_MSER again
 % --------------------------------------------------------------------
 
-[r,f] = vl_mser(uint8(255-I),'MinDiversity',0.7,'MaxVariation',0.2,'Delta',10) ;
+[r,f] = vl_mser(I,'MinDiversity',0.7,'MaxVariation',0.2,...
+  'Delta',10,'BrightOnDark',1,'DarkOnBright',0) ;
 
 % adjust convention
 f = vl_ertr(f) ;
@@ -62,7 +63,7 @@ f = vl_ertr(f) ;
 % compute regions mask
 M = zeros(size(I)) ;
 for x=r'
-  s = vl_erfill(uint8(255-I),x) ;
+  s = vl_erfill(I,x) ;
   M(s) = M(s) + 1;
 end
 

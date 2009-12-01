@@ -107,25 +107,6 @@ Extracted MSERs (left) and fitted ellipses (right).
 </div>
 </div>
 
-<p>Notice that we only find dark-on-bright regions by default. To include
-bright-on-dark regions we simply repeat the process with <code>255-I</code>.
-</p>
-
-<pre>
-[r,f] = vl_mser(uint8(255-I),'MinDiversity',0.7,'MaxVariation',0.2,'Delta',10) ;
-</pre>
-
-<div class="figure">
-<image src="%pathto:root;demo/mser_basic_contours_both.jpg"/>
-<image src="%pathto:root;demo/mser_basic_frames_both.jpg"/>
-<div class="caption">
-<span class="content">
-Extracted MSERs (left) and fitted ellipses (right) for both bright-on-dark
-(green) and dark-on-bright (yellow).  
-</span>
-</div>
-</div>
-
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.param">MSER parameters</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -186,6 +167,29 @@ rejected if:</p>
 <li>it is too similar to its parent MSER (see the
 parameter <code>MinDiversity</code>).</li>
 </ul>
+
+<p>By default, MSERs are extracted for both dark-on-bright regions and bright-on-dark regions. To control this, parmeters <code>BrightOnDark</code> and <code>DarkOnBright</code> which take values 0 or 1 to enable or disable the regions. For example:
+</p>
+
+<pre>
+[r,f] = vl_mser(I,'MinDiversity',0.7,...
+                'MaxVariation',0.2,...
+                'Delta',10,...
+                'BrightOnDark',1,'DarkOnBright',0) ;
+</pre>
+
+<p>computes the regions in green in the figure below.</p>
+
+<div class="figure">
+<image src="%pathto:root;demo/mser_basic_contours_both.jpg"/>
+<image src="%pathto:root;demo/mser_basic_frames_both.jpg"/>
+<div class="caption">
+<span class="content">
+Extracted MSERs (left) and fitted ellipses (right) for both bright-on-dark
+(green) and dark-on-bright (yellow).  
+</span>
+</div>
+</div>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.mser.conventions">Conventions</h1>
