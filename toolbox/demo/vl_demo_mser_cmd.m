@@ -27,7 +27,9 @@ imwrite(I,p_pgm,'pgm') ;
                     ' --delta=10 ' ...
                     ' --verbose '] ) ;
 
-r_ = load(p_sed,'-ASCII')' + 1 ;
+r_ = load(p_sed,'-ASCII')';
+% note: bright-on-dark region seeds are negative
+r_ = r_ + sign(r_); % add one for matlab indexing
 f_ = load(p_frm,'-ASCII')' ; f_(1:2,:) = f_(1:2,:) + 1 ;
 
 [r,f] = vl_mser(I','MinDiversity',0.7,'MaxVariation',0.2,'Delta',10) ;

@@ -11,7 +11,7 @@ This file is part of VLFeat, available in the terms of the GNU
 General Public License version 2.
 */
 
-#define VL_MSER_DRIVER_VERSION 0.1 
+#define VL_MSER_DRIVER_VERSION 0.2 
 
 #include "generic-driver.h"
 
@@ -31,18 +31,20 @@ char const help_message [] =
   "Usage: %s [options] files ...\n"
   "\n"
   "Options include:\n"
-  " --verbose -v    Be verbose\n"
-  " --help -h       Print this help message\n"
-  " --seeds         Specify seeds file\n"
-  " --frames        Specify frames file\n"
-  " --meta          Specify meta file\n"
-  " --delta -d      Specify MSER delta paramter\n"
-  " --epsilon -e    Specify MSER epsilon parameter\n"
-  " --no-dups       Remove duplicate\n"
-  " --dups          Keep duplicates\n"
-  " --max-area      Specify maximum region (relative) area\n"
-  " --min-area      Specify minimum region (relative) area\n"
-  " --max-variation Specify maximum absolute region stability\n"
+  " --verbose -v     Be verbose\n"
+  " --help -h        Print this help message\n"
+  " --seeds          Specify seeds file\n"
+  " --frames         Specify frames file\n"
+  " --meta           Specify meta file\n"
+  " --delta -d       Specify MSER delta paramter\n"
+  " --epsilon -e     Specify MSER epsilon parameter\n"
+  " --no-dups        Remove duplicate\n"
+  " --dups           Keep duplicates\n"
+  " --max-area       Specify maximum region (relative) area\n"
+  " --min-area       Specify minimum region (relative) area\n"
+  " --max-variation  Specify maximum absolute region stability\n"
+  " --bright-on-dark Enable or disable bright-on-dark regions (default 1)\n"
+  " --dark-on-bright Enable or disable dark-on-bright regions (default 1)\n"
   "\n" ;
 
 /* ----------------------------------------------------------------- */
@@ -54,7 +56,9 @@ enum {
   opt_max_area,
   opt_min_area,
   opt_max_variation,
-  opt_min_diversity
+  opt_min_diversity,
+  opt_bright,
+  opt_dark
 } ;
 
 /* short options */
@@ -72,6 +76,8 @@ struct option const longopts [] = {
   { "min-area",        required_argument,      0,          opt_min_area      },
   { "max-variation",   required_argument,      0,          opt_max_variation },
   { "min-diversity",   required_argument,      0,          opt_min_diversity },
+  { "bright-on-dark",  required_argument,      0,          opt_bright        },
+  { "dark-on-bright",  required_argument,      0,          opt_dark          },
   { 0,                 0,                      0,          0                 }
 } ;
 
@@ -88,6 +94,8 @@ main(int argc, char **argv)
   double   min_area      = -1 ;
   double   max_variation = -1 ;
   double   min_diversity = -1 ;
+  int      bright_on_dark = 1 ;
+  int      dark_on_bright = 1 ;
 
   vl_bool  err    = VL_ERR_OK ;
   char     err_msg [1024] ;
@@ -201,6 +209,18 @@ main(int argc, char **argv)
         ERR("meta file supports only ASCII protocol", NULL) ;
       break ;
 
+    case opt_bright :
+      n = sscanf (optarg, "%d", &bright_on_dark) ;
+      if (n == 0 || (bright_on_dark != 0 && bright_on_dark != 1))
+        ERR("bright_on_dark must be 0 or 1.", NULL) ;
+      break ;
+
+    case opt_dark :
+      n = sscanf (optarg, "%d", &dark_on_bright) ;
+      if (n == 0 || (dark_on_bright != 0 && dark_on_bright != 1))
+        ERR("dark_on_bright must be 0 or 1.", NULL) ;
+      break ;
+
       /* .......................................................... */      
     case 0 :
     default :
@@ -250,13 +270,18 @@ main(int argc, char **argv)
     char             basename [1024] ;
     char const      *name = *argv++ ;
     VlMserFilt      *filt = 0 ;
+    VlMserFilt      *filtinv = 0 ;
     vl_uint8        *data = 0 ;
+    vl_uint8        *datainv = 0 ;
     VlPgmImage       pim ;
     vl_uint const   *regions ;
+    vl_uint const   *regionsinv ;
     float const *frames ;
+    float const *framesinv ;
     enum            {ndims = 2} ;
     int              dims [ndims] ;
-    int              i, j, dof, nregions, nframes, q ;
+    int             nregions = 0, nregionsinv = 0, nframes = 0, nframesinv =0;
+    int              i, j, dof, q ;
     FILE            *in = 0 ;
 
     /* Open files  ------------------------------------------------ */
@@ -351,8 +376,9 @@ main(int argc, char **argv)
     dims[1] = pim.height ;
 
     filt = vl_mser_new (ndims, dims) ;
+    filtinv = vl_mser_new (ndims, dims) ;
     
-    if (!filt) {
+    if (!filt || !filtinv) {
       snprintf(err_msg, sizeof(err_msg), 
               "Could not create an MSER filter.") ;
       goto done ;
@@ -363,6 +389,12 @@ main(int argc, char **argv)
     if (min_area      >= 0) vl_mser_set_min_area       (filt, min_area) ;
     if (max_variation >= 0) vl_mser_set_max_variation  (filt, max_variation) ;
     if (min_diversity >= 0) vl_mser_set_min_diversity  (filt, min_diversity) ;
+    if (delta         >= 0) vl_mser_set_delta          (filtinv, (vl_mser_pix) delta) ;
+    if (max_area      >= 0) vl_mser_set_max_area       (filtinv, max_area) ;
+    if (min_area      >= 0) vl_mser_set_min_area       (filtinv, min_area) ;
+    if (max_variation >= 0) vl_mser_set_max_variation  (filtinv, max_variation) ;
+    if (min_diversity >= 0) vl_mser_set_min_diversity  (filtinv, min_diversity) ;
+
 
     if (verbose) {
       printf("mser: parameters:\n") ;
@@ -373,32 +405,77 @@ main(int argc, char **argv)
       printf("mser:   min_diversity = %g\n", vl_mser_get_min_diversity (filt)) ;
     }
 
-    vl_mser_process (filt, (vl_mser_pix*) data) ;
+    if (dark_on_bright) 
+    {
+      vl_mser_process (filt, (vl_mser_pix*) data) ;
 
-    /* Save result  ----------------------------------------------- */
-    nregions = vl_mser_get_regions_num (filt) ;
-    regions  = vl_mser_get_regions     (filt) ;
+      /* Save result  ----------------------------------------------- */
+      nregions = vl_mser_get_regions_num (filt) ;
+      regions  = vl_mser_get_regions     (filt) ;
     
-    if (piv.active) {
-      for (i = 0 ; i < nregions ; ++i) {
-        fprintf(piv.file, "%d ", regions [i]) ;
-      }
-    }
-
-    if (frm.active) {
-      vl_mser_ell_fit (filt) ;
-
-      nframes = vl_mser_get_ell_num (filt) ;
-      dof     = vl_mser_get_ell_dof (filt) ;
-      frames  = vl_mser_get_ell     (filt) ;
-      for (i = 0 ; i < nframes ; ++i) {
-        for (j = 0 ; j < dof ; ++j) {
-          fprintf(frm.file, "%f ", *frames++) ;
+      if (piv.active) {
+        for (i = 0 ; i < nregions ; ++i) {
+          fprintf(piv.file, "%d ", regions [i]) ;
         }
-        fprintf(frm.file, "\n") ;
+      }
+
+      if (frm.active) {
+        vl_mser_ell_fit (filt) ;
+
+        nframes = vl_mser_get_ell_num (filt) ;
+        dof     = vl_mser_get_ell_dof (filt) ;
+        frames  = vl_mser_get_ell     (filt) ;
+        for (i = 0 ; i < nframes ; ++i) {
+          for (j = 0 ; j < dof ; ++j) {
+            fprintf(frm.file, "%f ", *frames++) ;
+          }
+          fprintf(frm.file, "\n") ;
+        }
       }
     }
+    if (bright_on_dark)
+    {
+      /* allocate buffer */
+      datainv = malloc(vl_pgm_get_npixels (&pim) * 
+                  vl_pgm_get_bpp       (&pim)) ;
+      for (i = 0; i < vl_pgm_get_npixels (&pim); i++) {
+        datainv[i] = ~data[i]; /* 255 - data[i] */
+      }
     
+      if (!datainv) {
+        err = VL_ERR_ALLOC ;
+        snprintf(err_msg, sizeof(err_msg), 
+                 "Could not allocate enough memory.") ;
+        goto done ;
+      } 
+
+      vl_mser_process (filtinv, (vl_mser_pix*) datainv) ;
+
+      /* Save result  ----------------------------------------------- */
+      nregionsinv = vl_mser_get_regions_num (filtinv) ;
+      regionsinv  = vl_mser_get_regions     (filtinv) ;
+    
+      if (piv.active) {
+        for (i = 0 ; i < nregionsinv ; ++i) {
+          fprintf(piv.file, "%d ", -regionsinv [i]) ;
+        }
+      }
+
+      if (frm.active) {
+        vl_mser_ell_fit (filtinv) ;
+
+        nframesinv = vl_mser_get_ell_num (filtinv) ;
+        dof        = vl_mser_get_ell_dof (filtinv) ;
+        framesinv  = vl_mser_get_ell     (filtinv) ;
+        for (i = 0 ; i < nframesinv ; ++i) {
+          for (j = 0 ; j < dof ; ++j) {
+            fprintf(frm.file, "%f ", *framesinv++) ;
+          }
+          fprintf(frm.file, "\n") ;
+        }
+      }
+    }
+
     if (met.active) {
       fprintf(met.file, "<mser\n") ;
       fprintf(met.file, "  input = '%s'\n", name) ;
@@ -418,11 +495,19 @@ main(int argc, char **argv)
       vl_mser_delete (filt) ;
       filt = 0 ;
     }
+    if (filtinv) {
+      vl_mser_delete (filtinv) ;
+      filtinv = 0 ;
+    }
   
     /* release image data */
     if (data) {
       free (data) ;
       data = 0 ;
+    }
+    if (datainv) {
+      free (datainv) ;
+      datainv = 0 ;
     }
 
     /* close files */
