@@ -73,7 +73,7 @@ if demo
 end
 
 
-fprintf('** Welcome to the VLFeat Toolbox **\n') ;
+fprintf('** Welcome to the VLFeat Toolbox v0.9.5 **\n') ;
 
 if nargout == 0
   clear path ;
