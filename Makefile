@@ -539,7 +539,7 @@ bin-release:
 	echo Rebuilding binaries for release
 	rm -rf bin/$(ARCH)
 	rm -rf toolbox/mex$(ARCH)
-	make NDEBUG=yes
+	make NDEBUG=yes ARCH=$(ARCH)
 
 bin-commit: bin-release
 	@set -e ; \
@@ -574,7 +574,7 @@ bin-merge: $(m_lnk)
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
 	MERGE_BRANCHES=; \
-	for ALT_ARCH in maci glx a64 w32 w64 ; \
+	for ALT_ARCH in maci64 maci glx a64 w32 w64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
 	  echo Fetching $$MERGE_BRANCH ; \
