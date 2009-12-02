@@ -366,6 +366,7 @@ $(eval $(call gendir, noprefix, toolbox/noprefix                    ))
 # LINUX:
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+dll_lnk := $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_src := $(wildcard vl/*.c)
 dll_hdr := $(wildcard vl/*.h) $(wildcard vl/*.tc)
 dll_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(dll_src:.c=.o)))
@@ -550,7 +551,7 @@ bin-commit: bin-release
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
 	echo Adding binaries ; \
-	$(GIT) add -f $(dll_tgt) $(bin_tgt) $(mex_tgt) ; \
+	$(GIT) add -f $(dll_tgt) $(dll_lnk) $(bin_tgt) $(mex_tgt) ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
 	  echo No changes to commit ; \
