@@ -71,7 +71,7 @@ VL_XCAT(_vl_distance_hellinger_, SFX)
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
-#if (T == float)
+#if (FLT == VL_TYPE_FLOAT)
     acc += a + b - 2.0 * sqrtf (a*b) ;
 #else
     acc += a + b - 2.0 * sqrt (a*b) ;
@@ -138,7 +138,7 @@ VL_XCAT(_vl_kernel_hellinger_, SFX)
   while (X < X_end) {
     T a = *X++ ;
     T b = *Y++ ;
-#if (T == float)
+#if (FLT == VL_TYPE_FLOAT)
     acc += sqrtf (a*b) ;
 #else
     acc += sqrt (a*b) ;
