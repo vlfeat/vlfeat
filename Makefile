@@ -530,8 +530,6 @@ distclean: clean doc-distclean
 .PHONY: post, post-doc
 .PHONY: bin-release, bin-commit, bin-dist, src-dist
 
-GIT_ORIG_HEAD := $(shell cat .git/HEAD)
-
 bin-release:
 	echo Fetching remote tags ; \
 	$(GIT) fetch --tags ; \
