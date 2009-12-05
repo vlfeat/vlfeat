@@ -10,10 +10,10 @@ INSTALLING
   depending on the architecture. We support the following (the naming
   reflects MATLAB naming for MEX files):
 
-  - mac     Mac OS X PPC
   - maci    Mac OS X Intel
+  - maci64  Mac OS X Intel (64 bit)
   - glx     GNU Linux i386
-  - g64     GNU Linux x64
+  - a64     GNU Linux x64
   - w32     Windows
   - w64     Windows (64 bit)
 
