@@ -63,7 +63,7 @@ doc-toolbox: doc/toolbox-src/mdoc.html
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLABEXE) -nodesktop -r "vl_setup('noprefix','demo');vl_demo;exit"
+	$(MATLABEXE) -$(ARCH) -nodesktop -r "vl_setup('noprefix','demo');vl_demo;exit"
 
 #
 # Use webdoc.py to generate the website
