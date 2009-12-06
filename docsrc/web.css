@@ -266,7 +266,8 @@ pre, code {
 }
 #content div.parbox p,
 #content div.parbox blockquote,
-#content div.pargox div.figure
+#content div.pargox div.figure,
+#content dd blockquote
 {
     padding-right: 0em ;
 }
