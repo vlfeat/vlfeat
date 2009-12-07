@@ -17,7 +17,6 @@
 		2D13F028100A6E8800C072E8 /* vl_alldist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist.c; path = toolbox/misc/vl_alldist.c; sourceTree = "<group>"; };
 		2D13F02C100A718600C072E8 /* vl_simdctrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
 		2D13F039100A733D00C072E8 /* vl_simdctrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
-		2D36D6310DE337C700F6EFD5 /* mexversion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mexversion.c; path = /Applications/MATLAB7/extern/src/mexversion.c; sourceTree = "<absolute>"; };
 		2D624AD20FF927E300DB3122 /* heap-t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-t.h"; sourceTree = "<group>"; };
 		2D624AD60FF9306700DB3122 /* test_heap-t.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-t.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
@@ -142,7 +141,6 @@
 			children = (
 				2DD66ECE0FEFB0F3005A3664 /* matrix.h */,
 				2DD66ECC0FEFB076005A3664 /* mex.h */,
-				2D36D6310DE337C700F6EFD5 /* mexversion.c */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
 				2DE5B34E0FDC28A5008CEB1D /* Makefile.doc */,
 				2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */,
@@ -392,6 +390,7 @@
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				VERB = yes;
+				VLDIR = "$(PROJECT_DIR)";
 			};
 			name = Debug;
 		};
@@ -415,6 +414,7 @@
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				VERB = yes;
+				VLDIR = "$(PROJECT_DIR)";
 			};
 			name = Release;
 		};

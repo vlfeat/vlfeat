@@ -115,6 +115,9 @@ LIBTOOL    ?= libtool
 # programs required to build VLFeat distribution
 GIT        ?= git
 
+# VLFeat root directory. Useful to use absolute paths in Xcode.
+VLDIR      ?= .
+
 .PHONY : all
 all : dll all-bin
 
@@ -210,9 +213,10 @@ DEBUG := yes
 endif
 
 C_CFLAGS     = $(CFLAGS)
-C_CFLAGS    += -I. -pedantic -std=c99 -O3
+C_CFLAGS    += -I$(VLDIR)
+C_CFLAGS    += -pedantic -std=c99 -O3
 C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long
-C_CFLAGS    += $(if $(DEBUG), -O0 -g -std=c89)
+C_CFLAGS    += $(if $(DEBUG), -O0 -g)
 
 C_LDFLAGS    = $(LDFLAGS)
 C_LDFLAGS   += -L$(BINDIR) -l$(DLL_NAME)
@@ -221,7 +225,7 @@ DLL_NAME     = vl
 DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
 MEX_FLAGS    = $(if $(DEBUG), -g)
-MEX_CFLAGS   = $(C_CFLAGS) -Itoolbox
+MEX_CFLAGS   = $(CFLAGS) -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
 
 ifdef MATLABPATH
@@ -234,7 +238,7 @@ endif
 
 # Mac OS X on PPC processor
 ifeq ($(ARCH),mac)
-BINDIR          := bin/mac
+BINDIR          := $(VLDIR)/bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
 C_CFLAGS        += -D__BIG_ENDIAN__ -Wno-variadic-macros
@@ -248,7 +252,7 @@ endif
 
 # Mac OS X on Intel processor
 ifeq ($(ARCH),maci)
-BINDIR          := bin/maci
+BINDIR          := $(VLDIR)/bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
@@ -263,7 +267,7 @@ endif
 
 # Mac OS X on Intel 64 processor
 ifeq ($(ARCH),maci64)
-BINDIR          := bin/maci64
+BINDIR          := $(VLDIR)/bin/maci64
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci64
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
@@ -278,7 +282,7 @@ endif
 
 # Linux-32
 ifeq ($(ARCH),glx)
-BINDIR          := bin/glx
+BINDIR          := $(VLDIR)/bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
@@ -293,7 +297,7 @@ endif
 
 # Linux-64
 ifeq ($(ARCH),a64)
-BINDIR          := bin/a64
+BINDIR          := $(VLDIR)/bin/a64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
@@ -307,7 +311,7 @@ endif
 
 DIST            := $(NAME)-$(VER)
 BINDIST         := $(DIST)-bin
-MEX_BINDIR      := toolbox/$(MEX_SUFFIX)
+MEX_BINDIR      := $(VLDIR)/toolbox/$(MEX_SUFFIX)
 
 # Sanity check
 ifeq ($(DLL_SUFFIX),)
@@ -367,8 +371,8 @@ $(eval $(call gendir, noprefix, toolbox/noprefix                    ))
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_lnk := $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
-dll_src := $(wildcard vl/*.c)
-dll_hdr := $(wildcard vl/*.h) $(wildcard vl/*.tc)
+dll_src := $(wildcard $(VLDIR)/vl/*.c)
+dll_hdr := $(wildcard $(VLDIR)/vl/*.h) $(wildcard $(VLDIR)/vl/*.tc)
 dll_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(dll_src:.c=.o)))
 dll_dep := $(dll_obj:.o=.d)
 
@@ -378,12 +382,12 @@ dll: $(dll_tgt)
 .PRECIOUS: $(BINDIR)/objs/%.d
 
 $(BINDIR)/objs/%.o : vl/%.c $(bin-dir)
-	$(call C,CC) $(DLL_CFLAGS) -c $< -o $@
+	$(call C,CC) $(DLL_CFLAGS) -c "$(<)" -o "$(@)"
 
 $(BINDIR)/objs/%.d : vl/%.c $(bin-dir)
 	$(call C,CC) $(DLL_CFLAGS)                                   \
 	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
-	       $< -MF $@
+	       "$(<)" -MF "$(@)"
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	$(call C,LIBTOOL) -dynamic                                   \
@@ -403,7 +407,7 @@ $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 # dependency in order avoiding rebuilding all the executables if only
 # a part of the library is changed.
 
-bin_src := $(wildcard src/*.c)
+bin_src := $(wildcard $(VLDIR)/src/*.c)
 bin_tgt := $(notdir $(bin_src))
 bin_tgt := $(addprefix $(BINDIR)/, $(bin_tgt:.c=))
 bin_dep := $(addsuffix .d, $(bin_tgt))
@@ -432,13 +436,13 @@ $(BINDIR)/%.d : src/%.c $(bin-dir)
 # MEX file. On Mac OS X this is implicitly obtained since libvl.dylib
 # has install_name relative to @loader_path/.
 
-mex_src := $(shell find toolbox -name "*.c")
+mex_src := $(shell find $(VLDIR)/toolbox -name "*.c")
 mex_tgt := $(addprefix $(MEX_BINDIR)/,                               \
 	   $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
 mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 
-vpath %.c $(shell find toolbox -type d)
-vpath vl_%.m $(shell find toolbox -type d)
+vpath %.c $(shell find $(VLDIR)/toolbox -type d)
+vpath vl_%.m $(shell find $(VLDIR)/toolbox -type d)
 
 .PHONY: all-mex
 all-mex : $(mex_tgt) noprefix
@@ -447,7 +451,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
 	       -I"$(MATLABPATH)/extern/include" -M -MT               \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
-	       $< -MF $@
+	       "$(<)" -MF "$(@)"
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 	@make -s $(dll_tgt)
@@ -456,7 +460,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(D
 	$(call C,MEX) CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'               \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)'                    \
 	       $(MEX_FLAGS)                                          \
-	       $< -outdir $(dir $(@))
+	       "$(<)" -outdir "$(dir $(@))"
 
 # --------------------------------------------------------------------
 #                                          Prefix-less M and MEX files
@@ -464,7 +468,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(D
 # Populate the directory toolbox/noprefix with links to the MEX / M
 # files without the vl_ prefix.
 
-m_src := $(shell find toolbox -name "vl_*.m")
+m_src := $(shell find $(VLDIR)/toolbox -name "vl_*.m")
 m_lnk := $(addprefix toolbox/noprefix/,                              \
           $(filter-out setup.m,                                      \
           $(filter-out help.m,                                       \
