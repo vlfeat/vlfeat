@@ -210,7 +210,7 @@ DEBUG := yes
 endif
 
 C_CFLAGS     = $(CFLAGS)
-C_CFLAGS    += -I$(CURDIR) -pedantic -std=c99 -O3
+C_CFLAGS    += -I. -pedantic -std=c99 -O3
 C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long
 C_CFLAGS    += $(if $(DEBUG), -O0 -g -std=c89)
 
@@ -445,7 +445,7 @@ all-mex : $(mex_tgt) noprefix
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \
-               -I$(MATLABPATH)/extern/include -M -MT                 \
+	       -I"$(MATLABPATH)/extern/include" -M -MT               \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       $< -MF $@
 
