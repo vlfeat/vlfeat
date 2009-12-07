@@ -134,6 +134,10 @@ err_no_arch +=config
 err_internal  =$(shell echo Internal error)
 err_internal +=internal
 
+err_spaces  = $(shell echo "** VLFeat root dir VLDIR='$(VLDIR)' contains spaces."  1>&2)
+err_spaces += $(shell echo "** This is not supported due to GNU Make limitations." 1>&2)
+err_spaces +=spaces
+
 # --------------------------------------------------------------------
 #                                     Auto-detect architecture, MATLAB
 # --------------------------------------------------------------------
@@ -152,6 +156,10 @@ ARCH  ?= $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 # sanity check
 ifeq ($(ARCH),)
 die:=$(error $(err_no_arch))
+endif
+
+ifneq ($(VLDIR),$(shell echo "$(VLDIR)" | sed 's/ //g'))
+die:=$(error $(err_spaces))
 endif
 
 MATLABPATH := $(strip $(shell $(MEX) -v 2>&1 |                       \
