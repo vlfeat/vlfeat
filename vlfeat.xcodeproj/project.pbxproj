@@ -126,7 +126,7 @@
 		2DD99E8F0E59EA8E00CE1DA1 /* host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = host.h; sourceTree = "<group>"; };
 		2DD99E900E59EA8E00CE1DA1 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = host.c; sourceTree = "<group>"; };
 		2DD9A01F0E5A296700CE1DA1 /* test_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_host.c; sourceTree = "<group>"; };
-		2DE5B34E0FDC28A5008CEB1D /* Makefile.doc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.doc; sourceTree = "<group>"; };
+		2DE5B34E0FDC28A5008CEB1D /* Makefile.doc */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile.doc; sourceTree = "<group>"; };
 		2DE5B37D0FDC2BE9008CEB1D /* dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsift.c; sourceTree = "<group>"; };
 		2DE5B37E0FDC2BE9008CEB1D /* dsift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsift.h; sourceTree = "<group>"; };
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
