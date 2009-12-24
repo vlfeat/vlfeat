@@ -132,7 +132,7 @@
 #if defined(__LITTLE_ENDIAN__) || \
     defined(VL_ARCH_IX86)      || \
     defined(VL_ARCH_IA64)      || \
-    defined(VL_ARCH_X68)       || \
+    defined(VL_ARCH_X64)       || \
     defined(__DOXYGEN__)
 #define VL_ARCH_LITTLE_ENDIAN
 #endif

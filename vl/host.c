@@ -472,7 +472,7 @@ void vl_print_host_info ()
   arch = "PPC" ;
 #endif
 
-#ifdef VL_ARCH_BIN_ENDIAN
+#ifdef VL_ARCH_BIG_ENDIAN
   endian = "big endian" ;
 #endif
 #ifdef VL_ARCH_LITTLE_ENDIAN
