@@ -30,6 +30,12 @@ toolbox/noprefix
 vlfeat.xcodeproj/*.mode1v3
 vlfeat.xcodeproj/*.pbxuser
 
+# Visual C++
+vlfeat.suo
+vlfeat.ncb
+vlfeat.vcproj.*.user
+vc/*
+
 # Emacs backups
 *~
 
