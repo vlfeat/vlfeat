@@ -15,8 +15,7 @@
 		2D13F02C100A718600C072E8 /* vl_simdctrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
 		2D13F039100A733D00C072E8 /* vl_simdctrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
 		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
-		2D624AD20FF927E300DB3122 /* heap-t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-t.h"; sourceTree = "<group>"; };
-		2D624AD60FF9306700DB3122 /* test_heap-t.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-t.c"; sourceTree = "<group>"; };
+		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D6F09EC0E4C6ACA00B77055 /* imopv.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv.tc; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
@@ -110,14 +109,13 @@
 		2D86B1220F24CC9B00E625D6 /* vl_twister.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
 		2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
 		2D86B1240F24CC9B00E625D6 /* vl_whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_whistc.c; path = toolbox/misc/vl_whistc.c; sourceTree = "<group>"; };
+		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
+		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
 		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		2DD66ECC0FEFB076005A3664 /* mex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mex.h; path = /Applications/Matlab08A/extern/include/mex.h; sourceTree = "<absolute>"; };
 		2DD66ECE0FEFB0F3005A3664 /* matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix.h; path = /Applications/Matlab08A/extern/include/matrix.h; sourceTree = "<absolute>"; };
-		2DD6700B0FEFE56C005A3664 /* heap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heap.h; sourceTree = "<group>"; };
-		2DD6700C0FEFE56C005A3664 /* heap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = heap.c; sourceTree = "<group>"; };
-		2DD6709B0FF000CC005A3664 /* test_heap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_heap.c; sourceTree = "<group>"; };
 		2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv_sse2.c; sourceTree = "<group>"; };
 		2DD99CC50E58A8C700CE1DA1 /* imopv_sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv_sse2.h; sourceTree = "<group>"; };
 		2DD99CC70E58A90F00CE1DA1 /* imopv_sse2.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv_sse2.tc; sourceTree = "<group>"; };
@@ -176,13 +174,12 @@
 				2D732DE80CF8C2E40099B03C /* mser.c */,
 				2D732DEA0CF8C2E40099B03C /* sift.c */,
 				2D732DEB0CF8C2E40099B03C /* test_getopt_long.c */,
-				2DD6709B0FF000CC005A3664 /* test_heap.c */,
 				2DD9A01F0E5A296700CE1DA1 /* test_host.c */,
 				2D732DEC0CF8C2E40099B03C /* test_nan.c */,
 				2D732DED0CF8C2E40099B03C /* test_stringop.c */,
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
 				2D471AA710DD2C7900FA4182 /* test_threads.c */,
-				2D624AD60FF9306700DB3122 /* test_heap-t.c */,
+				2D624AD60FF9306700DB3122 /* test_heap-def.c */,
 				2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */,
 				2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */,
 			);
@@ -202,9 +199,7 @@
 				2DE5B37E0FDC2BE9008CEB1D /* dsift.h */,
 				2D732E820CF8C2E40099B03C /* getopt_long.c */,
 				2D732E830CF8C2E40099B03C /* getopt_long.h */,
-				2DD6700B0FEFE56C005A3664 /* heap.h */,
-				2DD6700C0FEFE56C005A3664 /* heap.c */,
-				2D624AD20FF927E300DB3122 /* heap-t.h */,
+				2D9941F410ECD04F00502DF6 /* heap-def.h */,
 				2D732E840CF8C2E40099B03C /* hikmeans.c */,
 				2D732E850CF8C2E40099B03C /* hikmeans.h */,
 				2D732E860CF8C2E40099B03C /* ikmeans.c */,

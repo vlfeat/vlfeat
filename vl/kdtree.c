@@ -84,29 +84,20 @@ GNU GPLv2, or (at your option) any later version.
  ** with automatic algorithmic configuration. In Proc. VISAPP, 2009.
  **/
 
-#define NAME vl_kdforest_search_heap
-#define T VlKDForestSearchState
-#define CMP(x,y) (x->distanceLowerBound - y->distanceLowerBound)
-#include "heap-t.h"
-#undef CMP
-#undef T
-#undef NAME
+#define VL_HEAP_prefix     vl_kdforest_search_heap
+#define VL_HEAP_type       VlKDForestSearchState
+#define VL_HEAP_cmp(v,x,y) (v[x].distanceLowerBound - v[y].distanceLowerBound)
+#include "heap-def.h"
 
-#define NAME vl_kdtree_split_heap
-#define T VlKDTreeSplitDimension
-#define CMP(x,y) (x->variance - y->variance)
-#include "heap-t.h"
-#undef CMP
-#undef T
-#undef NAME
+#define VL_HEAP_prefix     vl_kdtree_split_heap
+#define VL_HEAP_type       VlKDTreeSplitDimension
+#define VL_HEAP_cmp(v,x,y) (v[x].variance - v[y].variance)
+#include "heap-def.h"
 
-#define NAME vl_kdforest_neighbor_heap
-#define T VlKDForestNeighbor
-#define CMP(x,y) (y->distance - x->distance)
-#include "heap-t.h"
-#undef CMP
-#undef T
-#undef NAME
+#define VL_HEAP_prefix     vl_kdforest_neighbor_heap
+#define VL_HEAP_type       VlKDForestNeighbor
+#define VL_HEAP_cmp(v,x,y) (v[y].distance - v[x].distance)
+#include "heap-def.h"
 
 /** ------------------------------------------------------------------
  ** @internal
@@ -152,7 +143,8 @@ vl_kdtree_compare_index_entries (void const * a,
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Build KDTree recursively
- ** @param tree KDTree object.
+ ** @param forest forest to which the tree belongs.
+ ** @param tree tree being built.
  ** @param nodeIndex node to process.
  ** @param dataBegin begin of data for this node.
  ** @param dataEnd end of data for this node.
@@ -306,7 +298,7 @@ vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees)
 
 /** ------------------------------------------------------------------
  ** @brief Delete KDForest object
- ** @param tree KDForest object to delete
+ ** @param self KDForest object to delete
  ** @sa ::vl_kdforest_new
  **/
 
@@ -329,7 +321,7 @@ vl_kdforest_delete (VlKDForest * self)
 
 /** ------------------------------------------------------------------
  ** @brief Build KDTree from data
- ** @param tree KDTree object
+ ** @param self KDTree object
  ** @param numData number of data points.
  ** @param data pointer to the data.
  **
@@ -518,7 +510,7 @@ vl_kdforest_query_recursively (VlKDForest  * self,
 
 /** ------------------------------------------------------------------
  ** @internal @brief Compute tree bounds recursively
- ** @param self KDTree object instance.
+ ** @param tree KDTree object instance.
  ** @param nodeIndex node index to start from.
  ** @param searchBounds 2 x numDimension array of bounds.
  **/
@@ -569,7 +561,7 @@ vl_kdforest_query (VlKDForest * self,
   int i, ti ;
   vl_bool exactSearch = (self->searchMaxNumComparisons == 0) ;
   VlKDForestSearchState * searchState  ;
-  int unsigned numAddedNeighbors = 0 ;
+  vl_size numAddedNeighbors = 0 ;
 
   assert (neighbors) ;
   assert (numNeighbors > 0) ;
@@ -619,13 +611,15 @@ vl_kdforest_query (VlKDForest * self,
   while (exactSearch || self->searchNumComparisons < self->searchMaxNumComparisons)
   {
     /* pop the next optimal search node */
-    VlKDForestSearchState * searchState = vl_kdforest_search_heap_pop
-      (self->searchHeapArray, &self->searchHeapNumNodes) ;
+    VlKDForestSearchState * searchState ;
 
     /* break if search space completed */
-    if (searchState == NULL) {
+    if (self->searchHeapNumNodes == 0) {
       break ;
     }
+
+    searchState = self->searchHeapArray +
+      vl_kdforest_search_heap_pop (self->searchHeapArray, &self->searchHeapNumNodes) ;
 
     /* break if no better solution may exist */
     if (numAddedNeighbors == numNeighbors &&

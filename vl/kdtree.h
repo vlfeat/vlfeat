@@ -94,12 +94,12 @@ typedef struct _VlKDForest
   /* build */
   VlKDTreeThresholdingMethod thresholdingMethod ;
   VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEALP_SIZE] ;
-  int unsigned splitHeapNumNodes ;
-  int unsigned splitHeapSize ;
+  vl_size splitHeapNumNodes ;
+  vl_size splitHeapSize ;
 
   /* querying */
   VlKDForestSearchState * searchHeapArray ;
-  int unsigned searchHeapNumNodes ;
+  vl_size searchHeapNumNodes ;
   int unsigned searchId ;
   int unsigned * searchIdBook ;
 

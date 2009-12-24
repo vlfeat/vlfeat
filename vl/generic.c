@@ -45,7 +45,7 @@ GNU GPLv2, or (at your option) any later version.
    - @ref generic.h   "Errors, memory, logging, and others"
    - @ref random.h    "Random number generator"
    - @ref mathop.h    "Math operations"
-   - @ref heap.h      "Heap (priority queue)"
+   - @ref heap-def.h  "Generic heap object (priority queue)"
    - @ref stringop.h  "String operations"
    - @ref imopv.h     "Image operations"
    - @ref pgm.h       "PGM reading and writing"
@@ -218,6 +218,16 @@ GNU GPLv2, or (at your option) any later version.
  creating an object within a MEX file, returning it to MATLAB, and
  passing it again to another MEX file.
 
+ @section main-metaprogramming Preprocessor metaprogramming
+
+ Part of VLFeat code uses a simple form of perprocessor metaprogramming.
+ This technique is used, similarly to C++ templates, to instantiate
+ multiple version of a given algorithm for different data types
+ (e.g. @c float and @c double).
+
+ In most cases preprocessor metaprogramming is invisible to the library
+ user, as it is used only internally.
+
   @section main-glossary Glossary
 
   - <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
@@ -364,7 +374,7 @@ do_nothing_printf (char const* format, ...)
 VL_EXPORT VlState _vl_state ;
 
 /** ------------------------------------------------------------------
- ** @internal @fn @brief Lock VLFeat state
+ ** @internal @brief Lock VLFeat state
  **
  ** The function locks VLFeat global state mutex.
  **
