@@ -248,7 +248,7 @@ endif
 
 # Mac OS X on PPC processor
 ifeq ($(ARCH),mac)
-BINDIR          := $(VLDIR)/bin/mac
+BINDIR          := bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
 C_CFLAGS        += $(if $(DEBUG), -gstabs+)
@@ -261,7 +261,7 @@ endif
 
 # Mac OS X on Intel processor
 ifeq ($(ARCH),maci)
-BINDIR          := $(VLDIR)/bin/maci
+BINDIR          := bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
 SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
@@ -278,7 +278,7 @@ endif
 
 # Mac OS X on Intel 64 processor
 ifeq ($(ARCH),maci64)
-BINDIR          := $(VLDIR)/bin/maci64
+BINDIR          := bin/maci64
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci64
 SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
@@ -295,7 +295,7 @@ endif
 
 # Linux-32
 ifeq ($(ARCH),glx)
-BINDIR          := $(VLDIR)/bin/glx
+BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
@@ -310,7 +310,7 @@ endif
 
 # Linux-64
 ifeq ($(ARCH),a64)
-BINDIR          := $(VLDIR)/bin/a64
+BINDIR          := bin/a64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
@@ -324,7 +324,7 @@ endif
 
 DIST            := $(NAME)-$(VER)
 BINDIST         := $(DIST)-bin
-MEX_BINDIR      := $(VLDIR)/toolbox/$(MEX_SUFFIX)
+MEX_BINDIR      := toolbox/$(MEX_SUFFIX)
 
 # Sanity check
 ifeq ($(DLL_SUFFIX),)
@@ -394,10 +394,10 @@ dll: $(dll_tgt)
 
 .PRECIOUS: $(BINDIR)/objs/%.d
 
-$(BINDIR)/objs/%.o : vl/%.c $(bin-dir)
+$(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(bin-dir)
 	$(call C,CC) $(DLL_CFLAGS) -c "$(<)" -o "$(@)"
 
-$(BINDIR)/objs/%.d : vl/%.c $(bin-dir)
+$(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(bin-dir)
 	$(call C,CC) $(DLL_CFLAGS)                                   \
 	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
 	       "$(<)" -MF "$(@)"
@@ -430,11 +430,11 @@ bin_dep := $(addsuffix .d, $(bin_tgt))
 .PHONY: all-bin
 all-bin: $(bin_tgt)
 
-$(BINDIR)/% : src/%.c $(bin-dir)
+$(BINDIR)/% : $(VLDIR)/src/%.c $(bin-dir)
 	@make -s $(dll_tgt)
 	$(call C,CC) $(C_CFLAGS) $< $(C_LDFLAGS) -o $@
 
-$(BINDIR)/%.d : src/%.c $(bin-dir)
+$(BINDIR)/%.d : $(VLDIR)/src/%.c $(bin-dir)
 	$(call C,CC) $(C_CFLAGS) -M -MT                              \
 	       '$(BINDIR)/$* $(MEX_BINDIR)/$*.d'                     \
 	       $< -MF $@
@@ -483,7 +483,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'   \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) #$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	@make -s $(dll_tgt)
 	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"       \
 	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
