@@ -30,7 +30,8 @@ mexFunction(int nout, mxArray *out[],
   
   int NP, NCP ;
   int i,j ;
-  double *X_pt, *Y_pt, *U_pt ;  
+  double *X_pt, *Y_pt, *U_pt ;
+#undef small
   const double small = 2.220446049250313e-16 ;
 	  
   /* -----------------------------------------------------------------

@@ -11,24 +11,53 @@ GNU GPLv2, or (at your option) any later version.
 */
 
 /** @file random.h
- ** @author Andrea Vedaldi
- ** @brief  Random number generator
- 
+
  This module implements the popular Mersenne Twister algorithm (MATLAB
  random generator from version 7.4).
+
+ @section random-overview Overview
+
+ A random number generator can be initalized by
+
+ @code
+ VlRand rand ;
+ vl_rand_init (&rand) ;
+ @endcode
+
+ ::VlRand is a simple structure holding the state of the
+ random number generator. The generator can be seeded by
+ ::vl_rand_seed and ::vl_rand_seed_by_array. For intsance:
+
+ @code
+ vl_rand_seed (&rand, clock()) ;
+ @endcode
+
+ The generator can be used to obtain random quantities of
+ various types:
+
+ - ::vl_rand_int32, ::vl_rand_uint32 for 32-bit random integers;
+ - ::vl_rand_real1 for a double in [0,1];
+ - ::vl_rand_real2 for a double in [0,1);
+ - ::vl_rand_real3 for a double in (0,1);
+ - ::vl_rand_res53 for a double in [0,1) with high resolution.
+
+ There is no need to explicitly destroy a ::VlRand instance.
+
+ [1] http://en.wikipedia.org/wiki/Mersenne_twister
+
 **/
 
 #include "random.h"
 
-/* 
+/*
 A C-program for MT19937, with initialization improved 2002/1/26.
 Coded by Takuji Nishimura and Makoto Matsumoto.
 
-Before using, initialize the state by using init_genrand(seed)  
-or init_by_array(init_key, key_length).
+Before using, initialize the state by using init_genrand(seed)
+or init_by_array(init_key, keySize).
 
 Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-All rights reserved.                          
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -41,8 +70,8 @@ notice, this list of conditions and the following disclaimer.
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
 
-3. The names of its contributors may not be used to endorse or promote 
-products derived from this software without specific prior written 
+3. The names of its contributors may not be used to endorse or promote
+products derived from this software without specific prior written
 permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -64,55 +93,42 @@ email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
 #include <stdio.h>
+#include <string.h>
 
-/* Period parameters */  
+/* Period parameters */
 #define N 624
 #define M 397
 #define MATRIX_A 0x9908b0dfUL   /* constant vector a */
 #define UPPER_MASK 0x80000000UL /* most significant w-r bits */
 #define LOWER_MASK 0x7fffffffUL /* least significant r bits */
 
-static unsigned long mt[N]; /* the array for the state vector  */
-static int mti=N+1; /* mti==N+1 means mt[N] is not initialized */
-
 /* initializes mt[N] with a seed */
 
-/** @brief Read the state of the random number generator
- ** @param state pointer to an array of 625 numbers.
+/** @brief Initialise random number generator
+ ** @param self number generator.
  **/
 
-VL_EXPORT
-void vl_rand_get_state (vl_uint32 state [625])
+VL_EXPORT void
+vl_rand_init (VlRand * self)
 {
-  int k ;
-  for (k = 0 ; k < 624 ; ++k) state [k] = mt [k] ;
-  state [k] = mti ; 
-}
-
-/** @brief Write the state of the random number generator
- ** @param state pointer to an array of 625 numbers.
- **/
-
-VL_EXPORT
-void vl_rand_set_state (vl_uint32 const state [625])
-{
-  int k ;
-  for (k = 0 ; k < 624 ; ++k) mt [k] = state [k] ;
-  mti = VL_MIN (state [624], 624) ;
+  memset (self->mt, 0, sizeof(self->mt[0]) * N) ;
+  self->mti = N + 1 ;
 }
 
 /** @brief Seed the state of the random number generator
- **
+ ** @param self random number generator.
  ** @param s seed.
  **/
 
-VL_EXPORT
-void vl_rand_seed (vl_uint32 s)
+VL_EXPORT void
+vl_rand_seed (VlRand * self, vl_uint32 s)
 {
+#define mti self->mti
+#define mt self->mt
   mt[0]= s & 0xffffffffUL;
   for (mti=1; mti<N; mti++) {
-    mt[mti] = 
-      (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti); 
+    mt[mti] =
+      (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti);
     /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
     /* In the previous versions, MSBs of the seed affect   */
     /* only MSBs of the array mt[].                        */
@@ -120,28 +136,32 @@ void vl_rand_seed (vl_uint32 s)
     mt[mti] &= 0xffffffffUL;
     /* for >32 bit machines */
   }
+#undef mti
+#undef mt
 }
 
 /** @brief Seed the state of the random number generator by an array
- **
- ** @param init_key    array of numbers.
- ** @param key_length  length of the array.
+ ** @param self     random number generator.
+ ** @param key      array of numbers.
+ ** @param keySize  length of the array.
  **/
 
-VL_EXPORT
-void vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length)
+VL_EXPORT void
+vl_rand_seed_by_array (VlRand * self, vl_uint32 const key [], vl_size keySize)
 {
+#define mti self->mti
+#define mt self->mt
   int i, j, k;
-  vl_rand_seed (19650218UL);
+  vl_rand_seed (self, 19650218UL);
   i=1; j=0;
-  k = (N>key_length ? N : key_length);
+  k = (N > keySize ? N : keySize);
   for (; k; k--) {
     mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1664525UL))
-      + init_key[j] + j; /* non linear */
+      + key[j] + j; /* non linear */
     mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
     i++; j++;
     if (i>=N) { mt[0] = mt[N-1]; i=1; }
-    if (j>=key_length) j=0;
+    if (j>=keySize) j=0;
   }
   for (k=N-1; k; k--) {
     mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
@@ -151,25 +171,31 @@ void vl_rand_seed_by_array (vl_uint32 const init_key [], int key_length)
     if (i>=N) { mt[0] = mt[N-1]; i=1; }
   }
 
-  mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */ 
+  mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */
+#undef mti
+#undef mt
 }
 
-/** @brief Generate a random UINT32 
- ** @return a random number in [0, 0xffffffff]. 
+/** @brief Generate a random UINT32
+ ** @param self random number generator.
+ ** @return a random number in [0, 0xffffffff].
  **/
 
-VL_EXPORT
-vl_uint32 vl_rand_uint32 ()
+VL_EXPORT vl_uint32
+vl_rand_uint32 (VlRand * self)
 {
   unsigned long y;
   static unsigned long mag01[2]={0x0UL, MATRIX_A};
   /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
+#define mti self->mti
+#define mt self->mt
+
   if (mti >= N) { /* generate N words at one time */
     int kk;
 
     if (mti == N+1)   /* if init_genrand() has not been called, */
-      vl_rand_seed (5489UL); /* a default initial seed is used */
+      vl_rand_seed (self, 5489UL); /* a default initial seed is used */
 
     for (kk=0;kk<N-M;kk++) {
       y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
@@ -184,7 +210,7 @@ vl_uint32 vl_rand_uint32 ()
 
     mti = 0;
   }
-  
+
   y = mt[mti++];
 
   /* Tempering */
@@ -194,60 +220,68 @@ vl_uint32 vl_rand_uint32 ()
   y ^= (y >> 18);
 
   return y;
+
+#undef mti
+#undef mt
 }
 
 /** @brief Generate a random INT31
+ ** @param self random number generator.
  ** @return a random number in [0, 0x7fffffff].
  **/
 
-VL_EXPORT
-vl_int32 vl_rand_int31 ()
+VL_EXPORT vl_int32
+vl_rand_int31 (VlRand * self)
 {
-  return (vl_int32)(vl_rand_uint32()>>1);
+  return (vl_int32)(vl_rand_uint32(self)>>1);
 }
 
 /** @brief Generate a random number in [0,1]
+ ** @param self random number generator.
  ** @return a random number.
  **/
 
-VL_EXPORT
-double vl_rand_real1 ()
+VL_EXPORT double
+vl_rand_real1 (VlRand * self)
 {
-  return vl_rand_uint32()*(1.0/4294967295.0); 
-  /* divided by 2^32-1 */ 
+  return vl_rand_uint32(self)*(1.0/4294967295.0);
+  /* divided by 2^32-1 */
 }
 
 /** @brief Generate a random number in [0,1)
+ ** @param self random number generator.
  ** @return a random number.
  **/
 
-VL_EXPORT
-double vl_rand_real2 ()
+VL_EXPORT double
+vl_rand_real2 (VlRand * self)
 {
-  return vl_rand_uint32()*(1.0/4294967296.0); 
+  return vl_rand_uint32(self)*(1.0/4294967296.0);
   /* divided by 2^32 */
 }
 
 /** @brief Generate a random number in (0,1)
+ ** @param self random number generator.
  ** @return a random number.
  **/
 
-VL_EXPORT
-double vl_rand_real3 ()
+VL_EXPORT double
+vl_rand_real3 (VlRand * self)
 {
-  return (((double)vl_rand_uint32()) + 0.5)*(1.0/4294967296.0); 
+  return (((double)vl_rand_uint32(self)) + 0.5)*(1.0/4294967296.0);
   /* divided by 2^32 */
 }
 
 /** @brief Generate a random number in [0,1) with 53-bit resolution
- ** @return a random number. 
+ ** @param self random number generator.
+ ** @return a random number.
  **/
 
-VL_EXPORT
-double vl_rand_res53 () 
-{ 
-  vl_uint32 
-    a = vl_rand_uint32() >> 5, 
-    b = vl_rand_uint32() >> 6 ; 
-  return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0) ; 
-} 
+VL_EXPORT double
+vl_rand_res53 (VlRand * self)
+{
+  vl_uint32
+    a = vl_rand_uint32(self) >> 5,
+    b = vl_rand_uint32(self) >> 6 ;
+  return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0) ;
+}

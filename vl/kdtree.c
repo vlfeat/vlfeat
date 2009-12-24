@@ -215,7 +215,7 @@ vl_kdtree_build_recursively
 
   /* toss a dice to decide the splitting dimension */
   splitDimension = forest->splitHeapArray
-  + (vl_rand_uint32() % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
+  + (vl_rand_uint32(forest->rand) % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
 
   /* additional base case: variance is equal to 0 (overlapping points) */
   if (splitDimension->variance == 0) {
@@ -283,6 +283,7 @@ vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees)
 {
   VlKDForest * self = vl_malloc (sizeof(VlKDForest)) ;
 
+  self -> rand = vl_get_rand () ;
   self -> numData = 0 ;
   self -> data = 0 ;
   self -> numDimensions = numDimensions ;

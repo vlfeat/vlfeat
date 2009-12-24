@@ -82,7 +82,7 @@ BRANCH     = v$(VER)-$(ARCH)
 #   __LITTLE_ENDIAN__  : Signal little endian architecture
 #   /I.                : Add VLROOT to include search path
 #   /Z7                : Embedded CodeView debug info in .obj
-#   /MT                : Multi-thread run-time library
+#   /MD                : Multi-thread run-time library dynamically linked
 #   /TC                : Source code is C (not C++)
 #   /W3                : Usa all warnings
 #   /Zp8               : Align structures to 8 bytes
@@ -118,6 +118,7 @@ CFLAGS     = /nologo /TC /MD \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /D"__LITTLE_ENDIAN__" \
              /D"VL_SUPPORT_SSE2" \
+             /D"VL_THREADS_ENABLED" \
              /I. \
              /W1 /Z7 /Zp8 /Ox
 
@@ -167,6 +168,7 @@ cmdsrc = \
   src\test_nan.c \
   src\test_rand.c \
   src\test_stringop.c \
+  src\test_threads.c \
   src\test_vec_comp.c
 
 mexsrc = \
@@ -323,7 +325,7 @@ $(objdir)\imopv_sse2.obj : vl\imopv_sse2.c
 # Link VLFeat DLL
 $(bindir)\vl.dll : $(libobj)
 	@echo .. LINK [DLL] $(@R).dll
-	@$(LINK) /DLL  $(LFLAGS) $(**) /OUT:"$(@)"
+	$(LINK) /DLL  $(LFLAGS) $(**) /OUT:"$(@)"
 	@mt /nologo /outputresource:"$(@);#2" /manifest "$(@R).dll.manifest"
 	@-del "$(@R).dll.manifest"
 

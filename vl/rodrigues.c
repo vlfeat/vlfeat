@@ -53,6 +53,7 @@ vl_rodrigues(double* R_pt, double* dR_pt, const double* om_pt)
 #define OM(i)   om_pt[(i)]
 #define R(i,j)  R_pt[(i)+3*(j)]
 #define DR(i,j) dR_pt[(i)+9*(j)]
+#undef small
 
   const double small = 1e-6 ;
 

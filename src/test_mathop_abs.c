@@ -15,6 +15,7 @@
 int
 main(int argc, char**argv)
 {
+  VlRand * rand = vl_get_state() ;
   vl_size numData = 100000000 ;
   vl_size i ;
   float * X = vl_malloc(sizeof(float) * numData) ;
@@ -22,7 +23,7 @@ main(int argc, char**argv)
   float * X_end = X + numData ;
 
   for (i = 0 ; i < numData ; ++ i) {
-    X[i] = vl_rand_real1() - .5 ;
+    X[i] = vl_rand_real1(rand) - .5 ;
     Y[i] = 0 ;
   }
 
@@ -37,7 +38,7 @@ main(int argc, char**argv)
   }
 
   for (i = 0 ; i < numData ; ++ i) {
-    X[i] = vl_rand_real1() - .5 ;
+    X[i] = vl_rand_real1(rand) - .5 ;
     X[i] = 0 ;
   }
 

@@ -11,12 +11,13 @@
 void
 init_data (vl_size numDimensions, vl_size numSamples, float ** X, float ** Y)
 {
+  VlRand * rand = vl_get_rand() ;
   int i ;
   float * Xi = *X = vl_malloc(sizeof(float) * numDimensions * numSamples) ;
   float * Yi = *Y = vl_malloc(sizeof(float) * numDimensions * numSamples) ;
   for (i = 0 ; i < numDimensions * numSamples ; ++ i) {
-    *Xi++ = vl_rand_real1() ;
-    *Yi++ = vl_rand_real1() ;
+    *Xi++ = vl_rand_real1(rand) ;
+    *Yi++ = vl_rand_real1(rand) ;
   }
 }
 

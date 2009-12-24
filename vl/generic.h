@@ -1,5 +1,6 @@
 /** @file    generic.h
  ** @author  Andrea Vedaldi
+
  ** @brief   Generic
  **/
 
@@ -13,11 +14,21 @@ General Public License version 2.
 #ifndef VL_GENERIC_H
 #define VL_GENERIC_H
 
+#include "host.h"
+#include "random.h"
+
+#include <stdlib.h>
 #include <stddef.h>
 #include <time.h>
 #include <assert.h>
 
-#include "host.h"
+#if defined(VL_OS_WIN)
+#include <Windows.h>
+#endif
+
+#if defined(VL_THREADS_ENABLED) && defined(VL_THREADS_POSIX)
+#include <pthread.h>
+#endif
 
 /** @brief Library version string */
 #define VL_VERSION_STRING "0.9.7"
@@ -68,15 +79,112 @@ vl_get_type_name (int type)
 
 /** @} */
 
+
+/** ------------------------------------------------------------------
+ ** @name State and configuration parameters
+ ** @{ */
+
+/** @internal @brief VLFeat global state */
+typedef struct _VlState
+{
+
+#if defined(VL_THREADS_ENABLED)
+#if defined(VL_THREADS_POSIX)
+  pthread_key_t threadKey ;
+  pthread_mutex_t mutex ;
+  pthread_t mutexOwner ;
+  pthread_cond_t mutexCondition ;
+  size_t mutexCount ;
+#elif defined(VL_THREADS_WIN)
+  DWORD tlsIndex ;
+  CRITICAL_SECTION mutex ;
+#endif
+#else
+  VlThreadSpecificState threadState ;
+#endif
+
+  int   (*printf_func)  (char const * format, ...) ;
+  void *(*malloc_func)  (size_t) ;
+  void *(*realloc_func) (void*,size_t) ;
+  void *(*calloc_func)  (size_t, size_t) ;
+  void  (*free_func)    (void*) ;
+
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  VlX86CpuInfo cpuInfo ;
+#endif
+  int numCPUs ;
+
+  vl_bool simdEnabled ;
+  int maxNumThreads ;
+
+} VlState ;
+
+/** @internal @brief VLFeat thread state */
+typedef struct _VlThreadSpecificState
+{
+  /* errors */
+  int lastError ;
+  char lastErrorMessage [VL_ERR_MSG_LEN] ;
+
+  /* random number generator */
+  VlRand rand ;
+
+  /* tic / toc state */
+#if defined(VL_OS_WIN)
+  LARGE_INTEGER ticFreq ;
+  LARGE_INTEGER ticMark ;
+#else
+  clock_t ticMark ;
+#endif
+} VlThreadSpecificState ;
+
+/** @internal @brief VLFeat global state */
+extern VL_EXPORT VlState _vl_state ;
+
+VL_INLINE VlState * vl_get_state () ;
+VL_INLINE VlThreadSpecificState * vl_get_thread_specific_state () ;
+VL_EXPORT void vl_lock_state () ;
+VL_EXPORT void vl_unlock_state () ;
+VL_EXPORT VlThreadSpecificState * vl_thread_specific_state_new () ;
+VL_EXPORT void vl_thread_specific_state_delete (VlThreadSpecificState * self) ;
+VL_EXPORT char const * vl_get_version_string () ;
+VL_EXPORT void vl_print_info () ;
+VL_INLINE void vl_set_simd_enabled (vl_bool x) ;
+VL_INLINE vl_bool vl_get_simd_enabled () ;
+VL_INLINE vl_bool vl_cpu_has_sse3 () ;
+VL_INLINE vl_bool vl_cpu_has_sse2 () ;
+VL_INLINE int vl_get_num_cpus () ;
+VL_EXPORT VlRand * vl_get_rand () ;
+
+/** @} */
+
+/** ------------------------------------------------------------------
+ ** @name Error handling
+ ** @{ */
+
+#define VL_ERR_OK       0  /**< No error */
+#define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
+#define VL_ERR_ALLOC    2  /**< Resource allocation error */
+#define VL_ERR_BAD_ARG  3  /**< Bad argument or illegal data error */
+#define VL_ERR_IO       4  /**< Input/output error */
+#define VL_ERR_EOF      5  /**< End-of-file or end-of-sequence error */
+#define VL_ERR_NO_MORE  5  /**< End-of-sequence @deprecated */
+
+VL_INLINE int vl_get_last_error () ;
+VL_INLINE char const *  vl_get_last_error_message () ;
+VL_EXPORT int vl_set_last_error (int error, char const * errorMessage, ...) ;
+
+/** @} */
+
 /** ------------------------------------------------------------------
  ** @name Memory allocation
  ** @{ */
 
-VL_EXPORT
-void vl_set_alloc_func (void *(*malloc_func)  (size_t),
-                        void *(*realloc_func) (void*,size_t),
-                        void *(*calloc_func)  (size_t, size_t),
-                        void  (*free_func)    (void*)) ;
+VL_EXPORT void
+vl_set_alloc_func (void *(*malloc_func)  (size_t),
+                   void *(*realloc_func) (void*,size_t),
+                   void *(*calloc_func)  (size_t, size_t),
+                   void  (*free_func)    (void*)) ;
 VL_INLINE void *vl_malloc  (size_t n) ;
 VL_INLINE void *vl_realloc (void *ptr, size_t n) ;
 VL_INLINE void *vl_calloc  (size_t n, size_t size) ;
@@ -103,35 +211,12 @@ VL_EXPORT void vl_set_printf_func (printf_func_t printf_func) ;
  **
  ** The function calls the user customizable @c printf.
  **/
-#define VL_PRINTF (*vl_printf_func)
+#define VL_PRINTF (*vl_get_state()->printf_func)
 
 /** @def VL_PRINT
  ** @brief Same as ::VL_PRINTF (legacy code)
  **/
-#define VL_PRINT (*vl_printf_func)
-
-/** @} */
-
-/** ------------------------------------------------------------------
- ** @name Error handling
- ** @{ */
-
-/** @brief The number of the last error */
-extern VL_EXPORT int vl_err_no ;
-
-/** @brief The maximum length of an error description. */
-#define VL_ERR_MSG_LEN 1024
-
-/** @brief The description of the last error. */
-extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] ;
-
-#define VL_ERR_OK       0  /**< No error */
-#define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
-#define VL_ERR_ALLOC    2  /**< Resource allocation error */
-#define VL_ERR_BAD_ARG  3  /**< Bad argument or illegal data error */
-#define VL_ERR_IO       4  /**< Input/output error */
-#define VL_ERR_EOF      5  /**< End-of-file or end-of-sequence error */
-#define VL_ERR_NO_MORE  5  /**< End-of-sequence @deprecated */
+#define VL_PRINT (*vl_get_state()->printf_func)
 
 /** @} */
 
@@ -165,49 +250,128 @@ extern VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] ;
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
 /* @} */
 
-/** --------------------------------------------------------------- */
-VL_EXPORT
-char const * vl_get_version_string () ;
-
-VL_EXPORT
-void vl_print_info () ;
-
 /** ------------------------------------------------------------------
  ** @name Measuring time
  ** @{
  **/
-VL_EXPORT void vl_tic() ;
-VL_EXPORT double vl_toc() ;
+VL_EXPORT void vl_tic () ;
+VL_EXPORT double vl_toc () ;
 /** @} */
 
-extern VL_EXPORT int   (*vl_printf_func)  (char const * format, ...) ;
-extern VL_EXPORT void *(*vl_malloc_func)  (size_t) ;
-extern VL_EXPORT void *(*vl_realloc_func) (void*,size_t) ;
-extern VL_EXPORT void *(*vl_calloc_func)  (size_t, size_t) ;
-extern VL_EXPORT void  (*vl_free_func)    (void*) ;
+/* -------------------------------------------------------------------
+ *                                                    Inline functions
+ * ---------------------------------------------------------------- */
 
-VL_INLINE
-void* vl_malloc (size_t n)
+VL_INLINE VlState *
+vl_get_state ()
 {
-  return (*vl_malloc_func)(n) ;
+  return &_vl_state ;
 }
 
-VL_INLINE
-void* vl_realloc (void* ptr, size_t n)
+VL_INLINE VlThreadSpecificState *
+vl_get_thread_specific_state ()
 {
-  return (*vl_realloc_func)(ptr, n) ;
+#ifndef VL_THREADS_ENABLED
+  return vl_get_state()->threadState ;
+#else
+  VlState * state ;
+  VlThreadSpecificState * threadState ;
+
+  vl_lock_state() ;
+  state = vl_get_state() ;
+
+#if defined(VL_THREADS_POSIX)
+  threadState = (VlThreadSpecificState *) pthread_getspecific(state->threadKey) ;
+#elif defined(VL_THREADS_WIN)
+  threadState = (VlThreadSpecificState *) TlsGetValue(state->tlsIndex) ;
+#endif
+
+  if (! threadState) {
+    threadState = vl_thread_specific_state_new () ;
+  }
+
+#if defined(VL_THREADS_POSIX)
+  pthread_setspecific(state->threadKey, threadState) ;
+#elif defined(VL_THREADS_WIN)
+  TlsSetValue(state->tlsIndex, threadState) ;
+#endif
+
+  vl_unlock_state() ;
+  return threadState ;
+#endif
 }
 
-VL_INLINE
-void* vl_calloc (size_t n, size_t size)
+VL_INLINE void
+vl_set_simd_enabled (vl_bool x)
 {
-  return (*vl_calloc_func)(n, size) ;
+  vl_get_state()->simdEnabled = x ;
 }
 
-VL_INLINE
-void vl_free (void *ptr)
+VL_INLINE vl_bool
+vl_get_simd_enabled ()
 {
-  (*vl_free_func)(ptr) ;
+  return vl_get_state()->simdEnabled ;
+}
+
+VL_INLINE vl_bool
+vl_cpu_has_sse3 ()
+{
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  return vl_get_state()->cpuInfo.hasSSE3 ;
+#else
+  return 0 ;
+#endif
+}
+
+VL_INLINE vl_bool
+vl_cpu_has_sse2 ()
+{
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  return vl_get_state()->cpuInfo.hasSSE2 ;
+#else
+  return 0 ;
+#endif
+}
+
+VL_INLINE int
+vl_get_num_cpus ()
+{
+  return vl_get_state()->numCPUs ;
+}
+
+VL_INLINE int
+vl_get_last_error () {
+  return vl_get_thread_specific_state()->lastError ;
+}
+
+VL_INLINE char const *
+vl_get_last_error_message ()
+{
+  return vl_get_thread_specific_state()->lastErrorMessage ;
+}
+
+VL_INLINE void*
+vl_malloc (size_t n)
+{
+  return (vl_get_state()->malloc_func)(n) ;
+}
+
+VL_INLINE void*
+vl_realloc (void* ptr, size_t n)
+{
+  return (vl_get_state()->realloc_func)(ptr, n) ;
+}
+
+VL_INLINE void*
+vl_calloc (size_t n, size_t size)
+{
+  return (vl_get_state()->calloc_func)(n, size) ;
+}
+
+VL_INLINE void
+vl_free (void *ptr)
+{
+  (vl_get_state()->free_func)(ptr) ;
 }
 
 /* VL_GENERIC_H */

@@ -14,6 +14,7 @@
 		2D13F028100A6E8800C072E8 /* vl_alldist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist.c; path = toolbox/misc/vl_alldist.c; sourceTree = "<group>"; };
 		2D13F02C100A718600C072E8 /* vl_simdctrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
 		2D13F039100A733D00C072E8 /* vl_simdctrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
+		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
 		2D624AD20FF927E300DB3122 /* heap-t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-t.h"; sourceTree = "<group>"; };
 		2D624AD60FF9306700DB3122 /* test_heap-t.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-t.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
@@ -180,6 +181,7 @@
 				2D732DEC0CF8C2E40099B03C /* test_nan.c */,
 				2D732DED0CF8C2E40099B03C /* test_stringop.c */,
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
+				2D471AA710DD2C7900FA4182 /* test_threads.c */,
 				2D624AD60FF9306700DB3122 /* test_heap-t.c */,
 				2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */,
 				2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */,
@@ -336,7 +338,7 @@
 		};
 		2D732DBE0CF8BFFD0099B03C /* make */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION)  -k";
+			buildArgumentsString = "$(ACTION)";
 			buildConfigurationList = 2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */;
 			buildPhases = (
 			);
@@ -369,16 +371,17 @@
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		1DEB919408733D9F0010E9CD /* Debug */ = {
+		1DEB919408733D9F0010E9CD /* Debug 32 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CFLAGS = "-gstabs+";
+				ACTIVE_TEST = test_host;
+				ARCH = maci;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab08A;
+				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
@@ -386,22 +389,19 @@
 				VERB = yes;
 				VLDIR = "$(PROJECT_DIR)";
 			};
-			name = Debug;
+			name = "Debug 32";
 		};
-		1DEB919508733D9F0010E9CD /* Release */ = {
+		1DEB919508733D9F0010E9CD /* Release 32 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CFLAGS = "-gstabs+";
+				ACTIVE_TEST = test_host;
+				ARCH = maci;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab08A;
+				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
 				NDEBUG = yes;
 				PATH = "$(PATH):/opt/local/bin/";
@@ -410,9 +410,35 @@
 				VERB = yes;
 				VLDIR = "$(PROJECT_DIR)";
 			};
-			name = Release;
+			name = "Release 32";
 		};
-		2D72E9CB0E4765D2005DAA47 /* Debug */ = {
+		2D271AA710E1999F0064BE1D /* Debug 64 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ACTIVE_TEST = test_host;
+				ARCH = maci64;
+				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				MATLABEXE = "$(MATLABROOT)/bin/matlab";
+				MATLABROOT = /Applications/Matlab09B.app;
+				MEX = "$(MATLABROOT)/bin/mex";
+				PATH = "$(PATH):/opt/local/bin/";
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				VERB = yes;
+				VLDIR = "$(PROJECT_DIR)";
+			};
+			name = "Debug 64";
+		};
+		2D271AA810E1999F0064BE1D /* Debug 64 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Debug 64";
+		};
+		2D271AA910E1999F0064BE1D /* Debug 64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -422,16 +448,9 @@
 				MEX = "$(MEX)";
 				PRODUCT_NAME = "vlfeat-all";
 			};
-			name = Debug;
+			name = "Debug 64";
 		};
-		2D72E9CC0E4765D2005DAA47 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "make doc-api";
-			};
-			name = Release;
-		};
-		2D72EA240E476C05005DAA47 /* Debug */ = {
+		2D271AAA10E1999F0064BE1D /* Debug 64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -441,25 +460,96 @@
 				MEX = "$(MEX)";
 				PRODUCT_NAME = info;
 			};
-			name = Debug;
+			name = "Debug 64";
 		};
-		2D72EA250E476C05005DAA47 /* Release */ = {
+		2D271AAB10E199AF0064BE1D /* Release 64 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ACTIVE_TEST = test_host;
+				ARCH = maci64;
+				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				MATLABEXE = "$(MATLABROOT)/bin/matlab";
+				MATLABROOT = /Applications/Matlab09B.app;
+				MEX = "$(MATLABROOT)/bin/mex";
+				NDEBUG = yes;
+				PATH = "$(PATH):/opt/local/bin/";
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				VERB = yes;
+				VLDIR = "$(PROJECT_DIR)";
+			};
+			name = "Release 64";
+		};
+		2D271AAC10E199AF0064BE1D /* Release 64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = Release;
+			name = "Release 64";
 		};
-		2D732DBF0CF8BFFD0099B03C /* Debug */ = {
+		2D271AAD10E199AF0064BE1D /* Release 64 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "make doc-api";
+			};
+			name = "Release 64";
+		};
+		2D271AAE10E199AF0064BE1D /* Release 64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = Debug;
+			name = "Release 64";
 		};
-		2D732DC00CF8BFFD0099B03C /* Release */ = {
+		2D72E9CB0E4765D2005DAA47 /* Debug 32 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MATLAB = "$(MATLABROOT)";
+				MEX = "$(MEX)";
+				PRODUCT_NAME = "vlfeat-all";
+			};
+			name = "Debug 32";
+		};
+		2D72E9CC0E4765D2005DAA47 /* Release 32 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "make doc-api";
+			};
+			name = "Release 32";
+		};
+		2D72EA240E476C05005DAA47 /* Debug 32 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MATLAB = "$(MATLABROOT)";
+				MEX = "$(MEX)";
+				PRODUCT_NAME = info;
+			};
+			name = "Debug 32";
+		};
+		2D72EA250E476C05005DAA47 /* Release 32 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = Release;
+			name = "Release 32";
+		};
+		2D732DBF0CF8BFFD0099B03C /* Debug 32 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Debug 32";
+		};
+		2D732DC00CF8BFFD0099B03C /* Release 32 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Release 32";
 		};
 /* End XCBuildConfiguration section */
 
@@ -467,38 +557,46 @@
 		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "vlfeat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1DEB919408733D9F0010E9CD /* Debug */,
-				1DEB919508733D9F0010E9CD /* Release */,
+				1DEB919408733D9F0010E9CD /* Debug 32 */,
+				2D271AA710E1999F0064BE1D /* Debug 64 */,
+				1DEB919508733D9F0010E9CD /* Release 32 */,
+				2D271AAB10E199AF0064BE1D /* Release 64 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release 32";
 		};
 		2D72E9CA0E4765D2005DAA47 /* Build configuration list for PBXLegacyTarget "make doc-api" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D72E9CB0E4765D2005DAA47 /* Debug */,
-				2D72E9CC0E4765D2005DAA47 /* Release */,
+				2D72E9CB0E4765D2005DAA47 /* Debug 32 */,
+				2D271AA910E1999F0064BE1D /* Debug 64 */,
+				2D72E9CC0E4765D2005DAA47 /* Release 32 */,
+				2D271AAD10E199AF0064BE1D /* Release 64 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release 32";
 		};
 		2D72EA230E476C05005DAA47 /* Build configuration list for PBXLegacyTarget "make info" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D72EA240E476C05005DAA47 /* Debug */,
-				2D72EA250E476C05005DAA47 /* Release */,
+				2D72EA240E476C05005DAA47 /* Debug 32 */,
+				2D271AAA10E1999F0064BE1D /* Debug 64 */,
+				2D72EA250E476C05005DAA47 /* Release 32 */,
+				2D271AAE10E199AF0064BE1D /* Release 64 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release 32";
 		};
 		2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D732DBF0CF8BFFD0099B03C /* Debug */,
-				2D732DC00CF8BFFD0099B03C /* Release */,
+				2D732DBF0CF8BFFD0099B03C /* Debug 32 */,
+				2D271AA810E1999F0064BE1D /* Debug 64 */,
+				2D732DC00CF8BFFD0099B03C /* Release 32 */,
+				2D271AAC10E199AF0064BE1D /* Release 64 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release 32";
 		};
 /* End XCConfigurationList section */
 	};

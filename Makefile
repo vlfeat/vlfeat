@@ -227,13 +227,15 @@ C_CFLAGS    += -pedantic -std=c99 -O3
 C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 C_CFLAGS    += $(if $(DEBUG), -O0 -g)
 
+C_CFLAGS    += -DVL_THREADS_ENABLED -pthread
+
 C_LDFLAGS    = $(LDFLAGS)
 C_LDFLAGS   += -L$(BINDIR) -l$(DLL_NAME)
 
 DLL_NAME     = vl
 DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
-MEX_FLAGS    = $(if $(DEBUG), -g)
+MEX_FLAGS    = $(if $(DEBUG), -g) -DVL_THREADS_ENABLED
 MEX_CFLAGS   = $(CFLAGS) -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_CFLAGS  += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
@@ -298,7 +300,7 @@ ifeq ($(ARCH),glx)
 BINDIR          := bin/glx
 MEX_SUFFIX      := mexglx
 DLL_SUFFIX      := so
-C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
+C_CFLAGS        += -std=c99
 C_CFLAGS        += -DVL_SUPPORT_SSE2
 C_CFLAGS        += -march=i686
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
@@ -313,7 +315,7 @@ ifeq ($(ARCH),a64)
 BINDIR          := bin/a64
 MEX_SUFFIX      := mexa64
 DLL_SUFFIX      := so
-C_CFLAGS        += -D__LITTLE_ENDIAN__ -std=c99
+C_CFLAGS        += -std=c99
 C_CFLAGS        += -DVL_SUPPORT_SSE2
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 LDFLAGS         += -lm -Wl,--rpath,\$$ORIGIN/

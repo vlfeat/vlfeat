@@ -80,6 +80,9 @@ typedef struct _VlKDForest
 {
   int numDimensions ;
 
+  /* random number generator */
+  VlRand * rand ;
+
   /* indexed data */
   float const * data ;
   int numData ;

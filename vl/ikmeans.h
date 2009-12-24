@@ -15,6 +15,7 @@ General Public License version 2.
 #define VL_IKMEANS_H
 
 #include "generic.h"
+#include "random.h"
 
 typedef vl_int32 vl_ikm_acc ;  /**< IKM accumulator data type */
 

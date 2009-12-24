@@ -102,7 +102,7 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
  ** @param basename  Basename.
  ** @param mode      Opening mode (as in @c fopen).
  **
- ** @return error code. The function sets ::vl_err_no to either
+ ** @return error code. The error may be either either
  ** ::VL_ERR_OVERFLOW if the file name is too long or to ::VL_ERR_IO
  ** if the file cannot be opened.
  **/
@@ -123,14 +123,14 @@ vl_file_meta_open (VlFileMeta * fm, char const * basename, char const * mode)
                                   basename) ;
 
   if (q >= sizeof(fm -> name)) {
-    vl_err_no = VL_ERR_OVERFLOW ;
+    vl_get_thread_specific_state()->lastError = VL_ERR_OVERFLOW ;
     return -1 ;
   }
   
   if (fm -> active) {
     fm -> file = fopen (fm -> name, mode) ;
     if (! fm -> file) {
-      vl_err_no = VL_ERR_IO ;
+      vl_get_thread_specific_state()->lastError = VL_ERR_IO ;
       return -1 ;
     }
   }

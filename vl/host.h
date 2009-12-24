@@ -151,22 +151,26 @@
     defined(__linux__) || \
     defined(__DOXYGEN__)
 #define VL_OS_LINUX 1
+#define VL_THREADS_POSIX 1
 #endif
 
 #if (defined(__APPLE__) & defined(__MACH__)) || \
      defined(__DOXYGEN__)
 #define VL_OS_MACOSX 1
+#define VL_THREADS_POSIX 1
 #endif
 
 #if defined(__WIN32__) || \
     defined(_WIN32)    || \
     defined(__DOXYGEN__)
 #define VL_OS_WIN 1
+#define VL_THREADS_WIN 1
 #endif
 
 #if defined(_WIN64) || \
     defined(__DOXYGEN__)
 #define VL_OS_WIN64 1
+#define VL_THREADS_WIN 1
 #endif
 /** @} */
 
@@ -301,6 +305,8 @@ VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
 #define VL_EXPORT
 #endif
 #endif
+
+VL_EXPORT void vl_print_compiler_info () ;
 
 /** ------------------------------------------------------------------
  ** @name Atomic data types
@@ -465,13 +471,22 @@ VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
 /** ------------------------------------------------------------------
  ** @name Obtaining host info at run time
  ** @{ */
-VL_EXPORT void vl_print_host_info() ;
-VL_EXPORT vl_bool vl_cpu_has_sse3 () ;
-VL_EXPORT vl_bool vl_cpu_has_sse2 () ;
-/** @} */
 
-VL_EXPORT void vl_set_simd_enabled (vl_bool x) ;
-VL_EXPORT vl_bool vl_get_simd_enabled() ;
+typedef struct _VlX86CpuInfo
+{
+  char vendorString [0x20] ;
+  vl_bool hasSSE42 ;
+  vl_bool hasSSE41 ;
+  vl_bool hasSSE3 ;
+  vl_bool hasSSE2 ;
+  vl_bool hasSSE ;
+  vl_bool hasMMX ;
+} VlX86CpuInfo ;
+
+void _vl_x86cpu_info_init (VlX86CpuInfo *self) ;
+void _vl_x86cpu_info_print (VlX86CpuInfo const *self) ;
+
+/** @} */
 
 /** ------------------------------------------------------------------
  ** @brief Host <-> big endian transformation for 8-bytes value

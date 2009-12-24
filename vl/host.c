@@ -39,26 +39,26 @@ GNU GPLv2, or (at your option) any later version.
  @section host-compiler Host compiler
 
  The module defines a symbol to identify the host compiler:
- ::VL_COMPILER_MSC for Microsoft Visual C++, ::VL_COMPILER_GNUC for GNU C,
- and so on. The (integer) value of such symbols
- corresponds the version of the  compiler.
+ ::VL_COMPILER_MSC for Microsoft Visual C++, ::VL_COMPILER_GNUC for
+ GNU C, and so on. The (integer) value of such symbols corresponds the
+ version of the compiler.
 
- The module defines a symbol to identify the data model of the compiler:
- ::VL_COMPILER_ILP32, ::VL_COMPILER_LP32, or ::VL_COMPILER_LP64 (see
- Sect. @ref host-compiler-data-model).
- For convenience, it also defines a number of atomic types of prescribed
+ The module defines a symbol to identify the data model of the
+ compiler: ::VL_COMPILER_ILP32, ::VL_COMPILER_LP32, or
+ ::VL_COMPILER_LP64 (see Sect. @ref host-compiler-data-model).  For
+ convenience, it also defines a number of atomic types of prescribed
  width (::vl_int8, ::vl_int16, ::vl_int32, etc.).
 
  @remark While some of such functionalities are provided by the
- standard header @c stdint.h, the latter is not supported
- by all platforms.
+ standard header @c stdint.h, the latter is not supported by all
+ platforms.
 
  @subsection host-compiler-data-model Data models
 
- The C language defines a number of atomic data types (such as @c char, @c short,
- @c int and so on). The number of bits (width)
- used to represent each data type depends on the compiler data model.
- The following table summarizes the relevant conventions:
+ The C language defines a number of atomic data types (such as @c
+ char, @c short, @c int and so on). The number of bits (width) used to
+ represent each data type depends on the compiler data model.  The
+ following table summarizes the relevant conventions:
 
  <table><caption><b>Compiler data models.</b> The table shows
  how many bits are allocated to each atomic data type according to
@@ -122,10 +122,9 @@ GNU GPLv2, or (at your option) any later version.
  @subsection host-compiler-other Other compiler-specific features
 
  The module provides the macro ::VL_EXPORT to declare symbols exported
- from
- the library and the macro ::VL_INLINE to declare inline functions.
- Such features are not part of the C89 standard, and change
- depending on the compiler.
+ from the library and the macro ::VL_INLINE to declare inline
+ functions.  Such features are not part of the C89 standard, and
+ change depending on the compiler.
 
  @par "Example:"
  The following header file declares a function @c f that
@@ -146,10 +145,12 @@ GNU GPLv2, or (at your option) any later version.
 
  VL_INLINE int f() { return 1 ; }
  @endcode
- Here the first instruction defines the function @c f, where the second
- declares it. Notice that since this is an inline function, its definition
- must be found in the header file rather than in an implementation file.
- Notice also that definition and declaration can be merged.
+
+ Here the first instruction defines the function @c f, where the
+ second declares it. Notice that since this is an inline function, its
+ definition must be found in the header file rather than in an
+ implementation file.  Notice also that definition and declaration can
+ be merged.
 
  These macros translate according to the following tables:
 
@@ -203,39 +204,43 @@ GNU GPLv2, or (at your option) any later version.
 
  The module defines a symbol to identify the host CPU endianness:
  ::VL_ARCH_BIG_ENDIAN for big endian and ::VL_ARCH_LITTLE_ENDIAN for
- little endian. The functions
- ::vl_swap_host_big_endianness_8(), ::vl_swap_host_big_endianness_4(),
- ::vl_swap_host_big_endianness_2() to change the endianness
- of data (from/to host and network order).
+ little endian. The functions ::vl_swap_host_big_endianness_8(),
+ ::vl_swap_host_big_endianness_4(), ::vl_swap_host_big_endianness_2()
+ to change the endianness of data (from/to host and network order).
 
- Recall that <em>endianness</em> concerns the way multi-byte data types
- (such as 16, 32 and 64 bits
- integers) are stored into the addressable memory.
- All CPUs uses a contiguous address range to store atomic data types
- (e.g. a 16-bit integer could
- be assigned to the addresses <c>0x10001</c> and <c>0x10002</c>), but
- the order may differ.
+ Recall that <em>endianness</em> concerns the way multi-byte data
+ types (such as 16, 32 and 64 bits integers) are stored into the
+ addressable memory.  All CPUs uses a contiguous address range to
+ store atomic data types (e.g. a 16-bit integer could be assigned to
+ the addresses <c>0x10001</c> and <c>0x10002</c>), but the order may
+ differ.
 
- - The convention is <em>big endian</em>, or in <em>network order</em>,
- if the most significant byte of the multi-byte data types is assigned to
- the smaller memory address. This is the convention used for instance
- by the PPC architecture.
+ - The convention is <em>big endian</em>, or in <em>network
+   order</em>, if the most significant byte of the multi-byte data
+   types is assigned to the smaller memory address. This is the
+   convention used for instance by the PPC architecture.
 
- - The convention is <em>little endian</em> if  the least significant
- byte is assigned to the smaller memory address. This is the convention
- used for instance by the x86 architecture.
+ - The convention is <em>little endian</em> if the least significant
+   byte is assigned to the smaller memory address. This is the
+   convention used for instance by the x86 architecture.
 
- @remark The names &ldquo;big endian&rdquo; and &ldquo;little endian&rdquo; are
- a little confusing. &ldquo;Big endian&rdquo; means &ldquo;big endian first&rdquo;, i.e.
- the address of the most significant byte comes first. Similarly,
- &ldquo;little endian&rdquo; means &ldquo;little endian first&rdquo;,
- in the sense that the address of the least significant byte comes first.
+ @remark The names &ldquo;big endian&rdquo; and &ldquo;little
+ endian&rdquo; are a little confusing. &ldquo;Big endian&rdquo; means
+ &ldquo;big endian first&rdquo;, i.e.  the address of the most
+ significant byte comes first. Similarly, &ldquo;little endian&rdquo;
+ means &ldquo;little endian first&rdquo;, in the sense that the
+ address of the least significant byte comes first.
 
  Endianness is a concern when data is either exchanged with processors
- that use different conventions,
- transmitted over a network, or stored
- to a file. For the latter two cases, one usually saves data in
- big endian (network) order regardless of the host CPU.
+ that use different conventions, transmitted over a network, or stored
+ to a file. For the latter two cases, one usually saves data in big
+ endian (network) order regardless of the host CPU.
+
+@section Multi-threading host-threads
+
+The file defines ::VL_THREADS_WIN if multi-threading support is
+enabled and the host supports Windows threads and ::VL_THREAD_POSIX if
+it supports POSIX threads.
 
  **/
 
@@ -316,10 +321,30 @@ GNU GPLv2, or (at your option) any later version.
  ** @see @ref host-compiler-others
  **/
 
+/** @def VL_THREADS_ENABLED
+ ** @brief Defined if multi-threading support is enabled
+ **
+ ** Define this symbol to enable multi-threading support.
+ **/
+
+#ifdef __DOXYGEN__
+#define VL_THREADS_ENABLED
+#endif
+
+/** @def VL_THREADS_WIN
+ ** @biref Defined if the host uses Windows threads.
+ **/
+
+/** @def VL_THREADS_POSIX
+ ** @brief Defiend if the host uses POISX threads.
+ **/
+
 /** --------------------------------------------------------------- */
 
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_IA64) || defined(VL_ARCH_X64)
 #define HAS_CPUID
+#else
+#undef HAS_CPUID
 #endif
 
 #if defined(HAS_CPUID) & defined(VL_COMPILER_MSC)
@@ -357,107 +382,54 @@ _vl_cpuid (vl_int32* info, int function)
    : "cc") ;
 #endif
 }
+
 #endif
 
-#ifdef HAS_CPUID
-struct x86cpu_
-{
-  char vendor_string [0x20] ;
-  vl_bool has_sse42 ;
-  vl_bool has_sse41 ;
-  vl_bool has_sse3 ;
-  vl_bool has_sse2 ;
-  vl_bool has_sse ;
-  vl_bool has_mmx ;
-} x86cpu ;
-
-vl_bool x86cpu_initialized = 0 ;
-
-void _vl_x86cpu_init ()
+void
+_vl_x86cpu_info_init (VlX86CpuInfo *self)
 {
   vl_int32 info [4] ;
   int max_func = 0 ;
   _vl_cpuid(info, 0) ;
   max_func = info[0] ;
-  *((vl_int32*)x86cpu.vendor_string+0) = info[1] ;
-  *((vl_int32*)x86cpu.vendor_string+1) = info[3] ;
-  *((vl_int32*)x86cpu.vendor_string+2) = info[2] ;
+  *((vl_int32*)self->vendorString+0) = info[1] ;
+  *((vl_int32*)self->vendorString+1) = info[3] ;
+  *((vl_int32*)self->vendorString+2) = info[2] ;
 
   if (max_func >= 1) {
     _vl_cpuid(info, 1) ;
-    x86cpu.has_mmx   = info[3] & (1 << 23) ;
-    x86cpu.has_sse   = info[3] & (1 << 25) ;
-    x86cpu.has_sse2  = info[3] & (1 << 26) ;
-    x86cpu.has_sse3  = info[2] & (1 <<  0) ;
-    x86cpu.has_sse41 = info[2] & (1 << 19) ;
-    x86cpu.has_sse42 = info[2] & (1 << 20) ;
+    self->hasMMX   = info[3] & (1 << 23) ;
+    self->hasSSE   = info[3] & (1 << 25) ;
+    self->hasSSE2  = info[3] & (1 << 26) ;
+    self->hasSSE3  = info[2] & (1 <<  0) ;
+    self->hasSSE41 = info[2] & (1 << 19) ;
+    self->hasSSE42 = info[2] & (1 << 20) ;
   }
 }
 
-VL_INLINE
-struct x86cpu_ const* _vl_x86cpu_get()
+void
+_vl_x86cpu_info_print (VlX86CpuInfo const *self)
 {
-  if (!x86cpu_initialized) _vl_x86cpu_init() ;
-  return &x86cpu ;
-}
-#endif
-
-/** --------------------------------------------------------------- */
-
-vl_bool simd_enabled = 1 ;
-
-/** @brief Enalbe/disable usage of SIMD instructions
- ** @param x set to @c true to enable SIMD instructions.
- **
- ** Notice that usage of SIMD instructions may be prevented due
- ** to lack of CPU support and data alignment issues.
- **
- ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
- **/
-void vl_set_simd_enabled (vl_bool x)
-{
-  simd_enabled = x ;
-}
-
-/** @brief Are SIMD instructons enabled?
- ** @return @c true is SIMD is enabled.
- **/
-vl_bool vl_get_simd_enabled ()
-{
-  return simd_enabled ;
-}
-
-/** @brief Check for SSE3 instruction set
- ** @return @c true if SSE3 is present.
- **/
-vl_bool vl_cpu_has_sse3 ()
-{
-#ifdef HAS_CPUID
-  return _vl_x86cpu_get()->has_sse3 ;
-#else
-  return 0 ;
-#endif
-}
-
-/** @brief Check for SSE2 instruction set
- ** @return @c true if SSE2 is present.
- **/
-vl_bool vl_cpu_has_sse2 ()
-{
-#ifdef HAS_CPUID
-  return _vl_x86cpu_get()->has_sse2 ;
-#else
-  return 0 ;
-#endif
+  VL_PRINTF(" CPU %s", self->vendorString) ;
+  VL_PRINTF(": MMX:%s",           VL_YESNO(self->hasMMX)) ;
+  VL_PRINTF(", SSE:%s",           VL_YESNO(self->hasSSE)) ;
+  VL_PRINTF(", SSE2:%s",          VL_YESNO(self->hasSSE2)) ;
+  VL_PRINTF(", SSE3:%s",          VL_YESNO(self->hasSSE3)) ;
+  VL_PRINTF(", SSE4.1:%s",        VL_YESNO(self->hasSSE41)) ;
+  VL_PRINTF(", SSE4.2:%s\n",      VL_YESNO(self->hasSSE42)) ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Print host information
+ ** @brief Print compiler information
+ **
+ ** Print compiler, host, and configuration information. These
+ ** parameters are static and set at compile time.
  **/
 
-void vl_print_host_info ()
+VL_EXPORT void
+vl_print_compiler_info ()
 {
-  char const *arch = 0, *endian = 0, *comp = 0, *dm = 0 ;
+  char const *arch = 0, *endian = 0, *comp = 0, *dm = 0, *th = 0 ;
   int compver ;
 #ifdef VL_ARCH_X64
   arch = "X64" ;
@@ -498,26 +470,18 @@ void vl_print_host_info ()
   dm = "ILP32" ;
 #endif
 
-#define YESNO(x) ((x)?"yes":"no")
-
-  VL_PRINTF("Host: Compiler: %s %d\n", comp, compver) ;
-  VL_PRINTF("      Compiler data model: %s\n", dm) ;
-  VL_PRINTF("      Compiler CPU architecture: %s\n", arch) ;
-  VL_PRINTF("      Compiler CPU endianness: %s\n", endian) ;
-
-#ifdef HAS_CPUID
-  {
-    struct x86cpu_ const* c = _vl_x86cpu_get() ;
-    VL_PRINTF("      CPU vendor string: %s\n", c->vendor_string) ;
-    VL_PRINTF("      CPU has MMX: %s\n",    YESNO(c->has_mmx)) ;
-    VL_PRINTF("      CPU has SSE: %s\n",    YESNO(c->has_sse)) ;
-    VL_PRINTF("      CPU has SSE2: %s\n",   YESNO(c->has_sse2)) ;
-    VL_PRINTF("      CPU has SSE3: %s\n",   YESNO(c->has_sse3)) ;
-    VL_PRINTF("      CPU has SSE4.1: %s\n", YESNO(c->has_sse41)) ;
-    VL_PRINTF("      CPU has SSE4.2: %s\n", YESNO(c->has_sse42)) ;
-    VL_PRINTF("VLFeat uses SIMD: %s\n", YESNO(vl_get_simd_enabled())) ;
-  }
+#ifdef VL_THREADS_ENABLED
+#ifdef VL_THREADS_WIN
+  th = "Windows" ;
+#elif VL_THREADS_POSIX
+  th = "Posix" ;
 #endif
+#else
+  th = "None" ;
+#endif
+
+  VL_PRINTF(" Static config: %s %d, %s, %s, %s, threads:%s\n",
+            comp, compver, dm, arch, endian, th) ;
 }
 
 

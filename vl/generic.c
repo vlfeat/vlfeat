@@ -17,7 +17,7 @@ GNU GPLv2, or (at your option) any later version.
  @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
 
- @par Copyright &copy; 2007-09 Andrea Vedaldi and Brian Fulkerson
+ @par Copyright &copy; 2007-10 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
  vision algorithms, with a special focus on visual features for
@@ -31,12 +31,15 @@ GNU GPLv2, or (at your option) any later version.
 
  @section main-contents Contents
 
- - @ref design          "Design Concepts"
-   - @ref design-objects     "Objects"
-   - @ref design-resources   "Memory and resource management"
-   - @ref design-threads     "Multi-threading"
-   - @ref design-portability "Portability"
- - @ref main-glossary "Glossary"
+ - Algorithms
+   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
+   - @ref dsift.h    "Dense SIFT (DSIFT)"
+   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
+   - @ref ikmeans.h  "Integer K-means (IKM)"
+   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
+   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
+   - @ref quickshift.h "Quick shift image segmentation"
+   - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
  - Support functionalities
    - @ref host.h      "Platform abstraction"
    - @ref generic.h   "Errors, memory, logging, and others"
@@ -48,111 +51,172 @@ GNU GPLv2, or (at your option) any later version.
    - @ref pgm.h       "PGM reading and writing"
    - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
- - Algorithms
-   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
-   - @ref dsift.h    "Dense SIFT (DSIFT)"
-   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
-   - @ref ikmeans.h  "Integer K-means (IKM)"
-   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
-   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
-   - @ref quickshift.h "Quick shift image segmentation"
-   - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
+ - @ref design          "Design Concepts"
+   - @ref design-objects     "Objects"
+   - @ref design-resources   "Memory and resource management"
+   - @ref design-threads     "Multi-threading"
+   - @ref design-portability "Portability"
+ - @ref main-glossary "Glossary"
 
- @section design VLFeat Design Concepts
+ @section design VLFeat design concepts
 
- VLFeat follows a simple but rigorous design that makes it portable
- and simple to use in conjunction with high level language such as
- MATLAB. This section illustrates and motivates the aspects of the
- design that are relevant to the users of the library. Most of the
- features discussed in here are implemented in the @ref generic.h
- module.
+ VLFeat is designed to be portable and simple to integrate with high
+ level languages such as MATLAB. This section illustrates and
+ motivates the aspects of the design that are relevant to the users of
+ the library.
+
+ @subsection design-resources Memory and resource handling
+
+ Some VLFeat functions return pointers to memory blocks or
+ objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc, or functions
+ whose name contains either the keywords @c new or @c copy,
+ transfer the ownership of the memory block or object to the
+ caller. The caller must dispose explicitly of all the resources he
+ owns (by calling ::vl_free for a memory block, or the appropriate
+ destructor for an object).
+
+ The memory allocation functions can be customized by
+ ::vl_set_alloc_func (which sets the implementations of ::vl_malloc,
+ ::vl_realloc, ::vl_calloc and ::vl_free). Remapping the memory
+ allocation functions can be done only if there are no currently
+ allocated VLFeat memory blocks or objects. The memory allocation
+ functions are common to all threads.
+
+ VLFeat uses three rules that simplify handling exceptions:
+
+ - The library allocates local memory only through the reprogrammable
+   ::vl_malloc, ::vl_calloc, and ::vl_realloc functions.
+
+ - The only resource referenced by VLFeat objects is memory (for
+   instance, it is illegal for an object to reference an open file).
+   Other resources such as files or threads may be allocated within a
+   VLFeat function call, but they are all released before the function
+   ends, or their ownership is directly transferred to the caller.
+
+ - The global library state is an exception. It cannot reference any
+   local object created by the caller and uses the standard C memory
+   allocation functions.
+
+ In this way, the VLFeat local state can be reset at any time simply
+ by disposing of all the memory allocated so far. The latter can be
+ done easily by mapping the memory allocation functions to
+ implementations that track the memory blocks allocated, and simply
+ disposing of all such blocks. Since the global state does not
+ reference any local object nor uses the remapped memory functions, it
+ is unaffected by such an operation; conversely, since no VLFeat
+ object references anything but memory, this guarantees that all
+ allocated resources are properly disposed (no leaks). This is used
+ extensively in the design of MATLAB MEX files (see @ref
+ design-matlab).
 
  @subsection design-objects Objects
 
- Most of VLFeat functionalities are implemented as opaque data
- structures, to which we refer as "objects". Typically, you create an
- object by means of a constructor function and dispose of it by means
- of a destructor function. The data member of the object should not be
- accessed directly, but by means of appropriate accessor functions
- (typically containing the @c _get and _set keywords in their names).
+ Many VLFeat algorithms are availale in the form of
+ &ldquo;objects&rdquo;. Notice that the C language, used by VLFeat,
+ does not support objects explicitly. Here an object indicates an
+ opaque data structure along with a number of functions (methods)
+ operationg on it.
 
- @subsection design-resources Memory and Resource Management
+ Object names are captilaised and start with the <code>Vl</code>
+ prefix (for example ::VlSiftFilt). Object methods are lowercase and
+ start with the <code>vl_<object_name>_</code> suffix
+ (e.g. ::vl_sift_new). Object methods typraically include a constructor
+ (e.g. ::vl_sift_new), a destructor (::vl_sift_delete), some getter
+ methods (::vl_sift_get_octave_index), and some setter methods
+ (::vl_sift_set_magnif).
 
- Resource management in VLFeat is minimal. In most cases, you can
- assume that VLFeat does not provide any resource management
- functionality at all. Objects or memory blocks allocated by the
- library but owned by the client must be explicitly disposed. The
- following rule helps identifying such blocks and objects:
+ @subsection design-threads Multi-threading
 
- <b> The client owns a memory block or object if, and only if, it is
-   returned by a library call containing the keywords @c _new or @c
-   _copy, or by the allocator functions ::vl_malloc, ::vl_calloc,
-   ::vl_realloc.</b>
+ VLFeat can be used with multiple threads by treating appropriately
+ different kinds of operations:
 
- More in detail, the following rules apply:
+ - <b>Local operations (reentrancy).</b> Most VLFeat operations are
+   reentrant, in the sense that they operate on local data. It is safe
+   to execute such operations concurrently from multiple threads as
+   long as each thread operates on an independent sets of objects or
+   memory blocks.  By contrast, operating on the same object or memory
+   block from multiple threads requires proper synchronization by the
+   user.
 
- - Memory is the only managed resource. Other resources used by the
-   library (e.g. files) are either passed to the library by the
-   client, or acquired and released within the scope of a library
-   function call.
- - The memory manager can be customized through ::vl_set_alloc_func
-   (which sets the implementations of ::vl_malloc, ::vl_realloc,
-   ::vl_calloc and ::vl_free). The library allocates memory only through
-   these functions.
- - The memory manager is global to all threads.
- - At any moment, there is only one memory manager in
-   existence. ::vl_set_alloc_func can be used only before any other
-   function is invoked, or right before or after the previous memory
-   manager has relinquished all memory.
- - Such rules apply both to the library client and to the library
-   implementation. The only exception regards the memory allocated in
-   the global library state, which uses the native memory manager.
+ - <b>Task-specific operations.</b> A few operations are intrinsically
+   non-reentrant but thread-specific. These include: retrieving the
+   last error by ::vl_get_last_error and obtaining the thread-specific
+   random number generator by ::vl_get_random. VLFeat makes such
+   operations thread-safe by operating on task-specific data.
 
-  These rules make it possible to undo all the work done by the
-  library at any given instant. Disposing the memory allocated by the
-  custom memory manager essentially "resets" the library (except for
-  its global state). This functionality is used extensively in the
-  implementation of MATLAB MEX functions that access the library to
-  support abrupt interruption.
+ - <b>Global operations.</b> A small number of operations are
+   non-reentrant <em>and</em> affect all threads simultaneously. These
+   are restricted to changing certain global configuration parameters,
+   such as the memory allocation functions by
+   ::vl_set_alloc_func. These operations are <em>not</em> thread safe
+   and should be executed before multiple threads are started.
 
-   @note The rules guarantee that all memory allocated by the library
-     at any given time is allocated by the same memory manager, except
-     for the global state that should survive the "reset"
-     operation. In order to support multiple memory managers, one
-     should keep track of the allocator of each object (or memory
-     block). Moreover, partial de-allocation of a pool of objects is
-     dangerous, as such objects may be referred by other objects that
-     are not being de-allocated, corrupting their state. A proper
-     solution to the latter problem is the retain/release mechanism
-     implemented, for instance, by Apple Core Foundation or Cocoa.
+ Some VLFeat algorithms are randomised. Each thread has his own random
+ number generator (an instance of ::VlRand) accessed by
+ ::vl_get_rand. To make calculations reproducible the random number
+ generator must be seeded appropriately in each thread. Notice also
+ that using the same VLFeat object from multiple threads (with
+ appropriate synchronization) will cause multiple random number
+ generators to be intermixed.
 
-  @subsection design-threads Multi-threading
+ @subsection design-portability Portability features
 
-  The library is currently <em>not</em> thread safe, but this support
-  will be added in a future release.
+ Platform dependent details are isolated in the @ref host.h
+ library module. These include:
 
-  The library is almost entirely reentrant. The only thread-sensitive
-  operations are on the global library state and are limited to:
+ - Atomic types (e.g. ::vl_int32).
+ - Special syntaxes for the declaration of symbols exported by the library
+   and inline functions (e.g. ::VL_EXPORT).
+ - Host-dependent conversion of data endianess
+   (e.g. ::vl_swap_host_big_endianness_8()).
 
-  - Global library configuration (e.g. ::vl_set_alloc_func).
-  - Random number generator state (@ref random.h).
-  - Error handling (e.g. ::vl_err_no).
+ VLFeat uses processor specific features (e.g. Intel SSE) if those are
+ available at run time.
 
-  @subsection design-portability Portability features
+ <!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
 
-  Platform dependent details are isolated in the @ref generic.h
-  library module. These include:
+ @subsection design-matlab MATLAB integration issues
 
-  - Atomic types (e.g. ::vl_int32).
-  - Special syntaxes for the declaration of symbols exported by the library
-    and inline functions (e.g. ::VL_EXPORT).
-  - Host-dependent conversion of data endianess
-    (e.g. ::vl_swap_host_big_endianness_8()).
+ The VLFeat C library is designed to integrate seamlessly with MATLAB.
+ Binary compatibility is simplified by the use of the C language
+ (rather than C++). In addition, the library design follows certain
+ restrictons that make it compatible with the MATLAB MEX interface.
 
-  VLFeat uses processor specific features (e.g. Intel SSE) if those
-  are available at compile time.
+ The main issue in calling a library function from a MATLAB MEX
+ function is that MATLAB can abort the execution of the MEX function
+ at any point, either due to an error, or directly upon a user request
+ (Ctrl-C) (empirically, however, a MEX function seems to be
+ interruptible only during the invocation of certain functions of the
+ MEX API such as @c mexErrMsgTxt).
 
-  <!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
+ When a MEX function is interrupted, resources (memory blocks or
+ objects) whose ownership was transferred from VLFeat to the MEX
+ function may be leaked. Notice that interrupting a MEX function would
+ similarly leak any memory block allocated within the MEX function. To
+ solve this issue, MATLAB provides his own memory manager (@c
+ mxMalloc, @c mxRealloc, ...). When a MEX file is interrupted or ends,
+ all memory blocks allocated by using one of such functions are
+ released, preventing leakage.
+
+ In order to integrate VLFeat with this model in the most seamless
+ way, VLFeat memory allocation functions (::vl_malloc, ::vl_realloc,
+ ::vl_calloc) are mapped to the corresponding MEX memory allocation
+ functions. Such functions automatically dispose of all the memory
+ allocated by a MEX function when the function ends (even because of
+ an exception). Because of the restrictions of the library design
+ illustrated in @ref design-resources, this operation is safe and
+ correctly dispose of VLFeat local state. As a consequence, it is
+ possible to call @c mexErrMsgTxt at any point in the MEX function
+ without worring about leaking resources.
+
+ This however comes at the price of some limitations. Beyond the
+ restrictions illustred in @ref design-resources, here we note that no
+ VLFeat local resoruce (memory blocks or objects) can persist across
+ MEX file invocations. This implies that any result produced by a
+ VLFeat MEX function must be converted back to a MATLAB object such as
+ a vector or a structure. In particular, there is no direct way of
+ creating an object within a MEX file, returning it to MATLAB, and
+ passing it again to another MEX file.
 
   @section main-glossary Glossary
 
@@ -185,6 +249,7 @@ GNU GPLv2, or (at your option) any later version.
  This module provides the following functionalities:
 
  - @ref generic-preproc
+ - @ref generic-state
  - @ref generic-error
  - @ref generic-memory
  - @ref generic-logging
@@ -196,38 +261,49 @@ GNU GPLv2, or (at your option) any later version.
   utility. These include stringification (::VL_STRINGIFY,
   ::VL_XSTRINGIFY) and concatenation (::VL_CAT, ::VL_XCAT) of symbols.
 
+  @section generic-state State and configuration parameters
+
+  VLFeat has some global configuration parameters that can
+  changed. Changing the configuration is thread unsave
+  (@ref design-threads). Use ::vl_set_simd to toggle the use of
+  a SIMD unit (Intel SSE code), ::vl_set_alloc_func to change
+  the memory allocation functions, and ::vl_set_printf_func
+  to change the logging function.
+
   @section generic-error Error handling
 
-  Some VLFeat functions signal errors as the standard C library. Such
-  functions return 0 when they succeed and -1 when they fail, and set
-  the global variable ::vl_err_no with a code identifying the error
-  occurred. This variable is never set on success and should be
-  examined right after an error had occurred.
+  Some VLFeat functions signal errors in a way similar to the
+  standard C library. In case of error, a VLFeat function
+  may return an error code directly,
+  or an invalid result (for instance a negative file descriptor or a null
+  pointer). Then ::vl_get_last_error and ::vl_get_last_error_message can be used
+  to retrieve further details about the error (these functions should be
+  used right after an error has occurred, before any other VLFeat call).
 
   @section generic-memory Memory allocation
 
-  VLFeat uses the ::vl_malloc(), ::vl_realloc(), ::vl_calloc() and
-  ::vl_free() functions to allocate memory. Normally these functions
-  are mapped to the underlying standard C library implementations. However
-  ::vl_set_alloc_func() can be used to map them to other implementations.
-  For instance, in MATALB MEX files these functions are mapped to
-  the MATLAB equivalent which has a garbage collection mechanism to cope
-  with interruptions during execution.
+  VLFeat uses the ::vl_malloc, ::vl_realloc, ::vl_calloc and ::vl_free
+  functions to allocate memory. Normally these functions are mapped to
+  the underlying standard C library implementations. However
+  ::vl_set_alloc_func can be used to map them to other
+  implementations.  For instance, in MATALB MEX files these functions
+  are mapped to the MATLAB equivalent which has a garbage collection
+  mechanism to cope with interruptions during execution.
 
   @section generic-logging Logging
 
-  VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress or
-  debug informations. These functions are normally mapped to the @c
+  VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress
+  or debug informations. These functions are normally mapped to the @c
   printf function of the underlying standard C library. However
-  ::vl_set_printf_func() can be used to map it to a different
+  ::vl_set_printf_func can be used to map it to a different
   implementation. For instance, in MATLAB MEX files this function is
   mapped to @c mexPrintf. Setting the function to @c NULL disables
   logging.
 
-  @section generic-time Measruing time
+  @section generic-time Measuring time
 
-  VLFeat provides ::vl_tic() and ::vl_toc() as an easy way of
-  measuring elapsed time.
+  VLFeat provides ::vl_tic and ::vl_toc as an easy way of measuring
+  elapsed time.
 
 **/
 
@@ -236,22 +312,26 @@ GNU GPLv2, or (at your option) any later version.
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <math.h>
 
-#ifdef VL_OS_WIN
+#if defined(VL_OS_WIN)
 #include <Windows.h>
+#elif defined(_POSIX_THREADS)
+#include <pthread.h>
 #endif
 
-VL_EXPORT int vl_err_no = 0 ;
-VL_EXPORT char vl_err_msg [VL_ERR_MSG_LEN + 1] = "" ;
+#if defined(VL_OS_MACOSX) || defined(VL_OS_LINUX)
+#include <unistd.h>
+#endif
 
 /** ------------------------------------------------------------------
  ** @brief Get version string
  ** @return library version string
  **/
 
-VL_EXPORT
-char const * vl_get_version_string ()
+VL_EXPORT char const *
+vl_get_version_string ()
 {
   return VL_VERSION_STRING ;
 }
@@ -261,36 +341,106 @@ char const * vl_get_version_string ()
  ** @return library version string
  **/
 
-VL_EXPORT
-void vl_print_info ()
+VL_EXPORT void
+vl_print_info ()
 {
   VL_PRINTF ("VLFeat version %s\n", vl_get_version_string()) ;
-  vl_print_host_info () ;
+  vl_print_compiler_info () ;
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  _vl_x86cpu_info_print(&vl_get_state()->cpuInfo) ;
+#endif
+  VL_PRINTF (" Number of CPUs: %d\n", vl_get_num_cpus()) ;
 }
 
-/** @internal@brief A printf that does not do anything */
+/** @internal @brief A printf that does not do anything */
 static int
 do_nothing_printf (char const* format, ...)
 {
   return 0 ;
 }
 
-/** @internal@brief Customizable @c malloc function pointer */
-void *(*vl_malloc_func)  (size_t)          = &malloc ;
-
-/** @internal@brief Customizable @c realloc function pointer */
-void *(*vl_realloc_func) (void*,size_t)    = &realloc ;
-
-/** @internal@brief Customizable @c calloc function pointer */
-void *(*vl_calloc_func)  (size_t, size_t) = &calloc ;
-
-/** @internal@brief Customizable @c free function pointer */
-void  (*vl_free_func)    (void*)            = &free ;
-
-/** @internal@brief Customizable @c printf function pointer */
-int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*/
-
 /** --------------------------------------------------------------- */
+
+VL_EXPORT VlState _vl_state ;
+
+/** ------------------------------------------------------------------
+ ** @internal @fn @brief Lock VLFeat state
+ **
+ ** The function locks VLFeat global state mutex.
+ **
+ ** The mutex is recursive: locking multiple times from the same thread
+ ** is a valid operations, but requires an equivalent number
+ ** of calls to ::vl_unlock_state.
+ **
+ ** @sa ::vl_unlock_state
+ **/
+
+VL_EXPORT void
+vl_lock_state ()
+{
+#if defined(VL_THREADS_ENABLED)
+#if defined(VL_THREADS_POSIX)
+  VlState * state = vl_get_state () ;
+  pthread_t thisThread = pthread_self () ;
+  pthread_mutex_lock (&state->mutex) ;
+  if (state->mutexCount >= 1 &&
+      pthread_equal (state->mutexOwner, thisThread)) {
+    state->mutexCount ++ ;
+  } else {
+    while (state->mutexCount >= 1) {
+      pthread_cond_wait (&state->mutexCondition, &state->mutex) ;
+    }
+    state->mutexOwner = thisThread ;
+    state->mutexCount = 1 ;
+  }
+  pthread_mutex_unlock (&state->mutex) ;
+#elif defined(VL_THREADS_WIN)
+  EnterCriticalSection (&vl_get_state()->mutex) ;
+#endif
+#endif
+}
+
+/** ------------------------------------------------------------------
+ ** @internal @brief Unlock VLFeat state
+ **
+ ** The function unlocks VLFeat global state mutex.
+ **
+ ** @sa ::vl_lock_state
+ **/
+
+VL_EXPORT void
+vl_unlock_state ()
+{
+#if defined(VL_THREADS_ENABLED)
+#if defined(VL_THREADS_POSIX)
+  VlState * state = vl_get_state () ;
+  pthread_mutex_lock (&state->mutex) ;
+  -- state->mutexCount ;
+  if (state->mutexCount == 0) {
+    pthread_cond_signal (&state->mutexCondition) ;
+  }
+  pthread_mutex_unlock (&state->mutex) ;
+#elif defined(VL_THREADS_WIN)
+  LeaveCriticalSection (&vl_get_state()->mutex) ;
+#endif
+#endif
+}
+
+/** @internal @fn ::vl_get_state()
+ ** @brief Return VLFeat global state
+ **
+ ** The function returns a pointer to VLFeat global state.
+ **
+ ** @return pointer to the global state structure.
+ **/
+
+/** @internal @fn ::vl_get_thread_specific_state()
+ ** @brief Get VLFeat thread state
+ **
+ ** The function returns a pointer to VLFeat thread state.
+ **
+ ** @return pointer to the thread state structure.
+ **/
 
 /** @fn ::vl_malloc(size_t)
  ** @brief Call customizable @c malloc function
@@ -331,6 +481,90 @@ int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*
  ** The function calls the user customizable @c free.
  **/
 
+/** @fn ::vl_get_last_error()
+ ** @brief Get VLFeat last error code
+ **
+ ** The function returns the code of the last error generated
+ ** by VLFeat.
+ **
+ ** @return laste error code.
+ **/
+
+/** @internal @fn ::vl_get_last_error_message()
+ ** @brief Get VLFeat last error message
+ **
+ ** The function returns the message of the last
+ ** error generated by VLFeat.
+ **
+ ** @return last error message.
+ **/
+
+/** @fn ::vl_set_simd_enabled(vl_bool)
+ ** @brief Toggle usage of SIMD instructions
+ ** @param x @c true if SIMD instructions are used.
+ **
+ ** Notice that SIMD instructions are used only if the CPU model
+ ** supports them. Note also that data alignment may restrict the use
+ ** of such instructions.
+ **
+ ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
+ **/
+
+/** @fn ::vl_get_simd_enabled()
+ ** @brief Are SIMD instructons enabled?
+ ** @return @c true is SIMD instructions are enabled.
+ **/
+
+/** @fn ::vl_cpu_has_sse3()
+ ** @brief Check for SSE3 instruction set
+ ** @return @c true if SSE3 is present.
+ **/
+
+/** @fn ::vl_cpu_has_sse2()
+ ** @brief Check for SSE2 instruction set
+ ** @return @c true if SSE2 is present.
+ **/
+
+/** ------------------------------------------------------------------
+ ** @internal @brief Set last VLFeat error
+ **
+ ** The function sets the code and optionally the error message
+ ** of the last encountered error. @a errorMessage is the message
+ ** format. It uses the @c printf convention and is followed by
+ ** the format arguments. The maximum lenght of the error message is
+ ** given by ::VL_ERR_MSG_LEN (longer messages are truncated).
+ **
+ ** Passing @c NULL as @a errorMessage
+ ** sets the error message to the empty string.
+ **
+ ** @param error error code.
+ ** @param errorMessage error message format string.
+ ** @param ... format string arguments.
+ ** @return error code.
+ **/
+
+VL_EXPORT int
+vl_set_last_error (int error, char const * errorMessage, ...)
+{
+  VlThreadSpecificState * state = vl_get_thread_specific_state() ;
+  va_list args;
+  va_start(args, errorMessage) ;
+  if (errorMessage) {
+#ifdef VL_COMPILER_LCC
+    vsprintf(state->lastErrorMessage, errorMessage, args) ;
+#else
+    vsnprintf(state->lastErrorMessage,
+              sizeof(state->lastErrorMessage)/sizeof(char),
+              errorMessage, args) ;
+#endif
+  } else {
+    state->lastErrorMessage[0] = 0 ;
+  }
+  state->lastError = error ;
+  va_end(args) ;
+  return error ;
+}
+
 /** ------------------------------------------------------------------
  ** @brief Set memory allocation functions
  ** @param malloc_func  pointer to @c malloc.
@@ -339,65 +573,275 @@ int   (*vl_printf_func)  (char const *, ...)=  printf ; /* &do_nothing_printf ;*
  ** @param free_func    pointer to @c free.
  **/
 
-VL_EXPORT
-void vl_set_alloc_func (void *(*malloc_func)  (size_t),
-                        void *(*realloc_func) (void*, size_t),
-                        void *(*calloc_func)  (size_t, size_t),
-                        void  (*free_func)    (void*))
+VL_EXPORT void
+vl_set_alloc_func (void *(*malloc_func)  (size_t),
+                   void *(*realloc_func) (void*, size_t),
+                   void *(*calloc_func)  (size_t, size_t),
+                   void  (*free_func)    (void*))
 {
-  vl_malloc_func  = malloc_func ;
-  vl_realloc_func = realloc_func ;
-  vl_calloc_func  = calloc_func ;
-  vl_free_func    = free_func ;
+  VlState * state ;
+  vl_lock_state () ;
+  state = vl_get_state() ;
+  state->malloc_func  = malloc_func ;
+  state->realloc_func = realloc_func ;
+  state->calloc_func  = calloc_func ;
+  state->free_func    = free_func ;
+  vl_unlock_state () ;
 }
 
-VL_EXPORT
-void
+VL_EXPORT void
 vl_set_printf_func (printf_func_t printf_func)
 {
-  vl_printf_func  = printf_func ? printf_func : do_nothing_printf ;
+  vl_get_state()->printf_func = printf_func ? printf_func : do_nothing_printf ;
 }
 
-#ifdef VL_OS_WIN
-LARGE_INTEGER tic_freq ;
-LARGE_INTEGER tic_mark ;
-#else
-clock_t tic_mark ; /**< @internal Store clock time for ::vl_tic() */
-#endif
-
 /** ------------------------------------------------------------------
- ** @brief Set time reference
+ ** @brief Reset the processor time reference
+ **
+ ** The function resets VLFeat the internal time marker.
+ **
+ ** @sa ::vl_toc
  **/
 
-void vl_tic()
+VL_EXPORT void
+vl_tic ()
 {
+  VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
-  QueryPerformanceFrequency(&tic_freq) ;
-  QueryPerformanceCounter(&tic_mark) ;
+  QueryPerformanceFrequency (&threadState->ticFreq) ;
+  QueryPerformanceCounter (&threadState->ticMark) ;
 #else
-  tic_mark = clock() ;
+  threadState->ticMark = clock() ;
 #endif
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get time since reference
+ ** @brief Get processor time elapsed since the time reference was set
  **
- ** Returns the processor time elapsed since ::vl_tic() was called.
+ ** Returns the processor time elapsed since ::vl_tic was called last.
+ **
+ ** @remark In multi-threaded applications, there is
+ ** one such timers for each execution thread.
  **
  ** @remark On UNIX, this function uses the @c clock() system call.
  ** On Windows, it uses the @c QueryPerformanceCounter() system call,
  ** which is more accurate than @c clock() on this platform.
  **
- ** @return time in seconds.
+ ** @return elapsed time in seconds.
  **/
 
-double vl_toc()
+VL_EXPORT double
+vl_toc ()
 {
+  VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
-  LARGE_INTEGER toc_mark ;
-  QueryPerformanceCounter(&toc_mark) ;
-  return (double) (toc_mark.QuadPart - tic_mark.QuadPart) / tic_freq.QuadPart ;
+  LARGE_INTEGER tocMark ;
+  QueryPerformanceCounter(&tocMark) ;
+  return (double) (tocMark.QuadPart - threadState->ticMark.QuadPart) /
+    threadState->ticFreq.QuadPart ;
 #else
-  return (double) (clock() - tic_mark) / CLOCKS_PER_SEC ;
+  return (double) (clock() - threadState->ticMark) / CLOCKS_PER_SEC ;
 #endif
 }
+
+/** ------------------------------------------------------------------
+ ** @brief Get the random number generator for this thread
+ ** @return random number generator.
+ **
+ ** The function returns a pointer to the random number genrator
+ ** for this thread.
+ **/
+
+VL_EXPORT VlRand *
+vl_get_rand ()
+{
+  return &vl_get_thread_specific_state()->rand ;
+}
+
+/* -------------------------------------------------------------------
+ *                       Library construction and destruction routines
+ *  --------------------------------------------------------------- */
+
+VL_EXPORT VlThreadSpecificState *
+vl_thread_specific_state_new ()
+{
+  VlThreadSpecificState * self ;
+#ifndef NDEBUG
+  printf("VLFeat thread constructor called\n") ;
+#endif
+  self = malloc(sizeof(VlThreadSpecificState)) ;
+  self->lastError = 0 ;
+  self->lastErrorMessage[0] = 0 ;
+#if defined(VL_OS_WIN)
+  self->ticMark.QuadPart = 0 ;
+  self->ticFreq.QuadPart = 1 ;
+#else
+  self->ticMark = 0 ;
+#endif
+  vl_rand_init (&self->rand) ;
+
+  return self ;
+}
+
+VL_EXPORT void
+vl_thread_specific_state_delete (VlThreadSpecificState * self)
+{
+#ifndef NDEBUG
+  printf("VLFeat thread destructor called\n") ;
+#endif
+  free (self) ;
+}
+
+#if (defined(VL_OS_LINUX) || defined(VL_OS_MACOSX)) && defined(VL_COMPILER_GNUC)
+
+static void vl_constructor () __attribute__ ((constructor)) ;
+static void vl_destructor () __attribute__ ((destructor))  ;
+
+#elif defined(VL_OS_WIN)
+
+static void vl_constructor () ;
+static void vl_destructor () ;
+
+BOOL WINAPI DllMain(
+    HINSTANCE hinstDLL,  // handle to DLL module
+    DWORD fdwReason,     // reason for calling function
+    LPVOID lpReserved )  // reserved
+{
+  VlState * state ;
+  VlThreadSpecificState * threadState ;
+  switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+      /* Initialize once for each new process */
+      vl_constructor () ;
+      break ;
+
+    case DLL_THREAD_ATTACH:
+      /* Do thread-specific initialization */
+      break ;
+
+    case DLL_THREAD_DETACH:
+      /* Do thread-specific cleanup */
+#if defined(VL_THREADS_ENABLED) && defined(VL_THREADS_WIN)
+      state = vl_get_state() ;
+      threadState = (VlThreadSpecificState*) TlsGetValue(state->tlsIndex) ;
+      if (threadState) {
+        vl_thread_specific_state_delete (threadState) ;
+      }
+#endif
+      break;
+
+    case DLL_PROCESS_DETACH:
+      /* Perform any necessary cleanup */
+      vl_destructor () ;
+      break;
+    }
+    return TRUE ; /* Successful DLL_PROCESS_ATTACH */
+}
+
+#endif
+
+/** @internal @brief Initialize VLFeat */
+static void
+vl_constructor ()
+{
+  VlState * state ;
+#ifndef NDEBUG
+  printf("VLFeat constructor called\n") ;
+#endif
+
+  state = vl_get_state() ;
+
+#if defined(VL_THREADS_ENABLED)
+#if defined(VL_THREADS_POSIX)
+  {
+    typedef void (*destructorType)(void * );
+    pthread_key_create (&state->threadKey,
+                        (destructorType)
+                          vl_thread_specific_state_delete) ;
+    pthread_mutex_init (&state->mutex, NULL) ;
+    pthread_cond_init (&state->mutexCondition, NULL) ;
+  }
+#elif defined(VL_THREADS_WIN)
+  InitializeCriticalSection (&state->mutex) ;
+  state->tlsIndex = TlsAlloc () ;
+#endif
+#endif
+
+  state->malloc_func  = malloc ;
+  state->realloc_func = realloc ;
+  state->calloc_func  = calloc ;
+  state->free_func    = free ;
+  state->printf_func  = printf ;
+
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  _vl_x86cpu_info_init (&state->cpuInfo) ;
+#endif
+
+#if defined(VL_OS_WIN)
+  {
+    SYSTEM_INFO info;
+    GetSystemInfo (&info) ;
+    state->numCPUs = info.dwNumberOfProcessors ;
+  }
+#elif defined(VL_OS_MACOSX) || defined(VL_OS_LINUX)
+  state->numCPUs = sysconf(_SC_NPROCESSORS_ONLN) ;
+#else
+  state->numCPUs = 1 ;
+#endif
+  state->simdEnabled = VL_TRUE ;
+  state->maxNumThreads = 1 ;
+}
+
+/** @internal @brief Destruct VLFeat */
+static void
+vl_destructor ()
+{
+  VlState * state ;
+#ifndef NDEBUG
+  printf("VLFeat destructor called\n") ;
+#endif
+
+  state = vl_get_state() ;
+
+#if defined(VL_THREADS_ENABLED)
+#if defined(VL_THREADS_POSIX)
+  {
+    /* Delete the thread state of this thread as the
+       destructor is not called by pthread_key_delete or after
+       the key is deleted. When the library
+       is unloaded, this thread should also be the last one
+       using the library, so this is fine.
+     */
+    VlThreadSpecificState * threadState =
+       pthread_getspecific(state->threadKey) ;
+    if (threadState) {
+      vl_thread_specific_state_delete (threadState) ;
+      pthread_setspecific(state->threadKey, NULL) ;
+    }
+  }
+  pthread_cond_destroy (&state->mutexCondition) ;
+  pthread_mutex_destroy (&state->mutex) ;
+  pthread_key_delete (state->threadKey) ;
+#elif defined(VL_THREADS_WIN)
+ {
+    /* Delete the thread state of this thread as the
+       destructor is not called by pthread_key_delete or after
+       the key is deleted. When the library
+       is unloaded, this thread should also be the last one
+       using the library, so this is fine.
+     */
+    VlThreadSpecificState * threadState =
+       TlsGetValue(state->tlsIndex) ;
+    if (threadState) {
+      vl_thread_specific_state_delete (threadState) ;
+      TlsSetValue(state->tlsIndex, NULL) ;
+    }
+  }
+  TlsFree (state->tlsIndex) ;
+  DeleteCriticalSection (&state->mutex) ;
+#endif
+#endif
+}
+
+
+

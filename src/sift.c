@@ -467,7 +467,7 @@ main(int argc, char **argv)
     err = vl_pgm_extract_head (in, &pim) ;
 
     if (err) {
-      switch (vl_err_no) {
+      switch (vl_get_last_error()) {
       case  VL_ERR_PGM_IO :
         snprintf(err_msg, sizeof(err_msg),
                  "Cannot read from '%s'.", name) ;

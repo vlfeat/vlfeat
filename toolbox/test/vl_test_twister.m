@@ -16,19 +16,19 @@ a(1) = a(1)+1 ;
 rand('twister',a) ; b = rand('twister') ;
 check(a,b,'twister: set state') ;
 
-% VL_TWISTER([M N P ...])  
-rand('twister',b) ; 
+% VL_TWISTER([M N P ...])
+rand('twister',b) ;
 vl_twister('state',b) ;
 a=rand([1 2 3 4 5]) ;
 b=vl_twister([1 2 3 4 5]) ;
 check(a,b,'twister: VL_TWISTER([M N P ...])') ;
 
-% VL_TWISTER(M, N, P ...)  
+% VL_TWISTER(M, N, P ...)
 a=rand(1, 2, 3, 4, 5) ;
 b=vl_twister(1, 2, 3, 4, 5) ;
 check(a,b,'twister: VL_TWISTER(M, N, P, ...)') ;
 
-% VL_TWISTER(M, N, P ...)  
+% VL_TWISTER(M, N, P ...)
 a=rand(1, 2, 3, 4, 5) ;
 b=vl_twister(1, 2, 3, 4, 5) ;
 check(a,b,'twister: VL_TWISTER(M, N, P, ...)') ;
