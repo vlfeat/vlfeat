@@ -46,17 +46,17 @@ General Public License version 2.
    last paragraph.
 */
 
-/** @brief IEEE single precision quiet NaN constant */
+/** @internal @brief IEEE single precision quiet NaN constant */
 static union { vl_uint32 raw ; float value ; }
   const vl_nan_f =
     { 0x7FC00000UL } ;
 
-/** @brief IEEE single precision infinity constant */
+/** @internal @brief IEEE single precision infinity constant */
 static union { vl_uint32 raw ; float value ; }
   const vl_infinity_f =
     { 0x7F800000UL } ;
 
-/** @brief IEEE double precision quiet NaN constant */
+/** @internal @brief IEEE double precision quiet NaN constant */
 static union { vl_uint64 raw ; double value ; }
   const vl_nan_d =
 #ifdef VL_COMPILER_MSC
@@ -65,7 +65,7 @@ static union { vl_uint64 raw ; double value ; }
     { 0x7FF8000000000000ULL } ;
 #endif
 
-/** @brief IEEE double precision infinity constant */
+/** @internal @brief IEEE double precision infinity constant */
 static union { vl_uint64 raw ; double value ; }
   const vl_infinity_d =
 #ifdef VL_COMPILER_MSC
@@ -86,11 +86,12 @@ static union { vl_uint64 raw ; double value ; }
 /** @brief IEEE double precision positive infinity (not signaling) */
 #define VL_INFINITY_D (vl_infinity_d.value)
 
-/** ------------------------------------------------------------------
- ** @{
- ** @brief Fast <code>mod(x, 2 * VL_PI)</code>
+/* ---------------------------------------------------------------- */
+
+/** @brief Fast <code>mod(x, 2 * VL_PI)</code>
  **
  ** @param x input value.
+ ** @return <code>mod(x, 2 * VL_PI)</code>
  **
  ** The function is optimized for small absolute values of @a x.
  **
@@ -98,35 +99,34 @@ static union { vl_uint64 raw ; double value ; }
  ** finite numerical precision and rounding errors, the result can be
  ** equal to 2 * VL_PI (for instance, if @c x is a very small negative
  ** number).
- **
- ** @return <code>mod(x, 2 * VL_PI)</code>
  **/
-VL_INLINE
-float vl_mod_2pi_f (float x)
+
+VL_INLINE float
+vl_mod_2pi_f (float x)
 {
-  while (x > 2 * VL_PI) x -= (float) (2 * VL_PI) ;
-  while (x < 0.0F     ) x += (float) (2 * VL_PI);
+  while (x > (float)(2 * VL_PI)) x -= (float) (2 * VL_PI) ;
+  while (x < 0.0F) x += (float) (2 * VL_PI);
   return x ;
 }
 
-VL_INLINE
-double vl_mod_2pi_d (double x)
+/** @brief Fast <code>mod(x, 2 * VL_PI)</code>
+ ** @see vl_mod_2pi_f
+ **/
+
+VL_INLINE double
+vl_mod_2pi_d (double x)
 {
-  while (x > 2 * VL_PI) x -= 2 * VL_PI ;
-  while (x < 0.0      ) x += 2 * VL_PI ;
+  while (x > 2.0 * VL_PI) x -= 2 * VL_PI ;
+  while (x < 0.0) x += 2 * VL_PI ;
   return x ;
 }
-/** @} */
 
-/** ------------------------------------------------------------------
- ** @{
- ** @brief Fast <code>(int) floor(x)</code>
- **
+/** @brief Fast <code>(int) floor(x)</code>
  ** @param x argument.
  ** @return @c (int) floor(x)
  **/
-VL_INLINE
-int
+
+VL_INLINE int
 vl_floor_f (float x)
 {
   int xi = (int) x ;
@@ -134,19 +134,19 @@ vl_floor_f (float x)
   else return xi - 1 ;
 }
 
-VL_INLINE
-int
+/** @brief Fast <code>(int) floor(x)</code>
+ ** @see vl_floor_f
+ **/
+
+VL_INLINE int
 vl_floor_d (double x)
 {
   int xi = (int) x ;
   if (x >= 0 || (double) xi == x) return xi ;
   else return xi - 1 ;
 }
-/* @} */
 
-/** ------------------------------------------------------------------
- ** @{
- ** @brief Fast @c abs(x)
+/** @brief Fast @c abs(x)
  ** @param x argument.
  ** @return @c abs(x)
  **/
@@ -161,6 +161,10 @@ vl_abs_f (float x)
 #endif
 }
 
+/** @brief Fast @c abs(x)
+ ** @sa vl_abs_f
+ **/
+
 VL_INLINE double
 vl_abs_d (double x)
 {
@@ -170,10 +174,8 @@ vl_abs_d (double x)
   return fabs(x) ;
 #endif
 }
-/** @} */
 
 /** ------------------------------------------------------------------
- ** @{
  ** @brief Fast @c atan2 approximation
  ** @param y argument.
  ** @param x argument.
@@ -209,8 +211,7 @@ vl_abs_d (double x)
  ** @return Approximation of @c atan2(y,x).
  **/
 
-VL_INLINE
-float
+VL_INLINE float
 vl_fast_atan2_f (float y, float x)
 {
   float angle, r ;
@@ -229,8 +230,11 @@ vl_fast_atan2_f (float y, float x)
   return (y < 0) ? - angle : angle ;
 }
 
-VL_INLINE
-double
+/** @brief Fast @c atan2 approximation
+ ** @sa vl_fast_atan2_f
+ **/
+
+VL_INLINE double
 vl_fast_atan2_d (double y, double x)
 {
   double angle, r ;
@@ -248,12 +252,11 @@ vl_fast_atan2_d (double y, double x)
   angle += (c3*r*r - c1) * r ;
   return (y < 0) ? - angle : angle ;
 }
-/** @} */
 
 /** ------------------------------------------------------------------
- ** @{
  ** @brief Fast @c resqrt approximation
  ** @param x argument.
+ ** @return approximation of @c resqrt(x).
  **
  ** The function quickly computes an approximation of @f$ x^{-1/2}
  ** @f$.
@@ -261,12 +264,12 @@ vl_fast_atan2_d (double y, double x)
  ** @par Algorithm
  **
  ** The goal is to compute @f$ y = x^{-1/2} @f$, which we do by
- ** finding the solution of @f$ 0 = f(y) = y^{-2} - x@f$ by two Newton
+ ** finding the solution of @f$ 0 = f(y) = y^{-2} - x @f$ by two Newton
  ** steps. Each Newton iteration is given by
  **
  ** @f[
  **   y \leftarrow
- **   y - \frac{f(y)}{\dot f(y)} =
+ **   y - \frac{f(y)}{\frac{df(y)}{dy}} =
  **   y + \frac{1}{2} (y-xy^3) =
  **   \frac{y}{2} \left( 3 - xy^2 \right)
  ** @f]
@@ -278,11 +281,9 @@ vl_fast_atan2_d (double y, double x)
  **
  ** @see <a href="http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf">Inverse Sqare Root</a>.
  **
- ** @return Approximation of @c resqrt(x).
  **/
 
-VL_INLINE
-float
+VL_INLINE float
 vl_fast_resqrt_f (float x)
 {
   /* 32-bit version */
@@ -306,8 +307,11 @@ vl_fast_resqrt_f (float x)
   return u.x ;
 }
 
-VL_INLINE
-double
+/** @brief Fast @c resqrt approximation
+ ** @sa vl_fast_resqrt_d
+ **/
+
+VL_INLINE double
 vl_fast_resqrt_d (double x)
 {
   /* 64-bit version */
@@ -334,15 +338,12 @@ vl_fast_resqrt_d (double x)
   return u.x ;
 }
 
-/** @} */
-
 /** ------------------------------------------------------------------
- ** @{
  ** @brief Fast @c sqrt approximation
  ** @param x argument.
- ** @return Approximation of @c sqrt(x).
+ ** @return approximation of @c sqrt(x).
  **
- ** The function computes a fast approximation of @c sqrt(x).
+ ** The function computes a cheap approximation of @c sqrt(x).
  **
  ** @par Floating-point algorithm
  **
@@ -389,58 +390,69 @@ vl_fast_sqrt_f (float x)
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_f (x) ;
 }
 
+/** @brief Fast @c sqrt approximation
+ ** @sa vl_fast_sqrt_f
+ **/
+
 VL_INLINE double
 vl_fast_sqrt_d (float x)
 {
   return (x < 1e-8) ? 0 : x * vl_fast_resqrt_d (x) ;
 }
 
+/** @brief Fast @c sqrt approximation
+ ** @sa vl_fast_sqrt_f
+ **/
+
 VL_INLINE vl_uint32 vl_fast_sqrt_ui32 (vl_uint32 x) ;
+
+/** @brief Fast @c sqrt approximation
+ ** @sa vl_fast_sqrt_f
+ **/
+
 VL_INLINE vl_uint16 vl_fast_sqrt_ui16 (vl_uint16 x) ;
+
+/** @brief Fast @c sqrt approximation
+ ** @sa vl_fast_sqrt_f
+ **/
+
 VL_INLINE vl_uint8  vl_fast_sqrt_ui8  (vl_uint8  x) ;
 
-/** @} */
-
-#define VL_FAST_SQRT_UI(T, SFX)                 \
-  T                                             \
-  vl_fast_sqrt_ ## SFX (T x)                    \
-  {                                             \
-    T y = 0 ; /* w / 2^k */                     \
-    T tmp = 0 ;                                 \
-    int twok ;                                  \
-                                                \
-    for (twok = 8 * sizeof(T) - 2 ;             \
-         twok >= 0 ; twok -= 2) {               \
-      y <<= 1 ; /* y = 2 * y */                 \
-      tmp = (2*y + 1) << twok ;                 \
-      if (x >= tmp) {                           \
-        x -= tmp ;                              \
-        y += 1 ;                                \
-      }                                         \
-    }                                           \
-    return y ;                                  \
+#define VL_FAST_SQRT_UI(T,SFX)                                       \
+  VL_INLINE T                                                        \
+  vl_fast_sqrt_ ## SFX (T x)                                         \
+{                                                                    \
+    T y = 0 ; /* w / 2^k */                                          \
+    T tmp = 0 ;                                                      \
+    int twok ;                                                       \
+                                                                     \
+    for (twok = 8 * sizeof(T) - 2 ;                                  \
+         twok >= 0 ; twok -= 2) {                                    \
+      y <<= 1 ; /* y = 2 * y */                                      \
+      tmp = (2*y + 1) << twok ;                                      \
+      if (x >= tmp) {                                                \
+        x -= tmp ;                                                   \
+        y += 1 ;                                                     \
+      }                                                              \
+    }                                                                \
+    return y ;                                                       \
   }
 
-#ifdef __DOXYGEN__
-#undef VL_FAST_SQRT_UI
-#define VL_FAST_SQRT_UI(T,SFX)
-#endif
-
-VL_FAST_SQRT_UI(vl_uint32, ui32)
-VL_FAST_SQRT_UI(vl_uint16, ui16)
-VL_FAST_SQRT_UI(vl_uint8,  ui8 )
-
-/** @} */
+VL_FAST_SQRT_UI(vl_uint32,ui32)
+VL_FAST_SQRT_UI(vl_uint16,ui16)
+VL_FAST_SQRT_UI(vl_uint8,ui8)
 
 /* ---------------------------------------------------------------- */
 
-#ifndef __DOXYGEN__
+/** @typedef VlFloatVectorComparisonFunction
+ ** @brief Pointer to a function to compare vectors of floats
+ **/
 typedef float (*VlFloatVectorComparisonFunction)(vl_size dimension, float const * X, float const * Y) ;
+
+/** @typedef VlDoubleVectorComparisonFunction
+ ** @brief Pointer to a function to compare vectors of doubles
+ **/
 typedef double (*VlDoubleVectorComparisonFunction)(vl_size dimension, double const * X, double const * Y) ;
-#else
-typedef void VlFloatVectorComparisonFunction ;
-typedef void VlDoubleVectorComparisonFunction ;
-#endif
 
 /** @brief Vector comparison types */
 enum _VlVectorComparisonType {
@@ -473,7 +485,7 @@ VL_EXPORT void
 vl_eval_vector_comparison_on_all_pairs_d (double * result, vl_size dimension,
                                           double const * X, vl_size numDataX,
                                           double const * Y, vl_size numDataY,
-                                          VlDoubleVectorComparisonFunction) ;
+                                          VlDoubleVectorComparisonFunction function) ;
 
 /* VL_MATHOP_H */
 #endif
