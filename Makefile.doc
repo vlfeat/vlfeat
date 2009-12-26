@@ -107,7 +107,8 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 doc/api/index.html: docsrc/doxygen.conf VERSION docsrc/version.html  \
   $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
   doc/doxygen_header.html doc/doxygen_footer.html
-	$(call C,DOXYGEN) $<
+	#$(call C,DOXYGEN) $<
+	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
 
 #
 # Generate Man documentation
