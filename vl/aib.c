@@ -115,10 +115,10 @@ GNU GPLv2, or (at your option) any later version.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <float.h> /* DBL_MAX */
+#include <float.h>
 #include <math.h>
 
-/** @internal @brief The maximum value which beta may take */
+/* The maximum value which beta may take */
 #define BETA_MAX DBL_MAX
 
 /** ------------------------------------------------------------------

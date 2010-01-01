@@ -29,11 +29,11 @@ also returns the total number @c r of characters that would have been
 written if the buffer was big enough (not counting the terminating @c
 NUL). Thus:
 
-- overflow errors are be detected by testing whether @c r &gt;= @c n; 
+- overflow errors are be detected by testing whether @c r &gt;= @c n;
 - @c r can be used to re-allocate a sufficiently large buffer and repeat the operation;
 - as long as @a n &gt;= 0 the result is always @c NUL terminated;
 - if @a n = 0 nothing is actually written.
-  
+
 **/
 
 #include "stringop.h"
@@ -58,15 +58,14 @@ NUL). Thus:
  ** suffix but it cannot be recognized.
  **/
 
-VL_EXPORT
-char*  
+VL_EXPORT char *
 vl_string_parse_protocol (char const *str, int *prot)
 {
   char const* cpt ;
   int dummy ;
-  
+
   /* handle the case prot = 0 */
-  if (prot == 0) 
+  if (prot == 0)
     prot = &dummy ;
 
   /* look for :// */
@@ -75,11 +74,11 @@ vl_string_parse_protocol (char const *str, int *prot)
   if (cpt == 0) {
     *prot = VL_PROT_NONE ;
     cpt = str ;
-  } 
+  }
   else {
     if      (strncmp(str, "ascii", cpt - str) == 0) {
       *prot = VL_PROT_ASCII ;
-    } 
+    }
     else if (strncmp(str, "bin",   cpt - str) == 0) {
       *prot = VL_PROT_BINARY ;
     }
@@ -103,12 +102,11 @@ vl_string_parse_protocol (char const *str, int *prot)
  ** pointer if the protocol code is unknown.
  **/
 
-VL_EXPORT
-char const*  
+VL_EXPORT char const *
 vl_string_protocol_name (int prot)
 {
   switch (prot) {
-  case VL_PROT_ASCII: 
+  case VL_PROT_ASCII:
     return "ascii" ;
   case VL_PROT_BINARY:
     return "bin" ;
@@ -133,28 +131,27 @@ vl_string_protocol_name (int prot)
  ** buffer @a dst of length @a n.
  **
  ** The leading path is the suffix that ends with the last occurrence
- ** of the <tt>`\'</tt> or <tt>`/'</tt> characters. A trailing extension 
+ ** of the <tt>`\'</tt> or <tt>`/'</tt> characters. A trailing extension
  ** is the shortest suffix starting with the <tt>`.'</tt> character.
  **
  ** @return length of the result.
  ** @sa vl-stringop-err.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT int
 vl_string_basename (char *dst, int n, char const *src, int n_ext)
 {
 
   char c ;
   int  k = 0 ;
   int  beg, end ;
-  
+
   /* find beginning */
   beg = 0 ;
   for (k = 0 ; (c = src[k]) ; ++ k) {
     if (c == '\\' || c == '/') beg = k + 1 ;
   }
-  
+
   /* find ending */
   end = strlen(src) ;
   for (k = end ; k > beg ; --k) {
@@ -163,8 +160,8 @@ vl_string_basename (char *dst, int n, char const *src, int n_ext)
       end = k - 1 ;
     }
   }
-  
-  return vl_string_copy_sub (dst, n, src + beg, src + end) ; 
+
+  return vl_string_copy_sub (dst, n, src + beg, src + end) ;
 }
 
 /** -------------------------------------------------------------------
@@ -190,11 +187,10 @@ vl_string_basename (char *dst, int n, char const *src, int n_ext)
  ** @sa @ref vl-stringop-err.
  **/
 
-VL_EXPORT
-int
-vl_string_replace_wildcard (char *dst, int n, 
-                            char const *src, 
-                            char wild, 
+VL_EXPORT int
+vl_string_replace_wildcard (char *dst, int n,
+                            char const *src,
+                            char wild,
                             char esc,
                             char const *repl)
 {
@@ -203,7 +199,7 @@ vl_string_replace_wildcard (char *dst, int n,
   vl_bool escape = 0 ;
 
   while (( c = *src++ )) {
-    
+
     /* enter escape mode ? */
     if (! escape && c == esc) {
       escape = 1 ;
@@ -246,14 +242,13 @@ vl_string_replace_wildcard (char *dst, int n,
  ** @sa vl-stringop-err.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT int
 vl_string_copy (char *dst, int n, char const *src)
 {
 
   char c ;
   int  k = 0 ;
-    
+
   while (( c = *src++ )) {
     if (dst && k < n - 1) dst [k] = c ;
     ++ k ;
@@ -281,9 +276,8 @@ vl_string_copy (char *dst, int n, char const *src)
  ** @sa vl-stringop-err.
  **/
 
-VL_EXPORT
-int
-vl_string_copy_sub (char *dst, int n, 
+VL_EXPORT int
+vl_string_copy_sub (char *dst, int n,
                     char const *beg,
                     char const *end)
 {
@@ -313,8 +307,7 @@ vl_string_copy_sub (char *dst, int n,
  ** @return pointer to last occurrence of @a c, or 0 if none.
  **/
 
-VL_EXPORT
-char *
+VL_EXPORT char *
 vl_string_find_char_rev (char const *beg, char const* end, char c)
 {
   while(end -- != beg) {
@@ -332,8 +325,7 @@ vl_string_find_char_rev (char const *beg, char const* end, char c)
  ** @return string length.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT int
 vl_string_length (char const *str)
 {
   int i ;
@@ -351,11 +343,10 @@ vl_string_length (char const *str)
  ** greater (in lexicographical order) and <0 otherwise.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT int
 vl_string_casei_cmp (const char *s1, const char *s2)
 {
-  while (tolower((unsigned char)*s1) == 
+  while (tolower((unsigned char)*s1) ==
          tolower((unsigned char)*s2))
   {
     if (*s1 == 0)
@@ -363,7 +354,7 @@ vl_string_casei_cmp (const char *s1, const char *s2)
     s1++;
     s2++;
   }
-  return 
-    (int)tolower((unsigned char)*s1) - 
+  return
+    (int)tolower((unsigned char)*s1) -
     (int)tolower((unsigned char)*s2) ;
 }

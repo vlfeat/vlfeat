@@ -1,11 +1,9 @@
-/*
- *  test_vec_comp.c
- *  vlfeat
- *
- *  Created by Andrea Vedaldi on 12/07/2009.
- *  Copyright 2009 UCLA. All rights reserved.
- *
- */
+/** @file   test_vec_comp.c
+ ** @brief  Test vector computations
+ ** @author Andrea Vedaldi
+ **/
+
+/* AUTORIGHTS */
 
 #include <vl/random.h>
 #include <vl/mathop.h>
@@ -20,7 +18,6 @@ init_data (vl_size numDimensions, vl_size numSamples, float ** X, float ** Y)
     *Xi++ = vl_rand_real1() ;
     *Yi++ = vl_rand_real1() ;
   }
-
 }
 
 int

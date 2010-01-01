@@ -1,11 +1,9 @@
-/*
- *  vl_simdctrl.c
- *  vlfeat
- *
- *  Created by Andrea Vedaldi on 12/07/2009.
- *  Copyright 2009 UCLA. All rights reserved.
- *
- */
+/** @file   vl_simdctlr.c
+ ** @brief  vl_simdctrl MEX definition
+ ** @author Andrea Vedaldi
+ **/
+
+/* AUTORIGHTS */
 
 #include "mexutils.h"
 

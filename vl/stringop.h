@@ -27,7 +27,7 @@ General Public License version 2.
 
 enum {
   VL_PROT_UNKNOWN = -1, /**< unknown protocol */
-  VL_PROT_NONE    =  0, /**< no protocol      */ 
+  VL_PROT_NONE    =  0, /**< no protocol      */
   VL_PROT_ASCII,        /**< ASCII protocol   */
   VL_PROT_BINARY        /**< Binary protocol  */
 } ;

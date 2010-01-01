@@ -29,7 +29,6 @@ typedef vl_uint8 vl_mser_pix ;
  **/
 #define VL_MSER_PIX_MAXVAL 256
 
-
 /** @brief MSER Filter 
  **
  ** The MSER filter computes the Maximally Stable Extremal Regions of

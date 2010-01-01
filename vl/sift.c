@@ -27,7 +27,7 @@ P. Ivanov, and Q. S. Luo.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 This library module implements a
-@ref sift-filter-usage "SIFT filter object",
+@ref sift-usage "SIFT filter object",
 a reusable object to extract SIFT features from one or
 multiple images of the same size.
 
@@ -54,7 +54,7 @@ multiple images of the same size.
 A SIFT feature is a selected image region (also called keypoint) with
 an associated descriptor. Keypoints are extracted by the <b>@ref
 sift-intro-detector "SIFT detector"</b> and their descriptors are
-computed by the <b>@ref sift-descriptor "SIFT descriptor"</b>.  It is
+computed by the <b>@ref sift-intro-descriptor "SIFT descriptor"</b>.  It is
 also common to use independently the SIFT detector (i.e. computing the
 keypoints without descriptors) or the SIFT descriptor (i.e.  computing
 descriptors of custom keypoints).
