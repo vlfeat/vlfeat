@@ -135,6 +135,7 @@
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
+				2D99420410ECD6E300502DF6 /* index.html */,
 				2DD66ECE0FEFB0F3005A3664 /* matrix.h */,
 				2DD66ECC0FEFB076005A3664 /* mex.h */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
