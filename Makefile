@@ -571,7 +571,7 @@ bin-commit: bin-release
 	fi ; \
 	echo Commiting and pushing to server the binaries ; \
 	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ; \
-	$(GIT) checkout v$(VER) ; \
+	$(GIT) checkout master ; \
 	$(GIT) branch -D $$BRANCH ;
 
 bin-merge: $(m_lnk)
