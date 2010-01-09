@@ -103,7 +103,7 @@
 # debugging information.
 
 NAME   := vlfeat
-VER    := 0.9.5
+VER    := 0.9.5.1
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 
 # programs required to build VLFeat

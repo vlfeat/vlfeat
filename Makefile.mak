@@ -12,7 +12,7 @@
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 # - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
-VER  = 0.9.5
+VER  = 0.9.5.1
 ARCH = w32
 
 VCROOT     = C:\Program Files\Microsoft Visual Studio 9.0\VC
