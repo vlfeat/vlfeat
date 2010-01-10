@@ -579,7 +579,7 @@ bin-commit: bin-release
 	  $(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
 	fi ; \
 	echo Commiting and pushing to server the binaries ; \
-	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ;
+	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
 
 bin-merge: $(m_lnk)
 	echo Fetching remote tags ; \
