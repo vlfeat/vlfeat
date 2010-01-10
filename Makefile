@@ -503,7 +503,7 @@ noprefix: $(noprefix-dir) $(m_lnk)
 #                                                           Make clean
 # --------------------------------------------------------------------
 
-.PHONY: clean, distclean
+.PHONY: clean archclean distclean
 
 clean:
 	rm -f  `find . -name '*~'`
@@ -513,6 +513,11 @@ clean:
 	rm -rf `find ./bin -name 'objs' -type d`
 	rm -rf  ./results
 	rm -rf $(NAME)
+	rm -f $(dll_dep) $(bin_dep) $(mex_dep)
+
+archclean: clean
+	rm -rf bin/$(ARCH)
+	rm -rf toolbox/$(ARCH)
 
 distclean: clean doc-distclean
 	rm -rf bin
@@ -638,7 +643,7 @@ post-doc: doc
 # --------------------------------------------------------------------
 
 # Auto-deps
-ifeq ($(filter doc clean distclean info, $(MAKECMDGOALS)),)
+ifeq ($(filter doc clean archclean distclean info, $(MAKECMDGOALS)),)
 include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
 
