@@ -20,7 +20,7 @@ General Public License version 2.
 #include "host.h"
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.5.1"
+#define VL_VERSION_STRING "0.9.6"
 
 /** ------------------------------------------------------------------
  ** @name C preprocessor helper macros
