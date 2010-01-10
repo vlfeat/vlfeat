@@ -400,7 +400,7 @@ $(BINDIR)/objs/%.d : vl/%.c $(bin-dir)
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	$(call C,LIBTOOL) -dynamic                                   \
                     -flat_namespace                                  \
-                    -install_name @loader_path/libvl.dylib           \
+                    -install_name @loader_path/lib$(DLL_NAME).dylib  \
 	            -compatibility_version $(VER)                    \
                     -current_version $(VER)                          \
 	            -o $@ -undefined suppress $^
