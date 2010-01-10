@@ -77,7 +77,7 @@ doc/index.html: \
  docsrc/web.css \
  docsrc/webdoc.py \
  $(img_tgt) $(html_src) 
-	$(PYTHON) docsrc/webdoc.py --outdir=doc \
+	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py --outdir=doc \
 	     docsrc/web.xml --verbose
 	rsync -arv docsrc/images doc
 	rsync -arv docsrc/web.css doc

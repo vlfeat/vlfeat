@@ -103,7 +103,8 @@
 # debugging information.
 
 NAME   := vlfeat
-VER    := 0.9.5.1
+VER    := $(shell cat vl/generic.h | sed -n \
+	's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 
 # programs required to build VLFeat
@@ -668,6 +669,7 @@ info :
 	$(call dump-var,bin_src)
 	$(call dump-var,bin_tgt)
 	$(call dump-var,bin_dep)
+	@echo "VER          = $(VER)"
 	@echo "ARCH         = $(ARCH)"
 	@echo "DIST         = $(DIST)"
 	@echo "BINDIST      = $(BINDIST)"

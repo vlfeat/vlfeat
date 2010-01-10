@@ -1,7 +1,7 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <group>
- 
+
  <p>The <b>VLFeat</b> <a
   href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">open
   source</a> library implements popular computer vision algorithms
@@ -17,7 +17,7 @@
   <img src="%pathto:root;images/down.png" alt="Download" style="float:left;"/>
   <h1>Download</h1>
   <ul>
-   <li><b><a href="%pathto:root;download/vlfeat-0.9.5.1-bin.tar.gz" onClick="javascript: pageTracker._trackPageview('/download/vlfeat-0.9.5.1-bin.tar.gz');">VLFeat 0.9.5.1</a></b>  (Windows, Mac, Linux)</li>
+   <li><b><a href="%pathto:root;download/vlfeat-%env:VERSION;-bin.tar.gz" onClick="javascript: pageTracker._trackPageview('/download/vlfeat-%env:VERSION;-bin.tar.gz');">VLFeat %env:VERSION;</a></b>  (Windows, Mac, Linux)</li>
    <li><a href="%pathto:download;">Installation, source code, and more ...</a></li>
    <li><a href="http://github.com/vlfeat/vlfeat/tree/master">Git repository</a></li>
   </ul>
@@ -61,13 +61,20 @@
 
  <div class="clear">&nsbp;</div>
  <dl id="changes">
-   <dt>09/01/2010 - VLFeat 0.9.5.1 released</dt>
-   <dd>VLFeat 0.9.5.1 adds a fast kd-tree implementation and
+   <dt>10/01/2010 - VLFeat 0.9.6 released</dt>
+   <dd>VLFeat 0.9.6 contains minor improvements to the binary
+   distribution. Specifically, it makes VLFeat GNU/Linux distribution
+   compatible with the older GLIBC version 2.3.
+   [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.6">Details</a>].
+   </dd>
+
+   <dt>30/11/2009 - VLFeat 0.9.5 released</dt>
+   <dd>VLFeat 0.9.5 adds a fast kd-tree implementation and
    SSE-acelerated vector/histogram comparison. The dense SIFT (dsift)
    implementation has also been improved. Binaries and compilation
    support for Mac OS 10.6 (Snow Leopard) and MATLAB R2009b (32 and 64
    bit) have been added
-   [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.5.1">Details</a>].
+   [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.5">Details</a>].
    <blockquote>
      <b>MATLAB 7.0</b> and earlier require recompling the MEX files by
      the provided <code>vl_compile</code> command.
