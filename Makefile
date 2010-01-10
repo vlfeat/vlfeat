@@ -102,7 +102,7 @@
 # does produce a mymex.mexmaci.dSYM bundle with (almost complete)
 # debugging information.
 
-NAME   := vlfeat
+NAME   ?= vlfeat
 VER    := $(shell cat vl/generic.h | sed -n \
 	's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
 HOST   := ganesh.cs.ucla.edu:/var/www/vlfeat.org
@@ -513,7 +513,7 @@ clean:
 	rm -f  `find . -name '._*'`
 	rm -rf `find ./bin -name 'objs' -type d`
 	rm -rf  ./results
-	rm -rf $(NAME)
+	rm -rf $(NAME)-$(VER)
 	rm -f $(dll_dep) $(bin_dep) $(mex_dep)
 
 archclean: clean
@@ -551,19 +551,22 @@ distclean: clean doc-distclean
 bin-release:
 	echo Fetching remote tags ; \
 	$(GIT) fetch --tags ; \
+	echo Cloning VLFeat ; \
+	test -e $(NAME)-$(VER) || $(GIT) clone --no-checkout . $(NAME)-$(VER) ; \
+	$(GIT) --git-dir=$(NAME)-$(VER)/.git config remote.bin.url \
+	       $$($(GIT) config --get remote.bin.url) ;
 	echo Checking out v$(VER) ; \
-	$(GIT) checkout v$(VER)
+	cd $(NAME)-$(VER) ; $(GIT) checkout v$(VER)
 	echo Rebuilding binaries for release
-	rm -rf bin/$(ARCH)
-	rm -rf toolbox/mex$(ARCH)
-	make NDEBUG=yes ARCH=$(ARCH)
+	make -C $(NAME)-$(VER) NDEBUG=yes ARCH=$(ARCH) all
 
 bin-commit: bin-release
 	@set -e ; \
+	cd $(NAME)-$(VER) ; \
 	echo Fetching remote tags ; \
 	$(GIT) fetch --tags ; \
 	BRANCH=v$(VER)-$(ARCH)  ; \
-	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
+	echo Creating or resetting and checking out branch $$BRANCH to v$(VER); \
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
 	echo Adding binaries ; \
@@ -576,9 +579,7 @@ bin-commit: bin-release
 	  $(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
 	fi ; \
 	echo Commiting and pushing to server the binaries ; \
-	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ; \
-	$(GIT) checkout master ; \
-	$(GIT) branch -D $$BRANCH ;
+	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ;
 
 bin-merge: $(m_lnk)
 	echo Fetching remote tags ; \
@@ -644,7 +645,8 @@ post-doc: doc
 # --------------------------------------------------------------------
 
 # Auto-deps
-ifeq ($(filter doc clean archclean distclean info, $(MAKECMDGOALS)),)
+ifeq ($(filter doc clean archclean distclean info \
+               bin-release bin-commit bin-merge bin-dist, $(MAKECMDGOALS)),)
 include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
 
