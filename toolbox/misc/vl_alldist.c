@@ -66,6 +66,8 @@ mexFunction(int nout, mxArray *out[],
   int next ;
   mxArray const *optarg ;
 
+  VL_USE_MATLAB_ENV ;
+
   if (nin < 1) {
     VLMX_EIA("At least one argument required.") ;
   }
