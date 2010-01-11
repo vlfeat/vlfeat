@@ -1,6 +1,5 @@
 # file:       Makefile.mak
-# author:     Andrea Vedaldi
-# author:     Brian Fulkerson
+# authors:    Andrea Vedaldi and Brian Fulkerson
 # descrption: Microsoft NMake makefile
 
 # --------------------------------------------------------------------
@@ -10,14 +9,13 @@
 # - MSVCR    : the file name of msvcr__.dll for your compiler
 # - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
-# - MATLABLIB : Location of the external libs, such as libmex and libmx.
 
-VER  = 0.9.5.1
+VER  = 0.9.6
 ARCH = w32
 
-VCROOT     = C:\Program Files\Microsoft Visual Studio 9.0\VC
-WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
-MATLABROOT = C:\Program Files\MATLAB\R2008b
+VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
+WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0
+MATLABROOT = C:\Program Files\MATLAB\R2009b-32bit
 
 CC         = "$(VCROOT)\bin\cl.exe"
 LINK       = "$(VCROOT)\bin\link.exe"
@@ -26,8 +24,9 @@ MSVCR      = msvcr90.dll
 MSVCP      = msvcp90.dll
 MSVCM      = msvcm90.dll
 MSMANIFEST = Microsoft.VC90.CRT.manifest
-MATLABLIB  = $(MATLABROOT)\extern\lib\win32\microsoft
-MEX_SFX    = mexw32
+
+MEX        = "$(MATLABROOT)\bin\mex.bat"
+MEXEXT     = mexw32
 
 GIT        = git
 BRANCH     = v$(VER)-$(ARCH)
@@ -41,7 +40,7 @@ LFLAGS     = /MACHINE:X86 \
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
-MATLABROOT = C:\Program Files\MATLAB\R2008b
+MATLABROOT = C:\Program Files\MATLAB\R2009b
 
 CC         = "$(VCROOT)\bin\amd64\cl.exe"
 LINK       = "$(VCROOT)\bin\amd64\link.exe"
@@ -50,8 +49,9 @@ MSVCR      = msvcr90.dll
 MSVCP      = msvcp90.dll
 MSVCM      = msvcm90.dll
 MSMANIFEST = Microsoft.VC90.CRT.manifest
-MATLABLIB  = $(MATLABROOT)\extern\lib\win64\microsoft
-MEX_SFX    = mexw64
+
+MEX        = "$(MATLABROOT)\bin\mex.bat"
+MEXEXT     = mexw64
 
 LFLAGS     = /MACHINE:X64 \
 	     /LIBPATH:"$(VCROOT)\lib\amd64" \
@@ -66,7 +66,6 @@ LFLAGS     = /MACHINE:X64 \
 #MSMANIFEST = Microsoft.VC80.CRT.manifest
 #MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
 #MATLABROOT = C:\Program Files\MATLAB08a
-#MATLABLIB  = $(MATLABROOT)\extern\lib\$(ARCH)\microsoft
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -93,16 +92,10 @@ LFLAGS     = /MACHINE:X64 \
 #   /MANIFEST          : See DLL HELL below
 #   /DEBUG             : Generate debug info (.pdb files)
 #
-# MEX_RC               : MEX .rc file location
-#
-# MEX_CFLAGS
-#   /D_WINDLL          : Signal DLL code
-#   /DMATLAB_MEX_FILE  : Signal MATLAB MEX code
-#   /Itoolbox          : Add toolbox to inc
-#
-# MEX_LFLAGS
-#  /DLL                : Produce a DLL
-#  /EXPORT:mexFunction : Export MEX file entry point
+# MEX_FLAGS
+#   -I                 : Include VLFeat
+#   -L                 : Add a library search path
+#   -l                 : Link a dll
 #
 # ======================= ABOUT THE DLL HELL =========================
 #
@@ -116,7 +109,7 @@ LFLAGS     = /MACHINE:X64 \
 #
 
 bindir     = bin\$(ARCH)
-mexdir     = toolbox\$(MEX_SFX)
+mexdir     = toolbox\$(MEXEXT)
 objdir     = $(bindir)\objs
 
 CFLAGS     = /nologo /TC /MD \
@@ -126,28 +119,14 @@ CFLAGS     = /nologo /TC /MD \
              /I. \
              /W1 /Z7 /Zp8 /Ox
 
-DLL_CFLAGS = /D"VL_BUILD_DLL"
-
 LFLAGS     = $(LFLAGS) /NOLOGO \
              /INCREMENTAL:NO \
              /MANIFEST \
              /DEBUG
 
-EXE_LFLAGS = $(LFLAGS) \
-             /LIBPATH:"$(bindir)" vl.lib
-
-MEX_RC     = "$(MATLABROOT)\extern\include\mexversion.rc"
-
-MEX_CFLAGS = $(CFLAGS) \
-             /I"$(MATLABROOT)\extern\include" \
-             /Itoolbox \
-             /DMATLAB_MEX_FILE /D_WINDLL
-
-MEX_LFLAGS = $(LFLAGS) \
-             /DLL \
-             /EXPORT:mexFunction \
-             /LIBPATH:"$(bindir)" vl.lib \
-             /LIBPATH:"$(MATLABLIB)" libmx.lib libmex.lib libmat.lib
+DLL_CFLAGS = /D"VL_BUILD_DLL"
+EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
+MEX_FLAGS  = -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc =                \
  vl\aib.c               \
@@ -219,7 +198,6 @@ mexsrc =                          \
  toolbox\sift\vl_siftdescriptor.c \
  toolbox\sift\vl_ubcmatch.c
 
-
 # horrible Make program, horrible code:
 libobj = $(libsrc:vl\=bin\w32\objs\)
 cmdexe = $(cmdsrc:src\=bin\w32\)
@@ -262,11 +240,7 @@ all: $(bindir) $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(bindir)\$
 !ENDIF
 
 BUILD_MEX=@echo .... CC [MEX] $(@R).dll && \
-	$(CC) $(MEX_CFLAGS) /c /Fo"$(@R).obj" "$(<)" && \
-	$(RC) /fo"$(@R).res" $(MEX_RC) && \
-	$(LINK) $(MEX_LFLAGS) "$(@R).res" "$(@R).obj" /OUT:$(@) && \
-	mt /nologo /outputresource:"$(@)";^#2 /manifest "$(@).manifest" && \
-	del "$(@R).obj" "$(@R).exp" "$(@R).lib" "$(@R).res" "$(@).manifest"
+	$(MEX) $(MEX_FLAGS) "$(<)" -output $(@)
 
 # --------------------------------------------------------------------
 #                                                    Maintenance rules
@@ -277,20 +251,16 @@ clean:
 	del /f /Q $(objdir)
 	del /f /Q $(cmdpdb)
 	del /f /Q $(mexpdb)
-	del /f /Q $(mexdir)\$(MSMANIFEST)
-	del /f /Q $(mexdir)\$(MSVCR)
-	del /f /Q $(mexdir)\$(MSVCP)
-	del /f /Q $(mexdir)\$(MSVCM)
-	del /f /Q $(mexdir)\vl.dll
-	del /f /Q $(bindir)\$(MSMANIFEST)
-	del /f /Q $(bindir)\$(MSVCR)
-	del /f /Q $(bindir)\$(MSVCP)
-	del /f /Q $(bindir)\$(MSVCM)
-	del /f /Q $(bindir)\vl.dll
 
-distclean: clean
-	del /f /Q $(cmdexe)
-	del /f /Q $(mexdll)
+archclean:
+	if exist bin\$(ARCH) rmdir /S /Q bin\$(ARCH)
+	if exist toolbox\mex$(ARCH) rmdir /S /Q toolbox\mex$(ARCH)
+
+distclean:
+	if exist bin\w32 rmdir /S /Q bin\w32
+	if exist bin\w64 rmdir /S /Q bin\w64
+	if exist toolbox\mexw32 rmdir /S /Q toolbox\mexw32
+	if exist toolbox\mexw64 rmdir /S /Q toolbox\mexw64
 
 info:
 	@echo $(mexx)
@@ -372,29 +342,32 @@ $(bindir)\vl.lib : $(libobj)
 #                                                 Rules to compile MEX
 # --------------------------------------------------------------------
 
+mexsetup:
+	$(MEX) -setup
+
 # toolbox\*.c -> toolbox\*.dll
-{toolbox\sift}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\sift}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\mser}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\mser}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\imop}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\imop}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\geometry}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\geometry}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\kmeans}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\kmeans}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\aib}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\aib}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\quickshift}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\quickshift}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
-{toolbox\misc}.c{$(mexdir)}.$(MEX_SFX):
+{toolbox\misc}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
 # vl.dll => mexw{32,64}/vl.dll
@@ -473,5 +446,5 @@ bin-commit: bin-release
 	$(GIT) commit -m "$(ARCH) binaries for version $(VER)" && \
 	echo Commiting and pushing to server the binaries && \
 	$(GIT) push -v --force bin $(BRANCH):$(BRANCH) && \
-    $(GIT) checkout v$(VER) && \
-    $(GIT) branch -D $(BRANCH)
+	$(GIT) checkout v$(VER) && \
+	$(GIT) branch -D $(BRANCH)
