@@ -16,7 +16,7 @@ function path = vl_setup(varargin)
 
 % AUTORIGHTS
 % Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
-% 
+%
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
@@ -28,7 +28,7 @@ demo = false ;
 for ai=1:length(varargin)
   opt = varargin{ai} ;
   switch lower(opt)
-    case {'noprefix', 'usingvl'} 
+    case {'noprefix', 'usingvl'}
       noprefix = true ;
     case {'test'}
       test = true ;
@@ -73,7 +73,7 @@ if demo
 end
 
 
-fprintf('** Welcome to the VLFeat Toolbox v0.9.5.1 **\n') ;
+fprintf('** Welcome to the VLFeat Toolbox %s **\n', vl_version('verbose')) ;
 
 if nargout == 0
   clear path ;
