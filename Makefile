@@ -513,12 +513,13 @@ clean:
 	rm -f  `find . -name '._*'`
 	rm -rf `find ./bin -name 'objs' -type d`
 	rm -rf  ./results
-	rm -rf $(NAME)-$(VER)
+	rm -rf tmp-$(NAME)-*
 	rm -f $(dll_dep) $(bin_dep) $(mex_dep)
 
 archclean: clean
 	rm -rf bin/$(ARCH)
 	rm -rf toolbox/$(ARCH)
+	rm -rf tmp-$(NAME)-*$(ARCH)*
 
 distclean: clean doc-distclean
 	rm -rf bin
@@ -549,50 +550,80 @@ distclean: clean doc-distclean
 .PHONY: bin-release, bin-commit, bin-dist, src-dist
 
 bin-release:
+	set -e ; \
+	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
+	\
 	echo Fetching remote tags ; \
 	$(GIT) fetch --tags ; \
 	echo Cloning VLFeat ; \
-	test -e $(NAME)-$(VER) || $(GIT) clone --no-checkout . $(NAME)-$(VER) ; \
-	$(GIT) --git-dir=$(NAME)-$(VER)/.git config remote.bin.url \
-	       $$($(GIT) config --get remote.bin.url) ;
+	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
+	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
+	\
 	echo Checking out v$(VER) ; \
-	cd $(NAME)-$(VER) ; $(GIT) checkout v$(VER)
-	echo Rebuilding binaries for release
-	make -C $(NAME)-$(VER) NDEBUG=yes ARCH=$(ARCH) all
+	cd $$TMP ; \
+	$(GIT) checkout v$(VER) ; \
+	echo Rebuilding binaries for release ; \
+	make NDEBUG=yes ARCH=$(ARCH) all
 
 bin-commit: bin-release
 	@set -e ; \
-	cd $(NAME)-$(VER) ; \
-	echo Fetching remote tags ; \
-	$(GIT) fetch --tags ; \
+	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
 	BRANCH=v$(VER)-$(ARCH)  ; \
-	echo Creating or resetting and checking out branch $$BRANCH to v$(VER); \
+	\
+	cd $$TMP ; \
+	echo Setting up $$BRANCH to v$(VER) ; \
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
-	echo Adding binaries ; \
+	echo Adding binaries to $$BRANCH ; \
 	$(GIT) add -f $(dll_tgt) $(dll_lnk) $(bin_tgt) $(mex_tgt) ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
 	  echo No changes to commit ; \
-	else \
-	  echo Commiting changes ; \
-	  $(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
+	  exit 1 ; \
 	fi ; \
-	echo Commiting and pushing to server the binaries ; \
+	echo Commiting changes ; \
+	$(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
+	echo Pushing $$BRANCH to the server ; \
 	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
 
-bin-merge: $(m_lnk)
+bin-commit-common: bin-commit
+	@set -e ; \
+	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
+	BRANCH=v$(VER)-common  ; \
+	\
+	cd $$TMP ; \
+	echo Setting up $$BRANCH to v$(VER) ; \
+	$(GIT) branch -f $$BRANCH v$(VER) ; \
+	$(GIT) checkout $$BRANCH ; \
+	echo Adding binaries to $$BRANCH ; \
+	$(GIT) add -f $(m_lnk) ; \
+	if test -z "$$($(GIT) diff --cached)" ; \
+	then \
+	  echo No changes to commit ; \
+	  exit 1 ; \
+	fi ; \
+	echo Commiting changes ; \
+	$(GIT) commit -m "common products for $(VER)" ; \
+	echo Pushing $$BRANCH to the server ; \
+	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
+
+bin-merge:
+	set -e ; \
+	BRANCH=v$(VER)-bin ; \
+	TMP=tmp-$(NAME)-$(VER)-bin ; \
+	\
 	echo Fetching remote tags ; \
 	$(GIT) fetch --tags ; \
-	set -e ; \
-	echo Checking out $(VER) ; \
-	$(GIT) checkout v$(VER) ; \
-	BRANCH=v$(VER)-bin ; \
-	echo Crearing/resetting and checking out branch $$BRANCH to v$(VER); \
+	echo Cloning VLFeat ; \
+	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
+	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
+	\
+	cd $$TMP ; \
+	echo Creating or resetting and checking out branch $$BRANCH to v$(VER); \
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
 	MERGE_BRANCHES=; \
-	for ALT_ARCH in maci64 maci glx a64 w32 w64 ; \
+	for ALT_ARCH in common maci64 maci glx a64 w32 w64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
 	  echo Fetching $$MERGE_BRANCH ; \
@@ -601,13 +632,8 @@ bin-merge: $(m_lnk)
 	done ; \
 	echo merging $$MERGE_BRANCHES ; \
 	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ; \
-	echo Adding common binary distribution files ; \
-	$(GIT) add $(m_lnk) ; \
-	$(GIT) commit -m "adds common binary distribution files" ; \
 	echo Pushing to server the merged binaries ; \
-	$(GIT) push -v --force bin $$BRANCH:$$BRANCH ; \
-	$(GIT) checkout v$(VER) ; \
-	$(GIT) branch -D $$BRANCH ;
+	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
 
 src-dist:
 	COPYFILE_DISABLE=1                                           \
