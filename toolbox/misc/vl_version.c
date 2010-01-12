@@ -23,14 +23,14 @@ void
 mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
-  VL_USE_MATLAB_ENV ;
-
   int verbose = 0 ;
   char buffer [1024] ;
 
   int            opt ;
   int            next = 0 ;
   mxArray const *optarg ;
+
+  VL_USE_MATLAB_ENV ;
 
   if (nout > 1) {
     mxuError("illegalOutput", "Too many output arguments") ;
