@@ -11,10 +11,10 @@ function make
 {
     # sed below removes the trailing '\' from the last entry
     (
-        printf '%-69s\\\n' "$1 ="
+        printf '%s \\\n' "$1 ="
         find "$2" -name '*.c' | tr '/' '\' | while read -r x
         do
-            printf '  %-66s \\\n' "$x"
+            printf '  %s \\\n' "$x"
         done
     ) | sed '$s/ *\\$//'
     echo
