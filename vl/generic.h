@@ -39,6 +39,33 @@ General Public License version 2.
 #define VL_TYPE_INT64   9
 #define VL_TYPE_UINT64  10
 
+/** @brief Get the symbolic name of a data type
+ ** @param type data type.
+ ** @return data type symbolic name.
+ **
+ ** @c type is one of ::VL_TYPE_FLOAT, ::VL_TYPE_DOUBLE,
+ ** ::VL_TYPE_INT8, ::VL_TYPE_INT16, ::VL_TYPE_INT32, ::VL_TYPE_INT64,
+ ** ::VL_TYPE_UINT8, ::VL_TYPE_UINT16, ::VL_TYPE_UINT32, ::VL_TYPE_UINT64.
+ **/
+
+VL_INLINE char const *
+vl_get_type_name (int type)
+{
+  switch (type) {
+    case VL_TYPE_FLOAT   : return "float"  ;
+    case VL_TYPE_DOUBLE  : return "double" ;
+    case VL_TYPE_INT8    : return "int8"   ;
+    case VL_TYPE_INT16   : return "int16"  ;
+    case VL_TYPE_INT32   : return "int32"  ;
+    case VL_TYPE_INT64   : return "int64"  ;
+    case VL_TYPE_UINT8   : return "int8"   ;
+    case VL_TYPE_UINT16  : return "int16"  ;
+    case VL_TYPE_UINT32  : return "int32"  ;
+    case VL_TYPE_UINT64  : return "int64"  ;
+    default: return NULL ;
+  }
+}
+
 /** @} */
 
 /** ------------------------------------------------------------------
