@@ -10,6 +10,96 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
+/** @file mathop.h
+
+ @section mathop-usage-vector-comparison Comparing vectors
+
+ @ref mathop.h includes a number of functions to quickly compute
+ distances or similarity of pairs of vector. Applications include
+ clustering and evaluation of SVM-like classifiers.
+
+ Use ::vl_get_vector_comparison_function_f or
+ ::vl_get_vector_comparison_function_d obtain an approprite function
+ to comprare vectors of floats or doubles, respectively.  Such
+ functions are usually optimized (for instance, on X86 platforms they
+ use the SSE vector extension) and are several times faster than a
+ naive implementation.  ::vl_eval_vector_comparison_on_all_pairs_f and
+ ::vl_eval_vector_comparison_on_all_pairs_d can be used to evaluate
+ the comparison function on all pairs of one or two sequences of
+ vectors.
+
+ Let @f$ \mathbf{x} = (x_1,\dots,\x_d) @f$ and @f$ \mathbf{y} =
+ (y_1,\dots,\y_d) @f$ be two vectors.  The following comparison
+ functions are supported:
+
+ <table>
+ <tr>
+ <td>@f$ l^1 @f$</td>
+ <td>::VlDistanceL1</td>
+ <td>@f$ \sum_{i=1}^d |x_i - y_i| @f$</td>
+ <td>Manhattan distance</td>
+ </tr>
+ <tr>
+ <td>@f$ l^2 @f$</td>
+ <td>::VlDistanceL2</td>
+ <td>@f$\sum_{i=1}^d (x_i - y_i)^2@f$</td>
+ <td>Squared Euclidean disance</td>
+ </tr>
+ <tr>
+ <td>@f$ \chi^2 @f$</td>
+ <td>::VlDistanceChi2</td>
+ <td>@f$\sum_{i=1}^d \frac{(x_i - y_i)^2}{x_i + y_i}@f$</td>
+ <td>Squared chi-square distance</td>
+ </tr>
+ <tr>
+ <td>-</td>
+ <td>::VlDistanceHellinger</td>
+ <td>@f$\sum_{i=1}^d (\sqrt{x_i} - \sqrt{y_i})^2@f$</td>
+ <td>Squared Hellinger's distance</td>
+ </tr>
+ <tr>
+ <td>@f$ l^1 @f$</td>
+ <td>::VlKernelL1</td>
+ <td>@f$ \sum_{i=1}^d \min\{ x_i, y_i \} @f$</td>
+ <td>intersection kernel</td>
+ </tr>
+ <tr>
+ <td>@f$ l^2 @f$</td>
+ <td>::VlKernelL2</td>
+ <td>@f$\sum_{i=1}^d x_iy_i @f$</td>
+ <td>linear kernel</td>
+ </tr>
+ <tr>
+ <td>@f$ \chi^2 @f$</td>
+ <td>::VlKernelChi2</td>
+ <td>@f$\sum_{i=1}^d 2 \frac{x_iy_i}{x_i + y_i}@f$</td>
+ <td>chi-square kernel</td>
+ </tr>
+ <tr>
+ <td>-</td>
+ <td>::VlKernelHellinger</td>
+ <td>@f$\sum_{i=1}^d 2 \sqrt{x_i y_i}@f$</td>
+ <td>Bhattacharya coefficient</td>
+ </tr>
+ </table>
+
+ @remark The definitions have been choosen so that corresponding kernels and
+ distances are related by the equation:
+ @f[
+  d^2(\mathbf{x},\mathbf{y})
+  =
+  k(\mathbf{x},\mathbf{x})
+  +k(\mathbf{y},\mathbf{y})
+  -k(\mathbf{x},\mathbf{y})
+  -k(\mathbf{y},\mathbf{x})
+ @f]
+ This means that each of these distances can be interpreted as a
+ squared distance or metric in the corresponding reproducing kernel
+ Hilbert space. Notice in particular that the @f$ l^1 @f$ or Manhattan
+ distance is also a <em>squared</em> distance in this sense.
+
+ **/
+
 /** @fn vl_get_vector_comparison_function_f(VlVectorComparisonType)
  **
  ** @brief Get vector comparison function from comparison type
