@@ -680,7 +680,7 @@ post-doc: doc
 # Auto-deps
 ifeq ($(filter doc clean archclean distclean info \
                bin-release bin-commit bin-merge bin-dist, $(MAKECMDGOALS)),)
-include $(dll_dep) $(bin_dep) $(mex_dep)
+-include $(dll_dep) $(bin_dep) $(mex_dep)
 endif
 
 # Makefile for documentation
