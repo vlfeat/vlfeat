@@ -708,6 +708,10 @@ uIsString(const mxArray* A, int L)
     (L < 0 || N == L) ;
 }
 
+
+static char const vlmxErrInvalidArgument [] = "invalidArgument" ;
+static char const vlmxErrInconsistentData [] = "inconsistentData" ;
+
 /** ------------------------------------------------------------------
  ** @brief Generate MEX error with VLFeat format
  **
