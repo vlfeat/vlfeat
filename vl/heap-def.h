@@ -1,5 +1,5 @@
 /** @file   heap-def.h
- ** @brief  Heap template definition
+ ** @brief  Heap preprocessor metaprogram
  ** @author Andrea Vedaldi
  **/
 
@@ -149,7 +149,8 @@
 
  **/
 
-#include "generic.h"
+#include "host.h"
+#include <assert.h>
 
 #ifndef VL_HEAP_prefix
 #error "VL_HEAP_prefix must be defined"
@@ -398,7 +399,7 @@ VL_INLINE vl_uindex
 VL_HEAP_pop
 (VL_HEAP_array array, vl_size *heapSize)
 {
-  if (*heapSize == 0) assert (0) ;
+  assert (*heapSize) ;
 
   *heapSize -= 1 ;
 
