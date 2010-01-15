@@ -29,6 +29,16 @@ typedef vl_uint32 mwSize ;
 typedef vl_int32 mwIndex ;
 #endif
 
+/* these attributes supporess undefined symbols warning with GCC */
+#ifdef VL_COMPILER_GNUC
+EXTERN_C void __attribute__((noreturn))
+mexErrMsgIdAndTxt
+(const char * identifier, const char * err_msg, ...) ;
+
+void __attribute__((noreturn))
+mxuError
+(char const * errorId, char const * errorMessage, ...) ;
+#endif
 /** @file mexutils.h
 
  This header file provides helper functions for writing MATLAB MEX
