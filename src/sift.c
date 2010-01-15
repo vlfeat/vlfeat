@@ -196,11 +196,17 @@ main(int argc, char **argv)
   VlFileMeta gss  = {0, "%.pgm",   VL_PROT_ASCII, "", 0} ;
   VlFileMeta ifr  = {0, "%.frame", VL_PROT_ASCII, "", 0} ;
 
-#define ERR(msg, arg) {                                         \
+#define ERRF(msg, arg) {                                        \
     err = VL_ERR_BAD_ARG ;                                      \
     snprintf(err_msg, sizeof(err_msg), msg, arg) ;              \
     break ;                                                     \
   }
+
+#define ERR(msg) {                                              \
+    err = VL_ERR_BAD_ARG ;                                      \
+    snprintf(err_msg, sizeof(err_msg), msg) ;                   \
+    break ;                                                     \
+}
 
   /* -----------------------------------------------------------------
    *                                                     Parse options
@@ -220,12 +226,12 @@ main(int argc, char **argv)
 
     case '?' :
       /* unkown option ............................................ */
-      ERR("Invalid option '%s'.", argv [optind - 1]) ;
+      ERRF("Invalid option '%s'.", argv [optind - 1]) ;
       break ;
 
     case ':' :
       /* missing argument ......................................... */
-      ERR("Missing mandatory argument for option '%s'.",
+      ERRF("Missing mandatory argument for option '%s'.",
           argv [optind - 1]) ;
       break ;
 
@@ -253,7 +259,7 @@ main(int argc, char **argv)
       /* --output  ................................................ */
       err = vl_file_meta_parse (&out, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       force_output = 1 ;
       break ;
 
@@ -261,38 +267,38 @@ main(int argc, char **argv)
       /* --frames  ................................................ */
       err = vl_file_meta_parse (&frm, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
     case opt_descriptors :
       /* --descriptor ............................................. */
       err = vl_file_meta_parse (&dsc, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break;
 
     case opt_meta :
       /* --meta ................................................... */
       err = vl_file_meta_parse (&met, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
 
       if (met.protocol != VL_PROT_ASCII)
-        ERR("meta file supports only ASCII protocol", argv[optind - 1]) ;
+        ERR("meta file supports only ASCII protocol") ;
       break ;
 
     case opt_read_frames :
       /* --read_frames ............................................ */
       err = vl_file_meta_parse (&ifr, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
     case opt_gss :
       /* --gss .................................................... */
       err = vl_file_meta_parse (&gss, optarg) ;
       if (err)
-        ERR("The arguments of '%s' is invalid.", argv [optind - 1]) ;
+        ERRF("The arguments of '%s' is invalid.", argv [optind - 1]) ;
       break ;
 
 
@@ -301,7 +307,7 @@ main(int argc, char **argv)
       /* --octaves ............................................... */
       n = sscanf (optarg, "%d", &O) ;
       if (n == 0 || O < 0)
-        ERR("The argument of '%s' must be a non-negative integer.",
+        ERRF("The argument of '%s' must be a non-negative integer.",
             argv [optind - 1]) ;
       break ;
 
@@ -309,7 +315,7 @@ main(int argc, char **argv)
       /* --levels ............................................... */
       n = sscanf (optarg, "%d", &S) ;
       if (n == 0 || S < 0)
-        ERR("The argument of '%s' must be a non-negative integer.",
+        ERRF("The argument of '%s' must be a non-negative integer.",
             argv [optind - 1]) ;
       break ;
 
@@ -317,7 +323,7 @@ main(int argc, char **argv)
       /* --first-octave ......................................... */
       n = sscanf (optarg, "%d", &omin) ;
       if (n == 0)
-        ERR("The argument of '%s' must be an integer.",
+        ERRF("The argument of '%s' must be an integer.",
             argv [optind - 1]) ;
       break ;
 
@@ -327,7 +333,7 @@ main(int argc, char **argv)
       /* --edge-thresh ........................................... */
       n = sscanf (optarg, "%lf", &edge_thresh) ;
       if (n == 0 || edge_thresh < 1)
-        ERR("The argument of '%s' must be not smaller than 1.",
+        ERRF("The argument of '%s' must be not smaller than 1.",
             argv [optind - 1]) ;
       break ;
 
@@ -335,7 +341,7 @@ main(int argc, char **argv)
       /* --edge-thresh ........................................... */
       n = sscanf (optarg, "%lf", &peak_thresh) ;
       if (n == 0 || peak_thresh < 0)
-        ERR("The argument of '%s' must be a non-negative float.",
+        ERRF("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
 
@@ -343,7 +349,7 @@ main(int argc, char **argv)
       /* --magnif  .............................................. */
       n = sscanf (optarg, "%lf", &magnif) ;
       if (n == 0 || magnif < 1)
-        ERR("The argument of '%s' must be a non-negative float.",
+        ERRF("The argument of '%s' must be a non-negative float.",
             argv [optind - 1]) ;
       break ;
 
