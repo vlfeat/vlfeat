@@ -35,14 +35,14 @@ main (int argc, char *argv[])
   
   err = (q >= sml_len) ;
 
-  printf (sml) ;
+  printf ("%s", sml) ;
   printf ("\nwrote %d error %d\n", q, err) ;
 
   q = vl_string_copy (sml, sml_len, t1) ;
   
   err = (q >= sml_len) ;
 
-  printf (sml) ;
+  printf ("%s", sml) ;
   printf ("\nwrote %d error %d\n", q, err) ;
 
 
@@ -54,7 +54,7 @@ main (int argc, char *argv[])
   
   err = (q >= buf_len) ;
   
-  printf (buf) ;
+  printf ("%s", buf) ;
   printf ("\nwrote %d error %d\n", q, err) ;
 
   q = vl_string_replace_wildcard (sml, sml_len,
@@ -62,7 +62,7 @@ main (int argc, char *argv[])
 
   err = (q >= sml_len) ;
   
-  printf (sml) ;
+  printf ("%s", sml) ;
   printf ("\nwrote %d error %d\n", q, err) ;
 
   q = vl_string_replace_wildcard (0,0,
