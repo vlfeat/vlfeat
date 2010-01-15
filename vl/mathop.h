@@ -469,6 +469,25 @@ enum _VlVectorComparisonType {
 /** @brief Vector comparison types */
 typedef enum _VlVectorComparisonType VlVectorComparisonType ;
 
+/** @brief Get the symbolic name of a vector comparison type
+ ** @param type vector comparison type.
+ ** @return data symbolic name.
+ **/
+
+VL_INLINE char const *
+vl_get_vector_comparison_type_name (int type)
+{
+  switch (type) {
+    case VlDistanceL1   : return "l1" ;
+    case VlDistanceL2   : return "l2" ;
+    case VlDistanceChi2 : return "chi2" ;
+    case VlKernelL1     : return "kl1" ;
+    case VlKernelL2     : return "kl2" ;
+    case VlKernelChi2   : return "kchi2" ;
+    default: return NULL ;
+  }
+}
+
 VL_EXPORT VlFloatVectorComparisonFunction
 vl_get_vector_comparison_function_f (VlVectorComparisonType type) ;
 
