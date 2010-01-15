@@ -264,11 +264,13 @@ ifeq ($(ARCH),maci)
 BINDIR          := $(VLDIR)/bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
+SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
 C_CFLAGS        += -DVL_SUPPORT_SSE2 -m32
+C_CFLAGS        += -isysroot $(SDKROOT)
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
-LDFLAGS         += -lm
+LDFLAGS         += -lm -mmacosx-version-min=10.5
 MEX_FLAGS       += -lm -maci
 MEX_CFLAGS      +=
 MEX_LDFLAGS     +=
@@ -279,11 +281,13 @@ ifeq ($(ARCH),maci64)
 BINDIR          := $(VLDIR)/bin/maci64
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci64
+SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
 C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
 C_CFLAGS        += -DVL_SUPPORT_SSE2 -m64
+C_CFLAGS        += -isysroot $(SDKROOT)
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
-LDFLAGS         += -lm
+LDFLAGS         += -lm -mmacosx-version-min=10.5
 MEX_FLAGS       += -lm -maci64
 MEX_CFLAGS      +=
 MEX_LDFLAGS     +=
@@ -404,6 +408,7 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
                     -install_name @loader_path/lib$(DLL_NAME).dylib  \
 	            -compatibility_version $(VER)                    \
                     -current_version $(VER)                          \
+                    -syslibroot $(SDKROOT)                           \
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
