@@ -23,7 +23,7 @@ int s_cmp (S const * v, vl_uindex a, vl_uindex b)
 }
 void s_swap (S * v, vl_uindex a, vl_uindex b)
 {
-  VL_PRINTF("Swapping %x with %x\n", a, b) ;
+  printf("Swapping %x with %x\n", a, b) ;
   S t = v[a] ;
   v[a] = v[b] ;
   v[b] = t ;
@@ -72,63 +72,63 @@ main (int argc, char** argv)
   h.numNodes = 0 ;
   h.array = data_h ;
 
-  VL_PRINTF("Pushing heap\n") ;
+  printf("Pushing heap\n") ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    VL_PRINTF ("%5d: %f\n", i, data[i]) ;
+    printf ("%5d: %f\n", i, data[i]) ;
     vl_heap_float_push (data, &numNodes) ;
   }
 
-  VL_PRINTF("Popping heap\n") ;
+  printf("Popping heap\n") ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    VL_PRINTF ("%5d: %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
+    printf ("%5d: %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
   }
 
-  VL_PRINTF("Refilling, updating fourth element, and popping again\n") ;
+  printf("Refilling, updating fourth element, and popping again\n") ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
     vl_heap_float_push (data, &numNodes) ;
   }
-  VL_PRINTF("%f -> %f\n", data[3], 9.01) ;
+  printf("%f -> %f\n", data[3], 9.01) ;
   data [3] = 9.01 ;
   vl_heap_float_update (data, numNodes, 3) ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    VL_PRINTF ("%5d:  %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
+    printf ("%5d:  %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
   }
 
-  VL_PRINTF("Pushing heap of structures\n") ;
+  printf("Pushing heap of structures\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, data_s[i].x) ;
+    printf ("s[%5d].x = %d\n", i, data_s[i].x) ;
     s_heap_push (data_s, &numNodes) ;
   }
 
-  VL_PRINTF("Popping heap of structures\n") ;
+  printf("Popping heap of structures\n") ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, data_s[s_heap_pop (data_s, &numNodes)].x) ;
+    printf ("s[%5d].x = %d\n", i, data_s[s_heap_pop (data_s, &numNodes)].x) ;
   }
 
-  VL_PRINTF("Pushing heap of structures with custom swap\n") ;
+  printf("Pushing heap of structures with custom swap\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, data_s_track[i].x) ;
+    printf ("s[%5d].x = %d\n", i, data_s_track[i].x) ;
     track_s_heap_push (data_s_track, &numNodes) ;
   }
 
-  VL_PRINTF("Popping heap of structures with custom swap\n") ;
+  printf("Popping heap of structures with custom swap\n") ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, data_s_track
+    printf ("s[%5d].x = %d\n", i, data_s_track
                [track_s_heap_pop (data_s_track, &numNodes)].x) ;
   }
 
-  VL_PRINTF("Pushing heap of structures with custom container\n") ;
+  printf("Pushing heap of structures with custom container\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_h) / sizeof(data_h[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, h.array[i]) ;
+    printf ("s[%5d].x = %d\n", i, h.array[i]) ;
     h_heap_push (&h, &h.numNodes) ;
   }
 
-  VL_PRINTF("Popping heap of structures with custom container\n") ;
+  printf("Popping heap of structures with custom container\n") ;
   for (i = 0 ; i < sizeof(data_h) / sizeof(data_h[0]) ; ++i) {
-    VL_PRINTF ("s[%5d].x = %d\n", i, h.array
+    printf ("s[%5d].x = %d\n", i, h.array
                [h_heap_pop (&h, &h.numNodes)]) ;
   }
 
