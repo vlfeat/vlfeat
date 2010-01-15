@@ -14,7 +14,12 @@
 		2D13F028100A6E8800C072E8 /* vl_alldist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist.c; path = toolbox/misc/vl_alldist.c; sourceTree = "<group>"; };
 		2D13F02C100A718600C072E8 /* vl_simdctrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
 		2D13F039100A733D00C072E8 /* vl_simdctrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
+		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
 		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
+		2D4EB0BF10F3C1E800ADA534 /* kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmeans.c; sourceTree = "<group>"; };
+		2D4EB0C010F3C1E800ADA534 /* kmeans.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmeans.h; sourceTree = "<group>"; };
+		2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kmeans.c; path = toolbox/kmeans/vl_kmeans.c; sourceTree = "<group>"; };
+		2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shuffle-def.h"; sourceTree = "<group>"; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D6F09EC0E4C6ACA00B77055 /* imopv.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; path = imopv.tc; sourceTree = "<group>"; };
@@ -111,6 +116,8 @@
 		2D86B1240F24CC9B00E625D6 /* vl_whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_whistc.c; path = toolbox/misc/vl_whistc.c; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
+		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
+		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
 		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
@@ -126,8 +133,8 @@
 		2DE5B37D0FDC2BE9008CEB1D /* dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsift.c; sourceTree = "<group>"; };
 		2DE5B37E0FDC2BE9008CEB1D /* dsift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsift.h; sourceTree = "<group>"; };
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
-		2DE765220FF23EE9006347E0 /* kdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kdtree.h; path = toolbox/misc/kdtree.h; sourceTree = "<group>"; };
-		2DEEF3EE0E5634EB0028798B /* imsmooth.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = imsmooth.tc; path = toolbox/imop/imsmooth.tc; sourceTree = "<group>"; };
+		2DE765220FF23EE9006347E0 /* kdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kdtree.h; path = ../toolbox/misc/kdtree.h; sourceTree = "<group>"; };
+		2DEEF3EE0E5634EB0028798B /* imsmooth.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = imsmooth.tc; path = ../toolbox/imop/imsmooth.tc; sourceTree = "<group>"; };
 		2DFF4C370FF1033B00E5D79C /* vl_kdtreequery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kdtreequery.c; path = toolbox/misc/vl_kdtreequery.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -181,6 +188,7 @@
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
 				2D471AA710DD2C7900FA4182 /* test_threads.c */,
 				2D624AD60FF9306700DB3122 /* test_heap-def.c */,
+				2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */,
 				2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */,
 				2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */,
 			);
@@ -190,6 +198,7 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
+				2DBD0B2110F7AB58004DBA31 /* metaprograms */,
 				2D732E800CF8C2E40099B03C /* generic.c */,
 				2D732E810CF8C2E40099B03C /* generic.h */,
 				2DD99E8F0E59EA8E00CE1DA1 /* host.h */,
@@ -200,7 +209,8 @@
 				2DE5B37E0FDC2BE9008CEB1D /* dsift.h */,
 				2D732E820CF8C2E40099B03C /* getopt_long.c */,
 				2D732E830CF8C2E40099B03C /* getopt_long.h */,
-				2D9941F410ECD04F00502DF6 /* heap-def.h */,
+				2D4EB0BF10F3C1E800ADA534 /* kmeans.c */,
+				2D4EB0C010F3C1E800ADA534 /* kmeans.h */,
 				2D732E840CF8C2E40099B03C /* hikmeans.c */,
 				2D732E850CF8C2E40099B03C /* hikmeans.h */,
 				2D732E860CF8C2E40099B03C /* ikmeans.c */,
@@ -238,6 +248,8 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
+				2DEEF3EE0E5634EB0028798B /* imsmooth.tc */,
+				2DE765220FF23EE9006347E0 /* kdtree.h */,
 			);
 			path = vl;
 			sourceTree = "<group>";
@@ -245,6 +257,7 @@
 		2D732EAF0CF8C3950099B03C /* toolbox */ = {
 			isa = PBXGroup;
 			children = (
+				2D70CC780DDE1135000A23DE /* mexutils.h */,
 				2D86B1080F24CC9B00E625D6 /* vl_aib.c */,
 				2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */,
 				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
@@ -261,6 +274,7 @@
 				2D86B1120F24CC9B00E625D6 /* vl_ihashfind.c */,
 				2D86B1130F24CC9B00E625D6 /* vl_ihashsum.c */,
 				2D86B1140F24CC9B00E625D6 /* vl_ikmeans.c */,
+				2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */,
 				2D86B1150F24CC9B00E625D6 /* vl_ikmeanspush.c */,
 				2D86B1160F24CC9B00E625D6 /* vl_imintegral.c */,
 				2D86B1170F24CC9B00E625D6 /* vl_imsmooth.c */,
@@ -279,9 +293,7 @@
 				2D86B1220F24CC9B00E625D6 /* vl_twister.c */,
 				2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */,
 				2D86B1240F24CC9B00E625D6 /* vl_whistc.c */,
-				2D70CC780DDE1135000A23DE /* mexutils.h */,
-				2DEEF3EE0E5634EB0028798B /* imsmooth.tc */,
-				2DE765220FF23EE9006347E0 /* kdtree.h */,
+				2D27614810FF6B3900D14D9E /* vl_imdisttf.c */,
 			);
 			name = toolbox;
 			sourceTree = "<group>";
@@ -299,6 +311,16 @@
 				2D72EA930E4776FE005DAA47 /* html */,
 			);
 			name = doc;
+			sourceTree = "<group>";
+		};
+		2DBD0B2110F7AB58004DBA31 /* metaprograms */ = {
+			isa = PBXGroup;
+			children = (
+				2D9941F410ECD04F00502DF6 /* heap-def.h */,
+				2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */,
+				2DBD0AA110F78FEB004DBA31 /* qsort-def.h */,
+			);
+			name = metaprograms;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
