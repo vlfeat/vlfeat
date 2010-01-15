@@ -273,6 +273,22 @@ vlmxIsMatrix (mxArray const * array, vl_index M, vl_index N)
 
 
 /** ------------------------------------------------------------------
+ ** @brief Check if a MATLAB array is plain
+ ** @param array MATLAB array.
+ ** @return ::VL_TRUE if the array is plain.
+ ** @sa @ref mexutils-array-test
+ **/
+
+ VL_INLINE vl_bool
+ vlmxIsPlain (mxArray const * array)
+ {
+ return
+   vlmxIsReal (array) &&
+   vlmxIsOfClass(array, mxDOUBLE_CLASS) ;
+ }
+
+
+/** ------------------------------------------------------------------
  ** @brief Check if a MATLAB array is plain scalar
  ** @param array MATLAB array.
  ** @return ::VL_TRUE if the array is plain scalar.
@@ -282,10 +298,7 @@ vlmxIsMatrix (mxArray const * array, vl_index M, vl_index N)
 VL_INLINE vl_bool
 vlmxIsPlainScalar (mxArray const * array)
 {
-  return
-  vlmxIsReal (array) &&
-  vlmxIsOfClass(array, mxDOUBLE_CLASS)  &&
-  vlmxIsScalar (array) ;
+  return vlmxIsPlain (array) && vlmxIsScalar (array) ;
 }
 
 /** ------------------------------------------------------------------
@@ -300,10 +313,7 @@ VL_INLINE vl_bool
 vlmxIsPlainVector
 (mxArray const * array, vl_index numElements)
 {
-  return
-  vlmxIsReal (array) &&
-  vlmxIsOfClass (array, mxDOUBLE_CLASS) &&
-  vlmxIsVector (array, numElements) ;
+  return vlmxIsPlain (array) && vlmxIsVector (array, numElements) ;
 }
 
 
@@ -319,10 +329,7 @@ vlmxIsPlainVector
 VL_INLINE vl_bool
 vlmxIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
 {
-  return
-  vlmxIsReal (array) &&
-  vlmxIsOfClass (array, mxDOUBLE_CLASS) &&
-  vlmxIsMatrix (array, M, N) ;
+  return vlmxIsPlain (array) && vlmxIsMatrix (array, M, N) ;
 }
 
 /** @} */
