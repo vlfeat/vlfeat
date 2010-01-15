@@ -411,11 +411,9 @@ uCreateNumericMatrix (int M, int N, mxClassID classid, void * data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Create a plain scalar
- **
- ** @param x inital value.
- **
- ** @return new array.
+ ** @brief Create a MATLAB array which is a plain scalar
+ ** @param x scalar value.
+ ** @return the new array.
  **/
 
 static mxArray *
