@@ -39,6 +39,13 @@ void __attribute__((noreturn))
 mxuError
 (char const * errorId, char const * errorMessage, ...) ;
 #endif
+
+/** @brief Access MEX input argument */
+#define IN(x) (in[IN_ ## x])
+
+/** @brief Acces MEX output argument */
+#define OUT(x) (out[OUT_ ## x])
+
 /** @file mexutils.h
 
  This header file provides helper functions for writing MATLAB MEX
