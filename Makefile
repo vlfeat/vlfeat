@@ -224,7 +224,7 @@ endif
 C_CFLAGS     = $(CFLAGS)
 C_CFLAGS    += -I$(VLDIR)
 C_CFLAGS    += -pedantic -std=c99 -O3
-C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long
+C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 C_CFLAGS    += $(if $(DEBUG), -O0 -g)
 
 C_LDFLAGS    = $(LDFLAGS)
@@ -235,6 +235,7 @@ DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
 MEX_FLAGS    = $(if $(DEBUG), -g)
 MEX_CFLAGS   = $(CFLAGS) -I$(VLDIR) -I$(VLDIR)/toolbox
+MEX_CFLAGS  += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
 
 ifdef MATLABPATH
@@ -250,7 +251,6 @@ ifeq ($(ARCH),mac)
 BINDIR          := $(VLDIR)/bin/mac
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmac
-C_CFLAGS        += -D__BIG_ENDIAN__ -Wno-variadic-macros
 C_CFLAGS        += $(if $(DEBUG), -gstabs+)
 C_LDFLAGS       += -lm
 DLL_CFLAGS      += -fvisibility=hidden
@@ -265,8 +265,8 @@ BINDIR          := $(VLDIR)/bin/maci
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci
 SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
-C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
-C_CFLAGS        += -DVL_SUPPORT_SSE2 -m32
+C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += -m32
 C_CFLAGS        += -isysroot $(SDKROOT)
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
@@ -282,8 +282,8 @@ BINDIR          := $(VLDIR)/bin/maci64
 DLL_SUFFIX      := dylib
 MEX_SUFFIX      := mexmaci64
 SDKROOT         := /Developer/SDKs/MacOSX10.5.sdk
-C_CFLAGS        += -D__LITTLE_ENDIAN__ -Wno-variadic-macros
-C_CFLAGS        += -DVL_SUPPORT_SSE2 -m64
+C_CFLAGS        += -DVL_SUPPORT_SSE2
+C_CFLAGS        += -m64
 C_CFLAGS        += -isysroot $(SDKROOT)
 C_CFLAGS        += $(call if-like,%_sse2,$*,-msse2)
 CFLAGS          += $(if $(DEBUG), -gstabs+)
