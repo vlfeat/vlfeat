@@ -35,6 +35,7 @@ GNU GPLv2, or (at your option) any later version.
    - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
    - @ref dsift.h    "Dense SIFT (DSIFT)"
    - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
+   - @ref kmeans.h   "K-means"
    - @ref ikmeans.h  "Integer K-means (IKM)"
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
