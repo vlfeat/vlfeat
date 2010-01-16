@@ -11,7 +11,6 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-#include <mexutils.h>
 #include <vl/generic.h>
 
 #ifdef VL_OS_WIN
@@ -20,8 +19,10 @@ GNU GPLv2, or (at your option) any later version.
 #include <unistd.h>
 #endif
 
+#include <mexutils.h>
+
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   double pid ;
