@@ -10,7 +10,7 @@
 # - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 
-VER  = 0.9.6
+VER  = 0.9.7
 ARCH = w32
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC

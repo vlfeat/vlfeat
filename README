@@ -29,21 +29,42 @@ COMPILING
   and Visual C will do) plus a few common extension (see APPENDIX). To
   compile the MEX files, MATLAB needs also to be installed.
 
-  LINUX AND MAC OS X. Make sure to have a recent version of GCC (at
-  least 4.0) and GNU make (at least 3.81) installed. Edit the
-  Makefile to adjust the paths to MATLAB and the mex command, or to
-  disable MATLAB support. Then issue
+  LINUX. Make sure to have a recent version of GCC (at least 4.0) and
+  GNU make (at least 3.81) installed. Edit the Makefile to adjust the
+  paths to MATLAB and the mex command, or to disable MATLAB
+  support. Then issue
 
   > cd vlfeat
-  > make
+  > make NDEBUG=yes
 
-  Earlier versions of GCC and make can be used, but this requires
-  hacking the Makefile.
+  Omit the NDEBUG=yes option to compile with debugging symbols and
+  no optimizations. Earlier versions of GCC and make can be used, but
+  this requires hacking the Makefile.
+
+  MAC OS X. Compiling requires Xcode 3.1 or later. Edit the Makefile
+  to adjust the paths to MATLAB and the mex command, or to disable
+  MATLAB support. The Makefile produces a binary compatible with Mac
+  OS X 10.5 (Leopard) or later. For the 32 bit target issue
+
+  > cd vlfeat
+  > make NDEBUG=yes
+
+  Omit NDEBUG=yes to compile with debugging symbols and no
+  optimizations. For the 64 bit target issue
+
+  > cd vlfeat
+  > make NDEBUG=yes ARCH=maci64
+
+  !! REMARK !! Unforunately MATLAB mex script has a bug that prevents
+  selecting the architecture from working correctly and makes it
+  impossible to compile correctly for the non-default target. This bug
+  is easy to fix, but requires patching the mex script. See
+  www.vlfeat.org for detailed instructions.
 
   WINDOWS. We provide a Microsoft NMAKE Makefile (Makefile.mak) that
-  has been tested under Visual C++ 2008 Express and Matlab R2008a (minor
-  adjustments may be required for other versions). Open the Visual C terminal,
-  cd into the VLFeat directory and issue.
+  has been tested under Visual C++ 2008 Express and Matlab R2008a
+  (minor adjustments may be required for other versions). Open the
+  Visual C terminal, cd into the VLFeat directory and issue.
 
   > nmake /f Makefile.mak
 
@@ -110,6 +131,8 @@ APPENDIX
   intrisic. GCC and Visual C both satisfy all the requirements.
 
 CHANGES
+  0.9.7      Changed the Mac OS X binary distribution to require
+             a less recent version of Mac OS X (10.5).
   0.9.6      Changed the GNU/Linux binary distribution to require
              a less recent version of the C library.
   0.9.5      Added kd-tree and new SSE-accelerated vector/histogram
