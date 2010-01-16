@@ -565,9 +565,11 @@ bin-release:
 	echo Cloning VLFeat ; \
 	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
 	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
+	$(GIT) --git-dir=$$TMP/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ; \
 	\
 	echo Checking out v$(VER) ; \
 	cd $$TMP ; \
+	$(GIT) fetch origin ; \
 	$(GIT) checkout v$(VER) ; \
 	echo Rebuilding binaries for release ; \
 	make NDEBUG=yes ARCH=$(ARCH) all
@@ -624,19 +626,25 @@ bin-merge:
 	echo Cloning VLFeat ; \
 	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
 	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
+	$(GIT) --git-dir=$$TMP/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ; \
 	\
 	cd $$TMP ; \
 	echo Creating or resetting and checking out branch $$BRANCH to v$(VER); \
+	$(GIT) fetch origin ; \
+	$(GIT) checkout v$(VER) ; \
 	$(GIT) branch -f $$BRANCH v$(VER) ; \
 	$(GIT) checkout $$BRANCH ; \
 	MERGE_BRANCHES=; \
+	FETCH_BRANCHES=; \
 	for ALT_ARCH in common maci64 maci glx a64 w32 w64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
-	  echo Fetching $$MERGE_BRANCH ; \
-	  $(GIT) fetch -f bin $$MERGE_BRANCH:remotes/bin/$$MERGE_BRANCH ; \
 	  MERGE_BRANCHES="$$MERGE_BRANCHES bin/$$MERGE_BRANCH" ; \
+	  FETCH_BRANCHES="$$FETCH_BRANCHES $$MERGE_BRANCH:remotes/bin/$$MERGE_BRANCH" ; \
 	done ; \
+	echo Fetching binaries ; \
+	echo $(GIT) fetch -f bin $$FETCH_BRANCHES ; \
+	$(GIT) fetch -f bin $$FETCH_BRANCHES ; \
 	echo merging $$MERGE_BRANCHES ; \
 	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ; \
 	echo Pushing to server the merged binaries ; \
@@ -680,7 +688,10 @@ post-doc: doc
 # Auto-deps
 ifeq ($(filter doc clean archclean distclean info \
                bin-release bin-commit bin-merge bin-dist, $(MAKECMDGOALS)),)
--include $(dll_dep) $(bin_dep) $(mex_dep)
+-include $(dll_dep) $(bin_dep)
+ifdef MATLABPATH
+-include $(mex_dep)
+endif
 endif
 
 # Makefile for documentation
