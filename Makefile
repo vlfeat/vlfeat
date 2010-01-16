@@ -409,6 +409,7 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	            -compatibility_version $(VER)                    \
                     -current_version $(VER)                          \
                     -syslibroot $(SDKROOT)                           \
+		    -macosx_version_min 10.5                         \
 	            -o $@ -undefined suppress $^
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
