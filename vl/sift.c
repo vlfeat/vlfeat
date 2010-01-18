@@ -1920,7 +1920,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
 
   double const st0         = sin (angle0) ;
   double const ct0         = cos (angle0) ;
-  double const SBP         = magnif * sigma ;
+  double const SBP         = magnif * sigma + VL_EPSILON_D ;
   int    const W           = floor
     (sqrt(2.0) * SBP * (NBP + 1) / 2.0 + 0.5) ;
 
