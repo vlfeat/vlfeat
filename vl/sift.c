@@ -67,14 +67,14 @@ descriptors of custom keypoints).
 @ref sift-tech-ss "Scale space technical details",
 @ref sift-tech-detector "Detector technical details"
 
-A SIFT <em>keypoint</em> is a cricular image region with an
+A SIFT <em>keypoint</em> is a circular image region with an
 orientation. It is described by a geometric <em>frame</em> of four
 parameters: the keypoint center coordinates @e x and @e y, its @e
 scale (the radius of the region), and its @e orientation (an angle
-expresed in radians). The SIFT detector uses as keypoints image
+expressed in radians). The SIFT detector uses as keypoints image
 structures which resemble &ldquo;blobs&rdquo;. By searching for blobs
 at multiple scales and positions, the SIFT detector is invariant (or,
-more accurately, covaraint) to translation, rotations, and rescaling
+more accurately, covariant) to translation, rotations, and rescaling
 of the image.
 
 The keypoint orientation is also determined from the local image
@@ -88,7 +88,7 @@ only by their orientation) for each detected image blob.
 
 There are several parameters that influence the detection of SIFT
 keypoints. First, searching keypoints at multiple scales is obtained
-by constructing a so-called &ldquo;Gausssian scale space&rdquo;. The
+by constructing a so-called &ldquo;Gaussian scale space&rdquo;. The
 scale space is just a collection of images obtained by progressively
 smoothing the input image, which is analogous to gradually reducing
 the image resolution. Conventionally, the smoothing level is called
@@ -99,18 +99,18 @@ filter object by ::vl_sift_new():
 - <b>Number of octaves</b>. Increasing the scale by an octave means
   doubling the size of the smoothing kernel, whose effect is roughly
   equivalent to halving the image resolution. By default, the scale
-  space spans as many octaves as possible (i.e. roughy <code>
+  space spans as many octaves as possible (i.e. roughly <code>
   log2(min(width,height)</code>), which has the effect of searching
   keypoints of all possible sizes.
 - <b>First octave index</b>. By convention, the octave of index 0
   starts with the image full resolution. Specifying an index greater
   than 0 starts the scale space at a lower resolution (e.g. 1 halves
   the resolution). Similarly, specifying a negative index starts the
-  scale space at an higher resoltuon image, and can be useful to
+  scale space at an higher resolution image, and can be useful to
   extract very small features (since this is obtained by interpolating
   the input image, it does not make much sense to go past -1).
 - <b>Number of levels per octave</b>. Each octave is sampled at this
-  given numer of intermediate scales (by default 3). Increasing this
+  given number of intermediate scales (by default 3). Increasing this
   number might in principle return more refined keypoints, but in
   practice can make their selection unstable due to noise (see [1]).
 
@@ -122,7 +122,7 @@ contrast. Filtering is controlled by the follow:
 - <b>Peak threshold.</b> This is the minimum amount of contrast to
   accept a keypoint. It is set by configuring the SIFT filter object
   by ::vl_sift_set_peak_thresh().
-- <b>Edge threhsold.</b> This is the edge rejection threhsold. It is
+- <b>Edge threshold.</b> This is the edge rejection threshold. It is
   set by configuring the SIFT filter object by
   ::vl_sift_set_edge_thresh().
 
@@ -153,13 +153,13 @@ contrast. Filtering is controlled by the follow:
  <td>can affect the number of extracted keypoints</td>
  </tr>
  <tr>
- <td>edge threhsold</td>
+ <td>edge threshold</td>
  <td> @ref sift-intro-detector </td>
  <td>::vl_sift_set_edge_thresh</td>
  <td>decrease to eliminate more keypoints</td>
  </tr>
  <tr>
- <td>peak threhsold</td>
+ <td>peak threshold</td>
  <td> @ref sift-intro-detector </td>
  <td>::vl_sift_set_peak_thresh</td>
  <td>increase to eliminate more keypoints</td>
@@ -192,16 +192,16 @@ frame, which specifies the descriptor center, its size, and its
 orientation on the image plane. The following parameters influence the
 descriptor calculation:
 
-- <b>magnification factor</b>. The desciriptor size is determined by
+- <b>magnification factor</b>. The descriptor size is determined by
 multiplying the keypoint scale by this factor. It is set by
 ::vl_sift_set_magnif.
-- <b>Gaussian window size</b>. The desriptor support is determined by
+- <b>Gaussian window size</b>. The descriptor support is determined by
 a Gaussian window, which discounts gradient contributions farther away
 from the descriptor center. The standard deviation of this window is
 set by ::vl_sift_set_window_size and expressed in unit of bins.
 
 VLFeat SIFT descriptor uses the following convention. The @em y axis
-points downards and angles are measured clockwise (to be consistent
+points downwards and angles are measured clockwise (to be consistent
 with the standard image convention). The 3-D histogram (consisting of
 @f$ 8 \times 4 \times 4 = 128 @f$ bins) is stacked as a single
 128-dimensional vector, where the fastest varying dimension is the
@@ -249,7 +249,7 @@ can be used to set a threshold on the average norm of the local
 gradient to zero-out descriptors that correspond to very low contrast
 regions. By default, the threshold is equal to zero, which means that
 no descriptor is zeroed. Normally this option is useful only with
-custom keypoints, as detected keypoints are implicitly eseleted at
+custom keypoints, as detected keypoints are implicitly selected at
 high contrast image regions.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -313,8 +313,8 @@ The <b>Gaussian scale space</b> is the collection of smoothed images
 @f]
 
 The image at infinite resolution @f$ I_0 @f$ is useful conceptually,
-but is not available to us; intstead, the input image @f$ I_{\sigma_n}
-@f$ is assumed to be pre-smoothed at a nomimal level @f$ \sigma_n =
+but is not available to us; instead, the input image @f$ I_{\sigma_n}
+@f$ is assumed to be pre-smoothed at a nominal level @f$ \sigma_n =
 0.5 @f$ to account for the finite resolution of the pixels. Thus in
 practice the scale space is computed by
 
@@ -343,7 +343,7 @@ scales of the Gaussian scale space:
 \mathrm{DoG}_{\sigma(o,s)} = I_{\sigma(o,s+1)} - I_{\sigma(o,s)}
 @f]
 
-At each next octave, the resoltuion of the images is halved to save
+At each next octave, the resolution of the images is halved to save
 computations. The images composing the Gaussian and DoG scale space
 can then be arranged as in the following figure:
 
@@ -351,13 +351,13 @@ can then be arranged as in the following figure:
 
 The black vertical segments represent images of the Gaussian Scale
 Space (GSS), arranged by increasing scale @f$\sigma@f$.  Notice that
-the sacle level index @e s varies in a slightly redundant set
+the scale level index @e s varies in a slightly redundant set
 
 @f[
 s = -1, \dots, S+2
 @f]
 
-This simplifies gluging togheter different octaves and extracting DoG
+This simplifies glueing together different octaves and extracting DoG
 maxima (required by the SIFT detector).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -371,7 +371,7 @@ scale) have all smaller (or larger) value.  Once extracted, local
 extrema are quadratically interpolated (this is very important
 especially at the lower resolution scales in order to have accurate
 keypoint localization at the full resolution).  Finally, they are
-filtered to eliminate low-contranst responses or responses close to
+filtered to eliminate low-contrast responses or responses close to
 edges and the orientation(s) are assigned, as explained next.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -495,7 +495,7 @@ weighing contributions by the <em>binning functions</em>
 @f}
 
 The gradient vector field is transformed in a three-dimensional
-density map of weighed contribtions
+density map of weighed contributions
 
 @f[
    f(\theta, x, y) = |J(x,y)| \delta(\theta - \angle J(x,y))
@@ -525,7 +525,7 @@ clamped at 0.2, and @f$ l^2 @f$ normalized again.
 @subsubsection sift-tech-descriptor-image Calculation in the image frame
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Invariance to similarity transformation is attained by atttaching
+Invariance to similarity transformation is attained by attaching
 descriptors to SIFT keypoints (or other similarity-covariant frames).
 Then projecting the image in the canonical descriptor frames has the
 effect of undoing the image deformation.
@@ -556,7 +556,7 @@ related by an affinity:
 
 @image html sift-image-frame.png
 
-Then all quantites can be computed in the image frame directly. For instance,
+Then all quantities can be computed in the image frame directly. For instance,
 the image at infinite resolution in the two frames are related by
 
 @f[
@@ -585,7 +585,7 @@ where, by generalizing the previous definitions, we have
  \right)
 @f]
 
-Deriving shows that the gradient fileds are in relation
+Deriving shows that the gradient fields are in relation
 
 @f[
   \hat J(\hat \mathbf{x}) = J(\mathbf{x}) A,
@@ -633,7 +633,7 @@ illustration).
 
 For a SIFT-detected keypoint of center @f$ T @f$, scale @f$ \sigma @f$
 and orientation @f$ \theta @f$, the affine transformation @f$ (A,T)
-@f$ reduces to the similatity tranformation
+@f$ reduces to the similarity transformation
 
 @f[
      \mathbf{x} = m \sigma R(\theta) \hat \mathbf{x} + T
@@ -1839,8 +1839,8 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
     /*
        Set the descriptor to zero if it is lower than our
        norm_threshold.  We divide by the number of samples in the
-       descriptor region becasue the Gaussian window used in the
-       calculation fo the descriptor is not normalized.
+       descriptor region because the Gaussian window used in the
+       calculation of the descriptor is not normalized.
      */
     int numSamples =
       (VL_MIN(W, w - xi -1) - VL_MAX(-W, - xi) + 1) *
@@ -2086,11 +2086,11 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  ** - @e is is integer in the range @f$ [s_\mathrm{min}+1,
  **   s_\mathrm{max}-2] @f$.  This depends on how the scale is
  **   determined during detection, and must be so here because
- **   gradients are computed only for this range of scale levels and
+ **   gradients are computed only for this range of scale levels
  **   and are required for the calculation of the SIFT descriptor.
  ** - @f$ |s - is| < 0.5 @f$ for detected keypoints in most cases due
  **   to the interpolation technique used during detection. However
- **   this is not neceserray.
+ **   this is not necessary.
  **
  ** Thus octave o represents scales @f$ \{ \sigma(o, s) : s \in
  ** [s_\mathrm{min}+1-.5, s_\mathrm{max}-2+.5] \} @f$. Note that some
@@ -2115,7 +2115,7 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
  **
  ** In practice, both @f$ o(\sigma) @f$ and @f$ is(\sigma) @f$ are
  ** clamped to their feasible range as determined by the SIFT filter
- ** paramteres.
+ ** parameters.
  **/
 
 VL_EXPORT
