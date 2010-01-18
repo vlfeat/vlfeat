@@ -10,12 +10,21 @@
 # - MSVCRLOC : must point to the location of msvcr__.dll for your compiler
 # - MATLABROOT : must point to MATLAB root directory (undef = no MEX support)
 
+# Here is an example of how the variables might look with a different version
+# of Visual Studio and an alternate location for Matlab
+#MSVCR      = msvcr80.dll
+#MSVCP      = msvcp80.dll
+#MSVCM      = msvcm80.dll
+#MSMANIFEST = Microsoft.VC80.CRT.manifest
+#MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+#MATLABROOT = C:\Program Files\MATLAB08a
+
 VER  = 0.9.7
 ARCH = w32
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0
-MATLABROOT = C:\Program Files\MATLAB\R2009b-32bit
+MATLABROOT = C:\Program Files (x86)\MATLAB\R2009b
 
 CC         = "$(VCROOT)\bin\cl.exe"
 LINK       = "$(VCROOT)\bin\link.exe"
@@ -27,9 +36,7 @@ MSMANIFEST = Microsoft.VC90.CRT.manifest
 
 MEX        = "$(MATLABROOT)\bin\mex.bat"
 MEXEXT     = mexw32
-
-GIT        = git
-BRANCH     = v$(VER)-$(ARCH)
+MEXOPT     = $(MATLABROOT)\bin\win32\mexopts\msvc90opts.bat
 
 LFLAGS     = /MACHINE:X86 \
              /LIBPATH:"$(VCROOT)\lib" \
@@ -52,20 +59,15 @@ MSMANIFEST = Microsoft.VC90.CRT.manifest
 
 MEX        = "$(MATLABROOT)\bin\mex.bat"
 MEXEXT     = mexw64
+MEXOPT     = $(MATLABROOT)\bin\win64\mexopts\msvc90opts.bat
 
 LFLAGS     = /MACHINE:X64 \
 	     /LIBPATH:"$(VCROOT)\lib\amd64" \
 	     /LIBPATH:"$(WINSDKROOT)\lib\x64"
 !endif
 
-# Here is an example of how the variables might look with a different version
-# of Visual Studio and an alternate location for Matlab
-#MSVCR      = msvcr80.dll
-#MSVCP      = msvcp80.dll
-#MSVCM      = msvcm80.dll
-#MSMANIFEST = Microsoft.VC80.CRT.manifest
-#MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
-#MATLABROOT = C:\Program Files\MATLAB08a
+GIT        = git
+BRANCH     = v$(VER)-$(ARCH)
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -126,7 +128,7 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
-MEX_FLAGS  = -I. -Itoolbox -L"$(bindir)" -lvl
+MEX_FLAGS  = -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
   vl\aib.c \
@@ -216,7 +218,6 @@ mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\misc=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\aib=toolbox\mexw32)
 mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw32)
-mexres = $(mexdll:.dll=.res)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !if "$(ARCH)" == "w64"
@@ -231,7 +232,6 @@ mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\misc=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\aib=toolbox\mexw64)
 mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw64)
-mexres = $(mexdll:.mexw64=.res)
 mexpdb = $(mexdll:.mexw64=.pdb)
 !endif
 
@@ -348,8 +348,8 @@ $(bindir)\vl.lib : $(libobj)
 #                                                 Rules to compile MEX
 # --------------------------------------------------------------------
 
-mexsetup:
-	$(MEX) -setup
+startmatlab:
+	"$(MATLABROOT)/bin/matlab.exe" -nodesktop
 
 # toolbox\*.c -> toolbox\*.dll
 {toolbox\sift}.c{$(mexdir)}.$(MEXEXT):
