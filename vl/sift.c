@@ -2129,7 +2129,7 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   int    o, ix, iy, is ;
   double s, phi, xper ;
 
-  phi = log2 (sigma / f->sigma0) ;
+  phi = log2 ((sigma + VL_EPSILON_D) / f->sigma0) ;
   o   = vl_floor_d (phi -  ((double) f->s_min + 0.5) / f->S) ;
   o   = VL_MIN (o, f->o_min + f->O - 1) ;
   o   = VL_MAX (o, f->o_min           ) ;
