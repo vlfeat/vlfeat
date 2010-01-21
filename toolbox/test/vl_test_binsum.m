@@ -20,11 +20,11 @@ B = 3*ones(3,3,1) ;
 X = zeros(3,3,1) ; X(:,:,1) = 17 ;
 R = Z ; R(:,:,3) = 17 ;
 
-testh({Z, X, B, 2}, R) ;
+testh({Z, X, B, 3}, R) ;
 
 function testh(args, H_)
 H__ = vl_binsum(args{:}) ;
-if any(any(H_ ~= H__))
+if any(any(any(H_ ~= H__)))
   fprintf('H:\n') ; disp(args{1});
   fprintf('X:\n') ; disp(args{2});
   fprintf('B:\n') ; disp(args{3});
