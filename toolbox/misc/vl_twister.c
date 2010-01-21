@@ -35,7 +35,8 @@ mexFunction(int nout, mxArray *out[],
    ** -------------------------------------------------------------- */
   
   if (nout > 1) {
-    mexErrMsgTxt("Too many output arguments.");
+    mxuError(vlmxErrInvalidArgument,
+             "Too many output arguments");
   }
 
   mode = RUN_GENERATOR ;
@@ -55,11 +56,13 @@ mexFunction(int nout, mxArray *out[],
       if (nin > 1) {
         /* TWISTER(N1 N2 ...) style */
         if (nin >= max_ndims) {
-          mexErrMsgTxt("Too many dimensions.") ;
+          mxuError(vlmxErrInvalidArgument,
+                   "Too many dimensions") ;
         }
         for (k = 0 ; k < nin ; ++k) {
-          if (! uIsRealScalar(in[k])) {
-            mexErrMsgTxt("Invalid arguments.") ;
+          if (! vlmxIsPlainScalar(in[k])) {
+            mxuError(vlmxErrInvalidArgument,
+                     "Invalid arguments") ;
           }
           dims [k] = *mxGetPr(in[k]) ;
         }
@@ -67,16 +70,18 @@ mexFunction(int nout, mxArray *out[],
 
       } else if (nin == 1) {
         /* TWISTER([N1 N2 ...]) style */
-        if (! uIsRealVector(in[0], -1)) {
-          mexErrMsgTxt("Invalid arguments.") ;
+        if (! vlmxIsPlainVector(in[0], -1)) {
+          mxuError(vlmxErrInvalidArgument,
+                   "Invalid argument") ;
         }
 
-        x     = mxGetPr(in[0]) ;
-        n     = mxGetNumberOfElements(in[0]) ;
+        x = mxGetPr(in[0]) ;
+        n = mxGetNumberOfElements(in[0]) ;
         ndims = VL_MAX(2, n) ;
         
         if (ndims > max_ndims) {
-          mexErrMsgTxt("Too many dimensions.") ;
+          mxuError(vlmxErrInvalidArgument,
+                   "Invalid argument") ;
         }
         
         if (n == 1) {
@@ -111,7 +116,8 @@ mexFunction(int nout, mxArray *out[],
       if (! uIsString(in[0], -1)                    || 
           mxGetString(in[0], buff, buff_size)       ||
           vl_string_casei_cmp ("state", buff) != 0   ) {
-        mexErrMsgTxt("Invalid arguments.") ;
+        mxuError(vlmxErrInvalidArgument,
+                 "Invalid argument") ;
       }
       
       /* TWISTER('state') */
