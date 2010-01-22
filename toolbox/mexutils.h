@@ -137,6 +137,65 @@ mxuError
 
  **/
 
+/** @{
+ ** @name Error handling
+ **/
+
+static char const vlmxErrInvalidArgument [] = "invalidArgument" ;
+static char const vlmxErrInconsistentData [] = "inconsistentData" ;
+
+/** ------------------------------------------------------------------
+ ** @brief Generate MEX error with VLFeat format
+ **
+ ** @param errorId      error ID string.
+ ** @param errorMessage error message C-style format string.
+ ** @param ...          format string arguments.
+ **
+ ** The function invokes @c mxErrMsgTxtAndId.
+ **/
+
+void
+mxuError(char const * errorId, char const * errorMessage, ...)
+{
+  char formattedErrorId [512] ;
+  char formattedErrorMessage [1024] ;
+  va_list args;
+  va_start(args, errorMessage) ;
+
+  if (! errorId) {
+    errorId = "undefinedError" ;
+  }
+
+  if (! errorMessage) {
+    errorMessage = "Undefined error description" ;
+  }
+
+#ifdef VL_COMPILER_LCC
+  sprintf(formattedErrorId,
+          "VLFeat:%s", errorId) ;
+  vsprintf(formattedErrorMessage,
+           errorMessage, args) ;
+#else
+  snprintf(formattedErrorId,
+           sizeof(formattedErrorId)/sizeof(char),
+           "VLFeat:%s", errorId) ;
+  vsnprintf(formattedErrorMessage,
+            sizeof(formattedErrorMessage)/sizeof(char),
+            errorMessage, args) ;
+#endif
+  va_end(args) ;
+  mexErrMsgIdAndTxt(formattedErrorId, formattedErrorMessage) ;
+}
+
+/** @brief Generate invalid argument error */
+#ifdef VL_COMPILER_LCC
+#define VLMX_EIA(msg) mxuError("invalidArgument", msg)
+#else
+#define VLMX_EIA(...) mxuError("invalidArgument", __VA_ARGS__)
+#endif
+
+/** @} */
+
 /** @name Check for array attributes
  ** @{ */
 
@@ -707,61 +766,6 @@ uIsString(const mxArray* A, int L)
     (M == 1 || (M == 0 && N == 0)) &&
     (L < 0 || N == L) ;
 }
-
-
-static char const vlmxErrInvalidArgument [] = "invalidArgument" ;
-static char const vlmxErrInconsistentData [] = "inconsistentData" ;
-
-/** ------------------------------------------------------------------
- ** @brief Generate MEX error with VLFeat format
- **
- ** @param errorId      error ID string.
- ** @param errorMessage error message C-style format string.
- ** @param ...          format string arguments.
- **
- ** The function invokes @c mxErrMsgTxtAndId.
- **/
-
-void
-mxuError(char const * errorId, char const * errorMessage, ...)
-{
-  char formattedErrorId [512] ;
-  char formattedErrorMessage [1024] ;
-  va_list args;
-  va_start(args, errorMessage) ;
-
-  if (! errorId) {
-    errorId = "undefinedError" ;
-  }
-
-  if (! errorMessage) {
-    errorMessage = "Undefined error description" ;
-  }
-
-#ifdef VL_COMPILER_LCC
-  sprintf(formattedErrorId,
-          "VLFeat:%s", errorId) ;
-  vsprintf(formattedErrorMessage,
-           errorMessage, args) ;
-#else
-  snprintf(formattedErrorId,
-           sizeof(formattedErrorId)/sizeof(char),
-           "VLFeat:%s", errorId) ;
-  vsnprintf(formattedErrorMessage,
-            sizeof(formattedErrorMessage)/sizeof(char),
-            errorMessage, args) ;
-#endif
-  va_end(args) ;
-  mexErrMsgIdAndTxt(formattedErrorId, formattedErrorMessage) ;
-}
-
-/** @brief Generate invalid argument error */
-#ifdef VL_COMPILER_LCC
-#define VLMX_EIA(msg) mxuError("invalidArgument", msg)
-#else
-#define VLMX_EIA(...) mxuError("invalidArgument", __VA_ARGS__)
-#endif
-
 
 /** ------------------------------------------------------------------
  ** @brief Formatted @c mexErrMsgTxt()
