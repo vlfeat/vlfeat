@@ -193,21 +193,21 @@ mexFunction(int nout, mxArray *out[],
       vl_dsift_get_bounds (dsift, &minY, &minX, &maxY, &maxX) ;
       useFlatWindow = vl_dsift_get_flat_window(dsift) ;
 
-      mexPrintf("dsift: image size         [W, H] = [%d, %d]\n", N, M) ;
-      mexPrintf("       bounds:            [minX,minY,maxX,maxY] = [%d, %d, %d, %d]\n",
+      mexPrintf("vl_dsift: image size         [W, H] = [%d, %d]\n", N, M) ;
+      mexPrintf("vl_dsift: bounds:            [minX,minY,maxX,maxY] = [%d, %d, %d, %d]\n",
                 minX+1, minY+1, maxX+1, maxY+1) ;
-      mexPrintf("       subsampling steps: stepX=%d, stepY=%d\n", stepX, stepY) ;
-      mexPrintf("       num bins:          [numBinT, numBinX, numBinY] = [%d, %d, %d]\n",
+      mexPrintf("vl_dsift: subsampling steps: stepX=%d, stepY=%d\n", stepX, stepY) ;
+      mexPrintf("vl_dsift: num bins:          [numBinT, numBinX, numBinY] = [%d, %d, %d]\n",
                 geom->numBinT,
                 geom->numBinX,
                 geom->numBinY) ;
-      mexPrintf("       descriptor size:   %d\n", descrSize) ;
-      mexPrintf("       bin sizes:         [binSizeX, binSizeY] = [%d, %d]\n",
+      mexPrintf("vl_dsift: descriptor size:   %d\n", descrSize) ;
+      mexPrintf("vl_dsift: bin sizes:         [binSizeX, binSizeY] = [%d, %d]\n",
                 geom->binSizeX,
                 geom->binSizeY) ;
-      mexPrintf("       flat window:       %s\n", VL_YESNO(useFlatWindow)) ;
-      mexPrintf("       window size:       %g\n", vl_dsift_get_window_size(dsift)) ;
-      mexPrintf("       num of features:   %d\n", numFrames) ;
+      mexPrintf("vl_dsift: flat window:       %s\n", VL_YESNO(useFlatWindow)) ;
+      mexPrintf("vl_dsift: window size:       %g\n", vl_dsift_get_window_size(dsift)) ;
+      mexPrintf("vl_dsift: num of features:   %d\n", numFrames) ;
     }
 
     vl_dsift_process (dsift, data) ;
