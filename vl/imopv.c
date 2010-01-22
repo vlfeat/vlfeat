@@ -23,19 +23,18 @@ GNU GPLv2, or (at your option) any later version.
  ** version that works with triangular kernels.
  **/
 
+#ifndef VL_IMOPV_INSTANTIATING
+
 #include "imopv.h"
 #include "imopv_sse2.h"
 
-#define FLOAT_TYPE_FLOAT 1
-#define FLOAT_TYPE_DOUBLE 2
+#define FLT VL_TYPE_FLOAT
+#define VL_IMOPV_INSTANTIATING
+#include "imopv.c"
 
-#undef FLOAT_TYPE
-#define FLOAT_TYPE FLOAT_TYPE_DOUBLE
-#include "imopv.tc"
-
-#undef FLOAT_TYPE
-#define FLOAT_TYPE FLOAT_TYPE_FLOAT
-#include "imopv.tc"
+#define FLT VL_TYPE_DOUBLE
+#define VL_IMOPV_INSTANTIATING
+#include "imopv.c"
 
 /** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns
@@ -127,3 +126,184 @@ GNU GPLv2, or (at your option) any later version.
 /** @fn vl_imconvcoltri_vd(double*,int,double const*,int,int,int,int,int,unsigned int)
  ** @see ::vl_imconvcoltri_vf()
  **/
+
+/* VL_IMOPV_INSTANTIATING */
+#else
+
+#include "float.th"
+
+/* ---------------------------------------------------------------- */
+VL_EXPORT
+void VL_XCAT(vl_imconvcol_v, SFX)
+(T* dst, int dst_stride,
+ T const* src,
+ int src_width, int src_height, int src_stride,
+ T const* filt, int filt_begin, int filt_end,
+ int step, unsigned int flags)
+{
+  int x = 0 ;
+  int y ;
+  int dheight = (src_height - 1) / step + 1 ;
+  vl_bool transp = flags & VL_TRANSPOSE ;
+  vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
+
+  /* dispatch to accelerated version */
+#ifdef VL_SUPPORT_SSE2
+  if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
+    VL_XCAT3(_vl_imconvcol_v,SFX,_sse2)
+    (dst,dst_stride,
+     src,src_width,src_height,src_stride,
+     filt,filt_begin,filt_end,
+     step,flags) ;
+    return ;
+  }
+#endif
+
+  /* let filt point to the last sample of the filter */
+  filt += filt_end - filt_begin ;
+
+  while (x < src_width) {
+    /* Calculate dest[x,y] = sum_p image[x,p] filt[y - p]
+     * where supp(filt) = [filt_begin, filt_end] = [fb,fe].
+     *
+     * CHUNK_A: y - fe <= p < 0
+     *          completes VL_MAX(fe - y, 0) samples
+     * CHUNK_B: VL_MAX(y - fe, 0) <= p < VL_MIN(y - fb, height - 1)
+     *          completes fe - VL_MAX(fb, height - y) + 1 samples
+     * CHUNK_C: completes all samples
+     */
+    T const *filti ;
+    int stop ;
+
+    for (y = 0 ; y < src_height ; y += step) {
+      T acc = 0 ;
+      T v = 0, c ;
+      T const* srci ;
+
+      filti = filt ;
+      stop = filt_end - y ;
+      srci = src + x - stop * src_stride ;
+
+      if (stop > 0) {
+        if (zeropad) {
+          v = 0 ;
+        } else {
+          v = *(src + x) ;
+        }
+        while (filti > filt - stop) {
+          c = *filti-- ;
+          acc += v * c ;
+          srci += src_stride ;
+        }
+      }
+
+      stop = filt_end - VL_MAX(filt_begin, y - src_height + 1) + 1 ;
+      while (filti > filt - stop) {
+        v = *srci ;
+        c = *filti-- ;
+        acc += v * c ;
+        srci += src_stride ;
+      }
+
+      if (zeropad) v = 0 ;
+
+      stop = filt_end - filt_begin + 1 ;
+      while (filti > filt - stop) {
+        c = *filti-- ;
+        acc += v * c ;
+      }
+
+      if (transp) {
+        *dst = acc ; dst += 1 ;
+      } else {
+        *dst = acc ; dst += dst_stride ;
+      }
+    } /* next y */
+    if (transp) {
+      dst += 1 * dst_stride - dheight * 1 ;
+    } else {
+      dst += 1 * 1 - dheight * dst_stride ;
+    }
+    x += 1 ;
+  } /* next x */
+}
+
+/* ---------------------------------------------------------------- */
+VL_EXPORT void
+VL_XCAT(vl_imconvcoltri_v, SFX)
+(T* dst, int dst_stride,
+ T const* src,
+ int src_width, int src_height, int src_stride,
+ int filt_size,
+ int step, unsigned int flags)
+{
+  int x = 0 ;
+  int y ;
+  int dheight = (src_height - 1) / step + 1 ;
+  vl_bool transp = flags & VL_TRANSPOSE ;
+  vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
+#define fa ((double)(filt_size))
+  T scale = ((T) (1.0/(fa*fa))) ;
+  T * buff = vl_malloc(sizeof(T) * (src_height + filt_size)) ;
+  buff += filt_size ;
+
+  while (x < src_width) {
+    T const *srci ;
+    srci = src + x + src_stride * (src_height - 1) ;
+
+    /* We decompose the convolution by a triangluar signal as the convolution
+     * by two rectangular signals. The rectangular convolutions are computed
+     * quickly by computing the integral signals. Each rectangular convolution
+     * introduces a delay, which is compensated by convolving each in opposite
+     * directions.
+     */
+
+    /* integrate backward the column */
+    buff [src_height - 1] = *srci ;
+    for (y = src_height-2 ; y >=  0 ; --y) {
+      srci -= src_stride ;
+      buff [y] = buff [y+1] + *srci ;
+    }
+    if (zeropad) {
+      for ( ; y >= - filt_size ; --y) {
+        buff [y] = buff [y+1] ;
+      }
+    } else {
+      for ( ; y >= - filt_size ; --y) {
+        buff [y] = buff[y+1] + *srci ;
+      }
+    }
+
+    /* compute the filter forward */
+    for (y = - filt_size ; y < src_height - filt_size ; ++y) {
+      buff [y] = buff [y] - buff [y + filt_size] ;
+    }
+    if (! zeropad) {
+      for (y = src_height - filt_size ; y < src_height ; ++y) {
+        buff [y] = buff [y] - buff [src_height-1]  *
+        (src_height - filt_size - y) ;
+      }
+    }
+
+    /* integrate forward the column */
+    for (y = - filt_size + 1 ; y < src_height ; ++y) {
+      buff [y] += buff [y - 1] ;
+    }
+
+    /* compute the filter backward */
+    {
+      int stride = transp ? 1 : dst_stride ;
+      dst += dheight * stride ;
+      for (y = step * (dheight - 1) ; y >= 0 ; y -= step) {
+        dst -= stride ;
+        *dst = scale * (buff [y] - buff [y - filt_size]) ;
+      }
+    }
+    x += 1 ;
+    dst += transp ? dst_stride : 1 ;
+  } /* next x */
+  vl_free (buff - filt_size) ;
+}
+
+#undef FLT
+#endif
