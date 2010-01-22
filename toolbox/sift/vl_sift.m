@@ -53,21 +53,21 @@
 %     passed in order of increasing scale, they are re-orderded.
 %
 %   Orientations::
-%     Compute the orietantions of the frames overriding the 
+%     Compute the orietantions of the frames overriding the
 %     orientation specified by the 'Frames' option.
 %
 %   Verbose::
 %     Be verbose (may be repeated to increase the verbosity level).
 %
 %  REFERENCES
-% 
-%  [1] D. G. Lowe, Distinctive image features from scale-invariant
-%       keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
 %
-%  See also VL_HELP(), VL_UBCMATCH().
+%  [1] D. G. Lowe, Distinctive image features from scale-invariant
+%      keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
+%
+%  See also:: VL_HELP(), VL_UBCMATCH().
 
 % AUTORIGHTS
 % Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
-% 
+%
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
