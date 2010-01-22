@@ -674,7 +674,7 @@ Gaussian window size is set to have standard deviation
 **/
 
 #include "sift.h"
-#include "imop.h"
+#include "imopv.h"
 #include "mathop.h"
 
 #include <assert.h>
@@ -777,6 +777,65 @@ copy_and_upsample_rows
 
 /** ------------------------------------------------------------------
  ** @internal
+ ** @brief Smooth an image
+ **
+ ** @parma self        SIFT filter ;
+ ** @param outImage    output imgae buffer.
+ ** @param tempImage   temporary image buffer.
+ ** @param inputImage  input image buffer.
+ ** @param width       input image width.
+ ** @param height      input image height.
+ ** @param sigma       smoothing.
+ **/
+
+static void
+_vl_sift_smooth (VlSiftFilt * self,
+                 vl_sift_pix * outputImage,
+                 vl_sift_pix * tempImage,
+                 vl_sift_pix const * inputImage,
+                 vl_size width,
+                 vl_size height,
+                 double sigma)
+{
+  /* prepare Gaussian filter */
+  if (self->gaussFilterSigma != sigma) {
+    vl_uindex j ;
+    vl_sift_pix acc = 0 ;
+    if (self->gaussFilter) vl_free (self->gaussFilter) ;
+    self->gaussFilterWidth = VL_MAX(ceil(4.0 * sigma), 1) ;
+    self->gaussFilterSigma = sigma ;
+    self->gaussFilter = vl_malloc (sizeof(vl_sift_pix) * (2 * self->gaussFilterWidth + 1)) ;
+
+    for (j = 0 ; j < 2 * self->gaussFilterWidth + 1 ; ++j) {
+      vl_sift_pix d = ((vl_sift_pix)((signed)j - (signed)self->gaussFilterWidth)) / ((vl_sift_pix)sigma) ;
+      self->gaussFilter[j] = (vl_sift_pix) exp (- 0.5 * (d*d)) ;
+      acc += self->gaussFilter[j] ;
+    }
+    for (j = 0 ; j < 2 * self->gaussFilterWidth + 1 ; ++j) {
+      self->gaussFilter[j] /= acc ;
+    }
+  }
+
+  if (self->gaussFilterWidth == 0) {
+    memcpy (outputImage, inputImage, sizeof(vl_sift_pix) * width * height) ;
+    return ;
+  }
+
+  vl_imconvcol_vf (tempImage, height,
+                   inputImage, width, height, width,
+                   self->gaussFilter,
+                   - self->gaussFilterWidth, self->gaussFilterWidth,
+                   1, VL_PAD_BY_CONTINUITY | VL_TRANSPOSE) ;
+
+  vl_imconvcol_vf (outputImage, width,
+                   tempImage, height, width, height,
+                   self->gaussFilter,
+                   - self->gaussFilterWidth, self->gaussFilterWidth,
+                   1, VL_PAD_BY_CONTINUITY | VL_TRANSPOSE) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @internal
  ** @brief Copy and downsample an image
  **
  ** @param dst    output imgae buffer.
@@ -868,10 +927,9 @@ vl_sift_new (int width, int height,
   f-> sigma0  = 1.6 * f->sigmak ;
   f-> dsigma0 = f->sigma0 * sqrt (1.0 - 1.0 / (f->sigmak*f->sigmak)) ;
 
-  /*
-  VL_PRINTF ("sigman = %g\n", f-> sigman) ;
-  VL_PRINTF ("sigma0 = %g\n", f-> sigma0) ;
-  */
+  f-> gaussFilter = NULL ;
+  f-> gaussFilterSigma = 0 ;
+  f-> gaussFilterWidth = 0 ;
 
   f-> octave_width  = 0 ;
   f-> octave_height = 0 ;
@@ -906,12 +964,13 @@ VL_EXPORT
 void
 vl_sift_delete (VlSiftFilt* f)
 {
-  if(f) {
-    if(f-> keys   ) vl_free (f-> keys   ) ;
-    if(f-> grad   ) vl_free (f-> grad   ) ;
-    if(f-> dog    ) vl_free (f-> dog    ) ;
-    if(f-> octave ) vl_free (f-> octave ) ;
-    if(f-> temp   ) vl_free (f-> temp   ) ;
+  if (f) {
+    if (f->keys) vl_free (f->keys) ;
+    if (f->grad) vl_free (f->grad) ;
+    if (f->dog) vl_free (f->dog) ;
+    if (f->octave) vl_free (f->octave) ;
+    if (f->temp) vl_free (f->temp) ;
+    if (f->gaussFilter) vl_free (f->gaussFilter) ;
     vl_free (f) ;
   }
 }
@@ -1007,7 +1066,7 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 
   if (sa > sb) {
     double sd = sqrt (sa*sa - sb*sb) ;
-    vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
+    _vl_sift_smooth (f, octave, temp, octave, w, h, sd) ;
   }
 
   /* -----------------------------------------------------------------
@@ -1016,8 +1075,8 @@ vl_sift_process_first_octave (VlSiftFilt *f, vl_sift_pix const *im)
 
   for(s = s_min + 1 ; s <= s_max ; ++s) {
     double sd = dsigma0 * pow (sigmak, s) ;
-    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp,
-                   vl_sift_get_octave(f, s - 1), w, h, sd) ;
+    _vl_sift_smooth (f, vl_sift_get_octave(f, s), temp,
+                     vl_sift_get_octave(f, s - 1), w, h, sd) ;
   }
 
   return VL_ERR_OK ;
@@ -1082,7 +1141,7 @@ vl_sift_process_next_octave (VlSiftFilt *f)
 
   if (sa > sb) {
     double sd = sqrt (sa*sa - sb*sb) ;
-    vl_imsmooth_f (octave, temp, octave, w, h, sd) ;
+    _vl_sift_smooth (f, octave, temp, octave, w, h, sd) ;
   }
 
   /* ------------------------------------------------------------------
@@ -1091,8 +1150,8 @@ vl_sift_process_next_octave (VlSiftFilt *f)
 
   for(s = s_min + 1 ; s <= s_max ; ++s) {
     double sd = dsigma0 * pow (sigmak, s) ;
-    vl_imsmooth_f (vl_sift_get_octave(f, s    ), temp,
-                   vl_sift_get_octave(f, s - 1), w, h, sd) ;
+    _vl_sift_smooth (f, vl_sift_get_octave(f, s), temp,
+                     vl_sift_get_octave(f, s - 1), w, h, sd) ;
   }
 
   return VL_ERR_OK ;
