@@ -44,7 +44,7 @@ GNU GPLv2, or (at your option) any later version.
    - @ref mathop.h    "Math operations"
    - @ref heap.h      "Heap (priority queue)"
    - @ref stringop.h  "String operations"
-   - @ref imop.h      "Image operations"
+   - @ref imopv.h     "Image operations"
    - @ref pgm.h       "PGM reading and writing"
    - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
