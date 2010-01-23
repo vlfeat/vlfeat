@@ -73,8 +73,10 @@ if demo
   addpath(fullfile(root,'toolbox','demo')) ;
 end
 
-
-fprintf('** Welcome to the VLFeat Toolbox %s **\n', vl_version('verbose')) ;
+if ~quiet
+  fprintf('** Welcome to the VLFeat Toolbox %s **\n', ...
+          vl_version('verbose')) ;
+end
 
 if nargout == 0
   clear path ;
