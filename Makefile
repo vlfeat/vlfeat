@@ -459,8 +459,23 @@ mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 vpath %.c $(shell find $(VLDIR)/toolbox -type d)
 vpath vl_%.m $(shell find $(VLDIR)/toolbox -type d)
 
-.PHONY: all-mex
+.PHONY: all-mex, test-mex
 all-mex : $(mex_tgt) noprefix
+
+test-mex:
+	@echo "Testing Matlab toolbox" ; \
+	cd toolbox ; \
+	RESULT=$$(\
+	$(MATLABEXE) -$(ARCH) -nodesktop -r \
+	"vl_setup('xtest','verbose') ; vl_test ; exit") ; \
+	echo "$$RESULT" ; \
+	if test -n "$$(echo \"$$RESULT\" | grep \"failed\")" ; \
+	then \
+	  echo "Matlab toolbox test encountered an error!" ; \
+	  exit 1 ; \
+	else \
+	  echo "Matlab toolbox test completed successfully!" ; \
+	fi
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS)                                   \

@@ -7,7 +7,8 @@ function path = vl_setup(varargin)
 %   contain the VL_ prefix. For example, with this option it is
 %   possible to use SIFT() instead of VL_SIFT().
 %
-%   VL_SETUP('TEST') adds VLFeat test functions.
+%   VL_SETUP('TEST') or VL_SETUP('XTEST') adds VLFeat unit test
+%   function suite. See also VL_TEST().
 %
 %   VL_SETUP('QUIET') does not print the greeting message.
 %
@@ -22,7 +23,7 @@ function path = vl_setup(varargin)
 
 noprefix = false ;
 quiet = false ;
-test = false ;
+xtest = false ;
 demo = false ;
 
 for ai=1:length(varargin)
@@ -30,8 +31,8 @@ for ai=1:length(varargin)
   switch lower(opt)
     case {'noprefix', 'usingvl'}
       noprefix = true ;
-    case {'test'}
-      test = true ;
+    case {'test', 'xtest'}
+      xtest = true ;
     case {'demo'}
       demo = true ;
     case {'quiet'}
@@ -64,8 +65,8 @@ if noprefix
   addpath(fullfile(root,'toolbox','noprefix')) ;
 end
 
-if test
-  addpath(fullfile(root,'toolbox','test')) ;
+if xtest
+  addpath(fullfile(root,'toolbox','xtest')) ;
 end
 
 if demo
