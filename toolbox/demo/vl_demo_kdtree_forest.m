@@ -5,7 +5,6 @@ function vl_demo_kdtree_forest
   rand('state',0) ;
 
   Q = single(rand(2,1)) ;
-
   X = single(rand(2, 100)) ;
 
   kdforest = vl_kdtreebuild (X,  ...
@@ -27,9 +26,9 @@ function vl_demo_kdtree_forest
   vl_plotframe(X, 'ro') ; hold on ;
   [i, d] = vl_kdtreequery (kdforest, X, Q, 'numneighbors', 10, 'verbose') ;
 
-  plotframe(Q,'b*') ;
+  vl_plotframe(Q,'b*') ;
   for k=1:length(i)
-    plotframe([Q ; sqrt(d(k))],'b:','linewidth',1) ;
-    plotframe(X(:, i(k)), 'bx') ;
+    vl_plotframe([Q ; sqrt(d(k))],'b:','linewidth',1) ;
+    vl_plotframe(X(:, i(k)), 'bx') ;
   end
 end

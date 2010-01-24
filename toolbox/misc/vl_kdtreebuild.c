@@ -50,11 +50,13 @@ mexFunction(int nout, mxArray *out[],
   mxArray const *optarg ;
 
   VlKDForest * forest ;
-  float * data ;
-  int numData ;
-  int numDimensions ;
+  void * data ;
+  vl_size numData ;
+  vl_size dimension ;
+  mxClassID dataClass ;
+  vl_type dataType ;
   int thresholdingMethod = VL_KDTREE_MEDIAN ;
-  int numTrees = 1 ;
+  vl_size numTrees = 1 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -63,14 +65,27 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 1) {
-    mexErrMsgTxt("One argument required.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "At least one argument required") ;
   } else if (nout > 2) {
-    mexErrMsgTxt("Too many output arguments.");
+    mxuError(vlmxErrInvalidArgument,
+             "Too many output arguments");
   }
 
-  if (! uIsMatrix (in[IN_DATA], -1, -1) ||
-      mxGetClassID(in[IN_DATA]) != mxSINGLE_CLASS) {
-    mexErrMsgTxt("DATA must be a real matrix of class SINGLE.") ;
+  dataClass = mxGetClassID(IN(DATA)) ;
+
+  if (! vlmxIsMatrix (IN(DATA), -1, -1) ||
+      ! vlmxIsReal (IN(DATA))) {
+    mxuError(vlmxErrInvalidArgument,
+             "DATA must be a real matrix ") ;
+  }
+
+  switch (dataClass) {
+    case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
+    case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
+    default:
+      mxuError(vlmxErrInvalidArgument,
+               "DATA must be either SINGLE or DOUBLE") ;
   }
 
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
@@ -103,22 +118,23 @@ mexFunction(int nout, mxArray *out[],
     }
   }
 
-  data = (float*) mxGetData (in[IN_DATA]) ;
-  numData = mxGetN (in[IN_DATA]) ;
-  numDimensions = mxGetM (in[IN_DATA]) ;
+  data = mxGetData (IN(DATA)) ;
+  numData = mxGetN (IN(DATA)) ;
+  dimension = mxGetM (IN(DATA)) ;
 
-  forest = vl_kdforest_new (numDimensions, numTrees) ;
+  forest = vl_kdforest_new (dataType, dimension, numTrees) ;
   vl_kdforest_set_thresholding_method (forest, thresholdingMethod) ;
 
   if (verbose) {
     char const * str = 0 ;
-    mexPrintf("vl_kdforestbuild: data %d x %d\n", numDimensions, numData) ;
+    mexPrintf("vl_kdforestbuild: data %s [%d x %d]\n",
+              vl_get_type_name (dataType), dimension, numData) ;
     switch (vl_kdforest_get_thresholding_method(forest)) {
       case VL_KDTREE_MEAN : str = "mean" ; break ;
       case VL_KDTREE_MEDIAN : str = "median" ; break ;
       default: assert(0) ;
     }
-    mexPrintf("vl_kdforestbuild: threhsold selection method: %s\n", str) ;
+    mexPrintf("vl_kdforestbuild: threshold selection method: %s\n", str) ;
     mexPrintf("vl_kdforestbuild: number of trees: %d\n", vl_kdforest_get_num_trees(forest)) ;
   }
 

@@ -102,14 +102,13 @@ GNU GPLv2, or (at your option) any later version.
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Allocate a new node from the tree pool
- **
  **/
 
-int unsigned
-vl_kdtree_node_new (VlKDTree * tree, int unsigned parentIndex)
+static int unsigned
+vl_kdtree_node_new (VlKDTree * tree, vl_uindex parentIndex)
 {
   VlKDTreeNode * node = NULL ;
-  int unsigned nodeIndex = tree->numUsedNodes ;
+  vl_uindex nodeIndex = tree->numUsedNodes ;
   tree -> numUsedNodes += 1 ;
 
   assert (tree->numUsedNodes <= tree->numAllocatedNodes) ;
@@ -128,11 +127,11 @@ vl_kdtree_node_new (VlKDTree * tree, int unsigned parentIndex)
  ** @brief Compare KDTree index entries for sorting
  **/
 
-static int
+VL_INLINE int
 vl_kdtree_compare_index_entries (void const * a,
                                  void const * b)
 {
-  float delta =
+  double delta =
    ((VlKDTreeDataIndexEntry const*)a) -> value -
    ((VlKDTreeDataIndexEntry const*)b) -> value ;
   if (delta < 0) return -1 ;
@@ -154,11 +153,11 @@ vl_kdtree_compare_index_entries (void const * a,
 static void
 vl_kdtree_build_recursively
 (VlKDForest * forest,
- VlKDTree * tree, unsigned int nodeIndex,
- unsigned int dataBegin, unsigned int dataEnd,
+ VlKDTree * tree, vl_uindex nodeIndex,
+ vl_uindex dataBegin, vl_uindex dataEnd,
  unsigned int depth)
 {
-  int d, i, medianIndex, splitIndex ;
+  vl_uindex d, i, medianIndex, splitIndex ;
   VlKDTreeNode * node = tree->nodes + nodeIndex ;
   VlKDTreeSplitDimension * splitDimension ;
 
@@ -172,13 +171,22 @@ vl_kdtree_build_recursively
 
   /* compute the dimension with largest variance */
   forest->splitHeapNumNodes = 0 ;
-  for (d = 0 ; d < forest->numDimensions ; ++ d) {
-    float mean = 0 ; /* unnormalized */
-    float secondMoment = 0 ;
-    float variance = 0 ;
+  for (d = 0 ; d < forest->dimension ; ++ d) {
+    double mean = 0 ; /* unnormalized */
+    double secondMoment = 0 ;
+    double variance = 0 ;
     for (i = dataBegin ; i < dataEnd ; ++ i) {
       int di = tree -> dataIndex [i] .index ;
-      float const datum = forest->data [di * forest->numDimensions + d] ;
+      double datum ;
+      switch(forest->dataType) {
+        case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
+          [di * forest->dimension + d] ; break ;
+        case VL_TYPE_DOUBLE: datum = ((double const*)forest->data)
+          [di * forest->dimension + d] ; break ;
+        default:
+          assert(0) ;
+          break ;
+      }
       mean += datum ;
       secondMoment += datum * datum ;
     }
@@ -220,7 +228,17 @@ vl_kdtree_build_recursively
   /* sort data along largest variance dimension */
   for (i = dataBegin ; i < dataEnd ; ++ i) {
     int di = tree->dataIndex [i] .index ;
-    float datum = forest->data [di * forest->numDimensions + splitDimension->dimension] ;
+    double datum ;
+    switch (forest->dataType) {
+      case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
+        [di * forest->dimension + splitDimension->dimension] ;
+        break ;
+      case VL_TYPE_DOUBLE: datum = ((double const*)forest->data)
+        [di * forest->dimension + splitDimension->dimension] ;
+        break ;
+      default: assert(0) ;
+        break ;
+    }
     tree->dataIndex [i] .value = datum ;
   }
   qsort (tree->dataIndex + dataBegin,
@@ -264,21 +282,27 @@ vl_kdtree_build_recursively
 
 /** ------------------------------------------------------------------
  ** @brief Create new KDForest object
- ** @param numDimensions data dimensionality.
+ ** @param dataType type of data (::VL_TYPE_FLOAT or VL_TYPE_DOUBLE)
+ ** @param dimension data dimensionality.
  ** @param numTrees number of trees in the forest.
  ** @return new KDForest.
  **/
 
-VL_EXPORT
-VlKDForest *
-vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees)
+VL_EXPORT VlKDForest *
+vl_kdforest_new (vl_type dataType,
+                 vl_size dimension, vl_size numTrees)
 {
   VlKDForest * self = vl_malloc (sizeof(VlKDForest)) ;
 
+  assert(dataType == VL_TYPE_FLOAT || dataType == VL_TYPE_DOUBLE) ;
+  assert(dimension >= 1) ;
+  assert(numTrees >= 1) ;
+
   self -> rand = vl_get_rand () ;
+  self -> dataType = dataType ;
   self -> numData = 0 ;
   self -> data = 0 ;
-  self -> numDimensions = numDimensions ;
+  self -> dimension = dimension ;
   self -> numTrees = numTrees ;
   self -> trees = 0 ;
   self -> thresholdingMethod = VL_KDTREE_MEDIAN ;
@@ -288,10 +312,23 @@ vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees)
   self -> searchHeapArray = 0 ;
   self -> searchHeapNumNodes = 0 ;
 
-
   self -> searchMaxNumComparisons = 0 ;
   self -> searchIdBook = 0 ;
   self -> searchId = 0 ;
+
+  switch (self->dataType) {
+    case VL_TYPE_FLOAT:
+      self -> distanceFunction = (void(*)(void))
+      vl_get_vector_comparison_function_f (VlDistanceL2) ;
+      break ;
+    case VL_TYPE_DOUBLE :
+      self -> distanceFunction = (void(*)(void))
+      vl_get_vector_comparison_function_d (VlDistanceL2) ;
+      break ;
+    default :
+      assert (0) ;
+      break ;
+  }
 
   return self ;
 }
@@ -305,7 +342,7 @@ vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees)
 VL_EXPORT void
 vl_kdforest_delete (VlKDForest * self)
 {
-  int ti ;
+  vl_uindex ti ;
   if (self->searchIdBook) vl_free (self->searchIdBook) ;
   if (self->trees) {
     for (ti = 0 ; ti < self->numTrees ; ++ ti) {
@@ -332,9 +369,9 @@ vl_kdforest_delete (VlKDForest * self)
  **/
 
 VL_EXPORT void
-vl_kdforest_build (VlKDForest * self, int numData, float const * data)
+vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
 {
-  int di, ti ;
+  vl_uindex di, ti ;
 
   /* need to check: if alredy built, clean first */
   self->data = data ;
@@ -362,35 +399,6 @@ vl_kdforest_build (VlKDForest * self, int numData, float const * data)
  ** @internal @brief
  **/
 
-VL_INLINE
-float calc_dist2 (float const * a, float const * b, int unsigned N)
-{
-  float acc = 0 ;
-  float d0, d1, d2, d3 ;
-  float const * age = a + N - 3 ;
-  float const * ae = a + N ;
-
-  while (a < age) {
-    d0 = *a++ - *b++ ;
-    d1 = *a++ - *b++ ;
-    d2 = *a++ - *b++ ;
-    d3 = *a++ - *b++ ;
-    acc += d0 * d0 ;
-    acc += d1 * d1 ;
-    acc += d2 * d2 ;
-    acc += d3 * d3 ;
-  }
-  while (a < ae) {
-    d0 = *a++ - *b++ ;
-    acc += d0 * d0 ;
-  }
-  return acc ;
-}
-
-/** ------------------------------------------------------------------
- ** @internal @brief
- **/
-
 VL_EXPORT int
 vl_kdforest_query_recursively (VlKDForest  * self,
                                VlKDTree * tree,
@@ -398,26 +406,37 @@ vl_kdforest_query_recursively (VlKDForest  * self,
                                VlKDForestNeighbor * neighbors,
                                int unsigned numNeighbors,
                                int unsigned * numAddedNeighbors,
-                               float dist,
-                               float const * query)
+                               double dist,
+                               void const * query)
 {
   VlKDTreeNode const * node = tree->nodes + nodeIndex ;
-  int unsigned i = node->splitDimension ;
-  int nextChild, saveChild ;
-  float delta, saveDist ;
-  float x = query [i] ;
-  float x1 = node->lowerBound ;
-  float x2 = node->splitThreshold ;
-  float x3 = node->upperBound ;
+  vl_uindex i = node->splitDimension ;
+  vl_index nextChild, saveChild ;
+  double delta, saveDist ;
+  double x ;
+  double x1 = node->lowerBound ;
+  double x2 = node->splitThreshold ;
+  double x3 = node->upperBound ;
   VlKDForestSearchState * searchState ;
 
   self->searchNumRecursions ++ ;
 
+  switch (self->dataType) {
+    case VL_TYPE_FLOAT :
+      x = ((float const*) query)[i] ;
+      break ;
+    case VL_TYPE_DOUBLE :
+      x = ((double const*) query)[i] ;
+      break ;
+    default :
+      assert(0) ;
+  }
+
   /* base case: this is a leaf node */
   if (node->lowerChild < 0) {
-    int begin = - node->lowerChild - 1 ;
-    int end   = - node->upperChild - 1 ;
-    int iter ;
+    vl_index begin = - node->lowerChild - 1 ;
+    vl_index end   = - node->upperChild - 1 ;
+    vl_index iter ;
 
     for (iter = begin ;
          iter < end &&
@@ -425,16 +444,31 @@ vl_kdforest_query_recursively (VlKDForest  * self,
           self->searchNumComparisons < self->searchMaxNumComparisons) ;
          ++ iter) {
 
-      int unsigned di = tree->dataIndex [iter].index ;
-      float const * datum = self->data + di * self->numDimensions ;
+      vl_index di = tree->dataIndex [iter].index ;
 
       /* multiple KDTrees share the database points and we must avoid
        * adding the same point twice */
-      if (self->searchIdBook [di] == self->searchId) continue ;
-      self->searchIdBook [di] = self->searchId ;
+      if (self->searchIdBook[di] == self->searchId) continue ;
+      self->searchIdBook[di] = self->searchId ;
 
       /* compare the query to this point */
-      dist = calc_dist2 (query, datum, self->numDimensions) ;
+      switch (self->dataType) {
+        case VL_TYPE_FLOAT:
+          dist = ((VlFloatVectorComparisonFunction)self->distanceFunction)
+          (self->dimension,
+           ((float const *)query),
+           ((float const*)self->data) + di * self->dimension) ;
+          break ;
+        case VL_TYPE_DOUBLE:
+          dist = ((VlDoubleVectorComparisonFunction)self->distanceFunction)
+          (self->dimension,
+           ((double const *)query),
+           ((double const*)self->data) + di * self->dimension) ;
+          break ;
+        default:
+          assert (0) ;
+          break ;
+      }
       self->searchNumComparisons += 1 ;
 
       /* see if it should be added to the result set */
@@ -517,11 +551,11 @@ vl_kdforest_query_recursively (VlKDForest  * self,
 
 static void
 vl_kdtree_calc_bounds_recursively (VlKDTree * tree,
-                                   int unsigned nodeIndex, float * searchBounds)
+                                   vl_uindex nodeIndex, double * searchBounds)
 {
   VlKDTreeNode * node = tree->nodes + nodeIndex ;
   int unsigned i = node->splitDimension ;
-  float t = node->splitThreshold ;
+  double t = node->splitThreshold ;
 
   node->lowerBound = searchBounds [2 * i + 0] ;
   node->upperBound = searchBounds [2 * i + 1] ;
@@ -552,13 +586,13 @@ vl_kdtree_calc_bounds_recursively (VlKDTree * tree,
  ** to the query point. Neighbors are sorted by increasing distance.
  **/
 
-VL_EXPORT int
+VL_EXPORT vl_size
 vl_kdforest_query (VlKDForest * self,
                    VlKDForestNeighbor * neighbors,
-                   int unsigned numNeighbors,
-                   float const * query)
+                   vl_size numNeighbors,
+                   void const * query)
 {
-  int i, ti ;
+  vl_uindex i, ti ;
   vl_bool exactSearch = (self->searchMaxNumComparisons == 0) ;
   VlKDForestSearchState * searchState  ;
   vl_size numAddedNeighbors = 0 ;
@@ -582,9 +616,9 @@ vl_kdforest_query (VlKDForest * self,
     self -> searchIdBook = vl_calloc (sizeof(unsigned int), self->numData) ;
 
     for (ti = 0 ; ti < self->numTrees ; ++ti) {
-      float * searchBounds = vl_malloc(sizeof(float) * 2 * self->numDimensions) ;
-      float * iter = searchBounds  ;
-      float * end = iter + 2 * self->numDimensions ;
+      double * searchBounds = vl_malloc(sizeof(double) * 2 * self->dimension) ;
+      double * iter = searchBounds  ;
+      double * end = iter + 2 * self->dimension ;
       while (iter < end) {
         *iter++ = - VL_INFINITY_F ;
         *iter++ = + VL_INFINITY_F ;

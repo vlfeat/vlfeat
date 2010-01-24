@@ -14,6 +14,7 @@ General Public License version 2.
 #define VL_KDTREE_H
 
 #include "generic.h"
+#include "mathop.h"
 
 #define VL_KDTREE_SPLIT_HEALP_SIZE 5
 
@@ -24,26 +25,26 @@ typedef struct _VlKDForestSearchState VlKDForestSearchState ;
 
 struct _VlKDTreeNode
 {
-  int unsigned parent ;
-  int lowerChild ;
-  int upperChild ;
-  int unsigned splitDimension ;
-  float splitThreshold ;
-  float lowerBound ;
-  float upperBound ;
+  vl_uindex parent ;
+  vl_index lowerChild ;
+  vl_index upperChild ;
+  unsigned int splitDimension ;
+  double splitThreshold ;
+  double lowerBound ;
+  double upperBound ;
 } ;
 
 struct _VlKDTreeSplitDimension
 {
-  int unsigned dimension ;
-  float mean ;
-  float variance ;
+  unsigned int dimension ;
+  double mean ;
+  double variance ;
 } ;
 
 struct _VlKDTreeDataIndexEntry
 {
-  int index ;
-  float value ;
+  vl_index index ;
+  double value ;
 } ;
 
 /** @brief Thresholding method */
@@ -55,41 +56,43 @@ typedef enum _VlKDTreeThresholdingMethod
 
 /** @brief Neighbor of a query point */
 typedef struct _VlKDForestNeighbor {
-  float distance ;     /**< distance to the query point */
-  unsigned int index ; /**< index of the neighbor in the KDTree data */
+  double distance ;   /**< distance to the query point */
+  vl_uindex index ;   /**< index of the neighbor in the KDTree data */
 } VlKDForestNeighbor ;
 
 typedef struct _VlKDTree
 {
   VlKDTreeNode * nodes ;
-  int unsigned numUsedNodes ;
-  int unsigned numAllocatedNodes ;
+  vl_size numUsedNodes ;
+  vl_size numAllocatedNodes ;
   VlKDTreeDataIndexEntry * dataIndex ;
-  int depth ;
+  unsigned int depth ;
 } VlKDTree ;
 
 struct _VlKDForestSearchState
 {
   VlKDTree * tree ;
-  unsigned int nodeIndex ;
-  float distanceLowerBound ;
+  vl_uindex nodeIndex ;
+  double distanceLowerBound ;
 } ;
 
 /** @brief KDForest object */
 typedef struct _VlKDForest
 {
-  int numDimensions ;
+  vl_size dimension ;
 
   /* random number generator */
   VlRand * rand ;
 
   /* indexed data */
-  float const * data ;
-  int numData ;
+  vl_type dataType ;
+  void const * data ;
+  vl_size numData ;
+  void (*distanceFunction)(void) ;
 
   /* tree structure */
   VlKDTree ** trees ;
-  unsigned int numTrees ;
+  vl_size numTrees ;
 
   /* build */
   VlKDTreeThresholdingMethod thresholdingMethod ;
@@ -100,8 +103,8 @@ typedef struct _VlKDForest
   /* querying */
   VlKDForestSearchState * searchHeapArray ;
   vl_size searchHeapNumNodes ;
-  int unsigned searchId ;
-  int unsigned * searchIdBook ;
+  vl_uindex searchId ;
+  vl_uindex * searchIdBook ;
 
   int unsigned searchMaxNumComparisons ;
   int unsigned searchNumComparisons;
@@ -111,27 +114,31 @@ typedef struct _VlKDForest
 
 /** @name Creatind and disposing
  ** @{ */
-VL_EXPORT VlKDForest * vl_kdforest_new (int unsigned numDimensions, int unsigned numTrees) ;
+VL_EXPORT VlKDForest * vl_kdforest_new (vl_type dataType,
+                                        vl_size dimension, vl_size numTrees) ;
 VL_EXPORT void vl_kdforest_delete (VlKDForest * self) ;
 /** @} */
 
-
 /** @name Building and querying
  ** @{ */
-VL_EXPORT void vl_kdforest_build (VlKDForest * self, int numData, float const * data) ;
-VL_EXPORT int vl_kdforest_query (VlKDForest * self,
-                                 VlKDForestNeighbor * neighbors,
-                                 int unsigned numNeighbors,
-                                 float const * query) ;
+VL_EXPORT void vl_kdforest_build (VlKDForest * self,
+                                  vl_size numData,
+                                  void const * data) ;
+VL_EXPORT vl_size vl_kdforest_query (VlKDForest * self,
+                                     VlKDForestNeighbor * neighbors,
+                                     vl_size numNeighbors,
+                                     void const * query) ;
 /** @} */
 
 /** @name Retrieving and setting parameters
  ** @{ */
-VL_INLINE int unsigned vl_kdforest_get_depth_of_tree (VlKDForest const * self, int unsigned treeIndex) ;
-VL_INLINE int unsigned vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, int unsigned treeIndex) ;
-VL_INLINE int unsigned vl_kdforest_get_num_trees (VlKDForest const * self) ;
+VL_INLINE vl_size vl_kdforest_get_depth_of_tree (VlKDForest const * self, vl_uindex treeIndex) ;
+VL_INLINE vl_size vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, vl_uindex treeIndex) ;
+VL_INLINE vl_size vl_kdforest_get_num_trees (VlKDForest const * self) ;
+VL_INLINE vl_size vl_kdforest_get_data_dimension (VlKDForest const * self) ;
+VL_INLINE vl_size vl_kdforest_get_data_type (VlKDForest const * self) ;
 VL_INLINE void vl_kdforest_set_max_num_comparisons (VlKDForest * self, int unsigned n) ;
-VL_INLINE int unsigned vl_kdforest_get_max_num_comparisons (VlKDForest * self) ;
+VL_INLINE vl_size vl_kdforest_get_max_num_comparisons (VlKDForest * self) ;
 VL_INLINE void vl_kdforest_set_thresholding_method (VlKDForest * self, VlKDTreeThresholdingMethod method) ;
 VL_INLINE VlKDTreeThresholdingMethod vl_kdforest_get_thresholding_method (VlKDForest const * self) ;
 /** @} */
@@ -143,8 +150,8 @@ VL_INLINE VlKDTreeThresholdingMethod vl_kdforest_get_thresholding_method (VlKDFo
  ** @return number of trees.
  **/
 
-int unsigned
-vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, int unsigned treeIndex)
+vl_size
+vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, vl_uindex treeIndex)
 {
   assert (treeIndex < self->numTrees) ;
   return self->trees[treeIndex]->numUsedNodes ;
@@ -157,8 +164,8 @@ vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, int unsigned treeInd
  ** @return number of trees.
  **/
 
-int unsigned
-vl_kdforest_get_depth_of_tree (VlKDForest const * self, int unsigned treeIndex)
+vl_size
+vl_kdforest_get_depth_of_tree (VlKDForest const * self, vl_uindex treeIndex)
 {
   assert (treeIndex < self->numTrees) ;
   return self->trees[treeIndex]->depth ;
@@ -171,7 +178,7 @@ vl_kdforest_get_depth_of_tree (VlKDForest const * self, int unsigned treeIndex)
  ** @return number of trees.
  **/
 
-int unsigned
+vl_size
 vl_kdforest_get_num_trees (VlKDForest const * self)
 {
   return self->numTrees ;
@@ -221,7 +228,7 @@ vl_kdforest_get_max_num_comparisons (VlKDForest * self)
 VL_INLINE void
 vl_kdforest_set_thresholding_method (VlKDForest * self, VlKDTreeThresholdingMethod method)
 {
-  assert(VL_KDTREE_MEDIAN <= method && method <= VL_KDTREE_MEAN) ;
+  assert(method == VL_KDTREE_MEDIAN || method == VL_KDTREE_MEAN) ;
   self->thresholdingMethod = method ;
 }
 
@@ -239,6 +246,31 @@ vl_kdforest_get_thresholding_method (VlKDForest const * self)
 {
   return self->thresholdingMethod ;
 }
+
+/** ------------------------------------------------------------------
+ ** @brief Get the dimension of the data
+ ** @param self KDForest object.
+ ** @return dimension of the data.
+ **/
+
+VL_INLINE vl_size
+vl_kdforest_get_data_dimension (VlKDForest const * self)
+{
+  return self->dimension ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the data type
+ ** @param self KDForest object.
+ ** @return data type (one of ::VL_TYPE_FLOAT, ::VL_TYPE_DOUBLE).
+ **/
+
+VL_INLINE vl_type
+vl_kdforest_get_data_type (VlKDForest const * self)
+{
+  return self->dataType ;
+}
+
 
 /* VL_KDTREE_H */
 #endif

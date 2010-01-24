@@ -50,6 +50,8 @@ General Public License version 2.
 #define VL_TYPE_INT64   9
 #define VL_TYPE_UINT64  10
 
+typedef vl_uint32 vl_type ;
+
 /** @brief Get the symbolic name of a data type
  ** @param type data type.
  ** @return data type symbolic name.
@@ -60,7 +62,7 @@ General Public License version 2.
  **/
 
 VL_INLINE char const *
-vl_get_type_name (int type)
+vl_get_type_name (vl_type type)
 {
   switch (type) {
     case VL_TYPE_FLOAT   : return "float"  ;

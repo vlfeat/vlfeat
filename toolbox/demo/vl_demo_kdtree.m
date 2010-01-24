@@ -8,17 +8,22 @@ function vl_demo_kdtree
 
   X = single(rand(2, 100)) ;
 
+  Q = double(Q) ;
+  X = double(X) ;
+
   figure(1) ; clf ; do('thresholdmethod', 'mean') ;
   figure(2) ; clf ; do('thresholdmethod', 'median') ;
 
   thr = 2*pi*rand(1,100) ;
   X = single(.4*[cos(thr); sin(thr)] + .5) ;
+  Q = single(Q) ;
 
   figure(3) ; clf ; do('thresholdmethod', 'mean') ;
   figure(4) ; clf ; do('thresholdmethod', 'median') ;
 
   function do(varargin)
     kdforest = vl_kdtreebuild (X, 'verbose', varargin{:}) ;
+
     vl_plotframe(X, 'ro') ;
     hold on ;
     xl = [0, +1] ;
@@ -30,10 +35,10 @@ function vl_demo_kdtree
 
     [i, d] = vl_kdtreequery (kdforest, X, Q, 'numneighbors', 10, 'verbose') ;
 
-    plotframe(Q,'b*') ;
+    vl_plotframe(Q,'b*') ;
     for k=1:length(i)
-      plotframe([Q ; sqrt(d(k))],'b:','linewidth',1) ;
-      plotframe(X(:, i(k)), 'bx') ;
+      vl_plotframe([Q ; sqrt(d(k))],'b:','linewidth',1) ;
+      vl_plotframe(X(:, i(k)), 'bx') ;
     end
   end
 

@@ -54,15 +54,16 @@ mexFunction(int nout, mxArray *out[],
   mxArray const * query_array = in[IN_QUERY] ;
   mxArray * index_array ;
   mxArray * distance_array ;
-  float * query ;
+  void * query ;
   vl_uint32 * index ;
-  float * distance ;
-  int numNeighbors = 1 ;
-  int numQueries ;
-  int qi, ni;
+  void * distance ;
+  vl_size numNeighbors = 1 ;
+  vl_size numQueries ;
+  vl_uindex qi, ni;
   unsigned int numComparisons = 0 ;
   unsigned int maxNumComparisons = 0 ;
   VlKDForestNeighbor * neighbors ;
+  mxClassID dataClass ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -71,15 +72,28 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 3) {
-    mexErrMsgTxt("Three argument required.") ;
-  } else if (nout > 2) {
-    mexErrMsgTxt("Too many output arguments.");
+    mxuError(vlmxErrInvalidArgument,
+             "Three argument required") ;
+  }
+  if (nout > 2) {
+    mxuError(vlmxErrInvalidArgument,
+             "Too many output arguments");
   }
 
   forest = new_kdforest_from_array (forest_array, data_array) ;
-  if (!uIsMatrix (query_array, forest->numDimensions, -1) ||
-      mxGetClassID (query_array) != mxSINGLE_CLASS) {
-    mexErrMsgTxt ("QUERY must be a SINGLE matrix with TREE.NUMDIMENSIONS rows") ;
+
+  dataClass = mxGetClassID (data_array) ;
+  if (mxGetClassID (query_array) != dataClass) {
+    mxuError(vlmxErrInvalidArgument,
+             "QUERY must have the same storage class as DATA") ;
+  }
+  if (! vlmxIsReal (query_array)) {
+    mxuError(vlmxErrInvalidArgument,
+             "QUERY must be real") ;
+  }
+  if (! vlmxIsMatrix (query_array, forest->dimension, -1)) {
+    mxuError(vlmxErrInvalidArgument,
+             "QUERY must be a matrix with TREE.NUMDIMENSIONS rows") ;
   }
 
   while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
@@ -87,13 +101,15 @@ mexFunction(int nout, mxArray *out[],
       case opt_num_neighs :
         if (! uIsScalar(optarg) ||
             (numNeighbors = mxGetScalar(optarg)) < 1) {
-          mexErrMsgTxt("NUMNEIGHBORS must be a scalar not smaller than one") ;
+          mxuError(vlmxErrInvalidArgument,
+                   "NUMNEIGHBORS must be a scalar not smaller than one") ;
         }
         break;
 
       case opt_max_comparisons :
         if (! uIsScalar(optarg)) {
-          mexErrMsgTxt("MAXCOMPARISONS must be a scalar") ;
+          mxuError(vlmxErrInvalidArgument,
+                   "MAXCOMPARISONS must be a scalar") ;
         }
         maxNumComparisons = mxGetScalar(optarg) ;
         break;
@@ -115,7 +131,7 @@ mexFunction(int nout, mxArray *out[],
     (numNeighbors, numQueries, mxUINT32_CLASS, mxREAL) ;
 
   out[OUT_DISTANCE] = distance_array = mxCreateNumericMatrix
-    (numNeighbors, numQueries, mxSINGLE_CLASS, mxREAL) ;
+    (numNeighbors, numQueries, dataClass, mxREAL) ;
 
   index = mxGetData (index_array) ;
   distance = mxGetData (distance_array) ;
@@ -129,10 +145,32 @@ mexFunction(int nout, mxArray *out[],
 
   for (qi = 0 ; qi < numQueries ; ++ qi) {
     numComparisons += vl_kdforest_query (forest, neighbors, numNeighbors,
-                                    query + forest->numDimensions * qi) ;
-    for (ni = 0 ; ni < numNeighbors ; ++ni) {
-      *index++    = neighbors[ni].index + 1 ;
-      *distance++ = neighbors[ni].distance ;
+                                         query) ;
+    switch (dataClass) {
+      case mxSINGLE_CLASS:
+      {
+        float * distance_ = (float*) distance ;
+        for (ni = 0 ; ni < numNeighbors ; ++ni) {
+          *index++     = neighbors[ni].index + 1 ;
+          *distance_++ = neighbors[ni].distance ;
+        }
+        query = (float*)query + vl_kdforest_get_data_dimension (forest) ;
+        distance = distance_ ;
+        break ;
+      }
+      case mxDOUBLE_CLASS:
+      {
+        double * distance_ = (double*) distance ;
+        for (ni = 0 ; ni < numNeighbors ; ++ni) {
+          *index++     = neighbors[ni].index + 1 ;
+          *distance_++ = neighbors[ni].distance ;
+        }
+        query = (double*)query + vl_kdforest_get_data_dimension (forest)  ;
+        distance = distance_ ;
+        break ;
+      }
+      default:
+        assert (0) ;
     }
   }
 

@@ -26,11 +26,11 @@ for t = [1 2 3 4]
                            'maxcomparisons', maxr(t), ...
                            'verbose') ;
 
-  plotframe(Q,'b*','markersize',10) ;
+  vl_plotframe(Q,'b*','markersize',10) ;
   for k=1:length(i)
     if i(k) == 0, continue ; end
-    plotframe([Q ; sqrt(d(k))],'b-','linewidth',1) ;
-    plotframe(X(:, i(k)), 'bx','markersize',15) ;
+    vl_plotframe([Q ; sqrt(d(k))],'b-','linewidth',1) ;
+    vl_plotframe(X(:, i(k)), 'bx','markersize',15) ;
   end
   title(sprintf('10 ANNs with at most %d comparisions', maxr(t))) ;
 end

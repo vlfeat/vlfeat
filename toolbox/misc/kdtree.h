@@ -31,7 +31,8 @@ restore_parent_recursively (VlKDTree * tree, int nodeIndex, int * numNodesToVisi
   int upperChild = node->upperChild ;
 
   if (*numNodesToVisit == 0) {
-    mexErrMsgTxt ("FOREST.TREES has an inconsitsent tree structure") ;
+    mxuError (vlmxErrInconsistentData,
+              "FOREST.TREES has an inconsitsent tree structure") ;
   }
 
   *numNodesToVisit -= 1 ;
@@ -66,7 +67,7 @@ new_array_from_kdforest (VlKDForest const * forest)
   mwSize dims [] = {1,1} ;
   mwSize treeDims [] = {1,0} ;
   char const * fieldNames [] = {
-    "numDimensions",
+    "dimension",
     "numData",
     "trees"
   } ;
@@ -95,7 +96,7 @@ new_array_from_kdforest (VlKDForest const * forest)
    */
 
   forest_array = mxCreateStructArray (2, dims, sizeof(fieldNames) / sizeof(fieldNames[0]), fieldNames) ;
-  mxSetField (forest_array, 0, "numDimensions", uCreateScalar(forest->numDimensions)) ;
+  mxSetField (forest_array, 0, "dimension", uCreateScalar(forest->dimension)) ;
   mxSetField (forest_array, 0, "numData", uCreateScalar(forest->numData)) ;
   mxSetField (forest_array, 0, "trees", trees_array) ;
 
@@ -116,12 +117,12 @@ new_array_from_kdforest (VlKDForest const * forest)
       mxArray * lowerChild_array = mxCreateNumericMatrix (1, tree->numUsedNodes, mxINT32_CLASS, mxREAL) ;
       mxArray * upperChild_array = mxCreateNumericMatrix (1, tree->numUsedNodes, mxINT32_CLASS, mxREAL) ;
       mxArray * splitDimension_array = mxCreateNumericMatrix (1, tree->numUsedNodes, mxUINT32_CLASS, mxREAL) ;
-      mxArray * splitThreshold_array = mxCreateNumericMatrix (1, tree->numUsedNodes, mxSINGLE_CLASS, mxREAL) ;
+      mxArray * splitThreshold_array = mxCreateNumericMatrix (1, tree->numUsedNodes, mxDOUBLE_CLASS, mxREAL) ;
 
       vl_uint32 * upperChild = mxGetData (upperChild_array) ;
       vl_uint32 * lowerChild = mxGetData (lowerChild_array) ;
       vl_uint32 * splitDimension = mxGetData (splitDimension_array) ;
-      float * splitThreshold = mxGetData (splitThreshold_array) ;
+      double * splitThreshold = mxGetData (splitThreshold_array) ;
       int ni ;
 
       for (ni = 0 ; ni < tree -> numUsedNodes ; ++ ni) {
@@ -168,7 +169,7 @@ static VlKDForest *
 new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_array)
 {
   VlKDForest * forest ;
-  mxArray const * numDimensions_array ;
+  mxArray const * dimension_array ;
   mxArray const * numData_array ;
   mxArray const * trees_array ;
   mxArray const * nodes_array ;
@@ -181,13 +182,15 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
   vl_int32 const * lowerChild ;
   vl_int32 const * upperChild ;
   vl_uint32 const * splitDimension ;
-  float const * splitThreshold ;
+  double const * splitThreshold ;
 
-  int ti ;
-  int numDimensions ;
-  int numData ;
-  int numUsedNodes ;
-  int numTrees ;
+  vl_uindex ti ;
+  int unsigned dimension ;
+  vl_size numData ;
+  vl_size numUsedNodes ;
+  vl_size numTrees ;
+
+  vl_type dataType ;
 
   /*
     FOREST.NUMDIMENSIONS
@@ -199,15 +202,15 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
       mxGetNumberOfElements (forest_array) != 1) {
     mexErrMsgTxt ("FOREST must be a 1 x 1 structure") ;
   }
-  numDimensions_array = mxGetField (forest_array, 0, "numDimensions") ;
-  if (! numDimensions_array ||
-      ! uIsScalar (numDimensions_array) ||
-      (numDimensions = mxGetScalar (numDimensions_array)) < 1) {
+  dimension_array = mxGetField (forest_array, 0, "dimension") ;
+  if (! dimension_array ||
+      ! vlmxIsPlainScalar (dimension_array) ||
+      (dimension = mxGetScalar (dimension_array)) < 1) {
     uErrMsgTxt("FOREST.NUMDIMENSIONS must be a poisitve integer") ;
   }
   numData_array = mxGetField (forest_array, 0, "numData") ;
   if (! numData_array ||
-      ! uIsScalar (numData_array) ||
+      ! vlmxIsPlainScalar (numData_array) ||
       (numData = mxGetScalar (numData_array)) < 1) {
     uErrMsgTxt("FOREST.NUMDATA must be a poisitve integer") ;
   }
@@ -220,17 +223,25 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
     mexErrMsgTxt ("FOREST.TREES must have at least one element") ;
   }
 
-  forest = vl_kdforest_new (numDimensions, numTrees) ;
-  forest->numData = numData ;
-  forest->trees = vl_malloc (sizeof(VlKDTree*) * numTrees) ;
-
-  if (! uIsMatrix (data_array, numDimensions, numData)) {
+  if (! vlmxIsMatrix (data_array, dimension, numData)) {
     mexErrMsgTxt ("DATA dimensions are not compatible with TREE") ;
   }
-  if (mxGetClassID (data_array) != mxSINGLE_CLASS) {
-    mexErrMsgTxt ("DATA must be of class SINGLE") ;
+  if (! vlmxIsReal (data_array)) {
+    mxuError("vlmxErrInvalidArgument",
+             "DATA must be real") ;
   }
-  forest->data = (float*) mxGetData (data_array) ;
+  switch (mxGetClassID (data_array)) {
+    case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
+    case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
+    default :
+      mxuError("vlmxErrInvalidArgument",
+               "DATA must be either SINGLE or DOUBLE") ;
+  }
+
+  forest = vl_kdforest_new (dataType, dimension, numTrees) ;
+  forest->numData = numData ;
+  forest->trees = vl_malloc (sizeof(VlKDTree*) * numTrees) ;
+  forest->data = mxGetData (data_array) ;
 
   /*
    FOREST.TREES.NODES
@@ -261,34 +272,39 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
     numUsedNodes = mxGetN (lowerChild_array) ;
 
     if (! lowerChild_array ||
-        ! uIsMatrix (lowerChild_array, 1, numUsedNodes) ||
+        ! vlmxIsMatrix (lowerChild_array, 1, numUsedNodes) ||
         mxGetClassID (lowerChild_array) != mxINT32_CLASS) {
-      uErrMsgTxt("FOREST.TREES(%d).NODES.LOWERCHILD must be a 1 x NUMNODES INT32 array",ti+1) ;
+      mxuError("vlmxErrInconsistentData",
+               "FOREST.TREES(%d).NODES.LOWERCHILD must be a 1 x NUMNODES INT32 array",ti+1) ;
     }
     if (! upperChild_array ||
-        ! uIsMatrix (upperChild_array, 1, numUsedNodes) ||
+        ! vlmxIsMatrix (upperChild_array, 1, numUsedNodes) ||
         mxGetClassID (upperChild_array) != mxINT32_CLASS) {
-      uErrMsgTxt("FOREST.TREES(%d).NODES.UPPERCHILD must be a 1 x NUMNODES INT32 array",ti+1) ;
+      mxuError("vlmxErrInconsistentData",
+               "FOREST.TREES(%d).NODES.UPPERCHILD must be a 1 x NUMNODES INT32 array",ti+1) ;
     }
     if (! splitDimension_array ||
         ! uIsMatrix (splitDimension_array, 1, numUsedNodes) ||
         mxGetClassID (splitDimension_array) != mxUINT32_CLASS) {
-      uErrMsgTxt("FOREST.TREES(%d).NODES.SPLITDIMENSION must be a 1 x NUMNODES UINT32 array",ti+1) ;
+      mxuError("vlmxErrInconsistentData",
+               "FOREST.TREES(%d).NODES.SPLITDIMENSION must be a 1 x NUMNODES UINT32 array",ti+1) ;
     }
     if (! splitThreshold_array ||
-        ! uIsMatrix (splitThreshold_array, 1, numUsedNodes) ||
-        mxGetClassID (splitThreshold_array) != mxSINGLE_CLASS) {
-      uErrMsgTxt("FOREST.TREES(%d).NODES.SPLITTHRESHOLD must be a 1 x NUMNODES SINGLE array",ti+1) ;
+        ! vlmxIsMatrix (splitThreshold_array, 1, numUsedNodes) ||
+        mxGetClassID (splitThreshold_array) != mxDOUBLE_CLASS) {
+      mxuError(vlmxErrInconsistentData,
+               "FOREST.TREES(%d).NODES.SPLITTHRESHOLD must be a 1 x NUMNODES DOUBLE array",ti+1) ;
     }
     lowerChild = (vl_int32*) mxGetData (lowerChild_array) ;
     upperChild = (vl_int32*) mxGetData (upperChild_array) ;
     splitDimension = (vl_uint32*) mxGetData (splitDimension_array) ;
-    splitThreshold = (float*) mxGetData (splitThreshold_array) ;
+    splitThreshold = (double*) mxGetData (splitThreshold_array) ;
 
     if (! dataIndex_array ||
-        ! uIsMatrix (dataIndex_array, 1, numData) ||
+        ! vlmxIsMatrix (dataIndex_array, 1, numData) ||
         mxGetClassID (dataIndex_array) != mxUINT32_CLASS) {
-      uErrMsgTxt("FOREST.TREES(%d).DATAINDEX must be a 1 x NUMDATA array of class UINT32",ti+1) ;
+      mxuError(vlmxErrInconsistentData,
+               "FOREST.TREES(%d).DATAINDEX must be a 1 x NUMDATA array of class UINT32",ti+1) ;
     }
 
     tree->numAllocatedNodes = numUsedNodes ;
@@ -297,23 +313,26 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
     tree->dataIndex = vl_malloc (sizeof(VlKDTreeDataIndexEntry) * numData) ;
 
     {
-      int ni ;
+      vl_uindex ni ;
       for (ni = 0 ; ni < numUsedNodes ; ++ ni) {
         vl_int32 lc = lowerChild [ni] ;
         vl_int32 uc = upperChild [ni] ;
         vl_uint32 d = splitDimension [ni] ;
 
-        if (uc < - numData - 1 || uc > numUsedNodes) {
-          uErrMsgTxt ("TREE.NODES.UPPERCHILD(%d)=%d out of bounds",
-                      ni+1,uc) ;
+        if (uc < - (signed)numData - 1 || uc > (signed)numUsedNodes) {
+          mxuError (vlmxErrInconsistentData,
+                    "TREE.NODES.UPPERCHILD(%d)=%d out of bounds",
+                    ni+1,uc) ;
         }
-        if (lc < - numData || lc > numUsedNodes) {
-          uErrMsgTxt ("TREE.NODES.LOWERCHILD(%d)=%d out of bounds",
-                      ni+1,lc) ;
+        if (lc < - (signed)numData || lc > (signed)numUsedNodes) {
+          mxuError (vlmxErrInconsistentData,
+                    "TREE.NODES.LOWERCHILD(%d)=%d out of bounds",
+                    ni+1,lc) ;
         }
-        if (d > numDimensions) {
-          uErrMsgTxt ("TREE.NODES.SPLITDIMENSION(%d)=%d out of bounds",
-                      ni+1,d) ;
+        if (d > dimension) {
+          mxuError (vlmxErrInconsistentData,
+                    "TREE.NODES.SPLITDIMENSION(%d)=%d out of bounds",
+                    ni+1,d) ;
         }
 
         tree->nodes[ni].parent = 0 ;
@@ -325,7 +344,7 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
     }
 
     {
-      int di ;
+      vl_uindex di ;
       vl_uint32 * dataIndex = mxGetData (dataIndex_array) ;
       for (di = 0 ; di < numData ; ++ di) {
         tree->dataIndex[di].index = dataIndex [di] - 1 ;
@@ -336,7 +355,8 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
       int numNodesToVisit = tree->numUsedNodes ;
       restore_parent_recursively (tree, 0, &numNodesToVisit) ;
       if (numNodesToVisit != 0) {
-        mexErrMsgTxt ("TREE has an inconsitsent tree structure") ;
+        mxuError (vlmxErrInconsistentData,
+                  "TREE has an inconsitsent tree structure") ;
       }
     }
 

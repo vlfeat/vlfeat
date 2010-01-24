@@ -1,4 +1,7 @@
 function h = vl_demo_kdtree_plot(kdtree, nodeIndex, xlim, ylim)
+% VL_DEMO_KDTREE_PLOT
+
+% AUTORIGHTS
 
 dim        = kdtree.nodes.splitDimension(nodeIndex) ;
 thresh     = kdtree.nodes.splitThreshold(nodeIndex) ;
@@ -20,7 +23,7 @@ else
   ylimLower = [ylim(1) thresh] ;
   ylimUpper = [thresh ylim(2)] ;
 end
-h = line(xs,ys) ; %'b-') ;
+h = line(xs,ys) ;
 
 if lowerChild > 1
   h = [h vl_demo_kdtree_plot(kdtree, lowerChild, xlimLower, ylimLower)] ;
