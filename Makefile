@@ -236,8 +236,9 @@ DLL_NAME     = vl
 DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
 MEX_FLAGS    = $(if $(DEBUG), -g) -DVL_THREADS_ENABLED
-MEX_CFLAGS   = $(CFLAGS) -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_CFLAGS  += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
+MEX_CFLAGS   = $(CFLAGS)
+MEX_CFLAGS  += -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
 
 ifdef MATLABPATH
