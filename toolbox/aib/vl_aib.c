@@ -22,12 +22,12 @@ GNU GPLv2, or (at your option) any later version.
 /* option codes */
 enum {
   opt_cluster_null = 0,
-  opt_verbose 
+  opt_verbose
 } ;
 
 /* options */
-uMexOption options [] = {
-  {"ClusterNull",0,   opt_cluster_null}, 
+vlmxOption  options [] = {
+  {"ClusterNull",0,   opt_cluster_null},
   {"Verbose",    0,   opt_verbose    },
   {0,            0,   0              }
 } ;
@@ -38,14 +38,14 @@ uMexOption options [] = {
  **
  ** Null nodes are nodes with null probability and are not merged by AIB.
  ** It is convenient, however, to treat them as follows:
- ** 
+ **
  ** - we pretend that AIB merged those nodes at the very beginning into a
  **   single cluster (as they, after all, yield zero information drop).
  **
  ** - we attach this cluster to the root as the very last step (as we
  **   do not want to change other nodes.
  **
- ** In this way, 
+ ** In this way,
  **/
 
 static void
@@ -65,9 +65,9 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
       ++ nnull ;
     }
   }
-  
+
   if (nnull == 0) return ;
-  
+
   /* = : leaves
    * 0 : null leaves
    * i : internal node
@@ -87,7 +87,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
    * |                   | || |     |
    * 0                   a bc d     e
    */
-  
+
   a = nvalues ;
   b = nvalues + nnull - 1 - 1 ;
   c = b + 1 ;
@@ -95,7 +95,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
   e = 2 * nvalues - 2 ;
 
   dp = nvalues ;
-  ep = 2 * nvalues - 2 - nnull ; 
+  ep = 2 * nvalues - 2 - nnull ;
 
   mexPrintf("a:%d b:%d c:%d d:%d e:%d dp:%d ep:%d\n",
             a,b,c,d,e,dp,ep) ;
@@ -117,7 +117,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
   mexPrintf("nnull:%d\n",nnull) ;
   mexPrintf("nvalues:%d\n",nvalues) ;
   mexPrintf("first:%d\n",first) ;
-    
+
   /* move internal node block [dp:ep] to [d:e] */
   for (n = 0 ; n < e ; ++ n) {
     if ((parents [n] <= e) & (parents [n] != 0)) {
@@ -127,7 +127,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
   for (n = e ; n >= d ; -- n) {
     parents [n] = parents [n - (e - ep)] ;
   }
- 
+
   /* find first null node and connect it to a */
   last_intermed = a ;
   for (n = 0 ; n < a ; ++ n) {
@@ -136,8 +136,8 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
       break ;
     }
   }
-  
-  mexPrintf("first null %d parent seto to last_intermed:%d\n", 
+
+  mexPrintf("first null %d parent seto to last_intermed:%d\n",
             n,
             last_intermed)  ;
 
@@ -154,7 +154,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
 
   /* make last_intermed point to d */
   parents [last_intermed] = d ;
-  
+
   /* change parent of first to be last_intermed */
   mexPrintf("parent of %d (first) was %d\n", first, parents[first]) ;
   parents [first] = last_intermed ;
@@ -178,7 +178,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
  **/
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_PCX = 0, IN_END} ;
@@ -197,19 +197,19 @@ mexFunction(int nout, mxArray *out[],
 
   mxArray *Pcx_cpy ;
 
-  VL_USE_MATLAB_ENV ; 
+  VL_USE_MATLAB_ENV ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
-  
+
   if (nin < 1) {
     mexErrMsgTxt("One argument required.") ;
   } else if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
-       
-  if (!uIsRealMatrix(in[IN_PCX], -1, -1)) {
+
+  if (!vlmxIsMatrix(in[IN_PCX], -1, -1)) {
     mexErrMsgTxt("PCX must be a real matrix.") ;
   }
 
@@ -217,9 +217,9 @@ mexFunction(int nout, mxArray *out[],
   Pcx     = mxGetPr (Pcx_cpy) ;
   nlabels = mxGetM  (in[IN_PCX]) ;
   nvalues = mxGetN  (in[IN_PCX]) ;
-  
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
-    
+
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+
     switch (opt) {
 
     case opt_verbose :
@@ -229,19 +229,19 @@ mexFunction(int nout, mxArray *out[],
     case opt_cluster_null :
       cluster_null = 1 ;
       break ;
-      
+
     }
   }
 
   if (verbose) {
     mexPrintf("aib: cluster null:    %d", cluster_null) ;
   }
-  
+
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
-  
-  { 
+
+  {
     VlAIB   *aib;
     double* acost = 0, *cost = 0 ;
     vl_uint *aparents = 0, *parents = 0 ;
@@ -249,10 +249,10 @@ mexFunction(int nout, mxArray *out[],
 
     out[OUT_PARENTS] = mxCreateNumericMatrix(1, 2*nvalues - 1, mxUINT32_CLASS, mxREAL);
     parents = mxGetData(out[OUT_PARENTS]);
-    
+
     if (nout > 1) {
       out[OUT_COST] = mxCreateNumericMatrix(1, nvalues, mxDOUBLE_CLASS, mxREAL);
-      cost = mxGetPr(out[OUT_COST]); 
+      cost = mxGetPr(out[OUT_COST]);
     }
 
     aib = vl_aib_new (Pcx, nvalues, nlabels) ;
@@ -280,7 +280,7 @@ mexFunction(int nout, mxArray *out[],
         ++ parents [n]  ;
       }
     }
-   
+
   }
   mxDestroyArray(Pcx_cpy);
 }

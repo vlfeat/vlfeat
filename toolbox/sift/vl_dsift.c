@@ -31,7 +31,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
 {"Bounds",           1,   opt_bounds           },
 {"Step",             1,   opt_step             },
 {"Size",             1,   opt_size             },
@@ -94,7 +94,7 @@ mexFunction(int nout, mxArray *out[],
   M    = mxGetM (in[IN_I]) ;
   N    = mxGetN (in[IN_I]) ;
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
 
       case opt_verbose :

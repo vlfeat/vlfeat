@@ -96,8 +96,8 @@ new_array_from_kdforest (VlKDForest const * forest)
    */
 
   forest_array = mxCreateStructArray (2, dims, sizeof(fieldNames) / sizeof(fieldNames[0]), fieldNames) ;
-  mxSetField (forest_array, 0, "dimension", uCreateScalar(forest->dimension)) ;
-  mxSetField (forest_array, 0, "numData", uCreateScalar(forest->numData)) ;
+  mxSetField (forest_array, 0, "dimension", vlmxCreatePlainScalar (forest->dimension)) ;
+  mxSetField (forest_array, 0, "numData", vlmxCreatePlainScalar (forest->numData)) ;
   mxSetField (forest_array, 0, "trees", trees_array) ;
 
   for (ti = 0 ; ti < forest->numTrees ; ++ ti) {
@@ -200,31 +200,37 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
    */
   if (! mxIsStruct (forest_array) ||
       mxGetNumberOfElements (forest_array) != 1) {
-    mexErrMsgTxt ("FOREST must be a 1 x 1 structure") ;
+    mxuError (vlmxErrInconsistentData,
+              "FOREST must be a 1 x 1 structure") ;
   }
   dimension_array = mxGetField (forest_array, 0, "dimension") ;
   if (! dimension_array ||
       ! vlmxIsPlainScalar (dimension_array) ||
       (dimension = mxGetScalar (dimension_array)) < 1) {
-    uErrMsgTxt("FOREST.NUMDIMENSIONS must be a poisitve integer") ;
+    mxuError(vlmxErrInconsistentData,
+             "FOREST.NUMDIMENSIONS must be a poisitve integer") ;
   }
   numData_array = mxGetField (forest_array, 0, "numData") ;
   if (! numData_array ||
       ! vlmxIsPlainScalar (numData_array) ||
       (numData = mxGetScalar (numData_array)) < 1) {
-    uErrMsgTxt("FOREST.NUMDATA must be a poisitve integer") ;
+    mxuError(vlmxErrInconsistentData,
+             "FOREST.NUMDATA must be a poisitve integer") ;
   }
   trees_array = mxGetField (forest_array, 0, "trees") ;
   if (! mxIsStruct (trees_array)) {
-    mexErrMsgTxt ("FOREST.TREES must be a structure array") ;
+    mxuError(vlmxErrInconsistentData,
+             "FOREST.TREES must be a structure array") ;
   }
   numTrees = mxGetNumberOfElements (trees_array) ;
   if (numTrees < 1) {
-    mexErrMsgTxt ("FOREST.TREES must have at least one element") ;
+    mxuError(vlmxErrInconsistentData,
+             "FOREST.TREES must have at least one element") ;
   }
 
   if (! vlmxIsMatrix (data_array, dimension, numData)) {
-    mexErrMsgTxt ("DATA dimensions are not compatible with TREE") ;
+    mxuError(vlmxErrInconsistentData,
+             "DATA dimensions are not compatible with TREE") ;
   }
   if (! vlmxIsReal (data_array)) {
     mxuError("vlmxErrInvalidArgument",
@@ -254,7 +260,8 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
 
     if (! nodes_array ||
         ! mxIsStruct (nodes_array)) {
-      uErrMsgTxt("FOREST.TREES(%d).NODES must be a struct array", ti+1) ;
+      mxuError(vlmxErrInconsistentData,
+               "FOREST.TREES(%d).NODES must be a struct array", ti+1) ;
     }
 
     /*
@@ -284,7 +291,7 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
                "FOREST.TREES(%d).NODES.UPPERCHILD must be a 1 x NUMNODES INT32 array",ti+1) ;
     }
     if (! splitDimension_array ||
-        ! uIsMatrix (splitDimension_array, 1, numUsedNodes) ||
+        ! vlmxIsMatrix (splitDimension_array, 1, numUsedNodes) ||
         mxGetClassID (splitDimension_array) != mxUINT32_CLASS) {
       mxuError("vlmxErrInconsistentData",
                "FOREST.TREES(%d).NODES.SPLITDIMENSION must be a 1 x NUMNODES UINT32 array",ti+1) ;

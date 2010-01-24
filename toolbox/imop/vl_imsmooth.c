@@ -149,7 +149,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
 {"Padding",      1,   opt_padding       },
 {"Verbose",      0,   opt_verbose       },
 {"Subsample",    1,   opt_subsample     },
@@ -200,13 +200,13 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("Too many output arguments.");
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
       case opt_padding :
       {
         enum {buflen = 32} ;
         char buf [buflen] ;
-        if (!uIsString(optarg, -1)) {
+        if (!vlmxIsString(optarg, -1)) {
           mxuError(vlmxErrInvalidArgument,
                    "PADDING argument must be a string") ;
         }
@@ -240,7 +240,7 @@ mexFunction(int nout, mxArray *out[],
       {
         enum {buflen = 32} ;
         char buf [buflen] ;
-        if (!uIsString(optarg, -1)) {
+        if (!vlmxIsString(optarg, -1)) {
           mxuError(vlmxErrInvalidArgument,
                    "KERNEL argument must be a string") ;
         }

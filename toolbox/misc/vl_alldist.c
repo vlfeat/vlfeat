@@ -27,7 +27,7 @@ enum {
   opt_KHELL
 } ;
 
-uMexOption options [] = {
+vlmxOption  options [] = {
 {"linf",         0,   opt_LINF          },
 {"l2",           0,   opt_L2            },
 {"l1",           0,   opt_L1            },
@@ -96,7 +96,7 @@ mexFunction(int nout, mxArray *out[],
     VLMX_EIA("X must be either of class SINGLE or DOUBLE.");
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
       case opt_L2    : comparisonType = VlDistanceL2 ; break ;
       case opt_L1    : comparisonType = VlDistanceL1 ; break ;

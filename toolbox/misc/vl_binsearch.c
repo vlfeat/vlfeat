@@ -34,8 +34,8 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("Exactly two arguments are required.") ;
   }
 
-  if(! uIsPlainArray(in[IN_B]) ||
-     ! uIsPlainArray(in[IN_X])) {
+  if(! vlmxIsPlain (in[IN_B]) ||
+     ! vlmxIsPlain (in[IN_X])) {
     mexErrMsgTxt("All arguments must be plain arrays.") ;
   }
 

@@ -10,7 +10,7 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-/* TODO. 
+/* TODO.
  * - Make a faster version for the uniform grid case.
  * - Rename variables.
  */
@@ -40,39 +40,39 @@ findNeighbor(double x, const double* X, int K) {
   if(x >= X[j]) return j ;
 
   while(i < j - 1) {
-    pivot = (i+j) >> 1 ; 
+    pivot = (i+j) >> 1 ;
     y = X[pivot] ;
     /*mexPrintf("%d %d %d %f %f\n",i,j,pivot,x,y) ;*/
     if(x < y) {
       j = pivot ;
     } else {
       i = pivot ;
-    }    
+    }
   }
   return i ;
 }
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum { X=0,Y,I,iwXp,iwYp } ;
   enum { wI=0, wIx, wIy } ;
 
   int M, N, Mp, Np, ip, jp ;
-  double 
-    *X_pt, 
-    *Y_pt, 
-    *I_pt, 
-    *iwXp_pt, 
-    *iwYp_pt, 
-    *wI_pt, 
+  double
+    *X_pt,
+    *Y_pt,
+    *I_pt,
+    *iwXp_pt,
+    *iwYp_pt,
+    *wI_pt,
     *wIx_pt   = 0,
     *wIy_pt   = 0 ;
 
   double Xmin, Xmax, Ymin, Ymax ;
   const double NaN = mxGetNaN() ;
-  
+
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -83,32 +83,32 @@ mexFunction(int nout, mxArray *out[],
   if (nout > 3) {
     mexErrMsgTxt("Too many output arguments") ;
   }
-  
-  if(!uIsRealMatrix(in[I], -1, -1)) {
+
+  if(!vlmxIsMatrix(in[I], -1, -1)) {
     mexErrMsgTxt("I must be a real matrix of class DOUBLE") ;
   }
-  
-  if(!uIsRealMatrix(in[iwXp], -1, -1)) {
+
+  if(!vlmxIsMatrix(in[iwXp], -1, -1)) {
     mexErrMsgTxt("iwXp must be a real matrix") ;
   }
-  
+
   M = getM(I) ;
   N = getN(I) ;
   Mp = getM(iwXp) ;
   Np = getN(iwXp) ;
 
-  if(!uIsRealMatrix(in[iwYp], Mp, Np)) {
+  if(!vlmxIsMatrix(in[iwYp], Mp, Np)) {
       mexErrMsgTxt
 	  ("iwXp and iwYp must be a real matrices of the same dimension") ;
   }
 
-  if(!uIsRealVector(in[X],N) || !uIsRealVector(in[Y],M)) {
+  if(!vlmxIsPlainVector(in[X],N) || !vlmxIsPlainVector(in[Y],M)) {
       mexErrMsgTxt
 	  ("X and Y must be vectors of the same dimensions "
 	   "of the columns/rows of I, respectivelye") ;
   }
 
-  X_pt = getPr(X); 
+  X_pt = getPr(X);
   Y_pt = getPr(Y) ;
   I_pt = getPr(I) ;
   iwXp_pt = getPr(iwXp) ;
@@ -137,12 +137,12 @@ mexFunction(int nout, mxArray *out[],
 
     /* optimized for only image output */
     for(jp = 0 ; jp < Np ; ++jp) {
-      for(ip = 0 ; ip < Mp ; ++ip) {    
-	/* Search for the four neighbors of the backprojected point. */     
+      for(ip = 0 ; ip < Mp ; ++ip) {
+	/* Search for the four neighbors of the backprojected point. */
 	double x = *iwXp_pt++ ;
 	double y = *iwYp_pt++ ;
 	double z = NaN ;
-	
+
 	/* This messy code allows the identity transformation
 	 * to be processed as expected. */
 	if(x >= Xmin && x <= Xmax &&
@@ -150,7 +150,7 @@ mexFunction(int nout, mxArray *out[],
 	  int j = findNeighbor(x, X_pt, N) ;
 	  int i = findNeighbor(y, Y_pt, M) ;
 	  double* pt  = I_pt + j*M + i ;
-	  
+
 	  /* Weights. */
 	  double x0 = X_pt[j] ;
 	  double x1 = X_pt[j+1] ;
@@ -158,7 +158,7 @@ mexFunction(int nout, mxArray *out[],
 	  double y1 = Y_pt[i+1] ;
 	  double wx = (x-x0)/(x1-x0) ;
 	  double wy = (y-y0)/(y1-y0) ;
-	  
+
 	  /* Load all possible neighbors. */
 	  double z00 = 0.0 ;
 	  double z10 = 0.0 ;
@@ -172,37 +172,37 @@ mexFunction(int nout, mxArray *out[],
 	  } else {
 	    pt++ ;
 	  }
-	  
+
 	  pt += M - 1;
-	  
+
 	  if(j < N-1) {
-	    if(i > -1 ) z01 = *pt ; 
+	    if(i > -1 ) z01 = *pt ;
 	    pt++ ;
 	    if(i < M-1) z11 = *pt ;
-	  }       
-	  
+	  }
+
 	  /* Bilinear interpolation. */
-	  z = 
+	  z =
 	    (1 - wy) * ((1-wx) * z00 + wx * z01) +
-	    (    wy) * ((1-wx) * z10 + wx * z11) ; 
+	    (    wy) * ((1-wx) * z10 + wx * z11) ;
 	}
-	
+
 	*(wI_pt + jp*Mp + ip) = z ;
       }
     }
   }
-  
+
   /* do also the derivatives */
   else {
 
     /* optimized for only image output */
     for(jp = 0 ; jp < Np ; ++jp) {
-      for(ip = 0 ; ip < Mp ; ++ip) {    
-	/* Search for the four neighbors of the backprojected point. */     
+      for(ip = 0 ; ip < Mp ; ++ip) {
+	/* Search for the four neighbors of the backprojected point. */
 	double x = *iwXp_pt++ ;
 	double y = *iwYp_pt++ ;
 	double z = NaN, zx = NaN, zy = NaN ;
-	
+
 	/* This messy code allows the identity transformation
 	 * to be processed as expected. */
 	if(x >= Xmin && x <= Xmax &&
@@ -210,7 +210,7 @@ mexFunction(int nout, mxArray *out[],
 	  int j = findNeighbor(x, X_pt, N) ;
 	  int i = findNeighbor(y, Y_pt, M) ;
 	  double* pt  = I_pt + j*M + i ;
-	  
+
 	  /* Weights. */
 	  double x0 = X_pt[j] ;
 	  double x1 = X_pt[j+1] ;
@@ -218,13 +218,13 @@ mexFunction(int nout, mxArray *out[],
 	  double y1 = Y_pt[i+1] ;
 	  double wx = (x-x0)/(x1-x0) ;
 	  double wy = (y-y0)/(y1-y0) ;
-	  
+
 	  /* Load all possible neighbors. */
 	  double z00 = 0.0 ;
 	  double z10 = 0.0 ;
 	  double z01 = 0.0 ;
 	  double z11 = 0.0 ;
-	  
+
 	  if(j > -1) {
 	    if(i > -1 ) z00 = *pt ;
 	    pt++ ;
@@ -232,29 +232,29 @@ mexFunction(int nout, mxArray *out[],
 	  } else {
 	    pt++ ;
 	  }
-	  
+
 	  pt += M - 1;
-	  
+
 	  if(j < N-1) {
-	    if(i > -1 ) z01 = *pt ; 
+	    if(i > -1 ) z01 = *pt ;
 	    pt++ ;
 	    if(i < M-1) z11 = *pt ;
-	  }       
-	  
+	  }
+
 	  /* Bilinear interpolation. */
-	  z = 
+	  z =
 	    (1-wy)*( (1-wx) * z00 + wx * z01) +
 	    wy*( (1-wx) * z10 + wx * z11) ;
-	  
-	  zx = 
+
+	  zx =
 	    (1-wy) * (z01 - z00) +
 	       wy  * (z11 - z10) ;
 
-	  zy = 
+	  zy =
 	    (1-wx) * (z10 - z00) +
 	       wx  * (z11 - z01) ;
 	}
-	
+
 	*(wI_pt  + jp*Mp + ip) = z ;
 	*(wIx_pt + jp*Mp + ip) = zx ;
 	*(wIy_pt + jp*Mp + ip) = zy ;

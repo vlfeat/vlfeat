@@ -44,11 +44,11 @@ GNU GPLv2, or (at your option) any later version.
 #include "samplinthist.tc"
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   mwSize dims [3] ;
-  int numDims ; 
+  int numDims ;
   mwSize const * dimsPt = 0 ;
 
   void* histPt = 0 ;
@@ -58,56 +58,62 @@ mexFunction(int nout, mxArray *out[],
   mxClassID  histClass = mxUINT32_CLASS ;
   size_t     numBoxes  = 0 ;
   int width, height ;
- 
+
   enum {IN_INTHIST = 0, IN_BOXES, IN_END} ;
   enum {OUT_HIST = 0} ;
 
   /* ------------------------------------------------------------------
   **                                                Check the arguments
-  ** --------------------------------------------------------------- */ 
+  ** --------------------------------------------------------------- */
   if (nin != 2) {
-    mexErrMsgTxt("Two arguments required.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "Two arguments required.") ;
   } else if (nout > 1) {
-    mexErrMsgTxt("Too many output arguments.");
+    mxuError(vlmxErrInvalidArgument,
+             "Too many output arguments.");
   }
 
   histClass = mxGetClassID(in[IN_INTHIST]) ;
   if (histClass != mxDOUBLE_CLASS &&
       histClass != mxUINT32_CLASS) {
-    mexErrMsgTxt("INTHIST must be of either class DOUBLE or UINT32.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "INTHIST must be of either class DOUBLE or UINT32.") ;
   }
-  
+
   numDims = mxGetNumberOfDimensions(in[IN_INTHIST]) ;
   if (numDims > 3) {
-    mexErrMsgTxt("INTHIST must be a MxNxK array.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "INTHIST must be a MxNxK array.") ;
   }
   intHistPt = mxGetData(in[IN_INTHIST]) ;
-  
+
   dimsPt = mxGetDimensions(in[IN_INTHIST]) ;
   height    = dimsPt [0] ;
-  width     = dimsPt [1] ;  
+  width     = dimsPt [1] ;
   numLabels = (numDims >= 3) ? dimsPt [2] : 1 ;
 
   numBoxes = mxGetNumberOfElements(in[IN_BOXES]) ;
   if (numBoxes % 4 != 0) {
-    mexErrMsgTxt("The number of elements of BOXES must be a multiple of four.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "The number of elements of BOXES must be a multiple of four.") ;
   }
   numBoxes /= 4 ;
 
   if (mxGetClassID(in[IN_BOXES]) != mxUINT32_CLASS) {
-    mexErrMsgTxt("BOXES must be of class UINT32.") ;
+    mxuError(vlmxErrInvalidArgument,
+             "BOXES must be of class UINT32.") ;
   }
   boxesPt = (vl_uint32*) mxGetData(in[IN_BOXES]) ;
-    
+
   /* Allocate space for the result */
   dims [0] = numLabels ;
   dims [1] = numBoxes ;
   out [OUT_HIST] = mxCreateNumericArray(2, dims, histClass, mxREAL) ;
   histPt = mxGetData(out[OUT_HIST]) ;
-  
+
   /* ------------------------------------------------------------------
    *                                          Sample integral histogram
-   * --------------------------------------------------------------- */ 
+   * --------------------------------------------------------------- */
 
 #define PROCESS(SAMPLE, T)                      \
   SAMPLE (histPt,                               \

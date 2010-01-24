@@ -1,5 +1,5 @@
 /** @file   vl_version.c
- ** @brief  vl_version MEX definition 
+ ** @brief  vl_version MEX definition
  ** @author Andrea Vedaldi
  **/
 
@@ -14,7 +14,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption options [] = {
 {"Verbose",          0,   opt_verbose          },
 {0,                  0,   0                    }
 } ;
@@ -36,7 +36,7 @@ mexFunction(int nout, mxArray *out[],
     mxuError("illegalOutput", "Too many output arguments") ;
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
     case opt_verbose :
       ++ verbose ;

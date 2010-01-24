@@ -35,7 +35,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
   {"Octaves",          1,   opt_octaves           },
   {"Levels",           1,   opt_levels            },
   {"FirstOctave",      1,   opt_first_octave      },
@@ -180,7 +180,7 @@ mexFunction(int nout, mxArray *out[],
   M    = mxGetM (in[IN_I]) ;
   N    = mxGetN (in[IN_I]) ;
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
 
     case opt_verbose :
@@ -188,56 +188,56 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_octaves :
-      if (!uIsRealScalar(optarg) || (O = (int) *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (O = (int) *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Octaves' must be a positive integer.") ;
       }
       break ;
 
     case opt_levels :
-      if (! uIsRealScalar(optarg) || (S = (int) *mxGetPr(optarg)) < 1) {
+      if (! vlmxIsPlainScalar(optarg) || (S = (int) *mxGetPr(optarg)) < 1) {
         mexErrMsgTxt("'Levels' must be a positive integer.") ;
       }
       break ;
 
     case opt_first_octave :
-      if (!uIsRealScalar(optarg)) {
+      if (!vlmxIsPlainScalar(optarg)) {
         mexErrMsgTxt("'FirstOctave' must be an integer") ;
       }
       o_min = (int) *mxGetPr(optarg) ;
       break ;
 
     case opt_edge_thresh :
-      if (!uIsRealScalar(optarg) || (edge_thresh = *mxGetPr(optarg)) < 1) {
+      if (!vlmxIsPlainScalar(optarg) || (edge_thresh = *mxGetPr(optarg)) < 1) {
         mexErrMsgTxt("'EdgeThresh' must be not smaller than 1.") ;
       }
       break ;
 
     case opt_peak_thresh :
-      if (!uIsRealScalar(optarg) || (peak_thresh = *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (peak_thresh = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'PeakThresh' must be a non-negative real.") ;
       }
       break ;
 
     case opt_norm_thresh :
-      if (!uIsRealScalar(optarg) || (norm_thresh = *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (norm_thresh = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'NormThresh' must be a non-negative real.") ;
       }
       break ;
 
     case opt_magnif :
-      if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Magnif' must be a non-negative real.") ;
       }
       break ;
 
     case opt_window_size :
-      if (!uIsRealScalar(optarg) || (window_size = *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (window_size = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'WindowSize' must be a non-negative real.") ;
       }
       break ;
 
     case opt_frames :
-      if (!uIsRealMatrix(optarg, 4, -1)) {
+      if (!vlmxIsMatrix(optarg, 4, -1)) {
         mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
       }
       ikeys_array = mxDuplicateArray (optarg) ;

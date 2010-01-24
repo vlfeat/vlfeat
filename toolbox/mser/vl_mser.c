@@ -26,7 +26,7 @@ enum {
   opt_verbose
 } ;
 
-uMexOption options [] = {
+vlmxOption  options [] = {
   {"Delta",               1,   opt_delta          },
   {"MaxArea",             1,   opt_max_area       },
   {"MinArea",             1,   opt_min_area       },
@@ -40,60 +40,60 @@ uMexOption options [] = {
 
 /** @brief MEX entry point */
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
-  enum {IN_I = 0, 
+  enum {IN_I = 0,
         IN_END } ;
-  enum {OUT_SEEDS = 0, 
+  enum {OUT_SEEDS = 0,
         OUT_FRAMES } ;
-  
+
   int             verbose = 0 ;
   int             opt ;
   int             next = IN_END ;
   mxArray const  *optarg ;
 
-  /* algorithm parameters */ 
+  /* algorithm parameters */
   double   delta         = -1 ;
   double   max_area      = -1 ;
   double   min_area      = -1 ;
-  double   max_variation = -1 ; 
+  double   max_variation = -1 ;
   double   min_diversity = -1 ;
   int      bright_on_dark = 1 ;
   int      dark_on_bright = 1 ;
 
-  int nel ;              
-  int ndims ;            
-  mwSize const* dims ; 
-     
-  vl_mser_pix const *data ; 
-  vl_mser_pix *datainv = 0; 
+  int nel ;
+  int ndims ;
+  mwSize const* dims ;
+
+  vl_mser_pix const *data ;
+  vl_mser_pix *datainv = 0;
 
   VlMserFilt        *filt, *filtinv ;
   vl_uint     const *regions ;
   vl_uint     const *regionsinv ;
-  float       const *frames ;    
+  float       const *frames ;
   float       const *framesinv ;
   int nregions = 0, nregionsinv = 0;
   int nframes = 0, nframesinv = 0;
-  int                i, j, dof ;    
+  int                i, j, dof ;
   mwSize             odims [2] ;
   double            *pt ;
 
   VL_USE_MATLAB_ENV ;
-  
+
   /** -----------------------------------------------------------------
    **                                               Check the arguments
    ** -------------------------------------------------------------- */
-  
+
   if (nin < 1) {
     mexErrMsgTxt("At least one input argument is required.") ;
   }
-  
+
   if (nout > 2) {
     mexErrMsgTxt("Too many output arguments.");
   }
-  
+
   if(mxGetClassID(in[IN_I]) != mxUINT8_CLASS) {
     mexErrMsgTxt("I must be of class UINT8") ;
   }
@@ -104,7 +104,7 @@ mexFunction(int nout, mxArray *out[],
   dims  = mxGetDimensions(in[IN_I]) ;
   data  = mxGetData(in[IN_I]) ;
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
 
     case opt_verbose :
@@ -112,52 +112,52 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_delta :
-      if (!uIsRealScalar(optarg) || (delta = *mxGetPr(optarg)) < 0) {
+      if (!vlmxIsPlainScalar(optarg) || (delta = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'Delta' must be non-negative.") ;
       }
       break ;
 
-    case opt_max_area : 
-      if (!uIsRealScalar(optarg)            || 
+    case opt_max_area :
+      if (!vlmxIsPlainScalar(optarg)            ||
           (max_area = *mxGetPr(optarg)) < 0 ||
           max_area > 1) {
         mexErrMsgTxt("'MaxArea' must be in the range [0,1].") ;
       }
       break ;
 
-    case opt_min_area : 
-      if (!uIsRealScalar(optarg)            || 
+    case opt_min_area :
+      if (!vlmxIsPlainScalar(optarg)            ||
           (min_area = *mxGetPr(optarg)) < 0 ||
           min_area > 1) {
         mexErrMsgTxt("'MinArea' must be in the range [0,1].") ;
       }
       break ;
 
-    case opt_max_variation : 
-      if (!uIsRealScalar(optarg)           || 
+    case opt_max_variation :
+      if (!vlmxIsPlainScalar(optarg)           ||
           (max_variation = *mxGetPr(optarg)) < 0) {
         mexErrMsgTxt("'MaxVariation' must be non negative.") ;
       }
       break ;
 
-    case opt_min_diversity : 
-      if (!uIsRealScalar(optarg)                 || 
+    case opt_min_diversity :
+      if (!vlmxIsPlainScalar(optarg)                 ||
           (min_diversity = *mxGetPr(optarg)) < 0 ||
            min_diversity > 1.0) {
         mexErrMsgTxt("'MinDiversity' must be in the [0,1] range.") ;
       }
       break ;
-      
-    case opt_bright_on_dark : 
-      if (!uIsRealScalar(optarg)                 || 
+
+    case opt_bright_on_dark :
+      if (!vlmxIsPlainScalar(optarg)                 ||
           ((bright_on_dark = *mxGetPr(optarg)) != 0 &&
            bright_on_dark != 1)) {
         mexErrMsgTxt("'BrightOnDark' must be in 0 or 1.") ;
       }
       break ;
-      
-    case opt_dark_on_bright : 
-      if (!uIsRealScalar(optarg)                 || 
+
+    case opt_dark_on_bright :
+      if (!vlmxIsPlainScalar(optarg)                 ||
           ((dark_on_bright = *mxGetPr(optarg)) != 0 &&
            dark_on_bright != 1)) {
         mexErrMsgTxt("'DarkOnBright' must be in 0 or 1.") ;
@@ -173,7 +173,7 @@ mexFunction(int nout, mxArray *out[],
   /* -----------------------------------------------------------------
    *                                                     Run algorithm
    * -------------------------------------------------------------- */
-    
+
   /* new filter */
   {
     int * vlDims = mxMalloc(sizeof(int) * ndims) ;
@@ -206,19 +206,19 @@ mexFunction(int nout, mxArray *out[],
     mexPrintf("mser:   min_diversity = %g\n", vl_mser_get_min_diversity (filt)) ;
   }
 
-   
-  if (dark_on_bright) 
+
+  if (dark_on_bright)
   {
     /* process the image */
     vl_mser_process (filt, data) ;
-    
+
     /* save regions back to array */
     nregions         = vl_mser_get_regions_num (filt) ;
     regions          = vl_mser_get_regions     (filt) ;
 
     if (nout > 1) {
       vl_mser_ell_fit (filt) ;
-      
+
       dof     = vl_mser_get_ell_dof (filt) ;
       nframes = vl_mser_get_ell_num (filt) ;
       frames  = vl_mser_get_ell     (filt) ;
@@ -229,17 +229,17 @@ mexFunction(int nout, mxArray *out[],
   {
     datainv = mxMalloc(sizeof(vl_uint)*nel) ;
     for(i=0; i<nel; i++) datainv[i] = ~data[i]; /* 255 - data */
-    
+
     /* process the image */
     vl_mser_process (filtinv, datainv) ;
-    
+
     /* save regions back to array */
     nregionsinv    = vl_mser_get_regions_num (filtinv) ;
     regionsinv     = vl_mser_get_regions     (filtinv) ;
-    
+
     if (nout > 1) {
       vl_mser_ell_fit (filtinv) ;
-      
+
       dof        = vl_mser_get_ell_dof (filtinv) ;
       nframesinv = vl_mser_get_ell_num (filtinv) ;
       framesinv  = vl_mser_get_ell     (filtinv) ;
@@ -250,7 +250,7 @@ mexFunction(int nout, mxArray *out[],
   out [OUT_SEEDS] = mxCreateNumericArray (1, odims, mxDOUBLE_CLASS,mxREAL) ;
   pt               = mxGetPr (out [OUT_SEEDS]) ;
 
-  for (i = 0 ; i < nregions ; ++i) 
+  for (i = 0 ; i < nregions ; ++i)
     pt [i] = (int)regions [i] + 1 ;
 
   for (i = nregions; i < nregions + nregionsinv; ++i)
@@ -258,13 +258,13 @@ mexFunction(int nout, mxArray *out[],
 
   /* optionally compute and save ellipsoids */
   if (nout > 1) {
-    
+
     odims [0] = dof ;
     odims [1] = nframes + nframesinv;
-      
+
     out [OUT_FRAMES] = mxCreateNumericArray (2, odims, mxDOUBLE_CLASS, mxREAL) ;
     pt               = mxGetPr (out [OUT_FRAMES]) ;
-    
+
     for (i = 0 ; i < nframes ; ++i) {
       for (j = 0 ; j < dof ; ++j) {
         pt [i * dof + j] = frames [i * dof + j] + ((j < ndims)?1.0:0.0) ;
@@ -290,13 +290,13 @@ mexFunction(int nout, mxArray *out[],
     mexPrintf("mser:  %5d (%7.3g %% of previous) " test "\n",         \
               tot-(num),100.0*(double)(tot-(num))/(tot+VL_EPSILON_D)) ; \
     tot -= (num) ;
-    
+
     REMAIN("maximally stable,", s-> num_unstable + sinv-> num_unstable ) ;
     REMAIN("stable enough,",    s-> num_abs_unstable  + sinv-> num_abs_unstable ) ;
     REMAIN("small enough,",     s-> num_too_big  + sinv->num_too_big ) ;
     REMAIN("big enough,",       s-> num_too_small + sinv->num_too_small  ) ;
     REMAIN("diverse enough.",   s-> num_duplicates + sinv->num_duplicates ) ;
-    
+
   }
 
   /* cleanup */

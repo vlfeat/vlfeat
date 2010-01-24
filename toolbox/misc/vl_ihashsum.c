@@ -22,10 +22,10 @@ unsigned int fnv_hash (void const *key, int len)
   unsigned char const *p = key;
   unsigned int h = 2166136261U ;
   int i;
-  
+
   for ( i = 0; i < len; i++ )
     h = ( h * 16777619 ) ^ p[i];
-  
+
   return h;
 }
 
@@ -66,10 +66,10 @@ cpy (vl_uint8 * x, vl_uint8 const * y, int n)
  ** @param nin number of input arguments.
  ** @param in input arguments.
  **/
-void 
-mexFunction(int nout, mxArray *out[], 
+void
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
-{  
+{
   enum { IN_H, IN_ID, IN_NEXT, IN_K, IN_X } ;
   enum { OUT_H, OUT_ID, OUT_NEXT} ;
 
@@ -80,24 +80,24 @@ mexFunction(int nout, mxArray *out[],
 
   vl_uint8       * id ;
   vl_uint8 const * x ;
-  
+
   unsigned int K, i, N, res, last, ndims ;
 
   /* -----------------------------------------------------------------
    *                                                   Check arguments
    * -------------------------------------------------------------- */
-  
+
   if( nin != 5 ) {
     mexErrMsgTxt("Five arguments required") ;
   } else if (nout > 3) {
     mexErrMsgTxt("At most three output argument.") ;
   }
-  
+
   if(! mxIsNumeric(in[IN_H])   || mxGetClassID(in[IN_H]   )!= mxUINT32_CLASS ||
      ! mxIsNumeric(in[IN_NEXT])|| mxGetClassID(in[IN_NEXT])!= mxUINT32_CLASS) {
     mexErrMsgTxt("H, NEXT must be UINT32.") ;
   }
-  
+
   if(! mxIsNumeric(in[IN_X])   || mxGetClassID(in[IN_X])   != mxUINT8_CLASS) {
     mexErrMsgTxt("X must be UINT8") ;
   }
@@ -106,11 +106,11 @@ mexFunction(int nout, mxArray *out[],
       mxGetM(in[IN_NEXT]) != 1) {
     mexErrMsgTxt("H, NEXT must be row vectors") ;
   }
-  
+
   if(! mxIsNumeric(in[IN_ID])  || mxGetClassID(in[IN_ID])!= mxUINT8_CLASS) {
     mexErrMsgTxt("ID must be UINT8.") ;
   }
-  
+
   ndims = mxGetM(in[IN_ID]) ;
   res   = mxGetN(in[IN_H]) ;
 
@@ -118,15 +118,15 @@ mexFunction(int nout, mxArray *out[],
      res != mxGetN(in[IN_NEXT])) {
     mexErrMsgTxt("H, ID, NEXT must have the same number of columns") ;
   }
-  
+
   if(ndims != mxGetM(in[IN_X])) {
     mexErrMsgTxt("ID and X must havethe same number of rows") ;
   }
-  
-  if(! uIsRealScalar(in[IN_K])) {
+
+  if(! vlmxIsPlainScalar(in[IN_K])) {
     mexErrMsgTxt("K must be a scalar") ;
   }
-  K     = (unsigned int) *mxGetPr(in[IN_K]) ;  
+  K     = (unsigned int) *mxGetPr(in[IN_K]) ;
 
   h_    = mxDuplicateArray(in[IN_H]) ;
   id_   = mxDuplicateArray(in[IN_ID]) ;
@@ -139,7 +139,7 @@ mexFunction(int nout, mxArray *out[],
   next = mxGetData(next_) ;
   x    = mxGetData(in[IN_X]) ;
 
-  /* 
+  /*
      Temporary remove mxArray pointers to these buffer as we will
      mxRealloc them and if the user presses Ctrl-C matlab will attempt
      to free unvalid memory
@@ -154,10 +154,10 @@ mexFunction(int nout, mxArray *out[],
   for (i = 0 ; i < res ; ++i) last = VL_MAX(last, next [i]) ;
 
   /* REMARK: last and next are 1 based */
-  
+
   if (K > res) {
     mexErrMsgTxt("K cannot be larger then the size of H") ;
-  }  
+  }
   if (last > res) {
     mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
   }
@@ -174,7 +174,7 @@ mexFunction(int nout, mxArray *out[],
 
     h1 = fnv_hash(x + i * ndims, ndims) % K ;
     h2 = h1 | 0x1 ; /* this needs to be odd */
-            
+
     /* search first free or matching position */
     p = h1 % K ;
     for (j = 0 ; j < K ; ++j) {
@@ -183,15 +183,15 @@ mexFunction(int nout, mxArray *out[],
       h1 += h2 ;
       p = h1 % K ;
     }
-       
+
     /* search or make a free slot in the bucket */
-    while (! is_null (id + p * ndims,                ndims) && 
+    while (! is_null (id + p * ndims,                ndims) &&
            ! is_equal(id + p * ndims, x + i * ndims, ndims)) {
       if (next [p] > res) {
         mexErrMsgTxt("An element of NEXT is greater than the size of the table") ;
       }
       /* append */
-      if (next [p] == 0) {        
+      if (next [p] == 0) {
         if (last >= res) {
           size_t res_ = res + VL_MAX(res / 2, 2) ;
           h    = mxRealloc(h,    res_ * sizeof(vl_uint32)       ) ;
@@ -206,7 +206,7 @@ mexFunction(int nout, mxArray *out[],
       }
       p = next [p] - 1 ;
     }
-    
+
     /* accumulate */
     h  [p] += 1 ;
     /*    mexPrintf("p %d dims %d i %d N %d\n ", p, ndims, i, N) ;*/

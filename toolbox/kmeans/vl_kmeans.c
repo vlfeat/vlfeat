@@ -22,7 +22,7 @@ enum {
   INIT_PLUSPLUS
 } ;
 
-uMexOption options [] = {
+vlmxOption  options [] = {
   {"MaxNumIterations",  1,   opt_max_num_iterations  },
   {"Algorithm",         1,   opt_algorithm           },
   {"Distance",          1,   opt_distance            },
@@ -96,7 +96,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
               "than the number of data.") ;
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     char buf [1024] ;
 
     switch (opt) {
@@ -114,7 +114,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         break ;
 
       case opt_algorithm :
-        if (!uIsString (optarg, -1)) {
+        if (!vlmxIsString (optarg, -1)) {
           mxuError (vlmxErrInvalidArgument,
                     "ALGORITHM must be a string.") ;
         }
@@ -135,7 +135,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         break ;
 
       case opt_initialization :
-        if (!uIsString (optarg, -1)) {
+        if (!vlmxIsString (optarg, -1)) {
           mxuError (vlmxErrInvalidArgument,
                     "INITLAISATION must be a string.") ;
         }
@@ -155,7 +155,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         break ;
 
       case opt_distance :
-        if (!uIsString (optarg, -1)) {
+        if (!vlmxIsString (optarg, -1)) {
           mxuError (vlmxErrInvalidArgument,
                     "DISTANCE must be a string.") ;
         }
@@ -275,7 +275,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   if (nout > 2) {
-    OUT(ENERGY) = uCreateScalar (vl_kmeans_get_energy (kmeans)) ;
+    OUT(ENERGY) = vlmxCreatePlainScalar  (vl_kmeans_get_energy (kmeans)) ;
   }
 
   vl_kmeans_delete (kmeans) ;

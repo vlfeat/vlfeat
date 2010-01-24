@@ -26,7 +26,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
   {"Magnif",           1,   opt_magnif            },
   {"Verbose",          0,   opt_verbose           },
   {"FloatDescriptors", 0,   opt_float_descriptors },
@@ -110,13 +110,13 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("GRAD must be a 2xMxN matrix of class SINGLE.") ;
   }
 
-  if (!uIsRealMatrix(in[IN_FRAMES], 4, -1)) {
+  if (!vlmxIsMatrix(in[IN_FRAMES], 4, -1)) {
     mexErrMsgTxt("FRAMES must be a 4xN matrix.") ;
   }
   nikeys = mxGetN (in[IN_FRAMES]) ;
   ikeys  = mxGetPr(in[IN_FRAMES]) ;
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
 
       case opt_verbose :
@@ -124,7 +124,7 @@ mexFunction(int nout, mxArray *out[],
         break ;
 
       case opt_magnif :
-        if (!uIsRealScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
+        if (!vlmxIsPlainScalar(optarg) || (magnif = *mxGetPr(optarg)) < 0) {
           mexErrMsgTxt("MAGNIF must be a non-negative scalar.") ;
         }
         break ;

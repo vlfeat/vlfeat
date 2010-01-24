@@ -25,7 +25,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
 {"Verbose",        0,   opt_verbose         },
 {"NumNeighbors",   1,   opt_num_neighs      },
 {"MaxComparisons", 1,   opt_max_comparisons },
@@ -96,10 +96,10 @@ mexFunction(int nout, mxArray *out[],
              "QUERY must be a matrix with TREE.NUMDIMENSIONS rows") ;
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
       case opt_num_neighs :
-        if (! uIsScalar(optarg) ||
+        if (! vlmxIsScalar(optarg) ||
             (numNeighbors = mxGetScalar(optarg)) < 1) {
           mxuError(vlmxErrInvalidArgument,
                    "NUMNEIGHBORS must be a scalar not smaller than one") ;
@@ -107,7 +107,7 @@ mexFunction(int nout, mxArray *out[],
         break;
 
       case opt_max_comparisons :
-        if (! uIsScalar(optarg)) {
+        if (! vlmxIsScalar(optarg)) {
           mxuError(vlmxErrInvalidArgument,
                    "MAXCOMPARISONS must be a scalar") ;
         }

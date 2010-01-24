@@ -16,7 +16,7 @@ mexFunction(int nout, mxArray *out[],
 
   vl_bool wasEnabled = vl_get_simd_enabled() ;
 
-  out[OUT_ENABLED] = uCreateScalar(wasEnabled) ;
+  out[OUT_ENABLED] = vlmxCreatePlainScalar (wasEnabled) ;
 
   if (nin == 0) {
     return ;
@@ -26,7 +26,7 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("At most one argument") ;
   }
 
-  if (!uIsScalar(in[IN_ENABLED])) {
+  if (!vlmxIsScalar(in[IN_ENABLED])) {
     mexErrMsgTxt("ENABLED must be a scalar") ;
   }
 

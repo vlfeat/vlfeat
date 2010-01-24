@@ -31,5 +31,5 @@ mexFunction(int nout, mxArray *out[],
 #else
   pid = (double) getpid() ;
 #endif
-  out[0] = uCreateScalar(pid) ;
+  out[0] = vlmxCreatePlainScalar (pid) ;
 }

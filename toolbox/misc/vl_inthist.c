@@ -22,7 +22,7 @@ GNU GPLv2, or (at your option) any later version.
 enum {opt_mass = 1, opt_numLabels, opt_verbose} ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
   {"Mass",         1,   opt_mass,         },
   {"NumLabels",    1,   opt_numLabels     },
   {"Verbose",      0,   opt_verbose       },
@@ -54,11 +54,11 @@ uMexOption options [] = {
 #include "inthist.tc"
 
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   mwSize dims [3] ;
-  int numDims ; 
+  int numDims ;
   mwSize const * dimsPt = 0 ;
 
   vl_uint32* labelsPt  = 0 ;
@@ -67,7 +67,7 @@ mexFunction(int nout, mxArray *out[],
   vl_uint32  numLabels = 0 ;
   mxClassID  dataClass = mxUINT32_CLASS ;
   int width, height, numMaps, k, q ;
- 
+
   enum {IN_LABELS = 0, IN_END} ;
   enum {OUT_HIST = 0} ;
   int opt ;
@@ -77,7 +77,7 @@ mexFunction(int nout, mxArray *out[],
 
   /* ------------------------------------------------------------------
   **                                                Check the arguments
-  ** --------------------------------------------------------------- */ 
+  ** --------------------------------------------------------------- */
   if (nin < 1) {
     mexErrMsgTxt("At least one input argument is required.") ;
   } else if (nout > 1) {
@@ -86,7 +86,7 @@ mexFunction(int nout, mxArray *out[],
 
   if (mxGetClassID(in[IN_LABELS]) != mxUINT32_CLASS) {
     mexErrMsgTxt("LABELS must be of class UINT32.") ;
-  }  
+  }
   labelsPt = mxGetData(in[IN_LABELS]) ;
 
   numDims = mxGetNumberOfDimensions(in[IN_LABELS]) ;
@@ -104,7 +104,7 @@ mexFunction(int nout, mxArray *out[],
     numMaps = 1 ;
   }
 
-  while ((opt = uNextOption(in, nin, options, &nextOpt, &optArg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &nextOpt, &optArg)) >= 0) {
     switch (opt) {
     case opt_mass :
       {
@@ -117,28 +117,28 @@ mexFunction(int nout, mxArray *out[],
             ((numDims > 2) && numMaps < dimsPt[2])) {
           mexErrMsgTxt("MASS must have the same dimensions of LABELS.") ;
         }
-        
+
         /* the data is DOUBLE or UINT32 depending on the class of MASS */
-        dataClass = mxGetClassID(optArg) ;         
+        dataClass = mxGetClassID(optArg) ;
         if (dataClass != mxDOUBLE_CLASS &&
             dataClass != mxUINT32_CLASS) {
           mexErrMsgTxt("MASS must be of either class DOUBLE or UINT32.") ;
         }
         break ;
       }
-      
+
     case opt_numLabels :
-      if (!uIsRealScalar(optArg)) {
+      if (!vlmxIsPlainScalar(optArg)) {
         mexErrMsgTxt("NUMLABELS must be a real scalar.") ;
       }
       numLabels = *mxGetPr(optArg) ;
       break ;
-      
+
     case opt_verbose :
       ++ verb ;
       break ;
-      
-    default: 
+
+    default:
       assert(0) ;
     }
   }
@@ -155,7 +155,7 @@ mexFunction(int nout, mxArray *out[],
       }
     }
   }
-  
+
   /* Allocate space for the integral histogram */
   dims [0] = height ;
   dims [1] = width ;
@@ -167,11 +167,11 @@ mexFunction(int nout, mxArray *out[],
     mexPrintf("inthist: integrating %d x %d label map with %d labels\n", width, height, numLabels) ;
     mexPrintf("         custom mass map: %s\n", VL_YESNO(massPt)) ;
   }
-  
+
   /* ------------------------------------------------------------------
    *                                                    Distribute data
-   * --------------------------------------------------------------- */ 
-  
+   * --------------------------------------------------------------- */
+
 #define PROCESS(T, INTEGRAL)                                            \
   size_t const K = width*height ;                                       \
   T* dataPt = histPt ;                                                  \
@@ -195,7 +195,7 @@ mexFunction(int nout, mxArray *out[],
     INTEGRAL (dataPt + k*K, height,                                     \
               dataPt + k*K, height, width, height) ;                    \
   }
-  
+
   switch (dataClass) {
   case mxUINT32_CLASS: { PROCESS(vl_uint32, integral_ui) } ; break ;
   case mxDOUBLE_CLASS: { PROCESS(double,    integral_d)  } ; break ;

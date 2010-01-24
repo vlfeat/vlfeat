@@ -26,7 +26,7 @@ enum {
 } ;
 
 /* options */
-uMexOption options [] = {
+vlmxOption  options [] = {
 {"Verbose",          0,   opt_verbose          },
 {"ThresholdMethod",  1,   opt_threshold_method },
 {"NumTrees",         1,   opt_num_trees        },
@@ -88,27 +88,30 @@ mexFunction(int nout, mxArray *out[],
                "DATA must be either SINGLE or DOUBLE") ;
   }
 
-  while ((opt = uNextOption(in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     char buffer [1024] ;
     switch (opt) {
       case opt_threshold_method :
         mxGetString (optarg, buffer, sizeof(buffer)/sizeof(buffer[0])) ;
-        if (! uIsString(optarg, -1)) {
-          mexErrMsgTxt("THRESHOLDMETHOD must be a string") ;
+        if (! vlmxIsString(optarg, -1)) {
+          mxuError(vlmxErrInvalidOption,
+                   "THRESHOLDMETHOD must be a string") ;
         }
         if (vl_string_casei_cmp(buffer, "median") == 0) {
           thresholdingMethod = VL_KDTREE_MEDIAN ;
         } else if (vl_string_casei_cmp(buffer, "mean") == 0) {
           thresholdingMethod = VL_KDTREE_MEAN ;
         } else {
-          uErrMsgTxt("Unknown thresholding method %s", buffer) ;
+          mxuError(vlmxErrInvalidOption,
+                   "Unknown thresholding method %s", buffer) ;
         }
         break ;
 
       case opt_num_trees :
-        if (! uIsScalar(optarg) ||
+        if (! vlmxIsScalar(optarg) ||
             (numTrees = mxGetScalar(optarg)) < 1) {
-          mexErrMsgTxt("NUMTREES must be not smaller than one") ;
+          mxuError(vlmxErrInvalidOption,
+                   "NUMTREES must be not smaller than one") ;
         }
         break ;
 
@@ -135,7 +138,8 @@ mexFunction(int nout, mxArray *out[],
       default: assert(0) ;
     }
     mexPrintf("vl_kdforestbuild: threshold selection method: %s\n", str) ;
-    mexPrintf("vl_kdforestbuild: number of trees: %d\n", vl_kdforest_get_num_trees(forest)) ;
+    mexPrintf("vl_kdforestbuild: number of trees: %d\n",
+              vl_kdforest_get_num_trees(forest)) ;
   }
 
   /* -----------------------------------------------------------------
@@ -145,7 +149,7 @@ mexFunction(int nout, mxArray *out[],
   vl_kdforest_build (forest, numData, data) ;
 
   if (verbose) {
-    int ti ;
+    vl_uindex ti ;
     for (ti = 0 ; ti < vl_kdforest_get_num_trees(forest) ; ++ ti) {
       mexPrintf("vl_kdforestbuild: tree %d: depth %d, num nodes %d\n",
                 ti,

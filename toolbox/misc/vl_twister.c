@@ -117,7 +117,7 @@ mexFunction(int nout, mxArray *out[],
       char buff [buff_size] ;
 
       /* check for 'state' string */
-      if (! uIsString(in[0], -1)                    ||
+      if (! vlmxIsString(in[0], -1)                    ||
           mxGetString(in[0], buff, buff_size)       ||
           vl_string_casei_cmp ("state", buff) != 0   ) {
         mxuError(vlmxErrInvalidArgument,
@@ -133,7 +133,7 @@ mexFunction(int nout, mxArray *out[],
         for (i = 0 ; i < 624 ; ++i) data[i] = rand->mt[i] ;
         data[624] = (vl_uint32) rand->mti ;
       } else {
-        if (uIsRealScalar(in[1])) {
+        if (vlmxIsPlainScalar(in[1])) {
           /* TWISTER('state', X) */
           vl_uint32 x = (vl_uint32) mxGetScalar(in[1]) ;
           vl_rand_seed (rand, x) ;

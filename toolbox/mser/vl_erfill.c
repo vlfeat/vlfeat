@@ -42,7 +42,7 @@ adv(mwSize const* dims, int ndims, int* subs_pt)
 
 /* driver */
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
 
@@ -50,7 +50,7 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_MEMBERS} ;
 
   idx_t i ;
-  int k, nel, ndims ; 
+  int k, nel, ndims ;
   mwSize const * dims ;
   val_t const * I_pt ;
   int last = 0 ;
@@ -74,12 +74,12 @@ mexFunction(int nout, mxArray *out[],
   } else if (nout > 4) {
     mexErrMsgTxt("Too many output arguments.");
   }
-  
+
   if(mxGetClassID(in[IN_I]) != mxUINT8_CLASS) {
     mexErrMsgTxt("I must be of class UINT8.") ;
   }
 
-  if(!uIsRealScalar(in[IN_ER])) {
+  if(!vlmxIsPlainScalar(in[IN_ER])) {
     mexErrMsgTxt("ER must be a DOUBLE scalar.") ;
   }
 
@@ -97,13 +97,13 @@ mexFunction(int nout, mxArray *out[],
   members_pt = mxMalloc( sizeof(idx_t)    * nel   ) ;
 
   er_pt = mxGetPr(in[IN_ER]) ;
-  
+
   /* compute strides to move into the N-dimensional image array */
   strides_pt [0] = 1 ;
   for(k = 1 ; k < ndims ; ++k) {
     strides_pt [k] = strides_pt [k-1] * dims [k-1] ;
   }
-  
+
   /* load first pixel */
   memset(visited_pt, 0, sizeof(val_t) * nel) ;
   {
@@ -114,7 +114,7 @@ mexFunction(int nout, mxArray *out[],
     }
     if( idx < 1 || idx > nel ) {
       char buff[80] ;
-      snprintf(buff,80,"ER=%d out of range [1,%d]",idx,nel) ;    
+      snprintf(buff,80,"ER=%d out of range [1,%d]",idx,nel) ;
       mexErrMsgTxt(buff) ;
     }
     members_pt [last++] = idx - 1 ;
@@ -125,11 +125,11 @@ mexFunction(int nout, mxArray *out[],
    *                                                       Fill region
    * -------------------------------------------------------------- */
   while(last_expanded < last) {
-    
+
     /* pop next node xi */
     idx_t index = members_pt[last_expanded++] ;
-    
-    /* convert index into a subscript sub; also initialize nsubs 
+
+    /* convert index into a subscript sub; also initialize nsubs
        to (-1,-1,...,-1) */
     {
       idx_t temp = index ;
@@ -139,20 +139,20 @@ mexFunction(int nout, mxArray *out[],
         temp         = temp % strides_pt [k] ;
       }
     }
-    
+
     /* process neighbors of xi */
     while( true ) {
       int good = true ;
       idx_t nindex = 0 ;
-      
+
       /* compute NSUBS+SUB, the correspoinding neighbor index NINDEX
          and check that the pixel is within image boundaries. */
       for(k = 0 ; k < ndims && good ; ++k) {
         int temp = nsubs_pt [k] + subs_pt [k] ;
         good &= 0 <= temp && temp < dims[k] ;
         nindex += temp * strides_pt [k] ;
-      }      
-      
+      }
+
       /* process neighbor
          1 - the pixel is within image boundaries;
          2 - the pixel is indeed different from the current node
@@ -161,20 +161,20 @@ mexFunction(int nout, mxArray *out[],
          is a pixel older than xi
          4 - the pixel has not been visited yet
       */
-      if(good 
-         && nindex != index 
+      if(good
+         && nindex != index
          && ((!invert && I_pt [nindex] <= value) ||
              ( invert && I_pt [nindex] >= value))
          && ! visited_pt [nindex] ) {
-        
+
         /* mark as visited */
         visited_pt [nindex] = 1 ;
-        
+
         /* add to list */
         members_pt [last++] = nindex ;
       }
-      
-      /* move to next neighbor */      
+
+      /* move to next neighbor */
       k = 0 ;
       while(++ nsubs_pt [k] > 1) {
         nsubs_pt [k++] = -1 ;
@@ -197,7 +197,7 @@ mexFunction(int nout, mxArray *out[],
       *pt++ = members_pt[i] + 1 ;
     }
   }
-  
+
   /* free stuff */
   mxFree( members_pt ) ;
   mxFree( visited_pt ) ;
