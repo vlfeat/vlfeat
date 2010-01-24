@@ -17,6 +17,8 @@ function results = vl_test(suite, test)
 
 % AUTORIGHTS
 
+clear functions ;
+
 testRoot = fileparts(mfilename('fullpath')) ;
 
 if nargin == 0
