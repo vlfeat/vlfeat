@@ -274,6 +274,7 @@
 /** @} */
 
 #if defined(VL_COMPILER_MSC)
+#define VL_UNUSED
 #define VL_INLINE static __inline
 #define snprintf _snprintf
 #define isnan _isnan
@@ -285,6 +286,7 @@
 #endif
 
 #if defined(VL_COMPILER_LCC)
+#define VL_UNUSED
 #define VL_INLINE static __inline
 #define snprintf _snprintf
 #define isnan _isnan
@@ -298,6 +300,7 @@ VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
 
 #if defined(VL_COMPILER_GNUC) || \
     defined(__DOXYGEN__)
+#define VL_UNUSED __attribute__((unused))
 #define VL_INLINE static __inline__
 #ifdef VL_BUILD_DLL
 #define VL_EXPORT __attribute__((visibility ("default")))

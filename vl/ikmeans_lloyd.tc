@@ -18,8 +18,8 @@ General Public License version 2.
  ** @param f filter.
  **/
 
-static void 
-vl_ikm_init_lloyd (VlIKMFilt *f)
+static void
+vl_ikm_init_lloyd (VlIKMFilt * f VL_UNUSED)
 { }
 
 /** @internal
@@ -32,35 +32,35 @@ vl_ikm_init_lloyd (VlIKMFilt *f)
 static int
 vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
 {
-  int iter, i, j, k, 
+  int iter, i, j, k,
     K = f-> K,
     M = f-> M,
-    err =  0 ;  
-  vl_ikm_acc *centers = f->centers ;  
+    err =  0 ;
+  vl_ikm_acc *centers = f->centers ;
   vl_uint    *asgn    = vl_malloc (sizeof(vl_uint) * N) ;
   vl_uint    *counts  = vl_malloc (sizeof(vl_uint) * N) ;
-  
+
   for (iter = 0 ; 1 ; ++ iter) {
     vl_bool done = 1 ;
-    
+
     /* ---------------------------------------------------------------
      *                                               Calc. assignments
      * ------------------------------------------------------------ */
-    
+
     for (j = 0 ; j < N ; ++j) {
       vl_ikm_acc best_dist = 0 ;
       vl_uint    best = (vl_uint)-1 ;
-      
+
       for (k = 0; k < K; ++k) {
         vl_ikm_acc dist = 0;
-        
+
         /* compute distance with this center */
         for (i = 0; i < M; ++i) {
           vl_ikm_acc delta =
             data [j * M + i] - centers [k * M + i] ;
           dist += delta * delta ;
         }
-        
+
         /* compare with current best */
         if (best == (vl_uint) -1 || dist < best_dist) {
           best = k ;
@@ -72,24 +72,24 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
         done = 0 ;
       }
     }
-    
+
     /* stopping condition */
     if (done || iter == f->max_niters) break ;
-    
+
     /* -----------------------------------------------------------------
      *                                                     Calc. centers
      * -------------------------------------------------------------- */
-    
+
     /* re-compute centers */
     memset (centers, 0, sizeof (vl_int32) * M * K);
     memset (counts,  0, sizeof (vl_int32) * K);
     for (j = 0; j < N; ++j) {
-      int this_center = asgn [j] ;      
-      ++ counts [this_center] ;      
+      int this_center = asgn [j] ;
+      ++ counts [this_center] ;
       for (i = 0; i < M; ++i)
         centers [this_center * M + i] += data[j * M + i];
     }
-    
+
     for (k = 0; k < K; ++k) {
       vl_int32 n = counts [k];
       if (n > 0xffffff) {
@@ -99,14 +99,14 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
         for (i = 0; i < M; ++i)
           centers [k * M + i] /= n;
       } else {
-        /* 
+        /*
            If no data are assigned to the center, it is not changed
-           with respect to the previous iteration, so we do not do anything. 
+           with respect to the previous iteration, so we do not do anything.
         */
       }
     }
   }
-  
+
   vl_free (counts) ;
   vl_free (asgn) ;
   return err ;
@@ -121,7 +121,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
  ** @param N     Number of data.
  **/
 
-static void 
+static void
 vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
 {
   int j ;
@@ -130,7 +130,7 @@ vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
   }
 }
 
-/* 
+/*
  * Local Variables: *
  * mode: C *
  * End: *

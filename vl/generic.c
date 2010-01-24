@@ -365,7 +365,7 @@ vl_print_info ()
 
 /** @internal @brief A printf that does not do anything */
 static int
-do_nothing_printf (char const* format, ...)
+do_nothing_printf (char const* format VL_UNUSED, ...)
 {
   return 0 ;
 }
