@@ -41,9 +41,11 @@ mxuError
 #endif
 
 /** @brief Access MEX input argument */
+#undef IN
 #define IN(x) (in[IN_ ## x])
 
 /** @brief Acces MEX output argument */
+#undef OUT
 #define OUT(x) (out[OUT_ ## x])
 
 /** @brief Setup VLFeat to be used in a MEX file
@@ -55,6 +57,8 @@ mxuError
 #define VL_USE_MATLAB_ENV                                       \
 vl_set_alloc_func (mxMalloc, mxRealloc, mxCalloc, mxFree) ;   \
 vl_set_printf_func (mexPrintf) ;
+
+#define vlmxError mxuError
 
 /** @file mexutils.h
 

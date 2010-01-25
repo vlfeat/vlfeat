@@ -4,7 +4,7 @@ vl_test_init ;
 
 function s = setup()
 I = im2double(imread(fullfile(vl_root,'data','spots.jpg'))) ;
-I = max(min(imresize(I,2),1),0) ;
+I = max(min(vl_imdown(I),1),0) ;
 s.I = single(I) ;
 
 function test_pad_by_continuity(s)

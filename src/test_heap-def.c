@@ -23,10 +23,10 @@ int s_cmp (S const * v, vl_uindex a, vl_uindex b)
 }
 void s_swap (S * v, vl_uindex a, vl_uindex b)
 {
-  printf("Swapping %x with %x\n", a, b) ;
   S t = v[a] ;
   v[a] = v[b] ;
   v[b] = t ;
+  printf("Swapping %x with %x\n", a, b) ;
 }
 
 #define VL_HEAP_prefix  s_heap

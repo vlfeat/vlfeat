@@ -129,7 +129,8 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
-MEX_FLAGS  = -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
+MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl \
+             -DVL_THREADS_ENABLED -DVL_SUPPORT_SSE2
 
 libsrc = \
   vl\aib.c \

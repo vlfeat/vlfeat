@@ -332,11 +332,6 @@ VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
 {
   int x, c ;
   VlRand * rand = vl_get_rand () ;
-
-  self->dimension = dimension ;
-  self->numCenters = numCenters ;
-  self->centers = vl_malloc (sizeof(TYPE) * dimension * numCenters) ;
-
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
   TYPE * minDistances = vl_malloc (sizeof(TYPE) * numData) ;
 #if (FLT == VL_TYPE_FLOAT)
@@ -344,6 +339,10 @@ VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
 #else
   VlDoubleVectorComparisonFunction distFn = vl_get_vector_comparison_function_d(self->distance) ;
 #endif
+
+  self->dimension = dimension ;
+  self->numCenters = numCenters ;
+  self->centers = vl_malloc (sizeof(TYPE) * dimension * numCenters) ;
 
   for (x = 0 ; x < numData ; ++x) {
     minDistances[x] = (TYPE) VL_INFINITY_D ;
@@ -397,7 +396,7 @@ VL_XCAT(_vl_kmeans_push_, SFX)
  TYPE const * data,
  vl_size numData)
 {
-  int i ; ;
+  int i ;
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
 #else
@@ -630,17 +629,19 @@ VL_XCAT(_vl_kmeans_train_elkan_, SFX)
   vl_uint32 * permutations = NULL ;
   vl_size * numSeenSoFar = NULL ;
 
+  int unsigned totDistanceComputationsToInit = 0 ;
+  int unsigned totDistanceComputationsToRefreshUB = 0 ;
+  int unsigned totDistanceComputationsToRefreshLB = 0 ;
+  int unsigned totDistanceComputationsToRefreshCenterDistances = 0 ;
+  int unsigned totDistanceComputationsToNewCenters = 0 ;
+
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
     numSeenSoFar = vl_malloc(sizeof(vl_uint32) * self->numCenters) ;
     VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)(self, permutations, data, numData) ;
   }
 
-  int unsigned totDistanceComputationsToInit = 0 ;
-  int unsigned totDistanceComputationsToRefreshUB = 0 ;
-  int unsigned totDistanceComputationsToRefreshLB = 0 ;
-  int unsigned totDistanceComputationsToRefreshCenterDistances = 0 ;
-  int unsigned totDistanceComputationsToNewCenters = 0 ;
+ 
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   /*                          Initialization                        */

@@ -154,7 +154,6 @@
 			</File>
 			<File
 				RelativePath=".\vl\float.th"
-				FileType="0"
 				>
 			</File>
 			<File
@@ -174,15 +173,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vl\heap-t.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\heap.c"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\heap.h"
+				RelativePath=".\vl\heap-def.h"
 				>
 			</File>
 			<File
@@ -211,30 +202,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\ikmeans_elkan.tc"
-				FileType="0"
 				>
 			</File>
 			<File
 				RelativePath=".\vl\ikmeans_init.tc"
-				FileType="0"
 				>
 			</File>
 			<File
 				RelativePath=".\vl\ikmeans_lloyd.tc"
-				FileType="0"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\imop.c"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\imop.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\imop.tc"
-				FileType="0"
 				>
 			</File>
 			<File
@@ -246,21 +221,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vl\imopv.tc"
-				FileType="0"
-				>
-			</File>
-			<File
 				RelativePath=".\vl\imopv_sse2.c"
 				>
 			</File>
 			<File
 				RelativePath=".\vl\imopv_sse2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\imopv_sse2.tc"
-				FileType="0"
 				>
 			</File>
 			<File
@@ -272,6 +237,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\kmeans.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\kmeans.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\mathop.c"
 				>
 			</File>
@@ -280,26 +253,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vl\mathop.tc"
-				FileType="0"
-				>
-			</File>
-			<File
 				RelativePath=".\vl\mathop_sse2.c"
 				>
 			</File>
 			<File
 				RelativePath=".\vl\mathop_sse2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\mathop_sse2.tc"
-				FileType="0"
-				>
-			</File>
-			<File
-				RelativePath=".\vl\mathop_sse2.th"
-				FileType="0"
 				>
 			</File>
 			<File
@@ -316,6 +274,10 @@
 			</File>
 			<File
 				RelativePath=".\vl\pgm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\qsort-def.h"
 				>
 			</File>
 			<File
@@ -343,6 +305,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\shuffle-def.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\sift.c"
 				>
 			</File>
@@ -356,6 +322,166 @@
 			</File>
 			<File
 				RelativePath=".\vl\stringop.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="toolbox"
+			>
+			<File
+				RelativePath=".\toolbox\misc\kdtree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\mexutils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\aib\vl_aib.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\aib\vl_aibhist.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_alldist.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_alldist2.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_binsearch.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_binsum.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\sift\vl_dsift.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\mser\vl_erfill.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_getpid.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\kmeans\vl_hikmeans.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\kmeans\vl_hikmeanspush.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_ihashfind.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_ihashsum.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\kmeans\vl_ikmeans.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\kmeans\vl_ikmeanspush.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\imop\vl_imdisttf.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\imop\vl_imintegral.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\imop\vl_imsmooth.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\imop\vl_imwbackwardmx.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_inthist.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\geometry\vl_irodr.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_kdtreebuild.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_kdtreequery.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\kmeans\vl_kmeans.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_localmax.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\mser\vl_mser.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\quickshift\vl_quickshift.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\geometry\vl_rodr.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_samplinthist.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\sift\vl_sift.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\sift\vl_siftdescriptor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_simdctrl.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\imop\vl_tpsumx.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_twister.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\sift\vl_ubcmatch.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_version.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_whistc.c"
 				>
 			</File>
 		</Filter>

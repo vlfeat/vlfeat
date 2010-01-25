@@ -264,9 +264,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   if (nout > 1) {
-    int j ;
+    vl_uindex j ;
+    vl_uint32 * assignments  ;
     OUT(ASSIGNMENTS) = mxCreateNumericMatrix (1, numData, mxUINT32_CLASS, mxREAL) ;
-    vl_uint32 * assignments = mxGetData (OUT(ASSIGNMENTS)) ;
+    assignments = mxGetData (OUT(ASSIGNMENTS)) ;
 
     vl_kmeans_push (kmeans, assignments, NULL, data, numData) ;
 
@@ -275,7 +276,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   if (nout > 2) {
-    OUT(ENERGY) = vlmxCreatePlainScalar  (vl_kmeans_get_energy (kmeans)) ;
+    OUT(ENERGY) = vlmxCreatePlainScalar (vl_kmeans_get_energy (kmeans)) ;
   }
 
   vl_kmeans_delete (kmeans) ;
