@@ -86,6 +86,25 @@ vl_get_type_name (vl_type type)
  ** @name State and configuration parameters
  ** @{ */
 
+/** @internal @brief VLFeat thread state */
+typedef struct _VlThreadSpecificState
+{
+  /* errors */
+  int lastError ;
+  char lastErrorMessage [VL_ERR_MSG_LEN] ;
+
+  /* random number generator */
+  VlRand rand ;
+
+  /* tic / toc state */
+#if defined(VL_OS_WIN)
+  LARGE_INTEGER ticFreq ;
+  LARGE_INTEGER ticMark ;
+#else
+  clock_t ticMark ;
+#endif
+} VlThreadSpecificState ;
+
 /** @internal @brief VLFeat global state */
 typedef struct _VlState
 {
@@ -120,25 +139,6 @@ typedef struct _VlState
   int maxNumThreads ;
 
 } VlState ;
-
-/** @internal @brief VLFeat thread state */
-typedef struct _VlThreadSpecificState
-{
-  /* errors */
-  int lastError ;
-  char lastErrorMessage [VL_ERR_MSG_LEN] ;
-
-  /* random number generator */
-  VlRand rand ;
-
-  /* tic / toc state */
-#if defined(VL_OS_WIN)
-  LARGE_INTEGER ticFreq ;
-  LARGE_INTEGER ticMark ;
-#else
-  clock_t ticMark ;
-#endif
-} VlThreadSpecificState ;
 
 /** @internal @brief VLFeat global state */
 extern VL_EXPORT VlState _vl_state ;
@@ -274,7 +274,7 @@ VL_INLINE VlThreadSpecificState *
 vl_get_thread_specific_state ()
 {
 #ifndef VL_THREADS_ENABLED
-  return vl_get_state()->threadState ;
+  return & vl_get_state()->threadState ;
 #else
   VlState * state ;
   VlThreadSpecificState * threadState ;
