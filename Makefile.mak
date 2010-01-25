@@ -136,14 +136,13 @@ libsrc = \
   vl\dsift.c \
   vl\generic.c \
   vl\getopt_long.c \
-  vl\heap.c \
   vl\hikmeans.c \
   vl\host.c \
   vl\ikmeans.c \
-  vl\imop.c \
   vl\imopv.c \
   vl\imopv_sse2.c \
   vl\kdtree.c \
+  vl\kmeans.c \
   vl\mathop.c \
   vl\mathop_sse2.c \
   vl\mser.c \
@@ -159,13 +158,13 @@ cmdsrc = \
   src\mser.c \
   src\sift.c \
   src\test_getopt_long.c \
-  src\test_heap-t.c \
-  src\test_heap.c \
+  src\test_heap-def.c \
   src\test_host.c \
   src\test_imopv.c \
   src\test_mathop.c \
   src\test_mathop_abs.c \
   src\test_nan.c \
+  src\test_qsort-def.c \
   src\test_rand.c \
   src\test_stringop.c \
   src\test_threads.c \
@@ -176,6 +175,7 @@ mexsrc = \
   toolbox\aib\vl_aibhist.c \
   toolbox\geometry\vl_irodr.c \
   toolbox\geometry\vl_rodr.c \
+  toolbox\imop\vl_imdisttf.c \
   toolbox\imop\vl_imintegral.c \
   toolbox\imop\vl_imsmooth.c \
   toolbox\imop\vl_imwbackwardmx.c \
@@ -184,6 +184,7 @@ mexsrc = \
   toolbox\kmeans\vl_hikmeanspush.c \
   toolbox\kmeans\vl_ikmeans.c \
   toolbox\kmeans\vl_ikmeanspush.c \
+  toolbox\kmeans\vl_kmeans.c \
   toolbox\misc\vl_alldist.c \
   toolbox\misc\vl_alldist2.c \
   toolbox\misc\vl_binsearch.c \
