@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 int
-main (int argc, char ** argv)
+main (int argc VL_UNUSED, char ** argv VL_UNUSED)
 {
   float values [] = {.4, 12.3, 44.0, 1.2, 3.4, 5.6} ;
   vl_size n = sizeof(values) / sizeof(values[0]) ;
