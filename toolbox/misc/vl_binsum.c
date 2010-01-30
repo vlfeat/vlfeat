@@ -1,7 +1,7 @@
 /** @internal
  ** @file     binsum.c
  ** @author   Andrea Vedaldi
- ** @brief    BINSUM - MEX
+ ** @brief    vl_binsum.c - MEX definition
  **/
 
 /* AUTORIGHTS
@@ -69,12 +69,12 @@ mexFunction(int nout, mxArray *out[],
     while (B_pt < B_end) {
 
       /* next bin to accumulate */
-      j = (int)(*B_pt++) - 1;
+      j = (vl_index)(*B_pt++) - 1 ;
 
       /* bin index out of bounds ?*/
-      if(j < -1 || j >= KH) {
+      if(j < -1 || j >= (signed) KH) {
         mxuError(vlmxErrInconsistentData,
-                 "Index B(%"  VL_FMT_INDEX " = %" VL_FMT_INDEX " out of bound",
+                 "Index B(%"  VL_FMT_INDEX ") = %" VL_FMT_INDEX " out of bound",
                  (vl_index)(B_pt - mxGetPr(IN(B))),
                  j + 1) ;
       }
@@ -91,21 +91,21 @@ mexFunction(int nout, mxArray *out[],
 
   /* One dimension mode -------------------------------------------- */
   else {
-    int k ;
-    unsigned int d  = (unsigned int)*mxGetPr(IN(DIM)) - 1 ;
+    vl_index k ;
+    vl_size d  = (vl_size)*mxGetPr(IN(DIM)) - 1 ;
 
-    unsigned int HD = mxGetNumberOfDimensions(IN(H)) ;
-    unsigned int XD = mxGetNumberOfDimensions(IN(X)) ;
-    unsigned int BD = mxGetNumberOfDimensions(IN(B)) ;
+    mwSize HD = mxGetNumberOfDimensions(IN(H)) ;
+    mwSize XD = mxGetNumberOfDimensions(IN(X)) ;
+    mwSize BD = mxGetNumberOfDimensions(IN(B)) ;
 
-    mwSize const* Hdims = mxGetDimensions(IN(H)) ;
-    mwSize const* Xdims = mxGetDimensions(IN(X)) ;
-    mwSize const* Bdims = mxGetDimensions(IN(B)) ;
+    mwSize const * Hdims = mxGetDimensions(IN(H)) ;
+    mwSize const * Xdims = mxGetDimensions(IN(X)) ;
+    mwSize const * Bdims = mxGetDimensions(IN(B)) ;
 
-    const double* B_brk ;
-    const double* B_nbrk ;
+    double const * B_brk ;
+    double const * B_nbrk ;
 
-    unsigned int srd ;
+    vl_size srd ;
 
     /* We need to check a few more details about the matrices */
     if (d >= HD) {
@@ -140,16 +140,16 @@ mexFunction(int nout, mxArray *out[],
 
     srd = 1 ;
 
-    for(k = 0 ; k < XD ; ++k) {
+    for(k = 0 ; k < (signed) XD ; ++k) {
       if (KX > 1 &&  Xdims[k] != Bdims[k]) {
         mxuError(vlmxErrInconsistentData,
                  "X and B have incompatible dimensions.") ;
       }
-      if (k != d && (Bdims[k] != Hdims[k])) {
+      if (k != (signed) d && (Bdims[k] != Hdims[k])) {
         mxuError(vlmxErrInconsistentData,
                  "B and H have incompatible dimensions.") ;
       }
-      if (k < d) {
+      if (k < (signed) d) {
         srd = srd * Bdims[k] ;
       }
     }
@@ -197,12 +197,12 @@ mexFunction(int nout, mxArray *out[],
     while (B_pt < B_end) {
 
       /* next bin to accumulate */
-      j = (int)(*B_pt) - 1;
+      j = (vl_index)(*B_pt) - 1;
 
       /* index out of bounds? */
-      if(j < -1 || j >= KH) {
+      if(j < -1 || j >= (signed) KH) {
         mxuError(vlmxErrInconsistentData,
-                 "Index B(%"  VL_FMT_INDEX " = %" VL_FMT_INDEX " out of bound",
+                 "Index B(%"  VL_FMT_INDEX ") = %" VL_FMT_INDEX " out of bound",
                  (vl_index)(B_pt - mxGetPr(IN(B))),
                  j + 1) ;
       }
