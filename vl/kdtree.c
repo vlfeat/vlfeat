@@ -104,7 +104,7 @@ GNU GPLv2, or (at your option) any later version.
  ** @brief Allocate a new node from the tree pool
  **/
 
-static int unsigned
+static vl_uindex
 vl_kdtree_node_new (VlKDTree * tree, vl_uindex parentIndex)
 {
   VlKDTreeNode * node = NULL ;
@@ -402,10 +402,10 @@ vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
 VL_EXPORT int
 vl_kdforest_query_recursively (VlKDForest  * self,
                                VlKDTree * tree,
-                               int unsigned nodeIndex,
+                               vl_uindex nodeIndex,
                                VlKDForestNeighbor * neighbors,
-                               int unsigned numNeighbors,
-                               int unsigned * numAddedNeighbors,
+                               vl_size numNeighbors,
+                               vl_size * numAddedNeighbors,
                                double dist,
                                void const * query)
 {
@@ -554,7 +554,7 @@ vl_kdtree_calc_bounds_recursively (VlKDTree * tree,
                                    vl_uindex nodeIndex, double * searchBounds)
 {
   VlKDTreeNode * node = tree->nodes + nodeIndex ;
-  int unsigned i = node->splitDimension ;
+  vl_uindex i = node->splitDimension ;
   double t = node->splitThreshold ;
 
   node->lowerBound = searchBounds [2 * i + 0] ;
@@ -608,12 +608,12 @@ vl_kdforest_query (VlKDForest * self,
   if (! self -> searchHeapArray) {
     /* count number of tree nodes */
     /* add support structures */
-    int maxNumNodes = 0 ;
+    vl_size maxNumNodes = 0 ;
     for (ti = 0 ; ti < self->numTrees ; ++ti) {
       maxNumNodes += self->trees[ti]->numUsedNodes ;
     }
     self -> searchHeapArray = vl_malloc (sizeof(VlKDForestSearchState) * maxNumNodes) ;
-    self -> searchIdBook = vl_calloc (sizeof(unsigned int), self->numData) ;
+    self -> searchIdBook = vl_calloc (sizeof(vl_uindex), self->numData) ;
 
     for (ti = 0 ; ti < self->numTrees ; ++ti) {
       double * searchBounds = vl_malloc(sizeof(double) * 2 * self->dimension) ;

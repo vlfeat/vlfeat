@@ -106,10 +106,10 @@ typedef struct _VlKDForest
   vl_uindex searchId ;
   vl_uindex * searchIdBook ;
 
-  int unsigned searchMaxNumComparisons ;
-  int unsigned searchNumComparisons;
-  int unsigned searchNumRecursions ;
-  int unsigned searchNumSimplifications ;
+  vl_size searchMaxNumComparisons ;
+  vl_size searchNumComparisons;
+  vl_size searchNumRecursions ;
+  vl_size searchNumSimplifications ;
 } VlKDForest ;
 
 /** @name Creatind and disposing
@@ -136,8 +136,8 @@ VL_INLINE vl_size vl_kdforest_get_depth_of_tree (VlKDForest const * self, vl_uin
 VL_INLINE vl_size vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, vl_uindex treeIndex) ;
 VL_INLINE vl_size vl_kdforest_get_num_trees (VlKDForest const * self) ;
 VL_INLINE vl_size vl_kdforest_get_data_dimension (VlKDForest const * self) ;
-VL_INLINE vl_size vl_kdforest_get_data_type (VlKDForest const * self) ;
-VL_INLINE void vl_kdforest_set_max_num_comparisons (VlKDForest * self, int unsigned n) ;
+VL_INLINE vl_type vl_kdforest_get_data_type (VlKDForest const * self) ;
+VL_INLINE void vl_kdforest_set_max_num_comparisons (VlKDForest * self, vl_size n) ;
 VL_INLINE vl_size vl_kdforest_get_max_num_comparisons (VlKDForest * self) ;
 VL_INLINE void vl_kdforest_set_thresholding_method (VlKDForest * self, VlKDTreeThresholdingMethod method) ;
 VL_INLINE VlKDTreeThresholdingMethod vl_kdforest_get_thresholding_method (VlKDForest const * self) ;
@@ -197,7 +197,7 @@ vl_kdforest_get_num_trees (VlKDForest const * self)
  **/
 
 void
-vl_kdforest_set_max_num_comparisons (VlKDForest * self, int unsigned n)
+vl_kdforest_set_max_num_comparisons (VlKDForest * self, vl_size n)
 {
   self->searchMaxNumComparisons = n ;
 }
@@ -211,7 +211,7 @@ vl_kdforest_set_max_num_comparisons (VlKDForest * self, int unsigned n)
  ** @sa ::vl_kdforest_set_max_num_comparisons.
  **/
 
-int unsigned
+vl_size
 vl_kdforest_get_max_num_comparisons (VlKDForest * self)
 {
   return self->searchMaxNumComparisons ;
