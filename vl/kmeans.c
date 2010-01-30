@@ -200,7 +200,7 @@ _vl_kmeans_reset (VlKMeans * self)
 VL_EXPORT VlKMeans *
 vl_kmeans_new (VlKMeansAlgorithm algorithm,
                VlVectorComparisonType distance,
-               int dataType)
+               vl_type dataType)
 {
   VlKMeans * self = vl_malloc(sizeof(VlKMeans)) ;
 
@@ -267,7 +267,7 @@ VL_XCAT(_vl_kmeans_seed_centers_with_rand_data_, SFX)
  vl_size numData,
  vl_size numCenters)
 {
-  int i, j, k ;
+  vl_uindex i, j, k ;
   VlRand * rand = vl_get_rand () ;
 
   self->dimension = dimension ;
@@ -287,11 +287,7 @@ VL_XCAT(_vl_kmeans_seed_centers_with_rand_data_, SFX)
     for (i = 0 ; i < numData ; ++i) perm[i] = i ;
     _vl_kmeans_shuffle (perm, numData, rand) ;
 
-    k = 0 ;
-    i = -1 ;
-    while (k < numCenters) {
-      /* scan next point */
-      i ++ ;
+    for (k = 0, i = 0 ; k < numCenters ; ++ i) {
 
       /* compare the next data point to all centers collected so far
        to detect duplicates (if there are enough left)
@@ -330,7 +326,7 @@ VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
  vl_size numData,
  vl_size numCenters)
 {
-  int x, c ;
+  vl_uindex x, c ;
   VlRand * rand = vl_get_rand () ;
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
   TYPE * minDistances = vl_malloc (sizeof(TYPE) * numData) ;
@@ -349,7 +345,7 @@ VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
   }
 
   /* select the first point at random */
-  x = vl_rand_uint32 (rand) % numData ;
+  x = vl_rand_uindex (rand, numData) ;
   c = 0 ;
   while (1) {
     TYPE energy = 0 ;
@@ -379,8 +375,6 @@ VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
       acc += minDistances[x] ;
       if (acc >= thresh * energy) break ;
     }
-
-    VL_PRINTF("%f %f %d\n", thresh * energy, energy, x) ;
   }
 
   vl_free(distances) ;
@@ -396,7 +390,7 @@ VL_XCAT(_vl_kmeans_push_, SFX)
  TYPE const * data,
  vl_size numData)
 {
-  int i ;
+  vl_uindex i ;
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
 #else
@@ -641,7 +635,7 @@ VL_XCAT(_vl_kmeans_train_elkan_, SFX)
     VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)(self, permutations, data, numData) ;
   }
 
- 
+
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   /*                          Initialization                        */

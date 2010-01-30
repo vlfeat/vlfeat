@@ -28,7 +28,7 @@ typedef enum _VlKMeansAlgorithm {
 
 typedef struct _VlKMeans
 {
-  int dataType ;                       /**< data type */
+  vl_type dataType ;                   /**< data type */
   vl_size dimension ;                  /**< data dimensionality */
   vl_size numCenters ;                 /**< number of centers   */
 
@@ -50,8 +50,8 @@ typedef struct _VlKMeans
  **/
 VL_EXPORT VlKMeans *vl_kmeans_new (VlKMeansAlgorithm algorithm,
                                    VlVectorComparisonType distance,
-                                   int dataType) ;
-VL_EXPORT void      vl_kmeans_delete (VlKMeans * self) ;
+                                   vl_type dataType) ;
+VL_EXPORT void vl_kmeans_delete (VlKMeans * self) ;
 /** @} */
 
 /** @name Process data
@@ -81,19 +81,12 @@ VL_EXPORT void vl_kmeans_push (VlKMeans * f,
                                void * distances,
                                void const * data,
                                vl_size numData) ;
-VL_EXPORT vl_uint vl_kmeans_push_one (void * distance,
-                                      int dataType,
-                                      int distanceType,
-                                      VlKMeans const * centers,
-                                      vl_size numCenters,
-                                      void const * data,
-                                      vl_size numData) ;
 /** @} */
 
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_INLINE int vl_kemans_get_data_type (VlKMeans const * self) ;
+VL_INLINE vl_type vl_kemans_get_data_type (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kemans_get_dimension (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kemans_get_num_centers (VlKMeans const * self) ;
 VL_INLINE VlVectorComparisonType vl_kemans_get_distance (VlKMeans const * self) ;
@@ -189,7 +182,7 @@ vl_kmeans_get_energy (VlKMeans const * self)
  ** @return data type.
  **/
 
-VL_INLINE int
+VL_INLINE vl_type
 vl_kmeans_get_data_type (VlKMeans const * self)
 {
   return self->dataType ;
@@ -226,7 +219,7 @@ vl_kmeans_set_verbosity (VlKMeans * self, int verbosity)
  **/
 
 VL_INLINE void
-vl_kmeans_set_max_num_iterations (VlKMeans * self, int maxNumIterations)
+vl_kmeans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations)
 {
   self->maxNumIterations = maxNumIterations ;
 }
