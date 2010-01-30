@@ -116,20 +116,21 @@ VL_QSORT_swap
 
 /** @brief Sort portion of an array using quicksort
  ** @param array (in/out) pointer to the array.
- ** @param size size of the array.
- ** @param rand random number generator to use.
+ ** @param begin first element of the array portion.
+ ** @param end last element of the array portion.
  **
- ** The function sorts the array using quick-sort.
+ ** The function sorts the array using quick-sort. Note that
+ ** @c begin must be not larger than @c end.
  **/
 
 VL_INLINE void
 VL_QSORT_sort_recursive
-(VL_QSORT_array array, vl_index begin, vl_index end)
+(VL_QSORT_array array, vl_uindex begin, vl_uindex end)
 {
-  vl_index pivot = (end + begin) / 2 ;
-  vl_index lowPart, i ;
+  vl_uindex pivot = (end + begin) / 2 ;
+  vl_uindex lowPart, i ;
 
-  if (begin > end) return ;
+  assert (begin <= end) ;
 
   /* swap pivot with last */
   VL_QSORT_swap (array, pivot, end) ;
@@ -154,8 +155,13 @@ VL_QSORT_sort_recursive
   pivot = lowPart ;
 
   /* do recursion */
-  VL_QSORT_sort_recursive (array, begin, pivot - 1) ;
-  VL_QSORT_sort_recursive (array, pivot + 1, end) ;
+  if (pivot > begin) {
+    /* note that pivot-1 stays non-negative */
+    VL_QSORT_sort_recursive (array, begin, pivot - 1) ;
+  }
+  if (pivot < end) {
+    VL_QSORT_sort_recursive (array, pivot + 1, end) ;
+  }
 }
 
 /* VL_QSORT_sort_recursive */
@@ -177,7 +183,7 @@ VL_INLINE void
 VL_QSORT_sort
 (VL_QSORT_array array, vl_size size)
 {
-  assert (size >= 1 && size <= 0xffffffffUL) ;
+  assert (size >= 1) ;
   VL_QSORT_sort_recursive (array, 0, size - 1) ;
 }
 
