@@ -348,8 +348,9 @@ VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)
   int xi ;
   int yi ;
 
-  assert (X) ;
+  if (dimension == 0) return ;
   if (numDataX == 0) return ;
+  assert (X) ;
 
   if (Y) {
     if (numDataY == 0) return ;

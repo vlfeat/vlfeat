@@ -58,7 +58,7 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_D = 0} ;
   mwSize numDataX = 0 ;
   mwSize numDataY = 0 ;
-  mwSize numDimensions ;
+  mwSize dimension ;
   mxClassID classId ;
 
   /* for option parsing */
@@ -77,7 +77,7 @@ mexFunction(int nout, mxArray *out[],
   }
   next = 1 ;
   classId = mxGetClassID(in[IN_X]) ;
-  numDimensions = mxGetM(in[IN_X]) ;
+  dimension = mxGetM(in[IN_X]) ;
   numDataX = mxGetN(in[IN_X]) ;
 
   if (nin > 1 && vlmxIsMatrix (in[IN_Y],-1,-1) && vlmxIsReal(in[IN_Y])) {
@@ -87,7 +87,7 @@ mexFunction(int nout, mxArray *out[],
     if (mxGetClassID(in[IN_Y]) != classId) {
       VLMX_EIA("X and Y must have the same class.") ;
     }
-    if (numDimensions != mxGetM(in[IN_Y])) {
+    if (dimension != mxGetM(in[IN_Y])) {
       VLMX_EIA("X and Y must have the same number of rows.") ;
     }
   }
@@ -119,6 +119,19 @@ mexFunction(int nout, mxArray *out[],
     out[OUT_D] = mxCreateNumericArray (2, dims, classId, mxREAL) ;
   }
 
+  /* If either numDataX or numDataY are null, their data pointers are
+     null as well. This may confuse
+     vl_eval_vector_comparison_on_all_pairs_*, so we intercept this as
+     a special case. The same is true if dimension is null.
+  */
+
+  if (numDataX == 0 || (! autoComparison && numDataY == 0)) {
+    return ;
+  }
+  if (dimension == 0) {
+    return ;
+  }
+
   /* make calculation */
   switch (classId) {
   case mxSINGLE_CLASS:
@@ -126,13 +139,13 @@ mexFunction(int nout, mxArray *out[],
       VlFloatVectorComparisonFunction f = vl_get_vector_comparison_function_f (comparisonType) ;
       if (autoComparison) {
         vl_eval_vector_comparison_on_all_pairs_f ((float*)mxGetData(out[OUT_D]),
-                                                  numDimensions,
+                                                  dimension,
                                                   (float*)mxGetData(in[IN_X]), numDataX,
                                                   0, 0,
                                                   f) ;
       } else {
         vl_eval_vector_comparison_on_all_pairs_f ((float*)mxGetData(out[OUT_D]),
-                                                  numDimensions,
+                                                  dimension,
                                                   (float*)mxGetData(in[IN_X]), numDataX,
                                                   (float*)mxGetData(in[IN_Y]), numDataY,
                                                   f) ;
@@ -145,13 +158,13 @@ mexFunction(int nout, mxArray *out[],
       VlDoubleVectorComparisonFunction f = vl_get_vector_comparison_function_d (comparisonType) ;
       if (autoComparison) {
         vl_eval_vector_comparison_on_all_pairs_d ((double*)mxGetData(out[OUT_D]),
-                                                  numDimensions,
+                                                  dimension,
                                                   (double*)mxGetData(in[IN_X]), numDataX,
                                                   0, 0,
                                                   f) ;
       } else {
         vl_eval_vector_comparison_on_all_pairs_d ((double*)mxGetData(out[OUT_D]),
-                                                  numDimensions,
+                                                  dimension,
                                                   (double*)mxGetData(in[IN_X]), numDataX,
                                                   (double*)mxGetData(in[IN_Y]), numDataY,
                                                   f) ;
