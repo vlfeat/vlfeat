@@ -82,12 +82,9 @@ VL_INLINE void
 VL_SHUFFLE_shuffle
 (VL_SHUFFLE_array array, vl_size size, VlRand * rand)
 {
-  vl_uint32 n = size ;
-
-  assert (size <= 0xffffffffUL) ;
-
+  vl_uindex n = size ;
   while (n > 1) {
-    vl_uint32 k = vl_rand_uint32 (rand) % n ;
+    vl_uindex k = vl_rand_uindex (rand, n) ;
     n -- ;
     VL_SHUFFLE_swap (array, n, k) ;
   }
