@@ -224,7 +224,7 @@ endif
 C_CFLAGS     = $(CFLAGS)
 C_CFLAGS    += -I$(VLDIR)
 C_CFLAGS    += -pedantic -std=c99 -O3
-C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
+C_CFLAGS    += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros -Wextra
 C_CFLAGS    += $(if $(DEBUG), -O0 -g)
 
 C_CFLAGS    += -DVL_THREADS_ENABLED -pthread
@@ -236,7 +236,7 @@ DLL_NAME     = vl
 DLL_CFLAGS   = $(C_CFLAGS) -fvisibility=hidden -fPIC -DVL_BUILD_DLL
 
 MEX_FLAGS    = $(if $(DEBUG), -g) -DVL_THREADS_ENABLED
-MEX_CFLAGS  += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros
+MEX_CFLAGS  += -Wall -Wno-unused-function -Wno-long-long -Wno-variadic-macros -Wextra
 MEX_CFLAGS   = $(CFLAGS)
 MEX_CFLAGS  += -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_LDFLAGS  = -L$(BINDIR) -l$(DLL_NAME)
