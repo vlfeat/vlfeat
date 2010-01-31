@@ -5,20 +5,19 @@
  General Public License version 2.
  */
 
-#include <stdio.h>
-#include <assert.h>
-
+#include "check.h"
 #include <vl/stringop.h>
+#include <string.h>
 
 int
 main (int argc VL_UNUSED, char *argv[] VL_UNUSED)
 {
   vl_size q ;
   int err, protocol ;
-  char const *repl = "vision" ;
-  char const *str  = "*: the string '*' shold be equal to 'vision' but not to '\\**\\*'" ;
+  char const *repl  = "vision" ;
+  char const *str   = "*: * '\\*' *" ;
+  char const *subst = "vision: vision '*' vision" ;
   char const *t1   = "a/b/c/d.tar.gz" ;
-  char const *t2   = "ascii://bin://ascii://bin://bho://bha://bin:///which remains/" ;
   char const *t3   = "t" ;
   char const *next ;
 
@@ -29,74 +28,84 @@ main (int argc VL_UNUSED, char *argv[] VL_UNUSED)
   char sml [sml_len] ;
 
   /* -------------------------------------------------------------- */
-  printf ("testing vl_string_copy\n") ;
 
+  /* t3 fits in the destination buffer */
   q = vl_string_copy (sml, sml_len, t3) ;
-
   err = (q >= sml_len) ;
+  check (! err, "vl_string_copy") ;
+  check (q == strlen(t3), "vl_string_copy") ;
 
-  printf ("%s", sml) ;
-  printf ("\nwrote %" VL_FMT_SIZE " error %d\n", q, err) ;
-
+  /* t1 does not fit in the destination buffer */
   q = vl_string_copy (sml, sml_len, t1) ;
-
   err = (q >= sml_len) ;
-
-  printf ("%s", sml) ;
-  printf ("\nwrote %" VL_FMT_SIZE " error %d\n", q, err) ;
-
+  check (err, "vl_string_copy") ;
+  check (q == strlen(t1), "vl_string_copy") ;
 
   /* -------------------------------------------------------------- */
-  printf ("testing vl_string_replace_wildcard\n") ;
 
+  /* check substitution with widcard */
   q = vl_string_replace_wildcard (buf, buf_len,
                                   str, '*', '\\', repl) ;
-
   err = (q >= buf_len) ;
+  check (! err, "vl_string_replace_wildcard") ;
+  check (strcmp(buf, subst) == 0, "vl_string_replace_wildcard") ;
+  check (strlen(subst) == q, "vl_string_replace_wildcard") ;
 
-  printf ("%s", buf) ;
-  printf ("\nwrote %" VL_FMT_SIZE " error %d\n", q, err) ;
 
+  /* and the case in which the destination buffer is too small */
   q = vl_string_replace_wildcard (sml, sml_len,
                                   str, '*', '\\', repl) ;
-
   err = (q >= sml_len) ;
+  check (err, "vl_string_replace_wildcard") ;
+  check (strlen(subst) == q, "vl_string_replace_wildcard") ;
 
-  printf ("%s", sml) ;
-  printf ("\nwrote %" VL_FMT_SIZE " error %d\n", q, err) ;
-
+  /* and without output string */
   q = vl_string_replace_wildcard (0,0,
                                   str, '*', '\\', repl) ;
-
   err = (q >= sml_len) ;
-
-  printf ("\nwrote %" VL_FMT_SIZE " error %d\n", q, err) ;
-
-  /* -------------------------------------------------------------- */
-  printf ("\ntesting vl_string_basename\n") ;
-
-  q = vl_string_basename (buf, buf_len, t1, 1) ;
-
-  err = (q >= buf_len) ;
-
-  printf("'%s' -> '%s' (wrote %" VL_FMT_SIZE ", error %d)\n", t1, buf, q, err) ;
-
-  q = vl_string_basename (sml, sml_len, t1, 1) ;
-
-  err = (q >= buf_len) ;
-
-  printf("'%s' -> '%s' (wrote %" VL_FMT_SIZE ", error %d)\n", t1, sml, q, err) ;
-
+  check (err, "vl_string_replace_wildcard") ;
+  check (strlen(subst) == q, "vl_string_replace_wildcard") ;
 
   /* -------------------------------------------------------------- */
-  printf ("\ntesting vl_string_parse_protocol\n") ;
+  q = vl_string_basename (buf, buf_len, "a/b/c/d.tar.gz", 0) ;
+  err = (q >= buf_len) ;
+  check (! err, "vl_string_basename") ;
+  check (strcmp(buf, "d.tar.gz") == 0, "vl_string_basename") ;
 
-  next = t2 ;
-  while(next = vl_string_parse_protocol(next, &protocol), protocol != VL_PROT_NONE) {
-    printf("protocol: '%s'\n", vl_string_protocol_name (protocol)) ;
-  }
+  q = vl_string_basename (buf, buf_len, "a/b/c/d.tar.gz", 1) ;
+  err = (q >= buf_len) ;
+  check (! err, "vl_string_basename") ;
+  check (strcmp(buf, "d.tar") == 0, "vl_string_basename") ;
 
-  printf("%s\n", next) ;
+  q = vl_string_basename (buf, buf_len, "a/b/c/d.tar.gz", 2) ;
+  err = (q >= buf_len) ;
+  check (! err, "vl_string_basename") ;
+  check (strcmp(buf, "d") == 0, "vl_string_basename") ;
+
+  q = vl_string_basename (buf, buf_len, "a/b/c/d.tar.gz", 3) ;
+  err = (q >= buf_len) ;
+  check (! err, "vl_string_basename") ;
+  check (strcmp(buf, "d") == 0, "vl_string_basename") ;
+
+  /* -------------------------------------------------------------- */
+  next = "ascii://bin://ascii://bin://unkown1://unknown2://bin:///which remains/" ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_ASCII,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_BINARY,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_ASCII,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_BINARY,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_UNKNOWN,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_UNKNOWN,) ;
+  next = vl_string_parse_protocol(next, &protocol) ;
+  check (protocol == VL_PROT_BINARY,) ;
+  check (strcmp(next, "/which remains/") == 0,"%s",next) ;
+
+  check_signoff() ;
   return 0 ;
 }
 
