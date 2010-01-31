@@ -43,10 +43,10 @@ typedef struct _VlFileMeta VlFileMeta ;
 /** @brief Parse argument for file meta information
  **
  ** @param optarg  argument to parse.
- ** @param fm      structure to initalize.
+ ** @param self      structure to initalize.
  **
  ** The function parses the string @a optarg to fill the structure @a
- ** fm. @a optarg is supposed to be composed of two parts: a file
+ ** self. @a optarg is supposed to be composed of two parts: a file
  ** protocol specification and a file pattern. Then the function:
  **
  ** - Sets VlFileMeta::active to true.
@@ -58,16 +58,15 @@ typedef struct _VlFileMeta VlFileMeta ;
  ** pattern is too long to be stored (::VL_ERR_OVERFLOW).
  **/
 static int
-vl_file_meta_parse (VlFileMeta * fm, char const * optarg) 
+vl_file_meta_parse (VlFileMeta * self, char const * optarg)
 {
-  int q ;
-
-  fm -> active = 1 ;
+  vl_size q ;
+  self->active = 1 ;
 
   if (optarg) {
     int protocol ;
     char const * arg = vl_string_parse_protocol (optarg, &protocol) ;
-        
+
     /* parse the (optional) protocol part */
     switch (protocol) {
     case VL_PROT_UNKNOWN :
@@ -75,7 +74,7 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
 
     case VL_PROT_ASCII  :
     case VL_PROT_BINARY :
-      fm -> protocol = protocol ;
+      self->protocol = protocol ;
       break ;
 
     case VL_PROT_NONE :
@@ -83,14 +82,14 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
     }
 
     if (vl_string_length (arg) > 0) {
-      q = vl_string_copy 
-        (fm -> pattern, sizeof (fm -> pattern), arg) ;
-    
-      if (q >= sizeof (fm -> pattern)) {
+      q = vl_string_copy
+        (self->pattern, sizeof (self->pattern), arg) ;
+
+      if (q >= sizeof(self->pattern)) {
         return VL_ERR_OVERFLOW ;
       }
     }
-    
+
   }
   return VL_ERR_OK ;
 }
@@ -98,7 +97,7 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
 /* ----------------------------------------------------------------- */
 /** @brief Open the file associated to meta information
  **
- ** @param fm        File meta information.
+ ** @param self        File meta information.
  ** @param basename  Basename.
  ** @param mode      Opening mode (as in @c fopen).
  **
@@ -108,28 +107,28 @@ vl_file_meta_parse (VlFileMeta * fm, char const * optarg)
  **/
 
 static int
-vl_file_meta_open (VlFileMeta * fm, char const * basename, char const * mode) 
+vl_file_meta_open (VlFileMeta * self, char const * basename, char const * mode)
 {
-  int q ;
-  
-  if (! fm -> active) {
+  vl_size q ;
+
+  if (! self->active) {
     return VL_ERR_OK ;
   }
 
-  q = vl_string_replace_wildcard (fm -> name, 
-                                  sizeof(fm -> name),
-                                  fm -> pattern, 
-                                  '%', '\0', 
+  q = vl_string_replace_wildcard (self->name,
+                                  sizeof(self->name),
+                                  self -> pattern,
+                                  '%', '\0',
                                   basename) ;
 
-  if (q >= sizeof(fm -> name)) {
+  if (q >= sizeof(self->name)) {
     vl_get_thread_specific_state()->lastError = VL_ERR_OVERFLOW ;
     return -1 ;
   }
-  
-  if (fm -> active) {
-    fm -> file = fopen (fm -> name, mode) ;
-    if (! fm -> file) {
+
+  if (self->active) {
+    self->file = fopen (self->name, mode) ;
+    if (! self->file) {
       vl_get_thread_specific_state()->lastError = VL_ERR_IO ;
       return -1 ;
     }
@@ -140,21 +139,21 @@ vl_file_meta_open (VlFileMeta * fm, char const * basename, char const * mode)
 /* ----------------------------------------------------------------- */
 /** @brief Close the file associated to meta information
  **
- ** @param fm File meta information.
+ ** @param self File meta information.
  **/
 static void
-vl_file_meta_close (VlFileMeta * fm) 
+vl_file_meta_close (VlFileMeta * self)
 {
-  if (fm -> file) {
-    fclose (fm -> file) ;
-    fm -> file = 0 ;
+  if (self -> file) {
+    fclose (self -> file) ;
+    self -> file = 0 ;
   }
 }
 
 /* ----------------------------------------------------------------- */
 /** @brief Write double to file
  **
- ** @param fm   File meta information.
+ ** @param self   File meta information.
  ** @param x    Datum to write.
  **
  ** @return error code. The function returns ::VL_ERR_ALLOC if the
@@ -162,21 +161,21 @@ vl_file_meta_close (VlFileMeta * fm)
  **/
 
 VL_INLINE int
-vl_file_meta_put_double (VlFileMeta * fm, double x)
+vl_file_meta_put_double (VlFileMeta * self, double x)
 {
   int err ;
   size_t n ;
   double y ;
 
-  switch (fm -> protocol) {
+  switch (self -> protocol) {
 
   case VL_PROT_ASCII :
-    err = fprintf (fm -> file, "%g ", x) ;
+    err = fprintf (self -> file, "%g ", x) ;
     break ;
-    
+
   case VL_PROT_BINARY :
     vl_swap_host_big_endianness_8 (&y, &x) ;
-    n = fwrite (&y, sizeof(double), 1, fm -> file) ;
+    n = fwrite (&y, sizeof(double), 1, self -> file) ;
     err = n < 1 ;
     break ;
 
@@ -191,7 +190,7 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
 /* ----------------------------------------------------------------- */
 /** @brief Write uint8 to file
  **
- ** @param fm   File meta information.
+ ** @param self   File meta information.
  ** @param x    Datum to write.
  **
  ** @return error code. The function returns ::VL_ERR_ALLOC if the
@@ -199,20 +198,20 @@ vl_file_meta_put_double (VlFileMeta * fm, double x)
  **/
 
 VL_INLINE int
-vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
+vl_file_meta_put_uint8 (VlFileMeta *self, vl_uint8 x)
 {
   size_t n ;
   int err ;
 
-  switch (fm -> protocol) {
+  switch (self -> protocol) {
 
   case VL_PROT_ASCII :
-    err = fprintf (fm -> file, "%d ", x) ;
+    err = fprintf (self -> file, "%d ", x) ;
     if (err) return VL_ERR_ALLOC ;
     break ;
-    
+
   case VL_PROT_BINARY :
-    n = fwrite (&x, sizeof(vl_uint8), 1, fm -> file) ;
+    n = fwrite (&x, sizeof(vl_uint8), 1, self -> file) ;
     if (n < 1) return VL_ERR_ALLOC ;
     break ;
 
@@ -227,7 +226,7 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
 /* ----------------------------------------------------------------- */
 /** @brief Read double from file
  **
- ** @param fm  File meta information.
+ ** @param self  File meta information.
  ** @param x   Datum read.
  **
  ** @return error code. The function returns ::VL_ERR_EOF if the
@@ -236,23 +235,23 @@ vl_file_meta_put_uint8 (VlFileMeta *fm, vl_uint8 x)
  **/
 
 VL_INLINE int
-vl_file_meta_get_double (VlFileMeta *fm, double *x)
+vl_file_meta_get_double (VlFileMeta *self, double *x)
 {
   int err ;
   size_t n ;
   double y ;
 
-  switch (fm -> protocol) {
+  switch (self -> protocol) {
 
   case VL_PROT_ASCII :
-    fscanf (fm -> file, " ") ;
-    err = fscanf (fm -> file, "%lg", x) ;
+    fscanf (self -> file, " ") ;
+    err = fscanf (self -> file, "%lg", x) ;
     if (err == EOF) return VL_ERR_EOF ;
     if (err <  1  ) return VL_ERR_BAD_ARG ;
     break ;
-  
+
   case VL_PROT_BINARY :
-    n = fread (&y, sizeof(double), 1, fm -> file) ;
+    n = fread (&y, sizeof(double), 1, self -> file) ;
     if (n < 1) return VL_ERR_BAD_ARG ;
     vl_swap_host_big_endianness_8 (x, &y) ;
     break ;
