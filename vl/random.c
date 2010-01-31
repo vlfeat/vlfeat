@@ -161,7 +161,7 @@ vl_rand_seed_by_array (VlRand * self, vl_uint32 const key [], vl_size keySize)
     mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
     i++; j++;
     if (i>=N) { mt[0] = mt[N-1]; i=1; }
-    if (j>=keySize) j=0;
+    if (j>=(unsigned)keySize) j=0;
   }
   for (k=N-1; k; k--) {
     mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
