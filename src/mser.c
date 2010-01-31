@@ -282,12 +282,13 @@ main(int argc, char **argv)
     VlPgmImage       pim ;
     vl_uint const   *regions ;
     vl_uint const   *regionsinv ;
-    float const *frames ;
-    float const *framesinv ;
+    float const     *frames ;
+    float const     *framesinv ;
     enum            {ndims = 2} ;
     int              dims [ndims] ;
-    int             nregions = 0, nregionsinv = 0, nframes = 0, nframesinv =0;
-    int              i, j, dof, q ;
+    int              nregions = 0, nregionsinv = 0, nframes = 0, nframesinv =0;
+    int              i, j, dof ;
+    vl_size          q ;
     FILE            *in = 0 ;
 
     /* Open files  ------------------------------------------------ */
