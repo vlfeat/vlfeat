@@ -692,6 +692,7 @@ post-doc: doc
 	      --exclude=*.eps                                        \
 	      --progress                                             \
 	      --exclude=download                                     \
+	      --exclude=cvpr10wiki                                   \
 	      --exclude=man-src                                      \
 	      --exclude=toolbox-src                                  \
 	      --exclude=.htaccess                                    \
