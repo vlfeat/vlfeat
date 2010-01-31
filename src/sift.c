@@ -96,12 +96,13 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
 {
   char tmp [1024] ;
   int S = filt -> S ;
-  int q, i ;
+  int i ;
   int s, err ;
   int w, h ;
   int o = filt -> o_cur ;
   VlPgmImage pim ;
   vl_uint8 *buffer = 0 ;
+  vl_size q ;
 
   if (! fm -> active) {
     return VL_ERR_OK ;
@@ -420,7 +421,8 @@ main(int argc, char **argv)
     VlPgmImage       pim ;
 
     VlSiftFilt      *filt = 0 ;
-    int              q, i ;
+    vl_size          q ;
+    int              i ;
     vl_bool          first ;
 
     double           *ikeys = 0 ;
@@ -510,8 +512,9 @@ main(int argc, char **argv)
     }
 
     /* convert data type */
-    for (q = 0 ; q < pim.width * pim.height ; ++q)
+    for (q = 0 ; q < (unsigned) (pim.width * pim.height) ; ++q) {
       fdata [q] = data [q] ;
+    }
 
     /* ...............................................................
      *                                     Optionally source keypoints
@@ -721,7 +724,7 @@ main(int argc, char **argv)
         }
 
         /* for each orientation ................................... */
-        for (q = 0 ; q < nangles ; ++q) {
+        for (q = 0 ; q < (unsigned) nangles ; ++q) {
           vl_sift_pix descr [128] ;
 
           /* compute descriptor (if necessary) */
