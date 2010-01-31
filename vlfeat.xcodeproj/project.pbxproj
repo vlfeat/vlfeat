@@ -19,6 +19,7 @@
 		2D4EB0C010F3C1E800ADA534 /* kmeans.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmeans.h; sourceTree = "<group>"; };
 		2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kmeans.c; path = toolbox/kmeans/vl_kmeans.c; sourceTree = "<group>"; };
 		2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shuffle-def.h"; sourceTree = "<group>"; };
+		2D6007FF1115C1FA0020963C /* check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = check.h; sourceTree = "<group>"; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
@@ -171,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				2D732DE50CF8C2E40099B03C /* aib.c */,
+				2D6007FF1115C1FA0020963C /* check.h */,
 				2D732DE60CF8C2E40099B03C /* generic-driver.h */,
 				2D732DE80CF8C2E40099B03C /* mser.c */,
 				2D732DEA0CF8C2E40099B03C /* sift.c */,
