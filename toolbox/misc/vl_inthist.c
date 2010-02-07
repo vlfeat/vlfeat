@@ -58,7 +58,7 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   mwSize dims [3] ;
-  int numDims ;
+  vl_size numDims ;
   mwSize const * dimsPt = 0 ;
 
   vl_uint32* labelsPt  = 0 ;
@@ -66,7 +66,8 @@ mexFunction(int nout, mxArray *out[],
   void*      histPt    = 0 ;
   vl_uint32  numLabels = 0 ;
   mxClassID  dataClass = mxUINT32_CLASS ;
-  int width, height, numMaps, k, q ;
+  vl_size width, height, numMaps ;
+  vl_uindex k, q ;
 
   enum {IN_LABELS = 0, IN_END} ;
   enum {OUT_HIST = 0} ;
