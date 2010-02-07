@@ -345,8 +345,8 @@ VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)
  T const * Y, vl_size numDataY,
  COMPARISONFUNCTION_TYPE function)
 {
-  int xi ;
-  int yi ;
+  vl_uindex xi ;
+  vl_uindex yi ;
 
   if (dimension == 0) return ;
   if (numDataX == 0) return ;
