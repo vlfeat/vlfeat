@@ -76,12 +76,12 @@ vlmxOption  options [] = {
 /* for L1 norm */
 #define CMP(s1,s2) ((double)MIN(s1,s2))
 
-#define UINT8_t  unsigned char
-#define  INT8_t  char
-#define UINT16_t unsigned short
-#define  INT16_t short
-#define UINT32_t unsigned int
-#define  INT32_t int
+#define UINT8_t  vl_uint8
+#define  INT8_t  vl_int8
+#define UINT16_t vl_uint16
+#define  INT16_t vl_int16
+#define UINT32_t vl_uint32
+#define  INT32_t vl_int32
 #define SINGLE_t float
 #define DOUBLE_t double
 
@@ -91,10 +91,10 @@ vlmxOption  options [] = {
   (                                                                     \
    AC ## _t * pt, DC ## _t * s1_pt,                                     \
    DC ## _t * s2_pt,                                                    \
-   int L, int N1, int N2,                                               \
+   vl_size L, vl_size N1, vl_size N2,                                   \
    bool self)                                                           \
   {                                                                     \
-    int j1,j2,l ;                                                       \
+    vl_uindex j1,j2,l ;                                                 \
     for(j2 = 0 ; j2 < N2 ; ++j2)  {                                     \
       for(j1 = 0 ; j1 < N1 ; ++j1) {                                    \
         if(! self || j1>=j2) {                                          \
@@ -124,7 +124,7 @@ vlmxOption  options [] = {
     mwIndex  const * s2_ir  = 0 ;                                       \
     mwIndex const * s2_jc  = 0 ;                                        \
     double * pt = mxGetPr(out[OUT_D]) ;                                 \
-    int j1, j2 ;                                                        \
+    vl_uindex j1, j2 ;                                                  \
                                                                         \
     if (self) {                                                         \
       s2_pt = s1_pt ;                                                   \
@@ -277,8 +277,8 @@ mexFunction(int nout, mxArray *out[],
   /*  mxClassID data_class = mxINT8_CLASS ;*/
   enum {IN_S1,IN_S2} ;
   enum {OUT_D=0} ;
-  int L,N1,N2 ;
-  int sparse = 0 ;
+  vl_size L,N1,N2 ;
+  vl_bool sparse = 0 ;
   void const * s1_pt ;
   void const * s2_pt ;
   mxClassID data_class ;
