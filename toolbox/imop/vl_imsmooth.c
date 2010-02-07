@@ -69,12 +69,12 @@ VL_XCAT(_vl_imsmooth_smooth_, SFX)
       vl_size W = ceil (4.0 * sigma) ;
       T * filter = (T*) mxMalloc (sizeof(T) * (2 * W + 1)) ;
       T acc = 0 ;
-      for (j = 0 ; j < 2 * W + 1 ; ++j) {
+      for (j = 0 ; j < (signed)(2 * W + 1) ; ++j) {
         T z = ( (T) j - W) / (sigma + VL_EPSILON_F) ;
         filter[j] = exp(- 0.5 * (z*z)) ;
         acc += filter[j] ;
       }
-      for (j = 0 ; j < 2 * W + 1 ; ++j) {
+      for (j = 0 ; j < (signed)(2 * W + 1) ; ++j) {
         filter[j] /= acc ;
       }
 
@@ -207,7 +207,7 @@ mexFunction(int nout, mxArray *out[],
         enum {buflen = 32} ;
         char buf [buflen] ;
         if (!vlmxIsString(optarg, -1)) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "PADDING argument must be a string") ;
         }
         mxGetString(optarg, buf, buflen) ;
