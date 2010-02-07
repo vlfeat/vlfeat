@@ -47,7 +47,8 @@ xcreate (VlHIKMTree *tree, mxArray const *mnode, int i)
 {
   mxArray const *mcenters, *msub ;
   VlHIKMNode *node ;
-  int M, node_K, k ;
+  vl_size M, node_K ;
+  vl_uindex k ;
 
   /* sanity checks */
   mcenters = mxGetField(mnode, i, "centers") ;
