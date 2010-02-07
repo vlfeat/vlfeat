@@ -154,7 +154,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         mexErrMsgTxt (buf) ;
       }
 
-      while (true) {
+      while (VL_TRUE) {
         int x_ = (int) parents [x -1] ;
         /*     mexPrintf("%d : x_=%d, x=%d\n", i, x_, x) ; */
         ++ tree [x - 1] ;

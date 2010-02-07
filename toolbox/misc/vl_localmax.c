@@ -139,7 +139,7 @@ mexFunction(int nout, mxArray *out[],
     neighbors = mxMalloc(sizeof(int) * nneighbors) ;
     i = 0 ;
 
-    while(true) {
+    while(VL_TRUE) {
       if(o != 0 )
         neighbors[i++] = o ;
       h = 0 ;
@@ -173,7 +173,7 @@ mexFunction(int nout, mxArray *out[],
     for(h=0 ; h < pdims ; ++h)
       if(dims[h] < 3) goto end ;
 
-    while(true) {
+    while(VL_TRUE) {
       double v ;
       bool is_greater;
 

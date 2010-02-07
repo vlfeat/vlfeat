@@ -64,7 +64,7 @@ mexFunction(int nout, mxArray *out[],
   idx_t* strides_pt ;    /* strides to move in image array          */
   val_t* visited_pt ;    /* flag                                    */
   idx_t* members_pt ;    /* region members                          */
-  bool invert = false;
+  bool invert = VL_FALSE ;
 
   /** -----------------------------------------------------------------
    **                                               Check the arguments
@@ -110,7 +110,7 @@ mexFunction(int nout, mxArray *out[],
     idx_t idx = (idx_t) *er_pt ;
     if (idx < 0) {
       idx = -idx;
-      invert = true;
+      invert = VL_TRUE ;
     }
     if( idx < 1 || idx > nel ) {
       char buff[80] ;
@@ -141,8 +141,8 @@ mexFunction(int nout, mxArray *out[],
     }
 
     /* process neighbors of xi */
-    while( true ) {
-      int good = true ;
+    while(VL_TRUE) {
+      int good = VL_TRUE ;
       idx_t nindex = 0 ;
 
       /* compute NSUBS+SUB, the correspoinding neighbor index NINDEX
