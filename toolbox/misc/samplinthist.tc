@@ -7,11 +7,11 @@
 VL_INLINE void
 SAMPLE (T* histPt,
         T const* intHistPt,
-        int width, int height, int numLabels,
+        vl_size width, vl_size height, vl_size numLabels,
         vl_uint32 const* boxesPt,
-        int numBoxes)
+        vl_size numBoxes)
 {
-  int bi, k ;
+  vl_uindex bi, k ;
   for (bi = 0 ; bi < numBoxes ; ++ bi) {
     vl_uint32 x1 = *boxesPt++ ;
     vl_uint32 y1 = *boxesPt++ ;
