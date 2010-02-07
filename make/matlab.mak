@@ -22,7 +22,7 @@ distclean: mex-distclean matlab-distclean
 endif
 
 MEX_FLAGS    = -$(ARCH)
-MEX_FLAGS    = $(if $(DEBUG), -g, -O)
+MEX_FLAGS   += $(if $(DEBUG), -g, -O)
 MEX_FLAGS   += -lm -largeArrayDims
 
 MEX_CFLAGS   = $(CFLAGS)

@@ -212,6 +212,8 @@ doc/%.pdf : doc/%.eps
 # Other documentation related targets
 #
 
+doc-clean:
+doc-archclean:
 doc-distclean:
 	rm -f  docsrc/*.pyc
 	rm -rf doc

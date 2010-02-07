@@ -291,7 +291,7 @@ endef
 include make/dll.mak
 include make/bin.mak
 include make/matlab.mak
-include make/octave.mak
+#include make/octave.mak
 include make/doc.mak
 include make/dist.mak
 

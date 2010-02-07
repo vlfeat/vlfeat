@@ -85,11 +85,13 @@ octave-info:
 	@echo
 
 octave-clean:
+	rm -f $(octave_mex_dep)
 
-octave-archclean:
+octave-archclean: octave-clean
 	rm -f $(octave_mex_tgt)
 
 octave-distclean: octave-archclean
+	rm -rf toolbox/mex
 
 # Emacs:
 # Local variables:
