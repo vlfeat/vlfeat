@@ -85,18 +85,18 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("Too many output arguments.");
   }
 
-  if (mxGetClassID(in[IN_LABELS]) != mxUINT32_CLASS) {
+  if (mxGetClassID(IN(LABELS)) != mxUINT32_CLASS) {
     mexErrMsgTxt("LABELS must be of class UINT32.") ;
   }
-  labelsPt = mxGetData(in[IN_LABELS]) ;
+  labelsPt = mxGetData(IN(LABELS)) ;
 
-  numDims = mxGetNumberOfDimensions(in[IN_LABELS]) ;
+  numDims = mxGetNumberOfDimensions(IN(LABELS)) ;
   if (numDims > 3) {
     mexErrMsgTxt("LABELS must be a MxNxK array.") ;
   }
 
-  labelsPt = mxGetData(in[IN_LABELS]) ;
-  dimsPt   = mxGetDimensions(in[IN_LABELS]) ;
+  labelsPt = mxGetData(IN(LABELS)) ;
+  dimsPt   = mxGetDimensions(IN(LABELS)) ;
   height   = dimsPt [0] ;
   width    = dimsPt [1] ;
   if (numDims > 2) {
@@ -161,8 +161,8 @@ mexFunction(int nout, mxArray *out[],
   dims [0] = height ;
   dims [1] = width ;
   dims [2] = numLabels ;
-  out[OUT_HIST] = mxCreateNumericArray(3, dims, dataClass, mxREAL) ;
-  histPt = mxGetData(out[OUT_HIST]) ;
+  OUT(HIST) = mxCreateNumericArray(3, dims, dataClass, mxREAL) ;
+  histPt = mxGetData(OUT(HIST)) ;
 
   if (verb) {
     mexPrintf("inthist: integrating %d x %d label map with %d labels\n", width, height, numLabels) ;
