@@ -2,6 +2,11 @@ function results = vl_test_twister(varargin)
 % VL_TEST_TWISTER
 vl_test_init ;
 
+function test_illegal_args()
+vl_assert_exception(@() vl_twister(-1), 'vl:invalidArgument') ;
+vl_assert_exception(@() vl_twister(1, -1), 'vl:invalidArgument') ;
+vl_assert_exception(@() vl_twister([1, -1]), 'vl:invalidArgument') ;
+
 function test_seed_by_scalar()
 rand('twister',1) ; a = rand ;
 vl_twister('state',1) ; b = vl_twister ;
