@@ -1,7 +1,7 @@
 /** @internal
- ** @file    vl_imintegral.c
+ ** @file    vl_imdisttf.c
+ ** @brief   vl_imdisttf - MEX definition
  ** @author  Andrea Vedaldi
- ** @brief   vl_imintegral MEX definition
  **/
 
 /* AUTORIGHTS
@@ -120,24 +120,21 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 1) {
-    mxuError(vlmxErrInvalidArgument,
-             "At least an argument is needed.") ;
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
   if (nin > 2) {
-    mxuError(vlmxErrInvalidArgument,
-             "At most two arguments are allowed.") ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
   if (nout > 2) {
-    mxuError(vlmxErrInvalidArgument,
-             "Too many outout arguments.") ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
   if (! vlmxIsPlainMatrix(IN(I), -1, -1)) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "I must be a plain matrix.") ;
   }
   if (nin == 2) {
     if (! vlmxIsPlainVector(IN(PARAM), 4)) {
-      mxuError(vlmxErrInvalidArgument,
+      vlmxError(vlmxErrInvalidArgument,
                "PARAM must be a 4-dimensional vector.") ;
     }
     param = mxGetPr (IN(PARAM)) ;
