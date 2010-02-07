@@ -107,7 +107,7 @@ void
 mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
-  int K1, K2, ND ;
+  int unsigned K1, K2, ND ;
   void* L1_pt ;
   void* L2_pt ;
   double thresh = 1.5 ;
