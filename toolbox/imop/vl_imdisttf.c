@@ -148,7 +148,7 @@ mexFunction(int nout, mxArray *out[],
 
   OUT(DT) = mxCreateDoubleMatrix (M, N, mxREAL) ;
   if (nout > 1) {
-    int i ;
+    vl_uindex i ;
     OUT(INDEXES) = mxCreateDoubleMatrix (M, N, mxREAL) ;
     indexes = mxMalloc(sizeof(vl_uindex) * M * N) ;
     for (i = 0 ; i < M * N ; ++i) indexes[i] = i + 1 ;
@@ -175,7 +175,7 @@ mexFunction(int nout, mxArray *out[],
                               param[1]) ;
 
   if (indexes) {
-    int i ;
+    vl_uindex i ;
     double * pt = mxGetPr(OUT(INDEXES)) ;
     for (i = 0 ; i < M * N ; ++i) pt[i] = indexes[i] ;
     mxFree(indexes) ;
