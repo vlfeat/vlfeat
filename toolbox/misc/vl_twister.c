@@ -39,74 +39,81 @@ mexFunction(int nout, mxArray *out[],
    ** -------------------------------------------------------------- */
 
   if (nout > 1) {
-    vlmxError(vlmxErrInvalidArgument,
-             "Too many output arguments");
+    vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
 
-  mode = RUN_GENERATOR ;
   if (nin > 0 && ! mxIsNumeric(in[0])) {
     mode = MANIP_STATE ;
+  } else {
+    mode = RUN_GENERATOR ;
   }
 
   switch (mode) {
   case RUN_GENERATOR:
     {
-      enum { max_ndims = 30 } ;
-      int ndims = 2 ;
-      mwSize dims [max_ndims] = {1, 1} ;
-      int n, k ;
-      double *x ;
+      enum { maxNumDimensions = 30 } ;
+      vl_size numDimensions = 2, n ;
+      vl_uindex k ;
+      mwSize dimensions [maxNumDimensions] = {1, 1} ;
+      double * x ;
 
       if (nin > 1) {
         /* TWISTER(N1 N2 ...) style */
-        if (nin >= max_ndims) {
-          vlmxError(vlmxErrInvalidArgument,
-                   "Too many dimensions") ;
+        if (nin >= maxNumDimensions) {
+          vlmxError(vlmxErrTooManyInputArguments,
+                    "Too many dimensions specified.") ;
         }
-        for (k = 0 ; k < nin ; ++k) {
+        for (k = 0 ; k < (unsigned)nin ; ++k) {
           if (! vlmxIsPlainScalar(in[k])) {
             vlmxError(vlmxErrInvalidArgument,
-                     "Invalid arguments") ;
+                     "The %d-th argument is not a plain scalar.", k + 1) ;
           }
-          dims [k] = *mxGetPr(in[k]) ;
+          if (mxGetScalar(in[k]) < 0) {
+            vlmxError(vlmxErrInvalidArgument,
+                      "The %d-th argument is negative.", k + 1) ;
+          }
+          dimensions[k] = mxGetScalar(in[k]) ;
         }
-        ndims = k ;
+        numDimensions = k ;
 
       } else if (nin == 1) {
         /* TWISTER([N1 N2 ...]) style */
         if (! vlmxIsPlainVector(in[0], -1)) {
           vlmxError(vlmxErrInvalidArgument,
-                   "Invalid argument") ;
+                   "The argument is not a plain vector.") ;
         }
 
         x = mxGetPr(in[0]) ;
         n = mxGetNumberOfElements(in[0]) ;
-        ndims = VL_MAX(2, n) ;
+        numDimensions = VL_MAX(2, n) ;
 
-        if (ndims > max_ndims) {
+        if (numDimensions > maxNumDimensions) {
           vlmxError(vlmxErrInvalidArgument,
-                   "Invalid argument") ;
+                   "Too many dimensions specified.") ;
         }
 
         if (n == 1) {
-          dims [0] = dims [1] = *x ;
+          if (*x < 0) {
+            vlmxError(vlmxErrInvalidArgument,
+                      "The specified dimension is negative.") ;
+          }
+          dimensions[0] = dimensions[1] = *x ;
         } else {
           for (k = 0 ; k < n ; ++k) {
-            dims [k] = x [k] ;
+            if (x[k] < 0) {
+              vlmxError(vlmxErrInvalidArgument,
+                        "One of the specified dimensions is negative.") ;
+            }
+            dimensions[k] = x[k] ;
           }
         }
       }
 
-      /* ensure dims >= 0 */
-      for (k = 0 ; k < ndims ; ++k) {
-        dims [k] = VL_MAX(0, dims[k]) ;
-      }
-
-      out [0] = mxCreateNumericArray (ndims, dims, mxDOUBLE_CLASS, mxREAL) ;
-      n = mxGetNumberOfElements (out [0]) ;
-      x = mxGetPr (out [0]) ;
+      out[0] = mxCreateNumericArray (numDimensions, dimensions, mxDOUBLE_CLASS, mxREAL) ;
+      n = mxGetNumberOfElements (out[0]) ;
+      x = mxGetPr (out[0]) ;
       for (k = 0 ; k < n ; ++k) {
-        x [k] = vl_rand_res53(rand) ;
+        x[k] = vl_rand_res53(rand) ;
       }
     }
     break ;
@@ -117,16 +124,15 @@ mexFunction(int nout, mxArray *out[],
       char buff [buff_size] ;
 
       /* check for 'state' string */
-      if (! vlmxIsString(in[0], -1)                    ||
+      if (! vlmxIsString(in[0], -1)                 ||
           mxGetString(in[0], buff, buff_size)       ||
           vl_string_casei_cmp ("state", buff) != 0   ) {
-        vlmxError(vlmxErrInvalidArgument,
-                 "Invalid argument") ;
+        vlmxError(vlmxErrInvalidArgument, NULL) ;
       }
 
       /* TWISTER('state') */
       if (nin == 1) {
-        int i ;
+        vl_uindex i ;
         vl_uint32 * data ;
         out[0] = mxCreateNumericMatrix (625, 1, mxUINT32_CLASS, mxREAL) ;
         data = mxGetData(out[0]) ;
@@ -142,7 +148,7 @@ mexFunction(int nout, mxArray *out[],
                    mxGetNumberOfElements(in[1]) == 624+1             &&
                    ((vl_uint32 const*)mxGetData(in[1]))[624] <= 624  ) {
           /* TWISTER('state', STATE) */
-          int i ;
+          vl_uindex i ;
           vl_uint32 * data = mxGetData(in[1]) ;
           for (i = 0 ; i < 624 ; ++i) rand->mt[i] = data[i] ;
           rand->mti = data [624] ;
@@ -152,8 +158,8 @@ mexFunction(int nout, mxArray *out[],
           /* TWISTER('state', KEY) */
           vl_uint32 key [624] ;
           double const * x = mxGetPr(in[1]) ;
-          int n = mxGetNumberOfElements(in[1]) ;
-          int k ;
+          vl_size n = mxGetNumberOfElements(in[1]) ;
+          vl_uindex k ;
           for (k = 0 ; k < n ; ++k) {
             key [k] = x [k] ;
           }
