@@ -2,24 +2,24 @@
 %   SEL=VL_LOCALMAX(F) returns the indexes of the local maximizers of
 %   the Q-dimensional array F.
 %
-%   A local maximizer is an element whose value is greater than the
-%   value of all its neighbors.  The neighbors of an element i1...iQ
-%   have subscripts j1...jQ such that iq-1 <= jq <= iq (excluding
-%   i1...iQ itself).  For example, if Q=1 the neighbors of an element
-%   are its predecessor and successor in the linear order; if Q=2, its
-%   neighbors are the elements immediately to its north, south, west,
-%   est, north-west, north-est, south-west and south-est
+%   A local maximizer is an array element whose value is larger than
+%   the value of all its neighbors.  The neighbors of an element
+%   i1...iQ have subscripts j1...jQ such that iq-1 <= jq <= iq
+%   (excluding i1...iQ itself).  For example, if Q=1 the neighbors of
+%   an element are its predecessor and successor in the linear order;
+%   if Q=2, its neighbors are the elements immediately to its north,
+%   south, west, est, north-west, north-est, south-west and south-est
 %   (8-neighborhood).
 %
 %   Points on the boundary of F are ignored (and never selected as
 %   local maximizers).
 %
-%   SEL=VL_LOCALMAX(F,THRESH) accepts an element as a mazimizer only if
-%   it is not smaller thatn THRES.
+%   SEL=VL_LOCALMAX(F,THRESH) accepts an element as a mazimizer only
+%   if it is not smaller than THRESH.
 %
-%   SEL=VL_LOCALMAX(F,THRESH,P) looks for neighbors only in the first P
-%   dimensions of the Q-dimensional array F. This allows to process F
-%   in ``slices''.
+%   SEL=VL_LOCALMAX(F,THRESH,P) looks for neighbors only in the first
+%   P dimensions of the Q-dimensional array F. This allows to process
+%   F in ``slices''.
 %
 %   Remark:: Matrices (2-array) with a singleton dimension are
 %     interpreted as vectors (1-array). So for example VL_LOCALMAX([0 1
