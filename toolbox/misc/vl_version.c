@@ -33,7 +33,7 @@ mexFunction(int nout, mxArray *out[],
   VL_USE_MATLAB_ENV ;
 
   if (nout > 1) {
-    mxuError("illegalOutput", "Too many output arguments") ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {

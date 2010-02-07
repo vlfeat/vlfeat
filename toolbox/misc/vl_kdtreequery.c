@@ -72,28 +72,26 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 3) {
-    mxuError(vlmxErrInvalidArgument,
-             "Three argument required") ;
+    vlmxError(vlmxErrNotEnoughIputArguments, NULL) ;
   }
   if (nout > 2) {
-    mxuError(vlmxErrInvalidArgument,
-             "Too many output arguments");
+    vlmxError(vlmxErrTooManyOutoutArguments, NULL) ;
   }
 
   forest = new_kdforest_from_array (forest_array, data_array) ;
 
   dataClass = mxGetClassID (data_array) ;
   if (mxGetClassID (query_array) != dataClass) {
-    mxuError(vlmxErrInvalidArgument,
-             "QUERY must have the same storage class as DATA") ;
+    vlmxError(vlmxErrInvalidArgument,
+             "QUERY must have the same storage class as DATA.") ;
   }
   if (! vlmxIsReal (query_array)) {
-    mxuError(vlmxErrInvalidArgument,
-             "QUERY must be real") ;
+    vlmxError(vlmxErrInvalidArgument,
+             "QUERY must be real.") ;
   }
   if (! vlmxIsMatrix (query_array, forest->dimension, -1)) {
-    mxuError(vlmxErrInvalidArgument,
-             "QUERY must be a matrix with TREE.NUMDIMENSIONS rows") ;
+    vlmxError(vlmxErrInvalidArgument,
+             "QUERY must be a matrix with TREE.NUMDIMENSIONS rows.") ;
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
@@ -101,15 +99,15 @@ mexFunction(int nout, mxArray *out[],
       case opt_num_neighs :
         if (! vlmxIsScalar(optarg) ||
             (numNeighbors = mxGetScalar(optarg)) < 1) {
-          mxuError(vlmxErrInvalidArgument,
-                   "NUMNEIGHBORS must be a scalar not smaller than one") ;
+          vlmxError(vlmxErrInvalidArgument,
+                   "NUMNEIGHBORS must be a scalar not smaller than one.") ;
         }
         break;
 
       case opt_max_comparisons :
         if (! vlmxIsScalar(optarg)) {
-          mxuError(vlmxErrInvalidArgument,
-                   "MAXCOMPARISONS must be a scalar") ;
+          vlmxError(vlmxErrInvalidArgument,
+                   "MAXCOMPARISONS must be a scalar.") ;
         }
         maxNumComparisons = mxGetScalar(optarg) ;
         break;

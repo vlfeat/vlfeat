@@ -80,14 +80,15 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 1) {
-    VLMX_EIA("One argument required.") ;
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   } else if (nout > 2) {
-    VLMX_EIA("Too many output arguments.");
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
 
   if (mxGetNumberOfDimensions (in[IN_I]) != 2              ||
       mxGetClassID            (in[IN_I]) != mxSINGLE_CLASS ) {
-    VLMX_EIA("I must be a matrix of class SINGLE.") ;
+    vlmxError(vlmxErrInvalidArgument,
+              "I must be a matrix of class SINGLE.") ;
   }
 
   data = (float*) mxGetData (in[IN_I]) ;
@@ -122,19 +123,19 @@ mexFunction(int nout, mxArray *out[],
 
       case opt_size :
         if (!vlmxIsPlainScalar(optarg) || (size = (int) *mxGetPr(optarg)) <= 0) {
-          VLMX_EIA("SIZE must be a positive integer.") ;
+          vlmxError(vlmxErrInvalidArgument,"SIZE must be a positive integer.") ;
         }
         break ;
 
       case opt_step :
         if (!vlmxIsPlainScalar(optarg) || (step = (int) *mxGetPr(optarg)) <= 0) {
-          VLMX_EIA("STEP must be a positive integer.") ;
+          vlmxError(vlmxErrInvalidArgument,"STEP must be a positive integer.") ;
         }
         break ;
 
       case opt_window_size :
         if (!vlmxIsPlainScalar(optarg) || (windowSize = *mxGetPr(optarg)) < 0) {
-          VLMX_EIA("WINDOWSIZE must be a non-negative real.") ;
+          vlmxError(vlmxErrInvalidArgument,"WINDOWSIZE must be a non-negative real.") ;
         }
         break ;
 

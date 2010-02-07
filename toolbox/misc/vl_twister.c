@@ -39,7 +39,7 @@ mexFunction(int nout, mxArray *out[],
    ** -------------------------------------------------------------- */
 
   if (nout > 1) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "Too many output arguments");
   }
 
@@ -60,12 +60,12 @@ mexFunction(int nout, mxArray *out[],
       if (nin > 1) {
         /* TWISTER(N1 N2 ...) style */
         if (nin >= max_ndims) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "Too many dimensions") ;
         }
         for (k = 0 ; k < nin ; ++k) {
           if (! vlmxIsPlainScalar(in[k])) {
-            mxuError(vlmxErrInvalidArgument,
+            vlmxError(vlmxErrInvalidArgument,
                      "Invalid arguments") ;
           }
           dims [k] = *mxGetPr(in[k]) ;
@@ -75,7 +75,7 @@ mexFunction(int nout, mxArray *out[],
       } else if (nin == 1) {
         /* TWISTER([N1 N2 ...]) style */
         if (! vlmxIsPlainVector(in[0], -1)) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "Invalid argument") ;
         }
 
@@ -84,7 +84,7 @@ mexFunction(int nout, mxArray *out[],
         ndims = VL_MAX(2, n) ;
 
         if (ndims > max_ndims) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "Invalid argument") ;
         }
 
@@ -120,7 +120,7 @@ mexFunction(int nout, mxArray *out[],
       if (! vlmxIsString(in[0], -1)                    ||
           mxGetString(in[0], buff, buff_size)       ||
           vl_string_casei_cmp ("state", buff) != 0   ) {
-        mxuError(vlmxErrInvalidArgument,
+        vlmxError(vlmxErrInvalidArgument,
                  "Invalid argument") ;
       }
 

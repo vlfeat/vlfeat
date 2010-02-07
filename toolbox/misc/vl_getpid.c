@@ -26,11 +26,11 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[] VL_UNUSED)
 {
   if (nin > 0) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "no arguments accepted") ;
   }
   if (nout > 1) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "one output argument only") ;
   }
   double pid ;

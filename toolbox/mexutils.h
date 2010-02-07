@@ -24,20 +24,9 @@ General Public License version 2.
 #define vsnprintf _vsnprintf
 #endif
 
-#if ! defined (MX_API_VER) | (MX_API_VER < 0x07030000)
+#if ! defined (MX_API_VER) || (MX_API_VER < 0x07030000)
 typedef vl_uint32 mwSize ;
 typedef vl_int32 mwIndex ;
-#endif
-
-/* these attributes supporess undefined symbols warning with GCC */
-#ifdef VL_COMPILER_GNUC
-EXTERN_C void __attribute__((noreturn))
-mexErrMsgIdAndTxt
-(const char * identifier, const char * err_msg, ...) ;
-
-void __attribute__((noreturn))
-mxuError
-(char const * errorId, char const * errorMessage, ...) ;
 #endif
 
 /** @brief Access MEX input argument */
@@ -57,8 +46,6 @@ mxuError
 #define VL_USE_MATLAB_ENV                                       \
 vl_set_alloc_func (mxMalloc, mxRealloc, mxCalloc, mxFree) ;   \
 vl_set_printf_func (mexPrintf) ;
-
-#define vlmxError mxuError
 
 /** @file mexutils.h
 
@@ -146,7 +133,7 @@ vl_set_printf_func (mexPrintf) ;
  type-value pairs. Here type is a string identifying the option and
  value is a MATLAB array specifing its value. The function
  ::vlmxNextOption  can be used to simplify parsing a list of such
- arguments (similar to UNIX @c getopt). The functions ::mxuError
+ arguments (similar to UNIX @c getopt). The functions ::vlmxError
  and ::mxuWarning are shortcuts to specify VLFeat formatted errors.
 
  **/
@@ -155,9 +142,27 @@ vl_set_printf_func (mexPrintf) ;
  ** @name Error handling
  **/
 
-static char const vlmxErrInvalidArgument [] = "invalidArgument" ;
-static char const vlmxErrInvalidOption [] = "invalidOption" ;
-static char const vlmxErrInconsistentData [] = "inconsistentData" ;
+/** @brief VLFeat MEX errors */
+typedef enum _VlmxErrorId {
+  vlmxErrInvalidArgument = 1,
+  vlmxErrNotEnoughInputArguments,
+  vlmxErrTooManyInputArguments,
+  vlmxErrNotEnoughOutputArguments,
+  vlmxErrTooManyOutputArguments,
+  vlmxErrInvalidOption,
+  vlmxErrInconsistentData
+} VlmxErrorId ;
+
+/* these attributes supporess undefined symbols warning with GCC */
+#ifdef VL_COMPILER_GNUC
+EXTERN_C void __attribute__((noreturn))
+mexErrMsgIdAndTxt
+(const char * identifier, const char * err_msg, ...) ;
+
+void __attribute__((noreturn))
+vlmxError
+(VlmxErrorId errorId, char const * errorMessage, ...) ;
+#endif
 
 /** ------------------------------------------------------------------
  ** @brief Generate MEX error with VLFeat format
@@ -170,30 +175,47 @@ static char const vlmxErrInconsistentData [] = "inconsistentData" ;
  **/
 
 void
-mxuError(char const * errorId, char const * errorMessage, ...)
+vlmxError(VlmxErrorId errorId, char const * errorMessage, ...)
 {
+  char const * errorString ;
   char formattedErrorId [512] ;
   char formattedErrorMessage [1024] ;
   va_list args;
   va_start(args, errorMessage) ;
 
-  if (! errorId) {
-    errorId = "undefinedError" ;
+  switch (errorId) {
+  case vlmxErrInvalidArgument : errorString = "invalidArgument" ; break ;
+  case vlmxErrNotEnoughInputArguments : errorString = "notEnoughInputArguments" ; break ;
+  case vlmxErrTooManyInputArguments : errorString = "tooManyInputArguments" ; break ;
+  case vlmxErrNotEnoughOutputArguments : errorString = "notEnoughOutputArguments" ; break ;
+  case vlmxErrTooManyOutputArguments : errorString = "tooManyOutputArguments" ; break ;
+  case vlmxErrInvalidOption : errorString = "invalidOption" ; break ;
+  case vlmxErrInconsistentData : errorString = "inconsistentData" ; break ;
+  default : errorString = "undefinedError" ; break ;
   }
 
   if (! errorMessage) {
-    errorMessage = "Undefined error description" ;
+    switch (errorId) {
+      case vlmxErrInvalidArgument: errorMessage = "Invalid argument." ; break ;
+      case vlmxErrNotEnoughInputArguments: errorMessage = "Not enough input arguments." ; break ;
+      case vlmxErrTooManyInputArguments: errorMessage = "Too many input arguments." ; break ;
+      case vlmxErrNotEnoughOutputArguments: errorMessage = "Not enough output arguments." ; break ;
+      case vlmxErrTooManyOutputArguments: errorMessage = "Too many output arguments." ; break ;
+      case vlmxErrInconsistentData: errorMessage = "Inconsistent data." ; break ;
+      case vlmxErrInvalidOption: errorMessage = "Invalid option." ; break ;
+      default: errorMessage = "Undefined error message." ;
+    }
   }
 
 #ifdef VL_COMPILER_LCC
   sprintf(formattedErrorId,
-          "VLFeat:%s", errorId) ;
+          "vlfeat:%s", errorString) ;
   vsprintf(formattedErrorMessage,
            errorMessage, args) ;
 #else
   snprintf(formattedErrorId,
            sizeof(formattedErrorId)/sizeof(char),
-           "VLFeat:%s", errorId) ;
+           "vlfeat:%s", errorString) ;
   vsnprintf(formattedErrorMessage,
             sizeof(formattedErrorMessage)/sizeof(char),
             errorMessage, args) ;
@@ -201,13 +223,6 @@ mxuError(char const * errorId, char const * errorMessage, ...)
   va_end(args) ;
   mexErrMsgIdAndTxt(formattedErrorId, formattedErrorMessage) ;
 }
-
-/** @brief Generate invalid argument error */
-#ifdef VL_COMPILER_LCC
-#define VLMX_EIA(msg) mxuError("invalidArgument", msg)
-#else
-#define VLMX_EIA(...) mxuError("invalidArgument", __VA_ARGS__)
-#endif
 
 /** @} */
 
@@ -364,13 +379,13 @@ vlmxIsArray (mxArray const * array, vl_index numDimensions, vl_index* dimensions
     vl_index d ;
     mwSize const * actualDimensions = mxGetDimensions (array) ;
 
-    if (mxGetNumberOfDimensions (array) != numDimensions) {
+    if (mxGetNumberOfDimensions (array) != (unsigned) numDimensions) {
       return VL_FALSE ;
     }
 
     if(dimensions != NULL) {
       for(d = 0 ; d < numDimensions ; ++d) {
-        if (dimensions[d] >= 0 && dimensions[d] != actualDimensions[d])
+        if (dimensions[d] >= 0 && (unsigned) dimensions[d] != actualDimensions[d])
           return VL_FALSE ;
       }
     }
@@ -566,18 +581,18 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
   /* check the array is a string */
   if (! vlmxIsString (args [*next], -1)) {
-    mxuError (vlmxErrInvalidOption,
-              "The option name is not a string (argument number %d)",
-              *next + 1) ;
+    vlmxError (vlmxErrInvalidOption,
+               "The option name is not a string (argument number %d)",
+               *next + 1) ;
   }
 
   /* retrieve option name */
   len = mxGetNumberOfElements (args [*next]) ;
 
   if (mxGetString (args [*next], name, sizeof(name))) {
-    mxuError (vlmxErrInvalidOption,
-              "The option name is too long (argument number %d)",
-              *next + 1) ;
+    vlmxError (vlmxErrInvalidOption,
+               "The option name is too long (argument number %d)",
+               *next + 1) ;
   }
 
   /* advance argument list */
@@ -593,8 +608,8 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
   /* unknown argument */
   if (opt < 0) {
-    mxuError (vlmxErrInvalidOption,
-              "Unknown option '%s'", name) ;
+    vlmxError (vlmxErrInvalidOption,
+               "Unknown option '%s'.", name) ;
   }
 
   /* no argument */
@@ -605,8 +620,8 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
   /* argument */
   if (*next >= nargs) {
-    mxuError(vlmxErrInvalidOption,
-             "Option '%s' requires an argument", options[i].name) ;
+    vlmxError(vlmxErrInvalidOption,
+              "Option '%s' requires an argument.", options[i].name) ;
   }
 
   if (optarg) *optarg = args [*next] ;

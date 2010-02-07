@@ -67,11 +67,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    * -------------------------------------------------------------- */
 
   if (nin < 2) {
-    mxuError (vlmxErrInvalidArgument,
+    vlmxError (vlmxErrInvalidArgument,
               "At least two arguments required.");
   }
   else if (nout > 3) {
-    mxuError (vlmxErrInvalidArgument,
+    vlmxError (vlmxErrInvalidArgument,
               "Too many output arguments.");
   }
 
@@ -80,7 +80,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     case mxSINGLE_CLASS: dataType = VL_TYPE_FLOAT ; break ;
     case mxDOUBLE_CLASS: dataType = VL_TYPE_DOUBLE ; break ;
     default:
-      mxuError (vlmxErrInvalidArgument,
+      vlmxError (vlmxErrInvalidArgument,
                 "DATA must be of class SINGLE or DOUBLE") ;
       assert(0) ;
   }
@@ -91,7 +91,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   if (!vlmxIsPlainScalar(IN(NUMCENTERS)) ||
       (numCenters = (vl_size) mxGetScalar(IN(NUMCENTERS))) < 1  ||
       numCenters > numData) {
-    mxuError (vlmxErrInvalidArgument,
+    vlmxError (vlmxErrInvalidArgument,
               "NUMCENTERS must be a positive integer not greater "
               "than the number of data.") ;
   }
@@ -108,18 +108,18 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       case opt_max_num_iterations :
         if (!vlmxIsPlainScalar(optarg) ||
             (maxNumIterations = (vl_size) mxGetScalar(optarg)) < 0) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "MAXNUMITERATIONS must be a non-negative integer scalar") ;
         }
         break ;
 
       case opt_algorithm :
         if (!vlmxIsString (optarg, -1)) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "ALGORITHM must be a string.") ;
         }
         if (mxGetString (optarg, buf, sizeof(buf))) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "ALGORITHM argument too long.") ;
         }
         if (uStrICmp("lloyd", buf) == 0) {
@@ -129,18 +129,18 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         } else if (uStrICmp("ann", buf) == 0) {
           algorithm = VlKMeansANN ;
         } else {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "Invalid value %s for ALGORITHM", buf) ;
         }
         break ;
 
       case opt_initialization :
         if (!vlmxIsString (optarg, -1)) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "INITLAISATION must be a string.") ;
         }
         if (mxGetString (optarg, buf, sizeof(buf))) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "INITIALISATION argument too long.") ;
         }
         if (uStrICmp("plusplus", buf) == 0 ||
@@ -149,18 +149,18 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         } else if (uStrICmp("randsel", buf) == 0) {
           initialization = INIT_RANDSEL ;
         } else {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "Invalid value %s for INITIALISATION", buf) ;
         }
         break ;
 
       case opt_distance :
         if (!vlmxIsString (optarg, -1)) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "DISTANCE must be a string.") ;
         }
         if (mxGetString (optarg, buf, sizeof(buf))) {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "DISTANCE argument too long.") ;
         }
         if (uStrICmp("l2", buf) == 0) {
@@ -170,7 +170,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         } else if (uStrICmp("chi2", buf) == 0) {
           distance = VlDistanceChi2 ;
         } else {
-          mxuError (vlmxErrInvalidArgument,
+          vlmxError (vlmxErrInvalidArgument,
                     "Invalid value %s for DISTANCE", buf) ;
         }
         break ;

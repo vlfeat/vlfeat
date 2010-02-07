@@ -65,10 +65,10 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 1) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "At least one argument required") ;
   } else if (nout > 2) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "Too many output arguments");
   }
 
@@ -76,7 +76,7 @@ mexFunction(int nout, mxArray *out[],
 
   if (! vlmxIsMatrix (IN(DATA), -1, -1) ||
       ! vlmxIsReal (IN(DATA))) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "DATA must be a real matrix ") ;
   }
 
@@ -84,7 +84,7 @@ mexFunction(int nout, mxArray *out[],
     case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
     case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
     default:
-      mxuError(vlmxErrInvalidArgument,
+      vlmxError(vlmxErrInvalidArgument,
                "DATA must be either SINGLE or DOUBLE") ;
   }
 
@@ -94,7 +94,7 @@ mexFunction(int nout, mxArray *out[],
       case opt_threshold_method :
         mxGetString (optarg, buffer, sizeof(buffer)/sizeof(buffer[0])) ;
         if (! vlmxIsString(optarg, -1)) {
-          mxuError(vlmxErrInvalidOption,
+          vlmxError(vlmxErrInvalidOption,
                    "THRESHOLDMETHOD must be a string") ;
         }
         if (vl_string_casei_cmp(buffer, "median") == 0) {
@@ -102,7 +102,7 @@ mexFunction(int nout, mxArray *out[],
         } else if (vl_string_casei_cmp(buffer, "mean") == 0) {
           thresholdingMethod = VL_KDTREE_MEAN ;
         } else {
-          mxuError(vlmxErrInvalidOption,
+          vlmxError(vlmxErrInvalidOption,
                    "Unknown thresholding method %s", buffer) ;
         }
         break ;
@@ -110,7 +110,7 @@ mexFunction(int nout, mxArray *out[],
       case opt_num_trees :
         if (! vlmxIsScalar(optarg) ||
             (numTrees = mxGetScalar(optarg)) < 1) {
-          mxuError(vlmxErrInvalidOption,
+          vlmxError(vlmxErrInvalidOption,
                    "NUMTREES must be not smaller than one") ;
         }
         break ;

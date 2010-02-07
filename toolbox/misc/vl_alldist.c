@@ -69,11 +69,10 @@ mexFunction(int nout, mxArray *out[],
   VL_USE_MATLAB_ENV ;
 
   if (nin < 1) {
-    mxuError(vlmxErrInvalidArgument, "At least one argument is required") ;
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
-
   if (! (vlmxIsMatrix (in[IN_X],-1,-1) && vlmxIsReal(in[IN_X]))) {
-    mxuError(vlmxErrInvalidArgument, "X must be a real matrix") ;
+    vlmxError(vlmxErrInvalidArgument, "X must be a real matrix.") ;
   }
   next = 1 ;
   classId = mxGetClassID(in[IN_X]) ;
@@ -85,16 +84,16 @@ mexFunction(int nout, mxArray *out[],
     autoComparison = VL_FALSE ;
     numDataY = mxGetN(in[IN_Y]) ;
     if (mxGetClassID(in[IN_Y]) != classId) {
-      mxuError(vlmxErrInvalidArgument, "X and Y must have the same class") ;
+      vlmxError(vlmxErrInvalidArgument, "X and Y must have the same class.") ;
     }
     if (dimension != mxGetM(in[IN_Y])) {
-      mxuError(vlmxErrInvalidArgument, "X and Y must have the same number of rows") ;
+      vlmxError(vlmxErrInvalidArgument, "X and Y must have the same number of rows.") ;
     }
   }
 
   if (classId != mxSINGLE_CLASS && classId != mxDOUBLE_CLASS) {
-    mxuError(vlmxErrInvalidArgument,
-             "X must be either of class SINGLE or DOUBLE");
+    vlmxError(vlmxErrInvalidArgument,
+             "X must be either of class SINGLE or DOUBLE.");
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {

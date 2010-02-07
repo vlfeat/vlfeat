@@ -26,22 +26,19 @@ mexFunction(int nout, mxArray *out[],
   double *R_pt ;
 
   if (nin < 3) {
-    mxuError(vlmxErrInvalidArgument,
-             "At least three arguments are required") ;
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
   if (nin > 4) {
-    mxuError(vlmxErrInvalidArgument,
-             "At most four arguments are accepted") ;
+    vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
   if (nout > 1) {
-    mxuError(vlmxErrInvalidArgument,
-             "At most one output argument is accepted") ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
 
   if(! vlmxIsPlain (IN(H)) ||
      ! vlmxIsPlain (IN(X)) ||
      ! vlmxIsPlain (IN(B)) ) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "All arguments must be plain arrays.") ;
   }
 
@@ -59,7 +56,7 @@ mexFunction(int nout, mxArray *out[],
   R_pt = mxGetPr(out[0]) ;
 
   if ((KX != KB) && (KX > 1)) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "X and B must have the same number of elements, or X must be a scalar.") ;
   }
 
@@ -73,7 +70,7 @@ mexFunction(int nout, mxArray *out[],
 
       /* bin index out of bounds ?*/
       if(j < -1 || j >= (signed) KH) {
-        mxuError(vlmxErrInconsistentData,
+        vlmxError(vlmxErrInconsistentData,
                  "Index B(%"  VL_FMT_INDEX ") = %" VL_FMT_INDEX " out of bound",
                  (vl_index)(B_pt - mxGetPr(IN(B))),
                  j + 1) ;
@@ -109,8 +106,8 @@ mexFunction(int nout, mxArray *out[],
 
     /* We need to check a few more details about the matrices */
     if (d >= HD) {
-      mxuError(vlmxErrInconsistentData,
-               "DIM out of bound") ;
+      vlmxError(vlmxErrInconsistentData,
+               "DIM out of bounds.") ;
     }
 
     /*
@@ -124,13 +121,13 @@ mexFunction(int nout, mxArray *out[],
 
     if (HD != BD) {
       if (! d == HD - 1 && BD == HD-1) {
-        mxuError(vlmxErrInconsistentData,
+        vlmxError(vlmxErrInconsistentData,
                  "H and B must have the same number of dimensions.") ;
       }
     }
 
     if ((BD != XD) && (KX > 1)) {
-      mxuError(vlmxErrInconsistentData,
+      vlmxError(vlmxErrInconsistentData,
                "X mut have the same number of dimensions of B or be a scalar.") ;
     }
 
@@ -142,11 +139,11 @@ mexFunction(int nout, mxArray *out[],
 
     for(k = 0 ; k < (signed) XD ; ++k) {
       if (KX > 1 &&  Xdims[k] != Bdims[k]) {
-        mxuError(vlmxErrInconsistentData,
+        vlmxError(vlmxErrInconsistentData,
                  "X and B have incompatible dimensions.") ;
       }
       if (k != (signed) d && (Bdims[k] != Hdims[k])) {
-        mxuError(vlmxErrInconsistentData,
+        vlmxError(vlmxErrInconsistentData,
                  "B and H have incompatible dimensions.") ;
       }
       if (k < (signed) d) {
@@ -201,8 +198,8 @@ mexFunction(int nout, mxArray *out[],
 
       /* index out of bounds? */
       if(j < -1 || j >= (signed) KH) {
-        mxuError(vlmxErrInconsistentData,
-                 "Index B(%"  VL_FMT_INDEX ") = %" VL_FMT_INDEX " out of bound",
+        vlmxError(vlmxErrInconsistentData,
+                 "Index B(%"  VL_FMT_INDEX ") = %" VL_FMT_INDEX " out of bounds.",
                  (vl_index)(B_pt - mxGetPr(IN(B))),
                  j + 1) ;
       }

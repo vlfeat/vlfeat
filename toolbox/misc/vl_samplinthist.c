@@ -66,23 +66,23 @@ mexFunction(int nout, mxArray *out[],
   **                                                Check the arguments
   ** --------------------------------------------------------------- */
   if (nin != 2) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "Two arguments required.") ;
   } else if (nout > 1) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "Too many output arguments.");
   }
 
   histClass = mxGetClassID(in[IN_INTHIST]) ;
   if (histClass != mxDOUBLE_CLASS &&
       histClass != mxUINT32_CLASS) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "INTHIST must be of either class DOUBLE or UINT32.") ;
   }
 
   numDims = mxGetNumberOfDimensions(in[IN_INTHIST]) ;
   if (numDims > 3) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "INTHIST must be a MxNxK array.") ;
   }
   intHistPt = mxGetData(in[IN_INTHIST]) ;
@@ -94,13 +94,13 @@ mexFunction(int nout, mxArray *out[],
 
   numBoxes = mxGetNumberOfElements(in[IN_BOXES]) ;
   if (numBoxes % 4 != 0) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "The number of elements of BOXES must be a multiple of four.") ;
   }
   numBoxes /= 4 ;
 
   if (mxGetClassID(in[IN_BOXES]) != mxUINT32_CLASS) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "BOXES must be of class UINT32.") ;
   }
   boxesPt = (vl_uint32*) mxGetData(in[IN_BOXES]) ;

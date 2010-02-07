@@ -31,11 +31,11 @@ SAMPLE (T* histPt,
     }
 
     if (x1 < 1  || y1 < 1) {
-      mxuError(vlmxErrInconsistentData,
+      vlmxError(vlmxErrInconsistentData,
                "Box %d is out of bounds.", bi + 1) ;
     }
     if (x2 > width || y2 > height) {
-      mxuError(vlmxErrInconsistentData,
+      vlmxError(vlmxErrInconsistentData,
                "Box %d is out of bounds.", bi + 1) ;
     }
 

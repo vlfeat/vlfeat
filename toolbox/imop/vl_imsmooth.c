@@ -217,7 +217,7 @@ mexFunction(int nout, mxArray *out[],
         } else if (uStrICmp("continuity", buf) == 0) {
           padding = VL_PAD_BY_CONTINUITY ;
         } else {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "PADDING must be either ZERO or CONTINUITY, was '%s'",
                    buf) ;
         }
@@ -226,12 +226,12 @@ mexFunction(int nout, mxArray *out[],
 
       case opt_subsample :
         if (!vlmxIsPlainScalar(optarg)) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "SUBSAMPLE must be a scalar") ;
         }
         step = *mxGetPr(optarg) ;
         if (step < 1) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "SUBSAMPLE must be not less than one") ;
         }
         break ;
@@ -241,7 +241,7 @@ mexFunction(int nout, mxArray *out[],
         enum {buflen = 32} ;
         char buf [buflen] ;
         if (!vlmxIsString(optarg, -1)) {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "KERNEL argument must be a string") ;
         }
         mxGetString(optarg, buf, buflen) ;
@@ -251,7 +251,7 @@ mexFunction(int nout, mxArray *out[],
         } else if (uStrICmp("triangular", buf) == 0) {
           kernel = TRIANGULAR ;
         } else {
-          mxuError(vlmxErrInvalidArgument,
+          vlmxError(vlmxErrInvalidArgument,
                    "Unknown kernel type '%s'",
                    buf) ;
         }
@@ -268,7 +268,7 @@ mexFunction(int nout, mxArray *out[],
   }
 
   if (! vlmxIsPlainScalar(IN(S))) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "S must be a real scalar") ;
   }
 
@@ -276,11 +276,11 @@ mexFunction(int nout, mxArray *out[],
 
   if (classid != mxDOUBLE_CLASS &&
       classid != mxSINGLE_CLASS) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "I must be either DOUBLE or SINGLE") ;
   }
   if (mxGetNumberOfDimensions(IN(I)) > 3) {
-    mxuError(vlmxErrInvalidArgument,
+    vlmxError(vlmxErrInvalidArgument,
              "I must be either a two or three dimensional array") ;
   }
 
