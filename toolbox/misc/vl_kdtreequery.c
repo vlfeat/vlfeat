@@ -72,10 +72,10 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (nin < 3) {
-    vlmxError(vlmxErrNotEnoughIputArguments, NULL) ;
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
   if (nout > 2) {
-    vlmxError(vlmxErrTooManyOutoutArguments, NULL) ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
 
   forest = new_kdforest_from_array (forest_array, data_array) ;
