@@ -16,6 +16,11 @@ mexFunction(int nout, mxArray *out[],
 
   vl_bool wasEnabled = vl_get_simd_enabled() ;
 
+  if (nout > 1) {
+    vlmxError(vlmxErrInvalidArgument,
+              "at most one output argument") ;
+  }
+
   OUT(ENABLED) = vlmxCreatePlainScalar (wasEnabled) ;
 
   if (nin == 0) {
