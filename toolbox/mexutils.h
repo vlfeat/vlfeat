@@ -209,13 +209,13 @@ vlmxError(VlmxErrorId errorId, char const * errorMessage, ...)
 
 #ifdef VL_COMPILER_LCC
   sprintf(formattedErrorId,
-          "vlfeat:%s", errorString) ;
+          "vl:%s", errorString) ;
   vsprintf(formattedErrorMessage,
            errorMessage, args) ;
 #else
   snprintf(formattedErrorId,
            sizeof(formattedErrorId)/sizeof(char),
-           "vlfeat:%s", errorString) ;
+           "vl:%s", errorString) ;
   vsnprintf(formattedErrorMessage,
             sizeof(formattedErrorMessage)/sizeof(char),
             errorMessage, args) ;
