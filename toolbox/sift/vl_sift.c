@@ -111,17 +111,17 @@ korder (void const* a, void const* b) {
  ** @return 1 if the keypoints are storted.
  **/
 
-int
-check_sorted (double const * keys, int unsigned nkeys)
+vl_bool
+check_sorted (double const * keys, vl_size nkeys)
 {
-  int k ;
-  for (k = 0 ; k < nkeys-1 ; ++ k) {
+  vl_uindex k ;
+  for (k = 0 ; k + 1 < nkeys ; ++ k) {
     if (korder(keys, keys + 4) > 0) {
-      return 0 ;
+      return VL_FALSE ;
     }
     keys += 4 ;
   }
-  return 1 ;
+  return VL_TRUE ;
 }
 
 /** ------------------------------------------------------------------
