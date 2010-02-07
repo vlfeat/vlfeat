@@ -12,7 +12,7 @@ void
 init_data (vl_size numDimensions, vl_size numSamples, float ** X, float ** Y)
 {
   VlRand * rand = vl_get_rand() ;
-  int i ;
+  vl_uindex i ;
   float * Xi = *X = vl_malloc(sizeof(float) * numDimensions * numSamples) ;
   float * Yi = *Y = vl_malloc(sizeof(float) * numDimensions * numSamples) ;
   for (i = 0 ; i < numDimensions * numSamples ; ++ i) {
@@ -22,7 +22,7 @@ init_data (vl_size numDimensions, vl_size numSamples, float ** X, float ** Y)
 }
 
 int
-main (int argc, char** argv)
+main (int argc VL_UNUSED, char** argv VL_UNUSED)
 {
   float * X ;
   float * Y ;

@@ -8,7 +8,7 @@
 #include <vl/generic.h>
 
 int
-main(int argc, char**argv)
+main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 {
   vl_print_info() ;
   return 0 ;

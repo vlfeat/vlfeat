@@ -4,7 +4,7 @@
 #include <float.h>
 
 int
-main(int argc, char** argv)
+main (int argc VL_UNUSED, char** argv VL_UNUSED)
 {
   int error = 0 ;
 
@@ -57,7 +57,7 @@ main(int argc, char** argv)
 #define T vl_uint32
 #define STEP 7
 #include "test_mathop_fast_sqrt_ui.tc"
-  
+
 #undef SFX
 #undef T
 #undef STEP
@@ -65,7 +65,7 @@ main(int argc, char** argv)
 #define T vl_uint16
 #define STEP 0
 #include "test_mathop_fast_sqrt_ui.tc"
-  
+
 #undef SFX
 #undef T
 #undef STEP

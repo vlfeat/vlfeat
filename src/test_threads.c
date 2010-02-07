@@ -52,11 +52,11 @@ testThread(LPVOID args)
 #endif
 
 int
-main(int argc, char** argv)
+main(int argc VL_UNUSED, char** argv VL_UNUSED)
 {
 #ifdef VL_THREADS_ENABLED
 #if defined(VL_THREADS_POSIX)
-  int i ;
+  vl_uindex i ;
   pthread_t threads [5] ;
   int threadIds [5] ;
   for (i = 0 ; i < sizeof(threads) / sizeof(threads[0]) ; ++i) {

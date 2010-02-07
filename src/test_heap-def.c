@@ -26,7 +26,7 @@ void s_swap (S * v, vl_uindex a, vl_uindex b)
   S t = v[a] ;
   v[a] = v[b] ;
   v[b] = t ;
-  printf("Swapping %x with %x\n", a, b) ;
+  printf("Swapping %" VL_FMT_UINDEX "x with %" VL_FMT_UINDEX "\n", a, b) ;
 }
 
 #define VL_HEAP_prefix  s_heap
@@ -60,9 +60,9 @@ void h_swap (H * h, vl_uindex a, vl_uindex b) {
 #include <vl/heap-def.h>
 
 int
-main (int argc, char** argv)
+main (int argc VL_UNUSED, char** argv VL_UNUSED)
 {
-  int i ;
+  vl_uindex i ;
   vl_size numNodes = 0 ;
   float data [] = {1.01, 5.02, 8, 0.1, 100, 3, 9, 4, 1.02} ;
   S data_s [] = {{5}, {7}, {9}, {1}} ;
@@ -74,13 +74,13 @@ main (int argc, char** argv)
 
   printf("Pushing heap\n") ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    printf ("%5d: %f\n", i, data[i]) ;
+    printf ("%5" VL_FMT_UINDEX ": %f\n", i, data[i]) ;
     vl_heap_float_push (data, &numNodes) ;
   }
 
   printf("Popping heap\n") ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    printf ("%5d: %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
+    printf ("%" VL_FMT_UINDEX ": %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
   }
 
   printf("Refilling, updating fourth element, and popping again\n") ;
@@ -91,44 +91,44 @@ main (int argc, char** argv)
   data [3] = 9.01 ;
   vl_heap_float_update (data, numNodes, 3) ;
   for (i = 0 ; i < sizeof(data) / sizeof(data[0]) ; ++i) {
-    printf ("%5d:  %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
+    printf ("%" VL_FMT_UINDEX ":  %f\n", i, data[vl_heap_float_pop (data, &numNodes)]) ;
   }
 
   printf("Pushing heap of structures\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, data_s[i].x) ;
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, data_s[i].x) ;
     s_heap_push (data_s, &numNodes) ;
   }
 
   printf("Popping heap of structures\n") ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, data_s[s_heap_pop (data_s, &numNodes)].x) ;
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, data_s[s_heap_pop (data_s, &numNodes)].x) ;
   }
 
   printf("Pushing heap of structures with custom swap\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, data_s_track[i].x) ;
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, data_s_track[i].x) ;
     track_s_heap_push (data_s_track, &numNodes) ;
   }
 
   printf("Popping heap of structures with custom swap\n") ;
   for (i = 0 ; i < sizeof(data_s) / sizeof(data_s[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, data_s_track
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, data_s_track
                [track_s_heap_pop (data_s_track, &numNodes)].x) ;
   }
 
   printf("Pushing heap of structures with custom container\n") ;
   numNodes = 0 ;
   for (i = 0 ; i < sizeof(data_h) / sizeof(data_h[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, h.array[i]) ;
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, h.array[i]) ;
     h_heap_push (&h, &h.numNodes) ;
   }
 
   printf("Popping heap of structures with custom container\n") ;
   for (i = 0 ; i < sizeof(data_h) / sizeof(data_h[0]) ; ++i) {
-    printf ("s[%5d].x = %d\n", i, h.array
+    printf ("s[%" VL_FMT_UINDEX "].x = %d\n", i, h.array
                [h_heap_pop (&h, &h.numNodes)]) ;
   }
 

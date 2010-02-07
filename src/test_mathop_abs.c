@@ -13,9 +13,9 @@
 #include <math.h>
 
 int
-main(int argc, char**argv)
+main(int argc VL_UNUSED, char**argv VL_UNUSED)
 {
-  VlRand * rand = vl_get_state() ;
+  VlRand * rand = vl_get_rand() ;
   vl_size numData = 100000000 ;
   vl_size i ;
   float * X = vl_malloc(sizeof(float) * numData) ;

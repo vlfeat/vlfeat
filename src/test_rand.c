@@ -9,8 +9,8 @@
 #include <vl/random.h>
 
 int
-main (int argc, char *argv[])
-{    
+main (int argc VL_UNUSED, char *argv[] VL_UNUSED)
+{
   int i ;
   vl_uint32 init [4] = {0x123, 0x234, 0x345, 0x456} ;
   VlRand rand ;
