@@ -1,5 +1,5 @@
 /** @internal
- ** @file     binsearch.c
+ ** @file     vl_binsearch.c
  ** @brief    vl_binsearch - MEX definition
  ** @author   Andrea Vedaldi
  **/
@@ -13,63 +13,57 @@ GNU GPLv2, or (at your option) any later version.
 
 #include <mexutils.h>
 
-/** @brief Driver.
- **
- ** @param nount number of output arguments.
- ** @param out output arguments.
- ** @param nin number of input arguments.
- ** @param in input arguments.
- **/
 void
-mexFunction(int nout, mxArray *out[],
+mexFunction(int nout VL_UNUSED, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum { IN_B=0, IN_X, IN_END } ;
   enum { OUT_IDX=0 } ;
-  int NX, NB ;
+  vl_size numElementsX, numElementsB ;
   const double *X, *B ;
   double *IDX ;
 
-  if( nin != 2 ) {
-    mexErrMsgTxt("Exactly two arguments are required.") ;
+  if (nin != 2) {
+    vlmxError(vlmxErrInvalidArgument,
+              "Incorrect number of arguments.") ;
+  }
+  if (! vlmxIsPlain (IN(B)) ||
+      ! vlmxIsPlain (IN(X)) ) {
+    vlmxError(vlmxErrInvalidArgument,
+              "All arguments must be plain arrays.") ;
   }
 
-  if(! vlmxIsPlain (in[IN_B]) ||
-     ! vlmxIsPlain (in[IN_X])) {
-    mexErrMsgTxt("All arguments must be plain arrays.") ;
-  }
-
-  NX = mxGetNumberOfElements(in[IN_X]) ;
-  NB = mxGetNumberOfElements(in[IN_B]) ;
+  numElementsX = mxGetNumberOfElements(IN(X)) ;
+  numElementsB = mxGetNumberOfElements(IN(B)) ;
 
   {
-    mwSize const * dims = mxGetDimensions(in[IN_X]) ;
-    int unsigned ndims = mxGetNumberOfDimensions(in[IN_X]) ;
-    out[OUT_IDX] = mxCreateNumericArray (ndims, dims, mxDOUBLE_CLASS, mxREAL) ;
+    mwSize const * dimensions = mxGetDimensions(IN(X)) ;
+    vl_size numDimensions = mxGetNumberOfDimensions(IN(X)) ;
+    OUT(IDX) = mxCreateNumericArray (numDimensions, dimensions, mxDOUBLE_CLASS, mxREAL) ;
   }
 
   /* if B is empty it defines only [-inf, +inf) */
-  if (NB == 0) return ;
+  if (numElementsB == 0) return ;
 
-  IDX = mxGetPr(out[OUT_IDX]) ;
-  X = mxGetPr(in[IN_X]) ;
-  B = mxGetPr(in[IN_B]) ;
+  IDX = mxGetPr(OUT(IDX)) ;
+  X = mxGetPr(IN(X)) ;
+  B = mxGetPr(IN(B)) ;
 
   {
-    int i ;
-    for (i = 0 ; i < NX ; ++i) {
+    vl_uindex i ;
+    for (i = 0 ; i < numElementsX ; ++i) {
       double x = X[i] ;
-      int blower = 0 ;
-      int bupper = NB - 1 ;
-      int bsplit ;
+      vl_uindex blower = 0 ;
+      vl_uindex bupper = numElementsB - 1 ;
+      vl_uindex bsplit ;
 
       if (x < B[0]) {
         IDX [i] = 0 ;
         continue ;
       }
 
-      if (x >= B[NB-1]) {
-        IDX [i] = NB ;
+      if (x >= B[numElementsB - 1]) {
+        IDX [i] = numElementsB ;
         continue ;
       }
 
