@@ -25,15 +25,15 @@ void
 mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[] VL_UNUSED)
 {
+  double pid ;
+
   if (nin > 0) {
-    vlmxError(vlmxErrInvalidArgument,
-             "no arguments accepted") ;
+    vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
   if (nout > 1) {
-    vlmxError(vlmxErrInvalidArgument,
-             "one output argument only") ;
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
-  double pid ;
+
 #ifdef VL_OS_WIN
   pid = (double) GetCurrentProcessId() ;
 #else
