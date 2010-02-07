@@ -63,7 +63,7 @@ restore_parent_recursively (VlKDTree * tree, int nodeIndex, int * numNodesToVisi
 static mxArray *
 new_array_from_kdforest (VlKDForest const * forest)
 {
-  int ti ;
+  vl_uindex ti ;
   mwSize dims [] = {1,1} ;
   mwSize treeDims [] = {1,0} ;
   char const * fieldNames [] = {
@@ -123,7 +123,7 @@ new_array_from_kdforest (VlKDForest const * forest)
       vl_uint32 * lowerChild = mxGetData (lowerChild_array) ;
       vl_uint32 * splitDimension = mxGetData (splitDimension_array) ;
       double * splitThreshold = mxGetData (splitThreshold_array) ;
-      int ni ;
+      vl_uindex ni ;
 
       for (ni = 0 ; ni < tree -> numUsedNodes ; ++ ni) {
         VlKDTreeNode const * node = tree -> nodes + ni ;
