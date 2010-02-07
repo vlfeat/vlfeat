@@ -10,6 +10,8 @@ function results = vl_test(suite, test)
 %  SUCCEDED:   a boolean flag indicating whether the test succeded
 %  EXCEPTION:  the exception generated if the test failed
 %
+%  VL_TEST(SUITE) runs only the specified SUITE.
+%
 %  VL_TEST(SUITE, TEST) runs the specified SUITE/TEST without catching
 %  the potential exception. Useful to DBSTOP to debug.
 %
@@ -23,7 +25,11 @@ testRoot = fileparts(mfilename('fullpath')) ;
 
 if nargin == 0
   files = dir(fullfile(testRoot, 'vl_test_*m')) ;
+elseif nargin == 1
+  files.name = fullfile(['vl_test_' suite '.m']) ;
+end
 
+if nargin < 2
   results = {} ;
   for i = 1:length(files)
     testCommand = files(i).name(1:end-2) ;
