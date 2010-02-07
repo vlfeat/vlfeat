@@ -55,7 +55,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int verbosity = 0 ;
   int initialization = INIT_PLUSPLUS ;
 
-  int dataType ;
+  vl_type dataType ;
   mxClassID classID ;
 
   VlKMeans * kmeans ;
