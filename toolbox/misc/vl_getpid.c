@@ -23,8 +23,16 @@ GNU GPLv2, or (at your option) any later version.
 
 void
 mexFunction(int nout, mxArray *out[],
-            int nin, const mxArray *in[])
+            int nin, const mxArray *in[] VL_UNUSED)
 {
+  if (nin > 0) {
+    mxuError(vlmxErrInvalidArgument,
+             "no arguments accepted") ;
+  }
+  if (nout > 1) {
+    mxuError(vlmxErrInvalidArgument,
+             "one output argument only") ;
+  }
   double pid ;
 #ifdef VL_OS_WIN
   pid = (double) GetCurrentProcessId() ;
