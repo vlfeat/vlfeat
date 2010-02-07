@@ -4,9 +4,15 @@
 
 # AUTORIGHTS
 
-# The following programs are needed only to generate the
-# documentation:
-#
+info: doc-info
+clean: doc-clean
+distclean: doc-distclean
+archclean: doc-archclean
+
+# --------------------------------------------------------------------
+#                                                        Configuration
+# --------------------------------------------------------------------
+
 # PYTHON:       Python interpreter
 # DOXYGEN:      Doxygen documentation system
 # DVIPNG:       TeX DVI to PNG converter
@@ -26,15 +32,18 @@ PYTHON     ?= python
 GROFF      ?= groff
 TIDY       ?= tidy
 
-# This makefile should not be called directly.
+# 95 DPI make a letter page 808 pixels large
+screen_dpi := 95
+
+# --------------------------------------------------------------------
+#                                                                Build
+# --------------------------------------------------------------------
 
 .PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
 .PHONY: doc-web, doc-demo
-.PHONY: doc-dist, doc-distclean
+.PHONY: doc-clean, doc-archclean, doc-distclean
 .PHONY: autorights
-
-# 95 DPI make a letter page 808 pixels large
-screen_dpi := 95
+no_dep_targets := doc-clean doc-archclean doc-distclean
 
 fig_src  := $(wildcard docsrc/figures/*.fig)
 demo_src := $(wildcard doc/demo/*.eps)
@@ -42,12 +51,18 @@ html_src := $(wildcard docsrc/*.html)
 man_src  := $(wildcard src/*.1)
 man_src  += $(wildcard src/*.7)
 
-pdf_tgt := #$(fig_src:.fig=.pdf) 
+pdf_tgt := #$(fig_src:.fig=.pdf)
 eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
 png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
 jpg_tgt := $(demo_src:.eps=.jpg)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
+
+# generate doc-dir: target
+$(eval $(call gendir, doc, doc doc/demo doc/figures doc/man-src))
+
+# generate results-dir: target
+$(eval $(call gendir, results, results))
 
 VERSION: Makefile
 	echo "$(VER)" > VERSION
@@ -56,7 +71,7 @@ docsrc/version.html: Makefile
 	echo "<code>$(VER)</code>" > docsrc/version.html
 
 doc: doc-api doc-man doc-web
-doc-man: doc/man-src/man.xml doc/man-src/man.html 
+doc-man: doc/man-src/man.xml doc/man-src/man.html
 doc-api: doc/api/index.html
 doc-web: doc/index.html
 doc-toolbox: doc/toolbox-src/mdoc.html
@@ -76,7 +91,7 @@ doc/index.html: \
  docsrc/web.xml \
  docsrc/web.css \
  docsrc/webdoc.py \
- $(img_tgt) $(html_src) 
+ $(img_tgt) $(html_src)
 	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py --outdir=doc \
 	     docsrc/web.xml --verbose
 	rsync -arv docsrc/images doc
@@ -165,7 +180,7 @@ doc/figures/%.eps : doc/figures/%.dvi
 	$(call C,DVIPS) -E -o $@ $<
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
-	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@ 
+	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@
 
 doc/figures/%-raw.ps : docsrc/figures/%.fig
 	$(call C,FIG2DEV) -L pstex $< $@
@@ -197,25 +212,9 @@ doc/%.pdf : doc/%.eps
 # Other documentation related targets
 #
 
-doc-dist: $(NAME) doc
-	rsync -arv doc $(NAME)/                                      \
-	  --exclude=doc/demo/*.eps                                   \
-	  --exclude=doc/toolbox-src*
-
 doc-distclean:
 	rm -f  docsrc/*.pyc
 	rm -rf doc
-
-autorights: distclean
-	autorights                                                   \
-	  toolbox vl                                                 \
-	  --recursive                                                \
-	  --verbose                                                  \
-	  --template docsrc/copylet.txt                              \
-	  --years 2007-09                                            \
-	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
-	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
-	  --program "VLFeat"
 
 # --------------------------------------------------------------------
 #                                                       Debug Makefile
@@ -223,7 +222,7 @@ autorights: distclean
 
 .PHONY: doc-info
 doc-info :
-	@echo "=== DOCUMENTATION RELATED VARIABLES ==="
+	@echo "**************************************** Documentation"
 	$(call dump-var,man_src)
 	$(call dump-var,fig_src)
 	$(call dump-var,demo_src)
@@ -235,3 +234,8 @@ doc-info :
 	$(call dump-var,png_tgt)
 	$(call dump-var,jpg_tgt)
 	$(call dump-var,man_tgt)
+	@echo
+
+# Local variables:
+# mode: Makefile
+# End:

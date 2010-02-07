@@ -20,6 +20,12 @@
 		2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kmeans.c; path = toolbox/kmeans/vl_kmeans.c; sourceTree = "<group>"; };
 		2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shuffle-def.h"; sourceTree = "<group>"; };
 		2D6007FF1115C1FA0020963C /* check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = check.h; sourceTree = "<group>"; };
+		2D6102D0111EE22C00470F4C /* bin.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = bin.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D1111EE22C00470F4C /* dist.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = dist.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D2111EE22C00470F4C /* dll.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = dll.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D3111EE22C00470F4C /* doc.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = doc.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D4111EE22C00470F4C /* matlab.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = matlab.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D5111EE22C00470F4C /* octave.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = octave.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
@@ -118,7 +124,7 @@
 		2DB1A2A2110D09B200E02BD8 /* vl_version.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
 		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
 		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
-		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
+		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv_sse2.c; sourceTree = "<group>"; };
@@ -126,7 +132,6 @@
 		2DD99E8F0E59EA8E00CE1DA1 /* host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = host.h; sourceTree = "<group>"; };
 		2DD99E900E59EA8E00CE1DA1 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = host.c; sourceTree = "<group>"; };
 		2DD9A01F0E5A296700CE1DA1 /* test_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_host.c; sourceTree = "<group>"; };
-		2DE5B34E0FDC28A5008CEB1D /* Makefile.doc */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile.doc; sourceTree = "<group>"; };
 		2DE5B37D0FDC2BE9008CEB1D /* dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsift.c; sourceTree = "<group>"; };
 		2DE5B37E0FDC2BE9008CEB1D /* dsift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsift.h; sourceTree = "<group>"; };
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
@@ -140,14 +145,27 @@
 			children = (
 				2D99420410ECD6E300502DF6 /* index.html */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
-				2DE5B34E0FDC28A5008CEB1D /* Makefile.doc */,
 				2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */,
+				2D6102CF111EE22C00470F4C /* make */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D7AD0870E38C15700783252 /* doc */,
 			);
 			name = vlfeat;
+			sourceTree = "<group>";
+		};
+		2D6102CF111EE22C00470F4C /* make */ = {
+			isa = PBXGroup;
+			children = (
+				2D6102D0111EE22C00470F4C /* bin.mak */,
+				2D6102D1111EE22C00470F4C /* dist.mak */,
+				2D6102D2111EE22C00470F4C /* dll.mak */,
+				2D6102D3111EE22C00470F4C /* doc.mak */,
+				2D6102D4111EE22C00470F4C /* matlab.mak */,
+				2D6102D5111EE22C00470F4C /* octave.mak */,
+			);
+			path = make;
 			sourceTree = "<group>";
 		};
 		2D72EA930E4776FE005DAA47 /* html */ = {
