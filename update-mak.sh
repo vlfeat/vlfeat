@@ -56,3 +56,14 @@ a=$(sub "$a" cmdsrc src)
 a=$(sub "$a" mexsrc toolbox)
 
 echo "$a" > Makefile.mak.new
+
+diffs=$(diff Makefile.mak Makefile.mak.new)
+if [ -z "$diffs" ]
+then
+    echo "Makefile.mak is up to date"
+    rm Makefile.mak.new
+else
+    echo "Makefile.mak should be updated to Makefile.mak.new"
+    echo "Differences:"
+    echo "$diffs"
+fi
