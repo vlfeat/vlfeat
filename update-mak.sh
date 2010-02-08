@@ -3,6 +3,8 @@
 # description: Helper script to update Makefile.mak
 # author:      Andrea Vedaldi
 
+# AUTORIGHTS
+
 # This script updates Makefile.mak based on the current source tree
 # and version in vl/generic.h. It saves the new version to
 # Makefile.mak.new.
