@@ -13,14 +13,6 @@ archclean: doc-archclean
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-# PYTHON:       Python interpreter
-# DOXYGEN:      Doxygen documentation system
-# DVIPNG:       TeX DVI to PNG converter
-# DVIPS:        TeX DVI to PS converter
-# EPS2PDF:      EPS to PDF converter
-# CONVERT:      ImageMagick convert utility
-# FIG2DEV:      X-Fig conversion program
-
 CONVERT    ?= convert
 DOXYGEN    ?= doxygen
 DVIPNG     ?= dvipng

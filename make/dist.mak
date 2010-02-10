@@ -2,16 +2,21 @@
 # description: Build VLFeat DLL
 # author:      Andrea Vedaldi
 
-GIT ?= git
-DIST := $(NAME)-$(VER)
-BINDIST := $(DIST)-bin
-HOST := ganesh.cs.ucla.edu:/var/www/vlfeat.org
-RSYNC := rsync
-
 clean: dist-bin-clean
 archclean: dist-bin-archclean
 distclean: dist-bin-distclean dist-src-distclean
 info: dist-bin-info dist-src-info
+
+# --------------------------------------------------------------------
+#                                                        Configuration
+# --------------------------------------------------------------------
+
+GIT   ?= git
+RSYNC ?= rsync
+
+DIST := $(NAME)-$(VER)
+BINDIST := $(DIST)-bin
+HOST := ganesh.cs.ucla.edu:/var/www/vlfeat.org
 
 # --------------------------------------------------------------------
 #                                                 Build source package

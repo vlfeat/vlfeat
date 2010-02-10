@@ -57,7 +57,8 @@ endif
 
 .PHONY: mex-all, mex-dir, mex-info, mex-test
 .PHONY: mex-clean, mex-distclean, mex-archclean
-no_dep_targets += mex-dir mex-info mex-test mex-clean mex-distclean mex-archclean
+no_dep_targets += mex-dir mex-info mex-test
+no_dep_targets += mex-clean mex-distclean mex-archclean
 
 mex_src := $(shell find $(VLDIR)/toolbox -name "*.c")
 mex_tgt := $(addprefix $(MEX_BINDIR)/,\
