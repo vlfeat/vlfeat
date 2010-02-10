@@ -14,6 +14,7 @@ enum {
   opt_algorithm,
   opt_distance,
   opt_initialization,
+  opt_num_repetitions,
   opt_verbose
 } ;
 
@@ -27,6 +28,7 @@ vlmxOption  options [] = {
   {"Algorithm",         1,   opt_algorithm           },
   {"Distance",          1,   opt_distance            },
   {"Verbose",           0,   opt_verbose             },
+  {"NumRepetitions",    1,   opt_num_repetitions,    },
   {"Initialization",    1,   opt_initialization      },
   {"Initialisation",    1,   opt_initialization      }, /* UK spelling */
   {0,                   0,   0                       }
@@ -51,7 +53,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   VlKMeansAlgorithm algorithm = VlKMeansLLoyd ;
   VlVectorComparisonType distance = VlDistanceL2 ;
-  int maxNumIterations = 100 ;
+  vl_size maxNumIterations = 100 ;
+  vl_size numRepetitions = 1 ;
+  vl_uindex repetition ;
+  double bestEnergy = VL_INFINITY_D ;
   int verbosity = 0 ;
   int initialization = INIT_PLUSPLUS ;
 
@@ -106,11 +111,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         break ;
 
       case opt_max_num_iterations :
-        if (!vlmxIsPlainScalar(optarg) ||
-            (maxNumIterations = (vl_size) mxGetScalar(optarg)) < 0) {
+        if (!vlmxIsPlainScalar(optarg) || mxGetScalar(optarg) < 0) {
           vlmxError (vlmxErrInvalidArgument,
                     "MAXNUMITERATIONS must be a non-negative integer scalar") ;
         }
+        maxNumIterations = (vl_size) mxGetScalar(optarg) ;
         break ;
 
       case opt_algorithm :
@@ -150,7 +155,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           initialization = INIT_RANDSEL ;
         } else {
           vlmxError (vlmxErrInvalidArgument,
-                    "Invalid value %s for INITIALISATION", buf) ;
+                    "Invalid value %s for INITIALISATION.", buf) ;
         }
         break ;
 
@@ -175,6 +180,18 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         }
         break ;
 
+      case opt_num_repetitions :
+        if (!vlmxIsPlainScalar (optarg)) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "NUMREPETITIONS must be a scalar.") ;
+        }
+        if (mxGetScalar (optarg) < 1) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "NUMREPETITIONS must be larger than or equal to 1.") ;
+        }
+        numRepetitions = (vl_size) mxGetScalar (optarg) ;
+        break ;
+
       default :
         assert(0) ;
         break ;
@@ -196,6 +213,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     }
     mexPrintf("kmeans: MaxNumIterations = %d\n", maxNumIterations) ;
     mexPrintf("kmeans: Algorithm = %s\n", algorithmName) ;
+    mexPrintf("kmeans: NumRepetitions= %d\n", numRepetitions) ;
   }
 
   data = mxGetPr(IN(DATA)) ;
@@ -204,20 +222,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   vl_kmeans_set_verbosity (kmeans, verbosity) ;
   vl_kmeans_set_max_num_iterations (kmeans, maxNumIterations) ;
-  switch (initialization) {
-    case INIT_RANDSEL:
-      vl_kmeans_seed_centers_with_rand_data (kmeans,
-                                             data, dimension, numData,
-                                             numCenters) ;
-      break ;
-    case INIT_PLUSPLUS:
-      vl_kmeans_seed_centers_plus_plus (kmeans,
-                                        data, dimension, numData,
-                                        numCenters) ;
-      break ;
-    default:
-      assert(0) ;
-  }
+
   if (verbosity) {
     mexPrintf("kmeans: data type = %s\n",
               vl_get_type_name(vl_kmeans_get_data_type(kmeans))) ;
@@ -234,33 +239,15 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("\n") ;
   }
 
-  vl_tic() ;
-  vl_kmeans_train (kmeans, data, numData) ;
-  if (verbosity) {
-    mexPrintf("kmeans: trained in %.2f s\n", vl_toc()) ;
-  }
-
-  /* -----------------------------------------------------------------
-   *                                                    Return results
-   * -------------------------------------------------------------- */
-
-  {
-    switch (vl_kmeans_get_data_type(kmeans)) {
-      case VL_TYPE_FLOAT:
-        OUT(CENTERS) = mxCreateNumericMatrix (dimension, numCenters,
-                                              mxSINGLE_CLASS, mxREAL) ;
-        memcpy (mxGetData (OUT(CENTERS)),
-                vl_kmeans_get_centers (kmeans),
-                sizeof(float) * dimension * vl_kmeans_get_num_centers(kmeans)) ;
-        break ;
-      case VL_TYPE_DOUBLE:
-        OUT(CENTERS) = mxCreateNumericMatrix (dimension, numCenters,
-                                              mxDOUBLE_CLASS, mxREAL) ;
-        memcpy (mxGetData (OUT(CENTERS)),
-                vl_kmeans_get_centers (kmeans),
-                sizeof(double) * dimension * vl_kmeans_get_num_centers(kmeans)) ;
-        break ;
-    }
+  switch (vl_kmeans_get_data_type(kmeans)) {
+    case VL_TYPE_FLOAT:
+      OUT(CENTERS) = mxCreateNumericMatrix (dimension, numCenters,
+                                            mxSINGLE_CLASS, mxREAL) ;
+      break ;
+    case VL_TYPE_DOUBLE:
+      OUT(CENTERS) = mxCreateNumericMatrix (dimension, numCenters,
+                                            mxDOUBLE_CLASS, mxREAL) ;
+      break ;
   }
 
   if (nout > 1) {
@@ -277,6 +264,85 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   if (nout > 2) {
     OUT(ENERGY) = vlmxCreatePlainScalar (vl_kmeans_get_energy (kmeans)) ;
+  }
+
+  /* -------------------------------------------------------------- */
+  /*                                          Do repetated training */
+  /* -------------------------------------------------------------- */
+
+  for (repetition = 0 ; repetition < numRepetitions ; ++ repetition) {
+    double energy ;
+
+    if (verbosity) {
+      mexPrintf("kmeans: repetition %d of %d\n", repetition + 1, numRepetitions) ;
+    }
+
+    switch (initialization) {
+    case INIT_RANDSEL:
+        vl_kmeans_seed_centers_with_rand_data (kmeans,
+                                               data, dimension, numData,
+                                               numCenters) ;
+        break ;
+      case INIT_PLUSPLUS:
+        vl_kmeans_seed_centers_plus_plus (kmeans,
+                                          data, dimension, numData,
+                                          numCenters) ;
+        break ;
+      default:
+        assert(0) ;
+    }
+
+    vl_tic() ;
+    vl_kmeans_train (kmeans, data, numData) ;
+
+    energy = vl_kmeans_get_energy (kmeans) ;
+
+    if (verbosity) {
+      mexPrintf("kmeans: trained in %.2f s with energy %g\n", vl_toc(), energy) ;
+    }
+
+    /* copy centers to output if current solution is optimal */
+    if (energy < bestEnergy) {
+      bestEnergy = energy ;
+
+      switch (vl_kmeans_get_data_type(kmeans)) {
+        case VL_TYPE_FLOAT:
+          memcpy (mxGetData (OUT(CENTERS)),
+                  vl_kmeans_get_centers (kmeans),
+                  sizeof(float) * dimension * vl_kmeans_get_num_centers(kmeans)) ;
+          break ;
+        case VL_TYPE_DOUBLE:
+          memcpy (mxGetData (OUT(CENTERS)),
+                  vl_kmeans_get_centers (kmeans),
+                  sizeof(double) * dimension * vl_kmeans_get_num_centers(kmeans)) ;
+          break ;
+      }
+    }
+  }
+
+  /* -----------------------------------------------------------------
+   *                                                    Return results
+   * -------------------------------------------------------------- */
+
+  if (verbosity) {
+    mexPrintf("kmeans: final energy: %g\n", bestEnergy) ;
+  }
+
+  if (nout > 1) {
+    vl_uindex j ;
+    vl_uint32 * assignments  ;
+    OUT(ASSIGNMENTS) = mxCreateNumericMatrix (1, numData, mxUINT32_CLASS, mxREAL) ;
+    assignments = mxGetData (OUT(ASSIGNMENTS)) ;
+
+    vl_kmeans_set_centers (kmeans, mxGetData(OUT(CENTERS)), dimension, numCenters) ;
+    vl_kmeans_push (kmeans, assignments, NULL, data, numData) ;
+
+    /* use MATLAB indexing convention */
+    for (j = 0 ; j < numData ; ++j) { assignments[j] += 1 ; }
+  }
+
+  if (nout > 2) {
+    OUT(ENERGY) = vlmxCreatePlainScalar (bestEnergy) ;
   }
 
   vl_kmeans_delete (kmeans) ;
