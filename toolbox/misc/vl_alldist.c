@@ -68,6 +68,9 @@ mexFunction(int nout, mxArray *out[],
 
   VL_USE_MATLAB_ENV ;
 
+  if (nout > 1) {
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
+  }
   if (nin < 1) {
     vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
