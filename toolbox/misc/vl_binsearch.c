@@ -14,7 +14,7 @@ GNU GPLv2, or (at your option) any later version.
 #include <mexutils.h>
 
 void
-mexFunction(int nout VL_UNUSED, mxArray *out[],
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum { IN_B=0, IN_X, IN_END } ;
@@ -23,6 +23,9 @@ mexFunction(int nout VL_UNUSED, mxArray *out[],
   const double *X, *B ;
   double *IDX ;
 
+  if (nout > 1) {
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
+  }
   if (nin != 2) {
     vlmxError(vlmxErrInvalidArgument,
               "Incorrect number of arguments.") ;
