@@ -256,6 +256,24 @@ typedef struct _VlKMeansSortWrapper
 #ifdef VL_KMEANS_INSTANTIATING
 
 /* ---------------------------------------------------------------- */
+/*                    Initialization by copy                        */
+/* ---------------------------------------------------------------- */
+
+static void
+VL_XCAT(_vl_kmeans_set_centers_, SFX)
+(VlKMeans * self,
+ TYPE const * centers,
+ vl_size dimension,
+ vl_size numCenters)
+{
+  self->dimension = dimension ;
+  self->numCenters = numCenters ;
+  self->centers = vl_malloc (sizeof(TYPE) * dimension * numCenters) ;
+  memcpy ((TYPE*)self->centers, centers,
+          sizeof(TYPE) * dimension * numCenters) ;
+}
+
+/* ---------------------------------------------------------------- */
 /*                Initialization by random selection                */
 /* ---------------------------------------------------------------- */
 
@@ -631,11 +649,9 @@ VL_XCAT(_vl_kmeans_train_elkan_, SFX)
 
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
-    numSeenSoFar = vl_malloc(sizeof(vl_uint32) * self->numCenters) ;
+    numSeenSoFar = vl_malloc(sizeof(vl_size) * self->numCenters) ;
     VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)(self, permutations, data, numData) ;
   }
-
-
 
   /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   /*                          Initialization                        */
@@ -1136,12 +1152,47 @@ VL_XCAT(_vl_kmeans_train_, SFX)
 #ifndef VL_KMEANS_INSTANTIATING
 
 /** ------------------------------------------------------------------
+ ** @brief Set centers
+ ** @param self KMeans object.
+ ** @param centers centers to copy.
+ ** @param dimension data dimension.
+ ** @param numCenters number of centers.
+ **/
+
+VL_EXPORT void
+vl_kmeans_set_centers
+(VlKMeans * self,
+ void const * centers,
+ vl_size dimension,
+ vl_size numCenters)
+{
+  _vl_kmeans_reset (self) ;
+
+  switch (self->dataType) {
+    case VL_TYPE_FLOAT :
+      _vl_kmeans_set_centers_f
+      (self, (float const *)centers, dimension, numCenters) ;
+      break ;
+    case VL_TYPE_DOUBLE :
+      _vl_kmeans_set_centers_d
+      (self, (double const *)centers, dimension, numCenters) ;
+      break ;
+    default:
+      assert(0) ;
+  }
+}
+
+/** ------------------------------------------------------------------
  ** @brief
  ** @param self
- ** @param data
- ** @param dimension
- ** @param numData
- ** @param numCenters
+ ** @param self KMeans object.
+ ** @param centers centers to copy.
+ ** @param dimension data dimension.
+ ** @param numData nmber of data points.
+ ** @param numCenters number of centers.
+ **
+ ** The function seeds the KMeans centers by randomly sampling
+ ** the data @a data.
  **/
 
 VL_EXPORT void
