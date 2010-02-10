@@ -29,10 +29,12 @@ vl_image_distance_transform (double const * im,
                              double offset)
 {
   /* Each image pixel corresponds to a parabola. The algorithm scans
-     such parabola from the left to the right, keeping track of all
-     the parabolas in the lower envelop and their intersection points.
-     There are NUM active parabolas, the intersections are in FROM
-     and WHICH stores the seed (point x) of that parabola.
+     such parabolas from the left to the right, keeping track of which
+     parabolas form the lower envelope in which interval. There are
+     NUM active parabolas, FROM stores the beginning of the interval
+     for which a certain parabola is on the envoelope, and WHICH store
+     the index of the parabola (the pixel x from which the parabola
+     originated).
   */
   vl_uindex x, y ;
   double * from = vl_malloc (sizeof(double) * (numColumns + 1)) ;
@@ -49,21 +51,28 @@ vl_image_distance_transform (double const * im,
       double from_ = - VL_INFINITY_D ;
 
       /*
-         Add next parabola (there are NUM so far).
-         The algorithm finds intersection INTERS with the previously
-         added parabola. If the intersection is on the right of
-         the "starting point" of this parabola, then the previous parabola
-         is kept, and the new one is added to its right. Otherwise
-         the new parabola "eats" the old one, that gets deleted and the
-         next parabola is checked.
+         Add next parabola (there are NUM so far). The algorithm finds
+         intersection INTERS with the previously added parabola. If
+         the intersection is on the right of the "starting point" of
+         this parabola, then the previous parabola is kept, and the
+         new one is added to its right. Otherwise the new parabola
+         "eats" the old one, which gets deleted and the chec is
+         repeated with the previous parabola.
        */
 
       while (num >= 1) {
         vl_uindex x_ = which[num - 1] ;
         double x2_ = x_ * x_ ;
         double r_ = im[x_ * columnStride + y * rowStride] ;
-        double inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) - offset;
-
+        double inters ;
+        if (coeff > VL_EPSILON_D) {
+          inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) - offset ;
+        } else {
+          /* If coeff is very small, the parabolas are flat (= lines).
+             In this case the previous parabola should be deleted if the current
+             pixel has lower score */
+          inters = (r < r_) ? - VL_INFINITY_D : VL_INFINITY_D ;
+        }
         if (inters <= from [num - 1]) {
           /* delete a previous parabola */
           -- num ;
@@ -138,6 +147,11 @@ mexFunction(int nout, mxArray *out[],
                "PARAM must be a 4-dimensional vector.") ;
     }
     param = mxGetPr (IN(PARAM)) ;
+    if (param[0] < 0.0 ||
+        param[2] < 0.0) {
+      mxuError(vlmxErrInvalidArgument,
+               "PARAM[0] and PARAM[2] must not be negative") ;
+    }
   }
 
   M = mxGetM (IN(I)) ;
