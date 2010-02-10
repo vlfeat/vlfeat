@@ -192,8 +192,8 @@ _vl_kmeans_reset (VlKMeans * self)
  ** @param dataType type of data (::VL_TYPE_FLOAT or ::VL_TYPE_DOUBLE)
  ** @return new KMeans object instance.
  **
- ** The function allocates initializes a new KMeans object instance.
- ** The KMeans object utilises the quantization algorithm @a algorithm,
+ ** The function allocates and initializes a new KMeans object instance.
+ ** The KMeans object utilizes the quantization algorithm @a algorithm,
  ** the distance @a distance, and operates on data of type @a dataType.
  **/
 
@@ -437,6 +437,10 @@ VL_XCAT(_vl_kmeans_push_, SFX)
 }
 
 /* ---------------------------------------------------------------- */
+
+/* The sorting routine is used to find increasing permutation of each
+ * data dimension. This is used to quickly find the median for l1
+ * distance clustering. */
 
 VL_INLINE TYPE
 VL_XCAT3(_vl_kmeans_, SFX, _qsort_cmp)
