@@ -2,6 +2,13 @@
 function results = vl_test_binsearch(varargin)
 vl_test_init ;
 
+function test_inf_bins()
+x = [-inf -1 0 1 +inf] ;
+vl_assert_equal(vl_binsearch([],          x), [0 0 0 0 0]) ;
+vl_assert_equal(vl_binsearch([-inf 0],    x), [1 1 2 2 2]) ;
+vl_assert_equal(vl_binsearch([-inf],      x), [1 1 1 1 1]) ;
+vl_assert_equal(vl_binsearch([-inf +inf], x), [1 1 1 1 2]) ;
+
 function test_empty()
 vl_assert_equal(vl_binsearch([], []), []) ;
 

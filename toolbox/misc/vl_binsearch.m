@@ -7,4 +7,10 @@
 %   dimensions of X, specifying the bin correpsonding to each element
 %   of X.
 %
+%   If B(1) = -inf the bin number 0 is removed and the bin number 1 is
+%   [-inf B(2)). If B(M) = +inf, the last bin M is the singleton +inf.
+%
 %   See also:: VL_BINSUM().
+
+% AUTORIGHTS
+
