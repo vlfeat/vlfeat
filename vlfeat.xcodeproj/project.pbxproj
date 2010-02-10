@@ -115,7 +115,6 @@
 		2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_tpsumx.c; path = toolbox/imop/vl_tpsumx.c; sourceTree = "<group>"; };
 		2D86B1220F24CC9B00E625D6 /* vl_twister.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
 		2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
-		2D86B1240F24CC9B00E625D6 /* vl_whistc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_whistc.c; path = toolbox/misc/vl_whistc.c; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
 		2DB1A28F110CE32F00E02BD8 /* inthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = inthist.tc; path = toolbox/misc/inthist.tc; sourceTree = "<group>"; };
@@ -303,7 +302,6 @@
 				2D86B1220F24CC9B00E625D6 /* vl_twister.c */,
 				2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */,
 				2DB1A2A2110D09B200E02BD8 /* vl_version.c */,
-				2D86B1240F24CC9B00E625D6 /* vl_whistc.c */,
 			);
 			name = toolbox;
 			sourceTree = "<group>";
