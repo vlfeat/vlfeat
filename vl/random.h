@@ -49,9 +49,10 @@ VL_INLINE vl_uindex vl_rand_uindex (VlRand * self, vl_uindex range) ;
 
 /** @brief Generate a random index in a given range
  ** @param self random number generator.
- ** @return a random index in the interval [0, @c range - 1]
+ ** @param range range.
+ ** @return an index sampled uniformly at random in the interval [0, @c range - 1]
  **
- ** Currently, this function uses a simple technique that
+ ** @remark Currently, this function uses a simple algorithm that
  ** may yield slightly biased samples if @c range is not a power of
  ** two.
  **/
@@ -63,6 +64,7 @@ vl_rand_uindex (VlRand * self, vl_uindex range)
     /* 32-bit version */
     return (vl_rand_uint32 (self) % (vl_uint32)range) ;
   } else {
+    /* 64-bit version */
     return (vl_rand_uint64 (self) % range) ;
   }
 }
