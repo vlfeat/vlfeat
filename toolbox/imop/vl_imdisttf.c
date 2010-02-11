@@ -149,8 +149,8 @@ mexFunction(int nout, mxArray *out[],
     param = mxGetPr (IN(PARAM)) ;
     if (param[0] < 0.0 ||
         param[2] < 0.0) {
-      mxuError(vlmxErrInvalidArgument,
-               "PARAM[0] and PARAM[2] must not be negative") ;
+      vlmxError(vlmxErrInvalidArgument,
+                "PARAM[0] and PARAM[2] must not be negative.") ;
     }
   }
 
