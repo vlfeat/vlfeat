@@ -21,7 +21,9 @@ archclean: mex-archclean matlab-archclean
 distclean: mex-distclean matlab-distclean
 endif
 
-MEX_FLAGS    = -$(ARCH)
+MEX_ARCH     = $(ARCH)
+
+MEX_FLAGS    = -$(MEX_ARCH)
 MEX_FLAGS   += $(if $(DEBUG), -g, -O)
 MEX_FLAGS   += -lm -largeArrayDims
 
@@ -32,6 +34,7 @@ MEX_LDFLAGS  = $(LDFLAGS) -L$(BINDIR) -lvl
 
 MEX_SUFFIX  := mex$(ARCH)
 MEX_BINDIR  := toolbox/$(MEX_SUFFIX)
+
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
@@ -49,6 +52,7 @@ endif
 # Linux on 64 bit processor
 ifeq ($(ARCH),a64)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_ARCH = glxa64
 endif
 
 # --------------------------------------------------------------------
