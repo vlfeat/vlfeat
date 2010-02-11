@@ -14,93 +14,92 @@ GNU GPLv2, or (at your option) any later version.
 #include <mexutils.h>
 
 #include <vl/generic.h>
+#include <vl/imopv.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-/** @internal
- ** @brief Compute the integral image J of image I
- ** 
- ** The integral image is defined as:
- ** J(x,y) = \sum_{x} \sum_{y} I(x,y)
- ** J(x,y) = J(x,y-1) + J(x-1,y) + I(x,y) - J(x-1,y-1)
- ** where:
- ** J(0,0) = I(0,0)
- ** J(0,y) = J(0,y-1) + I(0,y)
- ** J(x,0) = J(x-1,0) + I(x,y)
- ** The sum of any window in I starting after x1,y1 ending at x2,y2 =
- ** J(x1,y1) + J(x2,y2) - ( J(x1,y2) + J(x2,y1) )
- **/
-void integral(double *I, double *J, int M, int N)
-{
-    int row,col;
-
-    *J = *I;                    /* J(0,0) = I(0,0) */
-    I++; J++;
-    for(row=1; row<M; row++) {
-        *J = *(J-1) + *I;       /* J(row,0) = J(row-1,0) + I(row,0) */
-        I++; J++;
-    }
-
-    for(col=1; col<N; col++) {
-        *J = *(J-M) + *I;       /* J(0,col) = J(0,col-1) + I(0,col) */
-        I++; J++;
-
-        for(row=1; row<M; row++) {
-            *J = *(J-M) + *(J-1) - *(J-M-1) + *I;
-            I++; J++;
-        }
-    }
-
-}
-
 void
-mexFunction(int nout, mxArray *out[], 
+mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
-  int M,N,K,ndims ;
-  mwSize const *dims ;
-  double* I_pt ;
-  double* J_pt ;
-  int k;
-  enum {I=0} ;
-  enum {J=0} ;
+  vl_size numDimensions, numChannels ;
+  mwSize const *dimensions ;
+  mxClassID classId ;
+  void * integral ;
+  void const * image ;
+  vl_uindex k ;
+  enum {IN_I=0} ;
+  enum {OUT_J=0} ;
 
-  /* ------------------------------------------------------------------
-  **                                                Check the arguments
-  ** --------------------------------------------------------------- */ 
-  if (nin != 1) {
-    mexErrMsgTxt("Exactly one input argument is required.");
-  } else if (nout > 1) {
-    mexErrMsgTxt("Too many output arguments.");
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
+
+  if (nin > 1) {
+    vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
-  
-  if (!mxIsDouble(in[I])) {
-    mexErrMsgTxt("All arguments must be real.") ;
+  if (nin < 1) {
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
-  
-  if(mxGetNumberOfDimensions(in[I]) > 3)
-    mexErrMsgTxt("I must be a two dimensional array.") ;
+  if (nout > 1) {
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
+  }
 
-  ndims = mxGetNumberOfDimensions(in[I]) ;
-  dims  = mxGetDimensions(in[I]) ;
-  M = dims[0] ;
-  N = dims[1] ;
-  K = (ndims > 2) ? dims[2] : 1 ;
+  if (! mxIsNumeric(IN(I))) {
+    vlmxError(vlmxErrInvalidArgument,
+              "I is not numeric.") ;
+  }
 
-  out[J] = mxCreateNumericArray(ndims, dims, mxDOUBLE_CLASS, mxREAL) ;
-  
-  I_pt   = mxGetPr(in[I]) ;
-  J_pt   = mxGetPr(out[J]) ;
+  dimensions = mxGetDimensions(IN(I)) ;
+  numDimensions = mxGetNumberOfDimensions(IN(I)) ;
+  if (numDimensions > 3) {
+    vlmxError(vlmxErrInvalidArgument,
+              "I has more than 3 dimensions (%d).", numDimensions) ;
+  }
+  if (numDimensions > 2) {
+    numChannels = dimensions [2] ;
+  } else {
+    numChannels = 1 ;
+  }
 
-  /* ------------------------------------------------------------------
-  **                                                         Do the job
-  ** --------------------------------------------------------------- */ 
-  for(k = 0 ; k < K ; ++k) {
-      integral(I_pt, J_pt, M, N);
-      I_pt += M*N ;
-      J_pt += M*N ;
+  classId = mxGetClassID(IN(I)) ;
+  if (classId != mxSINGLE_CLASS &&
+      classId != mxDOUBLE_CLASS &&
+      classId != mxUINT32_CLASS &&
+      classId != mxINT32_CLASS) {
+    vlmxError(vlmxErrInvalidArgument,
+              "I is not of a supported storage class.") ;
+  }
+
+  OUT(J) = mxCreateNumericArray(numDimensions, dimensions,
+                                classId, mxREAL) ;
+
+  image = mxGetData(IN(I)) ;
+  integral = mxGetData(OUT(J)) ;
+
+  /* -----------------------------------------------------------------
+   *                                                        Do the job
+   * -------------------------------------------------------------- */
+
+#define DO(CLASS, T, SFX) \
+case mx ## CLASS ## _CLASS : \
+vl_imintegral_ ## SFX (integral, dimensions[0], \
+  image, dimensions[0], dimensions[1], dimensions[0]) ; \
+  integral = ((T *) integral) + dimensions[0]*dimensions[1] ; \
+  image = ((T const *) image) + dimensions[0]*dimensions[1] ; \
+break
+
+  for (k = 0 ; k < numChannels ; ++k) {
+    switch (classId) {
+        DO(SINGLE, float, f) ;
+        DO(DOUBLE, double, d) ;
+        DO(UINT32, vl_uint32, ui32) ;
+        DO(INT32, vl_int32, i32) ;
+      default:
+        assert (0) ;
+    }
   }
 }
 

@@ -28,6 +28,13 @@ for i = 1:numTests
                            slow_imintegral(s.I)) ;
 end
 
+function test_datatypes(s)
+vl_assert_equal(single(vl_imintegral(s.I)), single(s.correct)) ;
+vl_assert_equal(double(vl_imintegral(s.I)), double(s.correct)) ;
+vl_assert_equal(uint32(vl_imintegral(s.I)), uint32(s.correct)) ;
+vl_assert_equal(int32(vl_imintegral(s.I)), int32(s.correct)) ;
+vl_assert_equal(int32(vl_imintegral(-s.I)), -int32(s.correct)) ;
+
 function integral = slow_imintegral(I)
 integral = zeros(size(I));
 for k = 1:size(I,3)
