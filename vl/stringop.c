@@ -179,7 +179,7 @@ vl_string_basename (char * destination,
  ** @param destination output buffer.
  ** @param destinationSize size of the output buffer.
  ** @param source input string.
- ** @param wildcardChar  widcard character.
+ ** @param wildcardChar wildcard character.
  ** @param escapeChar escape character.
  ** @param replacement replacement string.
  **
@@ -201,7 +201,7 @@ VL_EXPORT vl_size
 vl_string_replace_wildcard (char * destination,
                             vl_size destinationSize,
                             char const * source,
-                            char wildcarChar,
+                            char wildcardChar,
                             char escapeChar,
                             char const * replacement)
 {
@@ -218,7 +218,7 @@ vl_string_replace_wildcard (char * destination,
     }
 
     /* wildcard or regular? */
-    if (! escape && c == wildcarChar) {
+    if (! escape && c == wildcardChar) {
       char const * repl = replacement ;
       while ((c = *repl++)) {
         if (destination && k + 1 < destinationSize) {
