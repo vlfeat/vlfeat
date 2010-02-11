@@ -360,8 +360,7 @@ vlmxIsMatrix (mxArray const * array, vl_index M, vl_index N)
 
 /** ------------------------------------------------------------------
  ** @brief Check if the MATLAB array has the specified dimensions.
- **
- ** @param A array to check.
+ ** @param array array to check.
  ** @param numDimensions number of dimensions.
  ** @param dimensions dimensions.
  ** @return true the test succeeds.
