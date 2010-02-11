@@ -21,22 +21,24 @@ General Public License version 2.
 #if (FLT == VL_TYPE_FLOAT)
 #  define T      float
 #  define SFX    f
-#else
+#elif (FLT == VL_TYPE_DOUBLE)
 #  define T      double
 #  define SFX    d
+#elif (FLT == VL_TYPE_UINT32)
+#  define T      vl_uint32
+#  define SFX    ui32
+#elif (FLT == VL_TYPE_INT32)
+#  define T      vl_int32
+#  define SFX    i32
 #endif
 
 #ifdef  __SSE2__
 
 #if (FLT == VL_TYPE_FLOAT)
-#  define T      float
-#  define SFX    f
 #  define VSIZE  4
 #  define VSFX   s
 #  define VTYPE  __m128
-#else
-#  define T      double
-#  define SFX    d
+#elif (FLT == VL_TYPE_FLOAT)
 #  define VSIZE  2
 #  define VSFX   d
 #  define VTYPE  __m128d

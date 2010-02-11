@@ -54,5 +54,28 @@ void vl_imconvcoltri_vd (double* dst, int dst_stride,
                          int step, unsigned int flags) ;
 /** @} */
 
+/** @name Integral image
+ ** @{ */
+VL_EXPORT
+void vl_imintegral_f (float * integral,  vl_size integralStride,
+                      float const * image,
+                      vl_size imageWidth, vl_size imageHeight, vl_size imageStride) ;
+
+VL_EXPORT
+void vl_imintegral_d (double * integral,  vl_size integralStride,
+                      double const * image,
+                      vl_size imageWidth, vl_size imageHeight, vl_size imageStride) ;
+
+VL_EXPORT
+void vl_imintegral_i32 (vl_int32 * integral,  vl_size integralStride,
+                        vl_int32 const * image,
+                        vl_size imageWidth, vl_size imageHeight, vl_size imageStride) ;
+
+VL_EXPORT
+void vl_imintegral_ui32 (vl_uint32 * integral,  vl_size integralStride,
+                         vl_uint32 const * image,
+                         vl_size imageWidth, vl_size imageHeight, vl_size imageStride) ;
+/** @} */
+
 /* VL_IMOPV_H */
 #endif

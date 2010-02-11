@@ -36,6 +36,14 @@ GNU GPLv2, or (at your option) any later version.
 #define VL_IMOPV_INSTANTIATING
 #include "imopv.c"
 
+#define FLT VL_TYPE_UINT32
+#define VL_IMOPV_INSTANTIATING
+#include "imopv.c"
+
+#define FLT VL_TYPE_INT32
+#define VL_IMOPV_INSTANTIATING
+#include "imopv.c"
+
 /** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns
  **
@@ -127,10 +135,46 @@ GNU GPLv2, or (at your option) any later version.
  ** @see ::vl_imconvcoltri_vf()
  **/
 
+/** @fn vl_imintegral_f(float*,vl_size,float const*,vl_size,vl_size,vl_size)
+ ** @brief Compute integral image
+ **
+ ** @param integral integral image.
+ ** @param integralStride integral image stride.
+ ** @param image source image.
+ ** @param imageWidth source image width.
+ ** @param imageHeight source image height.
+ ** @param imageStride source image stride.
+ **
+ ** Let @f$ I(x,y), x,y \in [0, W-1] \times [0, H-1] @f$. The
+ ** integral image @f$ J(x,y) @f$ is give by:
+ **
+ ** @f[
+ **   J(x,y) = \sum_{x'=0}^{x} \sum_{y'=0}^{y} I(x',y')
+ ** @f]
+ **
+ ** Thus the integral of @f$ I(x,y) @f$ in a rectangular region
+ ** @f$ (x,y) \in R = [x',x'']\times[y',y''] @f$ can be evaluated
+ ** by manipulating four operations:
+ **
+ ** @f{eqnarray*}
+ **   \sum_{(x,y)\in R} I(x,y)
+ **   &=& \sum_{x=x'}^{x''} \sum_{y=y'}^{y''} I(x,y)\\
+ **   &=& \sum_{x=0}^{x''}  \sum_{y=y'}^{y''} I(x,y)
+ **     - \sum_{x=0}^{x'-1} \sum_{y=y'}^{y''} I(x,y)\\
+ **   &=& \sum_{x=0}^{x''}  \sum_{y=0}^{y''}  I(x,y)
+ **     - \sum_{x=0}^{x''}  \sum_{y=0}^{y'-1} I(x,y)
+ **     - \sum_{x=0}^{x'-1} \sum_{y=0}^{y''}  I(x,y)
+ **     + \sum_{x=0}^{x'-1} \sum_{y=0}^{y'-1} I(x,y)\\
+ **   &=& J(x'',y'') - J(x'-1,y'') - J(x'',y'-1) + J(x'-1,y'-1).
+ ** @f}
+ **/
+
 /* VL_IMOPV_INSTANTIATING */
 #else
 
 #include "float.th"
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
 /* ---------------------------------------------------------------- */
 VL_EXPORT
@@ -305,5 +349,39 @@ VL_XCAT(vl_imconvcoltri_v, SFX)
   vl_free (buff - filt_size) ;
 }
 
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
+/* ---------------------------------------------------------------- */
+VL_EXPORT void
+VL_XCAT(vl_imintegral_, SFX)
+(T * integral, vl_size integralStride,
+ T const * image,
+ vl_size imageWidth, vl_size imageHeight, vl_size imageStride)
+{
+  vl_uindex x, y ;
+  T temp  = 0 ;
+
+  if (imageHeight > 0) {
+    for (x = 0 ; x < imageWidth ; ++ x) {
+      temp += *image++ ;
+      *integral++ = temp ;
+    }
+  }
+
+  for (y = 1 ; y < imageHeight ; ++ y) {
+    integral += integralStride - imageWidth ;
+    image += imageStride - imageWidth ;
+    T * integralPrev = integral - integralStride ;
+
+    temp = 0 ;
+    for (x = 0 ; x < imageWidth ; ++ x) {
+      temp += *image++ ;
+      *integral++ = *integralPrev++ + temp ;
+    }
+  }
+}
+
 #undef FLT
+/* INSTANTIATING */
 #endif
