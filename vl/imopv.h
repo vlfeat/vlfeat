@@ -40,18 +40,18 @@ void vl_imconvcol_vd (double* dst, int dst_stride,
                       int step, unsigned int flags) ;
 
 VL_EXPORT
-void vl_imconvcoltri_vf (float* dst, int dst_stride,
-                         float const* src,
-                         int src_width, int src_height, int src_stride,
-                         int filt_size,
-                         int step, unsigned int flags) ;
+void vl_imconvcoltri_f (float * dest, vl_size destStride,
+                        float const * image,
+                        vl_size imageWidth, vl_size imageHeight, vl_size imageStride,
+                        vl_size filterSize,
+                        vl_size step, int unsigned flags) ;
 
 VL_EXPORT
-void vl_imconvcoltri_vd (double* dst, int dst_stride,
-                         double const* src,
-                         int src_width, int src_height, int src_stride,
-                         int filt_size,
-                         int step, unsigned int flags) ;
+void vl_imconvcoltri_d (double * dest, vl_size destStride,
+                        double const * image,
+                        vl_size imageWidth, vl_size imageHeight, vl_size imageStride,
+                        vl_size filterSize,
+                        vl_size step, int unsigned flags) ;
 /** @} */
 
 /** @name Integral image

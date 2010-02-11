@@ -584,19 +584,19 @@ void _vl_dsift_with_flat_window (VlDsiftFilter* self)
   /* for each orientation bin */
   for (bint = 0 ; bint < self->geom.numBinT ; ++bint) {
 
-    vl_imconvcoltri_vf (self->convTmp1, self->imHeight,
-                        self->grads [bint], self->imWidth, self->imHeight,
-                        self->imWidth,
-                        self->geom.binSizeY, /* filt size */
-                        1, /* subsampling step */
-                        VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    vl_imconvcoltri_f (self->convTmp1, self->imHeight,
+                       self->grads [bint], self->imWidth, self->imHeight,
+                       self->imWidth,
+                       self->geom.binSizeY, /* filt size */
+                       1, /* subsampling step */
+                       VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
 
-    vl_imconvcoltri_vf (self->convTmp2, self->imWidth,
-                        self->convTmp1, self->imHeight, self->imWidth,
-                        self->imHeight,
-                        self->geom.binSizeX,
-                        1,
-                        VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
+    vl_imconvcoltri_f (self->convTmp2, self->imWidth,
+                       self->convTmp1, self->imHeight, self->imWidth,
+                       self->imHeight,
+                       self->geom.binSizeX,
+                       1,
+                       VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
 
     for (biny = 0 ; biny < self->geom.numBinY ; ++biny) {
       float wy = _vl_dsift_get_bin_window_mean (self->geom.binSizeY,

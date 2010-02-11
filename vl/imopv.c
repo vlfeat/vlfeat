@@ -44,7 +44,18 @@ GNU GPLv2, or (at your option) any later version.
 #define VL_IMOPV_INSTANTIATING
 #include "imopv.c"
 
-/** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
+/* VL_IMOPV_INSTANTIATING */
+#endif
+
+#if defined(VL_IMOPV_INSTANTIATING) || defined(__DOXYGEN__)
+
+#include "float.th"
+
+/* ---------------------------------------------------------------- */
+/*                                                Image Convolution */
+/* ---------------------------------------------------------------- */
+
+/** @fn  vl_imconvcol_vd(double*,int,double const*,int,int,int,double const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns
  **
  ** @param dst destination image.
@@ -89,94 +100,12 @@ GNU GPLv2, or (at your option) any later version.
  ** boundary (::VL_PAD_BY_CONTINUITY).
  **/
 
-/** @fn vl_imconvcol_vd(double*,int,double const*,int,int,int,double const*,int,int,int,unsigned int)
+/** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @see ::vl_imconvcol_vf()
  **/
 
-/** @fn vl_imconvcoltri_vf(float*,int,float const*,int,int,int,int,int,unsigned int)
- ** @brief Convolve an image along the columns with a triangular kernel
- **
- ** @param dst destination image.
- ** @param dst_stride width of the destination image including padding.
- ** @param src source image.
- ** @param src_width width of the source image.
- ** @param src_height height of the source image.
- ** @param src_stride width of the source image including padding.
- ** @param filt_size size of the triangular filter.
- ** @param step sub-sampling step.
- ** @param flags operation modes.
- **
- ** The function convolves the column of the image @a src by the
- ** discrete kernel
- **
- ** @f[
- **   k(t) = \frac{1}{\Delta^2} \max\{ \Delta -  |t|, 0 \},
- **   \quad t \in \mathbb{Z}
- ** @f]
- **
- ** where @f$ \Delta @f$ is equal to the parameter @a filt_size. The
- ** normalization factor is selected such that
- **
- ** @f[
- **   \sum_{t=-\infty}^{+\infty} k(t) = 1
- ** @f]
- **
- ** for all @f$ \Delta \in \mathbb{Z}_+ @f$. Notice that the support
- ** of @f$ k(x) @f$ as a continuous function is @f$ (-\Delta,\Delta)
- ** @f$ and has length @f$ 2\Delta @f$ and as a discrete function is
- ** @f$ [-\Delta + 1, \Delta-1] @f$ which has length @f$ 2 \Delta - 1
- ** @f$.
- **
- ** The operation of the function is otherwise similar to
- ** ::vl_imconvocl().
- **/
-
-/** @fn vl_imconvcoltri_vd(double*,int,double const*,int,int,int,int,int,unsigned int)
- ** @see ::vl_imconvcoltri_vf()
- **/
-
-/** @fn vl_imintegral_f(float*,vl_size,float const*,vl_size,vl_size,vl_size)
- ** @brief Compute integral image
- **
- ** @param integral integral image.
- ** @param integralStride integral image stride.
- ** @param image source image.
- ** @param imageWidth source image width.
- ** @param imageHeight source image height.
- ** @param imageStride source image stride.
- **
- ** Let @f$ I(x,y), x,y \in [0, W-1] \times [0, H-1] @f$. The
- ** integral image @f$ J(x,y) @f$ is give by:
- **
- ** @f[
- **   J(x,y) = \sum_{x'=0}^{x} \sum_{y'=0}^{y} I(x',y')
- ** @f]
- **
- ** Thus the integral of @f$ I(x,y) @f$ in a rectangular region
- ** @f$ (x,y) \in R = [x',x'']\times[y',y''] @f$ can be evaluated
- ** by manipulating four operations:
- **
- ** @f{eqnarray*}
- **   \sum_{(x,y)\in R} I(x,y)
- **   &=& \sum_{x=x'}^{x''} \sum_{y=y'}^{y''} I(x,y)\\
- **   &=& \sum_{x=0}^{x''}  \sum_{y=y'}^{y''} I(x,y)
- **     - \sum_{x=0}^{x'-1} \sum_{y=y'}^{y''} I(x,y)\\
- **   &=& \sum_{x=0}^{x''}  \sum_{y=0}^{y''}  I(x,y)
- **     - \sum_{x=0}^{x''}  \sum_{y=0}^{y'-1} I(x,y)
- **     - \sum_{x=0}^{x'-1} \sum_{y=0}^{y''}  I(x,y)
- **     + \sum_{x=0}^{x'-1} \sum_{y=0}^{y'-1} I(x,y)\\
- **   &=& J(x'',y'') - J(x'-1,y'') - J(x'',y'-1) + J(x'-1,y'-1).
- ** @f}
- **/
-
-/* VL_IMOPV_INSTANTIATING */
-#else
-
-#include "float.th"
-
 #if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
-/* ---------------------------------------------------------------- */
 VL_EXPORT
 void VL_XCAT(vl_imconvcol_v, SFX)
 (T* dst, int dst_stride,
@@ -272,28 +201,81 @@ void VL_XCAT(vl_imconvcol_v, SFX)
   } /* next x */
 }
 
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
 /* ---------------------------------------------------------------- */
+/*                         Image convolution by a triangular kernel */
+/* ---------------------------------------------------------------- */
+
+/** @fn vl_imconvcoltri_d(double*,vl_size,double const*,vl_size,vl_size,vl_size,vl_size,vl_size,int unsigned)
+ ** @brief Convolve an image along the columns with a triangular kernel
+ ** @param dest destination image.
+ ** @param destStride destination image stride.
+ ** @param image image to convolve.
+ ** @param imageWidth width of the image.
+ ** @param imageHeight height of the image.
+ ** @param imageStride width of the image including padding.
+ ** @param filterSize size of the triangular filter.
+ ** @param step sub-sampling step.
+ ** @param flags operation modes.
+ **
+ ** The function convolves the column of the image @a image with the
+ ** discrete triangular kernel
+ **
+ ** @f[
+ **   k(t) = \frac{1}{\Delta^2} \max\{ \Delta -  |t|, 0 \},
+ **   \quad t \in \mathbb{Z}
+ ** @f]
+ **
+ ** where @f$ \Delta @f$ is equal to the parameter @a filterSize. The
+ ** filter normalization factor has been selected such that
+ **
+ ** @f[
+ **   \sum_{t=-\infty}^{+\infty} k(t) = 1
+ ** @f]
+ **
+ ** for all @f$ \Delta \in \mathbb{Z}_+ @f$. Notice that the support
+ ** of @f$ k(x) @f$ as a continuous function is @f$ (-\Delta,\Delta)
+ ** @f$, which has length @f$ 2\Delta @f$, and as a discrete function is
+ ** @f$ [-\Delta + 1, \Delta-1] @f$, which has length @f$ 2 \Delta - 1
+ ** @f$.
+ **
+ ** @see ::vl_imconvcol_vd for further details.
+ **/
+
+/** @fn vl_imconvcoltri_f(float*,vl_size,float const*,vl_size,vl_size,vl_size,vl_size,vl_size,int unsigned)
+ ** @brief Convolve an image along the columns with a triangular kernel
+ ** @see ::vl_imconvcoltri_d()
+ **/
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
 VL_EXPORT void
-VL_XCAT(vl_imconvcoltri_v, SFX)
-(T* dst, int dst_stride,
- T const* src,
- int src_width, int src_height, int src_stride,
- int filt_size,
- int step, unsigned int flags)
+VL_XCAT(vl_imconvcoltri_, SFX)
+(T * dest, vl_size destStride,
+ T const * image,
+ vl_size imageWidth, vl_size imageHeight, vl_size imageStride,
+ vl_size filterSize,
+ vl_size step, unsigned int flags)
 {
-  int x = 0 ;
-  int y ;
-  int dheight = (src_height - 1) / step + 1 ;
+  vl_index x, y, dheight ;
   vl_bool transp = flags & VL_TRANSPOSE ;
   vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
-#define fa ((double)(filt_size))
-  T scale = ((T) (1.0/(fa*fa))) ;
-  T * buff = vl_malloc(sizeof(T) * (src_height + filt_size)) ;
-  buff += filt_size ;
+  T scale = (T) (1.0 / ((double)filterSize * (double)filterSize)) ;
+  T * buffer = vl_malloc (sizeof(T) * (imageHeight + filterSize)) ;
+  buffer += filterSize ;
 
-  while (x < src_width) {
-    T const *srci ;
-    srci = src + x + src_stride * (src_height - 1) ;
+  if (imageHeight == 0) {
+    return  ;
+  }
+
+  x = 0 ;
+  dheight = (imageHeight - 1) / step + 1 ;
+
+  while (x < (signed)imageWidth) {
+    T const * imagei ;
+    imagei = image + x + imageStride * (imageHeight - 1) ;
 
     /* We decompose the convolution by a triangluar signal as the convolution
      * by two rectangular signals. The rectangular convolutions are computed
@@ -303,56 +285,122 @@ VL_XCAT(vl_imconvcoltri_v, SFX)
      */
 
     /* integrate backward the column */
-    buff [src_height - 1] = *srci ;
-    for (y = src_height-2 ; y >=  0 ; --y) {
-      srci -= src_stride ;
-      buff [y] = buff [y+1] + *srci ;
+    buffer[imageHeight - 1] = *imagei ;
+    for (y = (signed)imageHeight - 2 ; y >=  0 ; --y) {
+      imagei -= imageStride ;
+      buffer[y] = buffer[y + 1] + *imagei ;
     }
     if (zeropad) {
-      for ( ; y >= - filt_size ; --y) {
-        buff [y] = buff [y+1] ;
+      for ( ; y >= - (signed)filterSize ; --y) {
+        buffer[y] = buffer[y + 1] ;
       }
     } else {
-      for ( ; y >= - filt_size ; --y) {
-        buff [y] = buff[y+1] + *srci ;
+      for ( ; y >= - (signed)filterSize ; --y) {
+        buffer[y] = buffer[y + 1] + *imagei ;
       }
     }
 
     /* compute the filter forward */
-    for (y = - filt_size ; y < src_height - filt_size ; ++y) {
-      buff [y] = buff [y] - buff [y + filt_size] ;
+    for (y = - (signed)filterSize ;
+         y < (signed)imageHeight - (signed)filterSize ; ++y) {
+      buffer[y] = buffer[y] - buffer[y + filterSize] ;
     }
     if (! zeropad) {
-      for (y = src_height - filt_size ; y < src_height ; ++y) {
-        buff [y] = buff [y] - buff [src_height-1]  *
-        (src_height - filt_size - y) ;
+      for (y = (signed)imageHeight - (signed)filterSize ;
+           y < (signed)imageHeight ;
+           ++y) {
+        buffer[y] = buffer[y] - buffer[imageHeight - 1]  *
+        ((signed)imageHeight - (signed)filterSize - y) ;
       }
     }
 
     /* integrate forward the column */
-    for (y = - filt_size + 1 ; y < src_height ; ++y) {
-      buff [y] += buff [y - 1] ;
+    for (y = - (signed)filterSize + 1 ;
+         y < (signed)imageHeight ; ++y) {
+      buffer[y] += buffer[y - 1] ;
     }
 
     /* compute the filter backward */
     {
-      int stride = transp ? 1 : dst_stride ;
-      dst += dheight * stride ;
+      vl_size stride = transp ? 1 : destStride ;
+      dest += dheight * stride ;
       for (y = step * (dheight - 1) ; y >= 0 ; y -= step) {
-        dst -= stride ;
-        *dst = scale * (buff [y] - buff [y - filt_size]) ;
+        dest -= stride ;
+        *dest = scale * (buffer[y] - buffer[y - (signed)filterSize]) ;
       }
+      dest += transp ? destStride : 1 ;
     }
     x += 1 ;
-    dst += transp ? dst_stride : 1 ;
   } /* next x */
-  vl_free (buff - filt_size) ;
+  vl_free (buffer - filterSize) ;
 }
 
 /* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
 #endif
 
 /* ---------------------------------------------------------------- */
+/*                                                   Integral Image */
+/* ---------------------------------------------------------------- */
+
+/** @fn vl_imintegral_d(double*,vl_size,double const*,vl_size,vl_size,vl_size)
+ ** @brief Compute integral image
+ **
+ ** @param integral integral image.
+ ** @param integralStride integral image stride.
+ ** @param image source image.
+ ** @param imageWidth source image width.
+ ** @param imageHeight source image height.
+ ** @param imageStride source image stride.
+ **
+ ** Let @f$ I(x,y), (x,y) \in [0, W-1] \times [0, H-1] @f$. The
+ ** function computes the integral image @f$ J(x,y) @f$ of @f$ I(x,g)
+ ** @f$:
+ **
+ ** @f[
+ **   J(x,y) = \sum_{x'=0}^{x} \sum_{y'=0}^{y} I(x',y')
+ ** @f]
+ **
+ ** The integral image @f$ J(x,y) @f$ can be used to compute quickly
+ ** the integral of of @f$ I(x,y) @f$ in a rectangular region @f$ R =
+ ** [x',x'']\times[y',y''] @f$:
+ **
+ ** @f[
+ **  \sum_{(x,y)\in[x',x'']\times[y',y'']} I(x,y) =
+ **  (J(x'',y'') - J(x'-1, y'')) - (J(x'',y'-1) - J(x'-1,y'-1)).
+ ** @f]
+ **
+ ** Note that the order of operations is important when the integral image
+ ** has an unsigned data type (e.g. ::vl_uint32). The formula
+ ** is easily derived as follows:
+ **
+ ** @f{eqnarray*}
+ **   \sum_{(x,y)\in R} I(x,y)
+ **   &=& \sum_{x=x'}^{x''} \sum_{y=y'}^{y''} I(x,y)\\
+ **   &=& \sum_{x=0}^{x''}  \sum_{y=y'}^{y''} I(x,y)
+ **     - \sum_{x=0}^{x'-1} \sum_{y=y'}^{y''} I(x,y)\\
+ **   &=& \sum_{x=0}^{x''}  \sum_{y=0}^{y''}  I(x,y)
+ **     - \sum_{x=0}^{x''}  \sum_{y=0}^{y'-1} I(x,y)
+ **     - \sum_{x=0}^{x'-1} \sum_{y=0}^{y''}  I(x,y)
+ **     + \sum_{x=0}^{x'-1} \sum_{y=0}^{y'-1} I(x,y)\\
+ **   &=& J(x'',y'') - J(x'-1,y'') - J(x'',y'-1) + J(x'-1,y'-1).
+ ** @f}
+ **/
+
+/** @fn vl_imintegral_f(float*,vl_size,float const*,vl_size,vl_size,vl_size)
+ ** @brief Compute integral image
+ ** @see ::vl_imintegral_d.
+ **/
+
+/** @fn vl_imintegral_ui32(vl_uint32*,vl_size,vl_uint32 const*,vl_size,vl_size,vl_size)
+ ** @brief Compute integral image
+ ** @see ::vl_imintegral_d.
+ **/
+
+/** @fn vl_imintegral_i32(vl_int32*,vl_size,vl_int32 const*,vl_size,vl_size,vl_size)
+ ** @brief Compute integral image
+ ** @see ::vl_imintegral_d.
+ **/
+
 VL_EXPORT void
 VL_XCAT(vl_imintegral_, SFX)
 (T * integral, vl_size integralStride,
@@ -383,5 +431,7 @@ VL_XCAT(vl_imintegral_, SFX)
 }
 
 #undef FLT
-/* INSTANTIATING */
+
+/* VL_IMOPV_INSTANTIATING */
+#undef VL_IMOPV_INSTANTIATING
 #endif
