@@ -18,14 +18,13 @@ GNU GPLv2, or (at your option) any later version.
 
 #if (FLT == VL_TYPE_FLOAT)
 #define IMCONVCOL    vl_imconvcol_vf
-#define IMCONVCOLTRI vl_imconvcoltri_vf
+#define IMCONVCOLTRI vl_imconvcoltri_f
 #else
 #define IMCONVCOL    vl_imconvcol_vd
-#define IMCONVCOLTRI vl_imconvcoltri_vd
+#define IMCONVCOLTRI vl_imconvcoltri_d
 #endif
 
-VL_INLINE
-void
+VL_INLINE void
 VL_XCAT(_vl_imsmooth_smooth_, SFX)
 (T * outputImage,
  vl_size numOutputRows,
