@@ -52,7 +52,7 @@ General Public License version 2.
 
 typedef vl_uint32 vl_type ;
 
-/** @brief Get the symbolic name of a data type
+/** @brief Get data type name.
  ** @param type data type.
  ** @return data type symbolic name.
  **
@@ -77,6 +77,32 @@ vl_get_type_name (vl_type type)
     case VL_TYPE_UINT64  : return "int64"  ;
     default: return NULL ;
   }
+}
+
+/** @brief Get data type size.
+ ** @param type data type.
+ ** @return size (in byte)
+ **
+ ** @c type is one of ::VL_TYPE_FLOAT, ::VL_TYPE_DOUBLE,
+ ** ::VL_TYPE_INT8, ::VL_TYPE_INT16, ::VL_TYPE_INT32, ::VL_TYPE_INT64,
+ ** ::VL_TYPE_UINT8, ::VL_TYPE_UINT16, ::VL_TYPE_UINT32, ::VL_TYPE_UINT64.
+ **/
+
+VL_INLINE vl_size
+vl_get_type_size (vl_type type)
+{
+  vl_size dataSize ;
+  switch (type) {
+    case VL_TYPE_DOUBLE : dataSize = sizeof(double) ; break ;
+    case VL_TYPE_FLOAT  : dataSize = sizeof(float) ; break ;
+    case VL_TYPE_INT64  : case VL_TYPE_UINT64 : dataSize = sizeof(vl_int64) ; break ;
+    case VL_TYPE_INT32  : case VL_TYPE_UINT32 : dataSize = sizeof(vl_int32) ; break ;
+    case VL_TYPE_INT16  : case VL_TYPE_UINT16 : dataSize = sizeof(vl_int16) ; break ;
+    case VL_TYPE_INT8   : case VL_TYPE_UINT8  : dataSize = sizeof(vl_int8)  ; break ;
+    default:
+      assert(0) ;
+  }
+  return dataSize ;
 }
 
 /** @} */
