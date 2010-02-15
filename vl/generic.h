@@ -122,7 +122,7 @@ typedef struct _VlThreadSpecificState
   /* random number generator */
   VlRand rand ;
 
-  /* tic / toc state */
+  /* time */
 #if defined(VL_OS_WIN)
   LARGE_INTEGER ticFreq ;
   LARGE_INTEGER ticMark ;
@@ -284,6 +284,7 @@ VL_EXPORT void vl_set_printf_func (printf_func_t printf_func) ;
  **/
 VL_EXPORT void vl_tic () ;
 VL_EXPORT double vl_toc () ;
+VL_EXPORT double vl_get_cpu_time () ;
 /** @} */
 
 /* -------------------------------------------------------------------
