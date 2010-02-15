@@ -443,6 +443,8 @@ VL_FAST_SQRT_UI(vl_uint16,ui16)
 VL_FAST_SQRT_UI(vl_uint8,ui8)
 
 /* ---------------------------------------------------------------- */
+/*                                Vector distances and similarities */
+/* ---------------------------------------------------------------- */
 
 /** @typedef VlFloatVectorComparisonFunction
  ** @brief Pointer to a function to compare vectors of floats
