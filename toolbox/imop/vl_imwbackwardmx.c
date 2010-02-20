@@ -15,7 +15,6 @@ GNU GPLv2, or (at your option) any later version.
  * - Rename variables.
  */
 
-
 #include <mexutils.h>
 
 #include <vl/generic.h>
@@ -76,20 +75,22 @@ mexFunction(int nout, mxArray *out[],
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
-  if(nin != 5) {
-    mexErrMsgTxt("Five input argumets required.") ;
+  if (nin < 5) {
+    vlmxError (vlmxErrNotEnoughInputArguments, NULL) ;
   }
-
+  if (nin > 5) {
+    vlmxError (vlmxErrTooManyOutputArguments, NULL) ;
+  }
   if (nout > 3) {
-    mexErrMsgTxt("Too many output arguments") ;
+    vlmxError (vlmxErrTooManyOutputArguments, NULL) ;
   }
 
-  if(!vlmxIsMatrix(in[I], -1, -1)) {
-    mexErrMsgTxt("I must be a real matrix of class DOUBLE") ;
+  if (! vlmxIsPlainMatrix(in[I], -1, -1)) {
+    vlmxError (vlmxErrInvalidArgument, "I is not a plain matrix.") ;
   }
 
-  if(!vlmxIsMatrix(in[iwXp], -1, -1)) {
-    mexErrMsgTxt("iwXp must be a real matrix") ;
+  if (! vlmxIsPlainMatrix(in[iwXp], -1, -1)) {
+    vlmxError(vlmxErrInvalidArgument, "iwXp is not a plain matrix.") ;
   }
 
   M = getM(I) ;
@@ -97,15 +98,15 @@ mexFunction(int nout, mxArray *out[],
   Mp = getM(iwXp) ;
   Np = getN(iwXp) ;
 
-  if(!vlmxIsMatrix(in[iwYp], Mp, Np)) {
-      mexErrMsgTxt
-	  ("iwXp and iwYp must be a real matrices of the same dimension") ;
+  if(!vlmxIsPlainMatrix(in[iwYp], Mp, Np)) {
+    vlmxError(vlmxErrInvalidArgument,
+              "iwXp is not a plain matrix of the same idmension of iwYp.") ;
   }
 
   if(!vlmxIsPlainVector(in[X],N) || !vlmxIsPlainVector(in[Y],M)) {
-      mexErrMsgTxt
-	  ("X and Y must be vectors of the same dimensions "
-	   "of the columns/rows of I, respectivelye") ;
+    vlmxError(vlmxErrInvalidArgument,
+              "X and Y are not plain vectors with a length equal to the"
+	      " number of columns and rows of I.") ;
   }
 
   X_pt = getPr(X);
