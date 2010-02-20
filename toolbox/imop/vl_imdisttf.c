@@ -111,6 +111,7 @@ vl_image_distance_transform (double const * im,
   vl_free (from) ;
   vl_free (which) ;
   vl_free (base) ;
+  vl_free (baseIndexes) ;
 }
 
 void
