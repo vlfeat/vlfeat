@@ -1,5 +1,5 @@
-% VL_TEST_BINSEARCH
 function results = vl_test_binsearch(varargin)
+% VL_TEST_BINSEARCH
 vl_test_init ;
 
 function test_inf_bins()

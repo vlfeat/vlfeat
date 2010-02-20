@@ -1,5 +1,5 @@
-% VL_TEST_BINSUM
 function results = vl_test_binsum(varargin)
+% VL_TEST_BINSUM
 vl_test_init ;
 
 function test_three_args()

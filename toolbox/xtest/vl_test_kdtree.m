@@ -1,8 +1,5 @@
 function results = vl_test_kdtree(varargin)
 % VL_TEST_KDTREE
-
-% AUTORIGHTS
-
 vl_test_init ;
 
 function s = setup()

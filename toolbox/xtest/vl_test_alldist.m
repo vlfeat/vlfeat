@@ -1,4 +1,5 @@
 function results = vl_test_alldist(varargin)
+% VL_TEST_ALLDIST
 vl_test_init ;
 
 function s = setup()
