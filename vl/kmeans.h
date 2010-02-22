@@ -59,12 +59,15 @@ typedef struct _VlKMeans
  ** @{
  **/
 VL_EXPORT VlKMeans * vl_kmeans_new (vl_type dataType, VlVectorComparisonType distance) ;
+VL_EXPORT VlKMeans * vl_kmeans_new_copy (VlKMeans const * kmeans) ;
 VL_EXPORT void vl_kmeans_delete (VlKMeans * self) ;
 /** @} */
 
 /** @name Basic data processing
  ** @{
  **/
+VL_EXPORT void vl_kmeans_reset (VlKMeans * self) ;
+
 VL_EXPORT double vl_kmeans_cluster (VlKMeans * self,
                                     void const * data,
                                     vl_size dimension,
@@ -109,18 +112,18 @@ VL_EXPORT double vl_kmeans_refine_centers (VlKMeans * self,
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_INLINE vl_type vl_kemans_get_data_type (VlKMeans const * self) ;
-VL_INLINE VlVectorComparisonType vl_kemans_get_distance (VlKMeans const * self) ;
+VL_INLINE vl_type vl_kmeans_get_data_type (VlKMeans const * self) ;
+VL_INLINE VlVectorComparisonType vl_kmeans_get_distance (VlKMeans const * self) ;
 
 VL_INLINE VlKMeansAlgorithm vl_kmeans_get_algorithm (VlKMeans const * self) ;
 VL_INLINE VlKMeansInitialization vl_kmeans_get_initialization (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kmeans_get_num_repetitions (VlKMeans const * self) ;
 
-VL_INLINE vl_size vl_kemans_get_dimension (VlKMeans const * self) ;
-VL_INLINE vl_size vl_kemans_get_num_centers (VlKMeans const * self) ;
+VL_INLINE vl_size vl_kmeans_get_dimension (VlKMeans const * self) ;
+VL_INLINE vl_size vl_kmeans_get_num_centers (VlKMeans const * self) ;
 
-VL_INLINE int vl_kemans_get_verbosity (VlKMeans const * self) ;
-VL_INLINE vl_size vl_kemans_get_max_num_iterations (VlKMeans const * self) ;
+VL_INLINE int vl_kmeans_get_verbosity (VlKMeans const * self) ;
+VL_INLINE vl_size vl_kmeans_get_max_num_iterations (VlKMeans const * self) ;
 VL_INLINE double vl_kmeans_get_energy (VlKMeans const * self) ;
 VL_INLINE void const * vl_kmeans_get_centers (VlKMeans const * self) ;
 /** @} */
@@ -131,8 +134,8 @@ VL_INLINE void const * vl_kmeans_get_centers (VlKMeans const * self) ;
 VL_INLINE void vl_kmeans_set_algorithm (VlKMeans * self, VlKMeansAlgorithm algorithm) ;
 VL_INLINE void vl_kmeans_set_initialization (VlKMeans * self, VlKMeansInitialization initialization) ;
 VL_INLINE void vl_kmeans_set_num_repetitions (VlKMeans * self, vl_size numRepetitions) ;
-VL_INLINE void vl_kemans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations) ;
-VL_INLINE void vl_kemans_set_verbosity (VlKMeans * self, int verbosity) ;
+VL_INLINE void vl_kmeans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations) ;
+VL_INLINE void vl_kmeans_set_verbosity (VlKMeans * self, int verbosity) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -287,7 +290,7 @@ vl_kmeans_set_algorithm (VlKMeans * self, VlKMeansAlgorithm algorithm)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get K-means initialization
+ ** @brief Get K-means initialization algorithm
  ** @param self KMeans object.
  ** @return algorithm.
  **/
@@ -298,7 +301,7 @@ vl_kmeans_get_initialization (VlKMeans const * self)
   return self->initialization ;
 }
 
-/** @brief Set K-means initialization
+/** @brief Set K-means initialization algorithm
  ** @param self KMeans object.
  ** @param initialization initialization.
  **/

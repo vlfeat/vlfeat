@@ -169,33 +169,33 @@
 #ifndef VL_KMEANS_INSTANTIATING
 
 
-/* ---------------------------------------------------------------- */
+/** ------------------------------------------------------------------
+ ** @brief Reset state
+ **
+ ** The function reset the state of the KMeans object. It deletes
+ ** any stored centers, releasing the corresponding memory. This
+ ** cancels the effect of seeding or setting the centers, but
+ ** does not change the other configuration parameters.
+ **/
 
-static void
-_vl_kmeans_reset (VlKMeans * self)
+VL_EXPORT void
+vl_kmeans_reset (VlKMeans * self)
 {
   self->numCenters = 0 ;
   self->dimension = 0 ;
-  self->energy = VL_NAN_D ;
 
   if (self->centers) vl_free(self->centers) ;
-  if (self->centerDistances) vl_free (self->centerDistances) ;
+  if (self->centerDistances) vl_free(self->centerDistances) ;
   self->centers = NULL ;
   self->centerDistances = NULL ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Create a new KMeans object
- **
- ** @param algorithm clustering algorithm.
- ** @param distance distance.
  ** @param dataType type of data (::VL_TYPE_FLOAT or ::VL_TYPE_DOUBLE)
+ ** @param distance distance.
  ** @return new KMeans object instance.
- **
- ** The function allocates and initializes a new KMeans object instance.
- ** The KMeans object utilizes the quantization algorithm @a algorithm,
- ** the distance @a distance, and operates on data of type @a dataType.
- **/
+**/
 
 VL_EXPORT VlKMeans *
 vl_kmeans_new (vl_type dataType,
@@ -214,7 +214,46 @@ vl_kmeans_new (vl_type dataType,
   self->centers = NULL ;
   self->centerDistances = NULL ;
 
-  _vl_kmeans_reset (self) ;
+  vl_kmeans_reset (self) ;
+
+  return self ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Create a new KMeans object by copy
+ ** @param kmeans KMeans object to copy.
+ ** @return new copy.
+ **/
+
+VL_EXPORT VlKMeans *
+vl_kmeans_new_copy (VlKMeans const * kmeans)
+{
+  VlKMeans * self = vl_malloc(sizeof(VlKMeans)) ;
+
+  self->algorithm = kmeans->algorithm ;
+  self->distance = kmeans->distance ;
+  self->dataType = kmeans->dataType ;
+
+  self->verbosity = kmeans->verbosity ;
+  self->maxNumIterations = kmeans->maxNumIterations ;
+  self->numRepetitions = kmeans->numRepetitions ;
+
+  self->dimension = kmeans->dimension ;
+  self->numCenters = kmeans->numCenters ;
+  self->centers = NULL ;
+  self->centerDistances = NULL ;
+
+  if (kmeans->centers) {
+    vl_size dataSize = vl_get_type_size(self->dataType) * self->dimension * self->numCenters ;
+    self->centers = vl_malloc(dataSize) ;
+    memcpy (self->centers, kmeans->centers, dataSize) ;
+  }
+
+  if (kmeans->centerDistances) {
+    vl_size dataSize = vl_get_type_size(self->dataType) * self->numCenters * self->numCenters ;
+    self->centerDistances = vl_malloc(dataSize) ;
+    memcpy (self->centerDistances, kmeans->centerDistances, dataSize) ;
+  }
 
   return self ;
 }
@@ -230,7 +269,7 @@ vl_kmeans_new (vl_type dataType,
 VL_EXPORT void
 vl_kmeans_delete (VlKMeans * self)
 {
-  _vl_kmeans_reset (self) ;
+  vl_kmeans_reset (self) ;
   vl_free (self) ;
 }
 
@@ -1203,7 +1242,7 @@ vl_kmeans_set_centers
  vl_size dimension,
  vl_size numCenters)
 {
-  _vl_kmeans_reset (self) ;
+  vl_kmeans_reset (self) ;
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
@@ -1240,7 +1279,7 @@ vl_kmeans_seed_centers_with_rand_data
  vl_size numData,
  vl_size numCenters)
 {
-  _vl_kmeans_reset (self) ;
+  vl_kmeans_reset (self) ;
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
@@ -1273,7 +1312,7 @@ vl_kmeans_seed_centers_plus_plus
  vl_size numData,
  vl_size numCenters)
 {
-  _vl_kmeans_reset (self) ;
+  vl_kmeans_reset (self) ;
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
