@@ -1,5 +1,5 @@
 /** @file    random.h
- ** @brief   Random
+ ** @brief   Random number generator
  ** @author  Andrea Vedaldi
  **/
 
