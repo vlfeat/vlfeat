@@ -5,7 +5,7 @@ function vl_figaspect(a)
 %
 %   Author:: Andrea Vedaldi
 
-pos = get(gcf, 'position') ;
+pos = get(gcf, 'Position') ;
 
 if a >= 1
   pos(3) = a * pos(4) ;
@@ -13,9 +13,9 @@ else
   pos(4) = pos(3) / a ;
 end
 
-set(gcf,'position',pos) ;
+set(gcf,'Position',pos) ;
 
-pos = get(gcf, 'paperposition') ;
+pos = get(gcf, 'PaperPosition') ;
 
 if a >= 1
   pos(3) = a * pos(4) ;
@@ -23,5 +23,5 @@ else
   pos(4) = pos(3) / a ;
 end
 
-set(gcf,'paperposition',pos) ;
+set(gcf,'PaperPosition',pos) ;
 
