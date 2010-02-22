@@ -402,6 +402,7 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = maci;
+				ARCHS = x86_64;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -422,6 +423,7 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = maci;
+				ARCHS = i386;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -443,6 +445,7 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = maci64;
+				ARCHS = x86_64;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -493,6 +496,7 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = maci64;
+				ARCHS = x86_64;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
