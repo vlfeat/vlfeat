@@ -1,6 +1,5 @@
 /** @file    generic.h
  ** @author  Andrea Vedaldi
-
  ** @brief   Generic
  **/
 
@@ -91,7 +90,7 @@ vl_get_type_name (vl_type type)
 VL_INLINE vl_size
 vl_get_type_size (vl_type type)
 {
-  vl_size dataSize ;
+  vl_size dataSize = 0 ;
   switch (type) {
     case VL_TYPE_DOUBLE : dataSize = sizeof(double) ; break ;
     case VL_TYPE_FLOAT  : dataSize = sizeof(float) ; break ;
