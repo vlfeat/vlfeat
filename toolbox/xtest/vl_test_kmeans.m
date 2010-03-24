@@ -1,5 +1,5 @@
 function results = vl_test_kmeans(varargin)
-% VL_TEST_KDTREE
+% VL_TEST_KMEANS
 
 % AUTORIGHTS
 
