@@ -539,7 +539,7 @@ struct _vlmxOption
 
 /** @brief MEX option type */
 
-typedef struct _vlmxOption  vlmxOption  ;
+typedef struct _vlmxOption vlmxOption  ;
 
 /** ------------------------------------------------------------------
  ** @brief Process next option
@@ -607,8 +607,7 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
   /* unknown argument */
   if (opt < 0) {
-    vlmxError (vlmxErrInvalidOption,
-               "Unknown option '%s'.", name) ;
+    vlmxError (vlmxErrInvalidOption, "Unknown option '%s'.", name) ;
   }
 
   /* no argument */
