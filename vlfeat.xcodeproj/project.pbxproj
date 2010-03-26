@@ -225,6 +225,8 @@
 				2D732E830CF8C2E40099B03C /* getopt_long.h */,
 				2D732E840CF8C2E40099B03C /* hikmeans.c */,
 				2D732E850CF8C2E40099B03C /* hikmeans.h */,
+				2D519081115A800C0079E222 /* homkermap.c */,
+				2D519080115A800C0079E222 /* homkermap.h */,
 				2DD99E900E59EA8E00CE1DA1 /* host.c */,
 				2DD99E8F0E59EA8E00CE1DA1 /* host.h */,
 				2D732E860CF8C2E40099B03C /* ikmeans.c */,
@@ -258,8 +260,6 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
-				2D519080115A800C0079E222 /* homkermap.h */,
-				2D519081115A800C0079E222 /* homkermap.c */,
 			);
 			path = vl;
 			sourceTree = "<group>";

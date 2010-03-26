@@ -41,6 +41,7 @@ GNU GPLv2, or (at your option) any later version.
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
    - @ref quickshift.h "Quick shift image segmentation"
    - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
+   - @ref homkermap.h "Homogeneous kernel map"
  - Support functionalities
    - @ref host.h      "Platform abstraction"
    - @ref generic.h   "Errors, memory, logging, and others"
