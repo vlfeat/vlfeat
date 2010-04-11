@@ -20,11 +20,13 @@ enum {
   opt_L0,
   opt_CHI2,
   opt_HELL,
+  opt_JS,
 
   opt_KL2,
   opt_KL1,
   opt_KCHI2,
-  opt_KHELL
+  opt_KHELL,
+  opt_KJS
 } ;
 
 vlmxOption  options [] = {
@@ -34,11 +36,13 @@ vlmxOption  options [] = {
 {"l0",           0,   opt_L0            },
 {"chi2",         0,   opt_CHI2          },
 {"hell",         0,   opt_HELL          },
+{"js",           0,   opt_JS            },
 
 {"kl2",          0,   opt_KL2           },
 {"kl1",          0,   opt_KL1           },
 {"kchi2",        0,   opt_KCHI2         },
 {"khell",        0,   opt_KHELL         },
+{"kjs",          0,   opt_KJS           },
 
 {0,              0,   0                 }
 } ;
@@ -105,10 +109,12 @@ mexFunction(int nout, mxArray *out[],
       case opt_L1    : comparisonType = VlDistanceL1 ; break ;
       case opt_CHI2  : comparisonType = VlDistanceChi2 ; break ;
       case opt_HELL  : comparisonType = VlDistanceHellinger ; break ;
+      case opt_JS    : comparisonType = VlDistanceJS ; break ;
       case opt_KL2   : comparisonType = VlKernelL2 ; break ;
       case opt_KL1   : comparisonType = VlKernelL1 ; break ;
       case opt_KCHI2 : comparisonType = VlKernelChi2 ; break ;
       case opt_KHELL : comparisonType = VlKernelHellinger ; break ;
+      case opt_KJS   : comparisonType = VlKernelJS ; break ;
       default:
         assert(0) ;
     }

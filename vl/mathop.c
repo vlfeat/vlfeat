@@ -28,8 +28,8 @@ GNU GPLv2, or (at your option) any later version.
  the comparison function on all pairs of one or two sequences of
  vectors.
 
- Let @f$ \mathbf{x} = (x_1,\dots,\x_d) @f$ and @f$ \mathbf{y} =
- (y_1,\dots,\y_d) @f$ be two vectors.  The following comparison
+ Let @f$ \mathbf{x} = (x_1,\dots,x_d) @f$ and @f$ \mathbf{y} =
+ (y_1,\dots,y_d) @f$ be two vectors.  The following comparison
  functions are supported:
 
  <table>
@@ -37,7 +37,7 @@ GNU GPLv2, or (at your option) any later version.
  <td>@f$ l^1 @f$</td>
  <td>::VlDistanceL1</td>
  <td>@f$ \sum_{i=1}^d |x_i - y_i| @f$</td>
- <td>Manhattan distance</td>
+ <td>l1 distance (squared intersection metric)</td>
  </tr>
  <tr>
  <td>@f$ l^2 @f$</td>
@@ -56,6 +56,19 @@ GNU GPLv2, or (at your option) any later version.
  <td>::VlDistanceHellinger</td>
  <td>@f$\sum_{i=1}^d (\sqrt{x_i} - \sqrt{y_i})^2@f$</td>
  <td>Squared Hellinger's distance</td>
+ </tr>
+ <tr>
+ <td>-</td>
+ <td>::VlDistanceJS</td>
+ <td>@f$
+ \sum_{i=1}^d
+ \left(
+   x_i \log\frac{2x_i}{x_i+y_i}
+ + y_i \log\frac{2y_i}{x_i+y_i}
+ \right)
+ @f$
+ </td>
+ <td>Squared Jensen-Shannon distance</td>
  </tr>
  <tr>
  <td>@f$ l^1 @f$</td>
@@ -79,7 +92,20 @@ GNU GPLv2, or (at your option) any later version.
  <td>-</td>
  <td>::VlKernelHellinger</td>
  <td>@f$\sum_{i=1}^d 2 \sqrt{x_i y_i}@f$</td>
- <td>Bhattacharya coefficient</td>
+ <td>Hellinger's kernel (Bhattacharya coefficient)</td>
+ </tr>
+ <tr>
+ <td>-</td>
+ <td>::VlKernelJS</td>
+ <td>@f$
+ \sum_{i=1}^d
+ \left(
+   \frac{x_i}{2} \log_2\frac{x_i+y_i}{x_i}
+ + \frac{y_i}{2} \log_2\frac{x_i+y_i}{y_i}
+ \right)
+ @f$
+ </td>
+ <td>Jensen-Shannon kernel</td>
  </tr>
  </table>
 
@@ -234,6 +260,34 @@ VL_XCAT(_vl_distance_hellinger_, SFX)
 }
 
 VL_EXPORT T
+VL_XCAT(_vl_distance_js_, SFX)
+(vl_size dimension, T const * X, T const * Y)
+{
+  T const * X_end = X + dimension ;
+  T acc = 0.0 ;
+  while (X < X_end) {
+    T x = *X++ ;
+    T y = *Y++ ;
+
+#if (FLT == VL_TYPE_FLOAT)
+    if (x) {
+      acc += x - x * log2f(1 + y/x) ;
+    }
+    if (y) {
+      acc += y - y * log2f(1 + x/y) ;
+    }
+#else
+    if (x) {
+      acc += x - x * log2(1 + y/x) ;
+    }
+    if (y) {
+      acc += y - y * log2(1 + x/y) ;
+    }
+#endif
+  }
+}
+
+VL_EXPORT T
 VL_XCAT(_vl_kernel_l2_, SFX)
 (vl_size dimension, T const * X, T const * Y)
 {
@@ -300,6 +354,35 @@ VL_XCAT(_vl_kernel_hellinger_, SFX)
   return acc ;
 }
 
+VL_EXPORT T
+VL_XCAT(_vl_kernel_js_, SFX)
+(vl_size dimension, T const * X, T const * Y)
+{
+  T const * X_end = X + dimension ;
+  T acc = 0.0 ;
+  while (X < X_end) {
+    T x = *X++ ;
+    T y = *Y++ ;
+
+#if (FLT == VL_TYPE_FLOAT)
+    if (x) {
+      acc += x * log2f(1 + y/x) ;
+    }
+    if (y) {
+      acc += y * log2f(1 + x/y) ;
+    }
+#else
+    if (x) {
+      acc += x * log2(1 + y/x) ;
+    }
+    if (y) {
+      acc += y * log2(1 + x/y) ;
+    }
+#endif
+  }
+  return (T)0.5 * acc ;
+}
+
 /* ---------------------------------------------------------------- */
 
 VL_EXPORT COMPARISONFUNCTION_TYPE
@@ -311,10 +394,12 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
     case VlDistanceL1        : function = VL_XCAT(_vl_distance_l1_,        SFX) ; break ;
     case VlDistanceChi2      : function = VL_XCAT(_vl_distance_chi2_,      SFX) ; break ;
     case VlDistanceHellinger : function = VL_XCAT(_vl_distance_hellinger_, SFX) ; break ;
+    case VlDistanceJS        : function = VL_XCAT(_vl_distance_js_,        SFX) ; break ;
     case VlKernelL2          : function = VL_XCAT(_vl_kernel_l2_,          SFX) ; break ;
     case VlKernelL1          : function = VL_XCAT(_vl_kernel_l1_,          SFX) ; break ;
     case VlKernelChi2        : function = VL_XCAT(_vl_kernel_chi2_,        SFX) ; break ;
     case VlKernelHellinger   : function = VL_XCAT(_vl_kernel_hellinger_,   SFX) ; break ;
+    case VlKernelJS          : function = VL_XCAT(_vl_kernel_js_,          SFX) ; break ;
     default: assert(0) ; break ;
   }
 

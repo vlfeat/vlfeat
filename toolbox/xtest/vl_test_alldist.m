@@ -31,14 +31,19 @@ vl_assert_almost_equal(...
   1e-6) ;
 
 function test_distances(s)
-dists = {'chi2', 'l2', 'l1', 'kchi2', 'kl2', 'kl1'} ;
+dists = {'chi2', 'l2', 'l1', 'hell', 'js', ...
+         'kchi2', 'kl2', 'kl1', 'khell', 'kjs'} ;
 distsEquiv = { ...
   @(x,y) (x-y)^2 / (x + y), ...
   @(x,y) (x-y)^2, ...
   @(x,y) abs(x-y), ...
+  @(x,y) (sqrt(x) - sqrt(y))^2, ...
+  @(x,y) x - x .* log2(1 + y/x) + y - y .* log2(1 + x/y), ...
   @(x,y) 2 * (x*y) / (x + y), ...
   @(x,y) x*y, ...
-  @(x,y) min(x,y) } ;
+  @(x,y) min(x,y), ...
+  @(x,y) sqrt(x.*y), ...
+  @(x,y) .5 * (x .* log2(1 + y/x) + y .* log2(1 + x/y))} ;
 types = {'single', 'double'} ;
 
 for simd = [0 1]
@@ -57,6 +62,22 @@ for simd = [0 1]
         simd) ;
     end
   end
+end
+
+function test_distance_kernel_pairs(s)
+dists = {'chi2', 'l2', 'l1', 'hell', 'js'} ;
+for d = 1:length(dists)
+  dist = char(dists{d}) ;
+  X = s.X ;
+  Y = s.Y ;
+  ker = ['k' dist] ;
+  kxx = vl_alldist(X,X,ker) ;
+  kyy = vl_alldist(Y,Y,ker) ;
+  kxy = vl_alldist(X,Y,ker) ;
+  kxx = repmat(diag(kxx), 1, size(s.Y,2)) ;
+  kyy = repmat(diag(kyy), 1, size(s.X,1))' ;
+  d2  = vl_alldist(X,Y,dist) ;
+  vl_assert_almost_equal(d2, kxx + kyy - 2 * kxy, '1e-6') ;
 end
 
 function D = makedist(cmp,X,Y)

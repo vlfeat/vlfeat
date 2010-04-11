@@ -458,14 +458,16 @@ typedef double (*VlDoubleVectorComparisonFunction)(vl_size dimension, double con
 
 /** @brief Vector comparison types */
 enum _VlVectorComparisonType {
-  VlDistanceL1,        /**< l1 distance */
-  VlDistanceL2,        /**< l2 distance */
-  VlDistanceChi2,      /**< Chi2 distance */
-  VlDistanceHellinger, /**< Hellinger's distance */
-  VlKernelL1,          /**< l1 kernel */
+  VlDistanceL1,        /**< l1 distance (squared intersection metric) */
+  VlDistanceL2,        /**< squared l2 distance */
+  VlDistanceChi2,      /**< squared Chi2 distance */
+  VlDistanceHellinger, /**< squared Hellinger's distance */
+  VlDistanceJS,        /**< squared Jensen-Shannon distance */
+  VlKernelL1,          /**< intersection kernel */
   VlKernelL2,          /**< l2 kernel */
   VlKernelChi2,        /**< Chi2 kernel */
-  VlKernelHellinger    /**< Hellinger's kernel */
+  VlKernelHellinger,   /**< Hellinger's kernel */
+  VlKernelJS           /**< Jensen-Shannon kernel */
 } ;
 
 /** @brief Vector comparison types */
