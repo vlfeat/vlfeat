@@ -19,7 +19,8 @@
 
 typedef enum {
   VlHomogeneousKernelIntersection = 0,
-  VlHomogeneousKernelChi2
+  VlHomogeneousKernelChi2,
+  VlHomogeneousKernelJS
 } VlHomogeneousKernelType ;
 
 typedef struct _VlHomogeneousKernelMap

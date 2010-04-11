@@ -11,12 +11,14 @@
 
 enum {
   opt_KCHI2,
-  opt_KL1
+  opt_KL1,
+  opt_KJS
 } ;
 
 vlmxOption options [] = {
 {"kl1",          0,   opt_KL1           },
 {"kchi2",        0,   opt_KCHI2         },
+{"kjs",          0,   opt_KJS           },
 {0,              0,   0                 }
 } ;
 
@@ -88,6 +90,9 @@ mexFunction(int nout, mxArray *out[],
         break ;
       case opt_KCHI2 :
         kernelType = VlHomogeneousKernelChi2 ;
+        break ;
+      case opt_KJS :
+        kernelType = VlHomogeneousKernelJS ;
         break ;
       default:
         assert(0) ;

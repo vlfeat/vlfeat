@@ -29,9 +29,10 @@
 %   KL1::
 %     Compute the map for the L1 (intersection) kernel.
 %
+%   KJS::
+%     Compute the map for the JS (Jensen-Shannon) kernel.
 %
-%   REFERENCES:
-%
+%   REFERENCES
 %   [1] A. Vedaldi and A. Zisserman
 %       `Efficient Additive Kernels via Explicit Feature Maps',
 %       Proc. CVPR, 2010.

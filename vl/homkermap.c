@@ -129,7 +129,8 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
   self->maxExponent = 8 ;
 
   assert(kernelType == VlHomogeneousKernelIntersection ||
-         kernelType == VlHomogeneousKernelChi2) ;
+         kernelType == VlHomogeneousKernelChi2 ||
+         kernelType == VlHomogeneousKernelJS) ;
 
   self->table = vl_malloc (sizeof(double) *
                            (2*self->order+1) *
@@ -141,9 +142,6 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
   }
 
   {
-    /*
-
-     */
     vl_int exponent ;
     double * tablep  = self->table ;
     for (exponent  = self->minExponent ;
@@ -169,6 +167,9 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
           case VlHomogeneousKernelChi2:
             sqrtkappa0 = 1.0 ;
             break ;
+          case VlHomogeneousKernelJS:
+            sqrtkappa0 = sqrt(2.0 / log(4.0)) ;
+            break ;
           default:
             assert(0) ;
         }
@@ -183,6 +184,11 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
               break ;
             case VlHomogeneousKernelChi2:
               kappa = 2.0 / (exp(VL_PI * lambda) + exp(-VL_PI * lambda)) ;
+              break ;
+            case VlHomogeneousKernelJS:
+              kappa = (2.0 / log(4.0)) *
+              2.0 / (exp(VL_PI * lambda) + exp(-VL_PI * lambda)) /
+              (1 + 4 * lambda*lambda) ;
               break ;
             default:
               assert(0) ;
