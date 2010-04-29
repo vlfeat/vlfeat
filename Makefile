@@ -272,15 +272,10 @@ clean:
 	rm -f  `find . -name '.gdb_history'`
 	rm -f  `find . -name '._*'`
 	rm -rf ./results
-	rm -rf tmp-$(NAME)-*
 
 archclean: clean
-	rm -rf bin/$(ARCH)
-	rm -rf tmp-$(NAME)-*$(ARCH)*
 
 distclean:
-	rm -rf bin
-	rm -f $(NAME)-*.tar.gz
 
 info :
 	@echo "************************************* General settings"
@@ -303,16 +298,6 @@ autorights: distclean
 	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
 	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
 	  --program "VLFeat"
-
-# --------------------------------------------------------------------
-#                                                        Xcode Support
-# --------------------------------------------------------------------
-
-.PHONY: dox-
-dox- : dox
-
-.PHONY: dox-clean
-dox-clean:
 
 # --------------------------------------------------------------------
 #                                                             Includes

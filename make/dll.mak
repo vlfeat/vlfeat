@@ -71,7 +71,7 @@ no_dep_targets += dll-info
 dll-all: dll
 dll: $(dll_tgt)
 
-# generate dll-dir target
+# generate the dll-dir target
 $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
 
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
@@ -99,10 +99,10 @@ dll-clean:
 	rm -f $(dll_dep) $(dll_obj)
 
 dll-archclean: dll-clean
-	rm -f $(dll_tgt)
+	rm -rf $(BINDIR)
 
 dll-distclean:
-	rm -rf $(BINDIR)
+	rm -rf bin
 
 dll-info:
 	@echo "******************************************* VLFeat DLL"

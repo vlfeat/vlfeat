@@ -25,8 +25,7 @@ BIN_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
 # can be modified later by install_name_tool.
 
 bin_src := $(wildcard $(VLDIR)/src/*.c)
-bin_tgt := $(notdir $(bin_src))
-bin_tgt := $(addprefix $(BINDIR)/, $(bin_tgt:.c=))
+bin_tgt := $(addprefix $(BINDIR)/, $(patsubst %.c,%,$(notdir $(bin_src))))
 bin_dep := $(addsuffix .d, $(bin_tgt))
 
 deps += $(bin_dep)
@@ -40,26 +39,21 @@ no_dep_targets += bin-info
 
 bin-all: $(bin_tgt)
 
-# generate bin-dir target
-$(eval $(call gendir, bin, $(BINDIR) $(BINDIR)/objs))
-
-$(BINDIR)/% : $(VLDIR)/src/%.c $(bin-dir)
+$(BINDIR)/% : $(VLDIR)/src/%.c $(dll-dir)
 	@make -s $(dll_tgt)
-	$(call C,CC) $(BIN_CFLAGS) $< $(BIN_LDFLAGS) -o "$(@)"
+	$(call C,CC) $(BIN_CFLAGS) $(BIN_LDFLAGS) "$<" -o "$@"
 
-$(BINDIR)/%.d : $(VLDIR)/src/%.c $(bin-dir)
+$(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
 	$(call C,CC) $(BIN_CFLAGS) -M -MT  \
 	       '$(BINDIR)/$* $(BINDIR)/$*.d' \
-	       $< -MF $@
+	       "$<" -MF "$@"
 
 bin-clean:
 	rm -f $(bin_dep)
 
 bin-archclean: bin-clean
-	rm -f $(bin_tgt)
 
 bin-distclean:
-	rm -rf $(BINDIR)
 
 bin-info:
 	@echo "******************************* Command line utilities"

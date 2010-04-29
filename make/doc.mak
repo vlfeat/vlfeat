@@ -24,7 +24,7 @@ PYTHON     ?= python
 GROFF      ?= groff
 TIDY       ?= tidy
 
-# 95 DPI make a letter page 808 pixels large
+# 95 DPI makes a letter page 808 pixels large
 screen_dpi := 95
 
 # --------------------------------------------------------------------
@@ -229,6 +229,16 @@ doc-info :
 	$(call dump-var,jpg_tgt)
 	$(call dump-var,man_tgt)
 	@echo
+
+# --------------------------------------------------------------------
+#                                                        Xcode Support
+# --------------------------------------------------------------------
+
+.PHONY: dox-
+dox- : dox
+
+.PHONY: dox-clean
+dox-clean:
 
 # Local variables:
 # mode: Makefile
