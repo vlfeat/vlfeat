@@ -390,7 +390,7 @@ VL_EXPORT VlState _vl_state ;
 VL_EXPORT void
 vl_lock_state ()
 {
-#if defined(VL_THREADS_ENABLED)
+#if defined(VL_ENABLE_THREADS)
 #if defined(VL_THREADS_POSIX)
   VlState * state = vl_get_state () ;
   pthread_t thisThread = pthread_self () ;
@@ -423,7 +423,7 @@ vl_lock_state ()
 VL_EXPORT void
 vl_unlock_state ()
 {
-#if defined(VL_THREADS_ENABLED)
+#if defined(VL_ENABLE_THREADS)
 #if defined(VL_THREADS_POSIX)
   VlState * state = vl_get_state () ;
   pthread_mutex_lock (&state->mutex) ;
@@ -751,7 +751,7 @@ BOOL WINAPI DllMain(
 
     case DLL_THREAD_DETACH:
       /* Do thread-specific cleanup */
-#if defined(VL_THREADS_ENABLED) && defined(VL_THREADS_WIN)
+#if defined(VL_ENABLE_THREADS) && defined(VL_THREADS_WIN)
       state = vl_get_state() ;
       threadState = (VlThreadSpecificState*) TlsGetValue(state->tlsIndex) ;
       if (threadState) {
@@ -781,7 +781,7 @@ vl_constructor ()
 
   state = vl_get_state() ;
 
-#if defined(VL_THREADS_ENABLED)
+#if defined(VL_ENABLE_THREADS)
 #if defined(VL_THREADS_POSIX)
   {
     typedef void (*destructorType)(void * );
@@ -833,7 +833,7 @@ vl_destructor ()
 
   state = vl_get_state() ;
 
-#if defined(VL_THREADS_ENABLED)
+#if defined(VL_ENABLE_THREADS)
 #if defined(VL_THREADS_POSIX)
   {
     /* Delete the thread state of this thread as the

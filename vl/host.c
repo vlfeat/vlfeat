@@ -321,14 +321,14 @@ it supports POSIX threads.
  ** @see @ref host-compiler-others
  **/
 
-/** @def VL_THREADS_ENABLED
+/** @def VL_ENABLE_THREADS
  ** @brief Defined if multi-threading support is enabled
  **
  ** Define this symbol to enable multi-threading support.
  **/
 
 #ifdef __DOXYGEN__
-#define VL_THREADS_ENABLED
+#define VL_ENABLE_THREADS
 #endif
 
 /** @def VL_THREADS_WIN
@@ -470,7 +470,7 @@ vl_print_compiler_info ()
   dm = "ILP32" ;
 #endif
 
-#ifdef VL_THREADS_ENABLED
+#ifdef VL_ENABLE_THREADS
 #ifdef VL_THREADS_WIN
   th = "Windows" ;
 #elif VL_THREADS_POSIX

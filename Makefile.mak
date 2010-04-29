@@ -118,7 +118,7 @@ CFLAGS     = /nologo /TC /MD \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /D"__LITTLE_ENDIAN__" \
              /D"VL_SUPPORT_SSE2" \
-             /D"VL_THREADS_ENABLED" \
+             /D"VL_ENABLE_THREADS" \
              /I. \
              /W1 /Z7 /Zp8 /Ox
 
@@ -130,7 +130,7 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
 MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl \
-             -DVL_THREADS_ENABLED -DVL_SUPPORT_SSE2
+             -DVL_ENABLE_THREADS -DVL_SUPPORT_SSE2
 
 libsrc = \
   vl\aib.c \

@@ -25,7 +25,7 @@ General Public License version 2.
 #include <Windows.h>
 #endif
 
-#if defined(VL_THREADS_ENABLED) && defined(VL_THREADS_POSIX)
+#if defined(VL_ENABLE_THREADS) && defined(VL_THREADS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -134,7 +134,7 @@ typedef struct _VlThreadSpecificState
 typedef struct _VlState
 {
 
-#if defined(VL_THREADS_ENABLED)
+#if defined(VL_ENABLE_THREADS)
 #if defined(VL_THREADS_POSIX)
   pthread_key_t threadKey ;
   pthread_mutex_t mutex ;
@@ -299,7 +299,7 @@ vl_get_state ()
 VL_INLINE VlThreadSpecificState *
 vl_get_thread_specific_state ()
 {
-#ifndef VL_THREADS_ENABLED
+#ifndef VL_ENABLE_THREADS
   return & vl_get_state()->threadState ;
 #else
   VlState * state ;

@@ -167,7 +167,7 @@ CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 CFLAGS += $(if $(DEBUG), -O0 -g, -O3)
-CFLAGS += -DVL_THREADS_ENABLED
+CFLAGS += -DVL_ENABLE_THREADS
 CFLAGS += -DVL_ENABLE_SSE2
 CFLAGS += -I$(VLDIR)
 

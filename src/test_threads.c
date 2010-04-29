@@ -54,7 +54,7 @@ testThread(LPVOID args)
 int
 main(int argc VL_UNUSED, char** argv VL_UNUSED)
 {
-#ifdef VL_THREADS_ENABLED
+#ifdef VL_ENABLE_THREADS
 #if defined(VL_THREADS_POSIX)
   vl_uindex i ;
   pthread_t threads [5] ;
@@ -80,7 +80,7 @@ main(int argc VL_UNUSED, char** argv VL_UNUSED)
     WaitForSingleObject (threadHandles[i], INFINITE);
   }
 #endif
-/* VL_THREADS_ENABLED */
+/* VL_ENABLE_THREADS */
 #else
   printf("VLFeat was compiled without threading support\n") ;
 #endif
