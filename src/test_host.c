@@ -10,6 +10,9 @@
 int
 main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 {
-  vl_print_info() ;
+  char * string = vl_configuration_to_string_copy() ;
+  assert (string) ;
+  VL_PRINTF(string) ;
+  vl_free(string) ;
   return 0 ;
 }

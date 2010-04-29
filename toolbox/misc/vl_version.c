@@ -6,6 +6,8 @@
 /* AUTORIGHTS */
 
 #include "mexutils.h"
+#include <vl/stringop.h>
+
 #include <assert.h>
 
 /* option codes */
@@ -25,6 +27,7 @@ mexFunction(int nout, mxArray *out[],
 {
   int verbose = 0 ;
   char buffer [1024] ;
+  int unsigned const bufferSize = sizeof(buffer)/sizeof(buffer[0]) ;
 
   int            opt ;
   int            next = 0 ;
@@ -47,8 +50,12 @@ mexFunction(int nout, mxArray *out[],
   }
 
   if (verbose) {
-    snprintf(buffer, sizeof(buffer)/sizeof(buffer[0]),
-             "%s (%s)", VL_VERSION_STRING, __DATE__) ;
+    int offset = 0 ;
+    char * string = vl_configuration_to_string_copy() ;
+    offset = vl_string_copy(buffer, bufferSize, string) ;
+    snprintf(buffer + offset, bufferSize - offset,
+             "    SIMD enabled: %s\n", VL_YESNO(vl_get_simd_enabled())) ;
+    if(string) vl_free(string) ;
   } else {
     snprintf(buffer, sizeof(buffer)/sizeof(buffer[0]),
              "%s", VL_VERSION_STRING) ;

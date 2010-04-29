@@ -84,6 +84,10 @@ main(int argc VL_UNUSED, char** argv VL_UNUSED)
 #else
   printf("VLFeat was compiled without threading support\n") ;
 #endif
-  vl_print_info() ;
+  {
+    char const * string = vl_configuration_to_string_copy() ;
+    printf(string) ;
+    vl_free(string) ;
+  }
   return 0 ;
 }

@@ -175,7 +175,7 @@ VL_EXPORT void vl_unlock_state () ;
 VL_EXPORT VlThreadSpecificState * vl_thread_specific_state_new () ;
 VL_EXPORT void vl_thread_specific_state_delete (VlThreadSpecificState * self) ;
 VL_EXPORT char const * vl_get_version_string () ;
-VL_EXPORT void vl_print_info () ;
+VL_EXPORT char * vl_configuration_to_string_copy () ;
 VL_INLINE void vl_set_simd_enabled (vl_bool x) ;
 VL_INLINE vl_bool vl_get_simd_enabled () ;
 VL_INLINE vl_bool vl_cpu_has_sse3 () ;

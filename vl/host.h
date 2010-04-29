@@ -309,7 +309,7 @@ VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
 #endif
 #endif
 
-VL_EXPORT void vl_print_compiler_info () ;
+VL_EXPORT char * vl_static_configuration_to_string_copy () ;
 
 /** ------------------------------------------------------------------
  ** @name Atomic data types
@@ -487,7 +487,7 @@ typedef struct _VlX86CpuInfo
 } VlX86CpuInfo ;
 
 void _vl_x86cpu_info_init (VlX86CpuInfo *self) ;
-void _vl_x86cpu_info_print (VlX86CpuInfo const *self) ;
+char * _vl_x86cpu_info_to_string_copy (VlX86CpuInfo const *self) ;
 
 /** @} */
 

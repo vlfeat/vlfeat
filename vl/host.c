@@ -12,6 +12,7 @@ GNU GPLv2, or (at your option) any later version.
 
 #include "host.h"
 #include "generic.h"
+#include <stdio.h>
 
 /**
  @file host.h
@@ -24,7 +25,7 @@ GNU GPLv2, or (at your option) any later version.
  - @ref host-os "Host operating system"
  - @ref host-compiler "Host compiler"
    - @ref host-compiler-data-model "Data models"
-   - @ref host-compiler-other      "Oter compiler specific features"
+   - @ref host-compiler-other "Other compiler specific features"
  - @ref host-arch "Host CPU architecture"
    - @ref host-arch-endianness "Endianness"
 
@@ -407,81 +408,117 @@ _vl_x86cpu_info_init (VlX86CpuInfo *self)
   }
 }
 
-void
-_vl_x86cpu_info_print (VlX86CpuInfo const *self)
+char *
+_vl_x86cpu_info_to_string_copy (VlX86CpuInfo const *self)
 {
-  VL_PRINTF(" CPU %s", self->vendorString) ;
-  VL_PRINTF(": MMX:%s",           VL_YESNO(self->hasMMX)) ;
-  VL_PRINTF(", SSE:%s",           VL_YESNO(self->hasSSE)) ;
-  VL_PRINTF(", SSE2:%s",          VL_YESNO(self->hasSSE2)) ;
-  VL_PRINTF(", SSE3:%s",          VL_YESNO(self->hasSSE3)) ;
-  VL_PRINTF(", SSE4.1:%s",        VL_YESNO(self->hasSSE41)) ;
-  VL_PRINTF(", SSE4.2:%s\n",      VL_YESNO(self->hasSSE42)) ;
+  char * string = 0 ;
+  int length = 0 ;
+  while (string == 0) {
+    if (length > 0) {
+      string = vl_malloc(sizeof(char) * length) ;
+      if (string == NULL) break ;
+    }
+    length = snprintf(string, length, "%s%s%s%s%s%s%s",
+                      self->vendorString,
+                      self->hasMMX   ? " MMX" : "",
+                      self->hasSSE   ? " SSE" : "",
+                      self->hasSSE2  ? " SSE2" : "",
+                      self->hasSSE3  ? " SSE3" : "",
+                      self->hasSSE41 ? " SSE41" : "",
+                      self->hasSSE42 ? " SSE42" : "") ;
+    length += 1 ;
+  }
+  return string ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Print compiler information
+ ** @brief Human readable static library configuration
+ ** @return a new string with the static configuration.
  **
- ** Print compiler, host, and configuration information. These
- ** parameters are static and set at compile time.
+ ** The string includes information about the compiler, the host, and
+ ** other static configuration parameters. The string must be released
+ ** by ::vl_free.
  **/
 
-VL_EXPORT void
-vl_print_compiler_info ()
+VL_EXPORT char *
+vl_static_configuration_to_string_copy ()
 {
-  char const *arch = 0, *endian = 0, *comp = 0, *dm = 0, *th = 0 ;
-  int compver ;
+  char const * hostString =
 #ifdef VL_ARCH_X64
-  arch = "X64" ;
+  "X64"
 #endif
 #ifdef VL_ARCH_IA64
-  arch = "IA64" ;
+  "IA64"
 #endif
 #ifdef VL_ARCH_IX86
-  arch = "IX86" ;
+  "IX86"
 #endif
 #ifdef VL_ARCH_PPC
-  arch = "PPC" ;
+  "PPC"
 #endif
-
+  ", "
 #ifdef VL_ARCH_BIG_ENDIAN
-  endian = "big endian" ;
+  "big_endian"
 #endif
 #ifdef VL_ARCH_LITTLE_ENDIAN
-  endian = "little endian" ;
+  "little_endian"
 #endif
+  ;
 
+  char compilerString [1024] ;
+
+  snprintf(compilerString, 1024,
 #ifdef VL_COMPILER_MSC
-  comp = "Microsoft Visual C++" ;
-  compver = VL_COMPILER_MSC ;
+  "Microsoft Visual C++ %d"
+#define v VL_COMPILER_MSC
 #endif
 #ifdef VL_COMPILER_GNUC
-  comp = "GNU C" ;
-  compver = VL_COMPILER_GNUC ;
+  "GNU C %d"
+#define v VL_COMPILER_GNUC
 #endif
-
+  " "
 #ifdef VL_COMPILER_LP64
-  dm = "LP64" ;
+  "LP64"
 #endif
 #ifdef VL_COMPILER_LLP64
-  dm = "LP64" ;
+  "LP64"
 #endif
 #ifdef VL_COMPILER_ILP32
-  dm = "ILP32" ;
+  "ILP32"
 #endif
+           , v) ;
 
+  char const * libraryString =
 #ifdef VL_ENABLE_THREADS
 #ifdef VL_THREADS_WIN
-  th = "Windows" ;
+  "Windows_threads"
 #elif VL_THREADS_POSIX
-  th = "Posix" ;
+  "POSIX_threads"
 #endif
 #else
-  th = "None" ;
+  "No_threads"
 #endif
+#ifdef VL_ENABLE_SSE2
+  ", SSE2"
+#endif
+  ;
 
-  VL_PRINTF(" Static config: %s %d, %s, %s, %s, threads:%s\n",
-            comp, compver, dm, arch, endian, th) ;
+  {
+    char * string = 0 ;
+    int length = 0 ;
+    while (string == 0) {
+      if (length > 0) {
+        string = vl_malloc(sizeof(char) * length) ;
+        if (string == NULL) break ;
+      }
+      length = snprintf(string, length, "%s, %s, %s",
+                        hostString,
+                        compilerString,
+                        libraryString) ;
+      length += 1 ;
+    }
+    return string ;
+  }
 }
 
 

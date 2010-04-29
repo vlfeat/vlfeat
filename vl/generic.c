@@ -349,19 +349,44 @@ vl_get_version_string ()
 }
 
 /** ------------------------------------------------------------------
- ** @brief Print information about the library
- ** @return library version string
+ ** @brief Human readable library configuration
+ ** @return a new string with the library configuration.
+ **
+ ** The function returns a new string with a human readable
+ ** rendition of the library configuration.
  **/
 
-VL_EXPORT void
-vl_print_info ()
+VL_EXPORT char *
+vl_configuration_to_string_copy ()
 {
-  VL_PRINTF ("VLFeat version %s\n", vl_get_version_string()) ;
-  vl_print_compiler_info () ;
+  char * string = 0 ;
+  int length = 0 ;
+  char * staticString = vl_static_configuration_to_string_copy() ;
+  char * cpuString =
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
-  _vl_x86cpu_info_print(&vl_get_state()->cpuInfo) ;
+  _vl_x86cpu_info_to_string_copy(&vl_get_state()->cpuInfo) ;
+#else
+  "Generic CPU" ;
 #endif
-  VL_PRINTF (" Number of CPUs: %d\n", vl_get_num_cpus()) ;
+
+  while (string == 0) {
+    if (length > 0) {
+      string = vl_malloc(sizeof(char) * length) ;
+      if (string == NULL) break ;
+    }
+    length = snprintf(string, length,
+                      "VLFeat version %s\n"
+                      "    Static config: %s\n"
+                      "    %d CPU(s): %s\n",
+                      vl_get_version_string (),
+                      staticString,
+                      vl_get_num_cpus(), cpuString) ;
+    length += 1 ;
+  }
+
+  if (staticString) vl_free(staticString) ;
+  if (cpuString) vl_free(cpuString) ;
+  return string ;
 }
 
 /** @internal @brief A printf that does not do anything */

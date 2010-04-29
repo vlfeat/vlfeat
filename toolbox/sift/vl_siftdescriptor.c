@@ -1,7 +1,7 @@
 /** @internal
- ** @file     siftdescriptor.c
- ** @author   Andrea Vedaldi
+ ** @file     vl_siftdescriptor.c
  ** @brief    vl_siftdescriptor - MEX definition
+ ** @author   Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
