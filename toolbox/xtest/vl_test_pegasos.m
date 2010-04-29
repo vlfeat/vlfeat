@@ -1,0 +1,37 @@
+function results = vl_test_pegasos(varargin)
+% VL_TEST_KDTREE
+vl_test_init ;
+
+function s = setup()
+randn('state',0) ;
+
+s.biasMultiplier = 2 ;
+s.lambda = 0.1 ;
+
+Np = 10 ;
+Nn = 10 ;
+Xp = diag([1 3])*randn(2, Np) ;
+Xn = diag([1 3])*randn(2, Nn) ;
+Xp(1,:) = Xp(1,:) + 2 + 1 ;
+Xn(1,:) = Xn(1,:) - 2 + 1 ;
+
+s.X = [Xp Xn] ;
+s.y = [ones(1,Np) -ones(1,Nn)] ;
+%s.w = exact_solver(s.X, s.y, s.lambda, s.biasMultiplier) ;
+s.w = [ 0.984155766745943 ;
+        0.081875883054983 ;
+       -0.558661314436844] ;
+
+function test_problem_1(s)
+w = vl_pegasos(s.X, int8(s.y), s.lambda, ...
+               'numIterations', 3000, ...
+               'biasMultiplier', s.biasMultiplier) ;
+vl_assert_almost_equal(w, s.w, 0.1) ;
+
+function w = exact_solver(X, y, lambda, biasMultiplier)
+N = size(X,2) ;
+model = svmtrain(y', [(1:N)' X'*X], sprintf(' -c %f -t 4 ', 1/(lambda*N))) ;
+w = X(:,model.SVs) * model.sv_coef ;
+w(3) = - model.rho / biasMultiplier ;
+format long
+w
