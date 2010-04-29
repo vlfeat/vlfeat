@@ -76,40 +76,15 @@
 # == BUILDING THE DOCUMENTATION ==
 #
 # There are no configuration parameters.
-#
-# == ABOUT DEBUGGING ==
-#
-# We use the older STABS+ debug format as MATLAB MEX command has buggy
-# support for DWARD-2. In particular, compiling a MEX file produces a
-# DLL, but removes the intermediate object files, where DWARF-2 stores
-# the actual debugging information. Since MEX uses the default
-# debugging format (-g option) and this corresponds often to DWARF-2,
-# this should be considered a bug.
-#
-# As a workaround, we pass the -gstabs+ flag to MEX
-#
-# An alternative workaround is the following hack.
-# Fist we compile the MEX file without linking and then we linking in a
-# second pass, effectively preserving an intermediate object file
-# (but not all of them).  E.g., on Mac OS X
-#
-# > mex -c -g mymex.c ; mex -g mymex.o ;
-#
-# does preserve debugging information. In fact is also possible to run
-#
-# > dsymutil mymex.mexmaci
-#
-# does produce a mymex.mexmaci.dSYM bundle with (almost complete)
-# debugging information.
 
-NAME   ?= vlfeat
-VER    := $(shell cat vl/generic.h | sed -n \
-	's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
-CC     ?= cc
+NAME := vlfeat
+VER := $(shell cat vl/generic.h | sed -n \
+    's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
+CC ?= cc
 
-# VLFeat root directory. Mostly useful to switch to absolute paths for
-# the sources in Xcode.
-VLDIR      ?= .
+# VLFeat root directory. This is used to have absolute paths to the
+# source files in Xcode.
+VLDIR ?= .
 
 .PHONY : all
 all:
@@ -159,35 +134,28 @@ endif
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-ifndef NDEBUG
-DEBUG := yes
-endif
-
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-CFLAGS += $(if $(DEBUG), -O0 -g, -O3)
 CFLAGS += -DVL_ENABLE_THREADS
 CFLAGS += -DVL_ENABLE_SSE2
 CFLAGS += -I$(VLDIR)
 
+CFLAGS += $(if $(DEBUG), -DVL_DEBUG -O0 -g, -DNDEBUG -O3)
+
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Mac OS X on Intel processor
+# Mac OS X Intel 32
 ifeq ($(ARCH),maci)
 SDKROOT := /Developer/SDKs/MacOSX10.5.sdk
-CFLAGS  += $(if $(DEBUG), -gstabs+)
-CFLAGS  += -m32
-CFLAGS  += -isysroot $(SDKROOT)
+CFLAGS += -m32 -isysroot $(SDKROOT)
 LDFLAGS += -lm -mmacosx-version-min=10.5
 endif
 
-# Mac OS X on Intel processor
+# Mac OS X Intel 64
 ifeq ($(ARCH),maci64)
 SDKROOT := /Developer/SDKs/MacOSX10.5.sdk
-CFLAGS  += $(if $(DEBUG), -gstabs+)
-CFLAGS  += -m64
-CFLAGS  += -isysroot $(SDKROOT)
+CFLAGS += -m64 -isysroot $(SDKROOT)
 LDFLAGS += -lm -mmacosx-version-min=10.5
 endif
 
@@ -316,6 +284,7 @@ distclean:
 
 info :
 	@echo "************************************* General settings"
+	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
 	$(call echo-var,CFLAGS)

@@ -409,6 +409,7 @@
 				ACTIVE_TEST = test_host;
 				ARCH = maci;
 				ARCHS = x86_64;
+				DEBUG = YES;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -437,7 +438,6 @@
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
-				NDEBUG = yes;
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
@@ -452,6 +452,7 @@
 				ACTIVE_TEST = test_host;
 				ARCH = maci64;
 				ARCHS = x86_64;
+				DEBUG = YES;
 				DOXYGEN = /Applications/Doxygen.app/Contents/Resources/doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -510,7 +511,6 @@
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
-				NDEBUG = yes;
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
