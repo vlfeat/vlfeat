@@ -152,7 +152,7 @@ comm_bins += $(m_lnk)
 deps +=
 endif
 
-matlab-all: $(matlab-noprefix)
+matlab-all: matlab-noprefix
 
 # generate matlab-noprefix-dir target
 $(eval $(call gendir, matlab-noprefix, toolbox/noprefix))
