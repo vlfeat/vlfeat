@@ -4,7 +4,11 @@
 
 # AUTORIGTHS
 
-all: octave-all
+# Octave support is experimental. The MEX-files appear to compile and
+# work correctly, but part of the M-files in the MATLAB toolbox are
+# not compatible with Octave (in particular the demos).
+
+#all: octave-all
 info: octave-info
 clean: octave-clean
 archclean: octave-archclean
@@ -15,12 +19,13 @@ MKOCTFILE ?= mkoctfile
 
 OCTAVE_MEX_SUFFIX := mex
 OCTAVE_MEX_BINDIR := toolbox/mex
-OCTAVE_MEX_FLAGS   = -v
-OCTAVE_MEX_CFLAGS  = $(CFLAGS) -I$(VLDIR)/toolbox
+OCTAVE_MEX_FLAGS = -v
+OCTAVE_MEX_CFLAGS = $(CFLAGS) -I$(VLDIR)/toolbox
 OCTAVE_MEX_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
+OCTAVE_MEX_LDFLAGS += -m32
 endif
 
 # Mac OS X on Intel 64 bit processor
@@ -72,6 +77,7 @@ $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
 	        "$(OCTAVE_MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
 	CFLAGS="$(OCTAVE_MEX_CFLAGS)" \
+	CXXFLAGS="$(OCTAVE_MEX_CXXFLAGS)" \
 	LDFLAGS="$(OCTAVE_MEX_LDFLAGS)" \
 	 $(MKOCTFILE) \
 	       --mex $(OCTAVE_MEX_FLAGS) \

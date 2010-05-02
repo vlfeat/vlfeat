@@ -4,11 +4,11 @@
 
 # AUTORIGHTS
 
-# --------------------------------------------------------------------
-#                                                        Configuration
-# --------------------------------------------------------------------
+# To compile the MATLAB MEX files the MEX compiler must be in the
+# path.  The makefile then attempts to set the MATLABPATH root
+# directory from the output of `mex -v`.
 
-MATLABEXE  ?= matlab
+MATLABEXE ?= matlab
 MEX ?= mex
 MATLABPATH ?= $(strip $(shell $(MEX) -v 2>&1 | \
                 sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))

@@ -5,86 +5,37 @@
 # AUTORIGHTS
 
 # This makefile builds VLFeat on modern UNIX boxes with the GNU
-# compiler and make programs. Mac and Linux are explicitly supported,
-# and many other boxes should be easy to add.
+# toolchain. Mac OS X and Linux are explicitly supported, and support
+# for similar architectures can be easily added.
 #
-# This makefile builds three components: VLFeat shared library (DLL),
-# the command line programs, and the MATLAB toolbox. It also builds
-# the documentation (for the API, the MATLAB toolbox, the command line
-# utility, and also VLFeat homepage).
+# Usually, compiling VLFeat reduces to typing
 #
-# Configuring the build system entails setting the appropriate
-# variables, which are summarized next. The makefile attempts to
-# auto-detect the right configuration parameters depending on the
-# architecture (see later).
+# > make
 #
-# == MISCELLANEOUS VARIABLES ==
+# The makefile attempts to automatically determine the host
+# architecture. If this fails, or if the architecture is ambiguous,
+# the architecture can be set by specifying the ARCH variable. For
+# instance:
 #
-# VER:          Package version (e.g. 1.0)
-# DIST:         Package name for the source distr. ('vlfeat-1.0')
-# BINDIST:      Package name for the binary distr. ('vlfeat-1.0-bin')
-# HOST:         Where to pulbish the package.
-# NDEBUG:       Define this flag to remove debugging support (default undefined)
-# VERB:         Define this flag to provide extra information (default NO)
+# > make ARCH=maci64
 #
-# == PROGRAMS REQUIRED FOR BUILDING ==
+# builds VLFeat for Mac OS X Intel 64bit. Other useful variables include
 #
-# The following programs are required to compile the C library and the
-# command line utilities:
+#   ARCH     Choose the active architecture (one of maci, maci64, glx, a64).
+#   DEBUG    Define in order to compile a debugging version.
+#   MEX      Path to MATLAB MEX compiler program (e.g. ${MATLABROOT}/bin/mex).
 #
-# CC:           C compiler (e.g. gcc).
-# LIBTOOL:      libtool (used only under Mac)
+# The following targets may also be useful:
 #
-# The following programs are required to compile the C code in the
-# MATLAB Toolbox. Both are bundled with MATLAB, but may not be
-# available directly from the command line path.
+# > make clean      # removes intermediate files
+# > make archclean  # removes all products for the active architecture
+# > make distclean  # removes all products
+# > make octave-all # compiles GNU Octave MEX files (experimental)
 #
-# MATLAB:       Matlab executable (typically `matlab')
-# MEX:          MEX compiler executable (typically `mex')
-#
-# The following programs are required to make the distribution
-# packages:
-#
-# GIT:          Version system (you also need the full GIT repository).
-#
-# == BUILDING ===
-#
-# You can use CFLAGS and LDFLAGS to pass additional flags to the C
-# compiler and linker. These are in turn passed to the various flags
-# defined below.
-#
-# == BUILDING THE SHARED LIBRARY ==
-#
-# DLL_CLFAGS:   Aflags passed to $(CC) to compile a DLL C source
-# DLL_SUFFIX:   suffix of a DLL (.so, .dylib)
-#
-# == BUILDING THE COMMAND LINE UTILITIES ==
-#
-# BINDIR:       where to put the exec (and libraries)
-# C_CLFAGS:     flags passed to $(CC) to compile a C source
-# C_LDFLAGS:    flags passed to $(CC) to link C objects into an exec
-#
-# == BUILDING THE MEX FILES ==
-#
-# MATLABPATH:   MATALB root path
-# MEX_BINDIR:   where to put mex files
-# MEX_SUFFIX:   suffix of a MEX file (.mexglx, .mexmac, ...)
-# MEX_FLAGS:    flags passed to $(MEX)
-# MEX_CFLAGS:   flags added to the CLFAGS variable of $(MEX)
-# MEX_LDFLAGS:  flags added to the LDFLAGS variable of $(MEX)
-#
-# == BUILDING THE DOCUMENTATION ==
-#
-# There are no configuration parameters.
-
-NAME := vlfeat
-VER := $(shell cat vl/generic.h | sed -n \
-    's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
-CC ?= cc
-
-# VLFeat root directory. This is used to have absolute paths to the
-# source files in Xcode.
-VLDIR ?= .
+# As VLFeat is compsed of different parts (DLL, command line
+# utilities, MATLAB interface, Octave interface) so the makefile is
+# divided in components, located in make/*.mak. Please check out the
+# corresponding files in order to adjust any parameter that may not.
 
 .PHONY : all
 all:
@@ -110,16 +61,16 @@ err_spaces +=spaces
 #                                             Auto-detect architecture
 # --------------------------------------------------------------------
 
-Darwin_PPC_ARCH             := mac
+Darwin_PPC_ARCH := mac
 Darwin_Power_Macintosh_ARCH := mac
-Darwin_i386_ARCH            := maci
-Linux_i386_ARCH             := glx
-Linux_i686_ARCH             := glx
-Linux_unknown_ARCH          := glx
-Linux_x86_64_ARCH           := a64
+Darwin_i386_ARCH := maci
+Linux_i386_ARCH := glx
+Linux_i686_ARCH := glx
+Linux_unknown_ARC := glx
+Linux_x86_64_ARCH := a64
 
 UNAME := $(shell uname -sm)
-ARCH  ?= $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
+ARCH ?= $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
 
 # sanity check
 ifeq ($(ARCH),)
@@ -133,6 +84,9 @@ endif
 # --------------------------------------------------------------------
 #                                                        Configuration
 # --------------------------------------------------------------------
+
+VLDIR ?= .
+CC ?= cc
 
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
@@ -251,15 +205,15 @@ endef
 # --------------------------------------------------------------------
 
 # Each Makefile submodule appends appropriate dependencies to the all,
-# clean, archclean, distclean, and info
-# targets. In addition, it appends to the deps and bins variables the
-# list of .d files (to be inclued by make as auto-dependencies) and
-# the list of files to be added to the binary distribution.
+# clean, archclean, distclean, and info targets. In addition, it
+# appends to the deps and bins variables the list of .d files (to be
+# inclued by make as auto-dependencies) and the list of files to be
+# added to the binary distribution.
 
 include make/dll.mak
 include make/bin.mak
 include make/matlab.mak
-#include make/octave.mak
+include make/octave.mak
 include make/doc.mak
 include make/dist.mak
 
@@ -300,7 +254,7 @@ autorights: distclean
 	  --program "VLFeat"
 
 # --------------------------------------------------------------------
-#                                                             Includes
+#                                                 Include dependencies
 # --------------------------------------------------------------------
 
 .PRECIOUS: $(deps)

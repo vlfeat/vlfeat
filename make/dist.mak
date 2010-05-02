@@ -11,9 +11,12 @@ info: dist-bin-info dist-src-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-GIT   ?= git
+GIT ?= git
 RSYNC ?= rsync
 
+NAME := vlfeat
+VER := $(shell cat vl/generic.h | sed -n \
+    's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
 DIST := $(NAME)-$(VER)
 BINDIST := $(DIST)-bin
 HOST := ganesh.cs.ucla.edu:/var/www/vlfeat.org

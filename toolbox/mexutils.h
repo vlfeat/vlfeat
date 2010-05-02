@@ -24,7 +24,7 @@ General Public License version 2.
 #define vsnprintf _vsnprintf
 #endif
 
-#if ! defined (MX_API_VER) || (MX_API_VER < 0x07030000)
+#if (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && (! defined(HAVE_OCTAVE))
 typedef vl_uint32 mwSize ;
 typedef vl_int32 mwIndex ;
 #endif
@@ -155,9 +155,14 @@ typedef enum _VlmxErrorId {
 
 /* these attributes supporess undefined symbols warning with GCC */
 #ifdef VL_COMPILER_GNUC
+#if (! defined(HAVE_OCTAVE))
 EXTERN_C void __attribute__((noreturn))
 mexErrMsgIdAndTxt
 (const char * identifier, const char * err_msg, ...) ;
+#else
+extern void __attribute__((noreturn))
+mexErrMsgIdAndTxt (const char *id, const char *s, ...);
+#endif
 
 void __attribute__((noreturn))
 vlmxError
@@ -378,13 +383,13 @@ vlmxIsArray (mxArray const * array, vl_index numDimensions, vl_index* dimensions
     vl_index d ;
     mwSize const * actualDimensions = mxGetDimensions (array) ;
 
-    if (mxGetNumberOfDimensions (array) != (unsigned) numDimensions) {
+    if ((unsigned) mxGetNumberOfDimensions (array) != (unsigned) numDimensions) {
       return VL_FALSE ;
     }
 
     if(dimensions != NULL) {
       for(d = 0 ; d < numDimensions ; ++d) {
-        if (dimensions[d] >= 0 && (unsigned) dimensions[d] != actualDimensions[d])
+        if (dimensions[d] >= 0 && (unsigned) dimensions[d] != (unsigned) actualDimensions[d])
           return VL_FALSE ;
       }
     }
