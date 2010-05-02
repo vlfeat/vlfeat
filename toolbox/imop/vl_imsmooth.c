@@ -207,7 +207,7 @@ mexFunction(int nout, mxArray *out[],
         char buf [buflen] ;
         if (!vlmxIsString(optarg, -1)) {
           vlmxError(vlmxErrInvalidArgument,
-                   "PADDING argument must be a string") ;
+                   "PADDING argument must be a string.") ;
         }
         mxGetString(optarg, buf, buflen) ;
         buf [buflen - 1] = 0 ;
@@ -217,7 +217,7 @@ mexFunction(int nout, mxArray *out[],
           padding = VL_PAD_BY_CONTINUITY ;
         } else {
           vlmxError(vlmxErrInvalidArgument,
-                   "PADDING must be either ZERO or CONTINUITY, was '%s'",
+                   "PADDING must be either ZERO or CONTINUITY, was '%s'.",
                    buf) ;
         }
         break ;
@@ -226,12 +226,12 @@ mexFunction(int nout, mxArray *out[],
       case opt_subsample :
         if (!vlmxIsPlainScalar(optarg)) {
           vlmxError(vlmxErrInvalidArgument,
-                   "SUBSAMPLE must be a scalar") ;
+                   "SUBSAMPLE must be a scalar.") ;
         }
         step = *mxGetPr(optarg) ;
         if (step < 1) {
           vlmxError(vlmxErrInvalidArgument,
-                   "SUBSAMPLE must be not less than one") ;
+                   "SUBSAMPLE must be not less than one.") ;
         }
         break ;
 
@@ -241,7 +241,7 @@ mexFunction(int nout, mxArray *out[],
         char buf [buflen] ;
         if (!vlmxIsString(optarg, -1)) {
           vlmxError(vlmxErrInvalidArgument,
-                   "KERNEL argument must be a string") ;
+                   "KERNEL argument must be a string.") ;
         }
         mxGetString(optarg, buf, buflen) ;
         buf [buflen - 1] = 0 ;
@@ -251,7 +251,7 @@ mexFunction(int nout, mxArray *out[],
           kernel = TRIANGULAR ;
         } else {
           vlmxError(vlmxErrInvalidArgument,
-                   "Unknown kernel type '%s'",
+                   "Unknown kernel type '%s'.",
                    buf) ;
         }
         break ;
@@ -268,7 +268,7 @@ mexFunction(int nout, mxArray *out[],
 
   if (! vlmxIsPlainScalar(IN(S))) {
     vlmxError(vlmxErrInvalidArgument,
-             "S must be a real scalar") ;
+             "S must be a real scalar.") ;
   }
 
   classid = mxGetClassID(IN(I)) ;
@@ -276,11 +276,11 @@ mexFunction(int nout, mxArray *out[],
   if (classid != mxDOUBLE_CLASS &&
       classid != mxSINGLE_CLASS) {
     vlmxError(vlmxErrInvalidArgument,
-             "I must be either DOUBLE or SINGLE") ;
+             "I must be either DOUBLE or SINGLE.") ;
   }
   if (mxGetNumberOfDimensions(IN(I)) > 3) {
     vlmxError(vlmxErrInvalidArgument,
-             "I must be either a two or three dimensional array") ;
+             "I must be either a two or three dimensional array.") ;
   }
 
   ndims = mxGetNumberOfDimensions(IN(I)) ;
@@ -299,7 +299,7 @@ mexFunction(int nout, mxArray *out[],
   N_ = (N - 1) / step + 1 ;
   dims_ [0] = M_ ;
   dims_ [1] = N_ ;
-  if (ndims > 2) dims_ [2] = ndims ;
+  if (ndims > 2) dims_ [2] = K ;
 
   OUT(J) = mxCreateNumericArray(ndims, dims_, classid, mxREAL) ;
 
@@ -321,8 +321,8 @@ mexFunction(int nout, mxArray *out[],
       default: assert (0) ; break ;
     }
 
-    mexPrintf("vl_imsmooth: [%dx%d] -> [%dx%d] (%s, subsampling step %d)\n",
-              N, M, N_, M_, classid_str, step) ;
+    mexPrintf("vl_imsmooth: [%dx%dx%d] -> [%dx%dx%d] (%s, subsampling step %d)\n",
+              N, M, K, N_, M_, K, classid_str, step) ;
     mexPrintf("vl_imsmooth: padding: %s\n", padding_str) ;
     mexPrintf("vl_imsmooth: kernel: %s\n", kernel_str) ;
     mexPrintf("vl_imsmooth: sigma: %g\n", sigma) ;
