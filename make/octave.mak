@@ -19,7 +19,7 @@ MKOCTFILE ?= mkoctfile
 
 OCTAVE_MEX_SUFFIX := mex
 OCTAVE_MEX_BINDIR := toolbox/mex
-OCTAVE_MEX_FLAGS = -v
+OCTAVE_MEX_FLAGS =
 OCTAVE_MEX_CFLAGS = $(CFLAGS) -I$(VLDIR)/toolbox
 OCTAVE_MEX_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
 
@@ -64,12 +64,11 @@ vpath vl_%.m $(shell find $(VLDIR)/toolbox -type d)
 octave-all: octave-mex-all
 octave-mex-all: $(octave_mex_tgt) matlab-noprefix
 
-# generate octav-emex-dir target
+# generate octave-mex-dir target
 $(eval $(call gendir, octave-mex, $(OCTAVE_MEX_BINDIR)))
 
 $(OCTAVE_MEX_BINDIR)/%.d : %.c $(octave-mex-dir)
-	$(call C,MKOCTFILE) $(OCTAVE_MEX_FLAGS) \
-	       -M "$(<)"
+	$(call C,MKOCTFILE) $(OCTAVE_MEX_FLAGS) -M "$(<)"
 	@mv "$(<:.c=.d)" $(OCTAVE_MEX_BINDIR)
 
 $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
@@ -82,12 +81,17 @@ $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 	 $(MKOCTFILE) \
 	       --mex $(OCTAVE_MEX_FLAGS) \
 	       "$(<)" --output "$(@)"
+	@rm -f $(<:.c=.o)
 
 octave-info:
 	@echo "********************************************** Octave "
 	$(call dump-var,octave_mex_src)
 	$(call dump-var,octave_mex_tgt)
 	$(call dump-var,octave_mex_dep)
+	$(call echo-var,OCTAVE_MEX_BINDIR)
+	$(call echo-var,OCTAVE_MEX_FLAGS)
+	$(call echo-var,OCTAVE_MEX_CFLAGS)
+	$(call echo-var,OCTAVE_MEX_LDLAGS)
 	@echo
 
 octave-clean:

@@ -24,7 +24,8 @@ General Public License version 2.
 #define vsnprintf _vsnprintf
 #endif
 
-#if (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && (! defined(HAVE_OCTAVE))
+#if (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && \
+  (! defined(HAVE_OCTAVE))
 typedef vl_uint32 mwSize ;
 typedef vl_int32 mwIndex ;
 #endif
@@ -37,15 +38,41 @@ typedef vl_int32 mwIndex ;
 #undef OUT
 #define OUT(x) (out[OUT_ ## x])
 
+#ifdef HAVE_OCTAVE
+static void *
+mxReallocOctaveWorkaround(void * ptr, size_t size)
+{
+  /*  mexPrintf("fixed realloc\n") ; */
+  if (ptr) {
+    return mxRealloc(ptr, size) ;
+  } else {
+    return mxMalloc(size) ;
+  }
+}
+#define mxRealloc mxReallocOctaveWorkaround
+static int
+mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
+{
+  mwSize * dims_ = mxMalloc(sizeof(mwSize)*ndims) ;
+  int i ;
+  for (i = 0 ; i < ndims ; ++i) dims_[i] = dims[i] ;
+  mxSetDimensions(array,dims_,ndims) ;
+  return 0 ;
+}
+#define mxSetDimensions mxSetDimensionsOctaveWorkaround
+
+#endif
+
 /** @brief Setup VLFeat to be used in a MEX file
  **
  ** This makes VLFeat use MATLAB version of the memory allocation and
  ** logging functions.
  **/
 
-#define VL_USE_MATLAB_ENV                                       \
-vl_set_alloc_func (mxMalloc, mxRealloc, mxCalloc, mxFree) ;   \
-vl_set_printf_func (mexPrintf) ;
+#define VL_USE_MATLAB_ENV \
+  vl_set_alloc_func (mxMalloc, mxRealloc, mxCalloc, mxFree) ; \
+  vl_set_printf_func ((printf_func_t)mexPrintf) ;
+
 
 /** @file mexutils.h
 
