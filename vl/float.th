@@ -38,7 +38,7 @@ General Public License version 2.
 #  define VSIZE  4
 #  define VSFX   s
 #  define VTYPE  __m128
-#elif (FLT == VL_TYPE_FLOAT)
+#elif (FLT == VL_TYPE_DOUBLE)
 #  define VSIZE  2
 #  define VSFX   d
 #  define VTYPE  __m128d
