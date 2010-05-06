@@ -1,4 +1,4 @@
-function vl_demo_print(name,r)
+function vl_demo_print(varargin)
 % VL_DEMO_PRINT
 %   VL_DEMO_PRINT(NAME) print the current figure to the
 %   documentation directory with the specified filename.
@@ -23,25 +23,21 @@ function vl_demo_print(name,r)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-if nargin < 2
-  r = 0.5 ;
+if isa(varargin{1}, 'double')
+  fig = varargin{1} ;
+  varargin(1) = [] ;
+else
+  fig = gcf ;
 end
 
-fig = gcf  ;
+name = varargin{1} ;
 
-set(fig, 'PaperType', 'usletter', 'PaperUnits', 'points') ;
-
-paperSize = get(fig, 'PaperSize') ;
-paperWidth = paperSize(1) ;
-paperHeight = paperSize(2) ;
-
-figPos = get(fig,'PaperPosition') ;
-figWidth = figPos(3) ;
-figHeight = figPos(4) ;
-figPos(3) = r * paperWidth ;
-figPos(4) = r * paperWidth * figHeight / figWidth ;
-
-set(fig, 'PaperPosition', figPos) ;
+if length(varargin) < 2
+  r = 0.5 ;
+else
+  r = varargin{2} ;
+end
+vl_printsize(r) ;
 
 figDir = fullfile(vl_root,'doc','demo') ;
 if ~ exist(figDir, 'dir')
