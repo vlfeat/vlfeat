@@ -285,6 +285,7 @@ VL_XCAT(_vl_distance_js_, SFX)
     }
 #endif
   }
+  return acc ;
 }
 
 VL_EXPORT T
