@@ -96,6 +96,7 @@ CFLAGS += -DVL_ENABLE_SSE2
 CFLAGS += -I$(VLDIR)
 
 CFLAGS += $(if $(DEBUG), -DVL_DEBUG -O0 -g, -DNDEBUG -O3)
+CFLAGS += $(if $(PROFILE), -g,)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
