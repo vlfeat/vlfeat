@@ -9,7 +9,7 @@
 #ifndef VL_MATHOP_SSE2_INSTANTIATING
 #define VL_MATHOP_SSE2_INSTANTIATING
 
-#ifdef VL_SUPPORT_SSE2
+#ifdef VL_ENABLE_SSE2
 #ifndef __SSE2__
 #  error "mathop_sse2.c must be compiled with SSE2 intrinsics enabled"
 #endif
@@ -27,7 +27,7 @@
 #define FLT VL_TYPE_FLOAT
 #include "mathop_sse2.c"
 
-/* VL_SUPPORT_SSE2 */
+/* VL_ENABLE_SSE2 */
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -244,7 +244,6 @@ VL_XCAT(_vl_kernel_l2_sse2_, SFX)
     T b = *Y++ ;
     acc += a * b ;
   }
-
   return acc ;
 }
 

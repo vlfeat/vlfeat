@@ -27,7 +27,7 @@
 /* VL_MATHOP_SSE2_H_INSTANTIATING */
 #else
 
-#ifdef VL_SUPPORT_SSE2
+#ifdef VL_ENABLE_SSE2
 
 #include "generic.h"
 #include "float.th"
@@ -56,7 +56,7 @@ VL_EXPORT T
 VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
 (vl_size dimension, T const * X, T const * Y) ;
 
-/* VL_SUPPORT_SSE2 */
+/* VL_ENABLE_SSE2 */
 #endif
 
 /* VL_MATHOP_SSE2_INSTANTIATING */

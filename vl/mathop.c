@@ -403,7 +403,7 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
     default: assert(0) ; break ;
   }
 
-#ifdef VL_SUPPORT_SSE2
+#ifdef VL_ENABLE_SSE2
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {

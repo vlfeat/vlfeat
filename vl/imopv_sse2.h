@@ -16,10 +16,10 @@
 
 #include "generic.h"
 
-#ifdef VL_SUPPORT_SSE2
+#ifdef VL_ENABLE_SSE2
 
 VL_EXPORT
-void _vl_imconvcol_vf_sse2 (float* dst, int dst_stride,                 
+void _vl_imconvcol_vf_sse2 (float* dst, int dst_stride,
                             float const* src,
                             int src_width, int src_height, int src_stride,
                             float const* filt, int filt_begin, int filt_end,
