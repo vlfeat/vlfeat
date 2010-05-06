@@ -35,7 +35,7 @@ adv(mwSize const* dims, int ndims, int* subs_pt)
 {
   int d = 0 ;
   while(d < ndims) {
-    if( ++subs_pt[d]  < dims[d] ) return ;
+    if( ++subs_pt[d]  < (signed) dims[d] ) return ;
     subs_pt[d++] = 0 ;
   }
 }
@@ -149,7 +149,7 @@ mexFunction(int nout, mxArray *out[],
          and check that the pixel is within image boundaries. */
       for(k = 0 ; k < ndims && good ; ++k) {
         int temp = nsubs_pt [k] + subs_pt [k] ;
-        good &= 0 <= temp && temp < dims[k] ;
+        good &= 0 <= temp && temp < (signed) dims[k] ;
         nindex += temp * strides_pt [k] ;
       }
 
