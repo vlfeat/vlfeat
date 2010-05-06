@@ -97,7 +97,7 @@ save_gss (VlSiftFilt * filt, VlFileMeta * fm, const char * basename,
   char tmp [1024] ;
   int S = filt -> S ;
   int i ;
-  int s, err ;
+  int s, err = 0 ;
   int w, h ;
   int o = filt -> o_cur ;
   VlPgmImage pim ;
