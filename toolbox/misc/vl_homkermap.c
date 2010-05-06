@@ -95,7 +95,7 @@ mexFunction(int nout, mxArray *out[],
         kernelType = VlHomogeneousKernelJS ;
         break ;
       default:
-        assert(0) ;
+        abort() ;
     }
   }
 

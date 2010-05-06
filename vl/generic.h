@@ -99,7 +99,7 @@ vl_get_type_size (vl_type type)
     case VL_TYPE_INT16  : case VL_TYPE_UINT16 : dataSize = sizeof(vl_int16) ; break ;
     case VL_TYPE_INT8   : case VL_TYPE_UINT8  : dataSize = sizeof(vl_int8)  ; break ;
     default:
-      assert(0) ;
+      abort() ;
   }
   return dataSize ;
 }

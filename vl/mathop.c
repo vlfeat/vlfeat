@@ -401,7 +401,7 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
     case VlKernelChi2        : function = VL_XCAT(_vl_kernel_chi2_,        SFX) ; break ;
     case VlKernelHellinger   : function = VL_XCAT(_vl_kernel_hellinger_,   SFX) ; break ;
     case VlKernelJS          : function = VL_XCAT(_vl_kernel_js_,          SFX) ; break ;
-    default: assert(0) ; break ;
+    default: abort() ;
   }
 
 #ifdef VL_ENABLE_SSE2

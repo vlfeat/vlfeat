@@ -340,7 +340,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     default:
-      assert(0) ;
+      abort() ;
     }
   }
 
@@ -413,6 +413,6 @@ mexFunction(int nout, mxArray *out[],
 
     DISPATCH_NORM(MIN  ) ;
   default:
-    assert(0) ;
+    abort() ;
   }
 }

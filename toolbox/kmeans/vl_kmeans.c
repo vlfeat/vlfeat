@@ -86,7 +86,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     default:
       vlmxError (vlmxErrInvalidArgument,
                 "DATA must be of class SINGLE or DOUBLE") ;
-      assert(0) ;
+      abort() ;
   }
 
   dimension = mxGetM (IN(DATA)) ;
@@ -192,7 +192,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         break ;
 
       default :
-        assert(0) ;
+        abort() ;
         break ;
     }
   }
@@ -219,12 +219,12 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       case VlKMeansLLoyd: algorithmName = "Lloyd" ; break ;
       case VlKMeansElkan: algorithmName = "Elkan" ; break ;
       case VlKMeansANN:   algorithmName = "ANN" ; break ;
-      default : assert (0) ;
+      default : abort() ;
     }
     switch (vl_kmeans_get_initialization(kmeans)) {
       case VlKMeansPlusPlus : initializationName = "plusplus" ; break ;
       case VlKMeansRandomSelection : initializationName = "randsel" ; break ;
-      default: assert (0) ;
+      default: abort() ;
     }
     mexPrintf("kmeans: Initialization = %s\n", initializationName) ;
     mexPrintf("kmeans: Algorithm = %s\n", algorithmName) ;

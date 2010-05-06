@@ -140,7 +140,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     default:
-      assert(0) ;
+      abort() ;
     }
   }
 
@@ -201,7 +201,7 @@ mexFunction(int nout, mxArray *out[],
   case mxUINT32_CLASS: { PROCESS(vl_uint32, integral_ui) } ; break ;
   case mxDOUBLE_CLASS: { PROCESS(double,    integral_d)  } ; break ;
   default :
-    assert(0) ;
+    abort() ;
   }
 }
 

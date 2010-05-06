@@ -171,7 +171,7 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
             sqrtkappa0 = sqrt(2.0 / log(4.0)) ;
             break ;
           default:
-            assert(0) ;
+            abort() ;
         }
         *tablep++ = sqrtkappa0 * sqrtLx ;
 
@@ -191,7 +191,7 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
               (1 + 4 * lambda*lambda) ;
               break ;
             default:
-              assert(0) ;
+              abort() ;
           }
           sqrt2kappa = sqrt(2.0 * kappa) ;
           *tablep++ = sqrt2kappa * sqrtLx * cos(j * Llogx) ;

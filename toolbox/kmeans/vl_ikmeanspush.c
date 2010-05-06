@@ -109,8 +109,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     default :
-      assert(0) ;
-      break ;
+      abort() ;
     }
   }
 
@@ -124,7 +123,7 @@ mexFunction(int nout, mxArray *out[],
     case VL_IKM_LLOYD: method_name = "Lloyd" ; break ;
     case VL_IKM_ELKAN: method_name = "Elkan" ; break ;
     default :
-      assert (0) ;
+      abort() ;
     }
     mexPrintf("ikmeanspush: Method = %s\n", method_name) ;
     mexPrintf("ikmeanspush: ndata  = %d\n", N) ;

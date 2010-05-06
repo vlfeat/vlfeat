@@ -165,8 +165,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     default :
-        assert(0) ;
-        break ;
+        abort() ;
     }
   }
 

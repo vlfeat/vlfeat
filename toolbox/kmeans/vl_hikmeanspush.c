@@ -199,8 +199,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       break ;
 
     default :
-      assert(0) ;
-      break ;
+      abort() ;
     }
   }
 

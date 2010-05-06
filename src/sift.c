@@ -363,8 +363,7 @@ main(int argc, char **argv)
     case 0 :
     default :
       /* should not get here ...................................... */
-      assert (0) ;
-      break ;
+      abort() ;
     }
   }
 

@@ -45,7 +45,7 @@ mexFunction(int nout, mxArray *out[],
       ++ verbose ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
     }
   }
 

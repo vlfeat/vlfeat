@@ -27,7 +27,7 @@ int
 main (int argc, char *argv[])
 {
   int ch ;
-  
+
   printf("*** parsing options: start\n") ;
 
   while ((ch = getopt_long(argc, argv, "hbf:", longopts, 0)) != -1) {
@@ -43,7 +43,7 @@ main (int argc, char *argv[])
                " --daggerrunset auto option with no argument\n"
                " --spike        long option with optional argument\n") ;
         break;
-        
+
     case 'b':
       printf("option `b' or `buffy'\n") ;
       break;
@@ -59,7 +59,7 @@ main (int argc, char *argv[])
     case 0:
       printf("automatic longoption (daggerset=%d)\n", daggerset) ;
       break ;
-      
+
     case  '?' :
       printf("illegal option or missing argument\n") ;
       break ;
@@ -69,14 +69,14 @@ main (int argc, char *argv[])
       break ;
 
     default:
-      assert (0) ;
-    }    
+      abort() ;
+    }
   }
 
   printf("*** parsing options: end\n");
   {
     int i ;
-    for(i = optind ; i < argc ; ++i) 
+    for(i = optind ; i < argc ; ++i)
 		printf("non-option: '%s'\n", argv[i]) ;
   }
 

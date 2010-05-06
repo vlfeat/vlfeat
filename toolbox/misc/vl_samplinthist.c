@@ -124,6 +124,6 @@ mexFunction(int nout, mxArray *out[],
   case mxDOUBLE_CLASS: { PROCESS(sample_d,  double)    } ; break ;
   case mxUINT32_CLASS: { PROCESS(sample_ui, vl_uint32) } ; break ;
   default:
-    assert(0) ;
+    abort() ;
   }
 }

@@ -12,7 +12,7 @@ GNU GPLv2, or (at your option) any later version.
 */
 
 /** @file ikmeans.h
- ** 
+ **
  ** Integer K-means (IKM) is an implementation of K-means clustering
  ** (or Vector Quantization, VQ) for integer data. This is
  ** particularly useful for clustering large collections of visual
@@ -28,7 +28,7 @@ GNU GPLv2, or (at your option) any later version.
  ** @f$K@f$, the goal is to find assignments @f$a_i\in\{1,\dots,K\},@f$
  ** and centers @f$c_1,\dots,c_K\in R^d@f$ so that the <em>expected
  ** distortion</em>
- ** 
+ **
  ** @f[
  **   E(\{a_{i}, c_j\}) = \frac{1}{N} \sum_{i=1}^N d(x_i, c_{a_i})
  ** @f]
@@ -53,14 +53,14 @@ GNU GPLv2, or (at your option) any later version.
  ** @subsection ikmeans-alg-lloyd Lloyd
  **
  ** The Lloyd (also known as Lloyd-Max and LBG) algorithm iteratively:
- ** 
+ **
  ** - Fixes the centers, optimizing the assignments (minimizing by
  **   exhaustive search the association of each data point to the
  **   centers);
  ** - Fixes the assignments and optimizes the centers (by descending
  **   the distortion error function). For the squared distortion, this
  **   step is in closed form.
- ** 
+ **
  ** This algorithm is not particularly efficient because all data
  ** points need to be compared to all centers, for a complexity
  ** @f$O(dNKT)@f$, where <em>T</em> is the total number of iterations.
@@ -97,7 +97,7 @@ static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_uint8 const*, in
  ** operate based algorithm @a method.
  **
  ** @a method has values in the enumerations ::VlIKMAlgorithms.
- ** 
+ **
  ** @return new IKM quantizer.
  **/
 
@@ -117,7 +117,7 @@ vl_ikm_new (int method)
   return f ;
 }
 
-/** @brief Delete IKM quantizer 
+/** @brief Delete IKM quantizer
  **
  ** @param f IKM quantizer.
  **/
@@ -142,19 +142,19 @@ void vl_ikm_delete (VlIKMFilt* f)
 
 VL_EXPORT
 int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
-{ 
+{
   int err ;
-  
+
   if (f-> verb) {
     VL_PRINTF ("ikm: training with %d data\n",  N) ;
     VL_PRINTF ("ikm: %d clusters\n",  f -> K) ;
   }
-  
+
   switch (f -> method) {
   case VL_IKM_LLOYD : err = vl_ikm_train_lloyd (f, data, N) ; break ;
   case VL_IKM_ELKAN : err = vl_ikm_train_elkan (f, data, N) ; break ;
   default :
-    assert (0) ;
+    abort() ;
   }
   return err ;
 }
@@ -178,7 +178,7 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) {
   case VL_IKM_LLOYD : vl_ikm_push_lloyd (f, asgn, data, N) ; break ;
   case VL_IKM_ELKAN : vl_ikm_push_elkan (f, asgn, data, N) ; break ;
   default :
-    assert (0) ;
+    abort() ;
   }
 }
 
@@ -197,25 +197,25 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) {
 
 VL_EXPORT
 vl_uint
-vl_ikm_push_one (vl_ikm_acc const *centers, 
-		 vl_uint8 const *data, 
+vl_ikm_push_one (vl_ikm_acc const *centers,
+		 vl_uint8 const *data,
 		 int M, int K)
 {
   int i,k ;
-  
+
   /* assign data to centers */
   vl_int32 best_dist = 0 ;
   vl_uint  best      = (vl_uint)-1 ;
-  
+
   for(k = 0 ; k < K ; ++k) {
     vl_int32 dist = 0 ;
-    
+
     /* compute distance with this center */
     for(i = 0 ; i < M ; ++i) {
       vl_int32 delta = data[i] - centers[k*M + i] ;
       dist += delta * delta ;
     }
-    
+
     /* compare with current best */
     if (best == (vl_uint)-1 || dist < best_dist) {
       best = k  ;

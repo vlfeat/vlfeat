@@ -114,8 +114,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       break ;
 
     default :
-      assert(0) ;
-      break ;
+      abort() ;
     }
   }
 
@@ -129,7 +128,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     case VL_IKM_LLOYD: method_name = "Lloyd" ; break ;
     case VL_IKM_ELKAN: method_name = "Elkan" ; break ;
     default :
-      assert (0) ;
+      abort() ;
     }
     mexPrintf("ikmeans: MaxInters = %d\n", max_niters) ;
     mexPrintf("ikmeans: Method    = %s\n", method_name) ;

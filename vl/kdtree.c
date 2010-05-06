@@ -184,8 +184,7 @@ vl_kdtree_build_recursively
         case VL_TYPE_DOUBLE: datum = ((double const*)forest->data)
           [di * forest->dimension + d] ; break ;
         default:
-          assert(0) ;
-          break ;
+          abort() ;
       }
       mean += datum ;
       secondMoment += datum * datum ;
@@ -236,8 +235,8 @@ vl_kdtree_build_recursively
       case VL_TYPE_DOUBLE: datum = ((double const*)forest->data)
         [di * forest->dimension + splitDimension->dimension] ;
         break ;
-      default: assert(0) ;
-        break ;
+      default:
+        abort() ;
     }
     tree->dataIndex [i] .value = datum ;
   }
@@ -269,7 +268,7 @@ vl_kdtree_build_recursively
       break ;
 
     default:
-      assert(0) ;
+      abort() ;
   }
 
   /* divide subparts */
@@ -326,8 +325,7 @@ vl_kdforest_new (vl_type dataType,
       vl_get_vector_comparison_function_d (VlDistanceL2) ;
       break ;
     default :
-      assert (0) ;
-      break ;
+      abort() ;
   }
 
   return self ;
@@ -429,7 +427,7 @@ vl_kdforest_query_recursively (VlKDForest  * self,
       x = ((double const*) query)[i] ;
       break ;
     default :
-      assert(0) ;
+      abort() ;
   }
 
   /* base case: this is a leaf node */
@@ -466,8 +464,7 @@ vl_kdforest_query_recursively (VlKDForest  * self,
            ((double const*)self->data) + di * self->dimension) ;
           break ;
         default:
-          assert (0) ;
-          break ;
+          abort() ;
       }
       self->searchNumComparisons += 1 ;
 

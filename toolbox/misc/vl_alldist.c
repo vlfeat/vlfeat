@@ -116,7 +116,7 @@ mexFunction(int nout, mxArray *out[],
       case opt_KHELL : comparisonType = VlKernelHellinger ; break ;
       case opt_KJS   : comparisonType = VlKernelJS ; break ;
       default:
-        assert(0) ;
+        abort() ;
     }
   }
 
@@ -182,6 +182,6 @@ mexFunction(int nout, mxArray *out[],
     break ;
 
   default:
-    assert(0) ;
+    abort() ;
   }
 }

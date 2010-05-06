@@ -98,7 +98,7 @@ break
         DO(UINT32, vl_uint32, ui32) ;
         DO(INT32, vl_int32, i32) ;
       default:
-        assert (0) ;
+        abort() ;
     }
   }
 }

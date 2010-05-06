@@ -180,8 +180,7 @@ vl_file_meta_put_double (VlFileMeta * self, double x)
     break ;
 
   default :
-    assert (0) ;
-    break ;
+    abort() ;
   }
 
   return err ? VL_ERR_ALLOC : VL_ERR_OK ;
@@ -216,8 +215,7 @@ vl_file_meta_put_uint8 (VlFileMeta *self, vl_uint8 x)
     break ;
 
   default :
-    assert (0) ;
-    break ;
+    abort() ;
   }
 
   return VL_ERR_OK ;
@@ -257,8 +255,7 @@ vl_file_meta_get_double (VlFileMeta *self, double *x)
     break ;
 
   default :
-    assert (0) ;
-    break ;
+    abort() ;
   }
 
   return VL_ERR_OK ;

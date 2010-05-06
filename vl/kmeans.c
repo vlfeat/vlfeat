@@ -622,7 +622,7 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
         }
         break ;
       default:
-        assert(0);
+        abort();
     } /* done compute centers */
   } /* next Lloyd iteration */
 
@@ -844,7 +844,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
         }
         break ;
       default:
-        assert(0);
+        abort();
     } /* done compute centers */
 
     /* compute the distance from the old centers to the new centers */
@@ -1202,7 +1202,7 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
       VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)(self, data, numData) ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1254,7 +1254,7 @@ vl_kmeans_set_centers
       (self, (double const *)centers, dimension, numCenters) ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1291,7 +1291,7 @@ vl_kmeans_seed_centers_with_rand_data
       (self, (double const *)data, dimension, numData, numCenters) ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1324,7 +1324,7 @@ vl_kmeans_seed_centers_plus_plus
       (self, (double const *)data, dimension, numData, numCenters) ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1355,7 +1355,7 @@ vl_kmeans_quantize
       (self, assignments, distances, (double const *)data, numData) ;
       break ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1391,7 +1391,7 @@ vl_kmeans_refine_centers
       _vl_kmeans_refine_centers_d
       (self, (double const *)data, numData) ;
     default:
-      assert(0) ;
+      abort() ;
   }
 }
 
@@ -1442,7 +1442,7 @@ vl_kmeans_cluster (VlKMeans * self,
                                           numCenters) ;
         break ;
       default:
-        assert(0) ;
+        abort() ;
     }
 
     if (self->verbosity) {

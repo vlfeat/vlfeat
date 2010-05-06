@@ -114,8 +114,7 @@ VL_XCAT(_vl_imsmooth_smooth_, SFX)
     }
 
     default:
-      assert (0) ;
-      break ;
+      abort() ;
   }
   mxFree (tempImage) ;
 }
@@ -262,7 +261,7 @@ mexFunction(int nout, mxArray *out[],
         break ;
 
       default:
-        assert(0) ;
+        abort() ;
     }
   }
 
@@ -308,17 +307,17 @@ mexFunction(int nout, mxArray *out[],
     switch (padding) {
       case VL_PAD_BY_ZERO       : padding_str = "with zeroes" ; break ;
       case VL_PAD_BY_CONTINUITY : padding_str = "by continuity" ; break ;
-      default: assert (0) ; break ;
+      default: abort() ;
     }
     switch (classid) {
       case mxDOUBLE_CLASS: classid_str = "DOUBLE" ; break ;
       case mxSINGLE_CLASS: classid_str = "SINGLE" ; break ;
-      default: assert (0) ; break ;
+      default: abort() ;
     }
     switch (kernel) {
       case GAUSSIAN:   kernel_str = "Gaussian" ; break ;
       case TRIANGULAR: kernel_str = "triangular" ; break ;
-      default: assert (0) ; break ;
+      default: abort() ;
     }
 
     mexPrintf("vl_imsmooth: [%dx%dx%d] -> [%dx%dx%d] (%s, subsampling step %d)\n",
@@ -354,8 +353,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     default:
-      assert(0) ;
-      break ;
+      abort() ;
   }
 }
 

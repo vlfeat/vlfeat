@@ -230,8 +230,7 @@ main(int argc, char **argv)
       /* .......................................................... */
     case 0 :
     default :
-      assert (0) ;
-      break ;
+      abort() ;
     }
   }
 

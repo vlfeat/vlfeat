@@ -135,7 +135,7 @@ mexFunction(int nout, mxArray *out[],
     switch (vl_kdforest_get_thresholding_method(forest)) {
       case VL_KDTREE_MEAN : str = "mean" ; break ;
       case VL_KDTREE_MEDIAN : str = "median" ; break ;
-      default: assert(0) ;
+      default: abort() ;
     }
     mexPrintf("vl_kdforestbuild: threshold selection method: %s\n", str) ;
     mexPrintf("vl_kdforestbuild: number of trees: %d\n",
