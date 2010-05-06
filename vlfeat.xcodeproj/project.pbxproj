@@ -440,6 +440,7 @@
 				MEX = "$(MATLABROOT)/bin/mex";
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
+				PROFILE = yes;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				VERB = yes;
 				VLDIR = "$(PROJECT_DIR)";
@@ -513,6 +514,7 @@
 				MEX = "$(MATLABROOT)/bin/mex";
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
+				PROFILE = yes;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				VERB = yes;
 				VLDIR = "$(PROJECT_DIR)";
