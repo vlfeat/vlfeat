@@ -45,3 +45,6 @@ vc/*
 
 # Vim swap files
 .*.swp
+
+# Opt directory
+opt/*
