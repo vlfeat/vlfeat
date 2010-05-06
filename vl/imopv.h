@@ -77,5 +77,32 @@ void vl_imintegral_ui32 (vl_uint32 * integral,  vl_size integralStride,
                          vl_size imageWidth, vl_size imageHeight, vl_size imageStride) ;
 /** @} */
 
+/** @name Distance transform */
+/** @{ */
+
+VL_EXPORT void
+vl_image_distance_transform_d (double const * image,
+                               vl_size numColumns,
+                               vl_size numRows,
+                               vl_size columnStride,
+                               vl_size rowStride,
+                               double * distanceTransform,
+                               vl_uindex * indexes,
+                               double coeff,
+                               double offset) ;
+
+VL_EXPORT void
+vl_image_distance_transform_f (float const * image,
+                               vl_size numColumns,
+                               vl_size numRows,
+                               vl_size columnStride,
+                               vl_size rowStride,
+                               float * distanceTransform,
+                               vl_uindex * indexes,
+                               float coeff,
+                               float offset) ;
+
+/** @} */
+
 /* VL_IMOPV_H */
 #endif

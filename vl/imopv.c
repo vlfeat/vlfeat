@@ -12,21 +12,30 @@ GNU GPLv2, or (at your option) any later version.
 
 /** @file imopv.h
  **
- ** This module provides image operations such as convolution.
+ ** This module provides the following image operations:
  **
- ** Some operations are optimized to exploit possible SIMD
- ** instructions.  This requires image data to be properly aligned,
- ** along with the image stride.
+ ** - <b>Separable convolution.</b> The function ::vl_imconvcol_vf()
+ **   can be used to compute separable convolutions.
  **
- ** The function ::vl_imconvcol_vf() can be used to compute separable
- ** convolutions. The function vl_imconvcoltri_vf() is an optimized
- ** version that works with triangular kernels.
- **/
+ ** - <b>Convolution by a triangular kernel.</b> The function
+ **   vl_imconvcoltri_vf() is an optimized convolution routine for
+ **   triangular kernels.
+ **
+ ** - <b>Distance transform.</b> ::vl_image_distance_transform_f() is
+ **   a linear algorithm to compute the distance transform of an
+ **   image.
+ **
+ ** @remark  Some operations are optimized to exploit possible SIMD
+ ** instructions. This requires image data to be properly aligned (typically
+ ** to 16 bytes). Similalry, the image stride (the number of bytes to skip to move
+ ** to the next image row), must be aligned.
+  **/
 
 #ifndef VL_IMOPV_INSTANTIATING
 
 #include "imopv.h"
 #include "imopv_sse2.h"
+#include "mathop.h"
 
 #define FLT VL_TYPE_FLOAT
 #define VL_IMOPV_INSTANTIATING
@@ -199,6 +208,230 @@ void VL_XCAT(vl_imconvcol_v, SFX)
     }
     x += 1 ;
   } /* next x */
+}
+
+/* ---------------------------------------------------------------- */
+/*                                         Image distance transform */
+/* ---------------------------------------------------------------- */
+
+/** @fn ::vl_image_distance_transform_d(double const*,vl_size,vl_size,vl_size,vl_size,double*,vl_uindex*,double,double)
+ ** @brief Compute the distance transform of an image
+ ** @param image image.
+ ** @param numColumns number of columns of the image.
+ ** @param numRows number of rows of the image.
+ ** @param columnStride offset from one column to the next.
+ ** @param rowStride offset from one row to the next.
+ ** @param distanceTransform distance transform (out).
+ ** @param indexes nearest neighbor indexes (in/out).
+ ** @param coeff quadratic cost coefficient (non-negative).
+ ** @param offset quadratic cost offset.
+ **
+ ** The function computes the distance transform along the first
+ ** dimension of the image @a image. Let @f$ I(u,v) @f$ be @a image.
+ ** Its distance transfrom @f$ D(u,v) @f$ is given by:
+ **
+ ** @f[
+ **   u^*(u,v) = \min_{u'} I(u',v) + \mathtt{coeff} (u' - u - \mathtt{offset})^2,
+ **   \quad D(u,v) = I(u^*(u,v),v).
+ ** @f]
+ **
+ ** Notice that @a coeff must be non negative.
+ **
+ ** The function fills in the buffer @a distanceTransform with @f$ D
+ ** @f$.  This buffer must have the same size as @a image.
+ **
+ ** If @a indexes is not @c NULL, it must be a matrix of the same size
+ ** o the image. The function interprets the value of this matrix as
+ ** indexes of the pixels, i.e @f$ \mathtt{indexes}(u,v) @f$ is the
+ ** index of pixel @f$ (u,v) @f$. On output, the matrix @a indexes
+ ** contains @f$ \mathtt{indexes}(u^*(u,v),v) @f$. This information
+ ** can be used to determine for each pixel @f$ (u,v) @f$ its
+ ** &ldquo;nearest neighbor&rdquo.
+ **
+ ** Notice that by swapping @a numRows and @a numColumns and @a
+ ** columnStride and @a rowStride, the function can be made to operate
+ ** along the other image dimension. Specifically, to compute the
+ ** distance transform along columns and rows, call the functinon
+ ** twice:
+ ***
+ ** @code
+ **   for (i = 0 ; i < numColumns * numRows ; ++i) indexes[i] = i ;
+ **   vl_image_distance_transform_d(image,numColumns,numRows,1,numColumns,
+ **                                 distanceTransform,indexes,u_coeff,u_offset) ;
+ **   vl_image_distance_transform_d(distanceTransform,numRows,numColumns,numColumns,1,
+ **                                 distanceTransform,indexes,u_coeff,u_offset) ;
+ ** @endcode
+ **
+ ** @par Algorithm
+ **
+ ** The function implements the algorithm described in:
+ ** P. F. Felzenszwalb and D. P. Huttenlocher, <em>Distance Transforms
+ ** of Sampled Functions,</em> Technical Report, Cornell University,
+ ** 2004.
+ **
+ ** Since the algorithm operates along one dimension per time,
+ ** consider the 1D version of the problem for simplicity:
+ **
+ ** @f[
+ **  d(y) = \min_{x} g(y;x), \quad g(y;x) = f(x) + \alpha (y - x - \beta)^2,
+ **  \quad x,y \in \{0,1,\dots,N-1\}.
+ ** @f]
+ **
+ ** Hence the distance transform @f$ d(y) @f$ is the lower envelope of
+ ** the family of parabolas @f$ g(y;x) @f$ indexed by @f$ x
+ ** @f$. Notice that all parabolas have the same curvature and that
+ ** their centers are located at @f$ x + \beta, @f$ @f$ x=0,\dots,N-1
+ ** @f$. The algorithm considers one parabola per time, from left to
+ ** right, and finds the interval for which the parabola belongs to
+ ** the lower envelope (if any).
+ **
+ ** Initially, only the leftmost parabola @f$ g(y;0) @f$ has been
+ ** considered, and its validity interval is @f$(-\infty, \infty) @f$.
+ ** Then the second parabola @f$ g(y;1) @f$ is considered. As long as
+ ** @f$ \alpha > 0 @f$, the two parabolas @f$ g(y;0),\ g(y;1) @f$
+ ** intersect at a unique point @f$ \bar y @f$. Then the first
+ ** parabola belongs to the envelope in the interval @f$ (-\infty,
+ ** \bar y] @f$ and the second one in the interval @f$ (\bar y,
+ ** +\infty] @f$. When the third parabola @f$ g(y;2) @f$ is
+ ** considered, the intersection point @f$ \hat y @f$ with the
+ ** previously added parabola @f$ g(y;1) @f$ is found. Now two cases
+ ** may arise:
+ **
+ ** - @f$ \hat y > \bar y @f$, in which case all three parabolas
+ **   belong to the envelope in the intervals @f$ (-\infty,\bar y],
+ **   (\bar y, \hat y], (\hat y, +\infty] @f$.
+ **
+ ** - @f$ \hat y \leq \bar y @f$, in which case the second parabola
+ **   @f$ g(y;1) @f$ has no point beloning to the envelope, and it is
+ **   removed.  One then remains with the two parabolas @f$ g(y;0),\
+ **   g(y;2) @f$ and the algorithm is re-iterated.
+ **
+ ** The algorithm proceeds in this fashion. Every time a new parabola
+ ** is considered, its intersection point with the previously added
+ ** parabola on the left is computed, and that parabola is potentially
+ ** removed.  The cost of an iteration is 1 plus the number of deleted
+ ** parabolas. Since there are @f$ N @f$ iterations and at most @f$ N
+ ** @f$ parabolas to delete overall, the complexity is linear,
+ ** i.e. @f$ O(N) @f$.
+ **/
+
+/** @fn ::vl_image_distance_transform_f(float const*,vl_size,vl_size,vl_size,vl_size,float*,vl_uindex*,float,float)
+ ** @see ::vl_image_distance_transform_d
+ **/
+
+VL_EXPORT void
+VL_XCAT(vl_image_distance_transform_,SFX)
+(T const * image,
+ vl_size numColumns,
+ vl_size numRows,
+ vl_size columnStride,
+ vl_size rowStride,
+ T * distanceTransform,
+ vl_uindex * indexes,
+ T coeff,
+ T offset)
+{
+  /* Each image pixel corresponds to a parabola. The algorithm scans
+   such parabolas from left to right, keeping track of which
+   parabolas belong to the lower envelope and in which interval. There are
+   NUM active parabolas, FROM stores the beginning of the interval
+   for which a certain parabola is part of the envoelope, and WHICH store
+   the index of the parabola (that is, the pixel x from which the parabola
+   originated).
+   */
+  vl_uindex x, y ;
+  T * from = vl_malloc (sizeof(T) * (numColumns + 1)) ;
+  T * base = vl_malloc (sizeof(T) * numColumns) ;
+  vl_uindex * baseIndexes = vl_malloc (sizeof(vl_uindex) * numColumns) ;
+  vl_uindex * which = vl_malloc (sizeof(vl_uindex) * numColumns) ;
+  vl_uindex num = 0 ;
+
+  for (y = 0 ; y < numRows ; ++y) {
+    num = 0 ;
+    for (x = 0 ; x < numColumns ; ++x) {
+      T r = image[x  * columnStride + y * rowStride] ;
+      T x2 = x * x ;
+#if (FLT == VL_TYPE_FLOAT)
+      T from_ = - VL_INFINITY_F ;
+#else
+      T from_ = - VL_INFINITY_D ;
+#endif
+
+      /*
+       Add next parabola (there are NUM so far). The algorithm finds
+       intersection INTERS with the previously added parabola. If
+       the intersection is on the right of the "starting point" of
+       this parabola, then the previous parabola is kept, and the
+       new one is added to its right. Otherwise the new parabola
+       "eats" the old one, which gets deleted and the check is
+       repeated with the parabola added before the deleted one.
+       */
+
+      while (num >= 1) {
+        vl_uindex x_ = which[num - 1] ;
+        T x2_ = x_ * x_ ;
+        T r_ = image[x_ * columnStride + y * rowStride] ;
+        T inters ;
+#if (FLT == VL_TYPE_FLOAT)
+        if (coeff > VL_EPSILON_F) {
+#else
+        if (coeff > VL_EPSILON_D) {
+#endif
+
+          inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) - offset ;
+        } else {
+          /* If coeff is very small, the parabolas are flat (= lines).
+           In this case the previous parabola should be deleted if the current
+           pixel has lower score */
+#if (FLT == VL_TYPE_FLOAT)
+          inters = (r < r_) ? - VL_INFINITY_F : VL_INFINITY_F ;
+#else
+          inters = (r < r_) ? - VL_INFINITY_D : VL_INFINITY_D ;
+#endif
+        }
+        if (inters <= from [num - 1]) {
+          /* delete a previous parabola */
+          -- num ;
+        } else {
+          /* accept intersection */
+          from_ = inters ;
+          break ;
+        }
+      }
+
+      /* add a new parabola */
+      which[num] = x ;
+      from[num] = from_ ;
+      base[num] = r ;
+      if (indexes) baseIndexes[num] = indexes[x  * columnStride + y * rowStride] ;
+      num ++ ;
+    } /* next column */
+
+#if (FLT == VL_TYPE_FLOAT)
+    from[num] = VL_INFINITY_F ;
+#else
+    from[num] = VL_INFINITY_D ;
+#endif
+
+    /* fill in */
+    num = 0 ;
+    for (x = 0 ; x < numColumns ; ++x) {
+      double delta ;
+      while (x >= from[num + 1]) ++ num ;
+      delta = (double) x - (double) which[num] + offset ;
+      distanceTransform[x  * columnStride + y * rowStride]
+      = base[num] + coeff * delta * delta ;
+      if (indexes) {
+        indexes[x  * columnStride + y * rowStride]
+        = baseIndexes[num] ;
+      }
+    }
+  } /* next row */
+
+  vl_free (from) ;
+  vl_free (which) ;
+  vl_free (base) ;
+  vl_free (baseIndexes) ;
 }
 
 /* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */

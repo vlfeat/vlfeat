@@ -15,104 +15,7 @@
 
 #include <vl/generic.h>
 #include <vl/mathop.h>
-
-
-void
-vl_image_distance_transform (double const * im,
-                             vl_size numColumns,
-                             vl_size numRows,
-                             vl_size columnStride,
-                             vl_size rowStride,
-                             double * dt,
-                             vl_uindex * indexes,
-                             double coeff,
-                             double offset)
-{
-  /* Each image pixel corresponds to a parabola. The algorithm scans
-     such parabolas from the left to the right, keeping track of which
-     parabolas form the lower envelope in which interval. There are
-     NUM active parabolas, FROM stores the beginning of the interval
-     for which a certain parabola is on the envoelope, and WHICH store
-     the index of the parabola (the pixel x from which the parabola
-     originated).
-  */
-  vl_uindex x, y ;
-  double * from = vl_malloc (sizeof(double) * (numColumns + 1)) ;
-  double * base = vl_malloc (sizeof(double) * numColumns) ;
-  vl_uindex * baseIndexes = vl_malloc (sizeof(vl_uindex) * numColumns) ;
-  vl_uindex * which = vl_malloc (sizeof(vl_uindex) * numColumns) ;
-  vl_uindex num = 0 ;
-
-  for (y = 0 ; y < numRows ; ++y) {
-    num = 0 ;
-    for (x = 0 ; x < numColumns ; ++x) {
-      double r = im[x  * columnStride + y * rowStride] ;
-      double x2 = x * x ;
-      double from_ = - VL_INFINITY_D ;
-
-      /*
-         Add next parabola (there are NUM so far). The algorithm finds
-         intersection INTERS with the previously added parabola. If
-         the intersection is on the right of the "starting point" of
-         this parabola, then the previous parabola is kept, and the
-         new one is added to its right. Otherwise the new parabola
-         "eats" the old one, which gets deleted and the chec is
-         repeated with the previous parabola.
-       */
-
-      while (num >= 1) {
-        vl_uindex x_ = which[num - 1] ;
-        double x2_ = x_ * x_ ;
-        double r_ = im[x_ * columnStride + y * rowStride] ;
-        double inters ;
-        if (coeff > VL_EPSILON_D) {
-          inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) - offset ;
-        } else {
-          /* If coeff is very small, the parabolas are flat (= lines).
-             In this case the previous parabola should be deleted if the current
-             pixel has lower score */
-          inters = (r < r_) ? - VL_INFINITY_D : VL_INFINITY_D ;
-        }
-        if (inters <= from [num - 1]) {
-          /* delete a previous parabola */
-          -- num ;
-        } else {
-          /* accept intersection */
-          from_ = inters ;
-          break ;
-        }
-      }
-
-      /* add a new parabola */
-      which[num] = x ;
-      from[num] = from_ ;
-      base[num] = r ;
-      if (indexes) baseIndexes[num] = indexes[x  * columnStride + y * rowStride] ;
-      num ++ ;
-    } /* next column */
-
-    from[num] = VL_INFINITY_D ;
-
-    /* fill in */
-    num = 0 ;
-    for (x = 0 ; x < numColumns ; ++x) {
-      double delta ;
-      while (x >= from[num + 1]) ++ num ;
-      delta = (double) x - (double) which[num] + offset ;
-      dt[x  * columnStride + y * rowStride]
-      = base[num] + coeff * delta * delta ;
-      if (indexes) {
-        indexes[x  * columnStride + y * rowStride]
-        = baseIndexes[num] ;
-      }
-    }
-  } /* next row */
-
-  vl_free (from) ;
-  vl_free (which) ;
-  vl_free (base) ;
-  vl_free (baseIndexes) ;
-}
+#include <vl/imopv.h>
 
 void
 mexFunction(int nout, mxArray *out[],
@@ -122,6 +25,7 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_I = 0, IN_PARAM, IN_END} ;
   enum {OUT_DT = 0, OUT_INDEXES} ;
   vl_uindex * indexes = NULL ;
+  mxClassID classId ;
   double const defaultParam [] = {1.0, 0.0, 1.0, 0.0} ;
   double const * param = defaultParam ;
 
@@ -138,27 +42,29 @@ mexFunction(int nout, mxArray *out[],
   if (nout > 2) {
     vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
-  if (! vlmxIsPlainMatrix(IN(I), -1, -1)) {
+  classId = mxGetClassID(IN(I)) ;
+  if (! vlmxIsMatrix(IN(I), -1, -1) ||
+      (classId != mxSINGLE_CLASS && classId != mxDOUBLE_CLASS)) {
     vlmxError(vlmxErrInvalidArgument,
-             "I must be a plain matrix.") ;
+             "I is not a SINGLE or DOUBLE matrix.") ;
   }
   if (nin == 2) {
     if (! vlmxIsPlainVector(IN(PARAM), 4)) {
       vlmxError(vlmxErrInvalidArgument,
-               "PARAM must be a 4-dimensional vector.") ;
+               "PARAM is not a 4-dimensional vector.") ;
     }
     param = mxGetPr (IN(PARAM)) ;
     if (param[0] < 0.0 ||
         param[2] < 0.0) {
       vlmxError(vlmxErrInvalidArgument,
-                "PARAM[0] and PARAM[2] must not be negative.") ;
+                "Either PARAM[0] or PARAM[2] is negative.") ;
     }
   }
 
   M = mxGetM (IN(I)) ;
   N = mxGetN (IN(I)) ;
 
-  OUT(DT) = mxCreateDoubleMatrix (M, N, mxREAL) ;
+  OUT(DT) = mxCreateNumericMatrix (M, N, classId, mxREAL) ;
   if (nout > 1) {
     vl_uindex i ;
     OUT(INDEXES) = mxCreateDoubleMatrix (M, N, mxREAL) ;
@@ -170,21 +76,46 @@ mexFunction(int nout, mxArray *out[],
    *                                                        Do the job
    * -------------------------------------------------------------- */
 
-  vl_image_distance_transform(mxGetPr(IN(I)),
-                              M, N,
-                              1, M,
-                              mxGetPr(OUT(DT)),
-                              indexes,
-                              param[2],
-                              param[3]) ;
+  switch (classId) {
+    case mxSINGLE_CLASS:
+      vl_image_distance_transform_f((float const*)mxGetData(IN(I)),
+                                    M, N,
+                                    1, M,
+                                    (float*)mxGetPr(OUT(DT)),
+                                    indexes,
+                                    param[2],
+                                    param[3]) ;
 
-  vl_image_distance_transform(mxGetPr(OUT(DT)),
-                              N, M,
-                              M, 1,
-                              mxGetPr(OUT(DT)),
-                              indexes,
-                              param[0],
-                              param[1]) ;
+      vl_image_distance_transform_f((float*)mxGetPr(OUT(DT)),
+                                    N, M,
+                                    M, 1,
+                                    (float*)mxGetPr(OUT(DT)),
+                                    indexes,
+                                    param[0],
+                                    param[1]) ;
+      break ;
+
+    case mxDOUBLE_CLASS:
+      vl_image_distance_transform_d((double const*)mxGetData(IN(I)),
+                                    M, N,
+                                    1, M,
+                                    (double*)mxGetPr(OUT(DT)),
+                                    indexes,
+                                    param[2],
+                                    param[3]) ;
+
+      vl_image_distance_transform_d((double*)mxGetPr(OUT(DT)),
+                                    N, M,
+                                    M, 1,
+                                    (double*)mxGetPr(OUT(DT)),
+                                    indexes,
+                                    param[0],
+                                    param[1]) ;
+      break;
+
+    default:
+      abort() ;
+  }
 
   if (indexes) {
     vl_uindex i ;
