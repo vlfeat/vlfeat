@@ -37,6 +37,8 @@ for ai=1:length(varargin)
       demo = true ;
     case {'quiet'}
       quiet = true ;
+    otherwise
+      error('Unknown option ''%s''.', opt) ;
   end
 end
 
