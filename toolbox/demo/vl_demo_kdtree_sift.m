@@ -1,36 +1,53 @@
 function vl_demo_kdtree_sift
+% VL_DEMO_KDTREE_SIFT
+%   Demonstrates the use of a kd-tree forest to match SIFT
+%   features. If FLANN is present, this function runs a comparison
+%   against it.
 
-do_median = 0 ;
-do_mean   = 1 ;
-do_flann  = exist('flann_search','file') ;
-
-im1 = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
-im2 = imread(fullfile(vl_root, 'data', 'b.jpg')) ;
-
-im1 = single(rgb2gray(im1)) ;
-im2 = single(rgb2gray(im2)) ;
-
-[f1,d1] = vl_sift(im1,'firstoctave',-1,'floatdescriptors','verbose') ;
-[f2,d2] = vl_sift(im2,'firstoctave',-1,'floatdescriptors','verbose') ;
+% AUTORIGHS
 
 rand('state',0) ;
 randn('state',0);
 
+do_median = 0 ;
+do_mean = 1 ;
+
+% try to setup flann
+if ~exist('flann_search', 'file')
+  if exist(fullfile(vl_root, 'opt', 'flann', 'build', 'matlab'))
+    addpath(fullfile(vl_root, 'opt', 'flann', 'build', 'matlab')) ;
+  end
+end
+do_flann = exist('flann_search','file') ;
+if ~do_flann
+  warning('FLANN not found. Comparison disabled.') ;
+end
+
+maxNumComparisonsRange = [1 10 50 100 200 300 400] ;
+numTreesRange = [1 2 5 10] ;
+
+% get data (SIFT features)
+im1 = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
+im2 = imread(fullfile(vl_root, 'data', 'b.jpg')) ;
+im1 = single(rgb2gray(im1)) ;
+im2 = single(rgb2gray(im2)) ;
+[f1,d1] = vl_sift(im1,'firstoctave',-1,'floatdescriptors','verbose') ;
+[f2,d2] = vl_sift(im2,'firstoctave',-1,'floatdescriptors','verbose') ;
+
+% add some noise to make matches unique
 d1 = single(d1) + rand(size(d1)) ;
 d2 = single(d2) + rand(size(d2)) ;
 
-tic ;
-D = alldist2(d1,d2) ;
+% match exhaustively to get the ground truth
+elapsedDirect = tic ;
+D = vl_alldist(d1,d2) ;
 [drop, best] = min(D, [], 1) ;
-elapsedDirect = toc ;
+elapsedDirect = toc(elapsedDirect) ;
 
-vr = [1 10 50 100 200 300 400] ;
-tr = [1 2 5 10] ;
-
-for ti=1:length(tr)
-  for vi=1:length(vr)
-    v = vr(vi) ;
-    t = tr(ti) ;
+for ti=1:length(numTreesRange)
+  for vi=1:length(maxNumComparisonsRange)
+    v = maxNumComparisonsRange(vi) ;
+    t = numTreesRange(ti) ;
 
     if do_median
       tic ;
@@ -72,7 +89,6 @@ for ti=1:length(tr)
       errors_flann(vi,ti) = sum(i ~= best) / length(best) ;
       errorsD_flann(vi,ti) = mean(abs(d - drop) ./ drop) ;
     end
-
   end
 end
 
@@ -82,60 +98,69 @@ hnd = [] ;
 sty = {{'color','r'},{'color','g'},...
        {'color','b'},{'color','c'},...
        {'color','k'}} ;
-for ti=1:length(tr)
+
+for ti=1:length(numTreesRange)
   s = sty{mod(ti,length(sty))+1} ;
 
   if do_median
     h1=loglog(elapsedDirect ./ elapsedKD_median(:,ti),100*errors_median(:,ti),'-*',s{:}) ;  hold on ;
-    leg{end+1} = sprintf('median %d', tr(ti)) ;
+    leg{end+1} = sprintf('VLFeat median (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h1 ;
   end
 
   if do_mean
     h2=loglog(elapsedDirect ./ elapsedKD_mean(:,ti), 100*errors_mean(:,ti), '-o',s{:}) ;  hold on ;
-    leg{end+1} = sprintf('mean %d', tr(ti)) ;
+    leg{end+1} = sprintf('VLFeat (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h2 ;
   end
 
   if do_flann
-    h3=loglog(elapsedDirect ./ elapsedKD_flann(:,ti), 100*errors_flann(:,ti), '+-',s{:}) ;  hold on ;
-    leg{end+1} = sprintf('flann %d', tr(ti)) ;
+    h3=loglog(elapsedDirect ./ elapsedKD_flann(:,ti), 100*errors_flann(:,ti), '+--',s{:}) ;  hold on ;
+    leg{end+1} = sprintf('FLANN (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h3 ;
   end
 end
+set([hnd], 'linewidth', 2) ;
 xlabel('speedup over linear search (log times)') ;
 ylabel('percentage of incorrect matches (%)') ;
-legend(hnd, leg{:}) ;
+h=legend(hnd, leg{:}, 'location', 'southeast') ;
+set(h,'fontsize',8) ;
 grid on ;
+axis square ;
+vl_demo_print('kdtree_sift_incorrect',.6) ;
 
 figure(2) ; clf ;
 leg = {} ;
 hnd = [] ;
-for ti=1:length(tr)
+for ti=1:length(numTreesRange)
   s = sty{mod(ti,length(sty))+1} ;
 
   if do_median
     h1=loglog(elapsedDirect ./ elapsedKD_median(:,ti),100*errorsD_median(:,ti),'*-',s{:}) ; hold on ;
-    leg{end+1} = sprintf('median %d', tr(ti)) ;
+    leg{end+1} = sprintf('VLFeat median (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h1 ;
   end
 
   if do_mean
     h2=loglog(elapsedDirect ./ elapsedKD_mean(:,ti), 100*errorsD_mean(:,ti), 'o-',s{:}) ; hold on ;
-    leg{end+1} = sprintf('mean %d', tr(ti)) ;
+    leg{end+1} = sprintf('VLFeat (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h2 ;
   end
 
-  if do_mean
-    h3=loglog(elapsedDirect ./ elapsedKD_flann(:,ti), 100*errorsD_flann(:,ti), '+-',s{:}) ; hold on ;
-    leg{end+1} = sprintf('flann %d', tr(ti)) ;
+  if do_flann
+    h3=loglog(elapsedDirect ./ elapsedKD_flann(:,ti), 100*errorsD_flann(:,ti), '+--',s{:}) ; hold on ;
+    leg{end+1} = sprintf('FLANN (%d tr.)', numTreesRange(ti)) ;
     hnd(end+1) = h3 ;
   end
 end
+set([hnd], 'linewidth', 2) ;
 xlabel('speedup over linear search (log times)') ;
 ylabel('relative overestimation of minmium distannce (%)') ;
-legend(hnd, leg{:}) ;
+h=legend(hnd, leg{:}, 'location', 'southeast') ;
+set(h,'fontsize',8) ;
 grid on ;
+axis square ;
+vl_demo_print('kdtree_sift_distortion',.6) ;
 
 % --------------------------------------------------------------------
 function checkx(kdtree, X, t, n, mib, mab)

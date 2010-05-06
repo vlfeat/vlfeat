@@ -1,4 +1,6 @@
-% DEMO_ALL  Run all demos
+% VL_DEMO  Run all demos
+
+% AUTORIGHTS
 
 root = vl_root ;
 demo_path = fullfile(root,'toolbox','demo') ;
@@ -27,6 +29,11 @@ vl_demo_aib ;
 
 vl_demo_quickshift ;
 
+vl_demo_kdtree ;
+vl_demo_kdtree_sift ;
+vl_demo_kdtree_self ;
+vl_demo_kdtree_forest ;
+vl_demo_kdtree_ann ;
+
 rmpath(demo_path);
 rmpath(test_path);
-
