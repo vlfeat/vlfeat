@@ -37,7 +37,7 @@ mexFunction(int nout, mxArray *out[],
     vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
   if (nin > 2) {
-    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
+    vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
   if (nout > 2) {
     vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
