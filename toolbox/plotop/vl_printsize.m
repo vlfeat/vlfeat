@@ -1,13 +1,19 @@
-function vl_printsize(r,a)
+function vl_printsize(varargin)
 % VL_PRINTSIZE  Set the print size of a figure
-%   VL_PRINTSIZE(R) set the print size of a figure so that the width is
-%   the R fraction of the current paper size width.
+%   VL_PRINTSIZE(R) sets the PaperPosition property of a figure so
+%   that the width is the fraction R of the current paper page width.
 %
-%   VL_PRINTSIZE(R,A) sets also the aspect ratio to A (the aspect ratio
-%   is the width divided by the height)
+%   VL_PRINTSIZE(FIG,R) opearates on the specified figure FIG.
 %
 %   This command is useful to resize figures before printing them so
-%   that elements are scaled to match the final figure size in print.
+%   that elements are scaled to match the final figure size in
+%   print. The function accepts the following optional arguments:
+%
+%   Aspect:: Set the figure aspect ratio (widht/height) to this value.
+%
+%   Reference:: If 'horizontal' the ratio R is the widht of the figure
+%     over the width of the page. If 'vertical', the ratio R is the
+%     height of the figure over the height of the page.
 %
 %   See also:: VL_HELP().
 
@@ -17,18 +23,58 @@ function vl_printsize(r,a)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-if nargin < 2
-  a = NaN ;
+if length(varargin) >= 2 && isnumeric(varargin{2})
+  % called with two numeric arguments
+  fig = varargin{1} ;
+  varargin(1) = [] ;
+else
+  fig = gcf ;
 end
 
-papuni = get(gcf,'paperunits') ;
-set(gcf,'paperunits','normalized') ;
-pos = get(gcf,'paperposition') ;
-pos(1:2) = 0 ;
-s = r/pos(3) ;
-pos(3:4) = pos(3:4) * s ;
-if ~isnan(a)
-  pos(4) = pos(3) / a ;
+sizeRatio = varargin{1} ;
+varargin(1) = [] ;
+
+aspectRatio = NaN ;
+reference = 'horizontal' ;
+
+for ai=1:2:length(varargin)
+  opt = lower(varargin{ai}) ;
+  arg = varargin{ai+1} ;
+  switch lower(opt)
+    case 'aspect'
+      aspectRatio = opt ;
+    case 'reference'
+      switch lower(arg)
+        case 'horizontal'
+          reference = 'horizontal' ;
+        case 'vertical'
+          reference = 'vertical' ;
+        otherwise
+          error('Invalid value ''%s'' for option ''%s''.', arg, opt) ;
+      end
+    otherwise
+      error('Unknown option ''%s''.', opt) ;
+  end
 end
-set(gcf,'paperposition',pos) ;
-set(gcf,'paperunits',papuni) ;
+
+paperSize = get(fig, 'PaperSize') ;
+position = get(fig, 'PaperPosition') ;
+
+% if not specified, compute current aspect ratio
+if isnan(aspectRatio)
+  aspectRatio = position(3) / position(4) ;
+end
+
+% place the figure in the bottom-left corner
+position(1:2) = 0 ;
+
+% resize the figure
+switch reference
+  case 'horizontal'
+    s = paperSize(1) / position(3) * sizeRatio ;
+  case 'vertical'
+    s = paperSize(2) / position(4) * sizeRatio ;
+end
+position(3:4) = position(3) * s * [1 1/aspectRatio] ;
+
+set(fig, 'PaperPosition', position) ;
