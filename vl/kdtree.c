@@ -48,7 +48,9 @@ GNU GPLv2, or (at your option) any later version.
  ** @section kdtree-tech Technical details
  ** @sa @ref kdtree-references
  **
- ** KDTree implements the best-bin-first kd-tree of [1]. Given a set
+ ** ::VlKDTree implements the best-bin-first kd-tree of [1].
+ **
+ ** <b>Construction.</b> Given a set
  ** of points @f$ x_1,\dots,x_n \in \mathbb{R}^d @f$, the algorithm
  ** recursively partitions the @e d dimensional Euclidean space @f$
  ** \mathbb{R}^d @f$ into (hyper-) rectangles.
@@ -64,7 +66,7 @@ GNU GPLv2, or (at your option) any later version.
  ** and they contain a list of zero or more data points (typically
  ** one).
  **
- ** Querying amounts to finding the N data points closer to a given
+ ** <b>Querying.<b> Querying amounts to finding the N data points closer to a given
  ** query point @f$ x_q \in \mathbb{R}^d @f$. This is done by
  ** branch-and-bound. A search state is an active partition (initially
  ** the root) and it is weighed by the lower bound on the distance of
