@@ -27,11 +27,13 @@ function vl_demo_kdtree_forest
     hold on ;
     xl = [0, +1] ;
     yl = [0, +1] ;
-    axis equal ;
     xlim(xl) ;
     ylim(yl) ;
+    axis square ;
     h = vl_demo_kdtree_plot(kdforest.trees(t), 1, xl, yl) ;
-    vl_demo_print(sprintf('kdtree_forest_tree_%d', t)) ;
+    title(sprintf('Tree number %d', t)) ;
+    set(gca,'xtick',[],'ytick',[]) ;
+    vl_demo_print(t,sprintf('kdtree_forest_tree_%d', t)) ;
   end
 
   % query
@@ -48,5 +50,6 @@ function vl_demo_kdtree_forest
   xlim([0 1]) ;
   ylim([0 1]) ;
   axis square ;
-  vl_demo_print('kdtree_forest_query') ;
+  set(gca,'xtick',[],'ytick',[]) ;
+  vl_demo_print(5,'kdtree_forest_query') ;
 end

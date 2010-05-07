@@ -1,30 +1,37 @@
 function vl_demo_kdtree_ann
 % VL_DEMO_KDTREE
+%   Demonstrates the use of a kd-tree for approximate nearest neighbor
+%   (ANN) queries.
+
+% AUTORIGHTS
 
 randn('state',0) ;
 rand('state',0) ;
 
-X = single(rand(2, 100)) ;
-kdtree = vl_kdtreebuild (X) ;
+% Generate some 2D data and a query point
+X = rand(2, 100) ;
+Q = rand(2,1) ;
 
-Q = single(rand(2,1)) ;
+% Buld a kd-tree
+kdtree = vl_kdtreebuild(X) ;
 
-maxr = [1 10 20 30] ;
+% Query with increasing accuracy
+maxNumComparisonRange = [1 10 20 30] ;
 for t = [1 2 3 4]
   figure(t) ; clf ;
   vl_plotframe(X, 'ro') ;
   hold on ;
   xl = [.2, .8] ;
-  yl = [.1, .6] ;
+  yl = [.1, .7] ;
   xlim(xl) ;
   ylim(yl) ;
-  axis equal ;
+
   %  vl_demo_kdtree_plot(kdtree, 1, xl, yl) ;
 
   [i, d] = vl_kdtreequery (kdtree, X, Q, ...
-                           'numneighbors', 10, ...
-                           'maxcomparisons', maxr(t), ...
-                           'verbose') ;
+                           'NumNeighbors', 10, ...
+                           'MaxComparisons', maxNumComparisonRange(t), ...
+                           'Verbose') ;
 
   vl_plotframe(Q,'b*','markersize',10) ;
   for k=1:length(i)
@@ -32,5 +39,9 @@ for t = [1 2 3 4]
     vl_plotframe([Q ; sqrt(d(k))],'b-','linewidth',1) ;
     vl_plotframe(X(:, i(k)), 'bx','markersize',15) ;
   end
-  title(sprintf('10 ANNs with at most %d comparisions', maxr(t))) ;
+  title(sprintf('10 ANNs with at most %d comparisions', maxNumComparisonRange(t))) ;
+
+  axis square ;
+  set(gca,'xtick',[],'ytick',[]) ;
+  vl_demo_print(t, sprintf('kdtree_ann_%d', t)) ;
 end

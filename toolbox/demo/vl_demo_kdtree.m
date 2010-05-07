@@ -50,6 +50,7 @@ function vl_demo_kdtree
       vl_plotframe([Q ; sqrt(d(k))],'b:','linewidth',1) ;
       vl_plotframe(X(:, i(k)), 'bx') ;
     end
+    set(gca,'xtick',[],'ytick',[]) ;
   end
 
 end
