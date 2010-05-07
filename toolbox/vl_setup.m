@@ -76,8 +76,7 @@ if demo
 end
 
 if ~quiet
-  fprintf('** Welcome to the VLFeat Toolbox %s **\n', ...
-          vl_version('verbose')) ;
+  fprintf('VLFeat %s reday.\n', vl_version) ;
 end
 
 if nargout == 0
