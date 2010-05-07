@@ -33,11 +33,12 @@ end
 name = varargin{1} ;
 
 if length(varargin) < 2
-  r = 0.5 ;
+  figurePaperSize = 0.5 ;
 else
-  r = varargin{2} ;
+  figurePaperSize = varargin{2} ;
 end
-vl_printsize(r) ;
+
+vl_printsize(fig, figurePaperSize) ;
 
 figDir = fullfile(vl_root,'doc','demo') ;
 if ~ exist(figDir, 'dir')
