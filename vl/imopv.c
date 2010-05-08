@@ -378,7 +378,7 @@ VL_XCAT(vl_image_distance_transform_,SFX)
         if (coeff > VL_EPSILON_D) {
 #endif
 
-          inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) - offset ;
+          inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) + offset ;
         } else {
           /* If coeff is very small, the parabolas are flat (= lines).
            In this case the previous parabola should be deleted if the current
@@ -418,7 +418,7 @@ VL_XCAT(vl_image_distance_transform_,SFX)
     for (x = 0 ; x < numColumns ; ++x) {
       double delta ;
       while (x >= from[num + 1]) ++ num ;
-      delta = (double) x - (double) which[num] + offset ;
+      delta = (double) x - (double) which[num] - offset ;
       distanceTransform[x  * columnStride + y * rowStride]
       = base[num] + coeff * delta * delta ;
       if (indexes) {
