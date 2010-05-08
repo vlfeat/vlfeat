@@ -185,6 +185,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\homkermap.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\homkermap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\host.c"
 				>
 			</File>

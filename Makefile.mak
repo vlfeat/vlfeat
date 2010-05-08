@@ -111,7 +111,7 @@ BRANCH     = v$(VER)-$(ARCH)
 #
 
 bindir     = bin\$(ARCH)
-mexdir     = toolbox\$(MEXEXT)
+mexdir     = toolbox\mex\$(MEXEXT)
 objdir     = $(bindir)\objs
 
 CFLAGS     = /nologo /TC /MD \
@@ -215,28 +215,28 @@ mexsrc = \
 libobj = $(libsrc:vl\=bin\w32\objs\)
 cmdexe = $(cmdsrc:src\=bin\w32\)
 mexdll = $(mexsrc:.c=.mexw32)
-mexdll = $(mexdll:toolbox\sift=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\mser=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\imop=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\geometry=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\misc=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\aib=toolbox\mexw32)
-mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw32)
+mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\imop=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\geometry=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\kmeans=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\misc=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\aib=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\quickshift=toolbox\mex\mexw32)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !if "$(ARCH)" == "w64"
 libobj = $(libsrc:vl\=bin\w64\objs\)
 cmdexe = $(cmdsrc:src\=bin\w64\)
 mexdll = $(mexsrc:.c=.mexw64)
-mexdll = $(mexdll:toolbox\sift=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\mser=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\imop=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\geometry=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\kmeans=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\misc=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\aib=toolbox\mexw64)
-mexdll = $(mexdll:toolbox\quickshift=toolbox\mexw64)
+mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\imop=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\geometry=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\kmeans=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\misc=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\aib=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\quickshift=toolbox\mex\mexw64)
 mexpdb = $(mexdll:.mexw64=.pdb)
 !endif
 

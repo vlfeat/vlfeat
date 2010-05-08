@@ -175,6 +175,30 @@ vl_abs_d (double x)
 #endif
 }
 
+VL_INLINE double
+vl_log2_d (double x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_log2(x) ;
+#elif VL_COMPILER_MSC
+  return log(x) / 0.693147180559945 ;
+#else
+  return log2(x) ;
+#endif
+}
+
+VL_INLINE float
+vl_log2_f (float x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_log2f (x) ;
+#elif VL_COMPILER_MSC
+  return logf(x) / 0.6931472F ;
+#else
+  return log2(x) ;
+#endif
+}
+
 /** ------------------------------------------------------------------
  ** @brief Fast @c atan2 approximation
  ** @param y argument.

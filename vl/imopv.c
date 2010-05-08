@@ -651,9 +651,10 @@ VL_XCAT(vl_imintegral_, SFX)
   }
 
   for (y = 1 ; y < imageHeight ; ++ y) {
+    T * integralPrev ;
     integral += integralStride - imageWidth ;
     image += imageStride - imageWidth ;
-    T * integralPrev = integral - integralStride ;
+    integralPrev = integral - integralStride ;
 
     temp = 0 ;
     for (x = 0 ; x < imageWidth ; ++ x) {

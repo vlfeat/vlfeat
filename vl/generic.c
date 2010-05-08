@@ -721,14 +721,14 @@ VL_EXPORT VlThreadSpecificState *
 vl_thread_specific_state_new ()
 {
   VlThreadSpecificState * self ;
-#ifndef NDEBUG
+#ifdef DEBUG
   printf("VLFeat thread constructor called\n") ;
 #endif
   self = malloc(sizeof(VlThreadSpecificState)) ;
   self->lastError = 0 ;
   self->lastErrorMessage[0] = 0 ;
 #if defined(VL_OS_WIN)
-  QueryPerformanceFrequency (&threadState->ticFreq) ;
+  QueryPerformanceFrequency (&self->ticFreq) ;
   self->ticMark.QuadPart = 0 ;
 #else
   self->ticMark = 0 ;
@@ -741,7 +741,7 @@ vl_thread_specific_state_new ()
 VL_EXPORT void
 vl_thread_specific_state_delete (VlThreadSpecificState * self)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
   printf("VLFeat thread destructor called\n") ;
 #endif
   free (self) ;
@@ -800,7 +800,7 @@ static void
 vl_constructor ()
 {
   VlState * state ;
-#ifndef NDEBUG
+#ifndef DEBUG
   printf("VLFeat constructor called\n") ;
 #endif
 
@@ -852,7 +852,7 @@ static void
 vl_destructor ()
 {
   VlState * state ;
-#ifndef NDEBUG
+#ifndef DEBUG
   printf("VLFeat destructor called\n") ;
 #endif
 

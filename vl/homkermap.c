@@ -155,7 +155,7 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, 
 
       for (i = 0 ; i < self->numSubdivisions ;
            ++i, mantissa += self->subdivision) {
-        x = scalbn(mantissa, exponent) ;
+        x = ldexp(mantissa, exponent) ;
 
         Lx = self-> step * x ;
         sqrtLx = sqrt(Lx) ;

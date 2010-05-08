@@ -467,7 +467,22 @@ vl_static_configuration_to_string_copy ()
 
   char compilerString [1024] ;
 
-  snprintf(compilerString, 1024,
+  char const * libraryString =
+#ifdef VL_ENABLE_THREADS
+#ifdef VL_THREADS_WIN
+  "Windows_threads"
+#elif VL_THREADS_POSIX
+  "POSIX_threads"
+#endif
+#else
+  "No_threads"
+#endif
+#ifdef VL_ENABLE_SSE2
+  ", SSE2"
+#endif
+  ;
+
+snprintf(compilerString, 1024,
 #ifdef VL_COMPILER_MSC
   "Microsoft Visual C++ %d"
 #define v VL_COMPILER_MSC
@@ -487,21 +502,6 @@ vl_static_configuration_to_string_copy ()
   "ILP32"
 #endif
            , v) ;
-
-  char const * libraryString =
-#ifdef VL_ENABLE_THREADS
-#ifdef VL_THREADS_WIN
-  "Windows_threads"
-#elif VL_THREADS_POSIX
-  "POSIX_threads"
-#endif
-#else
-  "No_threads"
-#endif
-#ifdef VL_ENABLE_SSE2
-  ", SSE2"
-#endif
-  ;
 
   {
     char * string = 0 ;

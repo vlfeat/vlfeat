@@ -268,22 +268,8 @@ VL_XCAT(_vl_distance_js_, SFX)
   while (X < X_end) {
     T x = *X++ ;
     T y = *Y++ ;
-
-#if (FLT == VL_TYPE_FLOAT)
-    if (x) {
-      acc += x - x * log2f(1 + y/x) ;
-    }
-    if (y) {
-      acc += y - y * log2f(1 + x/y) ;
-    }
-#else
-    if (x) {
-      acc += x - x * log2(1 + y/x) ;
-    }
-    if (y) {
-      acc += y - y * log2(1 + x/y) ;
-    }
-#endif
+    if (x) acc += x - x * VL_XCAT(vl_log2_,SFX)(1 + y/x) ;
+    if (y) acc += y - y * VL_XCAT(vl_log2_,SFX)(1 + x/y) ;
   }
   return acc ;
 }
@@ -364,22 +350,8 @@ VL_XCAT(_vl_kernel_js_, SFX)
   while (X < X_end) {
     T x = *X++ ;
     T y = *Y++ ;
-
-#if (FLT == VL_TYPE_FLOAT)
-    if (x) {
-      acc += x * log2f(1 + y/x) ;
-    }
-    if (y) {
-      acc += y * log2f(1 + x/y) ;
-    }
-#else
-    if (x) {
-      acc += x * log2(1 + y/x) ;
-    }
-    if (y) {
-      acc += y * log2(1 + x/y) ;
-    }
-#endif
+    if (x) acc += x * VL_XCAT(vl_log2_,SFX)(1 + y/x) ;
+    if (y) acc += y * VL_XCAT(vl_log2_,SFX)(1 + x/y) ;
   }
   return (T)0.5 * acc ;
 }
