@@ -105,7 +105,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	       "$(<)" -outdir "$(dir $(@))"
 
 mex-info:
-	@echo "*************************************** MATLAB support"
+	$(call echo-title,MATLAB support)
 	$(if $(MATLAB_PATH),\
 	  @echo "MATLAB support enabled (MEX found)",\
 	  @echo "MATLAB support disabled (MEX not found)")
@@ -190,7 +190,6 @@ matlab-test:
 matlab-info:
 	$(call dump-var,m_src)
 	$(call dump-var,m_lnk)
-	$(call echo-var,MATLAB_DISABLE)
 	$(call echo-var,MATLAB_PATH)
 	$(call echo-var,MATLAB_EXE)
 	$(call echo-var,MEX)

@@ -37,7 +37,7 @@ dist-src-distclean:
 	rm -f $(DIST).tar.gz
 
 dist-src-info:
-	@echo "********************************** Source Distribution"
+	$(call echo-title,Source distribution)
 	$(call echo-var,DIST)
 	@echo
 
@@ -174,7 +174,7 @@ dist-bin-distclean:
 	rm -f $(BINDIST).tar.gz
 
 dist-bin-info:
-	@echo "********************************** Binary Distribution"
+	$(call echo-title,Binary distribution)
 	$(call dump-var,arch_bins)
 	$(call dump-var,comm_bins)
 	$(call echo-var,NAME)

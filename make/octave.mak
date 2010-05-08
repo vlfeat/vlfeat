@@ -100,7 +100,7 @@ $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 	@rm -f $(<:.c=.o)
 
 octave-info:
-	@echo "********************************************** Octave "
+	$(call echo-title,Octave support)
 	$(if $(OCTAVE_ENABLE),\
 	  @echo "OCTAVE support enabled (MKOCTFILE found)",\
 	  @echo "OCTAVE support disabled (MKOCTFILE not found)")

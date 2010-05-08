@@ -216,7 +216,7 @@ doc-distclean:
 
 .PHONY: doc-info
 doc-info :
-	@echo "**************************************** Documentation"
+	$(call echo-title,Documentation)
 	$(call dump-var,man_src)
 	$(call dump-var,fig_src)
 	$(call dump-var,demo_src)

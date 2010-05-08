@@ -56,7 +56,7 @@ bin-archclean: bin-clean
 bin-distclean:
 
 bin-info:
-	@echo "******************************* Command line utilities"
+	$(call echo-title,Command line utilities)
 	$(call dump-var,bin_src)
 	$(call dump-var,bin_tgt)
 	$(call dump-var,bin_dep)

@@ -105,7 +105,7 @@ dll-distclean:
 	rm -rf bin
 
 dll-info:
-	@echo "******************************************* VLFeat DLL"
+	$(call echo-title,VLFeat core library)
 	$(call dump-var,dll_src)
 	$(call dump-var,dll_obj)
 	$(call dump-var,dll_dep)

@@ -179,6 +179,11 @@ define echo-var
 @printf "%15s = %s\n" "$(1)" "$($(1))"
 endef
 
+# $(call echo-title,TITLE) pretty-prints TITLE as a title
+define echo-title
+@printf "** %s\n" "$(1)"
+endef
+
 # $(call print-command, CMD, TGT) prints a message
 define print-command
 @printf "%15s %s\n" "$(strip $(1))" "$(strip $(2))"
