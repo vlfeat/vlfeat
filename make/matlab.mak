@@ -4,28 +4,35 @@
 
 # AUTORIGHTS
 
-# To compile the MATLAB MEX files the MEX compiler must be in the
-# path.  The makefile then attempts to set the MATLABPATH root
-# directory from the output of `mex -v`.
+# MATLAB support is enabled if $(MEX) is executable and if MATLAB root
+# can be set from the output of `$(MEX) -v`. Therefore setting MEX to
+# the empty string disables MATLAB support.
 
-MATLABEXE ?= matlab
+MATLAB_EXE ?= matlab
 MEX ?= mex
-MATLABPATH ?= $(strip $(shell $(MEX) -v 2>&1 | \
-                sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+MATLAB_PATH ?= $(strip $(shell builtin type -P $(MEX) 2>&1 >/dev/null && \
+                 $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
-ifdef MATLABPATH
+# if expand to empty string, set to empty string for use with ifdef
+ifeq ($(MATLAB_PATH),)
+MATLAB_PATH=
+endif
+
+ifdef MATLAB_PATH
 all: mex-all matlab-all
-info: mex-info matlab-info
 clean: mex-clean matlab-clean
 archclean: mex-archclean matlab-archclean
 distclean: mex-distclean matlab-distclean
 endif
 
-MEX_ARCH     = $(ARCH)
+info: mex-info matlab-info
 
-MEX_FLAGS    = -$(MEX_ARCH)
-MEX_FLAGS   += $(if $(DEBUG), -g, -O)
-MEX_FLAGS   += -lm -largeArrayDims
+MEX_ARCH = $(ARCH)
+
+MEX_FLAGS  = -$(MEX_ARCH)
+MEX_FLAGS += $(if $(DEBUG), -g, -O)
+MEX_FLAGS += $(if $(PROFILE), -O -g,)
+MEX_FLAGS += -lm -largeArrayDims
 
 MEX_CFLAGS   = $(CFLAGS)
 MEX_CFLAGS  += -I$(VLDIR)/toolbox
@@ -33,8 +40,7 @@ MEX_CFLAGS  += -I$(VLDIR)/toolbox
 MEX_LDFLAGS  = $(LDFLAGS) -L$(BINDIR) -lvl
 
 MEX_SUFFIX  := mex$(ARCH)
-MEX_BINDIR  := toolbox/$(MEX_SUFFIX)
-
+MEX_BINDIR  := toolbox/mex/$(MEX_SUFFIX)
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
@@ -49,7 +55,7 @@ ifeq ($(ARCH),glx)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
-# Linux on 64 bit processor
+# Linux on 64 bit processorm
 ifeq ($(ARCH),a64)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
 MEX_ARCH = glxa64
@@ -69,7 +75,7 @@ mex_tgt := $(addprefix $(MEX_BINDIR)/,\
 	   $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
 mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
 
-ifdef MATLABPATH
+ifdef MATLAB_PATH
 arch_bins += $(mex_tgt) $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 comm_bins +=
 deps += $(mex_dep)
@@ -84,7 +90,7 @@ $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS) \
-	       -I"$(MATLABPATH)/extern/include" -M -MT \
+	       -I"$(MATLAB_PATH)/extern/include" -M -MT \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
@@ -100,9 +106,9 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 
 mex-info:
 	@echo "*************************************** MATLAB support"
-	$(if $(MATLABPATH),\
-	  @echo "MATLAB support enabled (MATLABPATH defined)",\
-	  @echo "MATLAB support disabled (MATLABPATH undefined)")
+	$(if $(MATLAB_PATH),\
+	  @echo "MATLAB support enabled (MEX found)",\
+	  @echo "MATLAB support disabled (MEX not found)")
 	$(call dump-var,mex_src)
 	$(call dump-var,mex_tgt)
 	$(call dump-var,mex_dep)
@@ -146,7 +152,7 @@ vpath vl_%.m $(shell find $(VLDIR)/toolbox -type d)
 no_dep_targets += matlab-all matlab-noprefix matlab-info
 no_dep_targets += matlab-clean matlab-archclean matlab-distclean
 
-ifdef MATLABPATH
+ifdef MATLAB_PATH
 arch_bins +=
 comm_bins += $(m_lnk)
 deps +=
@@ -170,7 +176,7 @@ matlab-test:
 	@echo "Testing Matlab toolbox" ; \
 	cd toolbox ; \
 	RESULT=$$(\
-	$(MATLABEXE) -$(ARCH) -nodesktop -r \
+	$(MATLAB_EXE) -$(ARCH) -nodesktop -r \
 	"vl_setup('xtest','verbose') ; vl_test ; exit") ; \
 	echo "$$RESULT" ; \
 	if test -n "$$(echo \"$$RESULT\" | grep \"failed\")" ; \
@@ -184,8 +190,9 @@ matlab-test:
 matlab-info:
 	$(call dump-var,m_src)
 	$(call dump-var,m_lnk)
-	$(call echo-var,MATLABPATH)
-	$(call echo-var,MATLABEXE)
+	$(call echo-var,MATLAB_DISABLE)
+	$(call echo-var,MATLAB_PATH)
+	$(call echo-var,MATLAB_EXE)
 	$(call echo-var,MEX)
 	$(call echo-var,MEX_FLAGS)
 	$(call echo-var,MEX_CFLAGS)

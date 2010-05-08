@@ -4,18 +4,32 @@
 
 # AUTORIGTHS
 
-# Octave support is experimental. The MEX-files appear to compile and
-# work correctly, but part of the M-files in the MATLAB toolbox are
-# not compatible with Octave (in particular the demos).
+# Octave support is experimental. Currently, the MEX files compile
+# successfully but a number of bugs and subtle MATLAB
+# imcompatibilities make VLFeat not fully functional.
+#
+# Octave support is enabled if $(MKOCTFILE) is executable. Therefore
+# setting MKOCTFILE to the empty string disables Octave support.
 
-#all: octave-all
-info: octave-info
+OCTAVE ?= octave
+MKOCTFILE ?=
+OCTAVE_ENABLE ?= $(strip $(shell builtin type -P $(MKOCTFILE) 2>&1 >/dev/null && \
+                   $(MKOCTFILE) -p OCTAVE_LIBS 2>&1 | \
+                   grep octave))
+
+# if expand to empty string, set to empty string for use with ifdef
+ifeq ($(OCTAVE_ENABLE),)
+OCTAVE_ENABLE=
+endif
+
+ifdef OCTAVE_ENABLE
+all: octave-all
 clean: octave-clean
 archclean: octave-archclean
 distclean: octave-distclean
+endif
 
-OCTAVE ?= octave
-MKOCTFILE ?= mkoctfile
+info: octave-info
 
 OCTAVE_MEX_SUFFIX := mex
 OCTAVE_MEX_BINDIR := toolbox/mex
@@ -56,7 +70,9 @@ octave_mex_tgt := $(addprefix $(OCTAVE_MEX_BINDIR)/,\
 	   $(notdir $(mex_src:.c=.$(OCTAVE_MEX_SUFFIX)) ) )
 octave_mex_dep := $(octave_mex_tgt:.$(OCTAVE_MEX_SUFFIX)=.d)
 
+ifdef OCTAVE_ENABLE
 deps += $(octave_mex_dep)
+endif
 
 vpath %.c $(shell find $(VLDIR)/toolbox -type d)
 vpath vl_%.m $(shell find $(VLDIR)/toolbox -type d)
@@ -85,6 +101,9 @@ $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 
 octave-info:
 	@echo "********************************************** Octave "
+	$(if $(OCTAVE_ENABLE),\
+	  @echo "OCTAVE support enabled (MKOCTFILE found)",\
+	  @echo "OCTAVE support disabled (MKOCTFILE not found)")
 	$(call dump-var,octave_mex_src)
 	$(call dump-var,octave_mex_tgt)
 	$(call dump-var,octave_mex_dep)

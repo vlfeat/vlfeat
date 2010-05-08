@@ -4,12 +4,15 @@
 
 # AUTORIGHTS
 
+# VLFEAT BUILDING INSTRUCTIONS
+#
 # This makefile builds VLFeat on modern UNIX boxes with the GNU
 # toolchain. Mac OS X and Linux are explicitly supported, and support
 # for similar architectures can be easily added.
 #
 # Usually, compiling VLFeat reduces to typing
 #
+# > cd PATH_TO_VLFEAT_SOURCE_TREE
 # > make
 #
 # The makefile attempts to automatically determine the host
@@ -19,18 +22,39 @@
 #
 # > make ARCH=maci64
 #
-# builds VLFeat for Mac OS X Intel 64bit. Other useful variables include
+# builds VLFeat for Mac OS X Intel 64-bit. Other useful variables are
+# listed below (their default value is in square bracked).
 #
-#   ARCH     Choose the active architecture (one of maci, maci64, glx, a64).
-#   DEBUG    Define in order to compile a debugging version.
-#   MEX      Path to MATLAB MEX compiler program (e.g. ${MATLABROOT}/bin/mex).
+#   ARCH [undefined] - Active architecture (maci, maci64, glx, or
+#       a64). If undefined, the makefile attempts to automatically
+#       detect the architecture.
 #
-# The following targets may also be useful:
+#   DEBUG [undefined] - If defined, turns on debugging symbols and
+#       turns off optimizations
 #
-# > make clean      # removes intermediate files
-# > make archclean  # removes all products for the active architecture
-# > make distclean  # removes all products
-# > make octave-all # compiles GNU Octave MEX files (experimental)
+#   PROFILE [undefined] - If defined, turns on debugging symbols but
+#       does NOT turn off optimizations.
+#
+#   VERB [undefinde] - If defined, display in full the command
+#       executed and their output.
+#
+#   MEX [mex]- Path to MATLAB MEX compiler. If undefined, MATLAB supprot
+#       is disabled.
+#
+#   MKOCTFILE [undefined] - Path to Octave MKOCTFILE compiler. If undefined,
+#       Octave support is disabled.
+#
+# To completely remove all build products use
+#
+# > make distclean
+#
+# Other useful targets include:
+#
+#   clean - Removes intermediate build products for the active architecture.
+#   archclean - Removes all build products for the active architecture.
+#   distclean - Removes all build products.
+#   info - Display a list of the variables defined by the Makefile.
+#   help - Print this message.
 #
 # As VLFeat is compsed of different parts (DLL, command line
 # utilities, MATLAB interface, Octave interface) so the makefile is
@@ -232,8 +256,9 @@ archclean: clean
 
 distclean:
 
-info :
-	@echo "************************************* General settings"
+info:
+	$(call echo-title,General settings)
+	$(call dump-var,deps)
 	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
