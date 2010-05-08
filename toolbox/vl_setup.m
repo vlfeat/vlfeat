@@ -42,8 +42,13 @@ for ai=1:length(varargin)
   end
 end
 
-bindir = mexext ;
-if strcmp(bindir, 'dll'), bindir = 'mexw32' ; end
+if exist('octave_config_info')
+  bindir = 'octave' ;
+else
+  bindir = mexext ;
+  if strcmp(bindir, 'dll'), bindir = 'mexw32' ; end
+end
+bindir = fullfile('mex',bindir) ;
 
 [a,b,c] = fileparts(mfilename('fullpath')) ;
 [a,b,c] = fileparts(a) ;

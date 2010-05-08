@@ -32,7 +32,7 @@ endif
 info: octave-info
 
 OCTAVE_MEX_SUFFIX := mex
-OCTAVE_MEX_BINDIR := toolbox/mex
+OCTAVE_MEX_BINDIR := toolbox/mex/octave
 OCTAVE_MEX_FLAGS =
 OCTAVE_MEX_CFLAGS = $(CFLAGS) -I$(VLDIR)/toolbox
 OCTAVE_MEX_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
@@ -89,7 +89,7 @@ $(OCTAVE_MEX_BINDIR)/%.d : %.c $(octave-mex-dir)
 
 $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 	@make -s $(dll_tgt)
-	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
+	@ln -sf "../../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
 	        "$(OCTAVE_MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
 	CFLAGS="$(OCTAVE_MEX_CFLAGS)" \
 	CXXFLAGS="$(OCTAVE_MEX_CXXFLAGS)" \
@@ -120,7 +120,7 @@ octave-archclean: octave-clean
 	rm -f $(octave_mex_tgt)
 
 octave-distclean: octave-archclean
-	rm -rf toolbox/mex
+	rm -rf toolbox/mex/octave
 
 # Emacs:
 # Local variables:

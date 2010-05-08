@@ -96,7 +96,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	@make -s $(dll_tgt)
-	@ln -sf "../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
+	@ln -sf "../../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
 	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
 	$(call C,MEX) \
                CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
@@ -120,10 +120,7 @@ mex-archclean: mex-clean
 	rm -rf $(MEX_BINDIR)
 
 mex-distclean:
-	for i in mac maci maci64 glx a64 w32 w64 ; \
-	do \
-	   rm -rf "toolbox/mex$${i}" ; \
-	done
+	rm -rf "toolbox/mex" ;
 
 # --------------------------------------------------------------------
 #                                                  Prefix-less M files
