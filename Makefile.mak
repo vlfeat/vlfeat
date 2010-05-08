@@ -138,6 +138,7 @@ libsrc = \
   vl\generic.c \
   vl\getopt_long.c \
   vl\hikmeans.c \
+  vl\homkermap.c \
   vl\host.c \
   vl\ikmeans.c \
   vl\imopv.c \
@@ -191,6 +192,7 @@ mexsrc = \
   toolbox\misc\vl_binsearch.c \
   toolbox\misc\vl_binsum.c \
   toolbox\misc\vl_getpid.c \
+  toolbox\misc\vl_homkermap.c \
   toolbox\misc\vl_ihashfind.c \
   toolbox\misc\vl_ihashsum.c \
   toolbox\misc\vl_inthist.c \
@@ -201,7 +203,6 @@ mexsrc = \
   toolbox\misc\vl_simdctrl.c \
   toolbox\misc\vl_twister.c \
   toolbox\misc\vl_version.c \
-  toolbox\misc\vl_whistc.c \
   toolbox\mser\vl_erfill.c \
   toolbox\mser\vl_mser.c \
   toolbox\quickshift\vl_quickshift.c \
