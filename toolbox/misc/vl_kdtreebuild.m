@@ -12,8 +12,8 @@
 %     approximate nearest-neighbors searches with VL_KDTREEQUERY().
 %
 %   ThresholdMethod::
-%     Sepecifies the thresholding method used to split the data
-%     (default is MEDIAN). Two methos are supported: split around the
+%     Specifies the thresholding method used to split the data
+%     (default is MEDIAN). Two methods are supported: split around the
 %     median (MEDIAN) or split around the mean (MEAN).
 %
 %   Verbose::
@@ -22,7 +22,7 @@
 %   The FOREST structure has the following fields:
 %
 %   FOREST.TREES::
-%     A structure array with one elment per tree.
+%     A structure array with one element per tree.
 %
 %   FOREST.DIMENSION::
 %     Dimensionality of the indexed data.

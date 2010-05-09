@@ -24,7 +24,7 @@
 %
 %   Options:
 %
-%   NumNeihgbors::
+%   NumNeighbors::
 %     Sets the number of neighbors to compute for each query point (by
 %     default 1).
 %
