@@ -81,7 +81,7 @@ if demo
 end
 
 if ~quiet
-  fprintf('VLFeat %s reday.\n', vl_version) ;
+  fprintf('VLFeat %s ready.\n', vl_version) ;
 end
 
 if nargout == 0
