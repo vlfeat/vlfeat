@@ -642,7 +642,7 @@ main(int argc, char **argv)
     i     = 0 ;
     first = 1 ;
     while (1) {
-      VlSiftKeypoint const *keys ;
+      VlSiftKeypoint const *keys = 0 ;
       int                   nkeys ;
 
       /* calculate the GSS for the next octave .................... */
