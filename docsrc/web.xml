@@ -31,7 +31,8 @@
      <input type="submit" name="sa" value="Search" />
     </div>
    </form>
-   <script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
+   <script type="text/javascript"
+   src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
    <!-- Google CSE Search Box Ends -->
    <h1><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></h1>
   </div>
@@ -86,7 +87,7 @@
  <!-- Site contents                                                -->
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- <page id="home"    name="index"    title="Home"> <include src="index.html"/>
+ <page id="home" name="index" title="Home"> <include src="index.html"/>
   <pagestyle>
    #content p.widePar {
      padding-right: 1em ;
@@ -95,7 +96,7 @@
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
-  <page id="install.matlab" name="install-matlab" title="Matlab install">
+  <page id="install.matlab" name="install-matlab" title="MATLAB install">
    <include src="install-matlab.html"/>
   </page>
   <page id="install.shell" name="install-shell" title="Shell install">
@@ -103,8 +104,8 @@
   </page>
   <page id="install.c" name="install-c" title="C library install">
    <include src="install-c.html"/>
-   <page id="xcode" name="xcode" title="Using Xcode"><include src="using-xcode.html"/></page>
-   <page id="vsexpress" name="vsexpress" title="Using VC++"><include src="using-vsexpress.html"/></page>
+   <page id="xcode" name="xcode" title="Xcode"><include src="using-xcode.html"/></page>
+   <page id="vsexpress" name="vsexpress" title="Visual C++"><include src="using-vsexpress.html"/></page>
   </page>
   <page id="compiling" name="compiling" title="Compiling">
    <include src="compiling.html"/>
@@ -141,16 +142,17 @@
  </page>
 
  <dir name="overview">
-  <page id="tut"       name="tut"       title="Tutorials">
+  <page id="tut" name="tut" title="Tutorials">
    <include src="tutorials.html"/>
-   <page id="tut.sift"  name="sift"      title="SIFT"> <include src="sift.html"/></page>
-   <page id="tut.mser"  name="mser"      title="MSER"> <include src="mser.html"/></page>
-   <page id="tut.ikm"   name="ikm"       title="IKM">  <include src="ikm.html"/></page>
-   <page id="tut.hikm"  name="hikm"      title="HIKM"> <include src="hikm.html"/></page>
-   <page id="tut.aib"   name="aib"       title="AIB">  <include src="aib.html"/></page>
-   <page id="tut.qs"    name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
+   <page id="tut.sift" name="sift" title="SIFT"> <include src="sift.html"/></page>
+   <page id="tut.mser" name="mser" title="MSER"> <include src="mser.html"/></page>
+   <page id="tut.ikm" name="ikm" title="IKM">  <include src="ikm.html"/></page>
+   <page id="tut.hikm" name="hikm" title="HIKM"> <include src="hikm.html"/></page>
+   <page id="tut.aib"  name="aib" title="AIB">  <include src="aib.html"/></page>
+   <page id="tut.qs" name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
    <page id="tut.kdtree"  name="kdtree" title="Kd-tree">  <include src="kdtree.html"/></page>
-   <page id="tut.utils" name="utils"     title="Utils"> <include src="utils.html"/></page>
+   <page id="tut.imdisttf"  name="imdisttf" title="Distance tf.">  <include src="imdisttf.html"/></page>
+   <page id="tut.utils" name="utils" title="Utils"> <include src="utils.html"/></page>
   </page>
  </dir>
 
