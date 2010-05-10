@@ -30,7 +30,7 @@ General Public License version 2.
 #endif
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.7"
+#define VL_VERSION_STRING "0.9.8"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024
