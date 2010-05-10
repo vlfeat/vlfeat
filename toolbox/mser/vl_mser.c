@@ -70,13 +70,13 @@ mexFunction(int nout, mxArray *out[],
   vl_mser_pix *datainv = 0;
 
   VlMserFilt        *filt, *filtinv ;
-  vl_uint     const *regions ;
-  vl_uint     const *regionsinv ;
-  float       const *frames ;
-  float       const *framesinv ;
+  vl_uint     const *regions = 0 ;
+  vl_uint     const *regionsinv = 0 ;
+  float       const *frames = 0;
+  float       const *framesinv = 0 ;
   int nregions = 0, nregionsinv = 0;
   int nframes = 0, nframesinv = 0;
-  int                i, j, dof ;
+  int                i, j, dof = 0 ;
   mwSize             odims [2] ;
   double            *pt ;
 
