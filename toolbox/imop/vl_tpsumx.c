@@ -37,8 +37,10 @@ mexFunction(int nout, mxArray *out[],
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
-  if(nin != 2) {
-    mexErrMsgTxt("Two input arguments required") ;
+  if (nin != 2) {
+    vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
+  } else if (nout > 1) {
+    vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
 
   if(!vlmxIsMatrix(in[X], 2, -1)) {
