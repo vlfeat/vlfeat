@@ -49,15 +49,15 @@ vlmxOption  options [] = {
  **/
 
 static void
-cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
+cluster_null_nodes (vl_uint32* parents, vl_uint32 nvalues, double *cost)
 {
-  int nnull = 0 ;
-  int n ;
-  int first ;
-  int last_intermed ;
+  vl_uint32 nnull = 0 ;
+  vl_uint32 n ;
+  vl_uint32 first ;
+  vl_uint32 last_intermed ;
 
-  int a, b, c, d, e ;
-  int dp, ep ;
+  vl_uint32 a, b, c, d, e ;
+  vl_uint32 dp, ep ;
 
   /* count null nodes so far */
   for (n = 0 ; n < nvalues ; ++ n) {
@@ -97,12 +97,12 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
   dp = nvalues ;
   ep = 2 * nvalues - 2 - nnull ;
 
-  mexPrintf("a:%d b:%d c:%d d:%d e:%d dp:%d ep:%d\n",
+  mexPrintf("a:%u b:%u c:%u d:%u e:%u dp:%u ep:%u\n",
             a,b,c,d,e,dp,ep) ;
 
   /* search first leaf that has been merged */
   {
-    int first_parent = e ;
+    vl_uint32 first_parent = e ;
     first = 0 ;
     for (n = 0 ; n < nvalues ; ++ n) {
       if ((parents[n] <= e) & (parents[n] != 1)) {
@@ -114,9 +114,9 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     }
   }
 
-  mexPrintf("nnull:%d\n",nnull) ;
-  mexPrintf("nvalues:%d\n",nvalues) ;
-  mexPrintf("first:%d\n",first) ;
+  mexPrintf("nnull:%u\n",nnull) ;
+  mexPrintf("nvalues:%u\n",nvalues) ;
+  mexPrintf("first:%u\n",first) ;
 
   /* move internal node block [dp:ep] to [d:e] */
   for (n = 0 ; n < e ; ++ n) {
@@ -137,7 +137,7 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     }
   }
 
-  mexPrintf("first null %d parent seto to last_intermed:%d\n",
+  mexPrintf("first null %u parent seto to last_intermed:%u\n",
             n,
             last_intermed)  ;
 
@@ -150,15 +150,15 @@ cluster_null_nodes (vl_uint32* parents, int nvalues, double *cost)
     }
   }
 
-  mexPrintf("after chaining other nulls last_intermed:%d\n", last_intermed)  ;
+  mexPrintf("after chaining other nulls last_intermed:%u\n", last_intermed)  ;
 
   /* make last_intermed point to d */
   parents [last_intermed] = d ;
 
   /* change parent of first to be last_intermed */
-  mexPrintf("parent of %d (first) was %d\n", first, parents[first]) ;
+  mexPrintf("parent of %u (first) was %u\n", first, parents[first]) ;
   parents [first] = last_intermed ;
-  mexPrintf("parent of %d (first) is now %d\n", first, parents[first]) ;
+  mexPrintf("parent of %u (first) is now %u\n", first, parents[first]) ;
 
   /* fix cost too (reall that the fist entry is the cost before
    any merge) */
@@ -192,8 +192,8 @@ mexFunction(int nout, mxArray *out[],
   int            cluster_null = 0 ;
 
   double   *Pcx     ;
-  vl_uint    nlabels ;
-  vl_uint    nvalues ;
+  vl_uint32    nlabels ;
+  vl_uint32    nvalues ;
 
   mxArray *Pcx_cpy ;
 
@@ -244,8 +244,8 @@ mexFunction(int nout, mxArray *out[],
   {
     VlAIB   *aib;
     double* acost = 0, *cost = 0 ;
-    vl_uint *aparents = 0, *parents = 0 ;
-    int n ;
+    vl_uint32 *aparents = 0, *parents = 0 ;
+    vl_uint32 n ;
 
     out[OUT_PARENTS] = mxCreateNumericMatrix(1, 2*nvalues - 1, mxUINT32_CLASS, mxREAL);
     parents = mxGetData(out[OUT_PARENTS]);
@@ -260,7 +260,7 @@ mexFunction(int nout, mxArray *out[],
 
     aparents = vl_aib_get_parents (aib);
     acost    = vl_aib_get_costs (aib);
-    memcpy(parents, aparents, sizeof(vl_uint)*(2*nvalues-1));
+    memcpy(parents, aparents, sizeof(vl_uint32)*(2*nvalues-1));
     if (nout > 1)
       memcpy(cost, acost, sizeof(double)*nvalues);
 

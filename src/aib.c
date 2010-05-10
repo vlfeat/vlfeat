@@ -11,8 +11,8 @@
 
 int main()
 {
-    vl_uint nrows = 10;
-    vl_uint ncols = 3;
+    vl_uint32 nrows = 10;
+    vl_uint32 ncols = 3;
     double Pic[3*10] = {     
     0.6813,    0.3028,    0.8216,
     0.3795,    0.5417,    0.6449,
@@ -26,7 +26,7 @@ int main()
     0.6822,    0.8998,    0.3093,
     };
 
-    int r,c;
+    vl_uint32 r,c;
     VlAIB * aib;
     vl_uint * parents;
 

@@ -38,7 +38,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int nnull = 0 ;
   int histmode = 0 ;
 
-  int i, P, N ;
+  vl_uint32 i, P, N ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
@@ -136,7 +136,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     /* process data */
     for (i = 0 ; i < N ; ++i) {
       int w = 1 ;
-      int x = (int) data [i] ;
+      vl_uint32 x = data [i] ;
 
       if (histmode) {
         w = x ;
@@ -149,14 +149,14 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
                    "DATA length exceeds number of AIB leaves") ;
         } else {
           snprintf(buf, sizeof(buf),
-                   "DATA [%d] = %d is not a leaf", i, x) ;
+                   "DATA [%u] = %u is not a leaf", i, x) ;
         }
         mexErrMsgTxt (buf) ;
       }
 
       while (VL_TRUE) {
-        int x_ = (int) parents [x -1] ;
-        /*     mexPrintf("%d : x_=%d, x=%d\n", i, x_, x) ; */
+        vl_uint32 x_ = parents [x -1] ;
+        /*     mexPrintf("%u : x_=%u, x=%u\n", i, x_, x) ; */
         ++ tree [x - 1] ;
         if ((x_ == x) | (x_ == 0) | (x_ == 1)) break ;
         x = x_ ;
