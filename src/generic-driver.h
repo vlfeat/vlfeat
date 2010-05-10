@@ -242,7 +242,8 @@ vl_file_meta_get_double (VlFileMeta *self, double *x)
   switch (self -> protocol) {
 
   case VL_PROT_ASCII :
-    fscanf (self -> file, " ") ;
+    err = fscanf (self -> file, " ") ;
+    if (err == EOF) return VL_ERR_EOF ;
     err = fscanf (self -> file, "%lg", x) ;
     if (err == EOF) return VL_ERR_EOF ;
     if (err <  1  ) return VL_ERR_BAD_ARG ;
