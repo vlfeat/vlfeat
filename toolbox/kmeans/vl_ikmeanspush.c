@@ -78,7 +78,7 @@ mexFunction(int nout, mxArray *out[],
   N = mxGetN(in[IN_X]) ;  /* n of elements */
   K = mxGetN(in[IN_C]) ;  /* n of centers */
 
-  if( mxGetM(in[IN_C]) != M ) {
+  if( (int) mxGetM(in[IN_C]) != M ) {
     mexErrMsgTxt("DATA and CENTERS must have the same number of columns.") ;
   }
 
