@@ -7,25 +7,30 @@
   source</a> library implements popular computer vision algorithms
   including
   <em>SIFT</em>, <em>MSER</em>, <em>k-means</em>, <em>hierarchical
-  k-means</em>, <em>agglomerative information bottleneck, and quick shift</em>.
-  It is written in C for efficiency and compatibility, with interfaces in
-  MATLAB for ease of use, and detailed documentation throughout. It supports
+  k-means</em>, <em>agglomerative information bottleneck, and quick
+  shift</em>.  It is written in C for efficiency and compatibility,
+  with interfaces in MATLAB for ease of use, and detailed
+  documentation throughout. It supports
   <em>Windows</em>, <em>Mac OS X</em>, and <em>Linux</em>. The latest version of
   VLFeat is <include src="version.html" />.</p>
 
- <div class="box" style="height:7em;">
-  <img src="%pathto:root;images/down.png" alt="Download" style="float:left;"/>
+ <div class="box" style="height:6em;">
+  <!-- <img src="%pathto:root;images/down.png" alt="Download" style="float:left;"/> -->
   <h1>Download</h1>
   <ul>
-   <li><b><a href="%pathto:root;download/vlfeat-%env:VERSION;-bin.tar.gz" onClick="javascript: pageTracker._trackPageview('/download/vlfeat-%env:VERSION;-bin.tar.gz');">VLFeat %env:VERSION;</a></b>  (Windows, Mac, Linux)</li>
-   <li><a href="%pathto:download;">Installation, source code, and more ...</a></li>
-   <li><a href="http://github.com/vlfeat/vlfeat/tree/master">Git repository</a></li>
+   <li><b><a href="%pathto:root;download/vlfeat-%env:VERSION;-bin.tar.gz"
+   onClick="javascript:
+   pageTracker._trackPageview('/download/vlfeat-%env:VERSION;-bin.tar.gz');">VLFeat
+   %env:VERSION;</a></b> (Windows, Mac, Linux)</li>
+   <li><a href="%pathto:download;">Source code and installation</a></li>
+   <li><a href="http://github.com/vlfeat/vlfeat/tree/master">Git
+   repository</a></li>
   </ul>
  </div>
 
- <div class="box" style="height:7em;">
-  <img src="%pathto:root;images/help.png" alt="Help" style="float:left;"/>
-  <h1>Reference</h1>
+ <div class="box" style="height:6em;">
+  <!-- <img src="%pathto:root;images/help.png" alt="Help" style="float:left;"/> -->
+  <h1>Documentation</h1>
   <ul>
    <li><a href="%pathto:mdoc;">MATLAB commands</a></li>
    <li><a href="%pathto:api;">C API</a> with algorithm descriptions</li>
@@ -35,20 +40,22 @@
  </div><div class="box" style="height:12em;">
   <h1>Tutorials</h1>
   <ul>
-   <li><a href="%pathto:tut.sift;">SIFT</a> &ndash; Scale Invariant Feature Transform</li>
-   <li><a href="%pathto:tut.mser;">MSER</a> &ndash; Maximally Stable Extremal Regions</li>
-   <li><a href="%pathto:tut.ikm;">IKM</a> &ndash; Integer optimized <em>k</em>-means</li>
-   <li><a href="%pathto:tut.hikm;">HIKM</a> &ndash; Hierarchical <em>k</em>-means</li>
-   <li><a href="%pathto:tut.aib;">AIB</a> &ndash; Agglomerative Information Bottleneck</li>
-   <li><a href="%pathto:tut.qs;">Quick shift</a> &ndash; Quick shift mode seeking</li>
-   <li><a href="%pathto:tut.kdtree;">Kd-tree</a> &ndash; kd-tree fast nearest neighbors</li>
-   <li><a href="%pathto:tut;">More ...</a></li>
+  <li>Features:  <a href="%pathto:tut.sift;">SIFT</a>, <a href="%pathto:tut.mser;">MSER</a>,
+    <a href="%pathto:tut.qs;">Quick shift</a></li>
+  <li>Clustering: <a href="%pathto:tut.ikm;">IKM</a>, <a href="%pathto:tut.hikm;">HIKM</a>,
+    <a href="%pathto:tut.aib;">AIB</a></li>
+  <li>Matching:<a href="%pathto:tut.kdtree;">randomized kd-trees</a></li>
+  <li><a href="%pathto:tut;">All tutorials</a></li>
+  </ul>
+  <h1>Demos</h1>
+  <ul>
+  <li>Dense SIFT and spatial histograms for classification in the Caltech-101 benchmark.</li>
   </ul>
  </div>
 
  <div class="box" style="height:12em;">
-  <h1>BibTeX entry</h1>
-<pre style="font-size: .8em; color: black; margin-bottom: 0em;">
+  <h1>Citing</h1>
+<pre style="font-size: .8em; color: black; margin-top: 0.5em ; margin-bottom: 1.1em; line-height:1.1em;">
 @misc{vedaldi08vlfeat,
  Author = {A. Vedaldi and B. Fulkerson},
  Title = {{VLFeat}: An Open and Portable Library 
@@ -56,12 +63,22 @@
  Year  = {2008},
  Howpublished = {\url{http://www.vlfeat.org/}}
 </pre>
+<h1>Acknowledgments</h1>
+<p><a href="http://vision.ucla.edu">UCLA Vision
+Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG</a>.</p>
  </div>
 
  <h2 style="clear:left;">News</h2>
 
  <div class="clear">&nsbp;</div>
  <dl id="changes">
+   <dt>10/05/2010 - VLFeat 0.9.8 released</dt>
+   <dd>VLFeat 0.9.8 adds new tutorials, (hierarchical) k-means support for
+     floating point data, homogenoeus kernel maps, a basic implementation
+     of PEGASOS for SVM learning, and many other improvements.
+     [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.7">Details</a>].
+   </dd>
+
    <dt>16/01/2010 - VLFeat 0.9.7 released</dt>
    <dd>VLFeat 0.9.7 updates the binary distribution to be backward
      compatible with Mac OS X 10.5 (Leopard).

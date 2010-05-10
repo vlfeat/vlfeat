@@ -151,16 +151,16 @@ pre, code {
     margin: 1em 0 ;
     margin-top: 1.5em ;
 }
-#content h1 {font-size:1.5em; margin-bottom: 0.59em;}
-#content h2 {font-size:1.4em; margin-bottom: 0.67em;}
-#content h3 {font-size:1.3em; margin-bottom: 0.77em;}
-#content h4 {font-size:1.2em; margin-bottom: 0.83em;}
-#content h5 {font-size:1.1em; margin-bottom: 1.00em;}
-#content h6 {font-size:1.0em; margin-bottom: 1.15em;}
+#content h1 {font-size:1.4em; margin-bottom: 0.5em;}
+#content h2 {font-size:1.3em; margin-bottom: 0.5em;}
+#content h3 {font-size:1.2em; margin-bottom: 0.5em;}
+#content h4 {font-size:1.1em; margin-bottom: 0.5em;}
+#content h5 {font-size:1.0em; margin-bottom: 0.5em;}
+#content h6 {font-size:1.0em; margin-bottom: 0.5em;}
 #content p,
 #content blockquote,
 #content div.figure {
-    margin: 1em 0 ;
+    margin: 0.5em 0 ;
     padding: 0 ;
     padding-right: 10em ;
 }
@@ -236,19 +236,21 @@ pre, code {
     width: 24em ;
     margin-right: 1em ;
     margin-bottom: 1em ;
-
-    background-color: #f3f0f5;
-
-    border-bottom-style: solid;
-    border-bottom-color: #a7a5a8;
-
-/*    border-top-style: solid;
-      border-top-color: #a7a5a8;*/
+    background-color: #f3f0f5 ;
+    border-bottom-style: solid ;
+    border-bottom-color: #a7a5a8 ;
 }
 #content div.box h1 {
     font-size: 1.2em ;
-    text-align: center ;
+    /*text-align: center ;*/
     margin: 0px ;
+}
+#content div.box ul {
+    margin-top: 0.25em ;
+    margin-bottom: 0.5em ;
+}
+#content div.box p {
+    padding-right: 1em ;
 }
 #content table.checker {
     border-collapse: collapse ;
