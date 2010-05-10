@@ -14,12 +14,40 @@ otherwise not necessary (use the
 
 <h1 id="compiling.unix">Compiling on Unix</h1>
 
-<p>For UNIX based platforms (Mac OS X and Linux), the library
- bundles a GNU makefile (<code>Makefile</code>). The makefile tries to
- auto-detect the environment and automatically configure itself. In
- most cases, typing <code>make</code> is all it is required to compile
- everything. If this does not work, please edit the makefile and make
- the necessary adjustment to the flags.</p>
+<p>Compiling for UNIX-like platforms (e.g. Mac OS X, Linux) uses the
+standard GNU toolchain. It is usually sufficient to change to VLFeat
+root directory, denoted <code>VLFEATROOT</code> in the following, and
+type <code>make</code>:</p>
+<pre>
+> cd VLFEATROOT
+> make
+</pre>
+<p>The make script attempts to automatically detect the host
+architecture and configure itself accordingly. If the architecture is
+not detected correctly, it can be specified manually. For instance</p>
+<pre>
+> make ARCH=glx
+</pre>
+<p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
+to obtain a list of other useful options.</p>
+
+<p><b>MATLAB support.</b> In order for MATLAB support to be compiled,
+the MATLAB <code>mex</code> script must be in the current path. If it
+is not, its location must be passed to <code>make</code> as
+follows. First, determine MATLAB root directory by running a MATLAB
+session and issuing the <code>matlabroot</code>
+command. Let <code>MATLABROOT</code> denote the returned path
+(e.g. <code>/Applications/MATLAB_R2009b.app/</code>). The <code>mex</code>
+script is usually located in <code>MALTABROOT/bin/mex</code>. Then run
+the compilation with the command</p>
+<pre>
+> make MEX=MATLABROOT/bin/mex
+</pre>
+<p>VLFeat must be compiled for the architecture used by MATLAB (run
+ MATLAB's <code>computer</code> command to obtain this
+ information). On Mac OS X it is often necessary to turn on 64-bit
+ support explicitly by setting <code>ARCH=maci64</code> as both the 32
+ and 64 bit versions are plausible targets on 64-bit machines.</p>
 
 <div class="parbox">
 <p><b>Mac OS X 10.6 (Snow Leopard), 64-bit, and MATLAB 2009b.</b>
@@ -29,17 +57,20 @@ compiling for this platform, but the architecture must be specified
 manually when compiling, either like:</p>
 
 <pre>
-MEX=/Applications/MATLAB_R2009b.app/bin/mex ARCH=maci64 NDEBUG=y make
+make ARCH=maci64
 </pre>
+
+<p>or</p>
 
 <pre>
-MEX=/Applications/MATLAB_R2009b.app/bin/mex ARCH=maci NDEBUG=y make
+make ARCH=maci
 </pre>
 
-<p>Unfortunately, MATLAB 2009b has a bug in inclued the mex script, so
-if you wish to compile yourself, you will need to modify it. We
-recommend making a backup before making any changes to this file. To
-fix the bug, you need to cut this line:</p>
+<p>Unfortunately, MATLAB 2009b <code>mex</code> script has a bug that
+must be manually fixed in order for this procedure to work
+correctyl. It is recommend to make backup of the <code>mex</code>
+script before attempting this. Th fix the bug, edit the
+<code>MATLABROOT/bin/mex</code> script </p>
 
 <pre>
 get_arch    # Call $MATLAB/bin/util/arch.sh
@@ -72,9 +103,9 @@ fc_flags="$fc_flags -DMX_COMPAT_32"
 
 <p>For Windows platform, it is also possible to compile just the
 MATLAB MEX files from within MATLAB (using the <code>vl_compile</code>
-command). This is meant as an helper for less experienced users that
-may need to recompile the mex file due to binary incompatibilities
-with older MATLAB versions.</p>
+command). This is meant to help less experienced users that may need
+to recompile the mex file due to binary incompatibilities with older
+MATLAB versions.</p>
 
 <div class="parbox">
 <p><b>MATLAB 7.0 and earlier</b> require recompling the MEX files by
@@ -82,7 +113,7 @@ with older MATLAB versions.</p>
 </p>
 </div>
 
-<h2>Troubleshooting</h2>
+<h3>Windows troubleshooting</h3>
 
 <dl>
  <dt>syntax error: '=' unexpected:</dt>
