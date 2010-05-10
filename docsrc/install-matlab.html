@@ -2,52 +2,68 @@
 
 <group>
 
-<p>These instructions explain how to use VLFeat from
-MATLAB.</p>
+<p>These instructions explain how to setup VLFeat in MATLAB using the
+binary distribution (it is also possible
+to <a href="%pathto:compile">compile</a> the library and toolbox from
+source).</p>
+
+<h1>One-time setup</h1>
 
 <p><a href="%pathto:download;">Download</a> and unpack the latest
 VLFeat binary distribution in a directory of your choice
 (e.g. <code>~/src/vlfeat</code>). Let <code>VLFEATROOT</code> denote
-this directory.</p>
-
-<p>VLFeat must be added to MATLAB search path by running
+this directory. VLFeat must be added to MATLAB search path by running
 the <code>vl_setup</code> command found in
 the <code>VLFEATROOT/toolbox</code> directory. From MATLAB prompt
 enter</p>
 
 <pre>
-> cd VLFEATROOT
-> cd toolbox
-> vl_setup
+>> run('VLFEATROOT/toolbox/vl_setup')
+VLFeat 0.9.7 ready.
 </pre>
 
-<p>To avoid name conflicts with other MATLAB commands, all VLFeat
-commands start with the <code>vl_</code> prefix (for instance the SIFT
-feature extractor command is called <code>vl_sift</code>). The prefix
-can be omitted by calling
-<code>vl_setup('noprefix')</code> instead.</p>
-
-<p><code>vl_setup</code> alters the search path for the current MATLAB
-session only (it does not save the changes). To make the change
-permanent, add the following fragment to your
-<a href="http://www.google.com/search?q=site:www.mathworks.com+startup.m&amp;btnI=I"><code>startup.m</code> file</a>:</p>
+<p>To check that VLFeat is sucessfully installed, try to run
+the <code>vl_version</code> command:</p>
 
 <pre>
-p=pwd ;
-cd VLFEATROOT ;
-cd toolbox ;
-vl_setup ;
-cd(p) ;
-clear p
+>> vl_version verbose
+VLFeat version 0.9.7
+    Static config: X64, little_endian, GNU C 40201 LP64, POSIX_threads, SSE2
+    4 CPU(s): GenuineIntel MMX SSE SSE2 SSE3 SSE41 SSE42
+    SIMD enabled: yes
 </pre>
 
-<p>Alternatively, you can use the
-<a href="http://www.google.com/search?q=site:www.mathworks.com+savepath&amp;btnI=I"><code>savepath</code>
-command</a> to save the updated search paths.</p>
+<h1>Permanent setup</h1>
+
+<p>To permanently add VLFeat to your MATLAB environment, add this line
+to your
+<a href="http://www.google.com/search?q=site:www.mathworks.com+startup.m&amp;btnI=I"><code>startup.m</code>
+file</a>:</p>
+
+<pre>
+run('VLFEATROOT/toolbox/vl_setup')
+</pre>
+
+<p>When you restart MATLAB, you should see VLFeat greetings
+message.</p>
+
+<h1>Getting started</h1>
 
 <p>All commands embed interface documentation that can be viewed with
 the
 builtin <a href="http://www.google.com/search?q=site:www.mathworks.com+help&amp;btnI=I"><code>help</code>
 command</a> (e.g. <code>help vl_sift</code>).</p>
+
+<p>VLFeat bundles a large number of demos. To use them, adds the demos
+to MATLAB path with <code>vl_setup demo</code>. For
+instance,<code>vl_demo_sift_basic</code>:</p>
+
+<pre>
+>> vl_setup demo
+>> vl_demo_sift_basic
+</pre>
+
+<p>demonstrates the SIFT detector. To see a list of demos
+TAB-complete <code>vl_demo</code> at MATLAB prompt.</p>
 
 </group>
