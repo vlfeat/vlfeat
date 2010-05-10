@@ -63,13 +63,13 @@ xcreate (VlHIKMTree *tree, mxArray const *mnode, int i)
   M      = mxGetM (mcenters) ;
   node_K = mxGetN (mcenters) ;
 
-  if (node_K > tree->K) {
+  if (node_K > (vl_size)tree->K) {
     mexErrMsgTxt("A node has more clusters than TREE.K.") ;
   }
 
   if (tree->M < 0) {
     tree->M = M ;
-  } else if (M != tree->M) {
+  } else if (M != (vl_size)tree->M) {
     mexErrMsgTxt("A node CENTERS field has inconsistent dimensionality.") ;
   }
 
