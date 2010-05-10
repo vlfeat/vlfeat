@@ -198,7 +198,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_uint8 const* data, int N)
       }          
       for(x = 0 ; x < N ; ++x) {
         vl_ikm_acc lxc = l_pt[c*N + x] ;
-        vl_uint cx  = asgn[x] ;
+        int cx  = (int) asgn[x] ;
         
         /* lower bound */
         if(dist < lxc) {
@@ -248,7 +248,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_uint8 const* data, int N)
      * ---------------------------------------------------------------- */
     done = 1 ;
     for(x=0 ; x < N ; ++x) {
-      vl_uint cx = asgn[x] ;
+      int cx = (int) asgn[x] ;
       vl_ikm_acc ux = u_pt[x] ;
       
       /* ux is an upper bound of the distance of x to its
@@ -352,7 +352,7 @@ vl_ikm_push_elkan (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
   vl_ikm_acc *d_pt = f-> inter_dist ;
   
   /* assign data to centers */
-  for(x=0 ; x < N ; ++x) {
+  for(x=0 ; x < (vl_uint)N ; ++x) {
     best_dist = VL_BIG_INT ;
     cx = 0 ;
     
