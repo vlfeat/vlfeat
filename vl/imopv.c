@@ -372,12 +372,15 @@ VL_XCAT(vl_image_distance_transform_,SFX)
         T x2_ = x_ * x_ ;
         T r_ = image[x_ * columnStride + y * rowStride] ;
         T inters ;
+        if (r == r_) {
+          /* handles the case r = r_ = \pm inf */
+          inters = (x + x_) / 2.0 + offset ;
+        }
 #if (FLT == VL_TYPE_FLOAT)
-        if (coeff > VL_EPSILON_F) {
+        else if (coeff > VL_EPSILON_F) {
 #else
-        if (coeff > VL_EPSILON_D) {
+        else if (coeff > VL_EPSILON_D) {
 #endif
-
           inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) + offset ;
         } else {
           /* If coeff is very small, the parabolas are flat (= lines).

@@ -16,7 +16,9 @@
 %
 %   The function uses the fast algorithm from [1].
 %
-%   [1]
+%   REFERENCES
+%   [1] P. F. Felzenszwalb and D. P. Huttenlocher. Distance transforms
+%   of sampled functions. Technical report, Cornell University, 2004.
 %
 %   Author:: Andrea Vedaldi
 
