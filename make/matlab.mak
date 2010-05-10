@@ -10,7 +10,7 @@
 
 MATLAB_EXE ?= matlab
 MEX ?= mex
-MATLAB_PATH ?= $(strip $(shell builtin type -P $(MEX) 2>&1 >/dev/null && \
+MATLAB_PATH ?= $(strip $(shell type -P $(MEX) 2>&1 >/dev/null && \
                  $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 
 # if expand to empty string, set to empty string for use with ifdef

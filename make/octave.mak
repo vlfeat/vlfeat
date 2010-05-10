@@ -13,7 +13,7 @@
 
 OCTAVE ?= octave
 MKOCTFILE ?=
-OCTAVE_ENABLE ?= $(strip $(shell builtin type -P $(MKOCTFILE) 2>&1 >/dev/null && \
+OCTAVE_ENABLE ?= $(strip $(shell type -P $(MKOCTFILE) 2>&1 >/dev/null && \
                    $(MKOCTFILE) -p OCTAVE_LIBS 2>&1 | \
                    grep octave))
 
