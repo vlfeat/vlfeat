@@ -34,7 +34,7 @@ to obtain a list of other useful options.</p>
 <p><b>MATLAB support.</b> In order for MATLAB support to be compiled,
 the MATLAB <code>mex</code> script must be in the current path. If it
 is not, its location must be passed to <code>make</code> as
-follows. First, determine MATLAB root directory by running a MATLAB
+follows. First, determine MATLAB's root directory by running a MATLAB
 session and issuing the <code>matlabroot</code>
 command. Let <code>MATLABROOT</code> denote the returned path
 (e.g. <code>/Applications/MATLAB_R2009b.app/</code>). The <code>mex</code>
@@ -66,17 +66,17 @@ make ARCH=maci64
 make ARCH=maci
 </pre>
 
-<p>Unfortunately, MATLAB 2009b <code>mex</code> script has a bug that
+<p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug that
 must be manually fixed in order for this procedure to work
-correctyl. It is recommend to make backup of the <code>mex</code>
+correctly. It is recommend to make backup of the <code>mex</code>
 script before attempting this. Th fix the bug, edit the
-<code>MATLABROOT/bin/mex</code> script </p>
+<code>MATLABROOT/bin/mex</code> script by cutting the line:</p>
 
 <pre>
 get_arch    # Call $MATLAB/bin/util/arch.sh
 </pre>
 
-<p>and paste it after the processing of options:</p>
+<p>and pasting it after the processing of options:</p>
 
 <pre>
 ...
@@ -94,7 +94,7 @@ fc_flags="$fc_flags -DMX_COMPAT_32"
 
 <h1 id="compiling.windows">Compiling on Windows</h1>
 
-<p>For Windows, the library bundles a NMake makefile
+<p>For Windows, the library bundles an NMake makefile
  (<code>Makefile.mak</code>). In order to use it, you must edit
  Makefile.mak to adjust the values of a number of configuration
  variables to match your setup. Once you have done that, start the
@@ -108,7 +108,7 @@ to recompile the mex file due to binary incompatibilities with older
 MATLAB versions.</p>
 
 <div class="parbox">
-<p><b>MATLAB 7.0 and earlier</b> require recompling the MEX files by
+<p><b>MATLAB 7.0 and earlier</b> require recompiling the MEX files by
  the provided <code>vl_compile</code> command.
 </p>
 </div>
