@@ -7,8 +7,8 @@ INSTALLING
   toolbox directory and type vl_setup.
 
   Binaries are created in the bin/XXX directory, where XXX changes
-  depending on the architecture. We support the following (the naming
-  reflects MATLAB naming for MEX files):
+  depending on the architecture. VLFeat supports the following (the
+  naming reflects MATLAB naming for MEX files):
 
   - maci    Mac OS X Intel
   - maci64  Mac OS X Intel (64 bit)
@@ -27,44 +27,23 @@ COMPILING
   The core library and command line utilities require a common C
   compiler supporting the C-90 standard and some C-99 extension (GCC
   and Visual C will do) plus a few common extension (see APPENDIX). To
-  compile the MEX files, MATLAB needs also to be installed.
+  compile MATLAB support, MATLAB should also be installed and the
+  MATLAB MEX command should be working correctly.
 
-  LINUX. Make sure to have a recent version of GCC (at least 4.0) and
-  GNU make (at least 3.81) installed. Edit the Makefile to adjust the
-  paths to MATLAB and the mex command, or to disable MATLAB
-  support. Then issue
+  In general, issuing
 
-  > cd vlfeat
-  > make NDEBUG=yes
+  > make
 
-  Omit the NDEBUG=yes option to compile with debugging symbols and
-  no optimizations. Earlier versions of GCC and make can be used, but
-  this requires hacking the Makefile.
+  should be enough to compile VLFeat. Type
 
-  MAC OS X. Compiling requires Xcode 3.1 or later. Edit the Makefile
-  to adjust the paths to MATLAB and the mex command, or to disable
-  MATLAB support. The Makefile produces a binary compatible with Mac
-  OS X 10.5 (Leopard) or later. For the 32 bit target issue
+  > make help
 
-  > cd vlfeat
-  > make NDEBUG=yes
+  or refer to http://www.vlfeat.org for further instructions.
 
-  Omit NDEBUG=yes to compile with debugging symbols and no
-  optimizations. For the 64 bit target issue
-
-  > cd vlfeat
-  > make NDEBUG=yes ARCH=maci64
-
-  !! REMARK !! Unforunately MATLAB mex script has a bug that prevents
-  selecting the architecture from working correctly and makes it
-  impossible to compile correctly for the non-default target. This bug
-  is easy to fix, but requires patching the mex script. See
-  www.vlfeat.org for detailed instructions.
-
-  WINDOWS. We provide a Microsoft NMAKE Makefile (Makefile.mak) that
-  has been tested under Visual C++ 2008 Express and Matlab R2008a
-  (minor adjustments may be required for other versions). Open the
-  Visual C terminal, cd into the VLFeat directory and issue.
+  WINDOWS. VLFeat bundels a Microsoft NMAKE Makefile (Makefile.mak)
+  script that has been tested under Visual C++ 2008 Express and MATLAB
+  R2008a (minor adjustments may be required for other versions). Open
+  the Visual C terminal, cd into the VLFeat directory and issue.
 
   > nmake /f Makefile.mak
 
@@ -108,7 +87,7 @@ CREATING THE DOCUMENTATION
 
   > vl_demo
 
-  TUTORIAL. To compile the tutorial, issue
+  TUTORIALS. To create the figures for the tutorials, issue
 
   > make doc-deep
   > make doc
@@ -131,6 +110,7 @@ APPENDIX
   intrisic. GCC and Visual C both satisfy all the requirements.
 
 CHANGES
+  0.9.8      Added image distance transform. Improved documentation.
   0.9.7      Changed the Mac OS X binary distribution to require
              a less recent version of Mac OS X (10.5).
   0.9.6      Changed the GNU/Linux binary distribution to require

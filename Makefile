@@ -22,8 +22,16 @@
 #
 # > make ARCH=maci64
 #
-# builds VLFeat for Mac OS X Intel 64-bit. Other useful variables are
-# listed below (their default value is in square bracked).
+# builds VLFeat for Mac OS X Intel 64-bit.
+#
+# !! Unforunately MATLAB 2009B mex script has a bug that prevents the
+# !! architecture selected by specifying ARCH to be used for the
+# !! compilation of the MEX files.  This bug is easy to fix, but
+# !! requires patching the mex script. See www.vlfeat.org for detailed
+# !! instructions.
+#
+# Other useful variables are listed below (their default value is in
+# square bracked).
 #
 #   ARCH [undefined] - Active architecture (maci, maci64, glx, or
 #       a64). If undefined, the makefile attempts to automatically
