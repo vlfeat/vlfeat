@@ -72,9 +72,9 @@ class PL (L):
 
 # line with bullet
 class BL (L):
-    bullet       = None
+    bullet = None
     inner_indent = 0
-    
+
 # line with description
 class DL (L):
     pass
@@ -90,8 +90,8 @@ def lex(line):
 
     match = re.match(r"\s*\n?$", line) ;
     if match: return B()
-    
-    match = re.match(r"(\s*)(.*)::(.*)\n?$", line) 
+
+    match = re.match(r"(\s*)(.*)::(.*)\n?$", line)
     if match:
         x = DL()
         x.indent        = len(match.group(1))
@@ -115,7 +115,7 @@ def lex(line):
         x.indent  = len(match.group(1))
         x.content = match.group(2)
         return x
-    
+
 # --------------------------------------------------------------------
 class Lexer(object):
 # --------------------------------------------------------------------
@@ -125,16 +125,16 @@ class Lexer(object):
     the following methods:
 
     l.next() advances the head and fetches the next terminal.
-    l.back() move back the head.
+    l.back() moves back the head.
     l.getpos() returns the head position.
-    l.seek(POS) set the head position to POS.
+    l.seek(POS) sets the head position to POS.
     """
     def __init__(self, lines):
         self.tokens = []
         self.pos    = -1
         for line in lines:
             self.tokens.append(lex(line))
-            
+
     def next(self):
         self.pos = self.pos + 1
         if self.pos >= len(self.tokens):
@@ -144,7 +144,7 @@ class Lexer(object):
 
     def seek(self, pos):
         self.pos = pos
-        
+
     def back(self):
         if self.pos >=0: self.pos -= 1
 
@@ -165,10 +165,10 @@ class Formatter:
 # --------------------------------------------------------------------
     """
     f = Formatter(LINES) parse the array of strings LINES.
-    
+
     f = Formatter(LINES, FUNCS) takes the dictionary of functions
-    FUNCS.  Function names must be uppercase. The dictionary entries
-    are used to embed links in the documentation.
+    FUNCS. Function names must be uppercase. The dictionary entries
+    are used to cross link functions in the generated documentation.
 
     Formatter(LINES, FUNCS, LINKTYPE) produces links of the specified
     type.  Use 'a' for HTML anchors and 'wiki' for MediaWiki style
@@ -195,8 +195,7 @@ class Formatter:
 
     def addAttr(self, tag, attr, val):
         x = self.xmldoc.createAttribute(attr)
-        t = self.toTextNode(val)
-        x.appendChild(t)
+        x.nodeValue = val
         tag.setAttributeNode(x)
 
     def addText(self, tag, s):
@@ -204,6 +203,7 @@ class Formatter:
         tag.appendChild(txt)
 
     def addFancyText(self, tag, s):
+        "Adds text while transforming function references to links."
         xs = []
         iter = re.finditer('([A-Z][A-Z0-9_]*)\([^\)]*\)', s)
         last = -1
@@ -215,7 +215,7 @@ class Formatter:
             if self.funcs.has_key(func_name):
                 # retrieve function HTML location
                 func_href = self.funcs[func_name]
-                
+
                 # add text so far
                 xs.append(self.toTextNode(s[last+1:i.start()]))
 
@@ -237,10 +237,12 @@ class Formatter:
         xs.append(self.toTextNode(s[last+1:]))
         for x in xs:
             tag.appendChild(x)
-            
-    # ................................................................        
+
+    # ................................................................
     # E, B, L, PL, BL, DL, ...
     def parse_Terminal(self, T):
+        "If the next terminal on the stream is of type T, the terminal"
+        "is extracted and returned. Otherwise the function returns None"
         pos = self.tokens.getpos()
         t = self.tokens.next()
         if t.isa(T):
@@ -251,12 +253,15 @@ class Formatter:
     # ................................................................
     # DIV(N) -> (B | P(N) | BL(N) | DL(N) | V(N))+
     def parse_DIV(self, indent):
+        "Parse a DIV(N) symbol. A DIV(N) a sequence of blank"
+        "lines (B or other blocks at indentation level N, such as"
+        "pharagraphs P(N), bullet lists BL(N), description lists DN(N)"
         pos = self.tokens.getpos()
         xs = []
         while True:
             x = self.parse_Terminal(B)
             if x: continue
-            
+
             x = self.parse_P(indent)
             if x:
                 xs.append(x)
@@ -280,12 +285,12 @@ class Formatter:
             break
         if len(xs) == 0: return None
         return xs
-    
-    # ................................................................        
+
+    # ................................................................
     # P(N) -> PL(N) L(N)*
     def parse_P(self, indent):
         content = "\n"
-        good = False 
+        good = False
         pos = self.tokens.getpos()
 
         # Introduced by PL
@@ -315,7 +320,7 @@ class Formatter:
         self.addFancyText(ptag, content)
         return ptag
 
-    # ................................................................        
+    # ................................................................
     # V(N) -> L(M)+, M > N
     def parse_V(self, indent):
         content = "\n"
@@ -329,7 +334,7 @@ class Formatter:
                     good = True
                     continue
                 else:
-                    self.tokens.back()                
+                    self.tokens.back()
             x = self.parse_Terminal(B)
             if x:
                 content += "\n"
@@ -365,7 +370,7 @@ class Formatter:
     # ULI(N) -> UL(N,M) L(M)* DIV(M), M > N
     def parse_ULI(self, indent):
         content = "\n"
-        good = False 
+        good = False
         pos = self.tokens.getpos()
 
         # Introduced by UL
@@ -425,7 +430,7 @@ class Formatter:
     # DI(N) -> DL(N) DIV(M)?, M > N
     def parse_DI(self, indent):
         content = "\n"
-        good   = False 
+        good   = False
         pos    = self.tokens.getpos()
         xs     = []
 
@@ -439,25 +444,40 @@ class Formatter:
                 self.tokens.back()
         if not good:
             return None
-        dttag = self.xmldoc.createElement(u"dt")
-        dttxt = self.toTextNode(content)
-        dttag.appendChild(dttxt)
-        xs.append(dttag)
 
-        # Inject inner_content
-        c = x.inner_content.strip()
-        if len(c) > 0:
-            tk = PL()
-            tk.content = x.inner_content
-            t = self.tokens.next()
-            self.tokens.back()
-            if t.isa(L) and t.indent > indent:
-                tk.indent = t.indent
-            else:
-                tk.indent = indent+1 ;
-            self.tokens.rewrite(tk)
-            self.tokens.back()
-            
+        if False:
+            # adds text after :: as part of the description dd
+            dttag = self.xmldoc.createElement(u"dt")
+            dttxt = self.toTextNode(content)
+            dttag.appendChild(dttxt)
+            xs.append(dttag)
+
+            # Inject inner_content
+            c = x.inner_content.strip()
+            if len(c) > 0:
+                tk = PL()
+                tk.content = x.inner_content
+                t = self.tokens.next()
+                self.tokens.back()
+                if t.isa(L) and t.indent > indent:
+                    tk.indent = t.indent
+                else:
+                    tk.indent = indent+1 ;
+                    self.tokens.rewrite(tk)
+                    self.tokens.back()
+        else:
+            # adds text after :: as part of the description term dt
+            dttag = self.xmldoc.createElement(u"dt")
+            dttxt = self.toTextNode(content)
+            dttag.appendChild(dttxt)
+            c = x.inner_content.strip()
+            if len(c) > 0:
+                deftag = self.xmldoc.createElement(u"span")
+                self.addAttr(deftag, "class", "defaults")
+                self.addText(deftag, c)
+                dttag.appendChild(deftag)
+            xs.append(dttag)
+
         # Continued by DIV
         t = self.tokens.next()
         self.tokens.back()
@@ -476,13 +496,13 @@ class Formatter:
         # write <mfile></mfile>
         xmf = self.xmldoc.createElement("div")
         xmf.setAttribute(u"class", u"documentation")
-        
+
         self.xmldoc.appendChild(xmf)
 
         # parse documentation
         xs = self.parse_DIV(self.indentinit)
         for x in xs: xmf.appendChild(x)
-        
+
         return self.xmldoc
 
 
@@ -505,7 +525,7 @@ if __name__ == '__main__':
    verbatim1
    verbatim2
    verbatim3
- 
+
    verbatim4
    verbatim5
  Lorem Ipsum is simply dummy text of the printing and typesetting
@@ -523,21 +543,21 @@ if __name__ == '__main__':
    outer1 line 3 /
 
    outer1 new paragarph
-   
+
    - inner1
    - inner2
    - inner3
      continued on next line
        continued with verbatim
-       
+
        more verbatim after blank
    - inner4
  - outer again
- - outer   
+ - outer
  bla
 
  - list2
- - list4 
+ - list4
  - BL()
  - BL(A,B)
 
@@ -556,7 +576,7 @@ if __name__ == '__main__':
  Ancora::
      Bli bli bli
      Blu blu blu
-     
+
      - list
      - lust
      - last

@@ -309,6 +309,10 @@ pre, code {
     text-decoration : none ;
     color: black ;
 }
+#content div.mdoc span.defaults {
+    font-weight: normal ;
+    color: green ;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                          Doxygen */
