@@ -35,5 +35,7 @@ vl_demo_kdtree_self ;
 vl_demo_kdtree_forest ;
 vl_demo_kdtree_ann ;
 
+vl_demo_imdisttf ;
+
 rmpath(demo_path);
 rmpath(test_path);
