@@ -43,7 +43,7 @@
 #   PROFILE [undefined] - If defined, turns on debugging symbols but
 #       does NOT turn off optimizations.
 #
-#   VERB [undefinde] - If defined, display in full the command
+#   VERB [undefined] - If defined, display in full the command
 #       executed and their output.
 #
 #   MEX [mex]- Path to MATLAB MEX compiler. If undefined, MATLAB supprot
