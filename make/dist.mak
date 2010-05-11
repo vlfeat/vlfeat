@@ -60,84 +60,75 @@ dist-src-info:
 no_dep_targets += dist-bin dist-bin-release dist-bin-commit dist-bin-info
 no_dep_targets += dist-bin-clean dist-bin-archclean dist-bin-distclean
 
+dist-bin-release: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-release:
-	set -e ; \
-	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
-	\
-	echo Fetching remote tags ; \
-	$(GIT) fetch --tags ; \
-	echo Cloning VLFeat ; \
-	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
-	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
-	$(GIT) --git-dir=$$TMP/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ; \
-	\
-	echo Checking out v$(VER) ; \
-	cd $$TMP ; \
-	$(GIT) fetch origin ; \
-	$(GIT) checkout v$(VER) ; \
-	echo Rebuilding binaries for release ; \
-	make NDEBUG=yes ARCH=$(ARCH) all
+	echo Fetching remote tags ;
+	$(GIT) fetch --tags ;
+	echo Cloning VLFeat ;
+	test -e "$(tmp-dir)" || $(GIT) clone --no-checkout . "$(tmp-dir)" ; \
+	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
+	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
+	echo Checking out v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
+	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
+	echo Rebuilding binaries for release ;
+	make -C "$(tmp-dir)" ARCH=$(ARCH) all
 
+dist-bin-commit: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-commit: branch=v$(VER)-$(ARCH)
 dist-bin-commit: dist-bin-release
-	@set -e ; \
-	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
-	BRANCH=v$(VER)-$(ARCH)  ; \
-	\
-	cd $$TMP ; \
-	echo Setting up $$BRANCH to v$(VER) ; \
-	$(GIT) branch -f $$BRANCH v$(VER) ; \
-	$(GIT) checkout $$BRANCH ; \
-	echo Adding binaries to $$BRANCH ; \
-	$(GIT) add -f $(arch_bins) ; \
+	echo Setting $(branch) to v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) checkout $(branch) ;
+	echo Adding binaries to $(branch) ;
+	cd "$(tmp-dir)" ; $(GIT) add -f $(arch_bins) ;
+	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
 	  echo No changes to commit ; \
 	  exit 1 ; \
-	fi ; \
-	echo Commiting changes ; \
-	$(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
-	echo Pushing $$BRANCH to the server ; \
-	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
+	else  \
+	  echo Commiting changes ; \
+	  $(GIT) commit -m "$(ARCH) binaries for version $(VER)" ; \
+	  echo Pushing $(branch) to the server ; \
+	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch) ; \
+	fi
 
+dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-commit
-	@set -e ; \
-	TMP=tmp-$(NAME)-$(VER)-$(ARCH) ; \
-	BRANCH=v$(VER)-common  ; \
-	\
-	cd $$TMP ; \
-	echo Setting up $$BRANCH to v$(VER) ; \
-	$(GIT) branch -f $$BRANCH v$(VER) ; \
-	$(GIT) checkout $$BRANCH ; \
-	echo Adding binaries to $$BRANCH ; \
-	$(GIT) add -f $(m_lnk) ; \
+	echo Setting up $(branch) to v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER)
+	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)
+	echo Adding binaries to $(branch)
+	cd "$(tmp-dir)" ; $(GIT) add -f $(m_lnk)
+	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
 	  echo No changes to commit ; \
 	  exit 1 ; \
-	fi ; \
-	echo Commiting changes ; \
-	$(GIT) commit -m "common products for $(VER)" ; \
-	echo Pushing $$BRANCH to the server ; \
-	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
+	else \
+	  echo Commiting changes ; \
+	  $(GIT) commit -m "common products for $(VER)" ; \
+	  echo Pushing $(branch) to the server ; \
+	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch); \
+	fi
 
+dist-bin-merge: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-merge: branch=v$(VER)-bin
 dist-bin-merge:
-	set -e ; \
-	BRANCH=v$(VER)-bin ; \
-	TMP=tmp-$(NAME)-$(VER)-bin ; \
-	\
-	echo Fetching remote tags ; \
-	$(GIT) fetch --tags ; \
-	echo Cloning VLFeat ; \
-	test -e $$TMP || $(GIT) clone --no-checkout . $$TMP ; \
-	$(GIT) --git-dir=$$TMP/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
-	$(GIT) --git-dir=$$TMP/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ; \
-	\
-	cd $$TMP ; \
-	echo Creating or resetting and checking out branch $$BRANCH to v$(VER); \
-	$(GIT) fetch origin ; \
-	$(GIT) checkout v$(VER) ; \
-	$(GIT) branch -f $$BRANCH v$(VER) ; \
-	$(GIT) checkout $$BRANCH ; \
+	echo Fetching remote tags ;
+	cd "$(tmp-dir)" ; $(GIT) fetch --tags ;
+	echo Cloning VLFeat ;
+	test -e "$(tmp-dir)" || $(GIT) clone --no-checkout . "$(tmp-dir)" ;
+	$(GIT) --git-dir=$(tmp-dir)/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ;
+	$(GIT) --git-dir=$(tmp-dir)/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
+	echo Creating or resetting and checking out branch $(branch) to v$(VER);
+	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
+	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) checkout $(branch) ;
+	cd "$(tmp-dir)" ; \
 	MERGE_BRANCHES=; \
 	FETCH_BRANCHES=; \
 	for ALT_ARCH in common maci maci64 glx a64 w32 w64 ; \
@@ -150,15 +141,14 @@ dist-bin-merge:
 	echo $(GIT) fetch -f bin $$FETCH_BRANCHES ; \
 	$(GIT) fetch -f bin $$FETCH_BRANCHES ; \
 	echo merging $$MERGE_BRANCHES ; \
-	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ; \
+	$(GIT) merge -m "Merged binaries $$MERGE_BRANCHES" $$MERGE_BRANCHES ;
 	echo Pushing to server the merged binaries ; \
-	$(GIT) push -v --force bin $$BRANCH:refs/heads/$$BRANCH ;
+	cd "$(tmp-dir)" ; $(GIT) push -v --force bin $(branch):refs/heads/$(branch) ;
 
-
+dist-bin: branch=v$(VER)-bin
 dist-bin:
 	echo Fetching binaries ; \
-	BRANCH=v$(VER)-bin ; \
-	git fetch -f bin $$BRANCH:remotes/bin/$$BRANCH ; \
+	$(GIT) fetch -f bin $(branch):remotes/bin/$(branch) ; \
 	echo Creating archive ; \
 	COPYFILE_DISABLE=1 \
 	COPY_EXTENDED_ATTRIBUTES_DISABLE=1 \

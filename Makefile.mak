@@ -426,7 +426,7 @@ bin-release:
 	$(GIT) checkout v$(VER)
 	echo Rebuilding binaries for release
 	if exist "bin\$(ARCH)" del /f /Q "bin\$(ARCH)"
-	if exist "bin\mex$(ARCH)" del /f /Q "toolbox\mex$(ARCH)"
+	if exist "bin\mex\$(ARCH)" del /f /Q "toolbox\mex$(ARCH)"
 	nmake /f Makefile.mak ARCH=$(ARCH)
 
 bin-commit: bin-release
