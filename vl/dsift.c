@@ -50,27 +50,32 @@ number of SIFT descriptors of densely sampled features of the same
 scale and orientation. See the @ref sift "SIFT module" for an
 overview of SIFT.
 
-The feature frames (keypoints) are indirectly specified by the sampling steps
-(::vl_dsift_set_steps) and the sampling bounds (::vl_dsift_set_bounds).
-The descriptor geometry (number and size of
+The feature frames (keypoints) are indirectly specified by the
+sampling steps (::vl_dsift_set_steps) and the sampling bounds
+(::vl_dsift_set_bounds).  The descriptor geometry (number and size of
 the spatial bins and number of orientation bins) can be customized
-(::vl_dsift_set_geometry).
+(::vl_dsift_set_geometry, ::VlDsiftDescriptorGeometry).
 
 @image html dsift-geom.png "Dense SIFT descriptor geometry"
 
 By default, SIFT uses a Gaussian windowing function that discounts
 contributions of gradients further away from the descriptor
 centers. This function can be changed to a flat window by invoking
-::vl_dsift_set_flat_window (this greatly speeds-up the calculation).
+::vl_dsift_set_flat_window. In this case, gradients are accumulated
+using only bilinear interpolation, but instad of being reweighted by a
+Gassuain window, they are all weighted equally. However, after
+gradients have been accumulated into a spatial bin, the whole bin is
+reweighted by the average of the Gaussian window over the spatial
+support of that bin. This &ldquo;approximation&rdquo; substantially
+improves speed with little or no loss of performance in applications.
 
-Keypoints are sampled in such a way that all bin centers are at
-integer coordinates within the image boundaries.
-::vl_dsift_set_bounds can be used to further restrict sampling to the
-keypoints in an image subregion.
-
-@remark This descriptor is <em>not</em> equivalent to N. Dalal and
-B. Triggs. <em>Histograms of Oriented Gradients for Human
-Detection.</em> CVPR 2005. It is instead just a dense version of SIFT.
+Keypoints are sampled in such a way that the centers of the spatial
+bins are at integer coordinates within the image boundaries. For
+instance, the top-left bin of the top-left descriptor is centered on
+the pixel (0,0). The bin immediately to the right at
+(<code>binSizeX</code>,0), where <code>binSizeX</code> is a paramtere
+in the ::VlDsiftDescriptorGeometry structure. ::vl_dsift_set_bounds
+can be used to further restrict sampling to the keypoints in an image.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
  @section dsift-usage Usage
@@ -575,8 +580,8 @@ _vl_dsift_with_gaussian_window (VlDsiftFilter * self)
  ** @param self DSIFT filter object.
  **/
 
-VL_INLINE
-void _vl_dsift_with_flat_window (VlDsiftFilter* self)
+VL_INLINE void
+_vl_dsift_with_flat_window (VlDsiftFilter* self)
 {
   int binx, biny, bint ;
   int framex, framey ;
@@ -599,16 +604,25 @@ void _vl_dsift_with_flat_window (VlDsiftFilter* self)
                        VL_PAD_BY_CONTINUITY|VL_TRANSPOSE) ;
 
     for (biny = 0 ; biny < self->geom.numBinY ; ++biny) {
-      float wy = _vl_dsift_get_bin_window_mean (self->geom.binSizeY,
-                                                self->geom.numBinY,
-                                                biny,
-                                                self->windowSize) ;
 
-      /* The convolution function uses triangualr wave with unit integral (hence height
-       * equal to half the bin size). Instead
-       * for SIFT the triangular wave is used as a partition function and must
-       * have unit maximum. We compoensate for this by multiplying the result
-       * by the bin size.
+      /*
+      This fast version of DSIFT does not use a proper Gaussian
+      weighting scheme for the gradiens that are accumulated on the
+      spatial bins. Instead each spatial bins is accumulated based on
+      the triangular kernel only, equivalent to bilinear interpolation
+      plus a flat, rather than Gaussian, window. Eventually, however,
+      the magnitude of the spatial bins in the SIFT descriptor is
+      reweighted by the average of the Gaussian window on each bin.
+      */
+
+      float wy = _vl_dsift_get_bin_window_mean
+        (self->geom.binSizeY, self->geom.numBinY, biny,
+         self->windowSize) ;
+
+      /* The convolution functions vl_imconvcoltri_* convolve by a
+       * triangular kernel with unit integral. Instead for SIFT the
+       * triangular kernel should have unit height. This is
+       * compensated for by multiplying by the bin size:
        */
 
       wy *= self->geom.binSizeY ;
