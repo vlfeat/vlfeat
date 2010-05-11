@@ -1,9 +1,14 @@
 function vl_figaspect(a)
 % VL_FIGASPECT  Set figure aspect ratio
 %   VL_FIGASPECT(A) sets the current figure aspect ratio to A. It
-%   leaves the shortest side unaltered.
+%   leaves the length of the shortest side unaltered. Both the
+%   screen and paper positions are affected.
 %
-%   Author:: Andrea Vedaldi
+%   See also: VL_HELP(), VL_PRINTSIZE().
+
+% Author: Andrea Vedaldi
+
+% AUTORIGHTS
 
 pos = get(gcf, 'Position') ;
 
@@ -23,5 +28,4 @@ else
   pos(4) = pos(3) / a ;
 end
 
-set(gcf,'PaperPosition',pos) ;
-
+set(gcf,'PaperPosition', pos) ;

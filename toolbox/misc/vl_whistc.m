@@ -1,9 +1,12 @@
-function h = vl_whistc2(x, w, edges, dim)
-% VL_WHISTC  Weighted histogram
-%  H = VL_WHISTC(X,W,EDGES) behaves exactly like HISTC(X,EDGES), but
-%  weights the samples by W. NaN-valued entries are skipped.
+function h = vl_whistc(x, w, edges, dim)
+% VL_WHISTC Weighted histogram
+%   H = VL_WHISTC(X,W,EDGES) behaves exactly like HISTC(X,EDGES), but
+%   weights the samples X by W. Samples that have NaN weight are
+%   skipped.
 %
-%  See also:: HITSC(), VL_HELP().
+%   See also: HITSC(), VL_HELP().
+
+% Authors: Andrea Vedladi
 
 % AUTORIGHTS
 % Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson

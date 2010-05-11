@@ -456,28 +456,41 @@ VL_XCAT(vl_image_distance_transform_,SFX)
  ** @param step sub-sampling step.
  ** @param flags operation modes.
  **
- ** The function convolves the column of the image @a image with the
- ** discrete triangular kernel
+ ** The function convolves the columns of the image @a image with the
+ ** triangular kernel
  **
  ** @f[
  **   k(t) = \frac{1}{\Delta^2} \max\{ \Delta -  |t|, 0 \},
  **   \quad t \in \mathbb{Z}
  ** @f]
  **
- ** where @f$ \Delta @f$ is equal to the parameter @a filterSize. The
- ** filter normalization factor has been selected such that
+ ** The paramter @f$ \Delta @f$, equal to the function argument @a
+ ** filterSize, controls the width of the kernel. Notice that the
+ ** support of @f$ k(x) @f$ as a continuous function of @f$ x @f$ is
+ ** the open interval @f$ (-\Delta,\Delta) @f$, which has length @f$
+ ** 2\Delta @f$.  However, @f$ k(x) @f$ restricted to the ingeter
+ ** domain @f$ x \in \mathcal{Z} @f$ has support @f$ \{ -\Delta + 1,
+ ** \Delta +2, \dots, \Delta-1 \} @f$, which counts @f$ 2 \Delta - 1
+ ** @f$ elements only. In particular, the discrete kernel is symmetric
+ ** about the origin for all values of @f$ \Delta @f$.
+ **
+ ** The normalization factor @f$ 1 / \Delta^2 @f$ guaratnees that the
+ ** filter is normalized to one, i.e.:
  **
  ** @f[
  **   \sum_{t=-\infty}^{+\infty} k(t) = 1
  ** @f]
  **
- ** for all @f$ \Delta \in \mathbb{Z}_+ @f$. Notice that the support
- ** of @f$ k(x) @f$ as a continuous function is @f$ (-\Delta,\Delta)
- ** @f$, which has length @f$ 2\Delta @f$, and as a discrete function is
- ** @f$ [-\Delta + 1, \Delta-1] @f$, which has length @f$ 2 \Delta - 1
- ** @f$.
+ ** @par Algorithm
  **
- ** @see ::vl_imconvcol_vd for further details.
+ ** The function exploits the fact that convolution by a triangular
+ ** kernel can be expressed as the repeated convolution by a
+ ** rectangular kernel, and that the latter can be performed in time
+ ** indepenedent on the fiter width by using an integral-image type
+ ** trick. Overall, the algorithm complexity is independent on the
+ ** parameter @a filterSize and linear in the nubmer of image pixels.
+ **
+ ** @see ::vl_imconvcol_vd for details on the meaning of the other parameters.
  **/
 
 /** @fn vl_imconvcoltri_f(float*,vl_size,float const*,vl_size,vl_size,vl_size,vl_size,vl_size,int unsigned)

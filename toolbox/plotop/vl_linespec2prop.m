@@ -6,7 +6,9 @@ function prop=vl_linespec2prop(spec)
 %  If SPEC is not in a recognized format, the string SPEC is returned
 %  unaltered as the only element of PROPR.
 %
-%  See also:: VL_PLOTFRAME(), PLOT(), VL_HELP().
+%  See also: VL_PLOTFRAME(), PLOT(), VL_HELP().
+
+% Author: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
