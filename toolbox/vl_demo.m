@@ -17,6 +17,8 @@ vl_demo_sift_or ;
 vl_demo_sift_match ;
 vl_demo_sift_vs_ubc ;
 
+vl_demo_dsift ;
+
 vl_demo_mser_basic ;
 vl_demo_mser_delta ;
 vl_demo_mser_cmd ;

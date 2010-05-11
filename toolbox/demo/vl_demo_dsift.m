@@ -1,39 +1,34 @@
 % VL_DEMO_DSIFT Demo: DSIFT
 
-pfx = fullfile(vl_root,'figures','demo') ;
 randn('state',0) ;
 rand('state',0) ;
 
-% --------------------------------------------------------------------
-%                                                        Load a figure
-% --------------------------------------------------------------------
+% read a test image
 I = imread(fullfile(vl_root,'data','a.jpg')) ;
 I = single(vl_imdown(rgb2gray(I))) ;
 
 % --------------------------------------------------------------------
-%                                          Basic Dense SIFT invocation
+%                                                      Basic benchmark
 % --------------------------------------------------------------------
 
-binSize     = 4 ; % bin size in pixels
-magnif      = 3 ; % bin size / keypoint scale
-scale       = binSize / magnif ;
-windowSize  = 2 ;
+binSize = 4 ; % bin size in pixels
+magnif = 3 ; % bin size / keypoint scale
 
 elaps_dsift = [] ;
 elaps_dsift_fast = [] ;
 err_dsift = [] ;
 err_dsift_fast = [] ;
 
-windowSizeRange = [1 1.2 1.5 1.7 2 2.5 5] ;
-for wi = 1:length(windowSizeRange)
-  windowSize = windowSizeRange(wi) ;
+binSizeRange = [3 4 5 6] ;
+for wi = 1:length(binSizeRange)
+  binSize = binSizeRange(wi) ;
+  scale = binSize / magnif ;
 
   tic ;
   [f, d] = vl_dsift(vl_imsmooth(I, sqrt(scale.^2 - .25)), ...
                     'size', binSize, ...
-                    'step', 5, ...
+                    'step', 2, ...
                     'bounds', [20,20,210,140], ...
-                    'windowsize', windowSize, ...
                     'floatdescriptors', ...
                     'verbose') ;
   elaps_dsift(wi) = toc ;
@@ -41,9 +36,8 @@ for wi = 1:length(windowSizeRange)
   tic ;
   [f, dfast] = vl_dsift(vl_imsmooth(I, sqrt(scale.^2 - .25)), ...
                         'size', binSize, ...
-                        'step', 5, ...
+                        'step', 2, ...
                         'bounds', [20,20,210,140], ...
-                        'windowsize', windowSize, ...
                         'floatdescriptors', ...
                         'fast', ...
                         'verbose') ;
@@ -58,27 +52,31 @@ for wi = 1:length(windowSizeRange)
                      'frames', f_, ...
                      'firstoctave', -1, ...
                      'levels', 5, ...
-                     'floatdescriptors', ...
-                     'windowsize', windowSize) ;
+                     'floatdescriptors') ;
   elaps_sift(wi) = toc ;
 
   err_dsift(wi)      = mean(mean(abs(d     - d_)) ./ mean(d_)) * 100 ;
   err_dsift_fast(wi) = mean(mean(abs(dfast - d_)) ./ mean(d_)) * 100 ;
 end
 
-figure(1) ; clf ;
-subplot(1,2,1) ; title('Descriptor  SIFT') ;
-plot(windowSizeRange, [err_dsift ; err_dsift_fast]', 'linewidth', 3) ;
+figure(1) ; clf ; title('Descriptor  SIFT') ;
+plot(binSizeRange, [err_dsift ; err_dsift_fast]', 'linewidth', 3) ;
 legend('DSIFT', 'DSIFT fast') ;
 ylabel('Approx error (%)') ;
-xlabel('windowSize parameter') ;
+xlabel('binSize parameter') ;
+grid on ;
+axis square ;
 
-subplot(1,2,2) ; title('Speedup on regular SIFT') ;
-plot(windowSizeRange, ...
+figure(2) ; title('Speedup on regular SIFT') ;
+plot(binSizeRange, ...
      [elaps_sift ./ elaps_dsift ; ...
       elaps_sift ./ elaps_dsift_fast ; ...
       elaps_sift ./ elaps_sift], 'linewidth', 3) ;
 legend('DSIFT', 'DSIFT fast', 'SIFT') ;
-ylabel('Times faster') ;
-xlabel('windowSize parameter') ;
+ylabel('Speedup') ;
+xlabel('binSize parameter') ;
+grid on ;
+axis square ;
 
+figure(1) ; vl_demo_print('dsift_accuracy') ;
+figure(2) ; vl_demo_print('dsift_speedup') ;
