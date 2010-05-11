@@ -11,8 +11,8 @@ function y = vl_ddgaussian(x)
 %   See also:: VL_GAUSSIAN(), VL_DGAUSSIAN(), VL_HELP().
 
 % AUTORIGHTS
-% Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
-% 
+% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+%
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 

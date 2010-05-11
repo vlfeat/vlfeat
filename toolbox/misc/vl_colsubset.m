@@ -30,10 +30,10 @@ function [Y, sel] = vl_colsubset(X,n,varargin)
 % Authors: Andrea Vedaldi
 
 % AUTORIGHTS
-% Copyright (C) 2008-09 Andrea Vedaldi
+% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
 %
-% This file is part of the VGG MKL Class and VGG MKL Det code packages,
-% available in the terms of the GNU General Public License version 2.
+% This file is part of VLFeat, available under the terms of the
+% GNU GPLv2, or (at your option) any later version.
 
 if nargin < 2, n = 1 ; end
 

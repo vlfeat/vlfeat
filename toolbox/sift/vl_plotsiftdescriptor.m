@@ -27,8 +27,8 @@ function h=vl_plotsiftdescriptor(d,f,varargin)
 %   See also VL_HELP(), VL_SIFT(), VL_PLOTFRAME().
 
 % AUTORIGHTS
-% Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
-% 
+% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+%
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
