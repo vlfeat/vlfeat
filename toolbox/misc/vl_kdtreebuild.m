@@ -6,15 +6,15 @@
 %
 %   VL_KDETREEBUILD() accepts the following options:
 %
-%   NumTrees::
+%   NumTrees:: 1
 %     Specifies the number of semi-randomized KD-trees to add to the
-%     forest (default is 1). Multiple trees can be used to improve
-%     approximate nearest-neighbors searches with VL_KDTREEQUERY().
+%     forest. Multiple trees can be used to improve approximate
+%     nearest-neighbors searches with VL_KDTREEQUERY().
 %
-%   ThresholdMethod::
-%     Specifies the thresholding method used to split the data
-%     (default is MEDIAN). Two methods are supported: split around the
-%     median (MEDIAN) or split around the mean (MEAN).
+%   ThresholdMethod:: MEDIAN
+%     Specifies the thresholding method used to split the data.  Two
+%     methods are supported: split around the median (MEDIAN) or split
+%     around the mean (MEAN).
 %
 %   Verbose::
 %     Increases the verbosity level (can be repeated).
@@ -55,7 +55,9 @@
 %      with the index of the splitting dimension and the threshold for
 %      each node.
 %
-%   See also:: VL_KDTREEQUERY()
+%   See also: VL_KDTREEQUERY()
+
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson

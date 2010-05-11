@@ -16,7 +16,9 @@
 %   labels explicitly.
 %
 %   VL_INTHIST(..., 'MASS', MASSES) specifies a mass MASSES for each
-%   entry of LABELS. MASSES can be either of class UINT32 or
-%   DOUBLE, and the class of INTHIST varies accordingly.
+%   entry of LABELS. MASSES can be either of class UINT32 or DOUBLE,
+%   and the class of INTHIST varies accordingly.
 %   
-%   Author:: Andrea Vedaldi
+%   See also: VL_HELP(), VL_IMINTEGRAL(), VL_SAMPLEINTHIST().
+
+% Author: Andrea Vedaldi

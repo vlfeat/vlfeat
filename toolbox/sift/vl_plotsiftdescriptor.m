@@ -15,13 +15,13 @@ function h=vl_plotsiftdescriptor(d,f,varargin)
 %
 %   The function supports the following options
 %
-%   NumSpatialBins [4]::
+%   NumSpatialBins:: 4
 %     Number of spatial bins in each spatial direction.
 %
-%   NumOrientBins [8]::
+%   NumOrientBins:: 8
 %     Number of orientation bis.
 %
-%   Magnif [3.0]::
+%   Magnif:: 3
 %     Magnification factor.
 %
 %   See also VL_HELP(), VL_SIFT(), VL_PLOTFRAME().

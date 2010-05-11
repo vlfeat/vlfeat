@@ -8,6 +8,17 @@
 %   dimensions of X except for the first, which is multiplied by
 %   2*N+1.
 %
+%   The function accepts the following options:
+%
+%   KChi2::
+%     Compute the map for the Chi2 kernel.
+%
+%   KL1::
+%     Compute the map for the L1 (intersection) kernel.
+%
+%   KJS::
+%     Compute the map for the JS (Jensen-Shannon) kernel.
+%
 %   Example::
 %     The following code results in approximatively the same
 %     similarities matrices between points X and Y:
@@ -21,22 +32,13 @@
 %       ker_ = psix' * psiy ;
 %       plot([ker ; ker_]') ;
 %
-%   The function accepts the following options:
-%
-%   KChi2::
-%     Compute the map for the Chi2 kernel.
-%
-%   KL1::
-%     Compute the map for the L1 (intersection) kernel.
-%
-%   KJS::
-%     Compute the map for the JS (Jensen-Shannon) kernel.
-%
 %   REFERENCES
 %   [1] A. Vedaldi and A. Zisserman
 %       `Efficient Additive Kernels via Explicit Feature Maps',
 %       Proc. CVPR, 2010.
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
+
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS

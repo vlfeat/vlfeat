@@ -25,7 +25,9 @@ function [Y, sel] = vl_colsubset(X,n,varargin)
 %   Uniform::
 %     Causes N equally spaced columns to be returned.
 %
-%  Author:: Andrea Vealdi
+%  See also: VL_HELP().
+
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2008-09 Andrea Vedaldi
