@@ -123,19 +123,19 @@ mexFunction(int nout, mxArray *out[],
 
       case opt_size :
         if (!vlmxIsPlainScalar(optarg) || (size = (int) *mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument,"SIZE must be a positive integer.") ;
+          vlmxError(vlmxErrInvalidArgument,"SIZE is not a scalar or it is negative.") ;
         }
         break ;
 
       case opt_step :
         if (!vlmxIsPlainScalar(optarg) || (step = (int) *mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument,"STEP must be a positive integer.") ;
+          vlmxError(vlmxErrInvalidArgument,"STEP is not a scalar or it is negative.") ;
         }
         break ;
 
       case opt_window_size :
         if (!vlmxIsPlainScalar(optarg) || (windowSize = *mxGetPr(optarg)) < 0) {
-          vlmxError(vlmxErrInvalidArgument,"WINDOWSIZE must be a non-negative real.") ;
+          vlmxError(vlmxErrInvalidArgument,"WINDOWSIZE is not a scalar or it is negative.") ;
         }
         break ;
 
