@@ -20,21 +20,21 @@ I = imread(fullfile(vl_root,'data','a.jpg')) ;
 I = single(vl_imdown(rgb2gray(I))) ;
 </pre>
 
-<p>To check the equivalene of <code>vl_disft</code>
-and <code>vl_sift</code> it is necessary to understand in details how
+<p>To check the equivalence of <code>vl_disft</code>
+and <code>vl_sift</code> it is necessary to understand in detail how
 the parameters of the two descriptors are related.</p>
 
 <ul>
 
 <li><p><b>Bin size vs keypoint scale</b>. DSIFT specifies the
-descriptor size by a single parameter, <code>size</code>, controlling
-the size of a SIFT spatial bin, in pixels. In the standard SIFT
+descriptor size by a single parameter, <code>size</code>, which controls
+the size of a SIFT spatial bin in pixels. In the standard SIFT
 descriptor, the bin size is related to the SIFT keypoint scale by a
 multiplier, denoted <code>magnif</code> below, which defaults
 to <code>3</code>. As a consequence, a DSIFT descriptor with bin size
 equal to 5 corresponds to a SIFT keypoint of scale 5/3=1.66.</p></li>
 
-<li><p><b>Smoothing.</b> The SIFT descriptor puts smooths the image
+<li><p><b>Smoothing.</b> The SIFT descriptor smoothes the image
 according to the scale of the keypoints (Gaussian scale space). By
 default, the smoothing is equivalent to a convolution by a Gaussian of
 variance <code>s^2 - .25</code>, where <code>s</code> is the scale of
@@ -83,7 +83,7 @@ f(4,:) = 0 ;
 SIFT descriptors, extracted at multiple scales. A color version, named
 PHOW-color, extracts descriptors on the three HSV image channels and
 stacks them up. A combination of <code>vl_dsift</code>
-and <code>vl_imsmooth</code> can be used to easliy and efficiently
+and <code>vl_imsmooth</code> can be used to easily and efficiently
 compute such features.</p>
 
 <p>VLFeat includes a simple wrapper, <code>vl_phow</code>, that does
