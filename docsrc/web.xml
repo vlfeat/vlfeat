@@ -151,7 +151,7 @@
    <page id="tut.aib"  name="aib" title="AIB">  <include src="aib.html"/></page>
    <page id="tut.qs" name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
    <page id="tut.kdtree"  name="kdtree" title="kd-tree">  <include src="kdtree.html"/></page>
-   <page id="tut.imdisttf"  name="imdisttf" title="Distance tf.">  <include src="imdisttf.html"/></page>
+   <page id="tut.imdisttf"  name="imdisttf" title="Distance tf">  <include src="imdisttf.html"/></page>
    <page id="tut.utils" name="utils" title="Utils"> <include src="utils.html"/></page>
   </page>
  </dir>
