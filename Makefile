@@ -69,6 +69,8 @@
 # divided in components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust any parameter that may not.
 
+SHELL = /bin/bash
+
 .PHONY : all
 all:
 

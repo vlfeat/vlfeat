@@ -107,6 +107,8 @@ octave-info:
 	$(call dump-var,octave_mex_src)
 	$(call dump-var,octave_mex_tgt)
 	$(call dump-var,octave_mex_dep)
+	$(call echo-var,OCTAVE)
+	$(call echo-var,MKOCTFILE)
 	$(call echo-var,OCTAVE_MEX_BINDIR)
 	$(call echo-var,OCTAVE_MEX_FLAGS)
 	$(call echo-var,OCTAVE_MEX_CFLAGS)
