@@ -23,15 +23,19 @@ s.w = [ 0.984155766745943 ;
        -0.558661314436844] ;
 
 function test_problem_1(s)
-w = vl_pegasos(s.X, int8(s.y), s.lambda, ...
-               'numIterations', 3000, ...
-               'biasMultiplier', s.biasMultiplier) ;
-vl_assert_almost_equal(w, s.w, 0.1) ;
+for conv = {@single,@double}
+  conv = conv{1} ;
+  w = vl_pegasos(conv(s.X), int8(s.y), s.lambda, ...
+                 'numIterations', 3000, ...
+                 'biasMultiplier', s.biasMultiplier) ;
+  vl_assert_almost_equal(w, conv(s.w), 0.1) ;
+end
 
 function w = exact_solver(X, y, lambda, biasMultiplier)
 N = size(X,2) ;
 model = svmtrain(y', [(1:N)' X'*X], sprintf(' -c %f -t 4 ', 1/(lambda*N))) ;
 w = X(:,model.SVs) * model.sv_coef ;
 w(3) = - model.rho / biasMultiplier ;
-format long
-w
+format long ;
+disp('model w:')
+disp(w)

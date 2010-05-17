@@ -56,7 +56,7 @@ mexFunction(int nout, mxArray *out[],
   vl_type dataType ;
   vl_size numSamples ;
   vl_size dimension ;
-  vl_size numIterations = 10000 ;
+  vl_size numIterations = 0 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -126,6 +126,10 @@ mexFunction(int nout, mxArray *out[],
     }
   }
 
+  if (numIterations == 0) {
+    numIterations = (vl_size) 10 / (lambda + 1) ;
+  }
+
   data = mxGetData (IN(DATA)) ;
   numSamples = mxGetN (IN(DATA)) ;
   dimension = mxGetM (IN(DATA)) ;
@@ -135,6 +139,7 @@ mexFunction(int nout, mxArray *out[],
                                      dataClass, mxREAL) ;
 
   if (verbose) {
+    mexPrintf("vl_pegasos: Lambda = %d\n", lambda) ;
     mexPrintf("vl_pegasos: BiasMultiplier = %g\n", biasMultiplier) ;
     mexPrintf("vl_pegasos: NumIterations = %d\n", numIterations) ;
   }
@@ -144,13 +149,13 @@ mexFunction(int nout, mxArray *out[],
       vl_pegasos_train_binary_svm_f((float *)mxGetData(OUT(MODEL)),
                                     (float const *)mxGetPr(IN(DATA)), dimension, numSamples,
                                     (vl_int8 const *)mxGetData(IN(LABELS)),
-                                    lambda, numIterations, biasMultiplier) ;
+                                    lambda, numIterations, biasMultiplier, NULL) ;
       break ;
     case VL_TYPE_DOUBLE:
       vl_pegasos_train_binary_svm_d((double *)mxGetData(OUT(MODEL)),
                                     (double const *)mxGetData(IN(DATA)), dimension, numSamples,
                                     (vl_int8 const *)mxGetData(IN(LABELS)),
-                                    lambda, numIterations, biasMultiplier) ;
+                                    lambda, numIterations, biasMultiplier, NULL) ;
       break ;
   }
 
