@@ -154,9 +154,9 @@ mexFunction(int nout, mxArray *out[],
 
 	  /* Weights. */
 	  double x0 = X_pt[j] ;
-	  double x1 = X_pt[j+1] ;
+	  double x1 = (j < N-1) ? X_pt[j+1] : x0 + 1;
 	  double y0 = Y_pt[i] ;
-	  double y1 = Y_pt[i+1] ;
+	  double y1 = (i < M-1) ? Y_pt[i+1] : y0 + 1;
 	  double wx = (x-x0)/(x1-x0) ;
 	  double wy = (y-y0)/(y1-y0) ;
 
