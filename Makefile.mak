@@ -148,6 +148,7 @@ libsrc = \
   vl\mathop.c \
   vl\mathop_sse2.c \
   vl\mser.c \
+  vl\pegasos.c \
   vl\pgm.c \
   vl\quickshift.c \
   vl\random.c \
@@ -199,6 +200,7 @@ mexsrc = \
   toolbox\misc\vl_kdtreebuild.c \
   toolbox\misc\vl_kdtreequery.c \
   toolbox\misc\vl_localmax.c \
+  toolbox\misc\vl_pegasos.c \
   toolbox\misc\vl_samplinthist.c \
   toolbox\misc\vl_simdctrl.c \
   toolbox\misc\vl_twister.c \
