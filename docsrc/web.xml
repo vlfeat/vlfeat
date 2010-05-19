@@ -157,6 +157,15 @@
   </page>
  </dir>
 
+ <dir name="applications">
+   <page id="apps" name="apps" title="Applications">
+     <include src="apps.html"/>
+     <page id="apps.caltech-101.code" name="caltech-101-code" title="phow_caltech101.m" hide="yes">
+       <pre><include src="../apps/phow_caltech101.m" type="text"/></pre>
+     </page>
+   </page>
+ </dir>
+
  <!-- Generate an additional page to hold search results -->
  <page name="search" id="search" title="Search" hide="yes">
   <!-- Google CSE Search Results Begins -->

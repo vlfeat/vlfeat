@@ -1,0 +1,25 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<h1 id="apps.caltech-101">Caltech-101 classification</h1>
+
+<p>This application uses VLFeat to train an image classifier on the
+Caltech-101 dataset. It uses:</p>
+<ul>
+<li>PHOW features (dense multi-scale SIFT descriptors) as low level
+features;</li>
+<li>the Elkan k-means algorotihm for fast visual word dictionary
+construction;</li>
+<li>spatial histograms as image descriptors;</li>
+<li>the homgeneous kernel map to train a Chi2 support vector
+machine (SVM) as a  linear one;</li>
+<li>PEGASOS for SVM training.</li>
+</ul>
+
+<p>The program is fully containe into
+a <a href="%pathto:apps.caltech-101.code;">single MATLAB M-file</a>.  The
+code is also bundled in VLFeat under the <code>VLROOT/apps</code>
+subdirectory.</p>
+
+</group>
