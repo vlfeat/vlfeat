@@ -237,8 +237,8 @@ pre, code {
     margin-right: 1em ;
     margin-bottom: 1em ;
     background-color: #f3f0f5 ;
-    border-bottom-style: solid ;
-    border-bottom-color: #a7a5a8 ;
+    border: 1px solid #a7a5a8 ;
+    border-bottom-width: 2px ;
 }
 #content div.box h1 {
     font-size: 1.2em ;
