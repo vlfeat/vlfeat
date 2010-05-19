@@ -15,7 +15,7 @@ function phow_caltech101
 %
 %   To run with a different number of training/testing images, change
 %   CONF.NUMTRAIN and CONF.NUMTEST. By default 15 training images are
-%   used, which shoudl result in about 65% performance (this is quite
+%   used, which should result in about 65% performance (this is quite
 %   remarkable for a single descriptor).
 
 % AUTORIGHTS
