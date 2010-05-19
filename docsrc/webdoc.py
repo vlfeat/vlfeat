@@ -946,7 +946,20 @@ class DocHandler(ContentHandler):
                     "<web:include> could not find file '%s'" % filePath)
             if self.verbosity > 0:
                 print "parsing '%s'" % qualFilePath
-            self.load(qualFilePath)
+            if attrs.has_key("type"):
+                includeType = attrs["type"]
+            else:
+                includeType = "webdoc"
+            if includeType == "webdoc":
+                self.load(qualFilePath)
+            elif includeType == "text":
+                self.characters(open(qualFilePath, 'r').read())
+            else:
+                raise DocParsingError(
+                    URL,
+                    locator.getLineNumber(),
+                    locator.getColumnNumber(),
+                    "<web:include> type '%s' is not defined" % includeType)
             return
 
         if len(self.stack) == 0:
