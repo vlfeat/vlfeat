@@ -449,6 +449,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\toolbox\misc\vl_pegasos.c"
+				>
+			</File>
+			<File
 				RelativePath=".\toolbox\quickshift\vl_quickshift.c"
 				>
 			</File>
@@ -490,6 +494,38 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\misc\vl_whistc.c"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="make"
+			>
+			<File
+				RelativePath=".\make\bin.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\dist.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\dll.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\doc.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\matlab.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\octave.mak"
+				>
+			</File>
+			<File
+				RelativePath=".\make\update-mak.sh"
 				>
 			</File>
 		</Filter>

@@ -8,6 +8,7 @@
 
 #include "generic.h"
 
+VL_EXPORT
 void vl_pegasos_train_binary_svm_d (double * model,
                                     double const * data,
                                     vl_size dimension,
@@ -19,6 +20,7 @@ void vl_pegasos_train_binary_svm_d (double * model,
                                     vl_size numIterations,
                                     VlRand* randomGenerator) ;
 
+VL_EXPORT
 void vl_pegasos_train_binary_svm_f (float * model,
                                     float const * data,
                                     vl_size dimension,
