@@ -393,9 +393,9 @@ _vl_x86cpu_info_init (VlX86CpuInfo *self)
   int max_func = 0 ;
   _vl_cpuid(info, 0) ;
   max_func = info[0] ;
-  *((vl_int32*)self->vendorString+0) = info[1] ;
-  *((vl_int32*)self->vendorString+1) = info[3] ;
-  *((vl_int32*)self->vendorString+2) = info[2] ;
+  self->vendor.words[0] = info[1] ;
+  self->vendor.words[1] = info[3] ;
+  self->vendor.words[2] = info[2] ;
 
   if (max_func >= 1) {
     _vl_cpuid(info, 1) ;
@@ -419,7 +419,7 @@ _vl_x86cpu_info_to_string_copy (VlX86CpuInfo const *self)
       if (string == NULL) break ;
     }
     length = snprintf(string, length, "%s%s%s%s%s%s%s",
-                      self->vendorString,
+                      self->vendor.string,
                       self->hasMMX   ? " MMX" : "",
                       self->hasSSE   ? " SSE" : "",
                       self->hasSSE2  ? " SSE2" : "",
