@@ -14,8 +14,9 @@ void vl_pegasos_train_binary_svm_d (double * model,
                                     vl_size numSamples,
                                     vl_int8 const * labels,
                                     double regularizer,
-                                    vl_size numIterations,
                                     double biasMultiplier,
+                                    vl_uindex startingIteration,
+                                    vl_size numIterations,
                                     VlRand* randomGenerator) ;
 
 void vl_pegasos_train_binary_svm_f (float * model,
@@ -24,8 +25,9 @@ void vl_pegasos_train_binary_svm_f (float * model,
                                     vl_size numSamples,
                                     vl_int8 const * labels,
                                     double regularizer,
-                                    vl_size numIterations,
                                     double biasMultiplier,
+                                    vl_uindex startingIteration,
+                                    vl_size numIterations,
                                     VlRand* randomGenerator) ;
 
 /* VL_PEGASOS_H */

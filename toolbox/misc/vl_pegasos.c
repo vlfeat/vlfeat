@@ -21,16 +21,18 @@ GNU GPLv2, or (at your option) any later version.
 
 /* option codes */
 enum {
-  opt_verbose, opt_bias_multiplier, opt_num_iterations, opt_model
+  opt_verbose, opt_bias_multiplier, opt_num_iterations,
+  opt_starting_iteration, opt_starting_model
 } ;
 
 /* options */
 vlmxOption  options [] = {
-  {"Verbose",          0,   opt_verbose           },
-  {"BiasMultiplier",   1,   opt_bias_multiplier   },
-  {"NumIterations",    1,   opt_num_iterations    },
-  {"InitialModel",     1,   opt_model             },
-  {0,                  0,   0                     }
+  {"Verbose",           0,   opt_verbose             },
+  {"BiasMultiplier",    1,   opt_bias_multiplier     },
+  {"NumIterations",     1,   opt_num_iterations      },
+  {"StartingIteration", 1,   opt_starting_iteration  },
+  {"StartingModel",     1,   opt_starting_model      },
+  {0,                   0,   0                       }
 } ;
 
 /** ------------------------------------------------------------------
@@ -57,6 +59,7 @@ mexFunction(int nout, mxArray *out[],
   vl_size numSamples ;
   vl_size dimension ;
   vl_size numIterations = 0 ;
+  vl_uindex startingIteration = 1 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -120,6 +123,23 @@ mexFunction(int nout, mxArray *out[],
         }
         numIterations = (vl_size) *mxGetPr(optarg) ;
         break ;
+      case opt_starting_iteration :
+        if (!vlmxIsPlainScalar(optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is not a plain scalar.") ;
+        }
+        if (*mxGetPr(optarg) < 1) {
+          vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is smaller than 1.") ;
+        }
+        startingIteration = (vl_size) *mxGetPr(optarg) ;
+        break ;
+
+      case opt_starting_model :
+        if (!vlmxIsVector(optarg, -1)) {
+          vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not a plain vector.") ;
+        }
+        OUT(MODEL) = mxDuplicateArray(optarg) ;
+        break ;
+
       case opt_verbose :
         ++ verbose ;
         break ;
@@ -134,9 +154,18 @@ mexFunction(int nout, mxArray *out[],
   numSamples = mxGetN (IN(DATA)) ;
   dimension = mxGetM (IN(DATA)) ;
 
-  OUT(MODEL) = mxCreateNumericMatrix(dimension + (biasMultiplier > 0),
-                                     1,
-                                     dataClass, mxREAL) ;
+  if (! OUT(MODEL)) {
+    OUT(MODEL) = mxCreateNumericMatrix(dimension + (biasMultiplier > 0),
+                                       1,
+                                       dataClass, mxREAL) ;
+  } else {
+    if (mxGetClassID(OUT(MODEL)) != dataClass) {
+      vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not of the same class of DATA.") ;
+    }
+    if (mxGetNumberOfElements(OUT(MODEL)) != dimension + (biasMultiplier > 0)) {
+      vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL has incompatible dimension.") ;
+    }
+  }
 
   if (verbose) {
     mexPrintf("vl_pegasos: Lambda = %d\n", lambda) ;
@@ -149,13 +178,21 @@ mexFunction(int nout, mxArray *out[],
       vl_pegasos_train_binary_svm_f((float *)mxGetData(OUT(MODEL)),
                                     (float const *)mxGetPr(IN(DATA)), dimension, numSamples,
                                     (vl_int8 const *)mxGetData(IN(LABELS)),
-                                    lambda, numIterations, biasMultiplier, NULL) ;
+                                    lambda,
+                                    biasMultiplier,
+                                    startingIteration,
+                                    numIterations,
+                                    NULL) ;
       break ;
     case VL_TYPE_DOUBLE:
       vl_pegasos_train_binary_svm_d((double *)mxGetData(OUT(MODEL)),
                                     (double const *)mxGetData(IN(DATA)), dimension, numSamples,
                                     (vl_int8 const *)mxGetData(IN(LABELS)),
-                                    lambda, numIterations, biasMultiplier, NULL) ;
+                                    lambda,
+                                    biasMultiplier,
+                                    startingIteration,
+                                    numIterations,
+                                    NULL) ;
       break ;
   }
 

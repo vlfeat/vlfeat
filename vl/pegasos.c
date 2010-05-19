@@ -12,30 +12,113 @@
 
 /** @file pegasos.h
 
-::pegasos.h provides basic impelmentation of the PEGASOS [1] SVM solver.
+@ref pegasos.h provides basic impelmentation of the PEGASOS [1] SVM solver.
 
-PEGASOS solves the binary SVM problem
+- @ref pegasos-overview Overview
+- @ref pegasos-bias Bias
+- @ref pegasos-kernels Non-linear kernels
+- @ref pegasos-algorithm Algorithm
+- @ref pegasos-references References
+
+<!-- ------------------------------------------------------------ --->
+@section pegasos-overview Overview
+<!-- ------------------------------------------------------------ --->
+
+PEGASOS solves the <em>linear</em> SVM learning problem
 
 @f[
  \min_{w} \frac{\lambda}{2} \|w\|^2 + \frac{1}{m} \sum_{i=1}^n
- \max\{0, 1 - y_i \langle w,x_i\rangle\}.
+ \ell(w; (x_i,y_i))
 @f]
 
-Here @f$ x_i @f$ are vectors in @f$ \mathbb{R}^d @f$, @f$ y_i \in \{-1,1\}
-@f$ are binary labels, and @f$ \lambda > 0 @f$ is the regularization
-parameter. This a binary SVM without bias, corresponding to the
-decision function @f$ F(x) = \operatorname{sign} \langle w, x\rangle @f$.
+where @f$ x_i @f$ are data vectors in @f$ \mathbb{R}^d @f$, @f$ y_i \in
+\{-1,1\} @f$ are binary labels,  @f$ \lambda > 0 @f$ is the
+regularization parameter, and
 
-To learn an SVM with bias, the vector @f$ x @f$ can be optionally
-extended by a constant component @f$ B @f$. In this case, @f$ w @f$ is
-@f$d + 1 @f$ dimensional and the decision function is @f$ F(x) = \operatorname{sign}
-(\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$.
+@f[
+\ell(w;(x_i,y_i) = \max\{0, 1 - y_i \langle w,x_i\rangle\}.
+@f]
+
+is the <em>hinge loss</em>. The result of the optimization is a model
+@f$ w \in \mathbb{R}^d @f$ that yields the decision function
+
+@f[ F(x) = \operatorname{sign} \langle w, x\rangle. @f]
+
+It is well known that the hinge loss is a convex upper bound of the
+01-loss of the decision function:
+
+@f[
+ \ell(w;(x,y)) \geq \frac{1}{2}(1 - y F(x)).
+@f]
 
 PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
- ::vl_pegasos_train_binary_svm_f.
+ ::vl_pegasos_train_binary_svm_f, operating respectively on @c double
+ or @c float data.
 
+<!-- ------------------------------------------------------------ --->
+@subsection pegasos-bias Bias
+<!-- ------------------------------------------------------------ --->
 
-@section pegasos-references
+PEGASOS SVM formulation does not incorporate a bias. To learn an SVM
+with bias, the vector @f$ x @f$ can be optionally extended by a
+constant component @f$ B @f$. In this case, the model @f$ w @f$ is
+@f$d + 1 @f$ dimensional and the decision function is @f$ F(x) =
+\operatorname{sign} (\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$. If
+<em>B</em> is large enough, the weight @f$ w_{d+1} @f$ remains small
+and it has small contribution in the regularization term @f$ \| w \|^2
+@f$; however, a large @f$ B @f$ makes the optimization harder.
+
+<!-- ------------------------------------------------------------ --->
+@subsection pegasos-kernels Non-linear kernels
+<!-- ------------------------------------------------------------ --->
+
+PEGASOS can be extended to work with kernels, but the algorithm is not
+particularly efficient in this setting. A preferable solution may be
+to compute an explicit feature map representing the kernel.
+
+Let @f$ k(x,y) @f$ be a kernel. A <em>feature map</em> is a function
+@f$ \Psi(x) @f$ such that @f$ k(x,y) = \langle \Psi(x), \Psi(y)
+\rangle @f$. Using this representation, that exists for any positive
+definite kernel as long as one accepts infinite dimensional feature
+maps, non-linear SVM learning writes:
+
+@f[
+ \min_{w} \frac{\lambda}{2} \|w\|^2 + \frac{1}{m} \sum_{i=1}^n
+ \ell(w; (\Psi(x)_i,y_i)).
+@f]
+
+Thus the only difference with the linear case is that @f$ \Psi(x) @f$
+is used in place of @f$ x @f$.
+
+The ability of computing a feature-map representation depends on the
+kernel. A general solution is to take the (incomplete) Cholesky
+decomposition @f$ V^\top V @f$ of the kernel matrix @f$ K =
+[k(x_i,x_j)] @f$ (in this case @f$ \Psi(x_i) @f$ is the <em>i</em>-th
+columns of <em>V</em>). Alternatively, for additive kernels
+(e.g. intersection, Chi2) @ref homkermap.h can be used.
+
+<!-- ------------------------------------------------------------ --->
+@subsection pegasos-algorithm Algorithm
+<!-- ------------------------------------------------------------ --->
+
+PEGASOS is a stochastic subgradient optmizer with automatically tuned
+learning rate. At the <em>t</em>-iteration, the algorithm:
+
+- Samples uniformly at random as subset @f$ A_t@f$ of <em>k</em> of
+  training pairs @f$(x,y)@f$ from the <em>m</em> pairs provided.
+- Compute a subgradient @f$ \nabla_t @f$ of the function @f$ E_t(w) =
+  \frac{1}{2}\|w\|^2 + \frac{1}{k} \sum_{(x,y) \in A_t} \ell(w;(x,y)) @f$.
+- Do a step @f$ w_{t+1/2} = w_t - \alpha_t \nalba_t @f$ with learning
+  rate @f$  \alpha_t = 1/(\eta t) @f$.
+- Back project on the hypersphere of radius @f$ \sqrt{\lambda} @f$ to obtain
+  the next model estimate @f$ w_{t+1} @f$:
+  @f[
+    w_t = \min\{1, \sqrt{\lambda}/\|w\|\} w_{t+1/2}
+  @f]
+
+<!-- ------------------------------------------------------------ --->
+@section pegasos-references References
+<!-- ------------------------------------------------------------ --->
 
 [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro.
     <em>Pegasos: Primal estimated sub-GrAdient SOlver for SVM.</em>
@@ -48,8 +131,9 @@ PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
  ** @param dimension data dimension.
  ** @param numSamples number of training data vectors.
  ** @param labels lables of the training vetctors.
- ** @param regularizer value of @f$ lambda @f$.
- ** @param numIterations number of PEGASOS iterations.
+ ** @param regularizer value of @f$ \lambda @f$.
+ ** @param firstIteration number of the fist iteration.
+ ** @param lastIteration number of the last iteration.
  ** @param biasMultiplier value of @f$ B @f$.
  ** @param randomGenerator random number generator.
  **
@@ -58,8 +142,20 @@ PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
  ** biasMultiplier is zero, or @a dimension + 1 if @a biasMultiplier
  ** is larger than zero.
  **
- ** If @a randomGenerator is @c NULL, the default random generator (as
- ** returned by ::vl_get_rand()) is used.
+ ** The function runs PEGASOS for iterations <em>t</em> in the
+ ** interval [@a fistIteration, @a lastIteration]. Together with the
+ ** fact that the inital model can be set arbitrarily, this enable
+ ** restaring PEGASOS from any point.
+ **
+ ** PEGASOS select the next point for computing the gradient at
+ ** random. If @a randomGenerator is @c NULL, the default random
+ ** generator (as returned by ::vl_get_rand()) is used.
+ **
+ ** See the @ref pegasos-overview overview for details.
+ **/
+
+/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,vl_size,double,VlRand*)
+ ** @see ::vl_pegasos_train_binary_svm_d
  **/
 
 #ifndef VL_PEGASOS_INSTANTIATING
@@ -88,62 +184,75 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
                                           vl_size numSamples,
                                           vl_int8 const * labels,
                                           double regularizer,
-                                          vl_size numIterations,
                                           double biasMultiplier,
+                                          vl_uindex startingIteration,
+                                          vl_size numIterations,
                                           VlRand * randomGenerator)
 {
   vl_uindex iteration ;
   vl_uindex i ;
   T const * x ;
-  T acc, eta, y, scale ;
+  T acc, eta, y, scale = 1 ;
   double lambda = regularizer ;
   double sqrtLambda = sqrt(lambda) ;
+
+
+#if (FLT == VL_TYPE_FLOAT)
+  VlFloatVectorComparisonFunction dotFn =
+#else
+  VlDoubleVectorComparisonFunction dotFn =
+#endif
+  VL_XCAT(vl_get_vector_comparison_function_,SFX)(VlKernelL2) ;
+
   if (randomGenerator == NULL) randomGenerator = vl_get_rand() ;
 
-  for (iteration = 0 ; iteration < numIterations ; ++ iteration) {
+  assert(startingIteration >= 1) ;
+
+  /*
+     The model is stored as scale*model[]. When a sample does not violate
+     the margin, only scale needs to be updated.
+   */
+
+  for (iteration = startingIteration ;
+       iteration < startingIteration + numIterations ;
+       ++ iteration) {
     /* pick a sample  */
     vl_uindex k = vl_rand_uindex(randomGenerator, numSamples) ;
-    y = labels[k] ;
     x = data + dimension * k ;
+    y = labels[k] ;
 
     /* project on the weight vector */
-    acc = 0 ;
-    for (i = 0 ; i < dimension ; ++i) {
-      acc += x[i] * model[i] ;
-    }
-    acc += biasMultiplier * model[dimension] ;
+    acc = dotFn(dimension, x, model) ;
+    if (biasMultiplier) acc += biasMultiplier * model[dimension] ;
+    acc *= scale ;
 
-    eta = 1.0 / ((iteration + 1) * lambda) ;
+    /* learning rate */
+    eta = 1.0 / (iteration * lambda) ;
 
-    /* compare to true label */
-    if (y * acc < 1.0) {
+    if (y * acc < (T) 1.0) {
+      /* margin violated */
+      T a = scale * (1 - eta * lambda)  ;
+      T b = y * eta ;
+
       acc = 0 ;
       for (i = 0 ; i < dimension ; ++i) {
-        model[i] = model[i] - eta * (lambda * model[i] - y * x[i]) ;
+        model[i] = a * model[i] + b * x[i] ;
         acc += model[i] * model[i] ;
       }
       if (biasMultiplier) {
-        model[dimension] = model[dimension] - eta * (lambda * model[dimension] - y * biasMultiplier) ;
+        model[dimension] = a * model[dimension] + b * biasMultiplier ;
         acc += model[dimension] * model[dimension] ;
       }
+      scale = VL_MIN((T)1.0 / (sqrtLambda * sqrt(acc + VL_EPSILON_D)), (T)1.0) ;
     } else {
-      for (i = 0 ; i < dimension ; ++i) {
-        model[i] = model[i] - eta * lambda * model[i] ;
-        acc += model[i] * model[i] ;
-      }
-      if (biasMultiplier) {
-        model[dimension] = model[dimension] - eta * lambda * model[dimension]  ;
-        acc += model[dimension] * model[dimension] ;
-      }
+      /* margin not violated */
+      scale *= 1 - eta * lambda ;
     }
+  }
 
-    scale = (T) 1.0 / (sqrtLambda * sqrt(acc + VL_EPSILON_D)) ;
-    if (scale < 1) {
-      for (i = 0 ; i < dimension ; ++i) model[i] *= scale ;
-      if (biasMultiplier) {
-        model[dimension] *= scale ;
-      }
-    }
+  /* denormalize representation */
+  for (i = 0 ; i < dimension + (biasMultiplier ? 1 : 0) ; ++i) {
+    model[i] *= scale ;
   }
 }
 
