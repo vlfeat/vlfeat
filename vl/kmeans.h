@@ -260,6 +260,7 @@ vl_kmeans_get_num_repetitions (VlKMeans const * self)
 
 /** @brief Set maximum number of repetitions
  ** @param self KMeans object instance.
+ ** @param numRepetitions maximum number of repetitions.
  ** The number of repetitions cannot be smaller than 1.
  **/
 
