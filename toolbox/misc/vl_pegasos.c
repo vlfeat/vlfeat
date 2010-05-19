@@ -168,7 +168,7 @@ mexFunction(int nout, mxArray *out[],
   }
 
   if (verbose) {
-    mexPrintf("vl_pegasos: Lambda = %d\n", lambda) ;
+    mexPrintf("vl_pegasos: Lambda = %g\n", lambda) ;
     mexPrintf("vl_pegasos: BiasMultiplier = %g\n", biasMultiplier) ;
     mexPrintf("vl_pegasos: NumIterations = %d\n", numIterations) ;
   }
