@@ -52,6 +52,8 @@ mexFunction(int nout, mxArray *out[],
   int next = IN_END ;
   mxArray const *optarg ;
 
+  VL_USE_MATLAB_ENV ;
+
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
@@ -105,21 +107,15 @@ mexFunction(int nout, mxArray *out[],
   }
 
   /* -----------------------------------------------------------------
-   *                                                Pre-compute tables
+   *                                               Evaluate kernel map
    * -------------------------------------------------------------- */
-/*
-   The feature map representation of a real number @$f x @$f is given by
-   @f[
 
-
-   @f]
-
-*/
   {
-    int j, numElements = mxGetNumberOfElements(IN(X)) ;
+    vl_uindex j ;
+    vl_size numElements = mxGetNumberOfElements(IN(X)) ;
     VlHomogeneousKernelMap * map = vl_homogeneouskernelmap_new (kernelType, n, L) ;
     mwSize extDimensions [20] ;
-    for (j = 0 ; (unsigned)j < numDimensions ; ++j) extDimensions[j] = dimensions[j] ;
+    for (j = 0 ; j < numDimensions ; ++j) extDimensions[j] = dimensions[j] ;
     extDimensions[0] *= 2*n+1 ;
     OUT(V) = mxCreateNumericArray(numDimensions, extDimensions, dataClassId, mxREAL) ;
     switch (dataClassId) {
@@ -144,7 +140,7 @@ mexFunction(int nout, mxArray *out[],
         break ;
       }
       default:
-        assert(VL_FALSE) ;
+        abort() ;
     }
     vl_homogeneouskernelmap_delete (map) ;
   }
