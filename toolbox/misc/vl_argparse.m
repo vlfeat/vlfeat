@@ -8,12 +8,13 @@ function [conf, args] = vl_argparse(conf, args)
 %   [CONF, ARGS] = VL_ARGPARSE(...) copies any unkown parameters to
 %   ARGS instead of producing an error.
 %
-%   Exampe:: The function can be used to quickly parse a variable list
-%     of arguments passed to a MATLAB functions:
+%   Example::
+%     The function can be used to quickly parse a variable list of
+%     arguments passed to a MATLAB functions:
 %
-%      conf = vl_argparse(conf, varargin)
+%       conf = vl_argparse(conf, varargin)
 %
-%   See also: VL_HELP().
+%   See also: VL_OVERRIDE(), VL_HELP().
 
 % Author: Andrea Vedaldi
 
