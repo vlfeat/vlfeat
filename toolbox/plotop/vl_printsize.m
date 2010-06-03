@@ -1,19 +1,30 @@
 function vl_printsize(varargin)
 % VL_PRINTSIZE  Set the print size of a figure
-%   VL_PRINTSIZE(R) sets the PaperPosition property of a figure so
-%   that the width is the fraction R of the current paper page width.
+%   VL_PRINTSIZE(R) sets the PaperPosition property of the current
+%   figure so that the width of the figure is the fraction R of a
+%   'uslsetter' page. It also sets the PaperSize property to tightly
+%   match the figure size. In this way, printing to any format crops
+%   the figure as printing to EPS would do.
 %
 %   VL_PRINTSIZE(FIG,R) opearates on the specified figure FIG.
 %
-%   This command is useful to resize figures before printing them so
-%   that elements are scaled to match the final figure size in
-%   print. The function accepts the following optional arguments:
+%   This command is useful to resize a figure before printing it so
+%   that elements are scaled appropriately to match the desired figure
+%   size in print. The function accepts the following optional
+%   arguments:
 %
-%   Aspect:: Set the figure aspect ratio (widht/height) to this value.
+%   Aspect:: none
+%     Change the figure aspect ratio (widht/height) to the specified
+%     value.
 %
-%   Reference:: If 'horizontal' the ratio R is the widht of the figure
+%   Reference:: vertical
+%     If set to 'horizontal' the ratio R is the widht of the figure
 %     over the width of the page. If 'vertical', the ratio R is the
 %     height of the figure over the height of the page.
+%
+%   PaperType:: letter
+%     Set the type (size) of the reference paperReference. Any of the
+%     paper types supported by MATLAB can be used (see PRINT())).
 %
 %   See also:: VL_HELP().
 
@@ -36,6 +47,7 @@ varargin(1) = [] ;
 
 aspectRatio = NaN ;
 reference = 'horizontal' ;
+paperType = 'usletter' ;
 
 for ai=1:2:length(varargin)
   opt = lower(varargin{ai}) ;
@@ -52,12 +64,19 @@ for ai=1:2:length(varargin)
         otherwise
           error('Invalid value ''%s'' for option ''%s''.', arg, opt) ;
       end
+    case 'papertype'
+      paperType = opt ;
     otherwise
       error('Unknown option ''%s''.', opt) ;
   end
 end
 
+
+% set the paper size to the reference type
+set(fig, 'PaperType', paperType) ;
 paperSize = get(fig, 'PaperSize') ;
+
+% get the current figure position to compute the current aspect ratio
 position = get(fig, 'PaperPosition') ;
 
 % if not specified, compute current aspect ratio
@@ -77,4 +96,6 @@ switch reference
 end
 position(3:4) = position(3) * s * [1 1/aspectRatio] ;
 
-set(fig, 'PaperPosition', position) ;
+set(fig, 'PaperPosition', position, ...
+         'PaperSize', position(3:4)) ;
+end
