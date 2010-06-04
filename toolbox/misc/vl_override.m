@@ -1,29 +1,38 @@
 function config = vl_override(config,update,varargin)
 % VL_OVERRIDE  Override structure subset
-%   CONFIG = VL_OVERRIDE(CONFIG, UPDATE) copies recursively the fileds of
-%   the structure UPDATE to the corresponding fields of the struture
-%   CONFIG.
+%   CONFIG = VL_OVERRIDE(CONFIG, UPDATE) copies recursively the fileds
+%   of the structure UPDATE to the corresponding fields of the
+%   struture CONFIG.
 %
-%   While CONFIG and UPDATE can arbitrary structures, usually CONFIG
-%   is a list of defaul parameters and UPDATE is a list of parameter
-%   updates.
+%   Usually CONFIG is interpreted as a list of paramters with their
+%   default values and UPDATE as a list of new paramete values.
 %
-%   VL_OVERRIDE(..., 'warn') prints a warning message whenever copying
-%   UPDATE adds new fileds to CONFIG, or overrides a non-empty
-%   substucture.
+%   VL_OVERRIDE(..., 'Warn') prints a warning message whenever: (i)
+%   UPDATE has a field not found in CONFIG, or (ii) non-leaf values of
+%   CONFIG are overwritten.
 %
-%   VL_OVERRIDE(..., 'skip') does not add any new parameters but only
-%   updates existing ones.
+%   VL_OVERRIDE(..., 'Skip') skips fields of UPDATE that are not found
+%   in CONFIG instead of copying them.
 %
-%   VL_OVERRIDE(..., 'casei') matches field names up to their case.
+%   VL_OVERRIDE(..., 'CaseI') matches field names in a
+%   case-insensitive manner.
 %
-%   Remark:: Each field path of UPDATE is matched as deeply as
-%    possible to a path of CONFIG.  Two fields A(IA).(FA) and B(IA).FB
-%    match if, and only if, (i) the struct arrays A and B have the
-%    same dimensions, (ii) the indeces IA and IB are equal, and the
-%    field names FA and FB are equal.
+%   Remark::
+%     Fields are copied at the deepest possible level. For instance,
+%     if CONFIG has fields A.B.C1=1 and A.B.C2=2, and if UPDATE is the
+%     structure A.B.C1=3, then VL_OVERRIDE() returns a strucuture with
+%     fields A.B.C1=3, A.B.C2=2. By contrast, if UPDATE is the
+%     structure A.B=4, then the field A.B is copied, and VL_OVERRIDE()
+%     returns the structure A.B=4 (specifying 'Warn' would warn about
+%     the fact that the substructure B.C1, B.C2 is being deleted).
 %
-%   See also:: VL_HELP().
+%   Remark::
+%     Two fields are matched if they correspond exactly. Specifically,
+%     two fileds A(IA).(FA) and B(IA).FB of two struct arrays A and B
+%     match if, and only if, (i) A and B have the same dimensions,
+%     (ii) IA == IB, and (iii) FA == FB.
+%
+%   See also: VL_ARGPARSE(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
