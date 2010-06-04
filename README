@@ -49,19 +49,19 @@ COMPILING
 
   For Windows 64 use
 
-  > make /f Makefile.mak ARCH=w64
+  > nmake /f Makefile.mak ARCH=w64
 
   If you do not have Visual C++ 2008, or you have an older version of
-  Matlab and wish to compile the mex files _only_, then you may start
+  MATLAB and wish to compile the mex files _only_, then you may start
   from our binary distribution. Enter the toolbox directory:
 
   > cd toolbox
 
-  And run our mex compilation script from the Matlab command line:
+  And run our mex compilation script from the MATLAB command line:
 
   > vl_compile
 
-  This has been tested with Matlab R14 and lcc, but other
+  This has been tested with MATLAB R14 and lcc, but other
   configurations should only require minor tweaking.
 
 CREATING THE DOCUMENTATION
@@ -110,7 +110,10 @@ APPENDIX
   intrisic. GCC and Visual C both satisfy all the requirements.
 
 CHANGES
-  0.9.8      Added image distance transform. Improved documentation.
+
+  0.9.8      Added: image distance transform, PEGASOS, floating point
+             (H)K-means, homogeneous kernel maps, a Caltech-101
+             classification example. Improved documentation.
   0.9.7      Changed the Mac OS X binary distribution to require
              a less recent version of Mac OS X (10.5).
   0.9.6      Changed the GNU/Linux binary distribution to require
@@ -123,7 +126,7 @@ CHANGES
              Added 64 bit Windows binaries. Many other small changes.
   0.9.3      Namespace change (everything begins with a vl_ prefix
              now). Many other changes to provide compilation support
-             on Windows with Matlab 7.
+             on Windows with MATLAB 7.
   beta-3     Completions to the ikmeans code.
   beta-2     Many completions.
   beta-1     Initial public release.
