@@ -234,10 +234,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("kmeans: Initialization = %s\n", initializationName) ;
     mexPrintf("kmeans: Algorithm = %s\n", algorithmName) ;
     mexPrintf("kmeans: MaxNumIterations = %d\n", vl_kmeans_get_max_num_iterations(kmeans)) ;
-    mexPrintf("kmeans: NumRepetitions= %d\n", vl_kmeans_get_num_repetitions(kmeans)) ;
+    mexPrintf("kmeans: NumRepetitions = %d\n", vl_kmeans_get_num_repetitions(kmeans)) ;
     mexPrintf("kmeans: data type = %s\n", vl_get_type_name(vl_kmeans_get_data_type(kmeans))) ;
     mexPrintf("kmeans: distance = %s\n", vl_get_vector_comparison_type_name(vl_kmeans_get_distance(kmeans))) ;
-    mexPrintf("kmeans: data dimension = %d\n", vl_kmeans_get_dimension(kmeans)) ;
+    mexPrintf("kmeans: data dimension = %d\n", dimension) ;
     mexPrintf("kmeans: num. data points = %d\n", numData) ;
     mexPrintf("kmeans: num. centers = %d\n", numCenters) ;
     mexPrintf("\n") ;
