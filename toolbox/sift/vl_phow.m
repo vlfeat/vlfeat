@@ -11,7 +11,7 @@ function [frames, descrs] = vl_phow(im, varargin)
 %   Verbose:: false
 %     Set to true to turn on verbose output.
 %
-%   Sizes:: [5 7 9 12]
+%   Sizes:: [5 7 9 11]
 %     Scales at which the dense SIFT features are extracted. Each
 %     value is used as bin size for the VL_DSIFT() function.
 %
@@ -46,7 +46,7 @@ function [frames, descrs] = vl_phow(im, varargin)
 
   opts.verbose = false ;
   opts.fast = true ;
-  opts.sizes = [5 7 9 12] ;
+  opts.sizes = [5 7 9 11] ;
   opts.step = 2 ;
   opts.color = false ;
   opts = vl_argparse(opts,varargin) ;
@@ -85,9 +85,12 @@ function [frames, descrs] = vl_phow(im, varargin)
     % scales so that they have the same geometric centers. For the
     % maximum size we pick XMIN = 1 and we get centers starting from
     % XC = 1 + 3/2 MAX(OPTS.SIZES). For any other scale we pick XMIN so
-    % that XMIN + 3/2 SIZE = 1 + 3/2 MAX(OPTS.SIZES)
+    % that XMIN + 3/2 SIZE = 1 + 3/2 MAX(OPTS.SIZES).
+    %
+    % In pracrice, the offset must be integer ('bounds'), so the
+    % alignment works properly only if all OPTS.SZES are even or odd.
 
-    off = 1 + 3/2 * (max(opts.sizes) - opts.sizes(si)) ;
+    off = floor(1 + 3/2 * (max(opts.sizes) - opts.sizes(si))) ;
 
     % scale space
     sigma = opts.sizes(si) / 6 ;
