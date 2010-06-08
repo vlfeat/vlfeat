@@ -26,13 +26,20 @@ function [frames, descrs] = vl_phow(im, varargin)
 %   Color:: false
 %     Set to true to compute PHOW-color rather than PHOW-gray.
 %
-%   LowContrastThreshold:: 0.002
+%   ContrastThreshold:: 0.005
 %     Contrast threshold below which SIFT features are mapped to
 %     zero. The input image is scaled to have intensity range in [0,1]
 %     (rather than [0,255]) and this value is compared to the
 %     descriptor norm as returned by VL_DSIFT().
 %
-%   See also VL_HELP(), VL_DSIFT().
+%   WindowSize:: 1.5
+%     Size of the Gaussian window in units of spatial bins.
+%
+%   Magnif:: 6
+%     The image is smoothed by a Gaussian kernel of standard deviation
+%     SIZE / MAGNIF.
+%
+%   See also: VL_HELP(), VL_DSIFT().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -46,12 +53,15 @@ function [frames, descrs] = vl_phow(im, varargin)
 
   opts.verbose = false ;
   opts.fast = true ;
-  opts.sizes = [5 7 9 11] ;
+  opts.sizes = [4 6 8 10] ;
   opts.step = 2 ;
   opts.color = false ;
+  opts.magnif = 6 ;
+  opts.windowsize = 1.5 ;
+  opts.contrastthreshold = 0.005 ;
   opts = vl_argparse(opts,varargin) ;
 
-  dsiftOpts = {'norm', 'windowsize', 1} ;
+  dsiftOpts = {'norm', 'windowsize', opts.windowsize} ;
   if opts.verbose, dsiftOpts{end+1} = 'verbose' ; end
   if opts.fast, dsiftOpts{end+1} = 'fast' ; end
   dsiftOpts(end+(1:2)) = {'step', opts.step} ;
@@ -93,7 +103,7 @@ function [frames, descrs] = vl_phow(im, varargin)
     off = floor(1 + 3/2 * (max(opts.sizes) - opts.sizes(si))) ;
 
     % scale space
-    sigma = opts.sizes(si) / 6 ;
+    sigma = opts.sizes(si) / opts.magnif ;
     ims = vl_imsmooth(im, sigma) ;
 
     for k = 1:numChannels
@@ -107,11 +117,11 @@ function [frames, descrs] = vl_phow(im, varargin)
     % remove low contrast descriptors
     % note that for color descriptors the V component is thresholded
     for k = 1:numChannels
-      descrs{k,si}(:, frames{si}(3,:) < 0.002) = 0 ;
+      descrs{k,si}(:, frames{si}(3,:) < opts.contrastthreshold) = 0 ;
     end
 
     % save only x,y, and the scale
-    frames{si} = [frames{si}(1:2, :) ; opts.sizes(si) * ones(1,size(frames{si},2))] ;
+    frames{si} = [frames{si}(1:3, :) ; opts.sizes(si) * ones(1,size(frames{si},2))] ;
   end
   descrs = cell2mat(descrs) ;
   frames = cell2mat(frames) ;
