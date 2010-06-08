@@ -26,12 +26,12 @@ conf.autoDownloadData = true ;
 conf.numTrain = 15 ;
 conf.numTest = 15 ;
 conf.numClasses = 102 ;
-conf.numWords = 800 ;
+conf.numWords = 400 ;
 conf.numSpatialX = 4 ;
 conf.numSpatialY = 4 ;
 conf.svm.C = 10 ;
 conf.svm.solver = 'pegasos' ;
-conf.phowOpts = {} ;
+conf.phowOpts = {'Step', 5} ;
 conf.clobber = false ;
 conf.tinyProblem = false ;
 conf.prefix = 'baseline' ;
@@ -43,13 +43,13 @@ if conf.tinyProblem
   conf.numSpatialX = 2 ;
   conf.numSpatialY = 2 ;
   conf.numWords = 300 ;
-  conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 3, 'Color', true} ;
+  conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 3} ;
 end
 
 conf.vocabPath = fullfile(conf.dataDir, [conf.prefix '-vocab.mat']) ;
 conf.histPath = fullfile(conf.dataDir, [conf.prefix '-hists.mat']) ;
 conf.modelPath = fullfile(conf.dataDir, [conf.prefix '-model.mat']) ;
-conf.resultPath = fullfile(conf.dataDir, [conf.prefix '-result.mat']) ;
+conf.resultPath = fullfile(conf.dataDir, [conf.prefix '-result']) ;
 
 randn('state',conf.randSeed) ;
 rand('state',conf.randSeed) ;
@@ -70,7 +70,7 @@ if ~exist(conf.calDir, 'dir') || ...
   vl_xmkdir(conf.calDir) ;
   calUrl = ['http://www.vision.caltech.edu/Image_Datasets/' ...
     'Caltech101/101_ObjectCategories.tar.gz'] ;
-  fprintf('Downloading Caltech-101 data to ''%s''. This will take a while.', conf.calDir) ;   
+  fprintf('Downloading Caltech-101 data to ''%s''. This will take a while.', conf.calDir) ;
   untar(calUrl, conf.calDir) ;
 end
 
