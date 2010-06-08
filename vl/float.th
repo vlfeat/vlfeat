@@ -44,7 +44,7 @@ General Public License version 2.
 #  define VTYPE  __m128d
 #endif
 
-#define VALIGNED(x) (! (((vl_uintptr)x) & 0xF))
+#define VALIGNED(x) (! (((vl_uintptr)(x)) & 0xF))
 
 #define VMAX  VL_XCAT(_mm_max_p,     VSFX)
 #define VMUL  VL_XCAT(_mm_mul_p,     VSFX)
