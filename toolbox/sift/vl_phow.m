@@ -11,7 +11,7 @@ function [frames, descrs] = vl_phow(im, varargin)
 %   Verbose:: false
 %     Set to true to turn on verbose output.
 %
-%   Sizes:: [5 7 9 11]
+%   Sizes:: [4 6 8 10]
 %     Scales at which the dense SIFT features are extracted. Each
 %     value is used as bin size for the VL_DSIFT() function.
 %
