@@ -31,6 +31,7 @@ conf.numSpatialX = 4 ;
 conf.numSpatialY = 4 ;
 conf.svm.C = 10 ;
 conf.svm.solver = 'pegasos' ;
+conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 5} ;
 conf.clobber = false ;
 conf.tinyProblem = false ;
@@ -83,7 +84,7 @@ end
 % --------------------------------------------------------------------
 classes = dir(conf.calDir) ;
 classes = classes([classes.isdir]) ;
-classes = {classes(3:conf.numClasses+2-1).name} ;
+classes = {classes(3:conf.numClasses+2).name} ;
 
 images = {} ;
 imageClass = {} ;
@@ -98,6 +99,15 @@ selTrain = find(mod(0:length(images)-1, conf.numTrain+conf.numTest) < conf.numTr
 selTest = setdiff(1:length(images), selTrain) ;
 imageClass = cat(2, imageClass{:}) ;
 
+model.classes = classes ;
+model.phowOpts = conf.phowOpts ;
+model.numSpatialX = conf.numSpatialX ;
+model.numSpatialY = conf.numSpatialY ;
+model.vocab = [] ;
+model.w = [] ;
+model.b = [] ;
+model.classify = @classify ;
+
 % --------------------------------------------------------------------
 %                                                     Train vocabulary
 % --------------------------------------------------------------------
@@ -107,22 +117,24 @@ if ~exist(conf.vocabPath) || conf.clobber
   % Get some PHOW descriptos to train the dictionary
   selTrainFeats = vl_colsubset(selTrain, 30) ;
   descrs = {} ;
-  for ii = 1:length(selTrainFeats)
+  %for ii = 1:length(selTrainFeats)
+  parfor ii = 1:length(selTrainFeats)
     im = imread(fullfile(conf.calDir, images{ii})) ;
-    im = imageStandarize(im) ;
-    [drop, descrs{ii}] = vl_phow(im, conf.phowOpts{:}) ;
+    im = standarizeImage(im) ;
+    [drop, descrs{ii}] = vl_phow(im, model.phowOpts{:}) ;
   end
 
   descrs = vl_colsubset(cat(2, descrs{:}), 10e4) ;
   descrs = single(descrs) ;
 
   % Quantize the descriptors to get the visual words
-  words = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
-  save(conf.vocabPath, 'words') ;
+  vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
+  save(conf.vocabPath, 'vocab') ;
 else
   load(conf.vocabPath) ;
 end
 
+model.vocab = vocab ;
 
 % --------------------------------------------------------------------
 %                                           Compute spatial histograms
@@ -130,30 +142,11 @@ end
 
 if ~exist(conf.histPath) || conf.clobber
   hists = {} ;
-  % par
-  for ii = 1:length(images)
+  parfor ii = 1:length(images)
+  % for ii = 1:length(images)
     fprintf('Processing %s (%.2f %%)\n', images{ii}, 100 * ii / length(images)) ;
     im = imread(fullfile(conf.calDir, images{ii})) ;
-    im = imageStandarize(im) ;
-    [frames, descrs] = vl_phow(im, conf.phowOpts{:}) ;
-
-    % quantize appearance
-    [drop, binsa] = min(vl_alldist(words, single(descrs)), [], 1) ;
-
-    % quantize location
-    width = size(im, 2) ;
-    height = size(im, 1) ;
-    binsx = vl_binsearch(linspace(1,width,conf.numSpatialX+1), frames(1,:)) ;
-    binsy = vl_binsearch(linspace(1,height,conf.numSpatialY+1), frames(2,:)) ;
-
-    % combined quantization
-    bins = sub2ind([conf.numSpatialY, conf.numSpatialX, conf.numWords], ...
-                   binsy,binsx,binsa) ;
-    hist = zeros(conf.numSpatialY * conf.numSpatialX * conf.numWords, 1) ;
-    hist = vl_binsum(hist, ones(size(bins)), bins) ;
-    hist = single(hist / sum(hist)) ;
-
-    hists{ii} = hist ;
+    hists{ii} = getImageDescriptor(model, im);
   end
 
   hists = cat(2, hists{:}) ;
@@ -172,30 +165,34 @@ psix = vl_homkermap(hists, 1, .7, 'kchi2') ;
 %                                                            Train SVM
 % --------------------------------------------------------------------
 
-biasMultiplier = 1 ;
-
 if ~exist(conf.modelPath) || conf.clobber
   switch conf.svm.solver
     case 'pegasos'
       lambda = 1 / (conf.svm.C *  length(selTrain)) ;
-      models = [] ;
-      for ci = 1:length(classes)
+      w = [] ;
+      % for ci = 1:length(classes)
+      parfor ci = 1:length(classes)
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        models(:,ci) = vl_pegasos(psix(:,selTrain(perm)), ...
-                                  int8(y(perm)), lambda, ...
-                                  'NumIterations', 20/lambda, ...
-                                  'BiasMultiplier', biasMultiplier) ;
+        w(:,ci) = vl_pegasos(psix(:,selTrain(perm)), ...
+                             int8(y(perm)), lambda, ...
+                             'NumIterations', 20/lambda, ...
+                             'BiasMultiplier', conf.svm.biasMultiplier) ;
       end
     case 'liblinear'
-      model = train(imageClass(selTrain)', ...
-                    sparse(double(psix(:,selTrain))),  ...
-                    sprintf(' -s 3 -B 1 -c %f', conf.svm.C), ...
-                    'col') ;
-      models = model.w' ;
+      svm = train(imageClass(selTrain)', ...
+                  sparse(double(psix(:,selTrain))),  ...
+                  sprintf(' -s 3 -B %f -c %f', ...
+                          conf.svm.biasMultiplier, conf.svm.C), ...
+                  'col') ;
+      w = svm.w' ;
   end
-  save(conf.modelPath, 'models') ;
+
+  model.b = conf.svm.biasMultiplier * w(end, :) ;
+  model.w = w(1:end-1, :) ;
+
+  save(conf.modelPath, 'model') ;
 else
   load(conf.modelPath) ;
 end
@@ -205,10 +202,7 @@ end
 % --------------------------------------------------------------------
 
 % Estimate the class of the test images
-scores = [] ;
-for ci = 1:length(classes)
-  scores(ci, :) = models(1:end-1,ci)' * psix + models(end,ci) * biasMultiplier ;
-end
+scores = model.w' * psix + model.b' * ones(1,size(psix,2)) ;
 [drop, imageEstClass] = max(scores, [], 1) ;
 
 % Compute the confusion matrix
@@ -231,8 +225,46 @@ save([conf.resultPath '.mat'], 'confus', 'conf') ;
 
 
 % -------------------------------------------------------------------------
-function im = imageStandarize(im)
+function im = standarizeImage(im)
 % -------------------------------------------------------------------------
 
 im = im2single(im) ;
 if size(im,1) > 480, im = imresize(im, [480 NaN]) ; end
+
+% -------------------------------------------------------------------------
+function hist = getImageDescriptor(model, im)
+% -------------------------------------------------------------------------
+
+im = standarizeImage(im) ;
+width = size(im,2) ;
+height = size(im,1) ;
+numWords = size(model.vocab, 2) ;
+
+% get PHOW features
+[frames, descrs] = vl_phow(im, model.phowOpts{:}) ;
+
+% quantize appearance
+[drop, binsa] = min(vl_alldist(model.vocab, single(descrs)), [], 1) ;
+
+% quantize location
+width = size(im, 2) ;
+height = size(im, 1) ;
+binsx = vl_binsearch(linspace(1,width,model.numSpatialX+1), frames(1,:)) ;
+binsy = vl_binsearch(linspace(1,height,model.numSpatialY+1), frames(2,:)) ;
+
+% combined quantization
+bins = sub2ind([model.numSpatialY, model.numSpatialX, numWords], ...
+               binsy,binsx,binsa) ;
+hist = zeros(model.numSpatialY * model.numSpatialX * numWords, 1) ;
+hist = vl_binsum(hist, ones(size(bins)), bins) ;
+hist = single(hist / sum(hist)) ;
+
+% -------------------------------------------------------------------------
+function [className, score] = classify(model, im)
+% -------------------------------------------------------------------------
+
+hist = getImageDescriptor(model, im) ;
+psix = vl_homkermap(hist, 1, .7, 'kchi2') ;
+scores = model.w' * psix + model.b' ;
+[score, best] = max(scores) ;
+className = model.classes{best} ;
