@@ -26,9 +26,10 @@ conf.autoDownloadData = true ;
 conf.numTrain = 15 ;
 conf.numTest = 15 ;
 conf.numClasses = 102 ;
-conf.numWords = 400 ;
+conf.numWords = 600 ;
 conf.numSpatialX = 4 ;
 conf.numSpatialY = 4 ;
+conf.quantizer = 'kdtree' ;
 conf.svm.C = 10 ;
 conf.svm.solver = 'pegasos' ;
 conf.svm.biasMultiplier = 1 ;
@@ -103,6 +104,7 @@ model.classes = classes ;
 model.phowOpts = conf.phowOpts ;
 model.numSpatialX = conf.numSpatialX ;
 model.numSpatialY = conf.numSpatialY ;
+model.quantizer = conf.quantizer ;
 model.vocab = [] ;
 model.w = [] ;
 model.b = [] ;
@@ -135,6 +137,10 @@ else
 end
 
 model.vocab = vocab ;
+
+if strcmp(model.quantizer, 'kdtree')
+  model.kdtree = vl_kdtreebuild(vocab) ;
+end
 
 % --------------------------------------------------------------------
 %                                           Compute spatial histograms
@@ -223,7 +229,6 @@ title(sprintf('Confusion matrix (%.2f %% accuracy)', ...
 print('-depsc2', [conf.resultPath '.ps']) ;
 save([conf.resultPath '.mat'], 'confus', 'conf') ;
 
-
 % -------------------------------------------------------------------------
 function im = standarizeImage(im)
 % -------------------------------------------------------------------------
@@ -244,8 +249,15 @@ numWords = size(model.vocab, 2) ;
 [frames, descrs] = vl_phow(im, model.phowOpts{:}) ;
 
 % quantize appearance
-[drop, binsa] = min(vl_alldist(model.vocab, single(descrs)), [], 1) ;
-
+switch model.quantizer
+  case 'vq'
+    [drop, binsa] = min(vl_alldist(model.vocab, single(descrs)), [], 1) ;
+  case 'kdtree'
+    binsa = double(vl_kdtreequery(model.kdtree, model.vocab, ...
+                                  single(descrs), ...
+                                  'MaxComparisons', 15)) ;
+end
+    
 % quantize location
 width = size(im, 2) ;
 height = size(im, 1) ;
