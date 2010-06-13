@@ -1,23 +1,47 @@
 function phow_caltech101
 % PHOW_CALTECH101 Image classification in the Caltech-101 dataset
-%   A quick test should run out of the box by running PHOW_CALTECH101
-%   from MATLAB (provied that VLFeat is correctly installed).
+%   This program demonstrates how to use VLFeat to construct an image
+%   classifier on the Caltech-101 data. The classifiers uses PHOW
+%   features (dense SIFT), spatial histograms of visual words, and a
+%   Chi2 SVM. To speedup computation it uses VLFeat fast dense SIFT,
+%   kd-trees, and homogeneous kernel map. It also demonstrates VLFeat
+%   PEGASOS SVM solver, although for this small dataset other solvers
+%   as LIBLINEAR can be more efficient.
 %
-%   The program automatically downloads the Caltech-101 data from the
-%   interned and decompresses it in CONF.CALDIR, which defaults to
-%   'data/caltech-101'. Change this path to the desidred location, for
-%   instance to point to an existing copy of the data.
+%   By default 15 training images are used, which should result in
+%   about 64% performance (a good performance considering that only
+%   the PHOW features are used).
 %
-%   Intermediate files are stored in the directory CONF.DATADIR.
+%   Call PHOW_CALTECH101 to train and test a classifier on a small
+%   subset of the Caltech-101 data. Note that the program downloads a
+%   copy of the Caltech-101 data from the Internet.
 %
-%   To run on the entiere dataset, change CONF.TINYPROBLEM to
-%   FALSE.
+%   Edit the PHOW_CALTECH101 M-file to change the program
+%   configuration.
 %
-%   To run with a different number of training/testing images, change
-%   CONF.NUMTRAIN and CONF.NUMTEST. By default 15 training images are
-%   used, which should result in about 65% performance (this is quite
-%   remarkable for a single descriptor).
-
+%   To run on the entire dataset change CONF.TINYPROBLEM to FALSE.
+%
+%   The Caltech-101 data is saved into CONF.CALDIR, which defaults to
+%   'data/caltech-101'. Change this path to the desired location, for
+%   instance to point to an existing copy of the Caltech-101 data.
+%
+%   The program can also be used to train a model on custom data by
+%   pointing CONF.CALDIR to it. Just create a subdirectory for each
+%   class and put the training images there. Make sure to adjust
+%   CONF.NUMTRAIN accordingly.
+%
+%   Intermediate files are stored in the directory CONF.DATADIR. All
+%   such files begin with the prefix CONF.PREFIX, which can be changed
+%   to test different parameter settings without overriding previous
+%   results.
+%
+%   The program saves the trained model in
+%   <CONF.DATADIR>/<CONF.PREFIX>-model.mat. This model can be used to
+%   test novel images:
+%
+%     load('data/baseline-model.mat') ; # change to the model path
+%     label = model.classify(model, im) ;
+%
 % AUTORIGHTS
 
 conf.calDir = 'data/caltech-101' ;
@@ -35,7 +59,7 @@ conf.svm.solver = 'pegasos' ;
 conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 5} ;
 conf.clobber = false ;
-conf.tinyProblem = false ;
+conf.tinyProblem = true ;
 conf.prefix = 'baseline' ;
 conf.randSeed = 1 ;
 
