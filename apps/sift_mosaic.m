@@ -1,6 +1,11 @@
 function mosaic = sift_mosaic(im1, im2)
 % SIFT_MOSAIC Demonstrates matching two images using SIFT and RANSAC
 
+if nargin == 0
+  im1 = imread(fullfile(vl_root, 'data', 'river1.jpg')) ;
+  im2 = imread(fullfile(vl_root, 'data', 'river2.jpg')) ;
+end
+
 % --------------------------------------------------------------------
 %                                                         SIFT matches
 % --------------------------------------------------------------------
@@ -118,4 +123,7 @@ mosaic = (im1_ + im2_) ./ mass ;
 figure(2) ; clf ;
 imagesc(mosaic) ; axis image off ;
 title('Mosaic') ;
+
+if nargout == 0, clear mosaic ; end
+
 end
