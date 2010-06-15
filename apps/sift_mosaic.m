@@ -1,17 +1,34 @@
 function mosaic = sift_mosaic(im1, im2)
 % SIFT_MOSAIC Demonstrates matching two images using SIFT and RANSAC
+%
+%   SIFT_MOSAIC demonstrates matching two images based on SIFT
+%   features and RANSAC and computing their mosaic.
+%
+%   SIFT_MOSAIC by itself runs the algorithm on two standard test
+%   images. Use SIFT_MOSAIC(IM1,IM2) to compute the mosaic of two
+%   custom images IM1 and IM2.
+
+% AUTORIGHTS
 
 if nargin == 0
   im1 = imread(fullfile(vl_root, 'data', 'river1.jpg')) ;
   im2 = imread(fullfile(vl_root, 'data', 'river2.jpg')) ;
 end
 
+% make single
+im1 = im2single(im1) ;
+im2 = im2single(im2) ;
+
+% make grayscale
+if size(im1,3) > 1, im1g = rgb2gray(im1) ; else im1g = im1 ; end
+if size(im2,3) > 1, im2g = rgb2gray(im2) ; else im2g = im2 ; end
+
 % --------------------------------------------------------------------
 %                                                         SIFT matches
 % --------------------------------------------------------------------
 
-[f1,d1] = vl_sift(im2single(rgb2gray(im1))) ;
-[f2,d2] = vl_sift(im2single(rgb2gray(im2))) ;
+[f1,d1] = vl_sift(im1g) ;
+[f2,d2] = vl_sift(im2g) ;
 
 [matches, scores] = vl_ubcmatch(d1,d2) ;
 
@@ -72,9 +89,12 @@ end
 %                                                         Show matches
 % --------------------------------------------------------------------
 
+dh1 = max(size(im2,1)-size(im1,1),0) ;
+dh2 = max(size(im1,1)-size(im2,1),0) ;
+
 figure(1) ; clf ;
 subplot(2,1,1) ;
-imagesc([im1 im2]) ;
+imagesc([padarray(im1,dh1,'post') padarray(im2,dh2,'post')]) ;
 o = size(im1,2) ;
 line([f1(1,matches(1,:));f2(1,matches(2,:))+o], ...
      [f1(2,matches(1,:));f2(2,matches(2,:))]) ;
@@ -82,7 +102,7 @@ title(sprintf('%d tentative matches', numMatches)) ;
 axis image off ;
 
 subplot(2,1,2) ;
-imagesc([im1 im2]) ;
+imagesc([padarray(im1,dh1,'post') padarray(im2,dh2,'post')]) ;
 o = size(im1,2) ;
 line([f1(1,matches(1,ok));f2(1,matches(2,ok))+o], ...
      [f1(2,matches(1,ok));f2(2,matches(2,ok))]) ;
