@@ -18,7 +18,7 @@ if ~exist('flann_search', 'file')
     addpath(fullfile(vl_root, 'opt', 'flann', 'build', 'matlab')) ;
   end
 end
-do_flann = exist('flann_search','file') ;
+do_flann = exist('nearest_neighbors') == 3 ;
 if ~do_flann
   warning('FLANN not found. Comparison disabled.') ;
 end
