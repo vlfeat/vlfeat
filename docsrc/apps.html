@@ -2,13 +2,16 @@
 
 <group>
 
+<p>This page lists a number of sample VLFeat applications. Their code
+  can be found in the <code>VLROOT/apps/</code> subdirectory.</p>
+
 <h1 id="apps.caltech-101">Caltech-101 classification</h1>
 
 <img alt="Caltech-101 Collage" src="%pathto:root;images/caltech-collage.jpg"/>
 
-<p>This application uses VLFeat to train an image classifier which
-achieves 65% using a single feature on the Caltech-101 dataset. It
-uses:</p>
+<p>This sample application uses VLFeat to train an image classifier
+which achieves 65% using a single feature on the Caltech-101
+dataset. It uses:</p>
 <ul>
 <li>PHOW features (dense multi-scale SIFT descriptors)</li>
 <li>Elkan k-means for fast visual word dictionary
@@ -22,8 +25,15 @@ machine (SVM) into a linear one</li>
 <p>The program is fully contained in
 a <a href="%pathto:apps.caltech-101.code;">single MATLAB M-file</a>,
 and can also be simply adapted to use your own data (change
-conf.calDir). The code is also bundled in VLFeat under the
-<code>VLROOT/apps</code>
-subdirectory.</p>
+conf.calDir).</p>
+
+<h1 id="apps.caltech-101">SIFT mosaic</h1>
+
+<img alt="SIFT mosaic" src="%pathto:root;images/sift-mosaic.jpg"/>
+
+<p>This sample application uses VLFeat to extract SIFT features form a
+pair of images and match them. It then filters the matches based on
+RANSAC and produces a mosaic. Read
+the <a href="%pathto:apps.sift-mosaic.code;">code</a>.</p>
 
 </group>
