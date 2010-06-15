@@ -59,7 +59,7 @@ $(eval $(call gendir, results, results))
 VERSION: Makefile
 	echo "$(VER)" > VERSION
 
-docsrc/version.html: Makefile
+docsrc/version.html: Makefile vl/generic.h
 	echo "<code>$(VER)</code>" > docsrc/version.html
 
 doc: doc-api doc-man doc-web
