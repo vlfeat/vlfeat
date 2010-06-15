@@ -111,8 +111,10 @@ APPENDIX
 
 CHANGES
 
+  0.9.9      Added: sift matching example. Extended Caltech-101
+             classification example to use kd-trees.
   0.9.8      Added: image distance transform, PEGASOS, floating point
-             (H)K-means, homogeneous kernel maps, a Caltech-101
+             K-means, homogeneous kernel maps, a Caltech-101
              classification example. Improved documentation.
   0.9.7      Changed the Mac OS X binary distribution to require
              a less recent version of Mac OS X (10.5).
