@@ -1,23 +1,23 @@
 function phow_caltech101
 % PHOW_CALTECH101 Image classification in the Caltech-101 dataset
 %   This program demonstrates how to use VLFeat to construct an image
-%   classifier on the Caltech-101 data. The classifiers uses PHOW
+%   classifier on the Caltech-101 data. The classifier uses PHOW
 %   features (dense SIFT), spatial histograms of visual words, and a
 %   Chi2 SVM. To speedup computation it uses VLFeat fast dense SIFT,
-%   kd-trees, and homogeneous kernel map. It also demonstrates VLFeat
-%   PEGASOS SVM solver, although for this small dataset other solvers
-%   as LIBLINEAR can be more efficient.
+%   kd-trees, and homogeneous kernel map. The program also
+%   demonstrates VLFeat PEGASOS SVM solver, although for this small
+%   dataset other solvers such as LIBLINEAR can be more efficient.
 %
 %   By default 15 training images are used, which should result in
-%   about 64% performance (a good performance considering that only
-%   the PHOW features are used).
+%   about 64% performance (a good performance considering that only a
+%   single feature type is being used).
 %
 %   Call PHOW_CALTECH101 to train and test a classifier on a small
-%   subset of the Caltech-101 data. Note that the program downloads a
-%   copy of the Caltech-101 data from the Internet.
+%   subset of the Caltech-101 data. Note that the program
+%   automatically downloads a copy of the Caltech-101 data from the
+%   Internet if it cannot find a local copy.
 %
-%   Edit the PHOW_CALTECH101 M-file to change the program
-%   configuration.
+%   Edit the PHOW_CALTECH101 file to change the program configuration.
 %
 %   To run on the entire dataset change CONF.TINYPROBLEM to FALSE.
 %
@@ -37,11 +37,12 @@ function phow_caltech101
 %
 %   The program saves the trained model in
 %   <CONF.DATADIR>/<CONF.PREFIX>-model.mat. This model can be used to
-%   test novel images:
+%   test novel images independently of the Caltech data.
 %
 %     load('data/baseline-model.mat') ; # change to the model path
 %     label = model.classify(model, im) ;
 %
+
 % AUTORIGHTS
 
 conf.calDir = 'data/caltech-101' ;
