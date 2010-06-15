@@ -2,8 +2,6 @@
 # author:      Andrea Vedaldi
 # description: Build everything
 
-# AUTORIGHTS
-
 # VLFEAT BUILDING INSTRUCTIONS
 #
 # This makefile builds VLFeat on modern UNIX boxes with the GNU
@@ -68,6 +66,8 @@
 # utilities, MATLAB interface, Octave interface) so the makefile is
 # divided in components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust any parameter that may not.
+
+# AUTORIGHTS
 
 SHELL = /bin/bash
 
