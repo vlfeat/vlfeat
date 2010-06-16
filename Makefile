@@ -74,6 +74,10 @@ SHELL = /bin/bash
 .PHONY : all
 all:
 
+# Feature selection
+ENABLE_SSE2=yes
+ENABLE_THREADS=yes
+
 # --------------------------------------------------------------------
 #                                                       Error Messages
 # --------------------------------------------------------------------
@@ -122,11 +126,13 @@ endif
 VLDIR ?= .
 CC ?= cc
 
+FEATUREFLAGS += $(if $(ENABLE_THREADS),-DVL_ENABLE_THREADS)
+FEATUREFLAGS += $(if $(ENABLE_SSE2),-DVL_ENABLE_SSE2)
+
+CLFAGS += $(FEATUREFLAGS)
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-CFLAGS += -DVL_ENABLE_THREADS
-CFLAGS += -DVL_ENABLE_SSE2
 CFLAGS += -I$(VLDIR)
 
 CFLAGS += $(if $(DEBUG), -DVL_DEBUG -O0 -g, -DNDEBUG -O3)
