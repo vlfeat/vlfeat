@@ -5,7 +5,7 @@ function [Ix,Iy] = vl_grad(I,varargin) ;
 %   function uses central differences for all but the boundary pixels,
 %   for which it uses forward/backward differences as appropriate.
 %
-%   The function accepts the following options:
+%   VL_GRAD() accepts the following options:
 %
 %   Type:: Central
 %     Use either 'central', 'forward', or 'backward' differences for
@@ -24,7 +24,7 @@ function [Ix,Iy] = vl_grad(I,varargin) ;
 opts.type = 'central' ;
 opts = vl_argparse(opts, varargin) ;
 
-switch opts.type
+switch lower(opts.type)
   case 'central'
     Ix = [ I(:,2)-I(:,1) , ...
            0.5*(I(:,3:end)-I(:,1:end-2)) , I(:,end)-I(:,end-1) ] ;
