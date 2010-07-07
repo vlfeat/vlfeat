@@ -92,7 +92,7 @@ if ~exist(conf.calDir, 'dir') || ...
   if ~conf.autoDownloadData
     error(...
       ['Caltech-101 data not found. ' ...
-       'Set conf.autoDownloadData=true to download the requried data.']) ;
+       'Set conf.autoDownloadData=true to download the required data.']) ;
   end
   vl_xmkdir(conf.calDir) ;
   calUrl = ['http://www.vision.caltech.edu/Image_Datasets/' ...
@@ -141,7 +141,7 @@ model.classify = @classify ;
 
 if ~exist(conf.vocabPath) || conf.clobber
 
-  % Get some PHOW descriptos to train the dictionary
+  % Get some PHOW descriptors to train the dictionary
   selTrainFeats = vl_colsubset(selTrain, 30) ;
   descrs = {} ;
   %for ii = 1:length(selTrainFeats)
