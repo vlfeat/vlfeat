@@ -8,7 +8,7 @@
 %   VL_IMSMOOTH() accepts the following options:
 %
 %   Kernel::
-%     Selects between GAUSSIAN and TRINAGULAR kernels. The triangular
+%     Selects between GAUSSIAN and TRIANGULAR kernels. The triangular
 %     kernel support has 2*SIGMA-1 sampels. Kernels have unit mass.
 %
 %   Padding::
