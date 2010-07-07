@@ -10,7 +10,7 @@
 %   dimension DIM. In this case, H, X and B are array of the same
 %   dimensions, except for the dimension DIM of H, which may differ,
 %   and B is an array of subscripts of the DIM-th dimension of H. A
-%   typical application is the caluclation of multiple histograms,
+%   typical application is the calculation of multiple histograms,
 %   where each histogram is a 1-dimensional slice of the array H along
 %   the dimension DIM.
 %
