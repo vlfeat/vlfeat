@@ -146,7 +146,7 @@ if ~exist(conf.vocabPath) || conf.clobber
   descrs = {} ;
   %for ii = 1:length(selTrainFeats)
   parfor ii = 1:length(selTrainFeats)
-    im = imread(fullfile(conf.calDir, images{ii})) ;
+    im = imread(fullfile(conf.calDir, images{selTrainFeats(ii)})) ;
     im = standarizeImage(im) ;
     [drop, descrs{ii}] = vl_phow(im, model.phowOpts{:}) ;
   end
