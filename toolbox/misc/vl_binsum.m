@@ -3,7 +3,7 @@
 %   elements of the array H indexed by B. X and B must have the same
 %   dimensions, and the elements of B must be valid indexes for the
 %   array H (except for null indexes, which are silently skipped). An
-%   application is the calculation of an histogram H, where B are the
+%   application is the calculation of a histogram H, where B are the
 %   occurences and X are the occurence weights.
 %
 %   H = VL_BINSUM(H,X,B,DIM) operates only along the specified
