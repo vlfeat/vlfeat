@@ -22,8 +22,6 @@ function [Ix,Iy] = vl_grad(I,varargin) ;
 opts.type = 'central' ;
 opts = vl_argparse(opts, varargin) ;
 
-[M,N]=size( F ) ;
-
 switch opts.type
   case 'central'
     Ix = [ I(:,2)-I(:,1) , ...
