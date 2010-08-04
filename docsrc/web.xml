@@ -106,6 +106,7 @@
    <include src="install-c.html"/>
    <page id="xcode" name="xcode" title="Xcode"><include src="using-xcode.html"/></page>
    <page id="vsexpress" name="vsexpress" title="Visual C++"><include src="using-vsexpress.html"/></page>
+   <page id="gcc" name="gcc" title="g++"><include src="using-gcc.html"/></page>
   </page>
   <page id="compiling" name="compiling" title="Compiling">
    <include src="compiling.html"/>
