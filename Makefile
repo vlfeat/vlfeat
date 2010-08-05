@@ -62,10 +62,10 @@
 #   info - Display a list of the variables defined by the Makefile.
 #   help - Print this message.
 #
-# As VLFeat is compsed of different parts (DLL, command line
-# utilities, MATLAB interface, Octave interface) so the makefile is
-# divided in components, located in make/*.mak. Please check out the
-# corresponding files in order to adjust any parameter that may not.
+# VLFeat is compsed of different parts (DLL, command line utilities,
+# MATLAB interface, Octave interface) so the makefile is divided in
+# components, located in make/*.mak. Please check out the
+# corresponding files in order to adjust parameters.
 
 # AUTORIGHTS
 
