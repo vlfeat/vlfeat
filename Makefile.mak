@@ -117,8 +117,6 @@ objdir     = $(bindir)\objs
 CFLAGS     = /nologo /TC /MD \
              /D"_CRT_SECURE_NO_DEPRECATE" \
              /D"__LITTLE_ENDIAN__" \
-             /D"VL_ENABLE_SSE2" \
-             /D"VL_ENABLE_THREADS" \
              /I. \
              /W1 /Z7 /Zp8 /Ox
 
@@ -129,8 +127,7 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
-MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl \
-             -DVL_ENABLE_THREADS -DVL_ENABLE_SSE2
+MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
   vl\aib.c \

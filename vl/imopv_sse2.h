@@ -16,7 +16,7 @@ GNU GPLv2, or (at your option) any later version.
 
 #include "generic.h"
 
-#ifdef VL_ENABLE_SSE2
+#ifndef VL_DISABLE_SSE2
 
 VL_EXPORT
 void _vl_imconvcol_vf_sse2 (float* dst, int dst_stride,

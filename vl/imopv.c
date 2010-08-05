@@ -130,7 +130,7 @@ void VL_XCAT(vl_imconvcol_v, SFX)
   vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
 
   /* dispatch to accelerated version */
-#ifdef VL_ENABLE_SSE2
+#ifndef VL_DISABLE_SSE2
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     VL_XCAT3(_vl_imconvcol_v,SFX,_sse2)
     (dst,dst_stride,

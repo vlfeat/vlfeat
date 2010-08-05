@@ -75,8 +75,8 @@ SHELL = /bin/bash
 all:
 
 # Feature selection
-ENABLE_SSE2=yes
-ENABLE_THREADS=yes
+DISABLE_SSE2=no
+DISABLE_THREADS=no
 
 # --------------------------------------------------------------------
 #                                                       Error Messages
@@ -126,8 +126,9 @@ endif
 VLDIR ?= .
 CC ?= cc
 
-FEATUREFLAGS += $(if $(ENABLE_THREADS),-DVL_ENABLE_THREADS)
-FEATUREFLAGS += $(if $(ENABLE_SSE2),-DVL_ENABLE_SSE2)
+FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
+FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
+
 
 CLFAGS += $(FEATUREFLAGS)
 CFLAGS += -std=c99

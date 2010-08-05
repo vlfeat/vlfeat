@@ -14,7 +14,7 @@ GNU GPLv2, or (at your option) any later version.
 #ifndef VL_MATHOP_SSE2_INSTANTIATING
 #define VL_MATHOP_SSE2_INSTANTIATING
 
-#ifdef VL_ENABLE_SSE2
+#ifndef VL_DISABLE_SSE2
 #ifndef __SSE2__
 #  error "mathop_sse2.c must be compiled with SSE2 intrinsics enabled"
 #endif
@@ -32,7 +32,7 @@ GNU GPLv2, or (at your option) any later version.
 #define FLT VL_TYPE_FLOAT
 #include "mathop_sse2.c"
 
-/* VL_ENABLE_SSE2 */
+/* VL_DISABLE_SSE2 */
 #endif
 
 /* ---------------------------------------------------------------- */

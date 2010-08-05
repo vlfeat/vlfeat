@@ -25,7 +25,7 @@ GNU GPLv2, or (at your option) any later version.
 #include <Windows.h>
 #endif
 
-#if defined(VL_ENABLE_THREADS) && defined(VL_THREADS_POSIX)
+#if ! defined(VL_DISABLE_THREADS) && defined(VL_THREADS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -134,8 +134,8 @@ typedef struct _VlThreadSpecificState
 typedef struct _VlState
 {
 
-#if defined(VL_ENABLE_THREADS)
-#if defined(VL_THREADS_POSIX)
+#if ! defined(VL_DISABLE_THREADS)
+#if   defined(VL_THREADS_POSIX)
   pthread_key_t threadKey ;
   pthread_mutex_t mutex ;
   pthread_t mutexOwner ;
@@ -299,7 +299,7 @@ vl_get_state ()
 VL_INLINE VlThreadSpecificState *
 vl_get_thread_specific_state ()
 {
-#ifndef VL_ENABLE_THREADS
+#ifdef VL_DISABLE_THREADS
   return & vl_get_state()->threadState ;
 #else
   VlState * state ;

@@ -11,11 +11,11 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-#if defined(VL_ENABLE_SSE2) & ! defined(__SSE2__)
-#error "Compiling with VL_ENABLE_SSE2, but no __SSE2__ defined"
+#if ! defined(VL_DISABLE_SSE2) & ! defined(__SSE2__)
+#error "Compiling with SSE2 enabled, but no __SSE2__ defined"
 #endif
 
-#if defined(VL_ENABLE_SSE2)
+#if ! defined(VL_DISABLE_SSE2)
 
 #ifndef VL_IMOPV_SSE2_INSTANTIATING
 
@@ -283,5 +283,5 @@ VL_XCAT(_vl_imconvcoltri_v, SFX, sse2)
 #undef VL_IMOPV_SSE2_INSTANTIATING
 #endif
 
-/* VL_ENABLE_SSE2 */
+/* ! VL_DISABLE_SSE2 */
 #endif

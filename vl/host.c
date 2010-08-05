@@ -322,15 +322,11 @@ it supports POSIX threads.
  ** @see @ref host-compiler-others
  **/
 
-/** @def VL_ENABLE_THREADS
- ** @brief Defined if multi-threading support is enabled
+/** @def VL_DISABLE_THREADS
+ ** @brief Defined if multi-threading support is disabled
  **
- ** Define this symbol to enable multi-threading support.
+ ** Define this symbol to disable multi-threading support.
  **/
-
-#ifdef __DOXYGEN__
-#define VL_ENABLE_THREADS
-#endif
 
 /** @def VL_THREADS_WIN
  ** @biref Defined if the host uses Windows threads.
@@ -468,7 +464,7 @@ vl_static_configuration_to_string_copy ()
   char compilerString [1024] ;
 
   char const * libraryString =
-#ifdef VL_ENABLE_THREADS
+#ifndef VL_DISABLE_THREADS
 #ifdef VL_THREADS_WIN
   "Windows_threads"
 #elif VL_THREADS_POSIX
@@ -477,7 +473,7 @@ vl_static_configuration_to_string_copy ()
 #else
   "No_threads"
 #endif
-#ifdef VL_ENABLE_SSE2
+#ifndef VL_DISABLE_SSE2
   ", SSE2"
 #endif
   ;
