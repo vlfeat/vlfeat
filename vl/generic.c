@@ -821,6 +821,8 @@ vl_constructor ()
   InitializeCriticalSection (&state->mutex) ;
   state->tlsIndex = TlsAlloc () ;
 #endif
+#else
+  vl_get_state()->threadState = vl_thread_specific_state_new() ;
 #endif
 
   state->malloc_func  = malloc ;
@@ -896,6 +898,8 @@ vl_destructor ()
   TlsFree (state->tlsIndex) ;
   DeleteCriticalSection (&state->mutex) ;
 #endif
+#else
+  vl_thread_specific_state_delete(vl_get_state()->threadState) ;
 #endif
 }
 

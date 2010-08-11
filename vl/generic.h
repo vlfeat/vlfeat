@@ -146,7 +146,7 @@ typedef struct _VlState
   CRITICAL_SECTION mutex ;
 #endif
 #else
-  VlThreadSpecificState threadState ;
+  VlThreadSpecificState * threadState ;
 #endif
 
   int   (*printf_func)  (char const * format, ...) ;
@@ -300,7 +300,7 @@ VL_INLINE VlThreadSpecificState *
 vl_get_thread_specific_state ()
 {
 #ifdef VL_DISABLE_THREADS
-  return & vl_get_state()->threadState ;
+  return vl_get_state()->threadState ;
 #else
   VlState * state ;
   VlThreadSpecificState * threadState ;
