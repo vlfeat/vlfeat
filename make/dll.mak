@@ -68,20 +68,11 @@ deps += $(dll_dep)
 no_dep_targets += dll-dir dll-clean dll-archclean dll-distclean
 no_dep_targets += dll-info
 
-dll-all: dll $(BINDIR)/vl-config
+dll-all: dll
 dll: $(dll_tgt)
 
 # generate the dll-dir target
 $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
-
-$(BINDIR)/vl-config: $(VLDIR)/src/vl-config Makefile make/dll.mak
-	@$(call print-command, SED, "$(@)")
-	@sed \
-	    -e 's/VLROOT/$(VLDIR)/' \
-            -e 's/VLARCH/$(ARCH)/' \
-	    -e 's/VLVER/$(VER)/' \
-	    -e 's/VLCFLAGS/$(FEATUREFLAGS)/' "$<" > "$@"
-	@chmod +x "$@"
 
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC) $(DLL_CFLAGS) -c "$(<)" -o "$(@)"
