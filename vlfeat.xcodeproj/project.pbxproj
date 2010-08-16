@@ -16,6 +16,7 @@
 		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
 		2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
 		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
+		2D48402412195B1600E13F49 /* vl_lbp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_lbp.c; path = toolbox/misc/vl_lbp.c; sourceTree = "<group>"; };
 		2D4EB0BF10F3C1E800ADA534 /* kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmeans.c; sourceTree = "<group>"; };
 		2D4EB0C010F3C1E800ADA534 /* kmeans.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmeans.h; sourceTree = "<group>"; };
 		2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kmeans.c; path = toolbox/kmeans/vl_kmeans.c; sourceTree = "<group>"; };
@@ -136,6 +137,8 @@
 		2DD99E8F0E59EA8E00CE1DA1 /* host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = host.h; sourceTree = "<group>"; };
 		2DD99E900E59EA8E00CE1DA1 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = host.c; sourceTree = "<group>"; };
 		2DD9A01F0E5A296700CE1DA1 /* test_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_host.c; sourceTree = "<group>"; };
+		2DDA2306124BD104003F6A9D /* lbp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lbp.h; sourceTree = "<group>"; };
+		2DDA2307124BD104003F6A9D /* lbp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lbp.c; sourceTree = "<group>"; };
 		2DE5B37D0FDC2BE9008CEB1D /* dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsift.c; sourceTree = "<group>"; };
 		2DE5B37E0FDC2BE9008CEB1D /* dsift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsift.h; sourceTree = "<group>"; };
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
@@ -247,6 +250,8 @@
 				2D765BAE0FEC076700D08578 /* kdtree.h */,
 				2D4EB0BF10F3C1E800ADA534 /* kmeans.c */,
 				2D4EB0C010F3C1E800ADA534 /* kmeans.h */,
+				2DDA2307124BD104003F6A9D /* lbp.c */,
+				2DDA2306124BD104003F6A9D /* lbp.h */,
 				2D732E8E0CF8C2E40099B03C /* mathop.c */,
 				2D732E8F0CF8C2E40099B03C /* mathop.h */,
 				2D13EEE1100A511200C072E8 /* mathop_sse2.c */,
@@ -292,6 +297,7 @@
 				2DF4565610ADB9010083F316 /* vl_homkermap.c */,
 				2D86B1120F24CC9B00E625D6 /* vl_ihashfind.c */,
 				2D86B1130F24CC9B00E625D6 /* vl_ihashsum.c */,
+				2D48402412195B1600E13F49 /* vl_lbp.c */,
 				2D86B1140F24CC9B00E625D6 /* vl_ikmeans.c */,
 				2D86B1150F24CC9B00E625D6 /* vl_ikmeanspush.c */,
 				2D27614810FF6B3900D14D9E /* vl_imdisttf.c */,
