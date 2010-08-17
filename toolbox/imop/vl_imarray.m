@@ -1,26 +1,31 @@
 function J = vl_imarray(A,varargin)
 % VL_IMARRAY  Flattens image array
-%   J=VL_IMARRAY(A) flattens the array of images A. A can be either a
-%   M*N*K array, storing one gray-scale image per slice, or a M*N*3*K
-%   or M*N*K*3 array, storing one RGB image per slice.  The function
-%   returns an image J which is a tiling of the images in the array.
+%   J=VL_IMARRAY(A) creates a composite image J from the array of
+%   images A. A can be either a M*N*K array, storing one gray-scale
+%   image per slice, or a M*N*3*K or M*N*K*3 array, storing one RGB
+%   image per slice. The function returns an image J which is a tiling
+%   of the images in the array. Tiles are arranged from left to
+%   right and top to bottom.
 %
 %   VL_IMARRAY(...) display the image J rather than returning it.
 %
 %   VL_IMARRAY() accepts the following options:
 %
-%   'Spacing' [0]::
+%   Spacing:: 0
 %     Orlates the images with a null border of the specified width.
 %
-%   'Layout' [[]]::
+%   Layout:: []
 %     Specify a vector [TM TN] with the number of rows and columns of
 %     the tiling. If equal to [] the layout is computed automatically.
 %
-%   'Movie' [0]::
+%   Movie:: 0
 %     Display/returns a movie rather than generating a tyling.
 %
-%   'CMap' [[]]::
+%   CMap:: []
 %     Specify a colormap for indexed images and movies.
+%
+%   Reverse:: true
+%     Starts filling from the bottom rather than from the top.
 %
 %   See also VL_IMARRAYSC(), VL_HELP().
 
@@ -30,67 +35,53 @@ function J = vl_imarray(A,varargin)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-reverse = 1 ;
-sp      = 0 ;
-lay     = [] ;
-swap3   = 0 ;
-domov   = 0 ;
-cmap    = colormap ;
+opts.reverse = false ;
+opts.spacing = 0 ;
+opts.layout = [] ;
+opts.movie = false ;
+opts.cmap = colormap ;
+opts = vl_argparse(opts, varargin) ;
 
-% process options
-for k=1:2:length(varargin)  
-  opt = varargin{k} ;
-  arg = varargin{k+1} ;
-  switch lower(opt)
-    case 'layout'
-      lay=arg;
-    case 'spacing'
-      sp=arg;
-    case 'movie'
-      domov=arg;
-    case 'cmap'
-      cmap=arg; 
-    case 'clim'      
-    otherwise
-      error(sprintf('Unknown option ''%s''',opt)) ;
-  end
-end
+swap3 = false ;
 
 % retrieve image dimensions
 if ndims(A) <= 3
-  d=1 ;
-  [Mi,Ni,K] = size(A) ;
+  numChannels = 1 ;
+  [height,width,numImages] = size(A) ;
 else
-  if size(A,3) == 3
-    [Mi,Ni,d,K] = size(A) ;
-  elseif size(A,4) == 3 ;
-    swap3 = 1 ;
-    [Mi,Ni,K,d] = size(A) ;
+  if ndims(A) == 4 && size(A,3) == 3
+    [height,width,numChannels,numImages] = size(A) ;
+  elseif ndims(A) == 4 && size(A,4) == 3 ;
+    swap3 = true ;
+    [height,width,numImages,numChannels] = size(A) ;
   else
-    error(['A should be either M*N*K or M*N*3*K or M*N*K*3']);
+    error('A must be either M*N*K or M*N*3*K or M*N*K*3.') ;
   end
 end
 
 % compute layout
-if isempty(lay)
-  N = ceil(sqrt(K)) ;
-  M = ceil(K/N) ;
+if isempty(opts.layout)
+  N = ceil(sqrt(numImages)) ;
+  M = ceil(numImages / N) ;
 else
-  M = lay(1) ;
-  N = lay(2) ;
-  K = min(K,M*N) ; 
+  M = opts.layout(1) ;
+  N = opts.layout(2) ;
+  numImages = min(numImages, M*N) ;
 end
 
-% make storage
-if ~ domov
-  cdata = zeros(Mi*M + sp*(M-1), Ni*N + sp*(N-1), d, class(A)) ;
+% make storage for composite image
+if ~ opts.movie
+  cdata = zeros(height * M + opts.spacing * (M-1), ...
+                width  * N + opts.spacing * (N-1), ...
+                numChannels, ...
+                class(A)) ;
 end
 
 % add one image per time
-for k=1:K
+for k = 1:numImages
 
-  % retriee k-th image
-  if(d == 1)
+  % retrieve k-th image
+  if numChannels == 1
     tmp = A(:,:,k) ;
   else
     if swap3
@@ -99,28 +90,28 @@ for k=1:K
       tmp = A(:,:,:,k) ;
     end
   end
-  
-  if ~ domov    
+
+  if ~ opts.movie
     p = k - 1 ;
     i = floor(p/N) ;
-    if reverse
-      i = M-1 - i ;
+    if opts.reverse
+      i = M - 1 - i ;
     end
     j = mod(p,N) ;
-    irng = i*(Mi+sp) + (0:Mi-1) + 1 ;
-    jrng = j*(Ni+sp) + (0:Ni-1) + 1 ;    
-    cdata(irng,jrng,:) = tmp ;
+    ir = i * (height + opts.spacing) + (1:height) ;
+    jr = j * (width  + opts.spacing) + (1:width) ;
+    cdata(ir,jr,:) = tmp ;
   else
-    MOV(k) = im2frame(tmp,cmap) ;
+    MOV(k) = im2frame(tmp, opts.cmap) ;
   end
 end
 
-if ~ domov
+if ~ opts.movie
   if nargout == 0
-    image(cdata) ; 
-    colormap(cmap) ;
+    image(cdata) ;
+    colormap(opts.cmap) ;
     return ;
-  else  
+  else
     J = cdata ;
   end
 else
