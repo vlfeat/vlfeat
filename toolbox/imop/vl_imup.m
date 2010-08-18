@@ -1,9 +1,9 @@
 function J = vl_imup(I)
-% VL_IMUP  Downsample an image 
-%   J=VL_IMUP(I) doubles the resolution of the image I by bilinear
-%   interpolation.
+% VL_IMUP Upsample an image by two
+%   J=VL_IMUP(I) doubles the resolution of the image I by using
+%   bilinear interpolation.
 %
-%   See also:: VL_IMDOWN(), VL_HELP().
+%   See also: VL_IMDOWN(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
