@@ -1,25 +1,47 @@
-% VL_PEGASOS PEGASOS binary SVM solver
-%   W = VL_PEGASOS(X, Y, LAMBDA) learns a binary SVM W given
-%   training vectors X, their labels Y, and the regularization
-%   parameter LAMBDA. The solver solves the problem
+% VL_PEGASOS PEGASOS linear SVM solver
+%   W = VL_PEGASOS(X, Y, LAMBDA) learns a linear SVM W given training
+%   vectors X, their labels Y, and the regularization parameter LAMBDA
+%   using the PEGASOS [1] solver. The algorithm finds a minimizer W of
+%   the objective function
 %
-%     MIN_W LAMBDA/2 |W|^2 + 1/N SUM_i LOSS(W, X(:,i), Y(i))
+%     LAMBDA/2 |W|^2 + 1/N SUM_i LOSS(W, X(:,i), Y(i))
 %
 %   where LOSS(W,X,Y) = MAX(0, 1 - Y W'X) is the hinge loss and N is
 %   the number of training vectors in X.
+%
+%   ALGORITHM. PEGASOS is an implementation of stochastic subgradient
+%   descent. At each iteration a data point is selected at random, the
+%   subgradient of the cost function relative to that data point is
+%   computed, and a step is taken in that direction. The step size is
+%   inversely proportional to the iteration number. See [1] for
+%   details.
 %
 %   NumIterations:: 10 / LAMBDA
 %     Sets the maximum number of iterations.
 %
 %   BiasMultiplier:: 0
-%     Appends to X this scalar value in order to estimate an SVM
-%     with bias.
+%     Appends to the data X the specified scalar value B. This
+%     approximates the training of a linear SVM with bias.  The bias
+%     can be recovered from the optimal weight vector W as W(end) * B.
 %
-%   StartingModel:: null vector
-%     Specify the initial value for the model W.
+%   StartingModel:: zero vector
+%     Specify the initial value for the weight vector W.
 %
 %   StartingIteration:: 1
-%     Specify the first iteration number.
+%     Specify the iteration number to start from. The only effect
+%     is to change the step size, as this is inversely proportional
+%     to the iteration number.
+%
+%   Permutation:: []
+%     Specify a permutation PERM to be used to sample the data (this
+%     disables random sampling). Specifically, at the T-th iteration
+%     the algorithm takes a step w.r.t. the PERM[T']-th data point,
+%     where T' is T modulo the number of data samples
+%     (i.e. MOD(T'-1,NUMSAMPLES)+1). PERM needs not to be
+%     bijective. This allows specifying certain data points more or
+%     less frequently, implicitly increasing their relative weight in
+%     the error term. A common application is to balance an unbalanced
+%     dataset.
 %
 %   Verbose::
 %     Be verbose.
@@ -38,6 +60,12 @@
 %       w = vl_pegasos(x,y,lambda,'NumIterations',500, ...
 %                      'StartingIteration', 501, ...
 %                      'StartingModel', w) ;
+%
+%   References
+%
+%   [1] S. Shalev-Shwartz, Y. Singer, N. Srebro, and
+%       A. Cotter. Pegasos: Primal Estimated sub-GrAdient SOlver for
+%       SVM. MBP, 2010.
 %
 %   See also: VL_HELP(), VL_HOMKERMAP().
 

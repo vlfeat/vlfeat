@@ -22,7 +22,7 @@ GNU GPLv2, or (at your option) any later version.
 /* option codes */
 enum {
   opt_verbose, opt_bias_multiplier, opt_num_iterations,
-  opt_starting_iteration, opt_starting_model
+  opt_starting_iteration, opt_starting_model, opt_permutation
 } ;
 
 /* options */
@@ -32,6 +32,7 @@ vlmxOption  options [] = {
   {"NumIterations",     1,   opt_num_iterations      },
   {"StartingIteration", 1,   opt_starting_iteration  },
   {"StartingModel",     1,   opt_starting_model      },
+  {"Permutation",       1,   opt_permutation         },
   {0,                   0,   0                       }
 } ;
 
@@ -60,6 +61,8 @@ mexFunction(int nout, mxArray *out[],
   vl_size dimension ;
   vl_size numIterations = 0 ;
   vl_uindex startingIteration = 1 ;
+  vl_uint32 * permutation  = NULL ;
+  vl_size permutationSize = 0 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -83,6 +86,7 @@ mexFunction(int nout, mxArray *out[],
               "DATA must be a real matrix.") ;
   }
 
+  data = mxGetData (IN(DATA)) ;
   dimension = mxGetM(IN(DATA)) ;
   numSamples = mxGetN(IN(DATA)) ;
 
@@ -134,10 +138,35 @@ mexFunction(int nout, mxArray *out[],
         break ;
 
       case opt_starting_model :
-        if (!vlmxIsVector(optarg, -1)) {
-          vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not a plain vector.") ;
+        if (!vlmxIsVector(optarg, -1) ||
+            mxIsComplex(optarg) ||
+            !mxIsNumeric(optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not a real vector.") ;
         }
         OUT(MODEL) = mxDuplicateArray(optarg) ;
+        break ;
+
+      case opt_permutation :
+        if (!vlmxIsVector(optarg, -1) ||
+            mxIsComplex(optarg) ||
+            mxGetClassID(optarg) != mxUINT32_CLASS) {
+          vlmxError(vlmxErrInvalidArgument, "PERMUTATION is not a UINT32 vector.") ;
+        }
+        permutationSize = mxGetNumberOfElements(optarg) ;
+        permutation = mxMalloc(sizeof(vl_uint32) * permutationSize) ;
+        {
+          /* adjust indexing */
+          vl_uint32 const * matlabPermutation = mxGetData(optarg) ;
+          vl_uindex k ;
+          for (k = 0 ; k < permutationSize ; ++k) {
+            permutation[k] = matlabPermutation[k] - 1 ;
+            if (permutation[k] >= numSamples) {
+              vlmxError(vlmxErrInconsistentData,
+                        "Permutation indexes out of bounds: PERMUTATION(%d) = %d > %d = number of data samples.",
+                        k + 1, permutation[k] + 1, numSamples) ;
+            }
+          }
+        }
         break ;
 
       case opt_verbose :
@@ -149,10 +178,6 @@ mexFunction(int nout, mxArray *out[],
   if (numIterations == 0) {
     numIterations = (vl_size) 10 / (lambda + 1) ;
   }
-
-  data = mxGetData (IN(DATA)) ;
-  numSamples = mxGetN (IN(DATA)) ;
-  dimension = mxGetM (IN(DATA)) ;
 
   if (! OUT(MODEL)) {
     OUT(MODEL) = mxCreateNumericMatrix(dimension + (biasMultiplier > 0),
@@ -171,6 +196,7 @@ mexFunction(int nout, mxArray *out[],
     mexPrintf("vl_pegasos: Lambda = %g\n", lambda) ;
     mexPrintf("vl_pegasos: BiasMultiplier = %g\n", biasMultiplier) ;
     mexPrintf("vl_pegasos: NumIterations = %d\n", numIterations) ;
+    mexPrintf("vl_pegasos: permutation size = %d\n", permutationSize) ;
   }
 
   switch (dataType) {
@@ -182,7 +208,9 @@ mexFunction(int nout, mxArray *out[],
                                     biasMultiplier,
                                     startingIteration,
                                     numIterations,
-                                    NULL) ;
+                                    NULL,
+                                    permutation,
+                                    permutationSize) ;
       break ;
     case VL_TYPE_DOUBLE:
       vl_pegasos_train_binary_svm_d((double *)mxGetData(OUT(MODEL)),
@@ -192,8 +220,12 @@ mexFunction(int nout, mxArray *out[],
                                     biasMultiplier,
                                     startingIteration,
                                     numIterations,
-                                    NULL) ;
+                                    NULL,
+                                    permutation,
+                                    permutationSize) ;
       break ;
   }
+
+  if (permutation) vl_free(permutation) ;
 
 }

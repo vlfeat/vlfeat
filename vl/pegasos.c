@@ -12,13 +12,15 @@
 
 /** @file pegasos.h
 
-@ref pegasos.h provides basic impelmentation of the PEGASOS [1] SVM solver.
+@ref pegasos.h provides a basic implementation of the PEGASOS [1]
+linear SVM solver.
 
-- @ref pegasos-overview Overview
-- @ref pegasos-bias Bias
-- @ref pegasos-kernels Non-linear kernels
-- @ref pegasos-algorithm Algorithm
-- @ref pegasos-references References
+- @ref pegasos-overview "Overview"
+- @ref pegasos-algorithm "Algorithm"
+- @ref pegasos-bias "Bias"
+- @ref pegasos-restarting "Restarting"
+- @ref pegasos-kernels "Non-linear kernels"
+- @ref pegasos-references "References"
 
 <!-- ------------------------------------------------------------ --->
 @section pegasos-overview Overview
@@ -36,7 +38,7 @@ where @f$ x_i @f$ are data vectors in @f$ \mathbb{R}^d @f$, @f$ y_i \in
 regularization parameter, and
 
 @f[
-\ell(w;(x_i,y_i) = \max\{0, 1 - y_i \langle w,x_i\rangle\}.
+\ell(w;(x_i,y_i)) = \max\{0, 1 - y_i \langle w,x_i\rangle\}.
 @f]
 
 is the <em>hinge loss</em>. The result of the optimization is a model
@@ -45,7 +47,7 @@ is the <em>hinge loss</em>. The result of the optimization is a model
 @f[ F(x) = \operatorname{sign} \langle w, x\rangle. @f]
 
 It is well known that the hinge loss is a convex upper bound of the
-01-loss of the decision function:
+i01-loss of the decision function:
 
 @f[
  \ell(w;(x,y)) \geq \frac{1}{2}(1 - y F(x)).
@@ -56,65 +58,102 @@ PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
  or @c float data.
 
 <!-- ------------------------------------------------------------ --->
+@subsection pegasos-algorithm Algorithm
+<!-- ------------------------------------------------------------ --->
+
+PEGASOS is a stochastic subgradient optimizer. At the <em>t</em>-th
+iteration the algorithm:
+
+- Samples uniformly at random as subset @f$ A_t@f$ of <em>k</em> of
+  training pairs @f$(x,y)@f$ from the <em>m</em> pairs provided for
+  training (this subset is called mini batch).
+- Computes a subgradient @f$ \nabla_t @f$ of the function @f$ E_t(w) =
+  \frac{1}{2}\|w\|^2 + \frac{1}{k} \sum_{(x,y) \in A_t} \ell(w;(x,y))
+  @f$ (this is the SVM objective function restricted to the
+  minibatch).
+- Compute an intermediate weight vector @f$ w_{t+1/2} @f$ by doing a
+  step @f$ w_{t+1/2} = w_t - \alpha_t \nalba_t @f$ with learning rate
+  @f$ \alpha_t = 1/(\eta t) @f$ along the subgradient. Note that the
+  learning rate is inversely proportional to the iteration numeber.
+- Back projects the weight vector @f$ w_{t+1/2} @f$ on the
+  hypersphere of radius @f$ \sqrt{\lambda} @f$ to obtain the next
+  model estimate @f$ w_{t+1} @f$:
+  @f[
+     w_t = \min\{1, \sqrt{\lambda}/\|w\|\} w_{t+1/2}.
+  @f]
+  The hypersfere is guaranteed to contain the optimal weight vector
+  @f$ w^* @f$ [1].
+
+VLFeat implementation fixes to one the size of the mini batches @f$ k
+@f$.
+
+<!-- ------------------------------------------------------------ --->
 @subsection pegasos-bias Bias
 <!-- ------------------------------------------------------------ --->
 
 PEGASOS SVM formulation does not incorporate a bias. To learn an SVM
-with bias, the vector @f$ x @f$ can be optionally extended by a
-constant component @f$ B @f$. In this case, the model @f$ w @f$ is
-@f$d + 1 @f$ dimensional and the decision function is @f$ F(x) =
-\operatorname{sign} (\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$. If
-<em>B</em> is large enough, the weight @f$ w_{d+1} @f$ remains small
-and it has small contribution in the regularization term @f$ \| w \|^2
-@f$; however, a large @f$ B @f$ makes the optimization harder.
+with bias, the each data vector @f$ x @f$ can be extended by a
+constant component @f$ B @f$ (called @c biasMultiplier in the
+code). In this case, the model @f$ w @f$ has dimension @f$ D + 1 @f$
+and the SVM discriminat function is given by @f$ F(x) =
+\operatorname{sign} (\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$. If the
+bias multiplier <em>B</em> is large enough, the weight @f$ w_{d+1} @f$
+remains small and it has small contribution in the SVM regularization
+term @f$ \| w \|^2 @f$, better approximating the case of an SVM with
+bias. Unfortunately, setting the bias multiplier @f$ B @f$ to a large
+value makes the optimization harder.
+
+<!-- ------------------------------------------------------------ --->
+@subsection pegasos-restarting Restarting
+<!-- ------------------------------------------------------------ --->
+
+VLFeat PEGASOS implementation can be restatred after any given number
+of iterations. This is useful to compute intermediate statistics or to
+load new data from disk for large datasets.  The state of the
+algorithm, which is required for restarting, is limited to the current
+estimate @f$ w_t @f$ of the SVM weight vector and the iteration number
+@f$ t @f$.
+
+<!-- ------------------------------------------------------------ --->
+@subsection pegasos-permutation Permutation
+<!-- ------------------------------------------------------------ --->
+
+VLFeat PEGASOS can use a user-defined permutation to decide the order
+in which data points are visited (instead of using random
+sampling). By specifying a permutation the algorithm is guaranteed to
+visit each data point exactly once in each loop. The permutation needs
+not to be bijective. This can be used to visit certain data samples
+more or less often than others, implicitly reweighting their relative
+importance in the SVM objective function. This can be used to blanace
+the data.
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-kernels Non-linear kernels
 <!-- ------------------------------------------------------------ --->
 
-PEGASOS can be extended to work with kernels, but the algorithm is not
-particularly efficient in this setting. A preferable solution may be
-to compute an explicit feature map representing the kernel.
+PEGASOS can be extended to non-linear kernels, but the algorithm is
+not particularly efficient in this setting [1]. When possible, it may
+be preferable to work with explicit feature maps.
 
-Let @f$ k(x,y) @f$ be a kernel. A <em>feature map</em> is a function
-@f$ \Psi(x) @f$ such that @f$ k(x,y) = \langle \Psi(x), \Psi(y)
-\rangle @f$. Using this representation, that exists for any positive
-definite kernel as long as one accepts infinite dimensional feature
-maps, non-linear SVM learning writes:
+Let @f$ k(x,y) @f$ be a positive definite kernel. A <em>feature
+map</em> is a function @f$ \Psi(x) @f$ such that @f$ k(x,y) = \langle
+\Psi(x), \Psi(y) \rangle @f$. Using this representation the non-linear
+SVM learning objective function writes:
 
 @f[
  \min_{w} \frac{\lambda}{2} \|w\|^2 + \frac{1}{m} \sum_{i=1}^n
  \ell(w; (\Psi(x)_i,y_i)).
 @f]
 
-Thus the only difference with the linear case is that @f$ \Psi(x) @f$
-is used in place of @f$ x @f$.
+Thus the only difference with the linear case is that the feature @f$
+\Psi(x) @f$ is used in place of the data @f$ x @f$.
 
-The ability of computing a feature-map representation depends on the
-kernel. A general solution is to take the (incomplete) Cholesky
-decomposition @f$ V^\top V @f$ of the kernel matrix @f$ K =
-[k(x_i,x_j)] @f$ (in this case @f$ \Psi(x_i) @f$ is the <em>i</em>-th
-columns of <em>V</em>). Alternatively, for additive kernels
-(e.g. intersection, Chi2) @ref homkermap.h can be used.
-
-<!-- ------------------------------------------------------------ --->
-@subsection pegasos-algorithm Algorithm
-<!-- ------------------------------------------------------------ --->
-
-PEGASOS is a stochastic subgradient optmizer with automatically tuned
-learning rate. At the <em>t</em>-iteration, the algorithm:
-
-- Samples uniformly at random as subset @f$ A_t@f$ of <em>k</em> of
-  training pairs @f$(x,y)@f$ from the <em>m</em> pairs provided.
-- Compute a subgradient @f$ \nabla_t @f$ of the function @f$ E_t(w) =
-  \frac{1}{2}\|w\|^2 + \frac{1}{k} \sum_{(x,y) \in A_t} \ell(w;(x,y)) @f$.
-- Do a step @f$ w_{t+1/2} = w_t - \alpha_t \nalba_t @f$ with learning
-  rate @f$  \alpha_t = 1/(\eta t) @f$.
-- Back project on the hypersphere of radius @f$ \sqrt{\lambda} @f$ to obtain
-  the next model estimate @f$ w_{t+1} @f$:
-  @f[
-    w_t = \min\{1, \sqrt{\lambda}/\|w\|\} w_{t+1/2}
-  @f]
+@f$ \Psi(x) @f$ can be learned off-line, for instance by using the
+incomplete Cholesky decomposition @f$ V^\top V @f$ of the Gram matrix
+@f$ K = [k(x_i,x_j)] @f$ (in this case @f$ \Psi(x_i) @f$ is the
+<em>i</em>-th columns of <em>V</em>). Alternatively, for additive
+kernels (e.g. intersection, Chi2) the explicit feature map computed by
+@ref homkermap.h can be used.
 
 <!-- ------------------------------------------------------------ --->
 @section pegasos-references References
@@ -125,17 +164,19 @@ learning rate. At the <em>t</em>-iteration, the algorithm:
     In Proc. ICML, 2007.
 */
 
-/** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,vl_size,double,VlRand*)
+/** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size)
  ** @param model (out) the learned model.
  ** @param data training vectors.
  ** @param dimension data dimension.
  ** @param numSamples number of training data vectors.
- ** @param labels lables of the training vetctors.
- ** @param regularizer value of @f$ \lambda @f$.
- ** @param firstIteration number of the fist iteration.
- ** @param lastIteration number of the last iteration.
- ** @param biasMultiplier value of @f$ B @f$.
+ ** @param labels labels of the training vectors.
+ ** @param regularizer value of the regularizer coefficient @f$ \lambda @f$.
+ ** @param biasMultiplier value of the bias multiplier @f$ B @f$.
+ ** @param startingIteration number of the first iteration.
+ ** @param numIterations number of iterations to perform.
  ** @param randomGenerator random number generator.
+ ** @param permutation order in which the data is accessed.
+ ** @param permutationSize length of @c permutation.
  **
  ** The function runs PEGASOS on the specified data. The vector @a
  ** model must have either dimension equal to @a dimension if @a
@@ -144,17 +185,22 @@ learning rate. At the <em>t</em>-iteration, the algorithm:
  **
  ** The function runs PEGASOS for iterations <em>t</em> in the
  ** interval [@a fistIteration, @a lastIteration]. Together with the
- ** fact that the inital model can be set arbitrarily, this enable
- ** restaring PEGASOS from any point.
+ ** fact that the initial model can be set arbitrarily, this enable
+ ** restarting PEGASOS from any point.
  **
  ** PEGASOS select the next point for computing the gradient at
  ** random. If @a randomGenerator is @c NULL, the default random
  ** generator (as returned by ::vl_get_rand()) is used.
  **
+ ** Alternatively, if @a permutation is not @c NULL, then points are
+ ** sampled in the order specified by this vector of indexes (this is
+ ** cycled through). In this way It is an error to set both @a
+ ** randomGenerator and @a permutation to non-null values.
+ **
  ** See the @ref pegasos-overview overview for details.
  **/
 
-/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,vl_size,double,VlRand*)
+/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size)
  ** @see ::vl_pegasos_train_binary_svm_d
  **/
 
@@ -187,7 +233,9 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
                                           double biasMultiplier,
                                           vl_uindex startingIteration,
                                           vl_size numIterations,
-                                          VlRand * randomGenerator)
+                                          VlRand * randomGenerator,
+                                          vl_uint32 const * permutation,
+                                          vl_size permutationSize)
 {
   vl_uindex iteration ;
   vl_uindex i ;
@@ -196,7 +244,6 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
   double lambda = regularizer ;
   double sqrtLambda = sqrt(lambda) ;
 
-
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction dotFn =
 #else
@@ -204,8 +251,11 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
 #endif
   VL_XCAT(vl_get_vector_comparison_function_,SFX)(VlKernelL2) ;
 
-  if (randomGenerator == NULL) randomGenerator = vl_get_rand() ;
+  if (randomGenerator == NULL && permutation == NULL) {
+    randomGenerator = vl_get_rand() ;
+  }
 
+  assert(randomGenerator == NULL || permutation == NULL) ;
   assert(startingIteration >= 1) ;
 
   /*
@@ -217,16 +267,23 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
        iteration < startingIteration + numIterations ;
        ++ iteration) {
     /* pick a sample  */
-    vl_uindex k = vl_rand_uindex(randomGenerator, numSamples) ;
+    vl_uindex k ;
+    if (permutation == NULL) {
+      k = vl_rand_uindex(randomGenerator, numSamples) ;
+    } else {
+      k = permutation[iteration % permutationSize] ;
+      assert(k < numSamples) ;
+    }
+
     x = data + dimension * k ;
     y = labels[k] ;
 
-    /* project on the weight vector */
+    /* project data point x on the weight vector */
     acc = dotFn(dimension, x, model) ;
     if (biasMultiplier) acc += biasMultiplier * model[dimension] ;
     acc *= scale ;
 
-    /* learning rate */
+    /* compute learning rate */
     eta = 1.0 / (iteration * lambda) ;
 
     if (y * acc < (T) 1.0) {
