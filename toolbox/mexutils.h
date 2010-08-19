@@ -171,7 +171,8 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
 
 /** @brief VLFeat MEX errors */
 typedef enum _VlmxErrorId {
-  vlmxErrInvalidArgument = 1,
+  vlmxErrAlloc = 1,
+  vlmxErrInvalidArgument,
   vlmxErrNotEnoughInputArguments,
   vlmxErrTooManyInputArguments,
   vlmxErrNotEnoughOutputArguments,
@@ -216,6 +217,7 @@ vlmxError(VlmxErrorId errorId, char const * errorMessage, ...)
   va_start(args, errorMessage) ;
 
   switch (errorId) {
+  case vlmxErrAlloc : errorString = "outOfMemory" ; break ;
   case vlmxErrInvalidArgument : errorString = "invalidArgument" ; break ;
   case vlmxErrNotEnoughInputArguments : errorString = "notEnoughInputArguments" ; break ;
   case vlmxErrTooManyInputArguments : errorString = "tooManyInputArguments" ; break ;
@@ -228,6 +230,7 @@ vlmxError(VlmxErrorId errorId, char const * errorMessage, ...)
 
   if (! errorMessage) {
     switch (errorId) {
+      case vlmxErrAlloc: errorMessage = "Out of memory." ; break ;
       case vlmxErrInvalidArgument: errorMessage = "Invalid argument." ; break ;
       case vlmxErrNotEnoughInputArguments: errorMessage = "Not enough input arguments." ; break ;
       case vlmxErrTooManyInputArguments: errorMessage = "Too many input arguments." ; break ;
