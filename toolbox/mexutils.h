@@ -15,7 +15,9 @@ GNU GPLv2, or (at your option) any later version.
 
 #include"mex.h"
 #include<vl/generic.h>
+#include<vl/array.h>
 #include<ctype.h>
+#include<string.h>
 #include<stdio.h>
 #include<stdarg.h>
 
@@ -530,6 +532,55 @@ vlmxCreatePlainScalar (double x)
 {
   mxArray * array = mxCreateDoubleMatrix (1,1,mxREAL) ;
   *mxGetPr(array) = x ;
+  return array ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Create a MATLAB array from a VlArray
+ ** @param x VlArray instance.
+ ** @return the new array.
+ **/
+
+static mxArray *
+vlmxCreateArrayFromVlArray (VlArray const * x)
+{
+  mwSize dimensions [VL_ARRAY_MAX_NUM_DIMENSIONS] ;
+  mxArray * array = NULL ;
+  mxClassID classId = 0 ;
+  vl_uindex d ;
+  vl_size numElements = vl_array_get_num_elements(x) ;
+  vl_size numDimensions  = vl_array_get_num_dimensions(x) ;
+  vl_size const * xdimensions = vl_array_get_dimensions(x) ;
+  vl_type type = vl_array_get_data_type(x) ;
+  vl_size typeSize = vl_get_type_size(type) ;
+
+  for (d = 0 ; d < numDimensions ; ++d) {
+    dimensions[d] = xdimensions[d] ;
+  }
+
+  switch (type) {
+    case VL_TYPE_FLOAT   : classId = mxSINGLE_CLASS ; break ;
+    case VL_TYPE_DOUBLE  : classId = mxDOUBLE_CLASS ; break ;
+    case VL_TYPE_INT8    : classId = mxINT8_CLASS ; break ;
+    case VL_TYPE_INT16   : classId = mxINT16_CLASS ; break ;
+    case VL_TYPE_INT32   : classId = mxINT32_CLASS ; break ;
+    case VL_TYPE_INT64   : classId = mxINT64_CLASS ; break ;
+    case VL_TYPE_UINT8   : classId = mxUINT8_CLASS ; break ;
+    case VL_TYPE_UINT16  : classId = mxUINT16_CLASS ; break ;
+    case VL_TYPE_UINT32  : classId = mxUINT32_CLASS ; break ;
+    case VL_TYPE_UINT64  : classId = mxUINT64_CLASS ; break ;
+    default: assert(VL_FALSE) ;
+  }
+
+  array = mxCreateNumericArray(numDimensions,
+                               dimensions,
+                               classId,
+                               mxREAL) ;
+
+  if (array == NULL) return NULL ;
+
+  memcpy(mxGetData(array), vl_array_get_data(x), typeSize * numElements) ;
+
   return array ;
 }
 
