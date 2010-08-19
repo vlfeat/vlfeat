@@ -1,5 +1,5 @@
 function [conf, args] = vl_argparse(conf, args)
-% VL_ARGPARSE  Parse option arguments
+% VL_ARGPARSE  Parse list of parameter-value pairs
 %   CONF = VL_ARGPARSE(CONF, ARGS) updates the structure CONF based on
 %   the specified parameter-value pairs ARGS={PAR1, VAL1, ... PARN,
 %   VALN}. The function produces an error if an unknown parameter name
@@ -9,10 +9,16 @@ function [conf, args] = vl_argparse(conf, args)
 %   ARGS instead of producing an error.
 %
 %   Example::
-%     The function can be used to quickly parse a variable list of
-%     arguments passed to a MATLAB functions:
+%     The function can be used to parse a list of arguments
+%     passed to a MATLAB functions:
 %
 %       conf = vl_argparse(conf, varargin)
+%
+%     If only a subset of the options should be parsed, for example
+%     because the other options are supposed to be interpreted by a
+%     subroutine, then use the form
+%
+%      [conf, varargin] = vl_argparse(conf, varargin)
 %
 %   See also: VL_OVERRIDE(), VL_HELP().
 
@@ -29,7 +35,7 @@ if ~isstruct(conf), error('CONF must be a structure') ; end
 remainingArgs = {} ;
 
 for ai = 1:2:length(args)
-  try 
+  try
     paramName = args{ai} ;
     value = args{ai+1} ;
   catch
