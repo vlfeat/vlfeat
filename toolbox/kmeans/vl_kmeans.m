@@ -16,16 +16,20 @@
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
 %
-%   Distance::
+%   Distance:: l2
 %     Use either l1 (L1) or l2 (L2) (default) distance.
 %
 %   Initialization::
 %     Use either random data points (RANDSEL) or k-means++ (PLUSPLUS)
 %     to initialize the centers.
 %
-%   Algorithm:
+%   Algorithm:: Lloyd
 %     Use either the standard Lloyd (LLOYD) or the accelerated
 %     Elkan (ELKAN) algorithm for optimization.
+%
+%   NumRepetitions:: 1
+%     Number of time to restart k-means. The solution with minimal
+%     energy is returned.
 %
 %   Example::
 %     VL_KMEANS(X, 10, 'verbose', 'distance', 'l1', 'algorithm',
