@@ -38,7 +38,7 @@ main (int argc, char *argv[])
         printf("test_getopt_long: test VLFeat implementation of this function.\n"
                " --help -h      this message\n"
                " --buffy -b     option with no arguments\n"
-               " --flouride -f  option with required argumetn\n"
+               " --fluoride -f  option with required argument\n"
                " --daggerset    auto option with no arguments\n"
                " --daggerrunset auto option with no argument\n"
                " --spike        long option with optional argument\n") ;
