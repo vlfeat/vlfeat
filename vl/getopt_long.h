@@ -18,11 +18,11 @@ GNU GPLv2, or (at your option) any later version.
 
 #include "generic.h"
 
-extern VL_EXPORT int    opterr ;  /** @brief option parsing last error */
-extern VL_EXPORT int    optind ;  /** @brief index of option to process in @c argv */
-extern VL_EXPORT int    optopt ;  /** @brief current option */
-extern VL_EXPORT char * optarg ;  /** @brief argument of current option */
-extern VL_EXPORT int    optreset; /** @brief */
+VL_EXPORT int    opterr ;  /** @brief option parsing last error */
+VL_EXPORT int    optind ;  /** @brief index of option to process in @c argv */
+VL_EXPORT int    optopt ;  /** @brief current option */
+VL_EXPORT char * optarg ;  /** @brief argument of current option */
+VL_EXPORT int    optreset; /** @brief */
 
 /** @brief ::getopt_long option */
 struct option
@@ -37,9 +37,9 @@ struct option
 #define required_argument 1 /**< ::option with required argument */
 #define optional_argument 2 /**< ::option with optional argument */
 
-extern VL_EXPORT int getopt_long(int argc, char *const argv[],
-			const char *optstring,
-			const struct option * longopts, int *longindex);
+VL_EXPORT int getopt_long(int argc, char * const argv[],
+                          const char * optstring,
+                          const struct option * longopts, int * longindex);
 
 /* VL_GETOPT_LONG_H */
 #endif

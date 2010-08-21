@@ -20,15 +20,14 @@ GNU GPLv2, or (at your option) any later version.
 typedef vl_int32 vl_ikm_acc ;  /**< IKM accumulator data type */
 
 /** ------------------------------------------------------------------
- ** @brief IKM algorithms 
+ ** @brief IKM algorithms
  **/
 
-VL_EXPORT 
 enum VlIKMAlgorithms {
   VL_IKM_LLOYD,       /**< Lloyd algorithm */
   VL_IKM_ELKAN        /**< Elkan algorithm */
 } ;
-  
+
 /** ------------------------------------------------------------------
  ** @brief IKM quantizer
  **/
@@ -48,7 +47,7 @@ typedef struct _VlIKMFilt
 
 /** @name Create and destroy
  ** @{
- **/ 
+ **/
 VL_EXPORT VlIKMFilt *vl_ikm_new    (int method) ;
 VL_EXPORT void       vl_ikm_delete (VlIKMFilt *f) ;
 /** @} */
@@ -63,7 +62,7 @@ VL_EXPORT int  vl_ikm_train          (VlIKMFilt *f, vl_uint8 const *data, int N)
 VL_EXPORT void vl_ikm_push           (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) ;
 
 VL_EXPORT
-vl_uint  vl_ikm_push_one   (vl_ikm_acc const *centers, 
+vl_uint  vl_ikm_push_one   (vl_ikm_acc const *centers,
                             vl_uint8 const *data,
                             int M, int K) ;
 /** @} */
@@ -90,11 +89,11 @@ VL_INLINE void vl_ikm_set_max_niters (VlIKMFilt *f, int max_niters) ;
  ** @param f IKM filter.
  ** @return data dimensionality.
  **/
- 
+
 VL_INLINE int
 vl_ikm_get_ndims (VlIKMFilt const* f)
 {
-  return f-> M ;  
+  return f-> M ;
 }
 
 /** ------------------------------------------------------------------
@@ -102,11 +101,11 @@ vl_ikm_get_ndims (VlIKMFilt const* f)
  ** @param f IKM filter.
  ** @return number of centers K.
  **/
- 
+
 VL_INLINE int
 vl_ikm_get_K (VlIKMFilt const* f)
 {
-  return f-> K ;  
+  return f-> K ;
 }
 
 /** ------------------------------------------------------------------
@@ -114,11 +113,11 @@ vl_ikm_get_K (VlIKMFilt const* f)
  ** @param f IKM filter.
  ** @return verbosity level.
  **/
- 
+
 VL_INLINE int
 vl_ikm_get_verbosity (VlIKMFilt const* f)
 {
-  return f-> verb ;  
+  return f-> verb ;
 }
 
 /** ------------------------------------------------------------------
@@ -126,11 +125,11 @@ vl_ikm_get_verbosity (VlIKMFilt const* f)
  ** @param f IKM filter.
  ** @return maximum number of iterations.
  **/
- 
+
 VL_INLINE int
 vl_ikm_get_max_niters (VlIKMFilt const* f)
 {
-  return f-> max_niters ;  
+  return f-> max_niters ;
 }
 
 /** ------------------------------------------------------------------
@@ -138,11 +137,11 @@ vl_ikm_get_max_niters (VlIKMFilt const* f)
  ** @param f IKM filter.
  ** @return maximum number of iterations.
  **/
- 
+
 VL_INLINE vl_ikm_acc const *
 vl_ikm_get_centers (VlIKMFilt const* f)
 {
-  return f-> centers ;  
+  return f-> centers ;
 }
 
 /** ------------------------------------------------------------------
@@ -150,7 +149,7 @@ vl_ikm_get_centers (VlIKMFilt const* f)
  ** @param f    IKM filter.
  ** @param verb verbosity level.
  **/
- 
+
 VL_INLINE void
 vl_ikm_set_verbosity (VlIKMFilt *f, int verb)
 {
@@ -162,11 +161,11 @@ vl_ikm_set_verbosity (VlIKMFilt *f, int verb)
  ** @param f          IKM filter.
  ** @param max_niters maximum number of iterations.
  **/
- 
+
 VL_INLINE void
 vl_ikm_set_max_niters (VlIKMFilt *f, int max_niters)
 {
-  f-> max_niters = max_niters ;  
+  f-> max_niters = max_niters ;
 }
 
 /* VL_IKMEANS_H */

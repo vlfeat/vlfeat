@@ -399,7 +399,7 @@ do_nothing_printf (char const* format VL_UNUSED, ...)
 
 /** --------------------------------------------------------------- */
 
-VL_EXPORT VlState _vl_state ;
+VlState _vl_state ;
 
 /** ------------------------------------------------------------------
  ** @internal @brief Lock VLFeat state

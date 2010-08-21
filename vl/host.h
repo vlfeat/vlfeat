@@ -274,39 +274,54 @@ GNU GPLv2, or (at your option) any later version.
 /** @} */
 
 #if defined(VL_COMPILER_MSC)
-#define VL_UNUSED
-#define VL_INLINE static __inline
-#define snprintf _snprintf
-#define isnan _isnan
-#ifdef VL_BUILD_DLL
-#define VL_EXPORT __declspec(dllexport)
-#else
-#define VL_EXPORT __declspec(dllimport)
-#endif
+#  define VL_UNUSED
+#  define VL_INLINE static __inline
+#  define snprintf _snprintf
+#  define isnan _isnan
+#  ifdef VL_BUILD_DLL
+#    ifdef __cplusplus
+#      define VL_EXPORT extern "C" __declspec(dllexport)
+#    else
+#      define VL_EXPORT extern __declspec(dllexport)
+#    endif
+#  else
+#    ifdef __cplusplus
+#      define VL_EXPORT extern "C" __declspec(dllimport)
+#    else
+#      define VL_EXPORT extern __declspec(dllimport)
+#    endif
+#  endif
 #endif
 
 #if defined(VL_COMPILER_LCC)
-#define VL_UNUSED
-#define VL_INLINE static __inline
-#define snprintf _snprintf
-#define isnan _isnan
+#  define VL_UNUSED
+#  define VL_INLINE static __inline
+#  define snprintf _snprintf
+#  define isnan _isnan
 VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
-#ifdef VL_BUILD_DLL
-#define VL_EXPORT __declspec(dllexport)
-#else
-#define VL_EXPORT
-#endif
+#  ifdef VL_BUILD_DLL
+#    define VL_EXPORT extern __declspec(dllexport)
+#  else
+#    define VL_EXPORT extern
+#  endif
 #endif
 
-#if defined(VL_COMPILER_GNUC) || \
-    defined(__DOXYGEN__)
-#define VL_UNUSED __attribute__((unused))
-#define VL_INLINE static __inline__
-#ifdef VL_BUILD_DLL
-#define VL_EXPORT __attribute__((visibility ("default")))
-#else
-#define VL_EXPORT
-#endif
+#if defined(VL_COMPILER_GNUC) || defined(__DOXYGEN__)
+#  define VL_UNUSED __attribute__((unused))
+#  define VL_INLINE static __inline__
+#  ifdef VL_BUILD_DLL
+#    ifdef __cplusplus
+#      define VL_EXPORT __attribute__((visibility ("default"))) extern "C"
+#    else
+#      define VL_EXPORT __attribute__((visibility ("default"))) extern
+#    endif
+#  else
+#    ifdef __cplusplus
+#      define VL_EXPORT extern "C"
+#    else
+#      define VL_EXPORT extern
+#    endif
+#  endif
 #endif
 
 VL_EXPORT char * vl_static_configuration_to_string_copy () ;
@@ -477,8 +492,8 @@ VL_INLINE void vl_swap_host_big_endianness_2 (void *dst, void* src) ;
 
 typedef struct _VlX86CpuInfo
 {
-  union { 
-    char string [0x20] ; 
+  union {
+    char string [0x20] ;
     vl_uint32 words [0x20 / 4] ;
   } vendor ;
   vl_bool hasSSE42 ;

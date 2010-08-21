@@ -166,7 +166,7 @@ typedef struct _VlState
 } VlState ;
 
 /** @internal @brief VLFeat global state */
-extern VL_EXPORT VlState _vl_state ;
+VL_EXPORT VlState _vl_state ;
 
 VL_INLINE VlState * vl_get_state () ;
 VL_INLINE VlThreadSpecificState * vl_get_thread_specific_state () ;
