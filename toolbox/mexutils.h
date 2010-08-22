@@ -585,6 +585,45 @@ vlmxCreateArrayFromVlArray (VlArray const * x)
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Envelope a MATLAB array in a VlArray instance
+ ** @param v VlArray instance (out)
+ ** @param x MATALB array.
+ ** @return @c v.
+ **/
+
+static VlArray *
+vlmxEnvelopeArrayInVlArray (VlArray * v, mxArray * x)
+{
+  vl_size numDimensions = mxGetNumberOfDimensions(x) ;
+  mwSize const * dimensions = mxGetDimensions(x) ;
+  mxClassID classId = mxGetClassID(x) ;
+  vl_size vdimensions [VL_ARRAY_MAX_NUM_DIMENSIONS] ;
+  vl_type type ;
+  vl_uindex d ;
+
+  for (d = 0 ; d < numDimensions ; ++d) {
+    vdimensions[d] = dimensions[d] ;
+  }
+
+  switch (classId) {
+    case mxSINGLE_CLASS: type =  VL_TYPE_FLOAT  ; break ;
+    case mxDOUBLE_CLASS: type =  VL_TYPE_DOUBLE ; break ;
+    case mxINT8_CLASS  : type =  VL_TYPE_INT8   ; break ;
+    case mxINT16_CLASS : type =  VL_TYPE_INT16  ; break ;
+    case mxINT32_CLASS : type =  VL_TYPE_INT32  ; break ;
+    case mxINT64_CLASS : type =  VL_TYPE_INT64  ; break ;
+    case mxUINT8_CLASS : type =  VL_TYPE_UINT8  ; break ;
+    case mxUINT16_CLASS: type =  VL_TYPE_UINT16 ; break ;
+    case mxUINT32_CLASS: type =  VL_TYPE_UINT32 ; break ;
+    case mxUINT64_CLASS: type =  VL_TYPE_UINT64 ; break ;
+    default: assert(VL_FALSE) ;
+  }
+
+  vl_array_init_envelope(v, mxGetData(x), type, numDimensions, vdimensions) ;
+  return v ;
+}
+
+/** ------------------------------------------------------------------
  ** @brief Case insensitive string comparison
  **
  ** @param s1 first string.
