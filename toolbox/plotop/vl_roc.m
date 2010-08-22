@@ -1,75 +1,85 @@
-function [tp,tn,info] = vl_roc(y, score, varargin)
+function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 % VL_ROC Compute ROC curve
-%  [TP,TN] = VL_ROC(Y, SCORE) computes the ROC curve for the specified
-%  data. Y are the ground thruth labels (+1 or -1) and SCORE is the
-%  discriminant score assigned to them by a classifier (higher scores
-%  correspond to positive labels).
+%  [TP,TN] = VL_ROC(LABELS, SCORES) computes the receiver operating
+%  characteristic (ROC curve). LABELS are the ground thruth labels (+1
+%  or -1) and SCORE is the scores assigned to them by a classifier
+%  (higher scores correspond to positive labels).
 %
 %  [TP,TN] are the true positive and true negative rates for
 %  incereasing values of the decision threshold.
 %
+%  Set the zero the lables of samples to ignore in the evaluation.
+%
+%  Set to -INF the score of samples which are never retrieved. In
+%  this case the PR curve will have maximum recall < 1.
+%
 %  [TP,TN,INFO] = VL_ROC(...) returns the following additional
 %  information:
 %
-%  INFO.EER::       Equal error rate.
-%  INFO.AUC::       Area under the VL_ROC (AUC).
-%  INFO.UR::        Uniform prior best op point rate.
-%  INFO.UT::        Uniform prior best op point threhsold.
-%  INFO.NR::        Natural prior best op point rate.
-%  INFO.NT::        Natural prior best op point threshold.
+%  INFO.EER:: Equal error rate.
+%  INFO.AUC:: Area under the VL_ROC (AUC).
+%  INFO.UR::  Uniform prior best op point rate.
+%  INFO.UT::  Uniform prior best op point threhsold.
+%  INFO.NR::  Natural prior best op point rate.
+%  INFO.NT::  Natural prior best op point threshold.
 %
-%  VL_ROC(...) plots the VL_ROC diagram in the current axis.
+%  VL_ROC(...) with no output arguments plots the VL_ROC diagram in
+%  the current axis.
 %
 %  About the ROC curve::
 %    Consider a classifier that predicts as positive all lables Y
-%    whose SCORE is not smaller than a threshold R. The ROC curve
-%    represents the performance of such classifier as the threshold R
-%    is varied. Let:
+%    whose SCORE is not smaller than a threshold S. The ROC curve
+%    represents the performance of such classifier as the threshold S
+%    is changed. Define
 %
-%      #P   = num of positive samples
-%      #N   = num of negative samples
-%      #TP = num of samples that are correctly classified as positive
-%      #TN = num of samples that are correctly classified as negative
-%      #FP = num of samples that are incorrectly classified as positive
-%      #FN = num of samples that are incorrectly classified as negative
+%      P = num. of positive samples,
+%      N = num. of negative samples,
+%
+%    and for each threshold S
+%
+%      TP(S) = num. of samples that are correctly classified as positive,
+%      TN(S) = num. of samples that are correctly classified as negative,
+%      FP(S) = num. of samples that are incorrectly classified as positive,
+%      FN(S) = num. of samples that are incorrectly classified as negative.
 %
 %    Consider also the rates:
 %
-%                TP = #TP / #P,      FN = #FN / #P,
-%                TN = #TN / #N,      FP = #FP / #N.
+%      TPR = TP(S) / P,      FNR = FN(S) / P,
+%      TNR = TN(S) / N,      FPR = FP(S) / N,
 %
-%    Notice that:
+%    and notice that by definition
 %
-%                 P = #TP + #FN ,    N = #TN + #FP,
-%                 1 = TP + FN,       1 = TN + FP.
+%      P = TP(S) + FN(S) ,    N = TN(S) + FP(S),
+%      1 = TPR(S) + FNR(S),   1 = TNR(S) + FPR(S).
 %
-%    The ROC curve is the parametric curve (TP, TN) obtained as the
-%    classifier threshold R is varied.
+%    The ROC curve is the parametric curve (TPR(S), TNR(S)) obtained
+%    as the classifier threshold S is varied from -INF to +INF. The
+%    TPR is also known as recall (see VL_PR()).
 %
 %    The ROC curve is contained in the square with vertices (0,0) The
 %    (average) ROC curve of a random classifier is a line which
 %    connects (1,0) and (0,1).
 %
 %    The ROC curve is independent of the prior probability of the
-%    labels Y (i.e. of #P/(#P+#N) and #N/(#P+#N)).
+%    labels (i.e. of P/(P+N) and N/(P+N)).
 %
-%    An OPERATING POINT is a point on the ROC curve, corresponding to
-%    a certain threshold R. Each operating point corresponds to
+%    An OPERATING POINT is a point on the ROC curve corresponding to
+%    a certain threshold S. Each operating point corresponds to
 %    minimizing the empirical 01 error of the classifier for given
-%    prior probabilty of the labels Y. VL_ROC() computes the following
+%    prior probabilty of the labels. VL_ROC() computes the following
 %    operating points:
 %
-%     Natural operating point:: Assumes P[Y=+1] = P/(P+N).
+%     Natural operating point:: Assumes P[Y=+1] = P / (P + N).
 %     Uniform operating point:: Assumes P[Y=+1] = 1/2.
 %
-%   Options:
+%   VL_ROC() acccepts the following options:
 %
-%   Plot::
-%     'TrueNegative' plots the true positives vs. the true negatives.
-%     'FalseNegative' plots the true positives vs. the false
-%     negatives.
+%   Plot:: []
+%     Setting this option turns on plotting. Set to 'TrueNegative' or
+%     'TN' to plot TP(S) (recall) vs. TN(S). Set to 'FalseNegative' or
+%     'FN' to plot TP(S) (recall) vs. FP(S) = 1 - TN(S).
 %
-%  See also:: VL_HELP().
+%  See also:: VL_PR(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -77,41 +87,33 @@ function [tp,tn,info] = vl_roc(y, score, varargin)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-plotenable = (nargout == 0);
-plotstyle = 'truenegative';
-for k=1:2:length(varargin)
-  switch lower(varargin{k})
-    case 'plot'
-      plotenable = 1;
-      plotstyle = lower(varargin{k+1}) ;
-    otherwise
-      error(['Unknown option ''', varargin{k}, '''.']) ;
-  end
-end
+opts.plot = [] ;
+opts = vl_argparse(opts, varargin) ;
 
 % make row vectors
-y = y(:)' ;
-score = score(:)' ;
+labels = labels(:)' ;
+scores = scores(:)' ;
 
-[score, perm] = sort(score) ;
+% sort by descending scores
+[scores, perm] = sort(scores, 'descend') ;
+labels = labels(perm) ;
 
-Np = sum(y==+1) ;
-Nn = sum(y==-1) ;
-N  = Np + Nn ;
+% assume that data with -INF score is never retrieved
+stop = max(find(scores > -inf)) ;
 
-if N < length(y)
-  error('Y must be a vector of -1 and +1')
-end
+% Compute number of true positives, false positives, and overall
+% peositives. Note that labels==0 don't increase any of the counts.
+tp = [0 cumsum(labels(1:stop) == +1)] ;
+fp = [0 cumsum(labels(1:stop) == -1)] ;
+p = sum(labels == +1) ;
+n = sum(labels == -1) ;
 
-% true positive rate
-% fliplr(perm) move the high scored ones to the beginning
-tp = cumsum( y(fliplr(perm)) == +1 ) / (Np + eps) ;
-tp = fliplr(tp) ;
-tp = [tp, 0] ;
+% compute the rates
+tpr = tp / (p + eps) ;
+fpr = fp / (n + eps) ;
 
-% true negative rate
-tn = cumsum(y(perm) == -1) / (Nn + eps)  ;
-tn = [0, tn] ;
+fnr = 1 - tpr ;
+tnr = 1 - fpr ;
 
 % --------------------------------------------------------------------
 %                                                      Additional info
@@ -120,27 +122,25 @@ tn = [0, tn] ;
 if nargout > 0 | nargout == 0
 
   % equal error rate
-  i1 = max(find(tp >= tn)) ;
-  i2 = min(find(tn >= tp)) ;
-%  eer = (tp(i) + tn(i)) / 2 ;
-  eer = max(tn(i1), tp(i2)) ;
+  i1 = max(find(tpr >= tnr)) ;
+  i2 = max(find(tnr >= tpr)) ;
+  eer = 1 - max(tnr(i1), tpr(i2)) ;
 
   % uniform prior and natural prior operating points
-  [drop, upoint] = max(tp + tn) ;
-  [drop, npoint] = max(tp .* Np + tn .* Nn) ;
+  [drop, upoint] = max(tpr * .5 + tnr * .5) ;
+  [drop, npoint] = max(tpr * p  + tnr * n) ;
 
   % uniform prior and natural prior operationg points rates and thresholds
-  ur = tp(upoint) * 1/2  + tn(upoint) * 1/2 ;
-  nr = tp(npoint) * Np/N + tn(npoint) * Nn/N ;
+  ur = tpr(upoint) * .5      + tnr(upoint) * .5 ;
+  nr = tpr(npoint) * p/(p+n) + tnr(npoint) * n/(p+n) ;
 
-  score_ = [-inf, score] ;
-  ut = score_(upoint) ;
-  nt = score_(npoint) ;
+  scores_ = [-inf, scores] ;
+  ut = scores_(upoint) ;
+  nt = scores_(npoint) ;
 
   % area
-  area = sum((tp(1:end-1)+tp(2:end)) .* diff(tn))/2 ;
+  area = sum((tnr(1:end-1)+tnr(2:end)) .* diff(tpr))/2 ;
 
-  % save
   info.eer  = eer ;
   info.auc  = area ;
   info.ut   = ut ;
@@ -153,53 +153,45 @@ end
 %                                                                 Plot
 % --------------------------------------------------------------------
 
-% plot?
-if plotenable
+if ~isempty(opts.plot) || (nargout == 0)
+  if isempty(opts.plot), opts.plot = 'tn' ; end
+  cla ; hold on ;
+  switch lower(opts.plot)
+    case {'truenegatives', 'tn'}
+      plot(tnr, tpr, 'b', 'linewidth', 2) ;
+      spline((1-eer) * [0 1 1], (1-eer) * [1 1 0], 'r--') ;
+      spline(tnr(upoint) * [0 1 1], tpr(upoint) * [1 1 0], 'g--') ;
+      spline(tnr(npoint) * [0 1 1], tpr(npoint) * [1 1 0], 'k--') ;
+      spline([0 1], [1 0], 'b:', 'linewidth', 2) ;
+      spline([0 1], [0 1], 'y--', 'linewidth', 1) ;
+      xlabel('true negative rate') ;
+      ylabel('true positve rate (recall)') ;
 
-	cla ; hold on ;
-	plot(tn,tp,'linewidth',2) ;
-
-  switch plotstyle
-
-    case 'truenegative'
-      line(eer             * [0 1 1], ...
-           eer             * [1 1 0], ...
-           'color','r', 'linestyle', '--','linewidth', 1) ;
-      line(tn(upoint) * [0 1 1], ...
-           tp(upoint) * [1 1 0], ...
-           'color','g', 'linestyle', '--', 'linewidth', 1) ;
-      line(tn(npoint) * [0 1 1], ...
-           tp(npoint) * [1 1 0], ...
-           'color','b', 'linestyle', '--', 'linewidth', 1) ;
-      line([0 1], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
-      line([0 1], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
-
-      xlim([0 1]) ; xlabel('true negative rate') ;
-      ylim([0 1]) ; ylabel('true positve rate') ;
-
-    case 'falsenegative'
-      line(1 - eer             * [0 1 1], ...
-           eer             * [1 1 0], ...
-           'color','r', 'linestyle', '--','linewidth', 1) ;
-      line(1 - tn(upoint) * [0 1 1], ...
-           tp(upoint) * [1 1 0], ...
-           'color','g', 'linestyle', '--', 'linewidth', 1) ;
-      line(1 - tn(npoint) * [0 1 1], ...
-           tp(npoint) * [1 1 0], ...
-           'color','b', 'linestyle', '--', 'linewidth', 1) ;
-      line([1 0], [1 0], 'color','b', 'linestyle', ':', 'linewidth', 2) ;
-      line([1 0], [0 1], 'color','y', 'linestyle', '-', 'linewidth', 1) ;
-
-      xlim([0 1]) ; xlabel('false negative rate') ;
-      ylim([0 1]) ; ylabel('true positve rate') ;
+    case {'falsepositives', 'fp'}
+      plot(fpr, tpr, 'b', 'linewidth', 2) ;
+      spline(eer * [0 1 1], (1-eer) * [1 1 0], 'r--') ;
+      spline((1-tnr(upoint)) * [0 1 1], tpr(upoint) * [1 1 0], 'g--') ;
+      spline((1-tnr(npoint)) * [0 1 1], tpr(npoint) * [1 1 0], 'k--') ;
+      spline([1 0], [1 0], 'b:', 'linewidth', 2) ;
+      spline([1 0], [0 1], 'y--', 'linewidth', 1) ;
+      xlabel('false positive rate') ;
+      ylabel('true positve rate (recall)') ;
     otherwise
-      error(sprintf('Unrecognized plotting style: %s', plotstyle));
+      error('Invalid argument %s for option PLOT.', opts.plot);
   end
+
+  grid on ;
+  xlim([0 1]) ;
+  ylim([0 1]) ;
   axis square ;
-	title(sprintf('VL_ROC (AUC = %.3g)', area), 'interpreter', 'none') ;
-	legend('ROC', ...
-				 sprintf('eer     %.3g %%', 100 * eer), ...
-				 sprintf('op unif %.3g %%', 100 * ur), ...
-				 sprintf('op nat  %.3g %%', 100 * nr), ...
-				 'random order', 'Location', 'SouthWest') ;
+  title(sprintf('ROC (AUC = %.3g)', area), 'interpreter', 'none') ;
+  legend('ROC', ...
+         sprintf('eer %.3g %%', 100 * eer), ...
+         sprintf('op. unif. %.3g %%', 100 * ur), ...
+         sprintf('op. nat. %.3g %%', 100 * nr), ...
+         'ROC rand.', 'Location', 'SouthWest') ;
 end
+
+function h = spline(x,y,spec,varargin)
+prop = vl_linespec2prop(spec) ;
+h = line(x,y,prop{:},varargin{:}) ;

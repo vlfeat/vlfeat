@@ -1,34 +1,39 @@
-function [recall, precision, info] = vl_pr(y, scores)
+function [recall, precision, info] = vl_pr(labels, scores, varargin)
 % VL_PR Compute precision-recall curve
-%  [RECALL, PRECISION] = VL_PR(Y, SCORES) computes the precision-recall
-%  (PR) curve of the specified data. Y are the ground thruth labels
-%  (+1 or -1) and SCORE is the discriminant score associated to the
-%  data by a classifier (lager scores correspond to positive
-%  guesses). 
-%
-%  Remark:: Assign -INF score to data which is never retrieved
-%    (this will result in maximum recall < 1).
+%  [RECALL, PRECISION] = VL_PR(LABELS, SCORES) computes the
+%  precision-recall (PR) curve. LABELS are the ground thruth labels
+%  (+1 or -1) and SCORES are the scores associated to them by a
+%  classifier (lager scores correspond to positive guesses).
 %
 %  RECALL and PRECISION are the recall and the precision for
 %  increasing values of the decision threshold.
 %
+%  Set the zero the lables of data points to ignore in the evaluation.
+%
+%  Set to -INF the score of data points which are never retrieved. In
+%  this case the PR curve will have maximum recall < 1.
+%
+%  VL_PR() accepts the following options:
+%
+%  InludeInf:: false
+%    If set to true, data with -INF score is included in the evaluation.
+%
 %  About the PR curve::
-%    We use the same symbols as for the VL_ROC() function. We define the
-%    quantities
+%    This section uses the same symbols used in the documentation of
+%    the VL_ROC() function. In addition to those quantities, define:
 %
-%      P = TP / (TP + FP) = precision
-%      R = TP / P = recall
+%      PRECISION(S) = TP(S) / (TP(S) + FP(S))
+%      RECALL(S) = TP(S) / P = TPR(S)
 %
-%    The precision P is the fraction of positivie predictions which
-%    are correct, and the recall R is the fraction of trurly positive
-%    labels that have been correctly classified (recalled).
-%
-%    Notice that the recall is also equal to the true positive rate in
-%    a ROC curve (see VL_ROC()).
+%    The precision is the fraction of positivie predictions which are
+%    correct, and the recall is the fraction of positive labels that
+%    have been correctly classified (recalled). Notice that the
+%    recall is also equal to the true positive rate for the ROC curve
+%    (see VL_ROC()).
 %
 %  Remark:: precision (P) is undefined for those values of the
 %    classifier threshold for which no example is classified as
-%    positive. Conventionally, we assign a precision of P=1 to such
+%    positive. Conventionally, a precision of P=1 is assigned to such
 %    cases.
 %
 %  See also:: VL_ROC(), VL_HELP().
@@ -39,54 +44,64 @@ function [recall, precision, info] = vl_pr(y, scores)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
+opts.includeinf = false ;
+opts = vl_argparse(opts,varargin) ;
+
+% make row vectors
+labels = labels(:)' ;
+scores = scores(:)' ;
+
+% sort by descending scores
 [scores, perm] = sort(scores, 'descend') ;
-y = y(perm) ;
+labels = labels(perm) ;
 
-stop = max(find(scores > -inf)) ;
-
-tp = [0 cumsum(y(1:stop) == +1)] ;
-fp = [0 cumsum(y(1:stop) == -1)] ;
-p  = sum(y == +1) ;
-
-recall    = tp  / (p + eps) ;
-precision = (tp + eps) ./ (tp + fp + eps) ;
-
-% compute auc
-if length(recall) > 1
-  a    = precision ;
-  b    = recall ;
-  auc  = sum((a(1:end-1) + a(2:end)) .* diff(b))/2 ;
+% assume that data with -INF score is never retrieved
+if opts.includeinf
+  stop = length(scores) ;
 else
-  auc  = 0 ;
+  stop = max(find(scores > -inf)) ;
 end
 
-% compute auc according to PA08 challenge
-ap=0;
-for t=0:0.1:1
-  p_=max(precision(recall>=t));
+% Compute number of true positives, false positives, and overall
+% positives. Note that lables==0 don't increase neither TP nor FP nor
+% affect P.
+tp = [0 cumsum(labels(1:stop) == +1)] ;
+fp = [0 cumsum(labels(1:stop) == -1)] ;
+p = sum(labels == +1) ;
+
+% compute precision and recall
+recall = tp / (p + eps) ;
+precision = (tp + eps) ./ (tp + fp + eps) ;
+
+% compute AUC
+if length(recall) > 1
+  auc = sum((precision(1:end-1) + precision(2:end)) .* diff(recall)) / 2 ;
+else
+  auc = 0 ;
+end
+
+% compute AUC according to TRECVID / PASCAL VOC <= 2009
+ap = 0;
+for t=0 : 0.1 : 1
+  p_ = max(precision(recall>=t));
   if isempty(p_)
     p_=0;
   end
-  ap=ap+p_/11;
+  ap = ap + p_ / 11 ;
 end
 
-info.auc      = auc ;
+info.auc = auc ;
 info.auc_pa08 = ap ;
 
-% --------------------------------------------------------------------
-%                                                                 Plot
-% --------------------------------------------------------------------
-
-if nargout == 0	
-	cla ; hold on ;
-	plot(recall,precision,'linewidth',2) ;
-  line([0 1], [1 1] * p / length(y), 'color', 'r', 'linestyle', '--') ;
-
-	axis square ;
-	xlim([0 1]) ; xlabel('recall') ;
-	ylim([0 1]) ; ylabel('precision') ;
-	title(sprintf('precision-recall (AUC = %.2f %%)', info.auc * 100)) ;
-	legend('PR', 'random classifier', 'location', 'northwestoutside') ;
-
+% make a figure if there are no output arguments
+if nargout == 0
+  cla ; hold on ;
+  plot(recall,precision,'linewidth',2) ;
+  line([0 1], [1 1] * p / length(labels), 'color', 'r', 'linestyle', '--') ;
+  axis square ; grid on ;
+  xlim([0 1]) ; xlabel('recall') ;
+  ylim([0 1]) ; ylabel('precision') ;
+  title(sprintf('Precision-recall (AP = %.2f %%)', info.auc * 100)) ;
+  legend('PR', 'random classifier', 'Location', 'NorthWestOutside') ;
   clear recall precision info ;
 end
