@@ -16,9 +16,10 @@ typedef struct VlLbp_
 {
   vl_size dimension ;
   vl_uint8 mapping [256] ;
+  vl_bool transposed ;
 } VlLbp ;
 
-VL_EXPORT VlLbp * vl_lbp_new(VlLbpMappingType type) ;
+VL_EXPORT VlLbp * vl_lbp_new(VlLbpMappingType type, vl_bool transposed) ;
 VL_EXPORT void vl_lbp_delete(VlLbp * self) ;
 VL_EXPORT void vl_lbp_process (VlLbp * self,
                                float * features,

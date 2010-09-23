@@ -55,7 +55,7 @@ mexFunction(int nout, mxArray *out[],
               "CELLSIZE is not a plain scalar.") ;
   }
 
-  if (mxGetScalar(IN(CELLSIZE)) <= 1.0) {
+  if (mxGetScalar(IN(CELLSIZE)) < 1.0) {
     vlmxError(vlmxErrInvalidArgument,
               "CELLSIZE is less than 1.") ;
   }
@@ -71,7 +71,7 @@ mexFunction(int nout, mxArray *out[],
     mwSize dimensions [3] ;
 
     /* get LBP object */
-    VlLbp * lbp = vl_lbp_new (VlLbpUniform) ;
+    VlLbp * lbp = vl_lbp_new (VlLbpUniform, VL_TRUE) ;
     if (lbp == NULL) {
       vlmxError(vlmxErrAlloc, NULL) ;
     }

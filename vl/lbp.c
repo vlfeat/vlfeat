@@ -64,6 +64,11 @@ size @c dimension (as returned by ::vl_lbp_get_dimension). Thus the
 required buffer has size @c floor(width/cellSize) x @c
 floor(height/cellSize) x @c dimension.
 
+::VlLbp supports computing transposed LPBs as well. A transposed LBP
+is the LBP obtained by transposing the underlying image patch
+(regarded as a matrix). This can be useful to compute the features
+when the image is column major rather than row major.
+
 @section lbp-references References
 
 [1] T. Ojala, M. Pietikainen, and M. Maenpaa. "Multiresolution
@@ -79,44 +84,69 @@ floor(height/cellSize) x @c dimension.
 static void
 _vl_lbp_init_uniform(VlLbp * self)
 {
-  int unsigned bitString ;
-  vl_size bitStringLength = 8 ;
-  int pattern = 0 ;
-  /* scan all bit strings */
-  for (bitString = 0 ; bitString < (unsigned)(1 << bitStringLength) ; ++bitString) {
-    /* count number of 01 or 10 transitions in string */
-    int unsigned rotBitString = (bitString >> 1) | ((bitString & 0x1) << (bitStringLength-1)) ;
-    int unsigned flips = bitString ^ rotBitString ;
-    int numFlips = 0 ;
-    int unsigned j ;
-    for (j = 0 ; j < bitStringLength ; ++j, flips >>= 1) {
-      numFlips += (flips & 0x1) ;
-    }
-    /* create a new pattern for any bit string with no or up to 2 transitions */
-    if (numFlips <= 2) {
-      self->mapping[bitString] = ++ pattern ;
-    } else {
-      self->mapping[bitString] = 0 ;
+  int i, j ;
+
+  /* one bin for constant patterns, 8*7 for 2-uniform, one for rest */
+  self->dimension = 58 ;
+
+  /* all but selected patterns map to 57 */
+  for (i = 0 ; i < 256 ; ++i) {
+    self->mapping[i] = 57 ;
+  }
+
+  /* uniform patterns map to 56 */
+  self->mapping[0x00] = 56 ;
+  self->mapping[0xff] = 56 ;
+
+  /* now uniform pattenrs, in order */
+  /* locations: 0:E, 1:SE, 2:S, ..., 7:NE */
+  for (i = 0 ; i < 8 ; ++i) { /* string[i-1]=0, string[i]=1 */
+    for (j = 1 ; j <= 7 ; ++j) { /* length of sequence of ones */
+      /* string starting with j ones */
+      int unsigned string = (1 << j) - 1 ;
+      /* put i zeroes in front */
+      string <<= i ;
+      /* wrap around 8 bit boundaries */
+      string = (string | (string >> 8)) & 0xff ;
+
+      /* optionally transpose the pattern */
+      if (self->transposed) {
+        int unsigned original = string;
+        int k ;
+        /* flip the string left-right */
+        string = 0 ;
+        for (k = 0 ; k < 8 ; ++k) {
+          string <<= 1 ;
+          string |= original & 0x1  ;
+          original >>= 1 ;
+        }
+        /* rotate 90 degrees */
+        string <<= 3 ;
+        string = (string | (string >> 8)) & 0xff ;
+      }
+
+      self->mapping[string] = i * 7 + (j-1) ;
     }
   }
-  self->dimension = pattern + 1 ;
 }
 
 /* ---------------------------------------------------------------- */
 
 /** @brief Create a new LBP object
  ** @param type type of LBP features.
- ** @return new object.
+ ** @param transposed if @c true, then transpose each LBP pattern.
+ ** @return new VlLbp object instance.
  **/
 
 VlLbp *
-vl_lbp_new(VlLbpMappingType type)
+vl_lbp_new(VlLbpMappingType type, vl_bool transposed)
 {
   VlLbp * self = vl_malloc(sizeof(VlLbp)) ;
   if (self == NULL) {
     vl_set_last_error(VL_ERR_ALLOC, NULL) ;
     return NULL ;
   }
+  self->transposed = transposed ;
   switch (type) {
     case VlLbpUniform: _vl_lbp_init_uniform(self) ; break ;
     default: exit(1) ;
@@ -165,7 +195,7 @@ vl_lbp_process (VlLbp * self,
 
   /* accumulate pixel-level measurements into cells */
   for (y = 1 ; y < (signed)height - 1 ; ++y) {
-    float wy1 = y / (float)cellSize - 0.5f ;
+    float wy1 = (y + 0.5f) / (float)cellSize - 0.5f ;
     int cy1 = (int) vl_floor_f(wy1) ;
     int cy2 = cy1 + 1 ;
     float wy2 = wy1 - (float)cy1 ;
@@ -173,7 +203,7 @@ vl_lbp_process (VlLbp * self,
     if (cy1 >= (signed)cheight) continue ;
 
     for (x = 1 ; x < (signed)width - 1; ++x) {
-      float wx1 = x / (float)cellSize - 0.5f ;
+      float wx1 = (x + 0.5f) / (float)cellSize - 0.5f ;
       int cx1 = (int) vl_floor_f(wx1) ;
       int cx2 = cx1 + 1 ;
       float wx2 = wx1 - (float)cx1 ;
@@ -183,14 +213,14 @@ vl_lbp_process (VlLbp * self,
       {
         int unsigned bitString = 0 ;
         float center = at(x,y) ;
-        if(at(x+1,y+0) > center) bitString |= 0x1 << 0; /* R */
-        if(at(x+1,y-1) > center) bitString |= 0x1 << 1; /* RU */
-        if(at(x+0,y-1) > center) bitString |= 0x1 << 2; /* U */
-        if(at(x-1,y-1) > center) bitString |= 0x1 << 3; /* LU */
-        if(at(x-1,y+0) > center) bitString |= 0x1 << 4; /* L */
-        if(at(x-1,y+1) > center) bitString |= 0x1 << 5; /* LB */
-        if(at(x+0,y+1) > center) bitString |= 0x1 << 6; /* B */
-        if(at(x+1,y+1) > center) bitString |= 0x1 << 7; /* RB */
+        if(at(x+1,y+0) > center) bitString |= 0x1 << 0; /*  E */
+        if(at(x+1,y+1) > center) bitString |= 0x1 << 1; /* SE */
+        if(at(x+0,y+1) > center) bitString |= 0x1 << 2; /* S  */
+        if(at(x-1,y+1) > center) bitString |= 0x1 << 3; /* SW */
+        if(at(x-1,y+0) > center) bitString |= 0x1 << 4; /*  W */
+        if(at(x-1,y-1) > center) bitString |= 0x1 << 5; /* NW */
+        if(at(x+0,y-1) > center) bitString |= 0x1 << 6; /* N  */
+        if(at(x+1,y-1) > center) bitString |= 0x1 << 7; /* NE */
         bin = self->mapping[bitString] ;
       }
 
