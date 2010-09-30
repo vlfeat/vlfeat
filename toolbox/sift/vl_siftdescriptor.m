@@ -38,6 +38,10 @@
 %   Magnif [3]::
 %     Magnification factor (see VL_SIFT()).
 %
+%   NormThresh:: [-inf]
+%     Set the minimum l2-norm of the descriptors before
+%     normalization. Descriptors below the threshold are set to zero.
+%
 %  See also:: VL_SIFT(), VL_HELP().
 
 % AUTORIGHTS
