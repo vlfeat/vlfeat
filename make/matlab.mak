@@ -58,7 +58,7 @@ endif
 # Linux on 64 bit processorm
 ifeq ($(ARCH),a64)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
-MEX_ARCH = glxa64
+MEX_ARCH = glnxa64
 endif
 
 # --------------------------------------------------------------------
