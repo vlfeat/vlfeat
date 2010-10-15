@@ -45,7 +45,7 @@ char const help_message [] =
   " --peak-thresh   Specift the peak threshold\n"
   " --magnif        Specify the magnification factor\n"
   " --read-frames   Specify a file from which to read frames\n"
-  " --orientations  Force the computation of the oriantations\n"
+  " --orientations  Force the computation of the orientations\n"
   "\n" ;
 
 /* ----------------------------------------------------------------- */
