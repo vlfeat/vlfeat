@@ -57,7 +57,7 @@ mexFunction(int nout, mxArray *out[],
 
   if ((KX != KB) && (KX > 1)) {
     vlmxError(vlmxErrInvalidArgument,
-             "X and B must have the same number of elements, or X must be a scalar.") ;
+              "X and B must have the same number of elements, or X must be a scalar.") ;
   }
 
   /* All dimensions mode ------------------------------------------- */
@@ -107,7 +107,7 @@ mexFunction(int nout, mxArray *out[],
     /* We need to check a few more details about the matrices */
     if (d >= HD) {
       vlmxError(vlmxErrInconsistentData,
-               "DIM out of bounds.") ;
+               "DIM is smaller than one or larger than the number of dimensions of H.") ;
     }
 
     /*
@@ -120,15 +120,15 @@ mexFunction(int nout, mxArray *out[],
     */
 
     if (HD != BD) {
-      if (! d == HD - 1 && BD == HD-1) {
+      if (! d == HD - 1 && BD == HD - 1) {
         vlmxError(vlmxErrInconsistentData,
-                 "H and B must have the same number of dimensions.") ;
+                 "H and B do not have the same number of dimensions.") ;
       }
     }
 
     if ((BD != XD) && (KX > 1)) {
       vlmxError(vlmxErrInconsistentData,
-               "X mut have the same number of dimensions of B or be a scalar.") ;
+               "X is not a scalar nor has the same number of dimensions of B.") ;
     }
 
     /* This will contain the stride required to advance to the next
