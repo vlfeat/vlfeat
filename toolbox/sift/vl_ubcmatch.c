@@ -86,7 +86,7 @@ typedef struct
       L2_pt -= ND*K2 ;                                                  \
                                                                         \
       /* Lowe's method: accept the match only if unique. */             \
-      if(thresh * (float) best <= (float) second_best &&                \
+      if(thresh * (float) best < (float) second_best &&                 \
          bestk != -1) {                                                 \
         pairs_iterator->k1 = k1 ;                                       \
         pairs_iterator->k2 = bestk ;                                    \
