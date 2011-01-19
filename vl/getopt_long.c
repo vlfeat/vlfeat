@@ -1,6 +1,6 @@
-/** @file    getopt_long.c
- ** @author  Andrea Vedaldi
- ** @brief   getopt_long - Definition
+/** @file   getopt_long.c
+ ** @brief  getopt_long - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -9,6 +9,15 @@ Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
 This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
+
+/**
+@file   getopt_long.h
+@brief  getopt_long
+@author Andrea Vedaldi
+
+This is a drop-in replacament of GNU getopt_long meant to be used
+on platforms that do not support such functionality.
+**/
 
 #include <stdlib.h>
 #include <string.h>
@@ -21,44 +30,43 @@ int    opterr = 1 ;
 int    optind = 1 ;
 int    optopt ;
 char * optarg ;
-int    optreset;
+int    optreset ;
 
 #define BADCH	'?'
 #define BADARG	':'
 #define EEND    -1
 #define EMSG	""
 
-/** @brief Parse long options - BSD style
- **
- ** @param argc
- ** @param argv
- ** @param optstring  abbreviated options
- ** @param longopts   list of long options.
- ** @param longindex  index of current option in @a longopts.
+/** @brief Parse long options (BSD style)
+ ** @param argc number of arguments.
+ ** @param argv pointer to the vector of arguments.
+ ** @param optstring list of abbreviated options
+ ** @param longopts list of long options.
+ ** @param longindex index of current option in @a longopts.
+ ** @return the code of the next option.
  **
  ** This function extract long and short options from the argument
  ** list @a argv of @a argc entries.
  **
- ** A short options sequence is introduced by a singe dash @c -.  Each
- ** short option is described by a single character in the @a
- ** optstring, possibly followed by a @c : character to denote a
- ** (mandatory) argument of the short option. A short option with an
- ** argument cannot appear in the middle of a short option sequence,
- ** but only at the end.
+ ** A short options sequence is introduced by a singe dash character
+ ** @c -. Each short option is described by a single character in the
+ ** string @a optstring, possibly followed by a @c : character to
+ ** denote a (mandatory) argument of the short option. A short option
+ ** with an argument cannot appear in the middle of a short option
+ ** sequence, but only at the end.
  **
  ** A long option is introduced by a double dash @c --. Each long
- ** option is described by an instance of the ::option structure in the
- ** @a longopts table (the last entry must be filled with zeroes to
- ** denote the end).
+ ** option is described by an instance of the ::option structure in
+ ** the @a longopts table (the last entry must be filled with zeroes
+ ** to denote the end).
  **
+ ** Illegal options and missing arguments cause the function to skip
+ ** the option and return '?'. If ::opterr is @c true (default), the
+ ** function prints an error message to @a stderr. Finally, if @a
+ ** optstring has a leading @c :, then error messages are suppressed
+ ** and a missing argument causes @a : to be returned.
  **
- ** @return the code of the next option. Illegal options and missing
- ** arguments cause the function to skip the option and return '?'. If
- ** ::opterr is true (default), the function prints an error message
- ** to @a stderr. Finally, if @a optstring has a leading @c :, then
- ** error messages are suppressed and a missing argument causes @a :
- ** to be returned.
-
+ ** @remark The function is currently <em>not</em> thread safe.
  **/
 
 VL_EXPORT int
@@ -88,9 +96,9 @@ getopt_long(int argc, char *const argv[],
 
   if (optreset || *place == '\0') {
 
-    /* --------------------------------------------------------------
-     *                                Look for next short/long option
-     * ----------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+     *                                 Look for next short/long option
+     * ------------------------------------------------------------ */
     optreset = 0 ;
 
     /* no more arguments ? */
@@ -102,9 +110,9 @@ getopt_long(int argc, char *const argv[],
     /* next argument that may hold an option */
     optbegin = optind ;
 
-    /* --------------------------------------------------------------
-     *                                    look for an option to parse
-     * ----------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+     *                                     Look for an option to parse
+     * ------------------------------------------------------------ */
 
   parse_option_at_optbegin :
 
@@ -132,9 +140,9 @@ getopt_long(int argc, char *const argv[],
     /* assume no argument */
     optarg = 0 ;
 
-    /* --------------------------------------------------------------
-     *                                                    option `--'
-     * ----------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+     *                                                     option `--'
+     * ------------------------------------------------------------ */
 
     /* this special option (void long option) ends the option processing */
     if (place[0]        &&
@@ -147,9 +155,9 @@ getopt_long(int argc, char *const argv[],
       goto done_option ;
     }
 
-    /* --------------------------------------------------------------
-     *                                                    long option
-     * ----------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+     *                                                     long option
+     * ------------------------------------------------------------ */
 
     if (place[0]        &&
         place[0] == '-' &&
@@ -225,9 +233,9 @@ getopt_long(int argc, char *const argv[],
     }
   } /* end new option */
 
-    /* --------------------------------------------------------------
-     *                                   finish short option sequence
-     * ----------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                      Finish short option sequence
+   * -------------------------------------------------------------- */
   optopt = (int) *place++ ;
 
   /* search charcater in option list */

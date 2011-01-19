@@ -54,6 +54,7 @@ GNU GPLv2, or (at your option) any later version.
    - @ref pgm.h       "PGM reading and writing"
    - @ref rodrigues.h "Rodrigues formula"
    - @ref mexutils.h  "MATLAB MEX helper functions"
+   - @ref getopt_long.h "Drop-in @c getopt_long replacement"
  - @ref design          "Design Concepts"
    - @ref design-objects     "Objects"
    - @ref design-resources   "Memory and resource management"

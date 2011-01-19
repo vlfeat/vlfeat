@@ -1,9 +1,6 @@
-/** @file    getopt_long.h
- ** @author  Andrea Vedaldi
- ** @brief   getopt_long
- **
- ** This is a re-implementation of GNU getopt_long meant to be used on
- ** platforms that do not support such functionality.
+/** file   getopt_long.h
+ ** brief  getopt_long
+ ** author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -18,18 +15,18 @@ GNU GPLv2, or (at your option) any later version.
 
 #include "generic.h"
 
-VL_EXPORT int    opterr ;  /** @brief option parsing last error */
-VL_EXPORT int    optind ;  /** @brief index of option to process in @c argv */
-VL_EXPORT int    optopt ;  /** @brief current option */
-VL_EXPORT char * optarg ;  /** @brief argument of current option */
-VL_EXPORT int    optreset; /** @brief */
+VL_EXPORT int    opterr ;   /**< code of the last error occured while parsing an option */
+VL_EXPORT int    optind ;   /**< index of the next option to process in @c argv */
+VL_EXPORT int    optopt ;   /**< current option */
+VL_EXPORT char * optarg ;   /**< argument of the current option */
+VL_EXPORT int    optreset ; /**< reset flag */
 
 /** @brief ::getopt_long option */
 struct option
 {
-  const char *name ;    /**< option long name */
-  int	      has_arg ; /**< no, required or optional argument flag */
-  int	     *flag ;    /**< pointer to variable to set (if null, returns) */
+  const char *name ;  /**< option long name */
+  int	      has_arg ; /**< flag indicating whether the option has no, required or optional argument */
+  int	     *flag ;    /**< pointer to a variable to set (if @c NULL, the value is returned instead) */
   int	      val ;     /**< value to set or to return */
 } ;
 
