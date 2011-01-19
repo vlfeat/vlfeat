@@ -322,6 +322,12 @@ it supports POSIX threads.
  ** @see @ref host-compiler-others
  **/
 
+/** @def VL_DISABLE_SSE2
+ ** @brief Defined if SSE2 support if disabled
+ **
+ ** Define this symbol to disable SSE2 support.
+ **/
+
 /** @def VL_DISABLE_THREADS
  ** @brief Defined if multi-threading support is disabled
  **

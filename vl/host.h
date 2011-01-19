@@ -14,6 +14,17 @@ GNU GPLv2, or (at your option) any later version.
 #define VL_HOST_H
 
 /** ------------------------------------------------------------------
+ ** @name Configuration options
+ ** @{ */
+
+#if defined(__DOXYGEN__)
+#define VL_DISABLE_THREADS
+#define VL_DISABLE_SSE2
+#endif
+
+/** @} */
+
+/** ------------------------------------------------------------------
  ** @name C preprocessor helper macros
  ** @{ */
 
@@ -412,7 +423,7 @@ typedef vl_uint32           vl_uindex ;
  **/
 
 /** @def VL_FL_INDEX
- ** @biref @c printf length flag for ::vl_index and ::vl_uindex
+ ** @brief @c printf length flag for ::vl_index and ::vl_uindex
  **/
 
 #ifdef VL_COMPILER_MSC

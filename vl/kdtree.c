@@ -66,7 +66,7 @@ GNU GPLv2, or (at your option) any later version.
  ** and they contain a list of zero or more data points (typically
  ** one).
  **
- ** <b>Querying.<b> Querying amounts to finding the N data points closer to a given
+ ** <b>Querying.</b> Querying amounts to finding the N data points closer to a given
  ** query point @f$ x_q \in \mathbb{R}^d @f$. This is done by
  ** branch-and-bound. A search state is an active partition (initially
  ** the root) and it is weighed by the lower bound on the distance of
