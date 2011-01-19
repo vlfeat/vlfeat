@@ -145,7 +145,7 @@ GNU GPLv2, or (at your option) any later version.
  - <b>Task-specific operations.</b> A few operations are intrinsically
    non-reentrant but thread-specific. These include: retrieving the
    last error by ::vl_get_last_error and obtaining the thread-specific
-   random number generator by ::vl_get_random. VLFeat makes such
+   random number generator by ::vl_get_rand. VLFeat makes such
    operations thread-safe by operating on task-specific data.
 
  - <b>Global operations.</b> A small number of operations are
@@ -657,7 +657,7 @@ vl_get_cpu_time ()
 /** ------------------------------------------------------------------
  ** @brief Reset processor time reference
  ** The function resets VLFeat TIC/TOC time reference.
- ** @sa ::vl_get_cup_time, ::vl_toc
+ ** @sa ::vl_get_cpu_time, ::vl_toc.
  **/
 
 VL_EXPORT void
