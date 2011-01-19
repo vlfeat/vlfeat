@@ -55,6 +55,7 @@ endif
 
 dll_tgt := $(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 dll_src := $(wildcard $(VLDIR)/vl/*.c)
+dll_hdr := $(wildcard $(VLDIR)/vl/*.h)
 dll_obj := $(addprefix $(BINDIR)/objs/, $(notdir $(dll_src:.c=.o)))
 dll_dep := $(dll_obj:.o=.d)
 
@@ -106,6 +107,7 @@ dll-distclean:
 
 dll-info:
 	$(call echo-title,VLFeat core library)
+	$(call dump-var,dll_hdr)
 	$(call dump-var,dll_src)
 	$(call dump-var,dll_obj)
 	$(call dump-var,dll_dep)
