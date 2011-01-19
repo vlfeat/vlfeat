@@ -25,6 +25,17 @@ GNU GPLv2, or (at your option) any later version.
 /** @} */
 
 /** ------------------------------------------------------------------
+ ** @name Defining functions
+ ** @{ */
+
+#if defined(__DOXYGEN__)
+#define VL_EXPORT
+#define VL_INLINE
+#endif
+
+/** @} */
+
+/** ------------------------------------------------------------------
  ** @name C preprocessor helper macros
  ** @{ */
 
@@ -284,7 +295,7 @@ GNU GPLv2, or (at your option) any later version.
 #endif
 /** @} */
 
-#if defined(VL_COMPILER_MSC)
+#if defined(VL_COMPILER_MSC) & ! defined(__DOXYGEN__)
 #  define VL_UNUSED
 #  define VL_INLINE static __inline
 #  define snprintf _snprintf
@@ -304,7 +315,7 @@ GNU GPLv2, or (at your option) any later version.
 #  endif
 #endif
 
-#if defined(VL_COMPILER_LCC)
+#if defined(VL_COMPILER_LCC) & ! defined(__DOXYGEN__)
 #  define VL_UNUSED
 #  define VL_INLINE static __inline
 #  define snprintf _snprintf
@@ -317,7 +328,7 @@ VL_INLINE float fabsf(float x) { return (float) fabs((double) x) ; }
 #  endif
 #endif
 
-#if defined(VL_COMPILER_GNUC) || defined(__DOXYGEN__)
+#if defined(VL_COMPILER_GNUC) & ! defined(__DOXYGEN__)
 #  define VL_UNUSED __attribute__((unused))
 #  define VL_INLINE static __inline__
 #  ifdef VL_BUILD_DLL

@@ -45,8 +45,8 @@ GNU GPLv2, or (at your option) any later version.
  version of the compiler.
 
  The module defines a symbol to identify the data model of the
- compiler: ::VL_COMPILER_ILP32, ::VL_COMPILER_LP32, or
- ::VL_COMPILER_LP64 (see Sect. @ref host-compiler-data-model).  For
+ compiler: ::VL_COMPILER_ILP32, ::VL_COMPILER_LP64, or
+ ::VL_COMPILER_LLP64 (see Sect. @ref host-compiler-data-model).  For
  convenience, it also defines a number of atomic types of prescribed
  width (::vl_int8, ::vl_int16, ::vl_int32, etc.).
 
