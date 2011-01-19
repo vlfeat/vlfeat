@@ -1,4 +1,4 @@
-/** @file    homker.h
+/** @file    homkermap.h
  ** @author  Andrea Vedaldi
  ** @brief   Homogeneous kernel map
  **/
@@ -17,27 +17,40 @@ GNU GPLv2, or (at your option) any later version.
 
 #include <math.h>
 
+/** @brief Type of kernel */
 typedef enum {
-  VlHomogeneousKernelIntersection = 0,
-  VlHomogeneousKernelChi2,
-  VlHomogeneousKernelJS
+  VlHomogeneousKernelIntersection = 0, /**< intersection kernel */
+  VlHomogeneousKernelChi2, /**< Chi2 kernel */
+  VlHomogeneousKernelJS /**< Jensen-Shannon kernel */
 } VlHomogeneousKernelType ;
 
+/** @brief Type of spectral windowing function  */
+typedef enum {
+  VlHomogeneousKernelMapWindowUniform = 0, /**< uniform window */
+  VlHomogeneousKernelMapWindowRectangular = 1, /**< rectangular window */
+} VlHomogeneousKernelMapWindowType ;
+
+/** @brief Homogeneous kernel map */
 typedef struct _VlHomogeneousKernelMap
 {
   VlHomogeneousKernelType kernelType ;
+  double gamma ;
+  VlHomogeneousKernelMapWindowType windowType ;
   vl_size order ;
-  double step ;
-  vl_uint numSubdivisions ;
+  double period ;
+  vl_size numSubdivisions ;
   double subdivision  ;
-  vl_int minExponent ;
-  vl_int maxExponent ;
+  vl_index minExponent ;
+  vl_index maxExponent ;
   double * table ;
 } VlHomogeneousKernelMap ;
 
-
 VL_EXPORT VlHomogeneousKernelMap *
-vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType, vl_size order, double step) ;
+vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
+                             double gamma,
+                             vl_size order,
+                             double period,
+                             VlHomogeneousKernelMapWindowType windowType) ;
 
 VL_EXPORT void
 vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self) ;

@@ -13,18 +13,27 @@ GNU GPLv2, or (at your option) any later version.
 #include "mexutils.h"
 #include <vl/homkermap.h>
 #include <vl/mathop.h>
+#include <vl/stringop.h>
 
 enum {
   opt_KCHI2,
   opt_KL1,
-  opt_KJS
+  opt_KJS,
+  opt_KINTERS,
+  opt_gamma,
+  opt_period,
+  opt_window
 } ;
 
 vlmxOption options [] = {
-{"kl1",          0,   opt_KL1           },
-{"kchi2",        0,   opt_KCHI2         },
-{"kjs",          0,   opt_KJS           },
-{0,              0,   0                 }
+  {"kl1",          0,   opt_KL1           },
+  {"kchi2",        0,   opt_KCHI2         },
+  {"kjs",          0,   opt_KJS           },
+  {"kinters",      0,   opt_KINTERS       },
+  {"gamma",        1,   opt_gamma         },
+  {"period",       1,   opt_period        },
+  {"window",       1,   opt_window        },
+  {0,              0,   0                 }
 } ;
 
 /* -------------------------------------------------------------------
@@ -38,14 +47,16 @@ mexFunction(int nout, mxArray *out[],
 
   typedef int unsigned data_t ;
 
-  enum {IN_X = 0, IN_N, IN_L, IN_END} ;
+  enum {IN_X = 0, IN_N, IN_END} ;
   enum {OUT_V = 0} ;
   VlHomogeneousKernelType kernelType = VlHomogeneousKernelChi2 ;
+  VlHomogeneousKernelMapWindowType windowType = VlHomogeneousKernelMapWindowRectangular ;
   mwSize numDimensions ;
   mwSize const * dimensions ;
   mxClassID dataClassId ;
+  double gamma = 1.0 ;
   int n ;
-  double L ;
+  double period = -1 ;
 
   /* for option parsing */
   int opt ;
@@ -61,45 +72,71 @@ mexFunction(int nout, mxArray *out[],
   if (nout > 1) {
     vlmxError(vlmxErrTooManyOutputArguments, NULL) ;
   }
-  if (nin < 3) {
+  if (nin < IN_END) {
     vlmxError(vlmxErrNotEnoughInputArguments, NULL) ;
   }
 
   dataClassId = mxGetClassID(IN(X)) ;
   if (dataClassId != mxDOUBLE_CLASS &&
       dataClassId != mxSINGLE_CLASS) {
-    vlmxError(vlmxErrInvalidArgument, "X must be either DOUBLE or SINGLE.") ;
+    vlmxError(vlmxErrInvalidArgument, "X is neither DOUBLE nor SINGLE.") ;
   }
 
   numDimensions = mxGetNumberOfDimensions(IN(X)) ;
   dimensions = mxGetDimensions(IN(X)) ;
 
   if (! vlmxIsPlainScalar(IN(N))) {
-    vlmxError(vlmxErrInvalidArgument, "N must be a scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
   }
   n = *mxGetPr(IN(N)) ;
   if (n < 0) {
-    vlmxError(vlmxErrInvalidArgument, "N must be non-negative.") ;
-  }
-
-  if (! vlmxIsPlainScalar(IN(L))){
-    vlmxError(vlmxErrInvalidArgument, "L must be a scalar.") ;
-  }
-  L = *mxGetPr(IN(L)) ;
-  if (L < 0) {
-    vlmxError(vlmxErrInvalidArgument, "L must be non-negative.") ;
+    vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
   }
 
   while ((opt = vlmxNextOption(in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
-      case opt_KL1   :
+      case opt_KINTERS:
+      case opt_KL1:
         kernelType = VlHomogeneousKernelIntersection ;
         break ;
-      case opt_KCHI2 :
+      case opt_KCHI2:
         kernelType = VlHomogeneousKernelChi2 ;
         break ;
-      case opt_KJS :
+      case opt_KJS:
         kernelType = VlHomogeneousKernelJS ;
+        break ;
+      case opt_period:
+        if (! vlmxIsPlainScalar(optarg)){
+          vlmxError(vlmxErrInvalidArgument, "PERIOD is not a scalar.") ;
+        }
+        period = *mxGetPr(optarg) ;
+        if (period <= 0) {
+          vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
+        }
+        break ;
+      case opt_gamma:
+        if (! vlmxIsPlainScalar(optarg)){
+          vlmxError(vlmxErrInvalidArgument, "GAMMA is not a scalar.") ;
+        }
+        gamma = *mxGetPr(optarg) ;
+        if (gamma <= 0) {
+          vlmxError(vlmxErrInvalidArgument, "GAMMA is not positive.") ;
+        }
+        break ;
+      case opt_window:
+        if (! vlmxIsString(optarg,-1)){
+          vlmxError(vlmxErrInvalidArgument, "WINDOW is not a string.") ;
+        } else {
+          char buffer [1024] ;
+          mxGetString(optarg, buffer, sizeof(buffer) / sizeof(char)) ;
+          if (vl_string_casei_cmp("uniform", buffer) == 0) {
+            windowType = VlHomogeneousKernelMapWindowUniform ;
+          } else if (vl_string_casei_cmp("rectangular", buffer) == 0) {
+            windowType = VlHomogeneousKernelMapWindowRectangular ;
+          } else {
+            vlmxError(vlmxErrInvalidArgument, "WINDOW=%s is not recognized.", buffer) ;
+          }
+        }
         break ;
       default:
         abort() ;
@@ -113,7 +150,7 @@ mexFunction(int nout, mxArray *out[],
   {
     vl_uindex j ;
     vl_size numElements = mxGetNumberOfElements(IN(X)) ;
-    VlHomogeneousKernelMap * map = vl_homogeneouskernelmap_new (kernelType, n, L) ;
+    VlHomogeneousKernelMap * map = vl_homogeneouskernelmap_new (kernelType, gamma, n, period, windowType) ;
     mwSize extDimensions [20] ;
     for (j = 0 ; j < numDimensions ; ++j) extDimensions[j] = dimensions[j] ;
     extDimensions[0] *= 2*n+1 ;
