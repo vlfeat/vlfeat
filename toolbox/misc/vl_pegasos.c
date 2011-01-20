@@ -22,7 +22,8 @@ GNU GPLv2, or (at your option) any later version.
 /* option codes */
 enum {
   opt_verbose, opt_bias_multiplier, opt_num_iterations,
-  opt_starting_iteration, opt_starting_model, opt_permutation
+  opt_starting_iteration, opt_starting_model, opt_permutation,
+  opt_preconditioner
 } ;
 
 /* options */
@@ -33,6 +34,7 @@ vlmxOption  options [] = {
   {"StartingIteration", 1,   opt_starting_iteration  },
   {"StartingModel",     1,   opt_starting_model      },
   {"Permutation",       1,   opt_permutation         },
+  {"Preconditioner",    1,   opt_preconditioner      },
   {0,                   0,   0                       }
 } ;
 
@@ -55,6 +57,8 @@ mexFunction(int nout, mxArray *out[],
   double biasMultiplier = 0 ;
   double lambda ;
   void * data ;
+  void * preconditioner = NULL ;
+  vl_size preconditionerDimension ;
   mxClassID dataClass ;
   vl_type dataType ;
   vl_size numSamples ;
@@ -118,6 +122,7 @@ mexFunction(int nout, mxArray *out[],
         }
         biasMultiplier = *mxGetPr(optarg) ;
         break ;
+
       case opt_num_iterations :
         if (!vlmxIsPlainScalar(optarg)) {
           vlmxError(vlmxErrInvalidArgument, "NUMITERATIONS is not a plain scalar.") ;
@@ -127,6 +132,7 @@ mexFunction(int nout, mxArray *out[],
         }
         numIterations = (vl_size) *mxGetPr(optarg) ;
         break ;
+
       case opt_starting_iteration :
         if (!vlmxIsPlainScalar(optarg)) {
           vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is not a plain scalar.") ;
@@ -169,10 +175,27 @@ mexFunction(int nout, mxArray *out[],
         }
         break ;
 
+      case opt_preconditioner :
+        if (!vlmxIsVector(optarg, -1) ||
+            mxIsComplex(optarg) ||
+            !mxIsNumeric(optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER is not a real vector.") ;
+        }
+        if (mxGetClassID(optarg) != dataClass) {
+          vlmxError(vlmxErrInvalidArgument, "PRECODNITIONER does not have the storage class.") ;
+        }
+        preconditioner = mxGetData(optarg) ;
+        preconditionerDimension = mxGetNumberOfElements(optarg) ;
+        break ;
+
       case opt_verbose :
         ++ verbose ;
         break ;
     }
+  }
+
+  if (preconditioner && preconditionerDimension != (dimension + (biasMultiplier > 0))) {
+    vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER has incompatible dimension.") ;
   }
 
   if (numIterations == 0) {
@@ -197,6 +220,7 @@ mexFunction(int nout, mxArray *out[],
     mexPrintf("vl_pegasos: BiasMultiplier = %g\n", biasMultiplier) ;
     mexPrintf("vl_pegasos: NumIterations = %d\n", numIterations) ;
     mexPrintf("vl_pegasos: permutation size = %d\n", permutationSize) ;
+    mexPrintf("vl_pegasos: using preconditioner = %s\n", VL_YESNO(preconditioner)) ;
   }
 
   switch (dataType) {
@@ -210,7 +234,8 @@ mexFunction(int nout, mxArray *out[],
                                     numIterations,
                                     NULL,
                                     permutation,
-                                    permutationSize) ;
+                                    permutationSize,
+                                    (float const*)preconditioner) ;
       break ;
     case VL_TYPE_DOUBLE:
       vl_pegasos_train_binary_svm_d((double *)mxGetData(OUT(MODEL)),
@@ -222,7 +247,8 @@ mexFunction(int nout, mxArray *out[],
                                     numIterations,
                                     NULL,
                                     permutation,
-                                    permutationSize) ;
+                                    permutationSize,
+                                    (double const *)preconditioner) ;
       break ;
   }
 

@@ -164,7 +164,7 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
     In Proc. ICML, 2007.
 */
 
-/** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size)
+/** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size,double const*)
  ** @param model (out) the learned model.
  ** @param data training vectors.
  ** @param dimension data dimension.
@@ -177,6 +177,7 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
  ** @param randomGenerator random number generator.
  ** @param permutation order in which the data is accessed.
  ** @param permutationSize length of @c permutation.
+ ** @param preconditioner diagonal precoditioner.
  **
  ** The function runs PEGASOS on the specified data. The vector @a
  ** model must have either dimension equal to @a dimension if @a
@@ -197,10 +198,16 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
  ** cycled through). In this way It is an error to set both @a
  ** randomGenerator and @a permutation to non-null values.
  **
+ ** @c preconditioner specifies a diagonal preconditioner for the
+ ** minimization problem (it is often useful to slow down the steps
+ ** for the bias term, if the latter is used). Set @c preconditioner to NULL
+ ** to avoid using a preconditioner. The precodnitioner should have the
+ ** same dimension of the model, plus one if an SVM with bias is learned.
+ **
  ** See the @ref pegasos-overview overview for details.
  **/
 
-/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size)
+/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size,float const*)
  ** @see ::vl_pegasos_train_binary_svm_d
  **/
 
@@ -235,12 +242,14 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
                                           vl_size numIterations,
                                           VlRand * randomGenerator,
                                           vl_uint32 const * permutation,
-                                          vl_size permutationSize)
+                                          vl_size permutationSize,
+                                          T const * preconditioner)
 {
   vl_uindex iteration ;
+  vl_uindex iteration0 ;
   vl_uindex i ;
   T const * x ;
-  T acc, eta, y, scale = 1 ;
+  T acc, learningRate, y, scale = 1 ;
   double lambda = regularizer ;
   double sqrtLambda = sqrt(lambda) ;
 
@@ -255,12 +264,24 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
     randomGenerator = vl_get_rand() ;
   }
 
+  assert(lambda > 0.0) ;
   assert(randomGenerator == NULL || permutation == NULL) ;
   assert(startingIteration >= 1) ;
 
   /*
-     The model is stored as scale*model[]. When a sample does not violate
-     the margin, only scale needs to be updated.
+   Choose iteration0 to start with small enoguh steps. Recall that
+   the learning rate is
+
+   learningRate = 1 / (lambda * (iteration + iteration0))
+
+   */
+
+  iteration0 = (vl_uindex) 1.0 / lambda ;
+  iteration0 = 0 ;
+
+  /*
+   The model is stored as scale*model[]. When a sample does not violate
+   the margin, only scale needs to be updated.
    */
 
   for (iteration = startingIteration ;
@@ -284,26 +305,37 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
     acc *= scale ;
 
     /* compute learning rate */
-    eta = 1.0 / (iteration * lambda) ;
+    learningRate = 1.0 / ((iteration + iteration0) * lambda) ;
 
+    /* regularizer step */
+    scale *= 1 - learningRate * lambda ;
+
+    /* loss step */
     if (y * acc < (T) 1.0) {
-      /* margin violated */
-      T a = scale * (1 - eta * lambda)  ;
-      T b = y * eta ;
+      T b = y * learningRate ;
 
       acc = 0 ;
-      for (i = 0 ; i < dimension ; ++i) {
-        model[i] = a * model[i] + b * x[i] ;
-        acc += model[i] * model[i] ;
+      if (preconditioner) {
+        for (i = 0 ; i < dimension ; ++i) {
+          model[i] = scale * model[i] + b * preconditioner[i] * x[i] ;
+          acc += model[i] * model[i] ;
+        }
+      } else {
+        for (i = 0 ; i < dimension ; ++i) {
+          model[i] = scale * model[i] + b * x[i] ;
+          acc += model[i] * model[i] ;
+        }
       }
       if (biasMultiplier) {
-        model[dimension] = a * model[dimension] + b * biasMultiplier ;
+        if (preconditioner) {
+          model[dimension] = scale * model[dimension]
+          + b * preconditioner[dimension] * biasMultiplier ;
+        } else {
+          model[dimension] = scale * model[dimension] + b * biasMultiplier ;
+        }
         acc += model[dimension] * model[dimension] ;
       }
       scale = VL_MIN((T)1.0 / (sqrtLambda * sqrt(acc + VL_EPSILON_D)), (T)1.0) ;
-    } else {
-      /* margin not violated */
-      scale *= 1 - eta * lambda ;
     }
   }
 

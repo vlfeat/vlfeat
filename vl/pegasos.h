@@ -20,7 +20,8 @@ void vl_pegasos_train_binary_svm_d (double * model,
                                     vl_size numIterations,
                                     VlRand* randomGenerator,
                                     vl_uint32 const * permutation,
-                                    vl_size permutationSize) ;
+                                    vl_size permutationSize,
+                                    double const * preconditioner) ;
 
 VL_EXPORT
 void vl_pegasos_train_binary_svm_f (float * model,
@@ -34,7 +35,8 @@ void vl_pegasos_train_binary_svm_f (float * model,
                                     vl_size numIterations,
                                     VlRand* randomGenerator,
                                     vl_uint32 const * permutation,
-                                    vl_size permutationSize) ;
+                                    vl_size permutationSize,
+                                    float const * preconditioner) ;
 
 
 /* VL_PEGASOS_H */

@@ -22,7 +22,10 @@
 %   BiasMultiplier:: 0
 %     Appends to the data X the specified scalar value B. This
 %     approximates the training of a linear SVM with bias.  The bias
-%     can be recovered from the optimal weight vector W as W(end) * B.
+%     can be recovered from the optimal weight vector W as W(end) *
+%     B. It is often useful to precondition the computation of the
+%     gradient with respect to this element by a small value,
+%     e.g. 0.1/B (see PRECONDITIONER).
 %
 %   StartingModel:: zero vector
 %     Specify the initial value for the weight vector W.
@@ -42,6 +45,13 @@
 %     less frequently, implicitly increasing their relative weight in
 %     the error term. A common application is to balance an unbalanced
 %     dataset.
+%
+%   Preconditioner:: []
+%     Specify a diagonal preconditioner PREC. The elements of this
+%     vector are multiplied to the function subgradient before adding
+%     the latter to the current model estimate. The dimension of the
+%     vector PREC is the same of the model, plus one if the SVM has
+%     bias (see BIASMULTIPLIER).
 %
 %   Verbose::
 %     Be verbose.
