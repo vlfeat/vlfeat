@@ -1,6 +1,6 @@
-/** @file     dsift.h
- ** @brief    Dense SIFT (DSIFT)
- ** @author   Andrea Vedaldi
+/** file   dsift.h
+ ** brief  Dense SIFT (DSIFT)
+ ** author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -90,7 +90,7 @@ VL_INLINE void vl_dsift_set_bounds (VlDsiftFilter *self,
                                    int maxX,
                                    int maxY) ;
 VL_INLINE void vl_dsift_set_geometry (VlDsiftFilter *self,
-                                     VlDsiftDescriptorGeometry const* geom) ;
+                                      VlDsiftDescriptorGeometry const* geom) ;
 VL_INLINE void vl_dsift_set_flat_window (VlDsiftFilter *self, vl_bool flatWindow) ;
 VL_INLINE void vl_dsift_set_window_size (VlDsiftFilter *self, double windowSize) ;
 /** @} */
@@ -267,7 +267,7 @@ vl_dsift_set_bounds (VlDsiftFilter* self,
 
 void
 vl_dsift_set_geometry (VlDsiftFilter *self,
-                      VlDsiftDescriptorGeometry const *geom)
+                       VlDsiftDescriptorGeometry const *geom)
 {
   self->geom = *geom ;
   _vl_dsift_update_buffers(self) ;

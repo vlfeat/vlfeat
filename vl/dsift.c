@@ -1,5 +1,4 @@
-/** @internal
- ** @file   dsift.c
+/** @file   dsift.c
  ** @brief  Dense SIFT (DSIFT) - Definition
  ** @author Andrea Vedaldi
  **/
@@ -246,7 +245,6 @@ and we impose that the bin size @f$ m \sigma @f$ is integer as well.
 
 /** ------------------------------------------------------------------
  ** @internal @brief Initialize new convolution kernel
- **
  ** @param binSize
  ** @param numBins
  ** @param binIndex negative to use flat window.
