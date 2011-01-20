@@ -126,7 +126,6 @@ vl_array_dealloc (VlArray * self)
 
 
 /** @brief New numeric array
- ** @param self array to initialize.
  ** @param type data type.
  ** @param numDimensions number of dimensions.
  ** @param dimensions dimensions.
