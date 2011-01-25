@@ -29,7 +29,7 @@ while 1
   tline = fgetl(fid) ;
   l = l + 1 ;
   if ~ischar(tline), break ; end
-  mo = regexp(tline, '^\s*function\s+(\w\s*=\s*)?test_(?<name>[\w_]+)\s*\(.*\)\s*$', ...
+  mo = regexp(tline, '^\s*function\s+(\w\s*=\s*)?test_(?<name>[\w_]+)\s*\(.*\).*$', ...
               'names') ;
   if length(mo) > 0
     t = t + 1 ;
@@ -38,7 +38,7 @@ while 1
     tests{t}.lineNumber = l ;
   end
 
-  mo = regexp(tline, '^\s*function\s+(\w+\s*=\s*)?(?<name>setup|teardown)\s*\(.*\)\s*$', ...
+  mo = regexp(tline, '^\s*function\s+(\w+\s*=\s*)?(?<name>setup|teardown)\s*\(.*\).*$', ...
               'names') ;
   if length(mo) > 0
     switch mo(1).name
