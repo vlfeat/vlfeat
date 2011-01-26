@@ -5,20 +5,25 @@ function [conf, args] = vl_argparse(conf, args)
 %   VALN}. The function produces an error if an unknown parameter name
 %   is passed in.
 %
-%   [CONF, ARGS] = VL_ARGPARSE(...) copies any unkown parameters to
-%   ARGS instead of producing an error.
+%   [CONF, ARGS] = VL_ARGPARSE(CONF, ARGS) copies any parameter in
+%   ARGS that does not match CONF back to ARGS instead of producing an
+%   error.
 %
 %   Example::
 %     The function can be used to parse a list of arguments
 %     passed to a MATLAB functions:
 %
+%       function myFunction(x,y,z,varargin)
+%       conf.parameterName = defaultValue ;
 %       conf = vl_argparse(conf, varargin)
 %
 %     If only a subset of the options should be parsed, for example
-%     because the other options are supposed to be interpreted by a
-%     subroutine, then use the form
+%     because the other options are interpreted by a subroutine, then
+%     use the form
 %
 %      [conf, varargin] = vl_argparse(conf, varargin)
+%
+%     that copies back to VARARGIN any unknown parameter.
 %
 %   See also: VL_OVERRIDE(), VL_HELP().
 
