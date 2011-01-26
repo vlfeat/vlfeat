@@ -182,7 +182,7 @@ mexFunction(int nout, mxArray *out[],
           vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER is not a real vector.") ;
         }
         if (mxGetClassID(optarg) != dataClass) {
-          vlmxError(vlmxErrInvalidArgument, "PRECODNITIONER does not have the storage class.") ;
+          vlmxError(vlmxErrInvalidArgument, "PRECODNITIONER storage class does not match the data.") ;
         }
         preconditioner = mxGetData(optarg) ;
         preconditionerDimension = mxGetNumberOfElements(optarg) ;

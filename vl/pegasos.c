@@ -249,9 +249,9 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
   vl_uindex iteration0 ;
   vl_uindex i ;
   T const * x ;
-  T acc, learningRate, y, scale = 1 ;
+  T acc, learningRate, y ;
   double lambda = regularizer ;
-  double sqrtLambda = sqrt(lambda) ;
+  vl_size const regularizationPeriod = 10 ;
 
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction dotFn =
@@ -277,7 +277,6 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
    */
 
   iteration0 = (vl_uindex) 1.0 / lambda ;
-  iteration0 = 0 ;
 
   /*
    The model is stored as scale*model[]. When a sample does not violate
@@ -299,49 +298,47 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
     x = data + dimension * k ;
     y = labels[k] ;
 
-    /* project data point x on the weight vector */
-    acc = dotFn(dimension, x, model) ;
-    if (biasMultiplier) acc += biasMultiplier * model[dimension] ;
-    acc *= scale ;
-
     /* compute learning rate */
     learningRate = 1.0 / ((iteration + iteration0) * lambda) ;
 
-    /* regularizer step */
-    scale *= 1 - learningRate * lambda ;
+    /* regularizer step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if (iteration % regularizationPeriod == 0) {
+      T eta = (T) learningRate * regularizationPeriod * lambda ;
+      if (preconditioner) {
+        for (i = 0 ; i < dimension + (biasMultiplier != 0) ; ++i) {
+          model[i] -= eta * preconditioner[i] * model[i] ;
+        }
+      } else {
+        for (i = 0 ; i < dimension + (biasMultiplier != 0) ; ++i) {
+          model[i] -= eta * model[i] ;
+        }
+      }
+    }
 
-    /* loss step */
+    /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    acc = dotFn(dimension, x, model) ;
+    if (biasMultiplier) acc += biasMultiplier * model[dimension] ;
+
     if (y * acc < (T) 1.0) {
-      T b = y * learningRate ;
+      T eta = y * learningRate ;
 
       acc = 0 ;
       if (preconditioner) {
         for (i = 0 ; i < dimension ; ++i) {
-          model[i] = scale * model[i] + b * preconditioner[i] * x[i] ;
-          acc += model[i] * model[i] ;
+          model[i] += eta * preconditioner[i] * x[i] ;
+        }
+        if (biasMultiplier) {
+          model[dimension] += eta * preconditioner[dimension] * biasMultiplier ;
         }
       } else {
         for (i = 0 ; i < dimension ; ++i) {
-          model[i] = scale * model[i] + b * x[i] ;
-          acc += model[i] * model[i] ;
+          model[i] += eta * x[i] ;
+        }
+        if (biasMultiplier) {
+          model[dimension] += eta * biasMultiplier ;
         }
       }
-      if (biasMultiplier) {
-        if (preconditioner) {
-          model[dimension] = scale * model[dimension]
-          + b * preconditioner[dimension] * biasMultiplier ;
-        } else {
-          model[dimension] = scale * model[dimension] + b * biasMultiplier ;
-        }
-        acc += model[dimension] * model[dimension] ;
-      }
-      scale = VL_MIN((T)1.0 / (sqrtLambda * sqrt(acc + VL_EPSILON_D)), (T)1.0) ;
     }
-  }
-
-  /* denormalize representation */
-  for (i = 0 ; i < dimension + (biasMultiplier ? 1 : 0) ; ++i) {
-    model[i] *= scale ;
   }
 }
 
