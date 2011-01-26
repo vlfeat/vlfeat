@@ -21,15 +21,16 @@ GNU GPLv2, or (at your option) any later version.
 
 /* option codes */
 enum {
-  opt_verbose, opt_num_neighs, opt_max_comparisons
+  opt_verbose, opt_num_neighs, opt_max_num_comparisons
 } ;
 
 /* options */
 vlmxOption  options [] = {
-{"Verbose",        0,   opt_verbose         },
-{"NumNeighbors",   1,   opt_num_neighs      },
-{"MaxComparisons", 1,   opt_max_comparisons },
-{0,                0,   0                   }
+{"Verbose",           0,   opt_verbose             },
+{"NumNeighbors",      1,   opt_num_neighs          },
+{"MaxComparisons",    1,   opt_max_num_comparisons },
+{"MaxNumComparisons", 1,   opt_max_num_comparisons },
+{0,                   0,   0                       }
 } ;
 
 /** ------------------------------------------------------------------
@@ -104,10 +105,10 @@ mexFunction(int nout, mxArray *out[],
         }
         break;
 
-      case opt_max_comparisons :
+      case opt_max_num_comparisons :
         if (! vlmxIsScalar(optarg)) {
           vlmxError(vlmxErrInvalidArgument,
-                   "MAXCOMPARISONS must be a scalar.") ;
+                   "MAXNUMCOMPARISONS must be a scalar.") ;
         }
         maxNumComparisons = mxGetScalar(optarg) ;
         break;

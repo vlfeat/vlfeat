@@ -17,7 +17,7 @@
 %   nearest one. In this case INDEX and DIST are NN x NUMQUERIES
 %   matrices. Neighbors are returned by increasing distance.
 %
-%   VL_KDTREEQUERY(..., 'MAXCOMPARISONS', NCOMP) performs at most
+%   VL_KDTREEQUERY(..., 'MAXNUMCOMPARISONS', NCOMP) performs at most
 %   NCOMP comparisons for each query point. In this case the result is
 %   only approximate (i.e. approximated nearest-neighbors, or ANNs)
 %   but the speed can be greatly improved.
@@ -28,7 +28,7 @@
 %     Sets the number of neighbors to compute for each query point (by
 %     default 1).
 %
-%   MaxComparisons:
+%   MaxNumComparisons:
 %     Sets the maximum number of comparisons per query point. The
 %     special value 0 means unbounded. The default is 0.
 %
