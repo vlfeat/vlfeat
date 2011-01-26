@@ -58,7 +58,7 @@ mexFunction(int nout, mxArray *out[],
   double lambda ;
   void * data ;
   void * preconditioner = NULL ;
-  vl_size preconditionerDimension ;
+  vl_size preconditionerDimension = 0 ;
   mxClassID dataClass ;
   vl_type dataType ;
   vl_size numSamples ;
