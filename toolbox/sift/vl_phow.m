@@ -39,6 +39,10 @@ function [frames, descrs] = vl_phow(im, varargin)
 %     The image is smoothed by a Gaussian kernel of standard deviation
 %     SIZE / MAGNIF.
 %
+%   FloatDescriptors:: false
+%     If set to TRUE, the descriptors are returned in floating point
+%     format.
+%
 %   See also: VL_HELP(), VL_DSIFT().
 
 % AUTORIGHTS
@@ -56,6 +60,7 @@ function [frames, descrs] = vl_phow(im, varargin)
   opts.sizes = [4 6 8 10] ;
   opts.step = 2 ;
   opts.color = false ;
+  opts.floatdescriptors = false ;
   opts.magnif = 6 ;
   opts.windowsize = 1.5 ;
   opts.contrastthreshold = 0.005 ;
@@ -64,6 +69,7 @@ function [frames, descrs] = vl_phow(im, varargin)
   dsiftOpts = {'norm', 'windowsize', opts.windowsize} ;
   if opts.verbose, dsiftOpts{end+1} = 'verbose' ; end
   if opts.fast, dsiftOpts{end+1} = 'fast' ; end
+  if opts.floatdescriptors, dsiftOpts{end+1} = 'floatdescriptors' ; end
   dsiftOpts(end+(1:2)) = {'step', opts.step} ;
 
 % -------------------------------------------------------------------
