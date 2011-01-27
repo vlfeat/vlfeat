@@ -23,8 +23,9 @@ function [frames, descrs] = vl_phow(im, varargin)
 %     Step (in pixels) of the grid at which the dense SIFT features
 %     are extracted.
 %
-%   Color:: false
-%     Set to true to compute PHOW-color rather than PHOW-gray.
+%   Color:: 'gray'
+%     Choose between 'gray' (PHOW-gray), 'rgb', 'hsv', and 'opponent'
+%     (PHOW-color).
 %
 %   ContrastThreshold:: 0.005
 %     Contrast threshold below which SIFT features are mapped to
@@ -59,7 +60,7 @@ function [frames, descrs] = vl_phow(im, varargin)
   opts.fast = true ;
   opts.sizes = [4 6 8 10] ;
   opts.step = 2 ;
-  opts.color = false ;
+  opts.color = 'gray' ;
   opts.floatdescriptors = false ;
   opts.magnif = 6 ;
   opts.windowsize = 1.5 ;
@@ -79,16 +80,33 @@ function [frames, descrs] = vl_phow(im, varargin)
 
   % standarize the image
   imageSize = [size(im,2) ; size(im,1)] ;
-  if opts.color
-    if size(im,3) == 1, im = cat(3, im, im, im) ; end
-    im = rgb2hsv(im) ;
-    numChannels = 3 ;
-  else
-    if size(im,3) == 3, im = rgb2gray(im) ; end
+  if strcmp(lower(opts.color), 'gray')
     numChannels = 1 ;
+    if size(im,3) > 1, im = rgb2gray(im) ; end
+  else
+    numChannels = 3 ;
+    if size(im,3) == 1, im = cat(3, im, im, im) ; end
+    switch lower(opts.color)
+      case 'rgb'
+      case 'opponent'
+        % Note that the last component is multiplied by sqrt(3)
+        % with respect to the definition of opponent color
+        % space. This is to make it compatible with the contrast
+        % selection below.
+        im = cat(3,...
+                 (im(:,:,1) - im(:,:,2))/sqrt(2), ...
+                 (im(:,:,1) + im(:,:,2) - 2*im(:,:,3))/sqrt(6), ...
+                 mean(im,3)) ;
+      case 'hsv'
+        im = rgb2hsv(im) ;
+      otherwise
+        opts.color = 'hsv' ;
+        warning('Color space not recongized, defaulting to HSV color space.') ;
+    end
   end
 
   if opts.verbose
+    fprintf('%s: color space: %s\n', mfilename, opts.color) ;
     fprintf('%s: image size: %d x %d\n', mfilename, imageSize(1), imageSize(2)) ;
     fprintf('%s: sizes: [%s]\n', mfilename, sprintf(' %d', opts.sizes)) ;
   end
@@ -108,12 +126,14 @@ function [frames, descrs] = vl_phow(im, varargin)
 
     off = floor(1 + 3/2 * (max(opts.sizes) - opts.sizes(si))) ;
 
-    % scale space
+    % smooth the image to the appropriate scale based on the size
+    % of the SIFT bins
     sigma = opts.sizes(si) / opts.magnif ;
     ims = vl_imsmooth(im, sigma) ;
 
+    % extract dense SIFT features on all channels
     for k = 1:numChannels
-      [frames{si}, descrs{k,si}] = vl_dsift(...
+      [f{k}, d{k}] = vl_dsift(...
         ims(:,:,k), ...
         dsiftOpts{:},  ...
         'size', opts.sizes(si), ...
@@ -121,13 +141,23 @@ function [frames, descrs] = vl_phow(im, varargin)
     end
 
     % remove low contrast descriptors
-    % note that for color descriptors the V component is thresholded
+    % note that for color descriptors the V component is
+    % thresholded
+    switch opts.color
+      case 'gray'
+        contrast = f{1}(3,:) ;
+      case 'rgb'
+        contrast = mean([f{1}(3,:) ; f{2}(3,:) ; f{3}(3,:)],1) ;
+      otherwise
+        contrast = f{1}(3,:) ;
+    end
     for k = 1:numChannels
-      descrs{k,si}(:, frames{si}(3,:) < opts.contrastthreshold) = 0 ;
+      d{k}(:, contrast < opts.contrastthreshold) = 0 ;
     end
 
     % save only x,y, and the scale
-    frames{si} = [frames{si}(1:3, :) ; opts.sizes(si) * ones(1,size(frames{si},2))] ;
+    frames{si} = [f{1}(1:3, :) ; opts.sizes(si) * ones(1,size(f{1},2))] ;
+    descrs{si} = cat(1, d{:}) ;
   end
   descrs = cell2mat(descrs) ;
   frames = cell2mat(frames) ;
