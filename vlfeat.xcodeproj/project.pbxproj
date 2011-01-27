@@ -144,8 +144,8 @@
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
 		2DE765220FF23EE9006347E0 /* kdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kdtree.h; path = toolbox/misc/kdtree.h; sourceTree = "<group>"; };
 		2DF4565610ADB9010083F316 /* vl_homkermap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_homkermap.c; path = toolbox/misc/vl_homkermap.c; sourceTree = "<group>"; };
-		2DECFC7A1129660800505F99 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
-		2DECFC7B1129660800505F99 /* array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = array.c; sourceTree = "<group>"; };
+		2DFA36D212F1A26D00E808D9 /* array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = array.c; sourceTree = "<group>"; };
+		2DFA36D312F1A26D00E808D9 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
 		2DFF4C370FF1033B00E5D79C /* vl_kdtreequery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_kdtreequery.c; path = toolbox/misc/vl_kdtreequery.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -224,6 +224,8 @@
 				2DBD0B2110F7AB58004DBA31 /* metaprograms */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
 				2D732E7F0CF8C2E40099B03C /* aib.h */,
+				2DFA36D212F1A26D00E808D9 /* array.c */,
+				2DFA36D312F1A26D00E808D9 /* array.h */,
 				2DE5B37D0FDC2BE9008CEB1D /* dsift.c */,
 				2DE5B37E0FDC2BE9008CEB1D /* dsift.h */,
 				2D0E6C4B1003E0DF00F0864E /* float.th */,
