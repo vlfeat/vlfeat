@@ -5,8 +5,8 @@ vl_test_init ;
 function s = setup()
 randn('state',0) ;
 
-s.biasMultiplier = 2 ;
-s.lambda = 0.1 ;
+s.biasMultiplier = 10 ;
+s.lambda = 0.01 ;
 
 Np = 10 ;
 Nn = 10 ;
@@ -17,17 +17,19 @@ Xn(1,:) = Xn(1,:) - 2 + 1 ;
 
 s.X = [Xp Xn] ;
 s.y = [ones(1,Np) -ones(1,Nn)] ;
-%s.w = exact_solver(s.X, s.y, s.lambda, s.biasMultiplier) ;
-s.w = [ 0.984155766745943 ;
-        0.081875883054983 ;
-       -0.558661314436844] ;
+%s.w = exact_solver(s.X, s.y, s.lambda, s.biasMultiplier)
+s.w = [1.181106685845652 ;
+       0.098478251033487 ;
+       -0.154057992404545 ] ;
 
 function test_problem_1(s)
 for conv = {@single,@double}
+  vl_twister('state',0) ;
   conv = conv{1} ;
   w = vl_pegasos(conv(s.X), int8(s.y), s.lambda, ...
-                 'NumIterations', 3000, ...
-                 'BiasMultiplier', s.biasMultiplier) ;
+                 'NumIterations', 100000, ...
+                 'BiasMultiplier', s.biasMultiplier, ...
+                 'Preconditioner', conv([1 1 .1])) ;
   vl_assert_almost_equal(w, conv(s.w), 0.1) ;
 end
 
