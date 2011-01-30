@@ -35,12 +35,12 @@ LIBTOOL := libtool
 endif
 
 # Linux-32
-ifeq ($(ARCH),glx)
+ifeq ($(ARCH),glnx32)
 DLL_SUFFIX := so
 endif
 
 # Linux-64
-ifeq ($(ARCH),a64)
+ifeq ($(ARCH),glnxa64)
 DLL_SUFFIX := so
 endif
 

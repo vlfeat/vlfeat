@@ -131,7 +131,7 @@ dist-bin-merge:
 	cd "$(tmp-dir)" ; \
 	MERGE_BRANCHES=; \
 	FETCH_BRANCHES=; \
-	for ALT_ARCH in common maci maci64 glx a64 w32 w64 ; \
+	for ALT_ARCH in common maci maci64 glnx32 glnxa64 win32 win64 ; \
 	do \
 	  MERGE_BRANCH=v$(VER)-$$ALT_ARCH ; \
 	  MERGE_BRANCHES="$$MERGE_BRANCHES bin/$$MERGE_BRANCH" ; \

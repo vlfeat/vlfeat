@@ -8,14 +8,15 @@ INSTALLING
 
   Binaries are created in the bin/XXX directory, where XXX changes
   depending on the architecture. VLFeat supports the following (the
-  naming reflects MATLAB naming for MEX files):
+  naming reflects MATLAB architecture naming for the MEX command the
+  MEX file extension differs and is reported in parenthesis):
 
-  - maci    Mac OS X Intel
-  - maci64  Mac OS X Intel (64 bit)
-  - glx     GNU Linux i386
-  - a64     GNU Linux x64
-  - w32     Windows
-  - w64     Windows (64 bit)
+  - maci     (mexmaci)    Mac OS X Intel
+  - maci64   (mexmaci64)  Mac OS X Intel (64 bit)
+  - glnx32   (mexglx)     GNU Linux i386
+  - glnxa64  (mexa64)     GNU Linux x64
+  - win32    (mexw32)     Windows
+  - win64    (mexw64)     Windows (64 bit)
 
   The executable binaries can be installed anywhere in the command
   line path (the directory contains also the static library).

@@ -39,26 +39,39 @@ MEX_CFLAGS  += -I$(VLDIR)/toolbox
 
 MEX_LDFLAGS  = $(LDFLAGS) -L$(BINDIR) -lvl
 
-MEX_SUFFIX  := mex$(ARCH)
-MEX_BINDIR  := toolbox/mex/$(MEX_SUFFIX)
-
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
+MEX_SUFFIX := mexmaci
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
+MEX_SUFFIX := mexmaci64
 endif
 
 # Linux on 32 bit processor
-ifeq ($(ARCH),glx)
+ifeq ($(ARCH),glnx32)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_SUFFIX := mexglx
 endif
 
 # Linux on 64 bit processorm
-ifeq ($(ARCH),a64)
+ifeq ($(ARCH),glnxa64)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
-MEX_ARCH = glnxa64
+MEX_SUFFIX := mexa64
+endif
+
+MEX_BINDIR  := toolbox/mex/$(MEX_SUFFIX)
+
+# --------------------------------------------------------------------
+#                                                         Sanity check
+# --------------------------------------------------------------------
+
+err_no_mex_suffix  = $(shell echo "** Could not set MEX_SUFFIX for ARCH = $(ARCH)"  1>&2)
+err_no_mex_suffix +=no_mex_suffix
+
+ifeq ($(MEX_SUFFIX),)
+die:=$(error $(err_no_mex_suffix))
 endif
 
 # --------------------------------------------------------------------

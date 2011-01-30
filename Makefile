@@ -20,20 +20,25 @@
 #
 # > make ARCH=maci64
 #
-# builds VLFeat for Mac OS X Intel 64-bit.
+# builds VLFeat for Mac OS X Intel 64 bit.
 #
-# !! Unforunately MATLAB 2009B mex script has a bug that prevents the
-# !! architecture selected by specifying ARCH to be used for the
-# !! compilation of the MEX files.  This bug is easy to fix, but
-# !! requires patching the mex script. See www.vlfeat.org for detailed
+# !! Unforunately MATLAB mex script (at least up to version 2009B) has
+# !! a bug that prevents selecting an architecture different from the
+# !! default one for compilation. For instance, compiling maci64 may
+# !! not work as the default architecture is maci if both 32 and 64
+# !! bit MATLAB are installed. This bug is easy to fix, but requires
+# !! patching the mex script. See www.vlfeat.org for detailed
 # !! instructions.
 #
 # Other useful variables are listed below (their default value is in
 # square bracked).
 #
-#   ARCH [undefined] - Active architecture (maci, maci64, glx, or
-#       a64). If undefined, the makefile attempts to automatically
-#       detect the architecture.
+#   ARCH [undefined] - Active architecture. The supported
+#       architectures are maci, maci64, glnx32, or glnxa64 (these are
+#       the same architecture identifers used by MATLAB:
+#       http://www.mathworks.com/help/techdoc/ref/computer.html). If
+#       undefined, the makefile attempts to automatically detect the
+#       architecture.
 #
 #   DEBUG [undefined] - If defined, turns on debugging symbols and
 #       turns off optimizations
@@ -102,10 +107,10 @@ err_spaces +=spaces
 Darwin_PPC_ARCH := mac
 Darwin_Power_Macintosh_ARCH := mac
 Darwin_i386_ARCH := maci
-Linux_i386_ARCH := glx
-Linux_i686_ARCH := glx
-Linux_unknown_ARC := glx
-Linux_x86_64_ARCH := a64
+Linux_i386_ARCH := glnx32
+Linux_i686_ARCH := glnx32
+Linux_unknown_ARC := glnx32
+Linux_x86_64_ARCH := glnxa64
 
 UNAME := $(shell uname -sm)
 ARCH ?= $($(shell echo "$(UNAME)" | tr \  _)_ARCH)
@@ -128,7 +133,6 @@ CC ?= cc
 
 FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
 FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
-
 
 CLFAGS += $(FEATUREFLAGS)
 CFLAGS += -std=c99
@@ -156,13 +160,13 @@ LDFLAGS += -lm -mmacosx-version-min=10.5
 endif
 
 # Linux-32
-ifeq ($(ARCH),glx)
+ifeq ($(ARCH),glnx32)
 CFLAGS  += -march=i686
 LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
 endif
 
 # Linux-64
-ifeq ($(ARCH),a64)
+ifeq ($(ARCH),glnxa64)
 LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
 endif
 
