@@ -89,14 +89,18 @@ function [frames, descrs] = vl_phow(im, varargin)
     switch lower(opts.color)
       case 'rgb'
       case 'opponent'
-        % Note that the last component is multiplied by sqrt(3)
-        % with respect to the definition of opponent color
-        % space. This is to make it compatible with the contrast
-        % selection below.
-        im = cat(3,...
-                 (im(:,:,1) - im(:,:,2))/sqrt(2), ...
-                 (im(:,:,1) + im(:,:,2) - 2*im(:,:,3))/sqrt(6), ...
-                 mean(im,3)) ;
+        % Note that the mean differs from the standard definition of opponent
+        % space and is the regular intesity (for compatibility with
+        % the contrast thresholding).
+        %
+        % Note also that the mean is added pack to the other two
+        % components with a small multipliers for monochromatic
+        % regions.
+        mu = 0.3*im(:,:,1) + 0.59*im(:,:,2) + 0.11*im(:,:,3) ;
+        alpha = 0.01 ;
+        im = cat(3, mu, ...
+                 (im(:,:,1) - im(:,:,2))/sqrt(2) + alpha*mu, ...
+                 (im(:,:,1) + im(:,:,2) - 2*im(:,:,3))/sqrt(6) + alpha*mu) ;
       case 'hsv'
         im = rgb2hsv(im) ;
       otherwise
@@ -131,7 +135,7 @@ function [frames, descrs] = vl_phow(im, varargin)
     sigma = opts.sizes(si) / opts.magnif ;
     ims = vl_imsmooth(im, sigma) ;
 
-    % extract dense SIFT features on all channels
+    % extract dense SIFT features from all channels
     for k = 1:numChannels
       [f{k}, d{k}] = vl_dsift(...
         ims(:,:,k), ...
@@ -144,12 +148,12 @@ function [frames, descrs] = vl_phow(im, varargin)
     % note that for color descriptors the V component is
     % thresholded
     switch opts.color
-      case 'gray'
+      case {'gray', 'opponent'}
         contrast = f{1}(3,:) ;
       case 'rgb'
         contrast = mean([f{1}(3,:) ; f{2}(3,:) ; f{3}(3,:)],1) ;
-      otherwise
-        contrast = f{1}(3,:) ;
+      otherwise % hsv
+        contrast = f{3}(3,:) ;
     end
     for k = 1:numChannels
       d{k}(:, contrast < opts.contrastthreshold) = 0 ;
