@@ -44,8 +44,8 @@ if isempty(path)
   return ;
 end
 
-[subPath, name, ext, versn] = fileparts(path) ;
-name = [name ext versn] ;
+[subPath, name, ext] = fileparts(path) ;
+name = [name ext] ;
 
 % subPath is equal to path if path = '/'
 if ~strcmp(subPath, path)
