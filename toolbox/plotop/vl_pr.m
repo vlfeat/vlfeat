@@ -16,7 +16,14 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %  VL_PR() accepts the following options:
 %
 %  InludeInf:: false
-%    If set to true, data with -INF score is included in the evaluation.
+%    If set to true, data with -INF score is included in the
+%    evaluation and the maximum recall is 1 even if -INF scores are
+%    present.
+%
+%  Stable:: false
+%    If set to true, RECALL and PRECISION are in the samre order of
+%    LABELS and SCORES rather than being sorted by increasing
+%    RECALL. This option implies INCLUDEINF.
 %
 %  About the PR curve::
 %    This section uses the same symbols used in the documentation of
@@ -44,7 +51,8 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-opts.includeinf = false ;
+opts.includeInf = false ;
+opts.stable = false ;
 opts = vl_argparse(opts,varargin) ;
 
 % make row vectors
@@ -56,14 +64,14 @@ scores = scores(:)' ;
 labels = labels(perm) ;
 
 % assume that data with -INF score is never retrieved
-if opts.includeinf
+if opts.includeInf | opts.stable
   stop = length(scores) ;
 else
   stop = max(find(scores > -inf)) ;
 end
 
 % Compute number of true positives, false positives, and overall
-% positives. Note that lables==0 don't increase neither TP nor FP nor
+% positives. Note that lables==0 do not increase neither TP nor FP nor
 % affect P.
 tp = [0 cumsum(labels(1:stop) == +1)] ;
 fp = [0 cumsum(labels(1:stop) == -1)] ;
@@ -104,4 +112,11 @@ if nargout == 0
   title(sprintf('Precision-recall (AP = %.2f %%)', info.auc * 100)) ;
   legend('PR', 'random classifier', 'Location', 'NorthWestOutside') ;
   clear recall precision info ;
+end
+
+if opts.stable
+  recall(1) = [] ;
+  precision(1) = [] ;
+  recall(perm) = recall ;
+  precision(perm) = precision ;
 end
