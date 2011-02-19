@@ -1,4 +1,4 @@
-function [conf, args] = vl_argparse(conf, args)
+function [conf, args] = vl_argparse(conf, args, varargin)
 % VL_ARGPARSE  Parse list of parameter-value pairs
 %   CONF = VL_ARGPARSE(CONF, ARGS) updates the structure CONF based on
 %   the specified parameter-value pairs ARGS={PAR1, VAL1, ... PARN,
@@ -37,38 +37,33 @@ function [conf, args] = vl_argparse(conf, args)
 
 if ~isstruct(conf), error('CONF must be a structure') ; end
 
+if length(varargin) > 0, args = {args, varargin{:}} ; end
+
 remainingArgs = {} ;
+names = fieldnames(conf) ;
+
+if mod(length(args),2) == 1
+  error('Parameter-value pair expected (missing value?).') ;
+end
 
 for ai = 1:2:length(args)
-  try
-    paramName = args{ai} ;
-    value = args{ai+1} ;
-  catch
-    error('Parameter-value pair expected (missing value?).') ;
-  end
-
-  confParamName = findFieldI(conf, paramName) ;
-
-  if isempty(confParamName)
-    if nargout < 2
-      error('Unknown parameter ''%s''.', paramName) ;
-    else
-      remainingArgs(end+1:end+2) = args(ai:ai+1) ;
-    end
+  paramName = args{ai} ;
+  value = args{ai+1} ;
+  if isfield(conf,paramName)
+    conf.(paramName) = value ;
   else
-    conf.(confParamName) = value ;
+    % try case-insensitive
+    i = find(strcmpi(paramName, names)) ;
+    if isempty(i)
+      if nargout < 2
+        error('Unknown parameter ''%s''.', paramName) ;
+      else
+        remainingArgs(end+1:end+2) = args(ai:ai+1) ;
+      end
+    else
+      conf.(names{i}) = value ;
+    end
   end
 end
 
 args = remainingArgs ;
-
-% --------------------------------------------------------------------
-function field = findFieldI(S, matchField)
-% --------------------------------------------------------------------
-field =  ''  ;
-fieldNames = fieldnames(S) ;
-for fi=1:length(fieldNames)
-  if strcmpi(fieldNames{fi}, matchField)
-    field = fieldNames{fi} ;
-  end
-end
