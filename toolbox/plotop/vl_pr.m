@@ -1,4 +1,4 @@
-function [recall, precision, info] = vl_pr(labels, scores, varargin)
+function [recall, precision, info, scores] = vl_pr(labels, scores, varargin)
 % VL_PR Compute precision-recall curve
 %  [RECALL, PRECISION] = VL_PR(LABELS, SCORES) computes the
 %  precision-recall (PR) curve. LABELS are the ground thruth labels
@@ -119,4 +119,7 @@ if opts.stable
   precision(1) = [] ;
   recall(perm) = recall ;
   precision(perm) = precision ;
+  scores(perm(1:stop)) = scores(1:stop) ;
+else
+  scores = [+inf scores(1:stop)] ;
 end
