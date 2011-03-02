@@ -54,7 +54,7 @@ for ai=1:2:length(varargin)
   arg = varargin{ai+1} ;
   switch lower(opt)
     case 'aspect'
-      aspectRatio = opt ;
+      aspectRatio = arg ;
     case 'reference'
       switch lower(arg)
         case 'horizontal'
