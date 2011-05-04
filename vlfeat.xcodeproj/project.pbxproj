@@ -24,19 +24,19 @@
 		2D519080115A800C0079E222 /* homkermap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = homkermap.h; sourceTree = "<group>"; };
 		2D519081115A800C0079E222 /* homkermap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homkermap.c; sourceTree = "<group>"; };
 		2D6007FF1115C1FA0020963C /* check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = check.h; sourceTree = "<group>"; };
-		2D6102D0111EE22C00470F4C /* bin.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = bin.mak; sourceTree = "<group>"; tabWidth = 8; };
-		2D6102D1111EE22C00470F4C /* dist.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = dist.mak; sourceTree = "<group>"; tabWidth = 8; };
-		2D6102D2111EE22C00470F4C /* dll.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = dll.mak; sourceTree = "<group>"; tabWidth = 8; };
-		2D6102D3111EE22C00470F4C /* doc.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = doc.mak; sourceTree = "<group>"; tabWidth = 8; };
-		2D6102D4111EE22C00470F4C /* matlab.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = matlab.mak; sourceTree = "<group>"; tabWidth = 8; };
-		2D6102D5111EE22C00470F4C /* octave.mak */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.make; path = octave.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D0111EE22C00470F4C /* bin.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = bin.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D1111EE22C00470F4C /* dist.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = dist.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D2111EE22C00470F4C /* dll.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = dll.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D3111EE22C00470F4C /* doc.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = doc.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D4111EE22C00470F4C /* matlab.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = matlab.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2D6102D5111EE22C00470F4C /* octave.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = octave.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
 		2D72EAF10E48A42F005DAA47 /* imopv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv.h; sourceTree = "<group>"; };
 		2D72EB080E48A934005DAA47 /* test_imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_imopv.c; sourceTree = "<group>"; };
-		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
+		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2D732DE50CF8C2E40099B03C /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aib.c; sourceTree = "<group>"; };
 		2D732DE60CF8C2E40099B03C /* generic-driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "generic-driver.h"; sourceTree = "<group>"; };
 		2D732DE80CF8C2E40099B03C /* mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mser.c; sourceTree = "<group>"; };
@@ -121,6 +121,8 @@
 		2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_tpsumx.c; path = toolbox/imop/vl_tpsumx.c; sourceTree = "<group>"; };
 		2D86B1220F24CC9B00E625D6 /* vl_twister.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
 		2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
+		2D8E1B551371FB23009CDE11 /* .gitattributes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
+		2D8E1B561371FB23009CDE11 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
 		2DB1A28F110CE32F00E02BD8 /* inthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = inthist.tc; path = toolbox/misc/inthist.tc; sourceTree = "<group>"; };
@@ -129,7 +131,7 @@
 		2DB1A2A2110D09B200E02BD8 /* vl_version.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
 		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
 		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
-		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv_sse2.c; sourceTree = "<group>"; };
@@ -153,6 +155,8 @@
 		08FB7794FE84155DC02AAC07 /* vlfeat */ = {
 			isa = PBXGroup;
 			children = (
+				2D8E1B551371FB23009CDE11 /* .gitattributes */,
+				2D8E1B561371FB23009CDE11 /* .gitignore */,
 				2D99420410ECD6E300502DF6 /* index.html */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
 				2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */,
@@ -405,7 +409,11 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "vlfeat" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* vlfeat */;
 			productRefGroup = 08FB7794FE84155DC02AAC07 /* vlfeat */;
 			projectDirPath = "";
@@ -419,191 +427,101 @@
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		1DEB919408733D9F0010E9CD /* Debug 32 */ = {
+		2D8E1B7C13720C55009CDE11 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ACTIVE_TEST = test_host;
-				ARCH = maci;
-				ARCHS = x86_64;
+				ARCH = "$(ARCH_$(ARCHS))";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
+				ARCH_i386 = maci;
+				ARCH_x86_64 = maci64;
 				DEBUG = YES;
 				DOXYGEN = doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
+				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				VERB = yes;
+				PROFILE = "";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
 			};
-			name = "Debug 32";
+			name = Debug;
 		};
-		1DEB919508733D9F0010E9CD /* Release 32 */ = {
+		2D8E1B7D13720C55009CDE11 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		2D8E1B7E13720C55009CDE11 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		2D8E1B7F13720C55009CDE11 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		2D8E1B8013720C5E009CDE11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ACTIVE_TEST = test_host;
-				ARCH = maci;
-				ARCHS = i386;
+				ARCH = "$(ARCH_$(ARCHS))";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
+				ARCH_i386 = maci;
+				ARCH_x86_64 = maci64;
+				DEBUG = "";
 				DOXYGEN = doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab09B.app;
 				MEX = "$(MATLABROOT)/bin/mex";
+				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
-				PROFILE = yes;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				VERB = yes;
+				PROFILE = YES;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
 			};
-			name = "Release 32";
+			name = Release;
 		};
-		2D271AA710E1999F0064BE1D /* Debug 64 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ACTIVE_TEST = test_host;
-				ARCH = maci64;
-				ARCHS = x86_64;
-				DEBUG = YES;
-				DOXYGEN = doxygen;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
-				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab09B.app;
-				MEX = "$(MATLABROOT)/bin/mex";
-				PATH = "$(PATH):/opt/local/bin/";
-				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				VERB = yes;
-				VLDIR = "$(PROJECT_DIR)";
-			};
-			name = "Debug 64";
-		};
-		2D271AA810E1999F0064BE1D /* Debug 64 */ = {
+		2D8E1B8113720C5E009CDE11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = "Debug 64";
+			name = Release;
 		};
-		2D271AA910E1999F0064BE1D /* Debug 64 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				MATLAB = "$(MATLABROOT)";
-				MEX = "$(MEX)";
-				PRODUCT_NAME = "vlfeat-all";
-			};
-			name = "Debug 64";
-		};
-		2D271AAA10E1999F0064BE1D /* Debug 64 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				MATLAB = "$(MATLABROOT)";
-				MEX = "$(MEX)";
-				PRODUCT_NAME = info;
-			};
-			name = "Debug 64";
-		};
-		2D271AAB10E199AF0064BE1D /* Release 64 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ACTIVE_TEST = test_host;
-				ARCH = maci64;
-				ARCHS = x86_64;
-				DOXYGEN = doxygen;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
-				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab09B.app;
-				MEX = "$(MATLABROOT)/bin/mex";
-				PATH = "$(PATH):/opt/local/bin/";
-				PREBINDING = NO;
-				PROFILE = yes;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				VERB = yes;
-				VLDIR = "$(PROJECT_DIR)";
-			};
-			name = "Release 64";
-		};
-		2D271AAC10E199AF0064BE1D /* Release 64 */ = {
+		2D8E1B8213720C5E009CDE11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = "Release 64";
+			name = Release;
 		};
-		2D271AAD10E199AF0064BE1D /* Release 64 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "make doc-api";
-			};
-			name = "Release 64";
-		};
-		2D271AAE10E199AF0064BE1D /* Release 64 */ = {
+		2D8E1B8313720C5E009CDE11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = "Release 64";
-		};
-		2D72E9CB0E4765D2005DAA47 /* Debug 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				MATLAB = "$(MATLABROOT)";
-				MEX = "$(MEX)";
-				PRODUCT_NAME = "vlfeat-all";
-			};
-			name = "Debug 32";
-		};
-		2D72E9CC0E4765D2005DAA47 /* Release 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "make doc-api";
-			};
-			name = "Release 32";
-		};
-		2D72EA240E476C05005DAA47 /* Debug 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				MATLAB = "$(MATLABROOT)";
-				MEX = "$(MEX)";
-				PRODUCT_NAME = info;
-			};
-			name = "Debug 32";
-		};
-		2D72EA250E476C05005DAA47 /* Release 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release 32";
-		};
-		2D732DBF0CF8BFFD0099B03C /* Debug 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Debug 32";
-		};
-		2D732DC00CF8BFFD0099B03C /* Release 32 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release 32";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -611,46 +529,38 @@
 		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "vlfeat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1DEB919408733D9F0010E9CD /* Debug 32 */,
-				2D271AA710E1999F0064BE1D /* Debug 64 */,
-				1DEB919508733D9F0010E9CD /* Release 32 */,
-				2D271AAB10E199AF0064BE1D /* Release 64 */,
+				2D8E1B7C13720C55009CDE11 /* Debug */,
+				2D8E1B8013720C5E009CDE11 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release 32";
+			defaultConfigurationName = Release;
 		};
 		2D72E9CA0E4765D2005DAA47 /* Build configuration list for PBXLegacyTarget "make doc-api" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D72E9CB0E4765D2005DAA47 /* Debug 32 */,
-				2D271AA910E1999F0064BE1D /* Debug 64 */,
-				2D72E9CC0E4765D2005DAA47 /* Release 32 */,
-				2D271AAD10E199AF0064BE1D /* Release 64 */,
+				2D8E1B7E13720C55009CDE11 /* Debug */,
+				2D8E1B8213720C5E009CDE11 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release 32";
+			defaultConfigurationName = Release;
 		};
 		2D72EA230E476C05005DAA47 /* Build configuration list for PBXLegacyTarget "make info" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D72EA240E476C05005DAA47 /* Debug 32 */,
-				2D271AAA10E1999F0064BE1D /* Debug 64 */,
-				2D72EA250E476C05005DAA47 /* Release 32 */,
-				2D271AAE10E199AF0064BE1D /* Release 64 */,
+				2D8E1B7F13720C55009CDE11 /* Debug */,
+				2D8E1B8313720C5E009CDE11 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release 32";
+			defaultConfigurationName = Release;
 		};
 		2D732DCF0CF8C02D0099B03C /* Build configuration list for PBXLegacyTarget "make" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D732DBF0CF8BFFD0099B03C /* Debug 32 */,
-				2D271AA810E1999F0064BE1D /* Debug 64 */,
-				2D732DC00CF8BFFD0099B03C /* Release 32 */,
-				2D271AAC10E199AF0064BE1D /* Release 64 */,
+				2D8E1B7D13720C55009CDE11 /* Debug */,
+				2D8E1B8113720C5E009CDE11 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release 32";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
