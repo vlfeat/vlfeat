@@ -36,7 +36,7 @@
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
 		2D72EAF10E48A42F005DAA47 /* imopv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv.h; sourceTree = "<group>"; };
 		2D72EB080E48A934005DAA47 /* test_imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_imopv.c; sourceTree = "<group>"; };
-		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
+		2D732DE30CF8C2CB0099B03C /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = Makefile; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2D732DE50CF8C2E40099B03C /* aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aib.c; sourceTree = "<group>"; };
 		2D732DE60CF8C2E40099B03C /* generic-driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "generic-driver.h"; sourceTree = "<group>"; };
 		2D732DE80CF8C2E40099B03C /* mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mser.c; sourceTree = "<group>"; };
@@ -85,13 +85,13 @@
 		2D7AD0AC0E38C18600783252 /* doxygen.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = doxygen.conf; path = docsrc/doxygen.conf; sourceTree = "<group>"; };
 		2D7AD0AD0E38C18600783252 /* hikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = hikm.html; path = docsrc/hikm.html; sourceTree = "<group>"; };
 		2D7AD0AE0E38C18600783252 /* ikm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = ikm.html; path = docsrc/ikm.html; sourceTree = "<group>"; };
-		2D7AD0AF0E38C18600783252 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = docsrc/index.html; sourceTree = "<group>"; };
+		2D7AD0AF0E38C18600783252 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; indentWidth = 2; name = index.html; path = docsrc/index.html; sourceTree = "<group>"; tabWidth = 2; };
 		2D7AD0B00E38C18600783252 /* mser.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = mser.html; path = docsrc/mser.html; sourceTree = "<group>"; };
 		2D7AD0B10E38C18600783252 /* sift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = sift.html; path = docsrc/sift.html; sourceTree = "<group>"; };
 		2D7AD0B20E38C18600783252 /* template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = template.html; path = docsrc/template.html; sourceTree = "<group>"; };
 		2D7AD0B30E38C18600783252 /* tutorials.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = tutorials.html; path = docsrc/tutorials.html; sourceTree = "<group>"; };
 		2D7AD0B40E38C18600783252 /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = docsrc/utils.html; sourceTree = "<group>"; };
-		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; };
+		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 1; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; tabWidth = 1; };
 		2D8061FE118229AB0092BDD1 /* pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pegasos.c; sourceTree = "<group>"; };
 		2D8061FF118229AB0092BDD1 /* pegasos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pegasos.h; sourceTree = "<group>"; };
 		2D86B1080F24CC9B00E625D6 /* vl_aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_aib.c; path = toolbox/aib/vl_aib.c; sourceTree = "<group>"; };
@@ -131,7 +131,7 @@
 		2DB1A2A2110D09B200E02BD8 /* vl_version.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
 		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
 		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
-		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; };
+		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		2DD302780DE33107009443C7 /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
 		2DD302790DE33107009443C7 /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv_sse2.c; sourceTree = "<group>"; };

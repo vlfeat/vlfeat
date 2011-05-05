@@ -54,6 +54,15 @@ pre, code {
     width: 10em ;
     padding: 0em ;
 }
+#sidebar .item {
+    margin: 0 ;
+    padding: 0.25em ;
+    margin-left: .5em ;
+    margin-top: 1em ;
+    margin-bottom: 0em ;
+    background-color: #f3f0f5 ;
+    border: 1px solid #a7a5a8 ;
+}
 #sidebar ul {
     margin: 0 ;
     padding: 0 ;
