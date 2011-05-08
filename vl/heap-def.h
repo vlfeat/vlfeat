@@ -24,7 +24,7 @@ GNU GPLv2, or (at your option) any later version.
  @section heap-def-overview Overview
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- To use ::heap-def.h one must specify at least a prefix and the data
+ To use @ref heap-def.h one must specify at least a prefix and the data
  type for the heap elements:
 
  @code
@@ -123,7 +123,7 @@ GNU GPLv2, or (at your option) any later version.
  property</em>) that any node is not larger than any of its
  children. In particular, the root is the smallest node.
 
- ::heap-def.h uses the standard binary tree representation as a linear
+ @ref heap-def.h uses the standard binary tree representation as a linear
  array. Tree nodes are mapped to array elements as follows:
  <code>array[0]</code> corresponds to the root, <code>array[1]</code>
  and <code>array[2]</code> to the root left and right children and so

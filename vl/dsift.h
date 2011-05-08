@@ -91,7 +91,7 @@ VL_INLINE void vl_dsift_set_bounds (VlDsiftFilter *self,
                                    int maxY) ;
 VL_INLINE void vl_dsift_set_geometry (VlDsiftFilter *self,
                                       VlDsiftDescriptorGeometry const* geom) ;
-VL_INLINE void vl_dsift_set_flat_window (VlDsiftFilter *self, vl_bool flatWindow) ;
+VL_INLINE void vl_dsift_set_flat_window (VlDsiftFilter *self, vl_bool useFlatWindow) ;
 VL_INLINE void vl_dsift_set_window_size (VlDsiftFilter *self, double windowSize) ;
 /** @} */
 
@@ -281,7 +281,7 @@ vl_dsift_set_geometry (VlDsiftFilter *self,
 
 void
 vl_dsift_set_flat_window (VlDsiftFilter* self,
-                         int useFlatWindow)
+                         vl_bool useFlatWindow)
 {
   self->useFlatWindow = useFlatWindow ;
 }

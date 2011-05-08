@@ -150,7 +150,7 @@ GNU GPLv2, or (at your option) any later version.
  @c gamma (use one for the standard kernels), the approximation order
  @c order (usually order one is enough), the period @a period (use a
  negative value to use the default period), and a window type @c
- window (use ::VlHomogeneousKernelMapRectangular if unsure). The
+ window (use ::VlHomogeneousKernelMapWindowRectangular if unsure). The
  approximation order trades off the quality and dimensionality of the
  approximation. The resulting feature map @f$ \Psi(x) @f$, computed by
  ::vl_homogeneouskernelmap_evaluate_d or

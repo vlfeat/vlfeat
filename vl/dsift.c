@@ -84,15 +84,15 @@ DSIFT is implemented by a ::VlDsiftFilter object that can be used
 to process a sequence of images of a given geometry.
 To use the <b>DSIFT filter</b>:
 
-- Initialize a new DSIFT filter object by ::vl_dsift_new() (or the simplified
-::vl_dsift_new_basic()). Customize the descriptor parameters by
-::vl_dsift_set_steps, ::vl_dsfit_set_geometry, etc.
-- Process an image by ::vl_dsift_process().
-- Retrieve the number of keypoints (::vl_dsift_get_nkeypoint), the
+- Initialize a new DSIFT filter object by ::vl_dsift_new (or the simplified
+::vl_dsift_new_basic). Customize the descriptor parameters by
+::vl_dsift_set_steps, ::vl_dsift_set_geometry, etc.
+- Process an image by ::vl_dsift_process.
+- Retrieve the number of keypoints (::vl_dsift_get_keypoint_num), the
   keypoints (::vl_dsift_get_keypoints), and their descriptors
   (::vl_dsift_get_descriptors).
 - Optionally repeat for more images.
-- Delete the DSIFT filter by ::vl_dsift_delete().
+- Delete the DSIFT filter by ::vl_dsift_delete.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section dsift-tech Technical details
@@ -460,15 +460,13 @@ vl_dsift_new (int imWidth, int imHeight)
 
 /** ------------------------------------------------------------------
  ** @brief Create a new DSIFT filter (basic interface)
- **
  ** @param imWidth width of the image.
  ** @param imHeight height of the image.
  ** @param step sampling step.
  ** @param binSize bin size.
+ ** @return new filter.
  **
  ** The descriptor geometry matches the standard SIFT descriptor.
- **
- ** @return new filter.
  **/
 
 VL_EXPORT VlDsiftFilter *

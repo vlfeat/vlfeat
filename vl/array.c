@@ -54,6 +54,7 @@ vl_array_init (VlArray* self, vl_type type,
 }
 
 /** @brief New numeric array envelope
+ ** @param self array to initialize.
  ** @param data data to envelople.
  ** @param type data type.
  ** @param numDimensions number of dimensions.
@@ -78,6 +79,7 @@ vl_array_init_envelope (VlArray * self, void * data, vl_type type,
 }
 
 /** @brief New numeric array with matrix shape
+ ** @param self array to initialize.
  ** @param type type.
  ** @param numRows number of rows.
  ** @param numColumns number of columns.
@@ -91,6 +93,7 @@ vl_array_init_matrix (VlArray * self, vl_type type, vl_size numRows, vl_size num
 }
 
 /** @brief New numeric array envelpe with matrix shape
+ ** @param self array to initialize.
  ** @param data data to envelope.
  ** @param type type.
  ** @param numRows number of rows.

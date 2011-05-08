@@ -88,7 +88,6 @@
 		2D7AD0AF0E38C18600783252 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; indentWidth = 2; name = index.html; path = docsrc/index.html; sourceTree = "<group>"; tabWidth = 2; };
 		2D7AD0B00E38C18600783252 /* mser.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = mser.html; path = docsrc/mser.html; sourceTree = "<group>"; };
 		2D7AD0B10E38C18600783252 /* sift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = sift.html; path = docsrc/sift.html; sourceTree = "<group>"; };
-		2D7AD0B20E38C18600783252 /* template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = template.html; path = docsrc/template.html; sourceTree = "<group>"; };
 		2D7AD0B30E38C18600783252 /* tutorials.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = tutorials.html; path = docsrc/tutorials.html; sourceTree = "<group>"; };
 		2D7AD0B40E38C18600783252 /* utils.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = utils.html; path = docsrc/utils.html; sourceTree = "<group>"; };
 		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 1; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; tabWidth = 1; };
@@ -193,7 +192,6 @@
 				2D7AD0AE0E38C18600783252 /* ikm.html */,
 				2D7AD0B00E38C18600783252 /* mser.html */,
 				2D7AD0B10E38C18600783252 /* sift.html */,
-				2D7AD0B20E38C18600783252 /* template.html */,
 				2D7AD0B30E38C18600783252 /* tutorials.html */,
 				2D7AD0B40E38C18600783252 /* utils.html */,
 			);

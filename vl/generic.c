@@ -279,7 +279,7 @@ GNU GPLv2, or (at your option) any later version.
 
   VLFeat has some global configuration parameters that can
   changed. Changing the configuration is thread unsave
-  (@ref design-threads). Use ::vl_set_simd to toggle the use of
+  (@ref design-threads). Use ::vl_set_simd_enabled to toggle the use of
   a SIMD unit (Intel SSE code), ::vl_set_alloc_func to change
   the memory allocation functions, and ::vl_set_printf_func
   to change the logging function.
