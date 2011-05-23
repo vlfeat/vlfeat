@@ -103,10 +103,10 @@ stop = max(find(scores > -inf)) ;
 
 % Compute number of true positives, false positives, and overall
 % peositives. Note that labels==0 don't increase any of the counts.
-tp = [0 cumsum(labels(1:stop) == +1)] ;
-fp = [0 cumsum(labels(1:stop) == -1)] ;
-p = sum(labels == +1) ;
-n = sum(labels == -1) ;
+tp = [0 cumsum(labels(1:stop) > 0)] ;
+fp = [0 cumsum(labels(1:stop) < 0)] ;
+p = sum(labels > 0) ;
+n = sum(labels < 0) ;
 
 % compute the rates
 tpr = tp / (p + eps) ;
