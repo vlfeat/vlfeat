@@ -2,6 +2,21 @@
 
 <group>
 
+<pagestyle>
+#content table.checker {
+    border-collapse: collapse ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+#content table.checker td {
+    background-color: #f6f6f6 ;
+    border: none ;
+    border-top: 1px solid #DDD ;
+    border-bottom: 1px solid #DDD ;
+    padding: 0.5em ;
+}
+</pagestyle>
+
 <p>These instructions explain how to use VLFeat from the command line
 (shell).</p>
 
@@ -18,7 +33,8 @@ Intel, <code>glx</code> for Linux, and so on). For the sake of
 illustration, the following table gives the path to the SIFT feature
 extraction program for the varius architectures:</p>
 
-<table class="checker;padding:0.5em;">
+<div class="p">
+<table class="checker">
 <tr>
 <th>Platform</th>
 <th><code>ARCH</code></th>
@@ -60,6 +76,7 @@ extraction program for the varius architectures:</p>
 <td><code>VLFEATROOT/bin/glnxa64/sift</code></td>
 </tr>
 </table>
+</div>
 
 <p>All commands have a corresponding man page found
 in <code>VLFEATROOT/src</code>.  For UNIX based systems, the man pages

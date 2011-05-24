@@ -19,14 +19,14 @@ standard GNU toolchain. It is usually sufficient to change to VLFeat
 root directory, denoted <code>VLFEATROOT</code> in the following, and
 type <code>make</code>:</p>
 <precode type='sh'>
-> cd VLFEATROOT
-> make
+$ cd VLFEATROOT
+$ make
 </precode>
 <p>The make script attempts to automatically detect the host
 architecture and configure itself accordingly. If the architecture is
 not detected correctly, it can be specified manually. For instance</p>
 <precode type='sh'>
-> make ARCH=glx
+$ make ARCH=glx
 </precode>
 <p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
 to obtain a list of other useful options.</p>
@@ -41,7 +41,7 @@ command. Let <code>MATLABROOT</code> denote the returned path
 script is usually located in <code>MALTABROOT/bin/mex</code>. Then run
 the compilation with the command</p>
 <precode type='sh'>
-> make MEX=MATLABROOT/bin/mex
+$ make MEX=MATLABROOT/bin/mex
 </precode>
 <p>VLFeat must be compiled for the architecture used by MATLAB (run
  MATLAB's <code>computer</code> command to obtain this
@@ -57,13 +57,13 @@ compiling for this platform, but the architecture must be specified
 manually when compiling, either like:</p>
 
 <precode type='sh'>
-make ARCH=maci64
+$ make ARCH=maci64
 </precode>
 
 <p>or</p>
 
 <precode type='sh'>
-make ARCH=maci
+$ make ARCH=maci
 </precode>
 
 <p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug that

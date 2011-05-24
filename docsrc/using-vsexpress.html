@@ -12,9 +12,9 @@
   Open Visual C++ Express 2008 and select <b>File &gt; New &gt; Project</b>
   and choose <b>General &gt; Empty Project</b>. Give your project a
   name and location (here <code>vlfeat-client</code>) and click OK.</p>
-  
+
  <img alt="New Project" src="%pathto:root;images/using-vs-new-project.png"/>
- 
+ <br/>
  <img alt="Empty Project" src="%pathto:root;images/using-vs-empty-project.png"/>
 
   <p>Next, we have to modify the project properties to include the
@@ -25,7 +25,7 @@
 
  <p>We want these settings to apply to both Debug and Release builds, so
  switch to all configurations.</p>
- 
+
  <img alt="All Configurations" src="%pathto:root;images/using-vs-all-configurations.png"/>
 
  <p>Add an additional include path which points to the root of the
@@ -45,18 +45,18 @@
  getting  because <code>vl.dll</code> will not be found:</p>
 
  <img alt="vl.dll was not found" src="%pathto:root;images/using-vs-nodll.png"/>
- 
+
  <p>To remedy this, we add a post-build step which copies vl.dll to
  the debug or release folder.  Since this only needs to be done once
  for each project, we could instead copy the file manually.</p>
 
  <img alt="Post-build step" src="%pathto:root;images/using-vs-post-step.png"/>
- 
+
  <p>Now that we have created our project, add a new .cpp file (right
  click on Source Files and choose <b>Add &gt; New Item</b>) with
  this code:</p>
 
-  <pre>
+<precode type="c">
 extern "C" {
 #include &lt;vl/generic.h&gt;
 }
@@ -65,7 +65,7 @@ int main (int argc, const char * argv[]) {
   VL_PRINT ("Hello world!\n") ;
   return 0;
 }
- </pre>
+</precode>
 
  <p>Build and run the project (Ctrl+F5). It should run correctly, and
  you should see this:</p>

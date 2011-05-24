@@ -42,6 +42,9 @@ pre, code {
     font-family: 'Bitstream Vera Sans Mono', monospace ;
     /* color: #ff6f00; */
 }
+code {
+    color: #BA2121 ;
+}
 #pagebody {
     background-color: white ;
     padding-bottom: 1px ;
@@ -164,7 +167,8 @@ pre, code {
 #content h6 {font-size:1.0em; margin-bottom: 0.5em;}
 #content p,
 #content blockquote,
-#content div.figure {
+#content div.figure,
+#content div.p {
     margin: 1em 0 ;
     padding: 0 ;
     padding-right: 10em ;
@@ -278,16 +282,9 @@ pre, code {
     margin-bottom: 0.5em ;
 }
 #content div.box p {
+    margin-top: 0.25em ;
+    margin-bottom: 0.5em ;
     padding-right: 1em ;
-}
-#content table.checker {
-    border-collapse: collapse ;
-    margin-left: auto ;
-    margin-right: auto ;
-}
-#content table.checker td {
-    border: 1px solid black ;
-    padding: .2em ;
 }
 #content div.parbox {
     border: 1px dotted #333 ;
