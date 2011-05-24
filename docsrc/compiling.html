@@ -18,16 +18,16 @@ otherwise not necessary (use the
 standard GNU toolchain. It is usually sufficient to change to VLFeat
 root directory, denoted <code>VLFEATROOT</code> in the following, and
 type <code>make</code>:</p>
-<pre>
+<precode type='sh'>
 > cd VLFEATROOT
 > make
-</pre>
+</precode>
 <p>The make script attempts to automatically detect the host
 architecture and configure itself accordingly. If the architecture is
 not detected correctly, it can be specified manually. For instance</p>
-<pre>
+<precode type='sh'>
 > make ARCH=glx
-</pre>
+</precode>
 <p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
 to obtain a list of other useful options.</p>
 
@@ -40,9 +40,9 @@ command. Let <code>MATLABROOT</code> denote the returned path
 (e.g. <code>/Applications/MATLAB_R2009b.app/</code>). The <code>mex</code>
 script is usually located in <code>MALTABROOT/bin/mex</code>. Then run
 the compilation with the command</p>
-<pre>
+<precode type='sh'>
 > make MEX=MATLABROOT/bin/mex
-</pre>
+</precode>
 <p>VLFeat must be compiled for the architecture used by MATLAB (run
  MATLAB's <code>computer</code> command to obtain this
  information). On Mac OS X it is often necessary to turn on 64-bit
@@ -56,15 +56,15 @@ corresponding extension <code>mexmaci64</code>. VLFeat now supports
 compiling for this platform, but the architecture must be specified
 manually when compiling, either like:</p>
 
-<pre>
+<precode type='sh'>
 make ARCH=maci64
-</pre>
+</precode>
 
 <p>or</p>
 
-<pre>
+<precode type='sh'>
 make ARCH=maci
-</pre>
+</precode>
 
 <p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug that
 must be manually fixed in order for this procedure to work
@@ -72,13 +72,13 @@ correctly. It is recommend to make backup of the <code>mex</code>
 script before attempting this. Th fix the bug, edit the
 <code>MATLABROOT/bin/mex</code> script by cutting the line:</p>
 
-<pre>
+<precode type='sh'>
 get_arch    # Call $MATLAB/bin/util/arch.sh
-</pre>
+</precode>
 
 <p>and pasting it after the processing of options:</p>
 
-<pre>
+<precode type='sh'>
 ...
 shift
 done
@@ -89,7 +89,7 @@ get_arch    # Call $MATLAB/bin/util/arch.sh
 if [ $v7_compat -eq 1 ] ; then
 fc_flags="$fc_flags -DMX_COMPAT_32"
 ...
-</pre>
+</precode>
 </div>
 
 <h1 id="compiling.windows">Compiling on Windows</h1>

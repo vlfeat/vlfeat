@@ -22,18 +22,18 @@ partitions. For more details see
 
 <p>First, we generate some random data to cluster in <code>[0,255]^2</code>:</p>
 
-<pre>
+<precode type='matlab'>
 data     = uint8(rand(2,10000) * 255) ;
 datat    = uint8(rand(2,100000)* 255) ;
-</pre>
+</precode>
 
 <p>To cluster this data, we simply use <code>vl_hikmeans</code>:</p>
 
-<pre>
+<precode type='matlab'>
 K        = 3 ;
 nleaves  = 100 ;
 [tree,A] = vl_hikmeans(data,K,nleaves) ;
-</pre>
+</precode>
 
 <p>Here <code>nleaves</code> is the desired number of leaf
 clusters. The algorithm terminates when there are at least
@@ -42,9 +42,9 @@ clusters. The algorithm terminates when there are at least
 
 <p>To assign labels to the new data, we use <code>vl_hikmeanspush</code>:</p>
 
-<pre>
+<precode type='matlab'>
 AT       = vl_hikmeanspush(tree,datat) ;
-</pre>
+</precode>
 
 <div class="figure">
 <image src="%pathto:root;demo/hikmeans-tree.jpg"/>
@@ -67,7 +67,7 @@ clusters, but only three colors are used).
 <p>The output <code>tree</code> is a MATLAB structure representing the tree of
 clusters:</p>
 
-<pre>
+<precode type='matlab'>
 > tree
 tree =
  
@@ -75,34 +75,34 @@ tree =
       depth: 5
     centers: [2x3 int32]
         sub: [1x3 struct]
-</pre>
+</precode>
 
 <p>The field <code>centers</code> is the matrix of the cluster centers at the
 root node.  If the depth of the tree is larger than 1, then the field
 <code>sub</code> is a structure array with one entry for each cluster. Each
 element is in turn a tree:</p>
 
-<pre>
+<precode type='matlab'>
 > tree.sub
 ans = 
 
 1x3 struct array with fields:
     centers
     sub
-</pre>
+</precode>
 
 <p>with a field <code>centers</code> for its clusters and a field
 <code>sub</code> for its children. When there are no children, this
 field is equal to the empty matrix</p>
 
-<pre>
+<precode type='matlab'>
 > tree.sub(1).sub(1).sub(1).sub(1)
 
 ans = 
 
     centers: [2x3 int32]
         sub: []
-</pre>
+</precode>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.hikm.elkan">Elkan</h1>
@@ -112,7 +112,7 @@ ans =
 produce identical output, the Elkan method is sometimes faster.
 The <code>method</code> parameters controls which method is used. Consider the case when <code>K=10</code> and our data is now 128 dimensional (e.g. SIFT descriptors):</p>
 
-<pre>
+<precode type='matlab'>
 K=10;
 nleaves = 1000;
 data = uint8(rand(128,10000) * 255);
@@ -130,6 +130,6 @@ t_lloyd =
 t_elkan =
 
     3.0427
-</pre>
+</precode>
 
 </group>

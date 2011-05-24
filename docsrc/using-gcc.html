@@ -6,24 +6,24 @@
  <b>VLFeat</b> library and the g++ compiler. Our project will consist of the
  following simple file, which we will refer to as <code>main.cpp</code>:
  </p>
- 
- <pre>
-  extern "C" {
-    #include &lt;vl/generic.h&gt;
-  }
 
-  int main (int argc, const char * argv[]) {
+<precode type="c">
+extern "C" {
+  #include &lt;vl/generic.h&gt;
+}
+
+int main (int argc, const char * argv[]) {
   VL_PRINT ("Hello world!") ;
   return 0;
-  }
- </pre>
+}
+</precode>
 
  <p>Notice that the <code>extern "C"</code> is required for C++ projects.
  Compiling the project is straightforward. From the command prompt type:</p>
 
- <pre>
- [vlfeat-user]$ g++ main.cpp -o vlfeat-test -IVLROOT -LVLROOT/bin/a64/ -lvl
- </pre>
+<precode type="sh">
+$ g++ main.cpp -o vlfeat-test -IVLROOT -LVLROOT/bin/a64/ -lvl
+</precode>
 
  <p>In this example, replace <code>VLROOT</code> with the path to your VLFeat
  installation and replace <code>a64</code> with your architecture

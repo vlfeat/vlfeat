@@ -17,21 +17,21 @@ the <code>vl_setup</code> command found in
 the <code>VLFEATROOT/toolbox</code> directory. From MATLAB prompt
 enter</p>
 
-<pre>
+<precode type='matlabsession'>
 >> run('VLFEATROOT/toolbox/vl_setup')
 VLFeat 0.9.8 ready.
-</pre>
+</precode>
 
 <p>To check that VLFeat is sucessfully installed, try to run
 the <code>vl_version</code> command:</p>
 
-<pre>
+<precode type='matlabsession'>
 >> vl_version verbose
 VLFeat version 0.9.8
     Static config: X64, little_endian, GNU C 40201 LP64, POSIX_threads, SSE2
     4 CPU(s): GenuineIntel MMX SSE SSE2 SSE3 SSE41 SSE42
     SIMD enabled: yes
-</pre>
+</precode>
 
 <h1>Permanent setup</h1>
 
@@ -40,9 +40,9 @@ to your
 <a href="http://www.google.com/search?q=site:www.mathworks.com+startup.m&amp;btnI=I"><code>startup.m</code>
 file</a>:</p>
 
-<pre>
+<precode type='matlab'>
 run('VLFEATROOT/toolbox/vl_setup')
-</pre>
+</precode>
 
 <p>When you restart MATLAB, you should see the VLFeat greeting
 message.</p>
@@ -56,12 +56,13 @@ command</a> (e.g. <code>help vl_sift</code>).</p>
 
 <p>VLFeat bundles a large number of demos. To use them, add the demo
 path with <code>vl_setup demo</code>. For example, a sift demo
-<code>vl_demo_sift_basic</code> can be run using the following: :</p>
+<code>vl_demo_sift_basic</code> can be run using the following:</p>
 
-<pre>
+<precode type='matlabsession'>
 >> vl_setup demo
+
 >> vl_demo_sift_basic
-</pre>
+</precode>
 
 <p>To see a list of demos TAB-complete <code>vl_demo</code> at MATLAB
 prompt, after running <code>vl_setup demo</code></p>

@@ -11,6 +11,7 @@
  <meta>
   <!-- Stylesheets -->
   <link href="%pathto:root;web.css" rel="stylesheet" type="text/css"/>
+  <link href="%pathto:root;pygmentize.css" rel="stylesheet" type="text/css"/>
   <title>VLFeat - %path;</title>
   %pagestyle;
 
@@ -34,7 +35,7 @@
    <script type="text/javascript"
     src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
    <!-- Google CSE Search Box Ends -->
-   <h1><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></h1>
+   <h1><a class="plain" href="%pathto:home;"><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></a></h1>
   </div>
   <div id="headbanner">
    %path;
@@ -42,7 +43,6 @@
   <div id="pagebody">
    <div id="sidebar"> <!-- Navigation Start -->
     %navigation;
-    <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/" style="text-decoration:none"><div class="item" style="font-size:.9em;text-align:center;">ACM OpenSource Award 2010</div></a>
    </div> <!-- sidebar -->
    <div id="content">
     %content;
@@ -89,11 +89,6 @@
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
  <page id="home" name="index" title="Home"> <include src="index.html"/>
-  <pagestyle>
-   #content p.widePar {
-     padding-right: 1em ;
-   }
-  </pagestyle>
   <page id="about" name="about" title="About"><include src="about.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>

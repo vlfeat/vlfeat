@@ -28,11 +28,11 @@ robustly. For a more in-depth description of the algorithm, see our
 the <code>vl_sift</code> MATLAB command (there is a similar command
 line utility). Open MATLAB and load a test image</p>
  
-<pre>
+<precode type='matlab'>
 pfx = fullfile(vl_root,'data','a.jpg') ;
 I = imread(pfx) ;
 image(I) ;
-</pre>
+</precode>
  
 <div class="figure">
  <img src="%pathto:root;demo/sift_basic_0.jpg"/>
@@ -49,29 +49,29 @@ interval (while this is not strictly required, the default values of
 some internal thresholds are tuned for this case). The image
 <code>I</code> is converted in the appropriate format by</p>
 
-<pre>
+<precode type='matlab'>
 I = single(rgb2gray(I)) ;
-</pre>
+</precode>
  
 <p>We compute the SIFT frames (keypoints) and descriptors by</p>
 
-<pre>
+<precode type='matlab'>
 [f,d] = vl_sift(I) ;
-</pre>
+</precode>
  
 <p>The matrix <code>f</code> has a column for each frame. A frame is a
 disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
 orientation <code>f(4)</code> . We visualize a random selection of 50
 features by:</p>
  
-<pre>
+<precode type="matlab">
 perm = randperm(size(f,2)) ; 
-sel  = perm(1:50) ;
-h1   = vl_plotframe(f(:,sel)) ; 
-h2   = vl_plotframe(f(:,sel)) ; 
+sel = perm(1:50) ;
+h1 = vl_plotframe(f(:,sel)) ; 
+h2 = vl_plotframe(f(:,sel)) ; 
 set(h1,'color','k','linewidth',3) ;
 set(h2,'color','y','linewidth',2) ;
-</pre>
+</precode>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_basic_2.jpg"/>
@@ -82,10 +82,10 @@ set(h2,'color','y','linewidth',2) ;
 
 <p>We can also overlay the descriptors by</p>
  
-<pre>
+<precode type='matlab'>
 h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
 set(h3,'color','g') ;
-</pre>
+</precode>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_basic_3.jpg"/>
@@ -104,11 +104,11 @@ algorithm. Let <code>Ia</code> and <code>Ib</code> be images of the
 same object or scene. We extract and match the descriptors by:
 </p>
 
-<pre>
+<precode type='matlab'>
 [fa, da] = vl_sift(Ia) ;
 [fb, db] = vl_sift(Ib) ;
 [matches, scores] = vl_ubcmatch(da, db) ;
-</pre>
+</precode>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_match_1.jpg"/>
@@ -149,14 +149,14 @@ second best one (see <code>vl_ubcmatch</code> for further details).
   that are too small (in absolute value). For instance, consider a
   test image of 2D Gaussian blobs:</p>
 
-<pre>
+<precode type='matlab'>
 I = double(rand(100,500) &lt;= .005) ;
 I = (ones(100,1) * linspace(0,1,500)) .* I ;
 I(:,1) = 0 ; I(:,end) = 0 ;
 I(1,:) = 0 ; I(end,:) = 0 ;
 I = 2*pi*4^2 * vl_imsmooth(I,4) ;
 I = single(255 * I) ;
-</pre>
+</precode>
 
 <div class="figure">
  <img src="%pathto:root;demo/sift_peak_0.jpg"/>
@@ -167,9 +167,9 @@ I = single(255 * I) ;
 
 <p>We run the detector with peak threshold <code>peak_thresh</code> by</p>
  
-<pre>
+<precode type='matlab'>
 f = vl_sift(I, 'PeakThresh', peak_thresh) ;
-</pre>
+</precode>
 
 <p>obtaining fewer features as <code>peak_thresh</code> is increased.</p>
 
@@ -190,14 +190,14 @@ f = vl_sift(I, 'PeakThresh', peak_thresh) ;
 the DoG scale space whose curvature is too small (such peaks yield
 badly localized frames). For instance, consider the test image</p>
  
-<pre>
+<precode type='matlab'>
 I = zeros(100,500) ;
 for i=[10 20 30 40 50 60 70 80 90]
 I(50-round(i/3):50+round(i/3),i*5) = 1 ;
 end
 I = 2*pi*8^2 * vl_imsmooth(I,8) ;
 I = single(255 * I) ;
-</pre>
+</precode>
 
 <div class="figure">
 <img src="%pathto:root;demo/sift_edge_0.jpg"/>
@@ -210,9 +210,9 @@ A test image for the edge threshold parameter.
 
 <p>We run the detector with edge threshold <code>edge_thresh</code> by</p>
 
-<pre>
+<precode type='matlab'>
 f = vl_sift(I, 'edgethresh', edge_thresh) ;
-</pre>
+</precode>
 
 <p>obtaining more features as <code>edge_thresh</code> is increased:</p>
 
@@ -241,10 +241,10 @@ the <code>Frames</code> option.</p>
 centered at position <code>(100,100)</code>, of scale <code>10</code>
 and orientation <code>-pi/8</code> by</p>
  
-<pre>
+<precode type='matlab'>
 fc = [100;100;10;-pi/8] ;
 [f,d] = vl_sift(I,'frames',fc) ;
-</pre>
+</precode>
 
 <div class="figure">
 <img src="%pathto:root;demo/sift_basic_4.jpg"/>
@@ -261,10 +261,10 @@ fc = [100;100;10;-pi/8] ;
   use the custom position and scale but to compute the keypoint
   orientations, as in</p>
 
-<pre>
+<precode type='matlab'>
 fc = [100;100;10;0] ;
 [f,d] = vl_sift(I,'frames',fc,'orientations') ;
-</pre>
+</precode>
 
  <div class="figure">
 <img src="%pathto:root;demo/sift_basic_5.jpg"/>

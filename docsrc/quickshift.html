@@ -24,11 +24,11 @@ instead of iteratively shifting each point towards a local mean instead forms a 
 
 <p>As a feature vector, we choose the LAB colorspace representation of the image augmented with the x,y location of the pixel. <code>vl_quickseg</code> is a convenient wrapper function which takes care of the transformation of the image to LAB and performs segmentation, making our job as easy as:</p>
 
-<pre>
+<precode type='matlab'>
 ratio = 0.5;
 kernelsize = 2;
 Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
-</pre>
+</precode>
 
 <p>where <code>ratio</code> is the tradeoff between color importance and spatial importance (larger values give more importance to color), <code>kernelsize</code> is the size of the kernel used to estimate the density, and <code>maxdist</code> is the maximum distance between points in the feature space that may be linked if the density is increased.</p>
 
@@ -46,14 +46,14 @@ Iseg = vl_quickseg(I, ratio, kernelsize, maxdist);
 
 <p>In the previous section, we created a superpixel segmentation by taking each of the trees in this forest as a distinct cluster. However, since <code>maxdist</code> simply prevents new links from forming, the segmentation formed by every <code>dist &lt; maxdist</code> is contained in the result. <code>vl_quickvis</code> lets us visualize this by running quick shift once and forming multiple segmentations by cutting links in the tree which are smaller and smaller.</p>
 
-<pre>
+<precode type='matlab'>
 maxdist = 50;
 ndists = 10;
 Iedge = vl_quickvis(I, ratio, kernelsize, maxdist, ndists)
 imagesc(Iedge);
 axis equal off tight;
 colormap gray;
-</pre>
+</precode>
 
 <div class="figure">
 <image src="%pathto:root;demo/quickshift_qvis.jpg"/>

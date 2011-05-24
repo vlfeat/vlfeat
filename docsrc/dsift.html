@@ -15,10 +15,10 @@ categorization.</p>
 
 <p>The main advantage of using <code>vl_dsift</code>
 over <code>vl_sift</code> is speed. To see this, load a test image</p>
-<pre>
+<precode type='matlab'>
 I = imread(fullfile(vl_root,'data','a.jpg')) ;
 I = single(vl_imdown(rgb2gray(I))) ;
-</pre>
+</precode>
 
 <p>To check the equivalence of <code>vl_disft</code>
 and <code>vl_sift</code> it is necessary to understand in detail how
@@ -46,7 +46,7 @@ accounts for the smoothing induced by the camera CCD.</p></li>
 <p>Thus the following code produces equivalent descriptors using
   either DSIFT or SIFT:</p>
 
-<pre>
+<precode type='matlab'>
 binSize = 8 ;
 magnif = 3 ;
 Is = vl_imsmooth(I, sqrt((binSize/magnif)^2 - .25)) ;
@@ -55,7 +55,7 @@ Is = vl_imsmooth(I, sqrt((binSize/magnif)^2 - .25)) ;
 f(3,:) = binSize/magnif ;
 f(4,:) = 0 ;
 [f_, d_] = vl_sift(I, 'frames', f) ;
-</pre>
+</precode>
 
 <p>The difference, of course, is that DSIFT is much faster.</p>
 
@@ -89,10 +89,10 @@ compute such features.</p>
 <p>VLFeat includes a simple wrapper, <code>vl_phow</code>, that does
 exactly this:</p>
 
-<pre>
+<precode type='matlab'>
 im = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
 [frames, descrs]=vl_phow(im2single(im)) ;
-</pre>
+</precode>
 
 <p>Note that this typically generate a very large number of features.
 In this example, there are 162,574 features.</p>

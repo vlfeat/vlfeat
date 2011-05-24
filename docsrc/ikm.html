@@ -28,26 +28,26 @@ command, we sample 1000 random points in the <code>[0,255]^2</code>
 integer square and use <code>vl_ikmeans</code> to get k=3
 clusters:</p>
 
-<pre>
+<precode type='matlab'>
 K = 3 ;
 data = uint8(rand(2,1000) * 255) ;
 [C,A] = vl_ikmeans(data,K) ;
-</pre>
+</precode>
 
 <p>The program returns both the cluster centers <code>C</code> and the
 data-to-cluster assignments <code>A</code>. By means of the cluster
 centers
 <code>C</code> we can project more data on the same clusters</p>
 
-<pre>
+<precode type='matlab'>
 datat = uint8(rand(2,10000) * 255) ;
 AT = vl_ikmeanspush(datat,C) ;
-</pre>
+</precode>
 
 <p>In order to visualize the results, we associate to each cluster a
 color and we plot the points:</p>
 
-<pre>
+<precode type='matlab'>
 cl = get(gca,'ColorOrder') ;
 ncl = size(cl,1) ;
 for k=1:K
@@ -58,7 +58,7 @@ for k=1:K
   plot(datat(1,selt),datat(2,selt),'+',...
        'Color',cl(mod(k,ncl)+1,:)) ;  
 end
-</pre>
+</precode>
 
 <div class="figure">
 <image src="%pathto:root;demo/ikmeans_lloyd.jpg"/>
@@ -84,7 +84,7 @@ distance computations.  The <code>method</code> parameters controls
 which method is used. Consider the case when <code>K=100</code> and our
 data is now 128 dimensional (e.g. SIFT descriptors):</p>
 
-<pre>
+<precode type='matlab'>
 K=100;
 data = uint8(rand(128,10000) * 255);
 tic;
@@ -101,7 +101,7 @@ t_lloyd =
 t_elkan =
 
     5.1405
-</pre>
+</precode>
 
 
 </group>

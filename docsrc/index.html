@@ -1,8 +1,34 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <group>
+  <pagestyle>
+   #content p.widePar {
+     padding-right: 1em ;
+   }
+   #changes dd {
+     margin-bottom: 1em ;
+   }
+   .award {
+     margin: 1em 0em ;
+     width: 10em ;
+     font-size: 0.9em ;
+     text-align:center ;
+     float: right ;
+     border: 1px solid #DDD ;
+     background-color: #f6f6f6 ;
+   }
+   #changes .date {
+     font-weight: normal ;
+     font-style: italic ;
+     width: 10em ;
+   }
+  </pagestyle>
 
- <p>The <b>VLFeat</b> <a
+  <div class="award">
+    <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/" style="text-decoration:none">ACM OpenSource Award 2010</a>
+  </div>
+
+  <p>The <b>VLFeat</b> <a
   href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">open
   source</a> library implements popular computer vision algorithms
   including
@@ -14,7 +40,10 @@
   <em>Windows</em>, <em>Mac OS X</em>, and <em>Linux</em>. The latest version of
   VLFeat is <include src="version.html" />.</p>
 
- <div class="box" style="height:6em;">
+ <table class="boxes">
+ <tr>
+ <td style="height:6em;padding-right:0.5em;padding-bottom:0.5em;">
+ <div class="box">
   <h1>Download</h1>
   <ul>
    <li><b>
@@ -25,8 +54,54 @@
    <li><a href="http://github.com/vlfeat/vlfeat/tree/master">Git
    repository</a></li>
   </ul>
- </div>
-
+ </div></td>
+ <td style="height:6em;padding-left:0.5em;padding-bottom:0.5em;">
+ <div class="box">
+  <h1>Documentation</h1>
+  <ul>
+   <li><a href="%pathto:mdoc;">MATLAB commands</a></li>
+   <li><a href="%pathto:api;">C API</a> with algorithm descriptions</li>
+   <li><a href="%pathto:man;">Command line tools</a></li>
+  </ul>
+  </div>
+ </td>
+ </tr>
+ <tr>
+ <td style="height:15em;padding-right:0.5em;padding-top:0.5em;">
+ <div class="box">
+  <h1>Tutorials</h1>
+  <ul>
+  <li>Features:  <a href="%pathto:tut.sift;">SIFT</a>, <a href="%pathto:tut.mser;">MSER</a>,
+    <a href="%pathto:tut.qs;">Quick shift</a></li>
+  <li>Clustering: <a href="%pathto:tut.ikm;">IKM</a>, <a href="%pathto:tut.hikm;">HIKM</a>,
+    <a href="%pathto:tut.aib;">AIB</a></li>
+  <li>Matching: <a href="%pathto:tut.kdtree;">Randomized kd-trees</a></li>
+  <li><a href="%pathto:tut;">All tutorials</a></li>
+  </ul>
+  <h1>Example applications</h1>
+  <ul>
+  <li><a href="%pathto:apps.caltech-101;">Caltech-101 classification</a></li>
+  <li><a href="%pathto:apps.sift-mosaic;">SIFT matching for
+  auto-stitching</a></li>
+  <li><a href="%pathto:apps;">All applications</a></li>
+  </ul>
+ </div></td>
+ <td style="height:15em;padding-left:0.5em;padding-top:0.5em;">
+ <div class="box">
+  <h1>Citing</h1>
+<pre style="font-size: .8em; color: black; margin-top: 0.5em ; margin-bottom: 1.1em; line-height:1.1em;">
+@misc{vedaldi08vlfeat,
+ Author = {A. Vedaldi and B. Fulkerson},
+ Title = {{VLFeat}: An Open and Portable Library
+          of Computer Vision Algorithms},
+ Year  = {2008},
+ Howpublished = {\url{http://www.vlfeat.org/}}
+</pre>
+<h1>Acknowledgments</h1>
+<p><a href="http://vision.ucla.edu">UCLA Vision
+Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG</a>.</p>
+</div></td></tr></table>
+<!--
  <div class="box" style="height:6em;">
   <h1>Documentation</h1>
   <ul>
@@ -68,53 +143,54 @@
 <p><a href="http://vision.ucla.edu">UCLA Vision
 Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG</a>.</p>
  </div>
+-->
 
  <h2 style="clear:left;">News</h2>
 
  <div class="clear">&nsbp;</div>
  <dl id="changes">
-   <dt>7/11/2011 - VLFeat 0.9.10 released</dt>
+   <dt><span class="date">7/11/2011</span> VLFeat 0.9.10 released</dt>
    <dd>VLFeat 0.9.10 rolls out numerous bug fixes
      and improvements, especially to the
      homogeneous kernel map implementation.
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.10">Details</a>].
    </dd>
-   <dt>28/10/2010 - VLFeat wins the ACM Multimedia Open Source Awards!</dt>
+   <dt><span class="date">28/10/2010</span> VLFeat wins the ACM Multimedia Open Source Awards!</dt>
    <dd>VLFeat 0.9.9 was awarded the <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/">ACM Multimedia Open Source Award 2010</a>.
    </dd>
 
-   <dt>14/06/2010 - VLFeat 0.9.9 released</dt>
+   <dt><span class="date">14/06/2010</span> VLFeat 0.9.9 released</dt>
    <dd>VLFeat 0.9.9 adds a new sample application (SIFT matching) and
      minor refinements.
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.9">Details</a>].
    </dd>
 
-   <dt>14/06/2010 - Open Source Vision Software Tutorial</dt>
+   <dt><span class="date">14/06/2010</span> Open Source Vision Software Tutorial</dt>
    <dd>VLFeat presented at the CVPR 2010 Open Source Vision Software
 Tutorial. Slides of the presentation are available from
 the <a href="http://www.vlfeat.org/cvpr10">tutorial web page</a>.</dd>
 
-   <dt>10/05/2010 - VLFeat 0.9.8 released</dt>
+   <dt><span class="date">10/05/2010</span> VLFeat 0.9.8 released</dt>
    <dd>VLFeat 0.9.8 adds new tutorials, (hierarchical) k-means support for
      floating point data, homogeneous kernel maps, a basic implementation
      of PEGASOS for SVM learning, and many other improvements.
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.8">Details</a>].
    </dd>
 
-   <dt>16/01/2010 - VLFeat 0.9.7 released</dt>
+   <dt><span class="date">16/01/2010</span> VLFeat 0.9.7 released</dt>
    <dd>VLFeat 0.9.7 updates the binary distribution to be backward
      compatible with Mac OS X 10.5 (Leopard).
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.7">Details</a>].
    </dd>
 
-   <dt>10/01/2010 - VLFeat 0.9.6 released</dt>
+   <dt><span class="date">10/01/2010</span> VLFeat 0.9.6 released</dt>
    <dd>VLFeat 0.9.6 contains minor improvements to the binary
    distribution. Specifically, it makes VLFeat GNU/Linux distribution
    compatible with the older GLIBC version 2.3.
    [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.6">Details</a>].
    </dd>
 
-   <dt>30/11/2009 - VLFeat 0.9.5 released</dt>
+   <dt><span class="date">30/11/2009</span> VLFeat 0.9.5 released</dt>
    <dd>VLFeat 0.9.5 adds a fast kd-tree implementation and
    SSE-acelerated vector/histogram comparison. The dense SIFT (dsift)
    implementation has also been improved. Binaries and compilation

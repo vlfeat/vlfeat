@@ -24,7 +24,7 @@ Random data generated from a Gaussian mixture with three components
 <p>We quantize this data on a fixed lattice (a 20x20 grid shown in the
 figures below), and construct histograms for each class.</p>
 
-<pre>
+<precode type='matlab'>
 f1 = quantize(X1,D,K) ;
 f2 = quantize(X2,D,K) ;
 f3 = quantize(X3,D,K) ;
@@ -32,13 +32,13 @@ f3 = quantize(X3,D,K) ;
 Pcx(1,:) = vl_binsum(Pcx(1,:), ones(size(f1)), f1) ;
 Pcx(2,:) = vl_binsum(Pcx(2,:), ones(size(f2)), f2) ;
 Pcx(3,:) = vl_binsum(Pcx(3,:), ones(size(f3)), f3) ;
-</pre>
+</precode>
 
 <p>Next we apply AIB:</p>
 
-<pre>
+<precode type='matlab'>
 [parents, cost] = vl_aib(Pcx) ;
-</pre>
+</precode>
 
 <p>This provides us with a list of parents of each column
 in <code>Pcx</code>, forming a tree of merges. We can now "cut" this

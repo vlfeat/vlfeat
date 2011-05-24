@@ -18,7 +18,7 @@ Intel, <code>glx</code> for Linux, and so on). For the sake of
 illustration, the following table gives the path to the SIFT feature
 extraction program for the varius architectures:</p>
 
-<table class="checker">
+<table class="checker;padding:0.5em;">
 <tr>
 <th>Platform</th>
 <th><code>ARCH</code></th>
@@ -51,13 +51,13 @@ extraction program for the varius architectures:</p>
 </tr>
 <tr>
 <td>Linux 32</td>
-<td><code>glx</code></td>
-<td><code>VLFEATROOT/bin/glx/sift</code></td>
+<td><code>glnx32</code></td>
+<td><code>VLFEATROOT/bin/glnx32/sift</code></td>
 </tr>
 <tr>
 <td>Linux 64</td>
-<td><code>a64</code></td>
-<td><code>VLFEATROOT/bin/a64/sift</code></td>
+<td><code>glnxa64</code></td>
+<td><code>VLFEATROOT/bin/glnxa64/sift</code></td>
 </tr>
 </table>
 
@@ -66,9 +66,9 @@ in <code>VLFEATROOT/src</code>.  For UNIX based systems, the man pages
 can be viewed with the <code>man</code> utility. For instance
 </p>
 
-<pre>
+<precode type='sh'>
 > man VLFEATROOT/src/sift.1
-</pre>
+</precode>
 
 <p>It might be convenient to add VLFeat to the system search paths. In
 Linux and Mac OS X this involves modifying the <code>PATH</code>
@@ -76,10 +76,10 @@ and <code>MANPATH</code> environment variables. The exact details may
 vary, but it should be enough to add the following to your
 <code>~/.bash_profile</code>:</p>
 
-<pre>
+<precode type='sh'>
 export PATH=VLFEATROOT/bin/ARCH:$PATH
 export MANPATH=VLFEATROOT/src:$MANPATH
-</pre>
+</precode>
 
 <p>Alternatively, you can copy the executables and man pages to
 appropriate system-wide directories.</p>

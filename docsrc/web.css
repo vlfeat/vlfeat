@@ -17,7 +17,7 @@ body {
     margin-left: auto ;
     margin-right: auto ;
     margin-bottom: 0.5em ;
-    width: 65em ;
+    width: 67em ;
     background-color: #183a60;
     font-family: Lucida, Helvetica, sans-serif ;
     font-size: 14px ;
@@ -31,12 +31,16 @@ h1, h2, h3, h4, h5, h6 {
 a {
     color: #004fdc;
 }
+a.plain {
+    text-decoration: inherit ! important ;
+    color: inherit ! important ;
+}
 b {
     color: rgb(40,40,40) ;
 }
 pre, code {
-    font-family: 'Andale Mono', monospaced ;
-    color: #ff6f00;
+    font-family: 'Bitstream Vera Sans Mono', monospace ;
+    /* color: #ff6f00; */
 }
 #pagebody {
     background-color: white ;
@@ -45,23 +49,16 @@ pre, code {
 #content {
     overflow: hidden ;
     float: right ;
-    width: 53em ;
-    line-height: 1.3em ;
-    padding-right: 1em ;
+    width: 54em ;
+    line-height: 1.4em ;
+    padding-right: 2em ;
+    padding-top: 0.5em ;
+    padding-bottom: 1em ;
 }
 #sidebar {
     float: left ;
     width: 10em ;
     padding: 0em ;
-}
-#sidebar .item {
-    margin: 0 ;
-    padding: 0.25em ;
-    margin-left: .5em ;
-    margin-top: 1em ;
-    margin-bottom: 0em ;
-    background-color: #f3f0f5 ;
-    border: 1px solid #a7a5a8 ;
 }
 #sidebar ul {
     margin: 0 ;
@@ -89,7 +86,7 @@ pre, code {
     margin-bottom: 0em ;
 }
 #sidebar li .active {
-    background-color: #d7d4d8;
+    background-color: #ccc ;
 }
 #sidebar li a {
     color: rgb(40,40,40) ;
@@ -101,9 +98,9 @@ pre, code {
     padding: .2em;
 }
 #header {
-    padding-left: 10px ;
-    padding-bottom: 10px ;
-    padding-top: 10px;
+    padding-left: 1em ;
+    padding-bottom: 1em ;
+    padding-top: 1em;
 }
 #header #cse-search-box {
     float: right ;
@@ -112,20 +109,19 @@ pre, code {
     margin-bottom: auto ;
 }
 #headbanner {
-    background-color: #d7d4d8;
-    padding: .2em .7em ;
-    border-bottom: 1px solid gray ;
-    border-style: none;
+    color: #5a5a5a ;
+    background-color: #f6f6f6 ;
+    padding: 0.4em 1em ;
+    border-bottom: 1px solid #DDD ;
     font: bold 1.1em 'Trebuchet MS', Helvetica, sans-serif;
-    color: #5a5a5e;
 }
 #header h1 {
     margin: 0 ;
-    color:  white ;
+    color: white ;
     font-family: 'Trebuchet MS', Helvetica, sans-serif ;
 }
 #dotorg {
-    color: #ccc ;
+    color: #AAA ;
 }
 #footer {
     clear: both ;
@@ -158,7 +154,7 @@ pre, code {
 #content h5,
 #content h6 {
     margin: 1em 0 ;
-    margin-top: 1.5em ;
+    margin-top: 1.7em ;
 }
 #content h1 {font-size:1.4em; margin-bottom: 0.5em;}
 #content h2 {font-size:1.3em; margin-bottom: 0.5em;}
@@ -169,7 +165,7 @@ pre, code {
 #content p,
 #content blockquote,
 #content div.figure {
-    margin: 0.5em 0 ;
+    margin: 1em 0 ;
     padding: 0 ;
     padding-right: 10em ;
 }
@@ -181,6 +177,18 @@ pre, code {
 #content pre {
     margin: 1em 0 ;
     padding: 0 ;
+}
+#content div.highlight {
+    margin: 1em 0 ;
+    background-color: #f6f6f6 ;
+    border-top: 1px solid #DDD ;
+    border-bottom: 1px solid #DDD ;
+}
+#content div.highlight pre {
+    margin: 0px ;
+    padding: 0.5em ;
+    padding-left: 1em ;
+    margin-right: 5em ;
 }
 #content ul,
 #content ol {
@@ -205,7 +213,7 @@ pre, code {
 }
 #content dd {
     display: block ;
-    margin: 0.1em 0 ;
+    margin: 0.25em 0 ;
     padding-left: 2em ;
     padding-right: 10em ;
 }
@@ -236,18 +244,29 @@ pre, code {
     text-align: left ;
     max-width: 40em ;
 }
+#content div.box {
+    background-color: #f6f6f6 ;
+    border: 1px solid #DDD ;
+    padding: 0.5em ;
+}
+#content table.boxes {
+    width: 100% ;
+    border-spacing: 0em ;
+    border-collapse: collapse ;
+    margin: 0em ;
+    padding: 0em ;
+}
+#content table.boxes td {
+    width: 50% ;
+    height: 100% ;
+    vertical-align: top ;
+}
+#content table.boxes div.box {
+    height:100% ;
+    min-height:100% ;
+}
 #content img.image-right {
     float: right ;
-}
-#content div.box {
-    float: left ;
-    padding: 0.5em ;
-    width: 24em ;
-    margin-right: 1em ;
-    margin-bottom: 1em ;
-    background-color: #f3f0f5 ;
-    border: 1px solid #a7a5a8 ;
-    border-bottom-width: 2px ;
 }
 #content div.box h1 {
     font-size: 1.2em ;
