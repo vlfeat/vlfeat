@@ -8,10 +8,9 @@
 # can be set from the output of `$(MEX) -v`. Therefore setting MEX to
 # the empty string disables MATLAB support.
 
-MATLAB_EXE ?= matlab
 MEX ?= mex
-MATLAB_PATH ?= $(strip $(shell type -P $(MEX) 2>&1 >/dev/null && \
-                 $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+MATLAB_PATH ?= $(strip $(shell $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
 
 # if expand to empty string, set to empty string for use with ifdef
 ifeq ($(MATLAB_PATH),)
