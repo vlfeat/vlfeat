@@ -98,8 +98,12 @@ fc_flags="$fc_flags -DMX_COMPAT_32"
  (<code>Makefile.mak</code>). In order to use it, you must edit
  Makefile.mak to adjust the values of a number of configuration
  variables to match your setup. Once you have done that, start the
- Visual Studio Command Prompt and type <code>nmake /f
- Makefile.mak</code>.</p>
+ Visual Studio Command Prompt and type</p>
+
+<precode type="sh">
+$ nmake /f Makefile.mak # for the Windows 32 target
+$ nmake /f Makefile.mak ARCH=w64 # for the Windows 64 target
+</precode>
 
 <p>For Windows platform, it is also possible to compile just the
 MATLAB MEX files from within MATLAB (using the <code>vl_compile</code>
