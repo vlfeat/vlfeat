@@ -19,7 +19,7 @@
 #MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
 #MATLABROOT = C:\Program Files\MATLAB08a
 
-VER  = 0.9.9
+VER  = 0.9.10
 ARCH = w32
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
@@ -131,6 +131,7 @@ MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
   vl\aib.c \
+  vl\array.c \
   vl\dsift.c \
   vl\generic.c \
   vl\getopt_long.c \
@@ -142,6 +143,7 @@ libsrc = \
   vl\imopv_sse2.c \
   vl\kdtree.c \
   vl\kmeans.c \
+  vl\lbp.c \
   vl\mathop.c \
   vl\mathop_sse2.c \
   vl\mser.c \
@@ -196,6 +198,7 @@ mexsrc = \
   toolbox\misc\vl_inthist.c \
   toolbox\misc\vl_kdtreebuild.c \
   toolbox\misc\vl_kdtreequery.c \
+  toolbox\misc\vl_lbp.c \
   toolbox\misc\vl_localmax.c \
   toolbox\misc\vl_pegasos.c \
   toolbox\misc\vl_samplinthist.c \
