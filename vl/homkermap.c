@@ -236,12 +236,12 @@ VL_INLINE double sinc(double x)
 VL_INLINE double
 vl_homogeneouskernelmap_get_smooth_spectrum (VlHomogeneousKernelMap const * self, double omega)
 {
-  assert (self) ;
   double kappa_hat = 0 ;
   double omegap ;
   double epsilon = 1e-2 ;
   double const omegaRange = 2.0 / (self->period * epsilon) ;
   double const domega = 2 * omegaRange / (2 * 1024.0 + 1) ;
+  assert (self) ;
   switch (self->windowType) {
     case VlHomogeneousKernelMapWindowUniform:
       kappa_hat = vl_homogeneouskernelmap_get_spectrum(self, omega) ;
