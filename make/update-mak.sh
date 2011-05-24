@@ -44,7 +44,7 @@ function subv
 
 # source version string from vl/generic.h
 ver=$(cat vl/generic.h | sed -n \
-     's/.*VL_VERSION_STRING.*\(\([0-9][0-9]*\.\{0,1\}\)\{3\}\).*/\1/p')
+    's/.*VL_VERSION_STRING.*\"\([0-9.]*\)\".*/\1/p')
 
 # source current nmake script
 a=$(cat Makefile.mak)
