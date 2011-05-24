@@ -10,8 +10,8 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-#ifndef VL_HOMKER_H
-#define VL_HOMKER_H
+#ifndef VL_HOMKERMAP_H
+#define VL_HOMKERMAP_H
 
 #include "generic.h"
 
@@ -66,5 +66,5 @@ vl_homogeneouskernelmap_evaluate_f (VlHomogeneousKernelMap const * self,
                                     float * destination,
                                     vl_size stride,
                                     double x) ;
-/* VL_HOMKER_H */
+/* VL_HOMKERMAP_H */
 #endif
