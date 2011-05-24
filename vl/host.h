@@ -80,6 +80,7 @@ GNU GPLv2, or (at your option) any later version.
  **
  ** @sa ::VL_STRINGIFY
  **/
+
 #define VL_XSTRINGIFY(x) VL_STRINGIFY(x)
 
 /** @brief Concatenate two arguments into a lexical unit
@@ -95,6 +96,7 @@ GNU GPLv2, or (at your option) any later version.
  **
  ** @see ::VL_XCAT
  **/
+
 #define VL_CAT(x,y) x ## y
 
 /** @brief Expand and then concatenate two arguments into a lexical unit
@@ -107,6 +109,7 @@ GNU GPLv2, or (at your option) any later version.
  **
  ** @see ::VL_CAT
  **/
+
 #define VL_XCAT(x,y) VL_CAT(x,y)
 
 /** @brief Expand and then concatenate three arguments into a lexical unit
@@ -115,10 +118,11 @@ GNU GPLv2, or (at your option) any later version.
  ** @param y second argument to be concatenated.
  ** @param z third argument to be concatenated.
  **
- ** This macro is the same as ::VL_XCAT, except that the arguments are three.
+ ** This macro is the same as ::VL_XCAT, except that it has three arguments.
  **
  ** @see ::VL_XCAT
  **/
+
 #define VL_XCAT3(x,y,z) VL_XCAT(VL_XCAT(x,y),z)
 
 /** @brief Expand and then concatenate four arguments into a lexical unit
@@ -128,10 +132,11 @@ GNU GPLv2, or (at your option) any later version.
  ** @param z third argument to be concatenated.
  ** @param u fourth argument to be concatenated.
  **
- ** This macro is the same as ::VL_XCAT, except that the arguments are four.
+ ** This macro is the same as ::VL_XCAT, except that it has four arguments.
  **
  ** @see ::VL_XCAT
  **/
+
 #define VL_XCAT4(x,y,z,u) VL_XCAT(VL_XCAT3(x,y,z),u)
 
 /** @brief Expand and then concatenate five arguments into a lexical unit
@@ -142,10 +147,11 @@ GNU GPLv2, or (at your option) any later version.
  ** @param u fourth argument to be concatenated.
  ** @param v fifth argument to be concatenated.
  **
- ** This macro is the same as ::VL_XCAT, except that the arguments are five.
+ ** This macro is the same as ::VL_XCAT, except that it has five arguments.
  **
  ** @see ::VL_XCAT
  **/
+
 #define VL_XCAT5(x,y,z,u,v) VL_XCAT(VL_XCAT4(x,y,z,u),v)
 
 /** @} */
@@ -159,6 +165,7 @@ GNU GPLv2, or (at your option) any later version.
  ** VL_PRINTF("Is x true? %s.", VL_YESNO(x))
  ** @endcode
  **/
+
 #define VL_YESNO(x) ((x)?"yes":"no")
 
 /*

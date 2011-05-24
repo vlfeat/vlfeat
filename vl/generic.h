@@ -51,9 +51,9 @@ GNU GPLv2, or (at your option) any later version.
 
 typedef vl_uint32 vl_type ;
 
-/** @brief Get data type name.
+/** @brief Get the name of a data type.
  ** @param type data type.
- ** @return data type symbolic name.
+ ** @return data name of the data type.
  **
  ** @c type is one of ::VL_TYPE_FLOAT, ::VL_TYPE_DOUBLE,
  ** ::VL_TYPE_INT8, ::VL_TYPE_INT16, ::VL_TYPE_INT32, ::VL_TYPE_INT64,
@@ -106,9 +106,8 @@ vl_get_type_size (vl_type type)
 
 /** @} */
 
-
 /** ------------------------------------------------------------------
- ** @name State and configuration parameters
+ ** @name Library state and configuration
  ** @{ */
 
 /** @internal @brief VLFeat thread state */

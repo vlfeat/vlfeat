@@ -97,7 +97,7 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
 
  MATLAB supports a variety of array types. Most MEX file arguments are
  restricted to a few types and must be properly checked at run time.
- ::mexutils.h provides some helper functions to make it simpler to
+ @ref mexutils.h provides some helper functions to make it simpler to
  check such arguments. MATLAB basic array types are:
 
  - Numeric array:
@@ -142,7 +142,7 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
    non-singleton dimensions can be zero (empty matrix), one, or
    more. The element of such a MATLAB array are stored as a C array in
    column major order and its dimensions can be obtained by @c mxGetM
-   and @c mxGetN.  Use ::vlmxIsMatrix to test if an array is a mtarix.
+   and @c mxGetN.  Use ::vlmxIsMatrix to test if an array is a matrix.
 
  - <b>Real array</b> is a numeric array (as for @c mxIsNumeric)
    without a complex component. Use ::vlmxIsReal to check if an array
@@ -163,7 +163,7 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
  value is a MATLAB array specifing its value. The function
  ::vlmxNextOption  can be used to simplify parsing a list of such
  arguments (similar to UNIX @c getopt). The functions ::vlmxError
- and ::mxuWarning are shortcuts to specify VLFeat formatted errors.
+ and ::vlmxWarning are shortcuts to specify VLFeat formatted errors.
 
  **/
 
@@ -187,16 +187,14 @@ typedef enum _VlmxErrorId {
 #ifdef VL_COMPILER_GNUC
 #if (! defined(HAVE_OCTAVE))
 EXTERN_C void __attribute__((noreturn))
-mexErrMsgIdAndTxt
-(const char * identifier, const char * err_msg, ...) ;
+mexErrMsgIdAndTxt (const char * identifier, const char * err_msg, ...) ;
 #else
 extern void __attribute__((noreturn))
 mexErrMsgIdAndTxt (const char *id, const char *s, ...);
 #endif
 
 void __attribute__((noreturn))
-vlmxError
-(VlmxErrorId errorId, char const * errorMessage, ...) ;
+vlmxError (VlmxErrorId errorId, char const * errorMessage, ...) ;
 #endif
 
 /** ------------------------------------------------------------------
@@ -667,27 +665,31 @@ struct _vlmxOption
 typedef struct _vlmxOption vlmxOption  ;
 
 /** ------------------------------------------------------------------
- ** @brief Process next option
- **
+ ** @brief Parse the next option
  ** @param args     MEX argument array.
  ** @param nargs    MEX argument array length.
  ** @param options  List of option definitions.
- ** @param next     Pointer to the next option (in and out).
- ** @param optarg   Pointer to the option optional argument (out).
+ ** @param next     Pointer to the next option (input and output).
+ ** @param optarg   Pointer to the option optional argument (output).
+ ** @return the code of the next option, or -1 if there are no more options.
  **
- ** The function scans the MEX driver arguments array @a args of @a
- ** nargs elements for the next option starting at location @a next.
+ ** The function parses the array @a args for options. @a args is
+ ** expected to be a sequence alternating option names and option
+ ** values, in the form of @a nargs instances of ::mxArray. The
+ ** function then scans the option starting at position @a next in the
+ ** array.  The option name is matched (case insensitive) to the table
+ ** of options @a options, a pointer to the option value is stored in
+ ** @a optarg, @a next is advanced to the next option, and the option
+ ** code is returned.
  **
- ** This argument is supposed to be the name of an option (case
- ** insensitive). The option is looked up in the option table @a
- ** options and decoded as the value vlmxOption ::val. Furthermore, if
- ** vlmxOption ::has_arg is true, the next entry in the array @a args
- ** is assumed to be argument of the option and stored in @a
- ** optarg. Finally, @a next is advanced to point to the next option.
+ ** The function is typically used in a loop to parse all the available
+ ** options. @a next is initialized to zero, and then the function
+ ** is called until the special code -1 is returned.
  **
- ** @return the code of the option, or -1 if the argument list is
- ** exhausted. In case of an error (e.g. unknown option) the function
- ** prints an error message and quits the MEX file.
+ ** If the option name cannot be matched to the available options,
+ ** either because the option name is not a string array or because
+ ** the name is unknown, the function exits the MEX file with an
+ ** error.
  **/
 
 static int

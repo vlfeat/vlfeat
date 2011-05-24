@@ -240,7 +240,7 @@ GNU GPLv2, or (at your option) any later version.
 @section Multi-threading host-threads
 
 The file defines ::VL_THREADS_WIN if multi-threading support is
-enabled and the host supports Windows threads and ::VL_THREAD_POSIX if
+enabled and the host supports Windows threads and ::VL_THREADS_POSIX if
 it supports POSIX threads.
 
  **/
@@ -314,12 +314,12 @@ it supports POSIX threads.
 
 /** @def VL_INLINE
  ** @brief Adds appropriate inline function qualifier
- ** @see @ref host-compiler-others
+ ** @see @ref host-compiler-other
  **/
 
 /** @def VL_EXPORT
  ** @brief Declares a DLL exported symbol
- ** @see @ref host-compiler-others
+ ** @see @ref host-compiler-other
  **/
 
 /** @def VL_DISABLE_SSE2

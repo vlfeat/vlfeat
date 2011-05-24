@@ -167,6 +167,7 @@ vl_lbp_delete(VlLbp * self) {
 /* ---------------------------------------------------------------- */
 
 /** @brief Extract LBP features
+ ** @param self LBP object.
  ** @param features buffer to write the features to.
  ** @param image image.
  ** @param width image width.
@@ -182,7 +183,8 @@ vl_lbp_delete(VlLbp * self) {
 VL_EXPORT void
 vl_lbp_process (VlLbp * self,
                 float * features,
-                float * image, vl_size width, vl_size height, vl_size cellSize)
+                float * image, vl_size width, vl_size height,
+                vl_size cellSize)
 {
   vl_size cwidth = width / cellSize;
   vl_size cheight = height / cellSize ;
