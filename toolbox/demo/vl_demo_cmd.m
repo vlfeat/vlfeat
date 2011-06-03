@@ -14,13 +14,13 @@ switch mexext
  case 'mexa64'
 	arch = 'a64' ;
  case 'dll'
-	arch = 'w32' ;
+	arch = 'win32' ;
 	ext = '.exe' ;
  case 'mexw32'
-	arch = 'w32' ;
+	arch = 'win32' ;
 	ext ='.exe' ;
  case 'mexw64'
-	arch = 'w64' ;
+	arch = 'win64' ;
 	ext ='.exe' ;
 end
 

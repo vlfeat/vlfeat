@@ -20,7 +20,7 @@
 #MATLABROOT = C:\Program Files\MATLAB08a
 
 VER  = 0.9.10
-ARCH = w32
+ARCH = win32
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0
@@ -42,7 +42,7 @@ LFLAGS     = /MACHINE:X86 \
              /LIBPATH:"$(VCROOT)\lib" \
              /LIBPATH:"$(WINSDKROOT)\lib"
 
-!if "$(ARCH)" == "w64"
+!if "$(ARCH)" == "win64"
 !message === COMPILING FOR 64-BIT ===
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
@@ -127,7 +127,7 @@ LFLAGS     = $(LFLAGS) /NOLOGO \
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
-MEX_FLAGS  = -v -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
+MEX_FLAGS  = -f "$(MEXOPT)" -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
   vl\aib.c \
@@ -214,8 +214,8 @@ mexsrc = \
   toolbox\sift\vl_ubcmatch.c
 
 # horrible Make program, horrible code:
-libobj = $(libsrc:vl\=bin\w32\objs\)
-cmdexe = $(cmdsrc:src\=bin\w32\)
+libobj = $(libsrc:vl\=bin\win32\objs\)
+cmdexe = $(cmdsrc:src\=bin\win32\)
 mexdll = $(mexsrc:.c=.mexw32)
 mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw32)
@@ -227,9 +227,9 @@ mexdll = $(mexdll:toolbox\aib=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\quickshift=toolbox\mex\mexw32)
 mexpdb = $(mexdll:.dll=.pdb)
 
-!if "$(ARCH)" == "w64"
-libobj = $(libsrc:vl\=bin\w64\objs\)
-cmdexe = $(cmdsrc:src\=bin\w64\)
+!if "$(ARCH)" == "win64"
+libobj = $(libsrc:vl\=bin\win64\objs\)
+cmdexe = $(cmdsrc:src\=bin\win64\)
 mexdll = $(mexsrc:.c=.mexw64)
 mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw64)
@@ -252,7 +252,7 @@ all: $(bindir) $(objdir) $(mexdir) $(bindir)\vl.lib $(bindir)\vl.dll $(mexdir)\v
 all: $(bindir) $(objdir) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) $(bindir)\$(MSMANIFEST) $(bindir)\$(MSVCR) $(bindir)\$(MSVCP) $(bindir)\$(MSVCM)
 !ENDIF
 
-BUILD_MEX=@echo .... CC [MEX] $(@R).dll && \
+BUILD_MEX=@echo .... CC [MEX] $(@) && \
 	$(MEX) $(MEX_FLAGS) "$(<)" -output $(@)
 
 # --------------------------------------------------------------------
@@ -267,13 +267,12 @@ clean:
 
 archclean:
 	if exist bin\$(ARCH) rmdir /S /Q bin\$(ARCH)
-	if exist toolbox\mex$(ARCH) rmdir /S /Q toolbox\mex$(ARCH)
+	if exist $(mexdir) rmdir /S /Q $(mexdir)
 
 distclean:
-	if exist bin\w32 rmdir /S /Q bin\w32
-	if exist bin\w64 rmdir /S /Q bin\w64
-	if exist toolbox\mexw32 rmdir /S /Q toolbox\mexw32
-	if exist toolbox\mexw64 rmdir /S /Q toolbox\mexw64
+	if exist bin\win32 rmdir /S /Q bin\win32
+	if exist bin\win64 rmdir /S /Q bin\win64
+	if exist toolbox\mex rmdir /S /Q toolbox\mex
 
 info:
 	@echo $(mexx)
