@@ -440,13 +440,13 @@ bin-commit: bin-release
 	$(GIT) add -f $(bindir)\vl.lib && \
 	$(GIT) add -f $(bindir)\vl.dll && \
 	$(GIT) add -f $(cmdexe) && \
-	$(GIT) add -f $(bindir)\$(MSANIFEST)  && \
+	$(GIT) add -f $(bindir)\$(MSMANIFEST)  && \
 	$(GIT) add -f $(bindir)\$(MSVCP) && \
 	$(GIT) add -f $(bindir)\$(MSVCR) && \
 	$(GIT) add -f $(bindir)\$(MSVCM)
 	@echo Adding MEX files && \
 	$(GIT) add -f $(mexdll) && \
-	$(GIT) add -f $(mexdir)\$(MSANIFEST)  && \
+	$(GIT) add -f $(mexdir)\$(MSMANIFEST)  && \
 	$(GIT) add -f $(mexdir)\$(MSVCP)  && \
 	$(GIT) add -f $(mexdir)\$(MSVCR)  && \
 	$(GIT) add -f $(mexdir)\$(MSVCM)  && \
