@@ -150,6 +150,7 @@ m_lnk := $(addprefix toolbox/noprefix/,                              \
           $(filter-out compile.m,                                    \
           $(filter-out test_%,                                       \
           $(filter-out demo_%,                                       \
+          $(filter-out tune_%,                                       \
           $(subst vl_,,$(notdir $(m_src))))))))))))
 m_lnk += $(addprefix toolbox/noprefix/,                              \
 	  $(subst, $(MEX_SUFFIX),.m,$(subst vl_,,$(notdir $(mex_tgt)))))
