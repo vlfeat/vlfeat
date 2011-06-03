@@ -48,6 +48,7 @@ varargin(1) = [] ;
 aspectRatio = NaN ;
 reference = 'horizontal' ;
 paperType = 'usletter' ;
+margin = 0 ;
 
 for ai=1:2:length(varargin)
   opt = lower(varargin{ai}) ;
@@ -66,6 +67,8 @@ for ai=1:2:length(varargin)
       end
     case 'papertype'
       paperType = opt ;
+    case 'margin'
+      margin = arg ;
     otherwise
       error('Unknown option ''%s''.', opt) ;
   end
@@ -84,9 +87,6 @@ if isnan(aspectRatio)
   aspectRatio = position(3) / position(4) ;
 end
 
-% place the figure in the bottom-left corner
-position(1:2) = 0 ;
-
 % resize the figure
 switch reference
   case 'horizontal'
@@ -96,6 +96,16 @@ switch reference
 end
 position(3:4) = position(3) * s * [1 1/aspectRatio] ;
 
+% add margin
+switch reference
+  case 'horizontal'
+    position(1) = position(3) * margin ;
+    position(2) = position(3) * margin ;
+  case 'vertical'
+    position(1) = position(4) * margin ;
+    position(2) = position(4) * margin ;
+end
+
 set(fig, 'PaperPosition', position, ...
-         'PaperSize', position(3:4)) ;
+         'PaperSize', 2 * position(1:2) + position(3:4)) ;
 end
