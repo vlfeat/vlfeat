@@ -181,8 +181,10 @@
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D7AD0870E38C15700783252 /* doc */,
 			);
+			indentWidth = 2;
 			name = vlfeat;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		2D6102CF111EE22C00470F4C /* make */ = {
 			isa = PBXGroup;
