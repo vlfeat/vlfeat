@@ -32,7 +32,7 @@
 		2D6102D5111EE22C00470F4C /* octave.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = octave.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
-		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; };
+		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; tabWidth = 2; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
 		2D72EAF10E48A42F005DAA47 /* imopv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv.h; sourceTree = "<group>"; };
 		2D72EB080E48A934005DAA47 /* test_imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_imopv.c; sourceTree = "<group>"; };
@@ -124,6 +124,22 @@
 		2D8E1B561371FB23009CDE11 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
+		2DAF7CE3139918EA00FA0D07 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = about.html; path = docsrc/about.html; sourceTree = "<group>"; };
+		2DAF7CE4139918EA00FA0D07 /* apps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = apps.html; path = docsrc/apps.html; sourceTree = "<group>"; };
+		2DAF7CE5139918EA00FA0D07 /* compiling.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = compiling.html; path = docsrc/compiling.html; sourceTree = "<group>"; };
+		2DAF7CE6139918EA00FA0D07 /* doc.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = doc.html; path = docsrc/doc.html; sourceTree = "<group>"; };
+		2DAF7CE7139918EA00FA0D07 /* dsift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = dsift.html; path = docsrc/dsift.html; sourceTree = "<group>"; };
+		2DAF7CE8139918EA00FA0D07 /* install-c.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "install-c.html"; path = "docsrc/install-c.html"; sourceTree = "<group>"; };
+		2DAF7CE9139918EA00FA0D07 /* install-matlab.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "install-matlab.html"; path = "docsrc/install-matlab.html"; sourceTree = "<group>"; };
+		2DAF7CEA139918EA00FA0D07 /* install-shell.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "install-shell.html"; path = "docsrc/install-shell.html"; sourceTree = "<group>"; };
+		2DAF7CEB139918EA00FA0D07 /* kdtree.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = kdtree.html; path = docsrc/kdtree.html; sourceTree = "<group>"; };
+		2DAF7CEC139918EA00FA0D07 /* pygmentize.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = pygmentize.css; path = docsrc/pygmentize.css; sourceTree = "<group>"; };
+		2DAF7CED139918EA00FA0D07 /* quickshift.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = quickshift.html; path = docsrc/quickshift.html; sourceTree = "<group>"; };
+		2DAF7CEE139918EA00FA0D07 /* using-gcc.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "using-gcc.html"; path = "docsrc/using-gcc.html"; sourceTree = "<group>"; };
+		2DAF7CEF139918EA00FA0D07 /* using-vsexpress.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "using-vsexpress.html"; path = "docsrc/using-vsexpress.html"; sourceTree = "<group>"; };
+		2DAF7CF0139918EA00FA0D07 /* using-xcode.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "using-xcode.html"; path = "docsrc/using-xcode.html"; sourceTree = "<group>"; };
+		2DAF7CF1139918EA00FA0D07 /* version.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = version.html; path = docsrc/version.html; sourceTree = "<group>"; };
+		2DAF7CF21399190700FA0D07 /* imdisttf.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = imdisttf.html; path = docsrc/imdisttf.html; sourceTree = "<group>"; };
 		2DB1A28F110CE32F00E02BD8 /* inthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = inthist.tc; path = toolbox/misc/inthist.tc; sourceTree = "<group>"; };
 		2DB1A290110CE32F00E02BD8 /* samplinthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = samplinthist.tc; path = toolbox/misc/samplinthist.tc; sourceTree = "<group>"; };
 		2DB1A2A1110D09B200E02BD8 /* vl_quickshift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_quickshift.c; path = toolbox/quickshift/vl_quickshift.c; sourceTree = "<group>"; };
@@ -184,6 +200,21 @@
 		2D72EA930E4776FE005DAA47 /* html */ = {
 			isa = PBXGroup;
 			children = (
+				2DAF7CE3139918EA00FA0D07 /* about.html */,
+				2DAF7CF21399190700FA0D07 /* imdisttf.html */,
+				2DAF7CE4139918EA00FA0D07 /* apps.html */,
+				2DAF7CE5139918EA00FA0D07 /* compiling.html */,
+				2DAF7CE6139918EA00FA0D07 /* doc.html */,
+				2DAF7CE7139918EA00FA0D07 /* dsift.html */,
+				2DAF7CE8139918EA00FA0D07 /* install-c.html */,
+				2DAF7CE9139918EA00FA0D07 /* install-matlab.html */,
+				2DAF7CEA139918EA00FA0D07 /* install-shell.html */,
+				2DAF7CEB139918EA00FA0D07 /* kdtree.html */,
+				2DAF7CED139918EA00FA0D07 /* quickshift.html */,
+				2DAF7CEE139918EA00FA0D07 /* using-gcc.html */,
+				2DAF7CEF139918EA00FA0D07 /* using-vsexpress.html */,
+				2DAF7CF0139918EA00FA0D07 /* using-xcode.html */,
+				2DAF7CF1139918EA00FA0D07 /* version.html */,
 				2D7AD0AF0E38C18600783252 /* index.html */,
 				2D7AD0AB0E38C18600783252 /* download.html */,
 				2D7AD0A90E38C18600783252 /* aib.html */,
@@ -336,6 +367,7 @@
 				2D7AD0AC0E38C18600783252 /* doxygen.conf */,
 				2D7AD0B50E38C18600783252 /* web.xml */,
 				2D7AD0860E38C05800783252 /* web.css */,
+				2DAF7CEC139918EA00FA0D07 /* pygmentize.css */,
 				2D7AD0800E38911C00783252 /* formatter.py */,
 				2D7AD0810E38911C00783252 /* mdoc.py */,
 				2D7AD0820E38911C00783252 /* webdoc.py */,
@@ -449,6 +481,7 @@
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
 				PROFILE = "";
+				PYTHON = "MACOSX_DEPLOYMENT_TARGET=10.6 python";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
@@ -497,6 +530,7 @@
 				PATH = "$(PATH):/opt/local/bin/";
 				PREBINDING = NO;
 				PROFILE = YES;
+				PYTHON = "MACOSX_DEPLOYMENT_TARGET=10.6 python";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
