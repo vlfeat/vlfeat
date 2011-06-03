@@ -179,21 +179,21 @@ class DocLocation:
                              self.column)
 
 # --------------------------------------------------------------------
-class DocError(Exception):
+class DocError(BaseException):
 # --------------------------------------------------------------------
     """
     An error consisting of a stack of locations and a message.
     """
     def __init__(self, message):
-        self.message = message
-        self.locations = [] ;
+        BaseException.__init__(self,message)
+        self.locations = []
 
     def __str__(self):
         str = ""
         if len(self.locations) > 0:
             for i in xrange(len(self.locations)-1,0,-1):
                 str += "included from %s:\n" % self.locations[i]
-            return str + "%s:%s" % (self.locations[0], self.message)
+            return str + "%s:%s" % (self.locations[0], BaseException.__str__(self))
         else:
             return self.message
 
@@ -644,7 +644,7 @@ class DocHtmlText(DocBareNode):
                 else:
                     print "warning: environment variable '%s' not defined" % envName
             else:
-                print "warning: ignoring unknown directive " + label
+                print "warning: ignoring unknown directive '%s'" % label
         if next < len(self.text):
             gen.putXMLString(self.text[next:])
 
