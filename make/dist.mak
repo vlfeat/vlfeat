@@ -52,8 +52,8 @@ dist-src-info:
 #              the architecture specific binary branches and
 #              adding additional files. It then pushes the result
 #              to the remote called bin.
-# dist-bin-dist:    Packs the commit remotes/bin/vXX.XX.XX-bin.
-# dist-src-dist:    Packs the commit vXX.XX.XX.
+# dist-bin: Packs the commit remotes/bin/vXX.XX.XX-bin.
+# dist-src: Packs the commit vXX.XX.XX.
 
 .PHONY: dist-bin, dist-bin-release, dist-bin-commit, dist-bin-info
 .PHONY: dist-bin-clean, dist-bin-archclean, dist-bin-distclean
