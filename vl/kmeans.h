@@ -188,6 +188,17 @@ vl_kmeans_get_num_centers (VlKMeans const * self)
   return self->numCenters ;
 }
 
+/** @brief Get the number energy of the current fit
+ ** @param self KMeans object instance.
+ ** @return energy.
+ **/
+
+VL_INLINE vl_size
+vl_kmeans_get_energy (VlKMeans const * self)
+{
+    return self->energy ;
+}
+
 /** ------------------------------------------------------------------
  ** @brief Get verbosity level
  ** @param self KMeans object instance.
