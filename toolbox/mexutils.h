@@ -167,6 +167,76 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
 
  **/
 
+/* these attributes supporess undefined symbols warning with GCC */
+#ifdef VL_COMPILER_GNUC
+#if (! defined(HAVE_OCTAVE))
+EXTERN_C void __attribute__((noreturn))
+mexErrMsgIdAndTxt (const char * identifier, const char * err_msg, ...) ;
+#else
+extern void __attribute__((noreturn))
+mexErrMsgIdAndTxt (const char *id, const char *s, ...);
+#endif
+#endif
+
+#define MEXUTILS_RAISE_HELPER_A \
+  char const * errorString ; \
+  char formattedErrorId [512] ; \
+  char formattedErrorMessage [1024] ; \
+  \
+  switch (errorId) { \
+    case vlmxErrAlloc : errorString = "outOfMemory" ; break ; \
+    case vlmxErrInvalidArgument : errorString = "invalidArgument" ; break ; \
+    case vlmxErrNotEnoughInputArguments : errorString = "notEnoughInputArguments" ; break ; \
+    case vlmxErrTooManyInputArguments : errorString = "tooManyInputArguments" ; break ; \
+    case vlmxErrNotEnoughOutputArguments : errorString = "notEnoughOutputArguments" ; break ; \
+    case vlmxErrTooManyOutputArguments : errorString = "tooManyOutputArguments" ; break ; \
+    case vlmxErrInvalidOption : errorString = "invalidOption" ; break ; \
+    case vlmxErrInconsistentData : errorString = "inconsistentData" ; break ; \
+    default : errorString = "undefinedError" ; break ; \
+  } \
+  \
+  if (! errorMessage) { \
+    switch (errorId) { \
+      case vlmxErrAlloc: errorMessage = "Out of memory." ; break ; \
+      case vlmxErrInvalidArgument: errorMessage = "Invalid argument." ; break ; \
+      case vlmxErrNotEnoughInputArguments: errorMessage = "Not enough input arguments." ; break ; \
+      case vlmxErrTooManyInputArguments: errorMessage = "Too many input arguments." ; break ; \
+      case vlmxErrNotEnoughOutputArguments: errorMessage = "Not enough output arguments." ; break ; \
+      case vlmxErrTooManyOutputArguments: errorMessage = "Too many output arguments." ; break ; \
+      case vlmxErrInconsistentData: errorMessage = "Inconsistent data." ; break ; \
+      case vlmxErrInvalidOption: errorMessage = "Invalid option." ; break ; \
+      default: errorMessage = "Undefined error message." ; \
+    } \
+  }
+
+#ifdef VL_COMPILER_LCC
+#define MEXUTILS_RAISE_HELPER_B \
+{ \
+  va_list args ; \
+  va_start(args, errorMessage) ; \
+  sprintf(formattedErrorId, \
+          "vl:%s", errorString) ; \
+  vsprintf(formattedErrorMessage, \
+           errorMessage, args) ; \
+  va_end(args) ; \
+}
+#else
+#define MEXUTILS_RAISE_HELPER_B \
+{ \
+  va_list args ; \
+  va_start(args, errorMessage) ; \
+  snprintf(formattedErrorId, \
+           sizeof(formattedErrorId)/sizeof(char), \
+           "vl:%s", errorString) ; \
+  vsnprintf(formattedErrorMessage, \
+            sizeof(formattedErrorMessage)/sizeof(char), \
+            errorMessage, args) ; \
+  va_end(args) ; \
+}
+#endif
+
+#define MEXUTILS_RAISE_HELPER MEXUTILS_RAISE_HELPER_A MEXUTILS_RAISE_HELPER_B
+
 /** @{
  ** @name Error handling
  **/
@@ -183,80 +253,40 @@ typedef enum _VlmxErrorId {
   vlmxErrInconsistentData
 } VlmxErrorId ;
 
-/* these attributes supporess undefined symbols warning with GCC */
-#ifdef VL_COMPILER_GNUC
-#if (! defined(HAVE_OCTAVE))
-EXTERN_C void __attribute__((noreturn))
-mexErrMsgIdAndTxt (const char * identifier, const char * err_msg, ...) ;
-#else
-extern void __attribute__((noreturn))
-mexErrMsgIdAndTxt (const char *id, const char *s, ...);
-#endif
 
-void __attribute__((noreturn))
-vlmxError (VlmxErrorId errorId, char const * errorMessage, ...) ;
-#endif
-
-/** ------------------------------------------------------------------
- ** @brief Generate MEX error with VLFeat format
- **
- ** @param errorId      error ID string.
+/** @brief Raise a MEX error with VLFeat format
+ ** @param errorId error ID string.
  ** @param errorMessage error message C-style format string.
- ** @param ...          format string arguments.
+ ** @param ... format string arguments.
  **
- ** The function invokes @c mxErrMsgTxtAndId.
+ ** The function internally calls @c mxErrMsgTxtAndId, which causes
+ ** the MEX file to abort.
+ **/
+
+#ifdef VL_COMPILER_GNUC & ! defined(__DOXYGEN__)
+void __attribute__((noreturn))
+#else
+void
+#endif
+vlmxError (VlmxErrorId errorId, char const * errorMessage, ...)
+{
+  MEXUTILS_RAISE_HELPER ;
+  mexErrMsgIdAndTxt (formattedErrorId, formattedErrorMessage) ;
+}
+
+/** @brief Raise a MEX warning with VLFeat format
+ ** @param errorId error ID string.
+ ** @param errorMessage error message C-style format string.
+ ** @param ... format string arguments.
+ **
+ ** The function internally calls @c mxWarnMsgTxtAndId.
  **/
 
 void
-vlmxError(VlmxErrorId errorId, char const * errorMessage, ...)
+vlmxWarning (VlmxErrorId errorId, char const * errorMessage, ...)
 {
-  char const * errorString ;
-  char formattedErrorId [512] ;
-  char formattedErrorMessage [1024] ;
-  va_list args;
-  va_start(args, errorMessage) ;
-
-  switch (errorId) {
-  case vlmxErrAlloc : errorString = "outOfMemory" ; break ;
-  case vlmxErrInvalidArgument : errorString = "invalidArgument" ; break ;
-  case vlmxErrNotEnoughInputArguments : errorString = "notEnoughInputArguments" ; break ;
-  case vlmxErrTooManyInputArguments : errorString = "tooManyInputArguments" ; break ;
-  case vlmxErrNotEnoughOutputArguments : errorString = "notEnoughOutputArguments" ; break ;
-  case vlmxErrTooManyOutputArguments : errorString = "tooManyOutputArguments" ; break ;
-  case vlmxErrInvalidOption : errorString = "invalidOption" ; break ;
-  case vlmxErrInconsistentData : errorString = "inconsistentData" ; break ;
-  default : errorString = "undefinedError" ; break ;
-  }
-
-  if (! errorMessage) {
-    switch (errorId) {
-      case vlmxErrAlloc: errorMessage = "Out of memory." ; break ;
-      case vlmxErrInvalidArgument: errorMessage = "Invalid argument." ; break ;
-      case vlmxErrNotEnoughInputArguments: errorMessage = "Not enough input arguments." ; break ;
-      case vlmxErrTooManyInputArguments: errorMessage = "Too many input arguments." ; break ;
-      case vlmxErrNotEnoughOutputArguments: errorMessage = "Not enough output arguments." ; break ;
-      case vlmxErrTooManyOutputArguments: errorMessage = "Too many output arguments." ; break ;
-      case vlmxErrInconsistentData: errorMessage = "Inconsistent data." ; break ;
-      case vlmxErrInvalidOption: errorMessage = "Invalid option." ; break ;
-      default: errorMessage = "Undefined error message." ;
-    }
-  }
-
-#ifdef VL_COMPILER_LCC
-  sprintf(formattedErrorId,
-          "vl:%s", errorString) ;
-  vsprintf(formattedErrorMessage,
-           errorMessage, args) ;
-#else
-  snprintf(formattedErrorId,
-           sizeof(formattedErrorId)/sizeof(char),
-           "vl:%s", errorString) ;
-  vsnprintf(formattedErrorMessage,
-            sizeof(formattedErrorMessage)/sizeof(char),
-            errorMessage, args) ;
-#endif
-  va_end(args) ;
-  mexErrMsgIdAndTxt(formattedErrorId, formattedErrorMessage) ;
+  MEXUTILS_RAISE_HELPER ;
+  mexWarnMsgIdAndTxt (formattedErrorId, formattedErrorMessage) ;
 }
 
 /** @} */
@@ -675,7 +705,7 @@ typedef struct _vlmxOption vlmxOption  ;
  **
  ** The function parses the array @a args for options. @a args is
  ** expected to be a sequence alternating option names and option
- ** values, in the form of @a nargs instances of ::mxArray. The
+ ** values, in the form of @a nargs instances of @c mxArray. The
  ** function then scans the option starting at position @a next in the
  ** array.  The option name is matched (case insensitive) to the table
  ** of options @a options, a pointer to the option value is stored in
