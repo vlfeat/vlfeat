@@ -193,10 +193,10 @@ vl_kmeans_get_num_centers (VlKMeans const * self)
  ** @return energy.
  **/
 
-VL_INLINE vl_size
+VL_INLINE double
 vl_kmeans_get_energy (VlKMeans const * self)
 {
-    return self->energy ;
+  return self->energy ;
 }
 
 /** ------------------------------------------------------------------
