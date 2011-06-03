@@ -38,16 +38,16 @@ GNU GPLv2, or (at your option) any later version.
 /** @name Type identidifers for atomic data types
  ** @{ */
 
-#define VL_TYPE_FLOAT   1
-#define VL_TYPE_DOUBLE  2
-#define VL_TYPE_INT8    3
-#define VL_TYPE_UINT8   4
-#define VL_TYPE_INT16   5
-#define VL_TYPE_UINT16  6
-#define VL_TYPE_INT32   7
-#define VL_TYPE_UINT32  8
-#define VL_TYPE_INT64   9
-#define VL_TYPE_UINT64  10
+#define VL_TYPE_FLOAT   1     /**< @c float type */
+#define VL_TYPE_DOUBLE  2     /**< @c double type */
+#define VL_TYPE_INT8    3     /**< @c ::vl_int8 type */
+#define VL_TYPE_UINT8   4     /**< @c ::vl_uint8 type */
+#define VL_TYPE_INT16   5     /**< @c ::vl_int16 type */
+#define VL_TYPE_UINT16  6     /**< @c ::vl_uint16 type */
+#define VL_TYPE_INT32   7     /**< @c ::vl_int32 type */
+#define VL_TYPE_UINT32  8     /**< @c ::vl_uint32 type */
+#define VL_TYPE_INT64   9     /**< @c ::vl_int64 type */
+#define VL_TYPE_UINT64  10    /**< @c ::vl_uint64 type */
 
 typedef vl_uint32 vl_type ;
 

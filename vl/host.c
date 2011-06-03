@@ -239,8 +239,8 @@ GNU GPLv2, or (at your option) any later version.
 
 @section Multi-threading host-threads
 
-The file defines ::VL_THREADS_WIN if multi-threading support is
-enabled and the host supports Windows threads and ::VL_THREADS_POSIX if
+The file defines #VL_THREADS_WIN if multi-threading support is
+enabled and the host supports Windows threads and #VL_THREADS_POSIX if
 it supports POSIX threads.
 
  **/

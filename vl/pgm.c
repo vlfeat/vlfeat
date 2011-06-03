@@ -156,10 +156,10 @@ vl_pgm_get_bpp (VlPgmImage const *im)
  **
  ** The function extracts from the file @a f the meta-data section of
  ** an image encoded in PGM format. The function fills the structure
- ** VlPgmImage according.
+ ** ::VlPgmImage accordingly.
  **
  ** @return error code. The error may be either
- ** ::VL_PGM_INV_HEAD or ::VL_PGM_INV_META depending whether the error
+ ** #VL_PGM_INV_HEAD or #VL_PGM_INV_META depending whether the error
  ** occurred in decoding the header or meta section of the PGM file.
  **/
 

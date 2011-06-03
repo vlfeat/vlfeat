@@ -34,18 +34,13 @@ GNU GPLv2, or (at your option) any later version.
  ** whether #max_value is smaller than 256.
  **/
 
-struct _VlPgmImage
+typedef struct _VlPgmImage
 {
   int        width ;     /**< image width.                     */
   int        height ;    /**< image height.                    */
   int        max_value ; /**< pixel maximum value (<= 2^16-1). */
   vl_bool    is_raw ;    /**< is RAW format?                   */
-};
-
-/** @brief PGM image meta data type
- ** @see ::_VlPgmImage.
- **/
-typedef struct  _VlPgmImage  VlPgmImage ;
+} VlPgmImage ;
 
 /** @name Core operations
  ** @{ */

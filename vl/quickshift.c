@@ -46,7 +46,7 @@ Parameter influencing the algorithm are:
 estimated by using a Parzen window estimator with a Gaussian kernel of
 the specified size (::vl_quickshift_set_kernel_size). The larger the
 size, the larger the neighborhoods of pixels considered.
-- <b>Maximum distance.</b> This (::vl_set_max_dist) is the maximum
+- <b>Maximum distance.</b> This (::vl_quickshift_set_max_dist) is the maximum
 distance between two pixels that the algorithm considers when building
 the forest. In principle, it can be infinity (so that a tree is
 returned), but in practice it is much faster to consider only
@@ -62,7 +62,7 @@ for Mode Seeking&rdquo;, in <em>Proc. ECCV</em>, 2008.
   can be reused for multiple images of the same size.
 - Configure quick shift by setting the kernel size
   (::vl_quickshift_set_kernel_size) and the maximum gap
-  (::vl_quickshift_max_dist). The latter is in principle not
+  (::vl_quickshift_set_max_dist). The latter is in principle not
   necessary, but useful to speedup processing.
 - Process an image (::vl_quickshift_process).
 - Retrieve the parents (::vl_quickshift_get_parents) and the distances

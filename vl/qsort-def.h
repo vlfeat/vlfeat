@@ -19,7 +19,7 @@ GNU GPLv2, or (at your option) any later version.
 
  @section qsort-def-usage Usage
 
- ::qsort-def.h is used to define a specialization of the
+ @ref qsort-def.h is used to define a specialization of the
  ::VL_QSORT_sort function that operatoes
  on a given type of array. For instance the code
 

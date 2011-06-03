@@ -23,7 +23,7 @@ typedef float vl_sift_pix ;
  ** @brief SIFT filter keypoint
  **
  ** This structure represent a keypoint as extracted by the SIFT
- ** filter ::VLSiftFilt.
+ ** filter ::VlSiftFilt.
  **/
 
 typedef struct _VlSiftKeypoint

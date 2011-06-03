@@ -19,7 +19,7 @@ GNU GPLv2, or (at your option) any later version.
 
 /** @file kdtree.h
  **
- ** ::VlKDTree implements a KD-tree object data structure useful to
+ ** ::VlKDForest implements a KD-tree object data structure useful to
  ** index moderately dimensional vector spaces. It can be used to
  ** quickly match two groups of feature descriptors.
  **
@@ -48,7 +48,7 @@ GNU GPLv2, or (at your option) any later version.
  ** @section kdtree-tech Technical details
  ** @sa @ref kdtree-references
  **
- ** ::VlKDTree implements the best-bin-first kd-tree of [1].
+ ** ::VlKDForest implements the best-bin-first kd-tree of [1].
  **
  ** <b>Construction.</b> Given a set
  ** of points @f$ x_1,\dots,x_n \in \mathbb{R}^d @f$, the algorithm

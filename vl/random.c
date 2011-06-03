@@ -35,7 +35,7 @@ GNU GPLv2, or (at your option) any later version.
  The generator can be used to obtain random quantities of
  various types:
 
- - ::vl_rand_int32, ::vl_rand_uint32 for 32-bit random integers;
+ - ::vl_rand_int31, ::vl_rand_uint32 for 32-bit random integers;
  - ::vl_rand_real1 for a double in [0,1];
  - ::vl_rand_real2 for a double in [0,1);
  - ::vl_rand_real3 for a double in (0,1);

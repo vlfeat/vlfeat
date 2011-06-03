@@ -187,7 +187,7 @@ eight bins and the spatial coordinates into four each, as follows:
 
 SIFT descriptors are computed by either calling
 ::vl_sift_calc_keypoint_descriptor or
-::vl_sift_cal_keypoint_descriptor_raw. They accept as input a keypoint
+::vl_sift_calc_raw_descriptor. They accept as input a keypoint
 frame, which specifies the descriptor center, its size, and its
 orientation on the image plane. The following parameters influence the
 descriptor calculation:
@@ -778,9 +778,8 @@ copy_and_upsample_rows
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Smooth an image
- **
- ** @parma self        SIFT filter ;
- ** @param outImage    output imgae buffer.
+ ** @param self        SIFT filter.
+ ** @param outputImage output imgae buffer.
  ** @param tempImage   temporary image buffer.
  ** @param inputImage  input image buffer.
  ** @param width       input image width.
