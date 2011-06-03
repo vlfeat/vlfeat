@@ -56,7 +56,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   void const * data = NULL ;
 
-  VlKMeansAlgorithm algorithm = VlKMeansLLoyd ;
+  VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
   VlVectorComparisonType distance = VlDistanceL2 ;
   vl_size maxNumIterations = 100 ;
   vl_size numRepetitions = 1 ;
@@ -132,7 +132,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
                     "ALGORITHM argument too long.") ;
         }
         if (uStrICmp("lloyd", buf) == 0) {
-          algorithm = VlKMeansLLoyd ;
+          algorithm = VlKMeansLloyd ;
         } else if (uStrICmp("elkan", buf) == 0) {
           algorithm = VlKMeansElkan ;
         } else if (uStrICmp("ann", buf) == 0) {
@@ -221,7 +221,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     char const * initializationName = 0 ;
 
     switch (vl_kmeans_get_algorithm(kmeans)) {
-      case VlKMeansLLoyd: algorithmName = "Lloyd" ; break ;
+      case VlKMeansLloyd: algorithmName = "Lloyd" ; break ;
       case VlKMeansElkan: algorithmName = "Elkan" ; break ;
       case VlKMeansANN:   algorithmName = "ANN" ; break ;
       default : abort() ;

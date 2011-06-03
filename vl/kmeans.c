@@ -30,7 +30,7 @@ GNU GPLv2, or (at your option) any later version.
  @section kmeans-usage Usage
 
  To use @ref kmeans.h to learn clusters from some training data,
- instantiate a ::KMeans object, set the configuration
+ instantiate a ::VlKMeans object, set the configuration
  parameters, initialise the cluster centers, and run the trainig code.
  For instance, to learn @c numCenters clusters from
  @c numData vectors of dimension @c dimension
@@ -40,26 +40,26 @@ GNU GPLv2, or (at your option) any later version.
  @code
  #include <vl/kmeans.h>
 
- VlKMeansAlgorithm algorithm = VlKMeansLLoyd ;
+ VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
  VlVectorComparisonType distance = VlDistanceL2 ;
  KMeans * kmeans = vl_kmeans_new (algorithm, distance, VL_TYPE_FLOAT) ;
- vl_kmeans_init_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
+ vl_kmeans_seed_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
  vl_kmeans_set_max_num_iterations (kmeans, 100) ;
- vl_kmeans_train (kmeans) ;
+ vl_kmeans_refine_centers (kmeans, data, numData) ;
  @endcode
 
  Use ::vl_kmeans_get_energy to get the solution energy (or an upper
  bound for the Elkan algorithm) and ::vl_kmeans_get_centers
- to obtain the @c numCluster cluster centers. Use ::vl_kmeans_push
+ to obtain the @c numCluster cluster centers. Use ::vl_kmeans_quantize
  to quantize new data points.
 
  @subsection kmeans-usage-init Initialization algorithms
 
  @ref kmeans.h supports the following cluster initialization algorithms:
 
- - <b>Random data points</b> (::vl_kmeans_init_centers_with_rand_data)
+ - <b>Random data points</b> (::vl_kmeans_seed_centers_with_rand_data)
    initialize the centers from a random selection of the training data.
- - <b>k-means++</b> (::vl_kmeans_init_centers_plus_plus) initialize
+ - <b>k-means++</b> (::vl_kmeans_seed_centers_plus_plus) initialize
    the centers from a random selection of the training data while
    attempting to obtain a good coverage of the dataset. This is
    the strategy from [1].
@@ -208,7 +208,7 @@ vl_kmeans_new (vl_type dataType,
 {
   VlKMeans * self = vl_malloc(sizeof(VlKMeans)) ;
 
-  self->algorithm = VlKMeansLLoyd ;
+  self->algorithm = VlKMeansLloyd ;
   self->distance = distance ;
   self->dataType = dataType ;
 
@@ -1198,7 +1198,7 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
  vl_size numData)
 {
   switch (self->algorithm) {
-    case VlKMeansLLoyd:
+    case VlKMeansLloyd:
       return
       VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)(self, data, numData) ;
       break ;
@@ -1214,6 +1214,7 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
 /* VL_KMEANS_INSTANTIATING */
 #else
 
+#ifndef __DOXYGEN__
 #define FLT VL_TYPE_FLOAT
 #define TYPE float
 #define SFX f
@@ -1225,6 +1226,7 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
 #define SFX d
 #define VL_KMEANS_INSTANTIATING
 #include "kmeans.c"
+#endif
 
 /* VL_KMEANS_INSTANTIATING */
 #endif
@@ -1264,10 +1266,9 @@ vl_kmeans_set_centers
 }
 
 /** ------------------------------------------------------------------
- ** @brief
- ** @param self
+ ** @brief Seed centers by randomly sampling data
  ** @param self KMeans object.
- ** @param centers centers to copy.
+ ** @param data data to sample from.
  ** @param dimension data dimension.
  ** @param numData nmber of data points.
  ** @param numCenters number of centers.
@@ -1301,12 +1302,12 @@ vl_kmeans_seed_centers_with_rand_data
 }
 
 /** ------------------------------------------------------------------
- ** @brief
- ** @param self
- ** @param data
- ** @param dimension
- ** @param numData
- ** @param numCenters
+ ** @brief Seed centers by the KMeans++ algorithm
+ ** @param self KMeans object.
+ ** @param data data to sample from.
+ ** @param dimension data dimension.
+ ** @param numData nmber of data points.
+ ** @param numCenters number of centers.
  **/
 
 VL_EXPORT void
@@ -1334,12 +1335,12 @@ vl_kmeans_seed_centers_plus_plus
 }
 
 /** ------------------------------------------------------------------
- ** @brief Quantize new data
+ ** @brief Quantize data
  ** @param self KMeans object.
  ** @param assignments data to centers assignments.
  ** @param distances data to closes center distance/
  ** @param data data to quantize.
- ** @param numCenters number of data to quantize.
+ ** @param numData number of data points.
  **/
 
 VL_EXPORT void
@@ -1405,14 +1406,17 @@ vl_kmeans_refine_centers
  ** @brief Cluster data.
  ** @param self KMeans object.
  ** @param data data to quantize.
+ ** @param dimension data dimension.
  ** @param numData number of data points.
+ ** @param numCenters number of clusters.
  ** @return K-means energy at the end of optimization.
  **
- ** The function calls the underlying K-means quantization algorithm
- ** (@ref VlKMeansAlgorithm) to quantize the specified data @a data.
- ** The function assumes that the cluster centers have already
- ** been assigned by using one of the seeding functions, or by
- ** setting them.
+ ** The function initializes the centers by using the initialization
+ ** algorithm set by ::vl_kmeans_set_initialization and refines them
+ ** by the quantization algorithm set by ::vl_kmeans_set_algorithm.
+ ** The process is repeated one or more times (see
+ ** ::vl_kmeans_set_num_repetitions) and the resutl with smaller
+ ** energy is retained.
  **/
 
 VL_EXPORT double

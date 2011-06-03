@@ -22,12 +22,12 @@ GNU GPLv2, or (at your option) any later version.
 /** @brief K-means algorithms */
 
 typedef enum _VlKMeansAlgorithm {
-  VlKMeansLLoyd,       /**< Lloyd algorithm */
+  VlKMeansLloyd,       /**< Lloyd algorithm */
   VlKMeansElkan,       /**< Elkan algorithm */
   VlKMeansANN          /**< Approximate nearest neighbors */
 } VlKMeansAlgorithm ;
 
-/** @brief K-means algorithms */
+/** @brief K-means initialization algorithms */
 
 typedef enum _VlKMeansInitialization {
   VlKMeansRandomSelection,  /**< Randomized selection */
