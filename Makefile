@@ -106,7 +106,7 @@ err_spaces +=spaces
 
 Darwin_PPC_ARCH := mac
 Darwin_Power_Macintosh_ARCH := mac
-Darwin_i386_ARCH := maci
+Darwin_i386_ARCH := maci64
 Linux_i386_ARCH := glnx32
 Linux_i686_ARCH := glnx32
 Linux_unknown_ARC := glnx32
