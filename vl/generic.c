@@ -17,7 +17,7 @@ GNU GPLv2, or (at your option) any later version.
  @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
 
- @par Copyright &copy; 2007-10 Andrea Vedaldi and Brian Fulkerson
+ @par Copyright &copy; 2007-11 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
  vision algorithms, with a special focus on visual features for
