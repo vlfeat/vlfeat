@@ -36,7 +36,7 @@ typedef vl_int32 mwIndex ;
 #undef IN
 #define IN(x) (in[IN_ ## x])
 
-/** @brief Acces MEX output argument */
+/** @brief Access MEX output argument */
 #undef OUT
 #define OUT(x) (out[OUT_ ## x])
 
@@ -167,7 +167,7 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
 
  **/
 
-/* these attributes supporess undefined symbols warning with GCC */
+/* these attributes suppress undefined symbols warning with GCC */
 #ifdef VL_COMPILER_GNUC
 #if (! defined(HAVE_OCTAVE))
 EXTERN_C void __attribute__((noreturn))
