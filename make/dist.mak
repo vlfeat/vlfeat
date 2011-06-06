@@ -19,7 +19,7 @@ VER := $(shell cat vl/generic.h | sed -n \
     's/.*VL_VERSION_STRING.*\"\([0-9.]*\)\".*/\1/p')
 DIST := $(NAME)-$(VER)
 BINDIST := $(DIST)-bin
-HOST := ganesh.cs.ucla.edu:/var/www/vlfeat.org
+HOST := vlfeat-admin:vlfeat.org/sandbox
 
 # --------------------------------------------------------------------
 #                                                 Build source package
