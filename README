@@ -50,7 +50,7 @@ COMPILING
 
   For Windows 64 use
 
-  > nmake /f Makefile.mak ARCH=w64
+  > nmake /f Makefile.mak ARCH=win64
 
   If you do not have Visual C++ 2008, or you have an older version of
   MATLAB and wish to compile the mex files _only_, then you may start
@@ -112,6 +112,9 @@ APPENDIX
 
 CHANGES
 
+  0.9.10     Improves the homogeneous kernel map. Plenty of small tweaks
+             and improvements. Make maci64 the default architecture on
+             the Mac.
   0.9.9      Added: sift matching example. Extended Caltech-101
              classification example to use kd-trees.
   0.9.8      Added: image distance transform, PEGASOS, floating point
