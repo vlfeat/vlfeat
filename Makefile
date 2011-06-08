@@ -299,7 +299,6 @@ info:
 help:
 	@cat Makefile | \
 	sed -n '1,/^$$/!p' | \
-	sed -n '1,/^$$/!p' | \
 	sed -n '1,/^$$/p' | \
 	sed 's/^# \{0,1\}\(.*\)$$/\1/'
 
