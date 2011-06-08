@@ -52,13 +52,13 @@ conf.numTrain = 15 ;
 conf.numTest = 15 ;
 conf.numClasses = 102 ;
 conf.numWords = 600 ;
-conf.numSpatialX = 4 ;
-conf.numSpatialY = 4 ;
+conf.numSpatialX = [2 4] ;
+conf.numSpatialY = [2 4] ;
 conf.quantizer = 'kdtree' ;
 conf.svm.C = 10 ;
 conf.svm.solver = 'pegasos' ;
 conf.svm.biasMultiplier = 1 ;
-conf.phowOpts = {'Step', 5} ;
+conf.phowOpts = {'Step', 3} ;
 conf.clobber = false ;
 conf.tinyProblem = true ;
 conf.prefix = 'baseline' ;
@@ -70,7 +70,7 @@ if conf.tinyProblem
   conf.numSpatialX = 2 ;
   conf.numSpatialY = 2 ;
   conf.numWords = 300 ;
-  conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 3} ;
+  conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 5} ;
 end
 
 conf.vocabPath = fullfile(conf.dataDir, [conf.prefix '-vocab.mat']) ;
@@ -190,7 +190,7 @@ end
 %                                                  Compute feature map
 % --------------------------------------------------------------------
 
-psix = vl_homkermap(hists, 1, .7, 'kchi2') ;
+psix = vl_homkermap(hists, 1, 'kchi2', 'gamma', .5) ;
 
 % --------------------------------------------------------------------
 %                                                            Train SVM
@@ -208,7 +208,7 @@ if ~exist(conf.modelPath) || conf.clobber
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
         w(:,ci) = vl_pegasos(psix(:,selTrain(perm)), ...
                              int8(y(perm)), lambda, ...
-                             'NumIterations', 20/lambda, ...
+                             'NumIterations', 50/lambda, ...
                              'BiasMultiplier', conf.svm.biasMultiplier) ;
       end
     case 'liblinear'
@@ -282,19 +282,20 @@ switch model.quantizer
                                   single(descrs), ...
                                   'MaxComparisons', 15)) ;
 end
-    
-% quantize location
-width = size(im, 2) ;
-height = size(im, 1) ;
-binsx = vl_binsearch(linspace(1,width,model.numSpatialX+1), frames(1,:)) ;
-binsy = vl_binsearch(linspace(1,height,model.numSpatialY+1), frames(2,:)) ;
 
-% combined quantization
-bins = sub2ind([model.numSpatialY, model.numSpatialX, numWords], ...
-               binsy,binsx,binsa) ;
-hist = zeros(model.numSpatialY * model.numSpatialX * numWords, 1) ;
-hist = vl_binsum(hist, ones(size(bins)), bins) ;
-hist = single(hist / sum(hist)) ;
+for i = 1:length(model.numSpatialX)
+  binsx = vl_binsearch(linspace(1,width,model.numSpatialX(i)+1), frames(1,:)) ;
+  binsy = vl_binsearch(linspace(1,height,model.numSpatialY(i)+1), frames(2,:)) ;
+
+  % combined quantization
+  bins = sub2ind([model.numSpatialY(i), model.numSpatialX(i), numWords], ...
+                 binsy,binsx,binsa) ;
+  hist = zeros(model.numSpatialY(i) * model.numSpatialX(i) * numWords, 1) ;
+  hist = vl_binsum(hist, ones(size(bins)), bins) ;
+  hists{i} = single(hist / sum(hist)) ;
+end
+hist = cat(1,hists{:}) ;
+hist = hist / sum(hist) ;
 
 % -------------------------------------------------------------------------
 function [className, score] = classify(model, im)
