@@ -26,7 +26,7 @@ $ make
 architecture and configure itself accordingly. If the architecture is
 not detected correctly, it can be specified manually. For instance</p>
 <precode type='sh'>
-$ make ARCH=glx
+$ make ARCH=glnx32
 </precode>
 <p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
 to obtain a list of other useful options.</p>
@@ -102,7 +102,7 @@ fc_flags="$fc_flags -DMX_COMPAT_32"
 
 <precode type="sh">
 $ nmake /f Makefile.mak # for the Windows 32 target
-$ nmake /f Makefile.mak ARCH=w64 # for the Windows 64 target
+$ nmake /f Makefile.mak ARCH=win64 # for the Windows 64 target
 </precode>
 
 <p>For Windows platform, it is also possible to compile just the
