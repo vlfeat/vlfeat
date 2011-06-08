@@ -263,10 +263,10 @@ typedef enum _VlmxErrorId {
  ** the MEX file to abort.
  **/
 
-#ifdef VL_COMPILER_GNUC & ! defined(__DOXYGEN__)
-void __attribute__((noreturn))
+#if defined(VL_COMPILER_GNUC) & ! defined(__DOXYGEN__)
+static void __attribute__((noreturn))
 #else
-void
+static void
 #endif
 vlmxError (VlmxErrorId errorId, char const * errorMessage, ...)
 {
@@ -282,7 +282,7 @@ vlmxError (VlmxErrorId errorId, char const * errorMessage, ...)
  ** The function internally calls @c mxWarnMsgTxtAndId.
  **/
 
-void
+static void
 vlmxWarning (VlmxErrorId errorId, char const * errorMessage, ...)
 {
   MEXUTILS_RAISE_HELPER ;
