@@ -721,11 +721,15 @@ class DocHtmlElement(DocNode):
             gen.putString(name)
             gen.putString("=")
             gen.putXMLAttr(expandAttr(value, pageNode))
-        gen.putString(">")
-        DocNode.publish(self, gen, pageNode)
-        gen.putString("</")
-        gen.putString(self.tag)
-        gen.putString(">")
+        if self.tag == 'br':
+            # workaround for browser that do not like <br><br/>
+            gen.putString("/>")
+        else:
+            gen.putString(">")
+            DocNode.publish(self, gen, pageNode)
+            gen.putString("</")
+            gen.putString(self.tag)
+            gen.putString(">")
 
     publish = makeGuard(publish)
 
