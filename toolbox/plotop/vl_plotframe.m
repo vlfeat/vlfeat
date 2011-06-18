@@ -23,7 +23,7 @@ function h=vl_plotframe(frames,varargin)
 %
 %   * ORIENTED ELLIPSES
 %     + FRAME(1:2)   center
-%     + FRAME(3:6)   stacking of A such that ELLIPSE = A {x : |x| = 1}
+%     + FRAME(3:6)   stacking of A such that ELLIPSE = {A x : |x| = 1}
 %
 %  H=VL_PLOTFRAME(...) returns the handle of the graphical object
 %  representing the frames.
