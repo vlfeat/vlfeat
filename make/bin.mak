@@ -39,8 +39,7 @@ no_dep_targets += bin-info
 
 bin-all: $(bin_tgt)
 
-$(BINDIR)/% : $(VLDIR)/src/%.c $(dll-dir)
-	@make -s $(dll_tgt)
+$(BINDIR)/% : $(VLDIR)/src/%.c $(dll-dir) $(dll_tgt)
 	$(call C,CC) $(BIN_CFLAGS) $(BIN_LDFLAGS) "$<" -o "$@"
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
