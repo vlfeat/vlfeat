@@ -45,14 +45,21 @@ dist-src-info:
 #                                                 Build binary package
 # --------------------------------------------------------------------
 
-# dist-bin-release: Rebuild binaries with optimizations and no debug symbols
-# dist-bin-commit:  Creates a new vXX.XX.XX-ARCH branch with the binaries
-#              and pushes it to the remote called bin
-# dist-bin-merge:   Creates a new vXX.XX.XX-bin branch by merging
-#              the architecture specific binary branches and
-#              adding additional files. It then pushes the result
-#              to the remote called bin.
+# dist-bin-release: Rebuild binaries with optimizations and no debug
+#   symbols.
+#
+# dist-bin-commit: Creates a new vXX.XX.XX-ARCH branch with the
+#   binaries and pushes it to the remote called bin.
+#
+# dist-bin-commit-common: Creates a new vXX.XX.XX-common branch with
+#   the architecture-independent parts of VLFeat.
+#
+# dist-bin-merge: Creates a new vXX.XX.XX-bin branch by merging the
+#   architecture specific binary branches and adding additional
+#   files. It then pushes the result to the remote called bin.
+#
 # dist-bin: Packs the commit remotes/bin/vXX.XX.XX-bin.
+#
 # dist-src: Packs the commit vXX.XX.XX.
 
 .PHONY: dist-bin, dist-bin-release, dist-bin-commit, dist-bin-info
