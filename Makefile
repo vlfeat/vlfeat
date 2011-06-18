@@ -185,8 +185,8 @@ endef
 # multiple columns
 ifdef VERB
 define dump-var
-@echo $(1) =
-@echo $($(1)) | sed 's/\([^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
+@echo "$(1) ="
+@echo "$($(1))" | sed 's/\([^ ][^ ]* [^ ][^ ]*\) */\1#/g' | \
 tr '#' '\n' | column -t | sed 's/\(.*\)/  \1/g'
 endef
 else
