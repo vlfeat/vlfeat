@@ -107,10 +107,8 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
-	@make -s $(dll_tgt)
-	@ln -sf "../../../$(BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)" \
-	        "$(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)"
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt)
+	@ln -sf "../../../$(dll_tgt)" "$(MEX_BINDIR)/"
 	$(call C,MEX) \
                CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
