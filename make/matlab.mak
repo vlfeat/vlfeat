@@ -9,7 +9,8 @@
 # the empty string disables MATLAB support.
 
 MEX ?= mex
-MATLAB_PATH ?= $(strip $(shell $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+MATLAB_PATH ?= $(strip $(shell test "$$(command -v '$(MEX)')" && \
+  $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
 
 # if expand to empty string, set to empty string for use with ifdef
