@@ -4,33 +4,36 @@ function J = vl_imarray(A,varargin)
 %   images A. A can be either a M*N*K array, storing one gray-scale
 %   image per slice, or a M*N*3*K or M*N*K*3 array, storing one RGB
 %   image per slice. The function returns an image J which is a tiling
-%   of the images in the array. Tiles are arranged from left to
-%   right and top to bottom.
+%   of the images in the array. Tiles are filled from left to right
+%   and top to bottom.
 %
-%   VL_IMARRAY(...) display the image J rather than returning it.
+%   VL_IMARRAY(...) displays the image J rather than returning it.
 %
 %   VL_IMARRAY() accepts the following options:
 %
 %   Spacing:: 0
-%     Orlates the images with a null border of the specified width.
+%     Separate the images by a border of the specified width (the
+%     border is assigned 0 value, which usually corresponds to black).
 %
 %   Layout:: []
 %     Specify a vector [TM TN] with the number of rows and columns of
 %     the tiling. If equal to [] the layout is computed automatically.
 %
-%   Movie:: 0
-%     Display/returns a movie rather than generating a tyling.
+%   Movie:: false
+%     Display/return a movie rather than generating a tiling.
 %
 %   CMap:: []
-%     Specify a colormap for indexed images and movies.
+%     Specify a colormap to construct a movie when the input is an
+%     indexed image array. If not specified, MATLAB default colormap
+%     is used.
 %
 %   Reverse:: true
-%     Starts filling from the bottom rather than from the top.
+%     Start filling the grid from the bottom rather than from the top.
 %
 %   See also VL_IMARRAYSC(), VL_HELP().
 
 % AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
 %
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
@@ -39,7 +42,7 @@ opts.reverse = false ;
 opts.spacing = 0 ;
 opts.layout = [] ;
 opts.movie = false ;
-opts.cmap = colormap ;
+opts.cmap = [] ;
 opts = vl_argparse(opts, varargin) ;
 
 swap3 = false ;
@@ -102,6 +105,9 @@ for k = 1:numImages
     jr = j * (width  + opts.spacing) + (1:width) ;
     cdata(ir,jr,:) = tmp ;
   else
+    if isempty(opts.cmap)
+      opts.cmap = get(0, 'DefaultFigureColormap') ;
+    end
     MOV(k) = im2frame(tmp, opts.cmap) ;
   end
 end
