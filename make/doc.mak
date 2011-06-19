@@ -56,7 +56,7 @@ $(eval $(call gendir, doc, doc doc/demo doc/figures doc/man-src))
 # generate results-dir: target
 $(eval $(call gendir, results, results))
 
-VERSION: Makefile
+VERSION: vl/generic.h
 	echo "$(VER)" > VERSION
 
 docsrc/version.html: Makefile vl/generic.h
@@ -95,12 +95,15 @@ doc/index.html: \
 # embedded in the website.
 #
 
-doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py
+doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
 	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
 	          --format=web \
 	          --exclude='noprefix/.*' \
+                  --exclude='xtune/.*' \
+                  --exclude='xtest/.*' \
 	          --exclude='.*/vl_test_.*' \
 	          --exclude='.*/vl_demo_.*' \
+	          --exclude='.*/vl_tune_.*' \
 	          --verbose
 #
 # Generate C API documentation
