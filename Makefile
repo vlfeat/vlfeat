@@ -287,6 +287,7 @@ distclean:
 info:
 	$(call echo-title,General settings)
 	$(call dump-var,deps)
+	$(call echo-var,PROFILE)
 	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
