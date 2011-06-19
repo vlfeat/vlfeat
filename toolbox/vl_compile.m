@@ -7,7 +7,7 @@ function vl_compile(useLcc)
 %   is the active compiler. Use VL_COMPILE(FALSE) if Visual C++
 %   is the active compiler (see MEX -SETUP).
 %
-%   See also:: VL_HELP().
+%   See also: VL_NOPREFIX(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -52,13 +52,13 @@ if useLcc
   lccImpLibPath = fullfile(lccImpLibDir, 'VL.lib') ;
   lccRoot       = fullfile(matlabroot, 'sys', 'lcc', 'bin') ;
   lccImpExePath = fullfile(lccRoot, 'lcc_implib.exe') ;
-  
+
   mkd(lccImpLibDir) ;
   cp(fullfile(binw32Dir, 'vl.dll'), fullfile(lccImpLibDir, 'vl.dll')) ;
 
   cmd = ['"' lccImpExePath '"', ' -u ', '"' fullfile(lccImpLibDir, 'vl.dll') '"'] ;
-  fprintf('Running:\n> %s\n', cmd) ; 
-  
+  fprintf('Running:\n> %s\n', cmd) ;
+
   curPath = pwd ;
   try
     cd(lccImpLibDir) ;
@@ -69,7 +69,7 @@ if useLcc
     cd(curPath) ;
     error(lasterr) ;
   end
-  
+
 end
 
 % Compile each mex file ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +77,7 @@ for i = 1:length(subDirs)
   thisDir = fullfile(toolboxDir, subDirs{i}) ;
   fileNames = ls(fullfile(thisDir, '*.c'));
 
-  
+
   for f = 1:size(fileNames,1)
     fileName = fileNames(f, :) ;
 
@@ -86,19 +86,19 @@ for i = 1:length(subDirs)
 
     filePath = fullfile(thisDir, fileName);
     fprintf('MEX %s\n', filePath);
-    
+
     dot = strfind(fileName, '.');
     mexFile = fullfile(mexw32Dir, [fileName(1:dot) 'dll']);
     if exist(mexFile)
       delete(mexFile)
     end
-    
+
     cmd = {['-I' toolboxDir],   ...
            ['-I' vlDir],        ...
            '-O',                ...
           '-outdir', mexw32Dir, ...
            filePath             } ;
-    
+
     if useLcc
       cmd{end+1} = lccImpLibPath ;
     else

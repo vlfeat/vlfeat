@@ -14,7 +14,7 @@
 %   Each column of F describes an ellipsoid; F(1:D,i) is the center of
 %   the elliposid and F(D:end,i) are the independent elements of the
 %   co-variance matrix of the ellipsoid.
-%   
+%
 %   Ellipsoids are computed according to the same reference frame of I
 %   seen as a matrix. This means that the first coordinate spans the
 %   first dimension of I.
@@ -27,44 +27,44 @@
 %
 %   VL_MSER(I,'Option'[,Value]...) accepts the following options
 %
-%   Delta:: 5
+%   Delta:: [5]
 %       Set the DELTA parameter of the VL_MSER algorithm. Roughly
 %       speaking, the stability of a region is the relative variation
 %       of the region area when the intensity is changed of +/-
 %       Delta/2.
 %
-%   MaxArea:: 0.75
+%   MaxArea:: [0.75]
 %       Set the maximum area (volume) of the regions relative to
 %       the image domain area (volume).
 %
-%   MinArea:: 3/npixels
-%       Set the minimum area (volume) of the regions relative to 
+%   MinArea:: [3 / numPixels]
+%       Set the minimum area (volume) of the regions relative to
 %       the image domain area (volume).
 %
-%   MaxVariation:: 0.25
+%   MaxVariation:: [0.25]
 %       Set the maximum variation (absolute stability score) of the
 %       regions.
 %
-%   MinDiversity:: 0.2
+%   MinDiversity:: [0.2]
 %       Set the minimum diversity of the region. When the relative
 %       area variation of two nested regions is below this threshold,
 %       then only the most stable one is selected.
 %
-%   BrightOnDark:: 1
+%   BrightOnDark:: [1]
 %       Detect bright-on-dark MSERs. This corresponds to MSERs of the
 %       inverted image.
 %
-%   DarkOnBright:: 1
+%   DarkOnBright:: [1]
 %       Detect dark-on-bright MSERs. This corresponds to MSERs of the
 %       original image.
 %
 %   Verbose::
 %       Be verbose.
 %
-%   REFERENCES
-%   [1] J. Matas, O. Chum, M. Urban, and T. Pajdla, "Robust wide
-%       baseline stereo from maximally stable extremal regions," in
-%       Proc. BMVC, 2002.
+%   REFERENCES::
+%     [1] J. Matas, O. Chum, M. Urban, and T. Pajdla, "Robust wide
+%     baseline stereo from maximally stable extremal regions," in
+%     Proc. BMVC, 2002.
 %
 %   See also: VL_HELP().
 

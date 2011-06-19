@@ -5,16 +5,16 @@ function vl_xmkdir(path, varargin)
 %
 %   The function accepts the following options:
 %
-%   Pretend:: false
+%   Pretend:: [false]
 %     Set to true to avoid creating any directory but print which
 %     directories would be created (implies 'Verbose',true).
 %
-%   Verbose:: false
+%   Verbose:: [false]
 %     Set to true to print the operations performed.
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
 
-% Author: Andrea Vedaldi
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

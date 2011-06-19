@@ -1,13 +1,13 @@
 function y = vl_gaussian(x)
 % VL_GAUSSIAN  Standard Gaussian density
 %   Y=VL_GAUSSIAN(X) computes the standard (zero mean, unit variance)
-%   Gaussian density.  
+%   Gaussian density.
 %
 %   To obtain the Gaussian density of standard deviation S do
 %
 %     Y = 1/S * VL_GAUSSIAN(X/S).
 %
-%   See also:: VL_DGAUSSIAN(), VL_DDGAUSSIAN(), VL_HELP().
+%   See also: VL_DGAUSSIAN(), VL_DDGAUSSIAN(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

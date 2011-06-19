@@ -49,13 +49,12 @@
 %   VL_AIB accepts the following options:
 %
 %   Verbose::
-%     Increase verbosity level.
+%     If specified, increase verbosity level.
 %
 %   ClusterNull::
-%     Do not signal null nodes; instead cluster them.
+%     If specified, do not signal null nodes; instead cluster them.
 %
-%   See also:: VL_AIBCUT(), VL_AIBHIST(), VL_AIBCUTHIST(),
-%              VL_AIBCUTPUSH(), VL_HELP().
+%   See also: VL_AIBCUT(), VL_AIBHIST(), VL_AIBCUTHIST(), VL_AIBCUTPUSH(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

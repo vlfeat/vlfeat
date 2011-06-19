@@ -9,7 +9,7 @@ function J=vl_xyz2rgb(I,ws)
 %
 %   The default workspace is CIE.
 %
-%   See also:: VL_RGB2XYZ(), VL_HELP().
+%   See also: VL_RGB2XYZ(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -17,29 +17,29 @@ function J=vl_xyz2rgb(I,ws)
 % This file is part of VLFeat, available under the terms of the
 % GNU GPLv2, or (at your option) any later version.
 
-if(nargin < 2) 
+if(nargin < 2)
   workspace = 'CIE' ;
 else
   workspace = ws ;
 end
 
 switch workspace
-  case 'CIE'   
+  case 'CIE'
     % CIE: E illuminant and 2.2 gamma
     A = [
-      0.488718    0.176204    0.000000   
-      0.310680    0.812985    0.0102048  
+      0.488718    0.176204    0.000000
+      0.310680    0.812985    0.0102048
       0.200602     0.0108109  0.989795 ]' ;
     gamma = 2.2 ;
-    
+
   case 'Adobe'
     % Adobe 1998: D65 illuminant and 2.2 gamma
     A = [
-      0.576700    0.297361    0.0270328  
-      0.185556    0.627355    0.0706879  
+      0.576700    0.297361    0.0270328
+      0.185556    0.627355    0.0706879
       0.188212    0.0752847   0.99124 ]' ;
     gamma = 2.2 ;
-end 
+end
 
 [M,N,K] = size(I) ;
 

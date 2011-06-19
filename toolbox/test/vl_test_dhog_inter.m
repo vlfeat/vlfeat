@@ -12,12 +12,12 @@ grd      = single(grd) ;
 
 f = [f ; siz * ones(1,size(f,2)) / 3 ; zeros(1,size(f,2))] ;
 d__ = [] ;
-for f1=f 
+for f1=f
   d__ = [d__ vl_siftdescriptor(grd, f1)] ;
 end
 
-figure(1) ; clf ; 
-imagesc(I) ; hold on ; colormap gray ; 
+figure(1) ; clf ;
+imagesc(I) ; hold on ; colormap gray ;
 title('blue:dhog, red:fast dhog, green:sift') ;
 h = [] ;
 while 1

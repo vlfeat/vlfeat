@@ -14,7 +14,7 @@ I = single(255 * I) ;
 figure(1) ; clf ;
 imagesc(I) ; colormap gray ;
 axis equal ;  axis off ; axis tight ;
-hold on ; 
+hold on ;
 
 vl_demo_print('sift_edge_0') ;
 
@@ -23,12 +23,12 @@ for te=ter
   f = vl_sift(I, ...
            'PeakThresh',   0,  ...
            'EdgeThresh',   te, ...
-           'FirstOctave', -1  ) ;  
-  h1 = vl_plotframe(f) ; 
+           'FirstOctave', -1  ) ;
+  h1 = vl_plotframe(f) ;
   set(h1,'color','k','linewidth',3) ;
-  h2 = vl_plotframe(f) ; 
+  h2 = vl_plotframe(f) ;
   set(h2,'color','y','linewidth',2) ;
-  
+
   vl_demo_print(sprintf('sift_edge_%d', find(te==ter))) ;
   delete(h1) ;
   delete(h2) ;

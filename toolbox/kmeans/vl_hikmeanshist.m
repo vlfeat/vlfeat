@@ -17,7 +17,7 @@ function h = vl_hikmeanshist(tree,path)
 %      H(K+1) = # of paths such that PATH(1:2,:) = [1 ; 1]
 %      H(K+K) = # of paths such that PATH(1:2,:) = [1 ; K]
 %
-%  See also:: VL_HIKMEANS(), VL_HIKMEANSPUSH(), VL_HELP().
+%  See also: VL_HIKMEANS(), VL_HIKMEANSPUSH(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

@@ -17,7 +17,7 @@
 %    used to control the state of the random number generator used by
 %    all VLFEAT functions.
 %
-%    See also:: VL_HELP().
+%    See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

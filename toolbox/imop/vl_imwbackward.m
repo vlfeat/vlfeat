@@ -16,7 +16,7 @@ function [wI,wIx,wIy] = vl_imwbackward(varargin)
 %   VL_IMWBACKWARD() is less general than the MATLAB native function
 %   INTERP2(), but it is significantly faster.
 %
-%   See also:: IMWFORWARD(), INTERP2(), VL_HELP().
+%   See also: IMWFORWARD(), INTERP2(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -37,7 +37,7 @@ else
   [M,N,K] = size(I) ;
   varargin = { varargin{4:end} } ;
 end
-  
+
 if K == 1
 	if nargout == 1
 		wI = vl_imwbackwardmx(xr, yr, I, varargin{:}) ;
@@ -59,8 +59,8 @@ else
 			[tmp1, tmp2, tmp3] = vl_imwbackwardmx(xr, yr, squeeze(I(:,:,k)),  varargin{:}) ;
 			wI(:,:,k)  = tmp1;
 			wIx(:,:,k) = tmp2;
-			wIy(:,:,k) = tmp3 ; 
+			wIy(:,:,k) = tmp3 ;
 		end
 	end
 end
-	
+

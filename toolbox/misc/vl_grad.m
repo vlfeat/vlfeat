@@ -20,7 +20,7 @@ function [Ix,Iy] = vl_grad(I,varargin) ;
 %
 %   See also: GRADIENT(), VL_HELP().
 
-% Author: Andrea Vedaldi
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

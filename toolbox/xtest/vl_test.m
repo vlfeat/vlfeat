@@ -14,8 +14,9 @@ function results = vl_test(suite, test)
 %
 %  VL_TEST(SUITE, TEST) runs the specified SUITE/TEST without catching
 %  the potential exception. Useful to DBSTOP to debug.
-%
-%  Author:: Andrea Vedaldi
+
+
+% Author: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

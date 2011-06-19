@@ -28,7 +28,7 @@ if any(any(any(H_ ~= H__)))
   fprintf('H:\n') ; disp(args{1});
   fprintf('X:\n') ; disp(args{2});
   fprintf('B:\n') ; disp(args{3});
-  if length(args) > 3, 
+  if length(args) > 3,
     fprintf('d:\n') ; disp(args{4}) ;
   end
   fprintf('R computed:\n') ; disp(H__) ;

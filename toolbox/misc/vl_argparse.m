@@ -27,7 +27,7 @@ function [conf, args] = vl_argparse(conf, args, varargin)
 %
 %   See also: VL_OVERRIDE(), VL_HELP().
 
-% Author: Andrea Vedaldi
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

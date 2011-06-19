@@ -33,10 +33,10 @@
 %
 %   VL_DSIFT() accepts the following options:
 %
-%   Step:: 1
+%   Step:: [1]
 %     Extracts a SIFT descriptor each STEP pixels.
 %
-%   Size:: 3
+%   Size:: [3]
 %     A spatial bin covers SIZE pixels.
 %
 %   Bounds:: [whole image]
@@ -115,7 +115,7 @@
 %   = 5.5. For the second descriptor immediately to its right this is
 %   5.5 + STEP, and so on.
 %
-%   See also:: VL_HELP(), VL_SIFT().
+%   See also: VL_SIFT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

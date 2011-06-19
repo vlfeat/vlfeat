@@ -15,12 +15,12 @@ function [recall, precision, info, scores] = vl_pr(labels, scores, varargin)
 %
 %  VL_PR() accepts the following options:
 %
-%  InludeInf:: false
+%  InludeInf:: [false]
 %    If set to true, data with -INF score is included in the
 %    evaluation and the maximum recall is 1 even if -INF scores are
 %    present.
 %
-%  Stable:: false
+%  Stable:: [false]
 %    If set to true, RECALL and PRECISION are in the samre order of
 %    LABELS and SCORES rather than being sorted by increasing
 %    RECALL. This option implies INCLUDEINF.
@@ -38,12 +38,13 @@ function [recall, precision, info, scores] = vl_pr(labels, scores, varargin)
 %    recall is also equal to the true positive rate for the ROC curve
 %    (see VL_ROC()).
 %
-%  Remark:: precision (P) is undefined for those values of the
+%  Remark::
+%    Precision (P) is undefined for those values of the
 %    classifier threshold for which no example is classified as
 %    positive. Conventionally, a precision of P=1 is assigned to such
 %    cases.
 %
-%  See also:: VL_ROC(), VL_HELP().
+%  See also: VL_ROC(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

@@ -2,4 +2,4 @@
 %   I = VL_IKMEANSPUSH(X,C) projects the data X to the integer K-meanns
 %   clusters of centers C returning the cluster indeces I.
 %
-%   See also VL_IKMEANS().
+%   See also: VL_IKMEANS(), VL_HELP().

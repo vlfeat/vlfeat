@@ -6,33 +6,33 @@ function H = vl_tightsubplot(varargin)
 %   SUBPLOT(), but by default it does not put any margin between
 %   axes. This is done by tiling the axes inner box rather than the
 %   axes outer box.
-%   
+%
 %   H = VL_TIGHTSUBPLOT(M,N,P) retursn an handle to the P-th axes in a
 %   regular subdivision with M rows and N columns.
 %
 %   VL_TIGHTSUBPLOT() accepts the following options:
 %
-%   Margin       [0]::
-%   MarginLeft   [0]::
-%   MarginRight  [0]::
-%   MarginTop    [0]::
-%   MarginBottom [0]::
+%   Margin:: [0]
+%   MarginLeft:: [0]
+%   MarginRight:: [0]
+%   MarginTop:: [0]
+%   MarginBottom:: [0]
 %     Set the axes inner box margin, either uniformly in all
 %     directions, or specifically to the left, right, top or bottom.
 %
-%   Box ['inner']::
+%   Box:: [0]
 %     If set to 'outer', tile the axes outer box, thus protecting
 %     title and labels. Unfortunately this usually produces
 %     unnecesarily large margins.
 %
-%   Spacing [0] (legacy option)::
+%   Spacing:: [0] (legacy option)
 %     Set extra spacing between axes.  The space is added between the
 %     inner or outer boxes, depending on the setting below.
 %
 %   REMARK. While SUBPLOT kills any pre-existing axes that overalps a
 %   new one, this function does not.
 %
-%   See also:: SUBPLOT(), VL_HELP().
+%   See also: SUBPLOT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -81,19 +81,19 @@ for a=a:2:NA
       ml = arg ;
       mr = arg ;
     case 'marginleft'
-      ml = arg ;      
+      ml = arg ;
     case 'marginright'
-      mr = arg ;      
+      mr = arg ;
     case 'margintop'
-      mt = arg ;      
+      mt = arg ;
     case 'marginbottom'
-      mb = arg ;            
+      mb = arg ;
     case 'spacing'
       mt = arg/2 ;
       mb = arg/2 ;
       ml = arg/2 ;
       mr = arg/2 ;
-    case 'box'      
+    case 'box'
       switch lower(arg)
         case 'inner'
           use_outer = 0 ;
@@ -104,7 +104,7 @@ for a=a:2:NA
       end
     otherwise
       error(['Uknown parameter ''', varargin{a}, '''.']) ;
-  end      
+  end
 end
 
 % --------------------------------------------------------------------
@@ -128,7 +128,7 @@ switch use_outer
     else
       axes(H) ;
     end
-    
+
   case 1
     H = findobj(gcf, 'Type', 'axes', 'OuterPosition', pos) ;
     if(isempty(H))
@@ -137,4 +137,4 @@ switch use_outer
     else
       axes(H) ;
     end
-end    
+end

@@ -26,23 +26,25 @@
 %     grd      = single(grd) ;
 %     d        = vl_siftdescriptor(grd, f) ;
 %
-%   Remark:: The above fragment generates results which are very close
+%   Remark::
+%     The above fragment generates results which are very close
 %     but not identical to the output of VL_SIFT() as the latter
 %     samples the scale space at finite steps.
 %
-%   Remark:: For object categorization is sometimes useful to compute
+%   Remark::
+%     For object categorization is sometimes useful to compute
 %     SIFT descriptors without smoothing the image.
 %
 %   Options:
 %
-%   Magnif [3]::
+%   Magnif:: [3]
 %     Magnification factor (see VL_SIFT()).
 %
 %   NormThresh:: [-inf]
 %     Set the minimum l2-norm of the descriptors before
 %     normalization. Descriptors below the threshold are set to zero.
 %
-%  See also:: VL_SIFT(), VL_HELP().
+%  See also: VL_SIFT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

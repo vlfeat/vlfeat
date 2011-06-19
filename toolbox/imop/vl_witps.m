@@ -3,12 +3,13 @@ function [x1,x2]=vl_witps(xp1,xp2,Y,Yp)
 %   [X1,X2]=VL_WITPS(XP1,XP2,Y,Yp) computes the inverse thin-plate spline
 %   (TPS) warp of the points XP1,XP2.
 %
-%   Remark:: The inverse of a thin-plate spline in general is NOT a
+%   Remark::
+%     The inverse of a thin-plate spline in general is NOT a
 %     thin-plate spline and some splines do not have an inverse.  This
 %     function uses Gauss-Newton to compute a set of points (X1,X2)
 %     such that [XP1,XP2]=VL_WTPS(X1,X2,Y,Yp).
 %
-%   See also:: VL_WTPS(), VL_HELP().
+%   See also: VL_WTPS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -30,14 +31,14 @@ L = [[ones(1,K); Y], zeros(3) ; U, ones(K,1), Y'] ;
 invL = inv(L) ;
 A = [Yp, zeros(2,3)] * invL ;
 
-for t=1:5  
+for t=1:5
   [U,dU]  = vl_tpsu(Y,X);
   W = A * [repmat([0 0;1 0;0 1],1,N); reshape(dU, K, 2*N)] ;
   err = Xp - A * [ ones(1,N) ; X(1,:) ; X(2,:) ; U ] ;
-    
+
   W = reshape(W,4,N) ;
   dets = W(1,:).*W(4,:) - W(3,:).*W(2,:) ;
-  dX = [ (  W(4,:).*err(1,:) - W(3,:).*err(2,:) ) ./ dets ; ... 
+  dX = [ (  W(4,:).*err(1,:) - W(3,:).*err(2,:) ) ./ dets ; ...
          (- W(2,:).*err(1,:) + W(1,:).*err(2,:) ) ./ dets ] ;
   X = X + dX ;
 end

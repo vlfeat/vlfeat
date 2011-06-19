@@ -16,7 +16,7 @@
 %     and hierarchical IKM optimized to work on integer data
 %     types. This is useful to quantize large collection of features,
 %     for instance to create visual dictionaries.
-% 
+%
 %   * VL_AIB() uses the AIB algorithm to discriminatively compress a
 %     discrete random variable. An application is the compresssion
 %     of a visual dictionary for categorization.
@@ -42,7 +42,7 @@
 %     randomized algorithms), VL_WHISTC() computes weighed histograms,
 %     VL_GRAD() computes the gradient of a 2-D function.
 %
-%   See also:: http://www.vlfeat.org.
+%   See also: http://www.vlfeat.org.
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

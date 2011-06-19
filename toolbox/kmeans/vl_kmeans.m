@@ -16,18 +16,18 @@
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
 %
-%   Distance:: l2
-%     Use either l1 (L1) or l2 (L2) (default) distance.
+%   Distance:: [L2]
+%     Use either L1 or L2 distance.
 %
 %   Initialization::
 %     Use either random data points (RANDSEL) or k-means++ (PLUSPLUS)
 %     to initialize the centers.
 %
-%   Algorithm:: Lloyd
-%     Use either the standard Lloyd (LLOYD) or the accelerated
-%     Elkan (ELKAN) algorithm for optimization.
+%   Algorithm:: [LLOYD]
+%     Use either the standard LLOYD or the accelerated
+%     ELKAN algorithm for optimization.
 %
-%   NumRepetitions:: 1
+%   NumRepetitions:: [1]
 %     Number of time to restart k-means. The solution with minimal
 %     energy is returned.
 %
@@ -36,7 +36,9 @@
 %     'elkan') clusters the data point X using 10 centers, l1
 %     distance, and the Elkan's algorithm.
 %
-%   Author:: Andrea Vedaldi
+%   See also: VL_HELP().
+
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

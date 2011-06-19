@@ -5,23 +5,23 @@ function [Iedge dists map gaps] = vl_quickvis(I, ratio, kernelsize, maxdist, max
 %   between color consistency and spatial consistency (See VL_QUICKSEG) and
 %   KERNELSIZE controls the bandwidth of the density estimator (See VL_QUICKSEG,
 %   VL_QUICKSHIFT). MAXDIST is the maximum distance between neighbors which
-%   increase the density. 
+%   increase the density.
 %
 %   VL_QUICKVIS takes at most MAXCUTS thresholds less than MAXDIST, forming at
 %   most MAXCUTS segmentations. The edges between regions in each of these
 %   segmentations are labeled in IEDGE, where the label corresponds to the
-%   largest DIST which preserves the edge. 
+%   largest DIST which preserves the edge.
 %
 %   [IEDGE,DISTS] = VL_QUICKVIS(I, RATIO, KERNELSIZE, MAXDIST, MAXCUTS) also
 %   returns the DIST thresholds that were chosen.
-%   
+%
 %   IEDGE = VL_QUICKVIS(I, RATIO, KERNELSIZE, DISTS) will use the DISTS
 %   specified
 %
 %   [IEDGE,DISTS,MAP,GAPS] = VL_QUICKVIS(I, RATIO, KERNELSIZE, MAXDIST, MAXCUTS)
 %   also returns the MAP and GAPS from VL_QUICKSHIFT.
 %
-% See Also: VL_QUICKSHIFT, VL_QUICKSEG
+%   See Also: VL_QUICKSHIFT(), VL_QUICKSEG(), VL_HELP().
 
 if nargin == 4
   dists = maxdist;
@@ -43,16 +43,16 @@ function [Iedge dists] = mapvis(map, gaps, maxdist, maxcuts)
 % MAPVIS Create an edge image from a Quickshift segmentation.
 %   IEDGE = MAPVIS(MAP, GAPS, MAXDIST, MAXCUTS) creates an edge
 %   stability image from a Quickshift segmentation. MAXDIST is the maximum
-%   distance between neighbors which increase the density. 
+%   distance between neighbors which increase the density.
 %
 %   MAPVIS takes at most MAXCUTS thresholds less than MAXDIST, forming at most
 %   MAXCUTS segmentations. The edges between regions in each of these
 %   segmentations are labeled in IEDGE, where the label corresponds to the
-%   largest DIST which preserves the edge. 
+%   largest DIST which preserves the edge.
 %
 %   [IEDGE,DISTS] = MAPVIS(MAP, GAPS, MAXDIST, MAXCUTS) also returns the DIST
 %   thresholds that were chosen.
-%   
+%
 %   IEDGE = MAPVIS(MAP, GAPS, DISTS) will use the DISTS specified
 %
 % See Also: VL_QUICKVIS, VL_QUICKSHIFT, VL_QUICKSEG
@@ -77,13 +77,13 @@ Iedge = zeros(size(map));
 
 for i = 1:length(dists)
   s = find(gaps >= dists(i));
-  mapdist = map;  
+  mapdist = map;
   mapdist(s) = s;
   [mapped labels] = vl_flatmap(mapdist);
   fprintf('%d/%d %d regions\n', i, length(dists), length(unique(mapped)))
 
   borders = getborders(mapped);
-  
+
   Iedge(borders) = dists(i);
   %Iedge(borders) = Iedge(borders) + 1;
   %Iedge(borders) = i;

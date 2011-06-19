@@ -10,15 +10,15 @@ function J = vl_imarraysc(A, varargin)
 %
 %   VL_IMARRAYSC() accepts the options of VL_IMARRAY() and:
 %
-%   CLim:: []
+%   CLim:: [empty]
 %     Specify the intensity range. If empty, the range is calcualted
 %     automatically for each image in the array.
 %
-%   Uniform:: false
+%   Uniform:: [false]
 %     If true all the images in the array are scaled in the same
 %     range.
 %
-%   See also:: VL_IMARRAY(), VL_HELP().
+%   See also: VL_IMARRAY(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

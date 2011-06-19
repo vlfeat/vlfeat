@@ -2,7 +2,9 @@
 %   This is a VLFeat internal function used to initialize
 %   a file containing tests.
 %
-%   Author:: Andrea Vedaldi
+%   See also: VL_TEST(), VL_HELP().
+
+% Author:: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

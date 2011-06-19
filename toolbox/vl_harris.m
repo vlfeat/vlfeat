@@ -35,7 +35,7 @@ function [H,details] = vl_harris(I,si,alpha)
 %  VL_HARRIS(I,SI,ALPHA) uses Harris' original score [1], defined to be
 %  SIGMAP*SIGMAM - ALPHA*(SIGMAP+SIGMAM)^2. This can be decomposed in
 %  the factors SIGMAP^2 (note the square) and
-%  
+%
 %    RHO = GAMMA - ALPHA (1+GAMMA)^2.
 %
 %  Note that RHO is equal to -ALPHA for a maximally anisotropic
@@ -48,20 +48,20 @@ function [H,details] = vl_harris(I,si,alpha)
 %  generally assumed to be a sampling artifact, and might be
 %  avoided by oversampling the image.
 %
-%  EXAMPLE:: 
+%  EXAMPLE::
 %    To extacts Harris points from image I:
 %      idx = vl_localmax( vl_harris( vl_imsmooth( I, sd ), si ) ) ;
 %      [i,j] = ind2sub( size(I), idx )
 %
 %  REFERENCES::
-%   [1] C. Harris and M. Stephens, "A combined corner and edge detector,"
-%   in Proceedings of The Fourth Alvey Vision Conference, pp. 147-151,
-%   1988.
+%    [1] C. Harris and M. Stephens, "A combined corner and edge detector,"
+%    in Proceedings of The Fourth Alvey Vision Conference, pp. 147-151,
+%    1988.
 %
-%   [2] J. A. Noble, "Finding corners, "Image Vision Computing, vol. 6,
-%   no. 2, pp. 121-128, 1988.
+%    [2] J. A. Noble, "Finding corners, "Image Vision Computing, vol. 6,
+%    no. 2, pp. 121-128, 1988.
 %
-%  See also:: VL_HELP().
+%  See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -96,11 +96,11 @@ if nargout > 1
   Lp = 0.5 * (tr + sqrt(tr.^2 - 4*dt));
   Lm = real(Lm) ;
   Lp = real(Lp) ;
-  
+
   gamma=sqrt(Lm./Lp) ;
 
   details.sigmap = Lp ;
-  if nargin > 2 
+  if nargin > 2
     details.rho = gamma - alpha * (1+gamma).^2 ;
   else
     details.rho   = 2*gamma ./ (1 + gamma) ;

@@ -21,7 +21,8 @@
 %   P dimensions of the Q-dimensional array F. This allows to process
 %   F in ``slices''.
 %
-%   Remark:: Matrices (2-array) with a singleton dimension are
+%   Remark::
+%     Matrices (2-array) with a singleton dimension are
 %     interpreted as vectors (1-array). So for example VL_LOCALMAX([0 1
 %     0]) and VL_LOCALMAX([0 1 0]') both return 2 as an aswer. However,
 %     if [0 1 0] is to be interpreted as a 1x2 matrix, then the
@@ -32,7 +33,7 @@
 %     VL_LOCALMAX(F,TRESH,2) (but note that in this case the result is
 %     always empty!).
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

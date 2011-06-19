@@ -15,4 +15,4 @@
 %   rows, one for each histogram bin. HIST is of the same class of
 %   INTHIST.
 %
-%   See also:: VL_HELP(), VL_INTHIST(), VL_IMINTEGRAL().
+%   See also: VL_INTHIST(), VL_IMINTEGRAL(), VL_HELP().

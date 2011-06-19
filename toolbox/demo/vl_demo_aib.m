@@ -19,7 +19,7 @@ axis equal ;
 xlim([-4 4]);
 ylim([-4 4]);
 axis off ;
-rectangle('position',D*[-1 -1 2 2]) 
+rectangle('position',D*[-1 -1 2 2])
 
 vl_demo_print('aib_basic_data', .6) ;
 
@@ -40,18 +40,18 @@ Pcx = Pcx / sum(Pcx(:)) ;
 
 cutsize = [K*K, 10, 3, 2, 1] ;
 for i=1:length(cutsize)
-  
-  [cut,map,short] = vl_aibcut(parents, cutsize(i)) ; 
+
+  [cut,map,short] = vl_aibcut(parents, cutsize(i)) ;
   parents_cut(short > 0) = parents(short(short > 0)) ;
   C = short(1:K*K+1) ; [drop1,drop2,C] = unique(C) ;
-  
+
   figure(i+1) ; clf ;
   plotquantization(D,K,C) ; hold on ;
   %plottree(D,K,parents_cut) ;
   axis equal ;
   axis off ;
   title(sprintf('%d clusters', cutsize(i))) ;
-  
+
   vl_demo_print(sprintf('aib_basic_clust_%d',i),.6) ;
 end
 
@@ -94,7 +94,7 @@ for i=0:K-1
 end
 
 for i=1:length(parents)
-  p = parents(i) ;  
+  p = parents(i) ;
   if p==0, continue ; end;
   if all(isnan(C(:,i))), continue; end
   if all(isnan(C(:,p)))
@@ -112,7 +112,7 @@ xt = zeros(3, 2*length(parents)-1)+NaN ;
 yt = zeros(3, 2*length(parents)-1)+NaN ;
 
 for i=1:length(parents)
-  p = parents(i) ;  
+  p = parents(i) ;
   if p==0, continue ; end;
   xt(1,i) = C(1,i) ; xt(2,i) = C(1,p) ;
   yt(1,i) = C(2,i) ; yt(2,i) = C(2,p) ;

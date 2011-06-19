@@ -45,7 +45,7 @@ for wi = 1:length(windowSizeRange)
                     'bounds', [20,20,210,140], ...
                     'windowsize', windowSize, ...
                     'floatdescriptors') ;
-  
+
   numKeys = size(f, 2) ;
   f_ = [f ; ones(1, numKeys) * scale ; zeros(1, numKeys)] ;
 
@@ -56,7 +56,7 @@ for wi = 1:length(windowSizeRange)
                      'levels', 5, ...
                      'floatdescriptors', ...
                      'windowsize', windowSize) ;
-  
-  error = std(d_(:) - d(:)) / std(d(:)) ;  
+
+  error = std(d_(:) - d(:)) / std(d(:)) ;
   assert(error < 0.1,  'dsift and sift equivalence') ;
 end

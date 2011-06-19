@@ -6,7 +6,7 @@ if nargin < 1
 end
 
 I     = vl_test_pattern(n) ;
-I     = uint8(I) ; 
+I     = uint8(I) ;
 [M,N] = size(I) ;
 
 pfx = fullfile(vlfeat_root,'results') ;
@@ -20,16 +20,16 @@ imwrite(I,fullfile(pfx, 'autotest.pgm')) ;
              'delta',6,...
              'epsilon',.3,...
              'maxarea',1.0,...
-             'minarea',0.0,...             
+             'minarea',0.0,...
              'maxvariation',0.3,...
              'dups',...
              'verbose') ;
 
-figure(100) ; clf ;  
+figure(100) ; clf ;
 colormap gray ;
 
-subplot(1,2,1) ; 
-imagesc(I) ; 
+subplot(1,2,1) ;
+imagesc(I) ;
 hold on ;
 [i,j] = ind2sub([M,N],p) ;
 plot(j,i,'r*') ;
@@ -43,5 +43,5 @@ end
 f= f([2 1 5 4 3],:) ;
 
 imagesc(m) ;
-hold on ; 
+hold on ;
 vl_plotframe(f) ;

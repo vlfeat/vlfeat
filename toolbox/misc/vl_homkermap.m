@@ -22,18 +22,18 @@
 %   KJS::
 %     Compute the map for the JS (Jensen-Shannon) kernel.
 %
-%   Period [automatically tuned]::
+%   Period:: [automatically tuned]
 %     Set the period of the kernel specturm. The approximation is
 %     based on periodicizing the kernel specturm. If not specified,
 %     the period is automatically set based on the heuristic described
 %     in [2].
 %
-%   Window [RECTANGULAR]::
+%   Window:: [RECTANGULAR]
 %     Set the window used to truncate the spectrum before The window
 %     can be either RECTANGULAR or UNIFORM window. See [2] and the API
 %     documentation for details.
 %
-%   Gamma [1]::
+%   Gamma:: [1]
 %     Set the homogeneity degree of the kernel. The standard kernels
 %     are 1-homogeneous, but sometimes smaller values perform better
 %     in applications. See [2] for details.
@@ -58,14 +58,14 @@
 %     SIGN(X)SIGN(Y)K(ABS(X),ABS(Y)) -- note that other extensions are
 %     possible as well (see [2]).
 %
-%   REFERENCES
-%   [1] A. Vedaldi and A. Zisserman
-%       `Efficient Additive Kernels via Explicit Feature Maps',
-%       Proc. CVPR, 2010.
+%   REFERENCES::
+%     [1] A. Vedaldi and A. Zisserman
+%     `Efficient Additive Kernels via Explicit Feature Maps',
+%     Proc. CVPR, 2010.
 %
-%   [2] A. Vedaldi and A. Zisserman
-%       `Efficient Additive Kernels via Explicit Feature Maps',
-%       PAMI, 2011 (submitted).
+%     [2] A. Vedaldi and A. Zisserman
+%     `Efficient Additive Kernels via Explicit Feature Maps',
+%     PAMI, 2011 (submitted).
 %
 %   See also: VL_HELP().
 

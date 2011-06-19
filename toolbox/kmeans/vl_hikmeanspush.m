@@ -5,11 +5,12 @@
 %   leaf. Here X has a datum for each column and each column of PATH
 %   represents the corresponding root-to-leaf path.
 %
-%   Example:: PATH(:,1) = [2 1 4] means that the first datum follows
+%   Example::
+%     PATH(:,1) = [2 1 4] means that the first datum follows
 %     the branches number 2, 1 and 4 starting from the root of the
 %     HIKM tree ending to a leaf.
 %
-%   See also:: VL_HIKMEANS(), VL_HELP().
+%   See also: VL_HIKMEANS(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

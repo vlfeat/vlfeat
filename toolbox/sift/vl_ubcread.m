@@ -1,4 +1,4 @@
-function [f,d] = vl_ubcread(file, varargin) 
+function [f,d] = vl_ubcread(file, varargin)
 % SIFTREAD Read Lowe's SIFT implementation data files
 %   [F,D] = VL_UBCREAD(FILE) reads the frames F and the descriptors D
 %   from FILE in UBC (Lowe's original implementation of SIFT) format
@@ -31,13 +31,13 @@ if count ~= 2
 end
 switch opts.format
   case 'ubc'
-    numKeypoints  = header(1) ; 
+    numKeypoints  = header(1) ;
     descrLen      = header(2) ;
-    
+
   case 'oxford'
-    numKeypoints  = header(2) ; 
+    numKeypoints  = header(2) ;
     descrLen      = header(1) ;
-    
+
   otherwise
     error('Unknown format ''%s''.', opts.format) ;
 end
@@ -50,7 +50,7 @@ end
 switch opts.format
   case 'ubc'
     P = zeros(4,numKeypoints) ;
-    
+
   case 'oxford'
     P = zeros(5,numKeypoints) ;
 end
@@ -63,24 +63,24 @@ for k = 1:numKeypoints
   switch opts.format
     case 'ubc'
       % Record format: i,j,s,th
-      [record, count] = fscanf(g, '%f', [1 4]) ; 
+      [record, count] = fscanf(g, '%f', [1 4]) ;
       if count ~= 4
         error(...
           sprintf('Invalid keypoint file (parsing keypoint %d, frame part)',k) );
       end
       P(:,k) = record(:) ;
-      
+
     case 'oxford'
       % Record format: x, y, a, b, c such that x' [a b ; b c] x = 1
-      [record, count] = fscanf(g, '%f', [1 5]) ; 
+      [record, count] = fscanf(g, '%f', [1 5]) ;
       if count ~= 5
         error(...
           sprintf('Invalid keypoint file (parsing keypoint %d, frame part)',k) );
       end
       P(:,k) = record(:) ;
   end
-  
-	
+
+
 	% Record format: descriptor
 	[record, count] = fscanf(g, '%d', [1 descrLen]) ;
 	if count ~= descrLen
@@ -88,17 +88,17 @@ for k = 1:numKeypoints
 			sprintf('Invalid keypoint file (parsing keypoint %d, descriptor part)',k) );
 	end
 	L(:,k) = record(:) ;
-	
+
 end
 fclose(g) ;
 
 switch opts.format
   case 'ubc'
     P(1:2,:) = flipud(P(1:2,:)) + 1 ; % i,j -> x,y
-    
+
     f=[ P(1:2,:) ; P(3,:) ; -P(4,:) ] ;
     d=uint8(L) ;
-    
+
     p=[1 2 3 4 5 6 7 8] ;
     q=[1 8 7 6 5 4 3 2] ;
     for j=0:3
@@ -106,7 +106,7 @@ switch opts.format
         d(8*(i+4*j)+p,:) = d(8*(i+4*j)+q,:) ;
       end
     end
-    
+
   case 'oxford'
     P(1:2,:) = P(1:2,:) + 1 ; % matlab origin
     f = P  ;

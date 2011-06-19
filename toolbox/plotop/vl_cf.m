@@ -6,7 +6,7 @@ function h = vl_cf(h0)
 %
 %   See also: VL_HELP().
 
-% Author: Andrea Vedaldi
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

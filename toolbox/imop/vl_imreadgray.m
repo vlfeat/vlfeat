@@ -1,4 +1,4 @@
-function I = vl_imreadgray(file,varargin) 
+function I = vl_imreadgray(file,varargin)
 % VL_IMREADGRAY  Reads an image as gray-scale
 %   I=VL_IMREADGRAY(FILE) reads the image from file FILE and converts the
 %   result to a gray scale image (DOUBLE storage class ranging in
@@ -6,7 +6,7 @@ function I = vl_imreadgray(file,varargin)
 %
 %   VL_IMREADGRAY(FILE,FMT) specifies the file format FMT (see IMREAD()).
 %
-%   See also:: RGB2DOUBLE().
+%   See also: RGB2DOUBLE(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

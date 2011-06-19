@@ -4,9 +4,9 @@ function vl_figaspect(a)
 %   leaves the length of the shortest side unaltered. Both the
 %   screen and paper positions are affected.
 %
-%   See also: VL_HELP(), VL_PRINTSIZE().
+%   See also: VL_PRINTSIZE(), VL_HELP().
 
-% Author: Andrea Vedaldi
+% Authors: Andrea Vedaldi
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

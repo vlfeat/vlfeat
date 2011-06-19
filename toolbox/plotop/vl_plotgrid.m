@@ -5,7 +5,7 @@ function h=vl_plotgrid(x,y,varargin)
 %
 %  H=VL_PLOTGRID(...) returns the handle to the grid object.
 %
-%  See also:: VL_HELP().
+%  See also: VL_HELP().
 
 washold = ishold ;
 
@@ -26,7 +26,7 @@ xv = xv(:) ;
 yv = yv(:) ;
 
 lineprop = {} ;
-if length(varargin) > 0 
+if length(varargin) > 0
   lineprop = vl_linespec2prop(varargin{1}) ;
   lineprop = {lineprop{:}, varargin{2:end}} ;
 end

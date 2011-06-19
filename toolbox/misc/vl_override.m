@@ -53,7 +53,7 @@ end
 if ~warn & length(varargin) > 0
   for i=1:length(varargin)
     switch lower(varargin{i})
-      case 'warn' 
+      case 'warn'
         warn = true ;
       case 'skip'
         skip = true ;
@@ -78,7 +78,7 @@ end
 % if CONFIG is a struct array but UPDATE is not, no match can be
 % established and we simply copy UPDATE verbatim
 if ~isstruct(update)
-  config = update ; 
+  config = update ;
   return ;
 end
 

@@ -12,8 +12,9 @@ function path = vl_setup(varargin)
 %
 %   VL_SETUP('QUIET') does not print the greeting message.
 %
-%   See also:: VL_HELP(), VL_ROOT().
-%   Authors:: Andrea Vedaldi and Brian Fulkerson
+%   See also: VL_ROOT(), VL_HELP().
+
+% Authors: Andrea Vedaldi and Brian Fulkerson
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

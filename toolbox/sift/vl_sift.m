@@ -55,12 +55,11 @@
 %     If specfified, be verbose (may be repeated to increase the
 %     verbosity level).
 %
-%   REFERENCES
+%   REFERENCES::
+%     [1] D. G. Lowe, Distinctive image features from scale-invariant
+%     keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
 %
-%   [1] D. G. Lowe, Distinctive image features from scale-invariant
-%       keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
-%
-%   See also:: VL_HELP(), VL_UBCMATCH(), VL_DSIFT().
+%   See also: VL_UBCMATCH(), VL_DSIFT(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

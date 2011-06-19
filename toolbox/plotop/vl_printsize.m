@@ -13,20 +13,20 @@ function vl_printsize(varargin)
 %   size in print. The function accepts the following optional
 %   arguments:
 %
-%   Aspect:: none
+%   Aspect:: [none]
 %     Change the figure aspect ratio (widht/height) to the specified
 %     value.
 %
-%   Reference:: vertical
+%   Reference:: [vertical]
 %     If set to 'horizontal' the ratio R is the widht of the figure
 %     over the width of the page. If 'vertical', the ratio R is the
 %     height of the figure over the height of the page.
 %
-%   PaperType:: letter
+%   PaperType:: [letter]
 %     Set the type (size) of the reference paperReference. Any of the
 %     paper types supported by MATLAB can be used (see PRINT())).
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

@@ -11,26 +11,26 @@ function J = vl_imarray(A,varargin)
 %
 %   VL_IMARRAY() accepts the following options:
 %
-%   Spacing:: 0
+%   Spacing:: [0]
 %     Separate the images by a border of the specified width (the
 %     border is assigned 0 value, which usually corresponds to black).
 %
-%   Layout:: []
+%   Layout:: [empty]
 %     Specify a vector [TM TN] with the number of rows and columns of
 %     the tiling. If equal to [] the layout is computed automatically.
 %
-%   Movie:: false
+%   Movie:: [false]
 %     Display/return a movie rather than generating a tiling.
 %
-%   CMap:: []
+%   CMap:: [empty]
 %     Specify a colormap to construct a movie when the input is an
 %     indexed image array. If not specified, MATLAB default colormap
 %     is used.
 %
-%   Reverse:: true
+%   Reverse:: [true]
 %     Start filling the grid from the bottom rather than from the top.
 %
-%   See also VL_IMARRAYSC(), VL_HELP().
+%   See also:VL_IMARRAYSC(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson

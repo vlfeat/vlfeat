@@ -5,7 +5,7 @@ function y = vl_aibcutpush(map, x)
 %
 %  The function is equivalent to Y = MAP(X).
 %
-%  See also VL_HELP(), VL_AIB().
+%  See also: VL_HELP(), VL_AIB().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

@@ -12,7 +12,7 @@ switch n
     I     = abs(u) + abs(v) > (1/4) ;
     I     = 255 * I ;
     I(1:64,:) = 0 ;
-  
+
   case 2
     I = zeros(100,100) ;
     I(20:100-20+1,20:100-20+1) = 128 ;
@@ -21,20 +21,20 @@ switch n
     I(50,55)                   = 250 ;
     I(50,45)                   = 245 ;
     I = 255 - I ;
-        
-  case 3 
+
+  case 3
     I = 255 * vl_imsmooth(checkerboard(10,10),1) ;
-    
+
   case 4
     I = 255 * rand(32,32) ;
-    
+
   case 101
     I = 255 * vl_imreadbw(fullfile(vlfeat_root,'data','a.jpg')) ;
-    
+
   case 102
-	 I = 255 * vl_imreadbw(fullfile(vlfeat_root,'data','box.pgm')) ;   
-		
+	 I = 255 * vl_imreadbw(fullfile(vlfeat_root,'data','box.pgm')) ;
+
  case 'cone'
 	I = sqrt(u.^2+v.^2) ;
-	
+
 end

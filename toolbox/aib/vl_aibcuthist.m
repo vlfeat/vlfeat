@@ -10,13 +10,13 @@ function hist = vl_aibcuthist(map, x, varargin)
 %
 %  VL_AIBCUTHIST() accepts the following options:
 %
-%  Nulls ['drop']::
+%  Nulls:: [drop]
 %    What to do of null nodes: drop ('drop'), accumulate to an
 %    extra bin at the end of HIST ('append'), or accumulate to
 %    the first bin ('first')
 %
-%  See also:: VL_AIB(), VL_HELP().
-  
+%  See also: VL_AIB(), VL_HELP().
+
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
 %

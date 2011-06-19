@@ -13,7 +13,7 @@
 %                                  2 4 6 ;
 %                                  3 6 9 ]
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

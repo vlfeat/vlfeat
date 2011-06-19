@@ -1,6 +1,6 @@
 % VL_TEST_AIBHIST
 function vl_test_aibhist
- 
+
 D   = 4 ;
 K   = 20 ;
 
@@ -43,30 +43,30 @@ legend('signal null', 'cluster null') ;
 
 range = [1 10 K*K-10 K*K] ;
 for c=1:length(range)
-    
+
   cut_size = range(c) ;
-    
+
   % compare two methods of getting the same cut histogram
   [cut_,map_]  = vl_aibcut(parents_, cut_size) ;
   hist_        = vl_aibcuthist(map_, f1, 'nulls', 'append') ;
   histtree_    = vl_aibhist(parents_, f1) ;
   thist_       = histtree_(cut_) ;
-  
+
   [cut,map]    = vl_aibcut(parents, cut_size) ;
   hist         = vl_aibcuthist(map, f1, 'nulls', 'append') ;
   histtree     = vl_aibhist(parents, f1) ;
   thist        = histtree(cut) ;
-    
+
   figure(100 + c) ; clf ;
   subplot(2,2,1) ; hold on ; plot(hist_,'g.-') ; plot(thist_,'r') ;
   legend('cut+cuthist', 'hist+cut') ;
   title('vl_aibcuthist vs aibhist');
   subplot(2,2,2) ; hold on ; plot(histtree_) ; title('aibtree') ;
-  
+
   subplot(2,2,3) ; hold on ; plot(hist,'g.-') ; plot(thist,'r') ;
   legend('cut+cuthist', 'hist+cut') ;
   title('vl_aibcuthist vs vl_aibhist (clust null)');
-  subplot(2,2,4) ; hold on ; plot(histtree) ; title('aibtree (clust null)') ;  
+  subplot(2,2,4) ; hold on ; plot(histtree) ; title('aibtree (clust null)') ;
 end
 
 % --------------------------------------------------------------------

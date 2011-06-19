@@ -4,14 +4,14 @@ function y = vl_sigmoid(x)
 %
 %    Y = 1 ./ (1 + EXP(X)) ;
 %
-%   Remark:: 
+%   Remark::
 %     Useful properties of the vl_sigmoid are:
 %
 %     -  1 - VL_SIGMOID(X) = VL_SIGMOID(-X)
 %     -  Centered sigmoid: 2 * VL_SIGMOID(X) - 1 ;
 %     -  VL_SIGMOID(X) = (EXP(X/2) - EXP(X/2)) / (EXP(X/2) + EXP(X/2))
-% 
-%   See also:: VL_DSIGMOID(), VL_HELP().
+%
+%   See also: VL_DSIGMOID(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

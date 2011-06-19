@@ -45,11 +45,11 @@ I3 = vl_imsmooth(I,sigma,'kernel',ker,'padding','continuity','verbose','subsampl
 
 function compare(n,I1,I2,I3,tit)
 figure(n) ; clf ; colormap gray ;
-subplot(1,3,1) ; axis equal ; imagesc(icut(I1)) ; axis off ; 
+subplot(1,3,1) ; axis equal ; imagesc(icut(I1)) ; axis off ;
 title('Matlab zeropad') ;
-subplot(1,3,2) ; axis equal ; imagesc(abs(I1-I2)) ; axis off ; 
+subplot(1,3,2) ; axis equal ; imagesc(abs(I1-I2)) ; axis off ;
 title('matlab - imsmooth') ;
-subplot(1,3,3) ; axis equal ; imagesc(icut(I3)) ; axis off ; 
+subplot(1,3,3) ; axis equal ; imagesc(icut(I3)) ; axis off ;
 title('vl_imsmooth contpad') ;
 set(n,'name',tit) ;
 
@@ -59,6 +59,6 @@ if strcmp(class(I),'single')
 else
   g = double(g) ;
 end
-for k=1:size(I,3) 
-  I(:,:,k) = conv2(g,g,I(:,:,k),'same'); 
+for k=1:size(I,3)
+  I(:,:,k) = conv2(g,g,I(:,:,k),'same');
 end

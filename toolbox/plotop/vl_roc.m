@@ -79,7 +79,7 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %     'TN' to plot TP(S) (recall) vs. TN(S). Set to 'FalseNegative' or
 %     'FN' to plot TP(S) (recall) vs. FP(S) = 1 - TN(S).
 %
-%  See also:: VL_PR(), VL_HELP().
+%  See also: VL_PR(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

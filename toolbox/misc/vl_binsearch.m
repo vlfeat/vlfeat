@@ -10,7 +10,7 @@
 %   If B(1) = -inf the bin number 0 is removed and the bin number 1 is
 %   [-inf B(2)). If B(M) = +inf, the last bin M is the singleton +inf.
 %
-%   See also: VL_BINSUM().
+%   See also: VL_BINSUM(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

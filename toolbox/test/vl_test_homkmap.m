@@ -15,7 +15,7 @@ figure(1) ; clf ;
 subplot(1,2,1) ;
 semilogx(x,V_','-') ; hold on ;
 semilogy(x,V','--')  ;
-subplot(1,2,2); 
+subplot(1,2,2);
 plot(x,V_','-') ; hold on ;
 plot(x,V','--')  ;
 

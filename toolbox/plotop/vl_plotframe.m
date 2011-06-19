@@ -48,7 +48,7 @@ function h=vl_plotframe(frames,varargin)
 np        = 40 ;
 
 lineprop = {} ;
-if length(varargin) > 0 
+if length(varargin) > 0
   lineprop = vl_linespec2prop(varargin{1}) ;
   lineprop = {lineprop{:}, varargin{2:end}} ;
 end
@@ -61,7 +61,7 @@ end
 if(min(size(frames))==1)
   frames = frames(:) ;
 end
-  
+
 [D,K] = size(frames) ;
 zero_dimensional = D==2 ;
 
@@ -71,7 +71,7 @@ if zero_dimensional
   return ;
 end
 
-% reduce all other cases to ellipses/oriented ellipses 
+% reduce all other cases to ellipses/oriented ellipses
 frames    = frame2oell(frames) ;
 do_arrows = (D==4 || D==6) ;
 
@@ -97,11 +97,11 @@ end
 Xp = [cos(thr) ; sin(thr) ;] ;
 
 for k=1:K
-  
+
   % frame center
 	xc = frames(1,k) ;
 	yc = frames(2,k) ;
-  
+
   % frame matrix
   A = reshape(frames(3:6,k),2,2) ;
 
@@ -109,8 +109,8 @@ for k=1:K
   X = A * Xp ;
   X(1,:) = X(1,:) + xc ;
   X(2,:) = X(2,:) + yc ;
-  		
-  % store 
+
+  % store
 	allx((k-1)*(np+1) + (1:np)) = X(1,:) ;
 	ally((k-1)*(np+1) + (1:np)) = X(2,:) ;
 
@@ -149,20 +149,20 @@ function eframes = frame2oell(frames)
 switch D
   case 2
     kind = 'point' ;
-       
+
   case 3
     kind = 'disk' ;
-    
-  case 4 
+
+  case 4
     kind = 'odisk' ;
-    
+
   case 5
     kind = 'ellipse' ;
-    
+
   case 6
     kind = 'oellipse' ;
-    
-  otherwise 
+
+  otherwise
     error(['FRAMES format is unknown']) ;
 end
 
@@ -179,8 +179,8 @@ switch kind
     eframes(1:2,:) = frames(1:2,:) ;
     eframes(3,:)   = frames(3,:) ;
     eframes(6,:)   = frames(3,:) ;
-    
-  case 'odisk' 
+
+  case 'odisk'
     r = frames(3,:) ;
     c = r.*cos(frames(4,:)) ;
     s = r.*sin(frames(4,:)) ;
@@ -191,10 +191,10 @@ switch kind
   case 'ellipse'
     eframes(1:2,:) = frames(1:2,:) ;
     eframes(3:6,:) = mapFromS(frames(3:5,:)) ;
-  
-  case 'oellipse' 
+
+  case 'oellipse'
     eframes = frames ;
-end    
+end
 
 
 

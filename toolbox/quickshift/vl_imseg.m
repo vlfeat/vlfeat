@@ -1,7 +1,9 @@
 function Q = vl_imseg(I,labels)
-% IMSEG Color an image based on the segmentation
-%   ISEG = IMSEG(I,LABELS) Labels ISEG with the average color from I of 
-%   each cluster indicated by LABELS
+% VL_IMSEG Color an image based on the segmentation
+%   ISEG = VL_IMSEG(I,LABELS) labels ISEG with the average color from I of
+%   each cluster indicated by LABELS.
+%
+%   See also: VL_HELP().
 
 [M,N,K] = size(I) ;
 Q = 0*I ;

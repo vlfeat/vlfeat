@@ -6,6 +6,6 @@
 %     UNIX-like operating systems and of GetCurrentProcessID() on
 %     Windows.
 %
-%   See also: VL_HELP()
+%   See also: VL_HELP().
 
-%   Author:: Andrea Vedaldi
+% Authors: Andrea Vedaldi

@@ -44,22 +44,22 @@
 %  same storage class. The sotrage class of D is promoted to reduce
 %  the chance of overvlow, but this is not checked.
 %
-%    X & Y class      D class  
+%    X & Y class      D class
 %   ---------------------------
-%    UINT8            UINT32   
-%     INT8             INT32   
-%    UINT16           UINT32   
-%     INT16            INT32   
-%    UINT32           UINT32   
-%     INT32            INT32   
-%    SINGLE           SINGLE   
-%    DOUBLE           DOUBLE   
+%    UINT8            UINT32
+%     INT8             INT32
+%    UINT16           UINT32
+%     INT16            INT32
+%    UINT32           UINT32
+%     INT32            INT32
+%    SINGLE           SINGLE
+%    DOUBLE           DOUBLE
 %
 %  Warning: Both chi2 and kchi2 use integer math when presented with
 %  integer data types. This can easily result in zeros where you did
 %  not expect them.
 %
-%  See also:: VL_HELP().
+%  See also: VL_HELP().
 
 
 % AUTORIGHTS

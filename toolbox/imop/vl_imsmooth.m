@@ -22,7 +22,7 @@
 %     causes J(1:STEPS:end, 1:STEPS:end, :) to be computed. This is
 %     useful to downsample the image.
 %
-%   See also:: VL_HELP().
+%   See also: VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

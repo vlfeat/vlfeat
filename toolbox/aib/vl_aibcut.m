@@ -27,7 +27,7 @@ function [cut, map, short] = vl_aibcut(parents, n)
 %  unchanged, except if the corresponding node is in the cut (in which
 %  case the map-to-itself rule has the precedence).
 %
-%  See also VL_HELP(), VL_AIB().
+%  See also: VL_HELP(), VL_AIB().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
@@ -41,23 +41,23 @@ function [cut, map, short] = vl_aibcut(parents, n)
 
 if n > 1
   root    = max(parents) ;
-  
+
   % count number of null nodes
   z = sum(parents(1:root) == 0) ;
-  
+
   % determine number of leves
   nleaves = (root - z + 1) / 2 ;
-  
+
   % find first node of the cut
   mu   = root - min(n, nleaves) + 1 ;
-    
+
   % correction for presence of null nodes
   nz   = find(parents(1:mu) > 0) ;
   mu   = nz(end) ;
-  
+
   % find node belnoging to the cut
   cut  = find(parents(1:mu) > mu) ;
-  
+
   % In the presence of null nodes, the cut size might exceed
   % nleaves, which is the maximum cut size we can obtain with the
   % specified tree. The additional nodes have to be picked up from
@@ -67,10 +67,10 @@ if n > 1
     sel_z = find(parents == 0) ;
     cut = [sel_z(1:n-length(cut)) cut] ;
   end
-  
+
   % aesthetic reasons only
   cut = sort(cut) ;
-  
+
 else
   mu   = max(parents) ;
   cut  = mu ;
@@ -99,5 +99,5 @@ short(setdiff(find(parents == 0), cut)) = 0 ;
 map             = 1:numel(parents) ;
 map(cut)        = 1:n ;
 map(short >  0) = map(short(short > 0)) ;
-map(short == 0) = 0 ; 
+map(short == 0) = 0 ;
 map(mu+1:end)   = 0 ;

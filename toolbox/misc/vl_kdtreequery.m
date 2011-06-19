@@ -28,11 +28,11 @@
 %     Sets the number of neighbors to compute for each query point (by
 %     default 1).
 %
-%   MaxNumComparisons:
+%   MaxNumComparisons::
 %     Sets the maximum number of comparisons per query point. The
 %     special value 0 means unbounded. The default is 0.
 %
-%   See also:: VL_KDTREEBUILD()
+%   See also: VL_KDTREEBUILD(), VL_HELP().
 
 % AUTORIGHTS
 % Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson

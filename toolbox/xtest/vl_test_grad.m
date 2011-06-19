@@ -19,4 +19,4 @@ Iy = diff(s.I,2,1) ;
 vl_assert_equal(gradient(s.I_small), vl_grad(s.I_small)) ;
 
 
- 
+

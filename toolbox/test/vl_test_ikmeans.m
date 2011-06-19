@@ -40,7 +40,7 @@ for k=1:K
   sel  = find(A  == k) ;
   selt = find(AT == k) ;
   vl_plotframe(data(:,sel),  '.','Color',cl(mod(k,ncl)+1,:)) ;
-  vl_plotframe(datat(:,selt),'+','Color',cl(mod(k,ncl)+1,:)) ;  
+  vl_plotframe(datat(:,selt),'+','Color',cl(mod(k,ncl)+1,:)) ;
 end
 plot(C(1,:),C(2,:),'ko','markersize',10','linewidth',6) ;
 plot(C(1,:),C(2,:),'yo','markersize',10','linewidth',1) ;

@@ -1,5 +1,5 @@
 K = 2 ;
-N = 5 ; 
+N = 5 ;
 
 
 next = zeros(1,K,'uint32') ;
