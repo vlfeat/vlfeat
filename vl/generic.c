@@ -723,7 +723,7 @@ VL_EXPORT VlThreadSpecificState *
 vl_thread_specific_state_new ()
 {
   VlThreadSpecificState * self ;
-#ifdef DEBUG
+#if defined(DEBUG)
   printf("VLFeat thread constructor called\n") ;
 #endif
   self = malloc(sizeof(VlThreadSpecificState)) ;
@@ -743,7 +743,7 @@ vl_thread_specific_state_new ()
 VL_EXPORT void
 vl_thread_specific_state_delete (VlThreadSpecificState * self)
 {
-#ifdef DEBUG
+#if defined(DEBUG)
   printf("VLFeat thread destructor called\n") ;
 #endif
   free (self) ;
@@ -802,7 +802,7 @@ static void
 vl_constructor ()
 {
   VlState * state ;
-#ifndef DEBUG
+#if defined(DEBUG)
   printf("VLFeat constructor called\n") ;
 #endif
 
@@ -856,7 +856,7 @@ static void
 vl_destructor ()
 {
   VlState * state ;
-#ifndef DEBUG
+#if defined(DEBUG)
   printf("VLFeat destructor called\n") ;
 #endif
 
