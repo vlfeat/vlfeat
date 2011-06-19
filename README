@@ -112,6 +112,8 @@ APPENDIX
 
 CHANGES
 
+  0.9.11     Fixes a compatibility problem on older Mac OS X versions.
+             A few bugfixes are included too.
   0.9.10     Improves the homogeneous kernel map. Plenty of small tweaks
              and improvements. Make maci64 the default architecture on
              the Mac.
