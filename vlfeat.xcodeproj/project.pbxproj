@@ -31,6 +31,184 @@
 		2D6102D4111EE22C00470F4C /* matlab.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = matlab.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2D6102D5111EE22C00470F4C /* octave.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = octave.mak; sourceTree = "<group>"; tabWidth = 8; };
 		2D624AD60FF9306700DB3122 /* test_heap-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_heap-def.c"; sourceTree = "<group>"; };
+		2D66AC5D13AE05BD0060594E /* vl_aib.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_aib.m; path = toolbox/aib/vl_aib.m; sourceTree = "<group>"; };
+		2D66AC5E13AE05BD0060594E /* vl_aibcut.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_aibcut.m; path = toolbox/aib/vl_aibcut.m; sourceTree = "<group>"; };
+		2D66AC5F13AE05BD0060594E /* vl_aibcuthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_aibcuthist.m; path = toolbox/aib/vl_aibcuthist.m; sourceTree = "<group>"; };
+		2D66AC6013AE05BD0060594E /* vl_aibcutpush.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_aibcutpush.m; path = toolbox/aib/vl_aibcutpush.m; sourceTree = "<group>"; };
+		2D66AC6113AE05BD0060594E /* vl_aibhist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_aibhist.m; path = toolbox/aib/vl_aibhist.m; sourceTree = "<group>"; };
+		2D66AC6213AE05BD0060594E /* vl_alldist2.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_alldist2.m; path = toolbox/misc/vl_alldist2.m; sourceTree = "<group>"; };
+		2D66AC6313AE05BD0060594E /* vl_argparse.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_argparse.m; path = toolbox/misc/vl_argparse.m; sourceTree = "<group>"; };
+		2D66AC6413AE05BD0060594E /* vl_assert_almost_equal.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_assert_almost_equal.m; path = toolbox/xtest/vl_assert_almost_equal.m; sourceTree = "<group>"; };
+		2D66AC6513AE05BD0060594E /* vl_assert_equal.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_assert_equal.m; path = toolbox/xtest/vl_assert_equal.m; sourceTree = "<group>"; };
+		2D66AC6613AE05BD0060594E /* vl_assert_exception.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_assert_exception.m; path = toolbox/xtest/vl_assert_exception.m; sourceTree = "<group>"; };
+		2D66AC6713AE05BD0060594E /* vl_binsearch.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_binsearch.m; path = toolbox/misc/vl_binsearch.m; sourceTree = "<group>"; };
+		2D66AC6813AE05BD0060594E /* vl_binsum.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_binsum.m; path = toolbox/misc/vl_binsum.m; sourceTree = "<group>"; };
+		2D66AC6913AE05BD0060594E /* vl_cf.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_cf.m; path = toolbox/plotop/vl_cf.m; sourceTree = "<group>"; };
+		2D66AC6A13AE05BD0060594E /* vl_click.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_click.m; path = toolbox/plotop/vl_click.m; sourceTree = "<group>"; };
+		2D66AC6B13AE05BD0060594E /* vl_clickpoint.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_clickpoint.m; path = toolbox/plotop/vl_clickpoint.m; sourceTree = "<group>"; };
+		2D66AC6C13AE05BD0060594E /* vl_clicksegment.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_clicksegment.m; path = toolbox/plotop/vl_clicksegment.m; sourceTree = "<group>"; };
+		2D66AC6D13AE05BD0060594E /* vl_colsubset.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_colsubset.m; path = toolbox/misc/vl_colsubset.m; sourceTree = "<group>"; };
+		2D66AC6E13AE05BD0060594E /* vl_compile.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_compile.m; path = toolbox/vl_compile.m; sourceTree = "<group>"; };
+		2D66AC6F13AE05BD0060594E /* vl_ddgaussian.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ddgaussian.m; path = toolbox/special/vl_ddgaussian.m; sourceTree = "<group>"; };
+		2D66AC7013AE05BD0060594E /* vl_demo_aib.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_aib.m; path = toolbox/demo/vl_demo_aib.m; sourceTree = "<group>"; };
+		2D66AC7113AE05BD0060594E /* vl_demo_alldist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_alldist.m; path = toolbox/demo/vl_demo_alldist.m; sourceTree = "<group>"; };
+		2D66AC7213AE05BD0060594E /* vl_demo_cmd.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_cmd.m; path = toolbox/demo/vl_demo_cmd.m; sourceTree = "<group>"; };
+		2D66AC7313AE05BD0060594E /* vl_demo_dsift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_dsift.m; path = toolbox/demo/vl_demo_dsift.m; sourceTree = "<group>"; };
+		2D66AC7413AE05BD0060594E /* vl_demo_imdisttf.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_imdisttf.m; path = toolbox/demo/vl_demo_imdisttf.m; sourceTree = "<group>"; };
+		2D66AC7513AE05BD0060594E /* vl_demo_kdtree_ann.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree_ann.m; path = toolbox/demo/vl_demo_kdtree_ann.m; sourceTree = "<group>"; };
+		2D66AC7613AE05BD0060594E /* vl_demo_kdtree_forest.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree_forest.m; path = toolbox/demo/vl_demo_kdtree_forest.m; sourceTree = "<group>"; };
+		2D66AC7713AE05BD0060594E /* vl_demo_kdtree_plot.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree_plot.m; path = toolbox/demo/vl_demo_kdtree_plot.m; sourceTree = "<group>"; };
+		2D66AC7813AE05BD0060594E /* vl_demo_kdtree_self.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree_self.m; path = toolbox/demo/vl_demo_kdtree_self.m; sourceTree = "<group>"; };
+		2D66AC7913AE05BD0060594E /* vl_demo_kdtree_sift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree_sift.m; path = toolbox/demo/vl_demo_kdtree_sift.m; sourceTree = "<group>"; };
+		2D66AC7A13AE05BD0060594E /* vl_demo_kdtree.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kdtree.m; path = toolbox/demo/vl_demo_kdtree.m; sourceTree = "<group>"; };
+		2D66AC7B13AE05BD0060594E /* vl_demo_kmeans_init.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kmeans_init.m; path = toolbox/demo/vl_demo_kmeans_init.m; sourceTree = "<group>"; };
+		2D66AC7C13AE05BD0060594E /* vl_demo_kmeans_vs_builtin.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_kmeans_vs_builtin.m; path = toolbox/demo/vl_demo_kmeans_vs_builtin.m; sourceTree = "<group>"; };
+		2D66AC7D13AE05BD0060594E /* vl_demo_mser_basic.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_mser_basic.m; path = toolbox/demo/vl_demo_mser_basic.m; sourceTree = "<group>"; };
+		2D66AC7E13AE05BD0060594E /* vl_demo_mser_cmd.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_mser_cmd.m; path = toolbox/demo/vl_demo_mser_cmd.m; sourceTree = "<group>"; };
+		2D66AC7F13AE05BD0060594E /* vl_demo_mser_delta.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_mser_delta.m; path = toolbox/demo/vl_demo_mser_delta.m; sourceTree = "<group>"; };
+		2D66AC8013AE05BD0060594E /* vl_demo_print.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_print.m; path = toolbox/demo/vl_demo_print.m; sourceTree = "<group>"; };
+		2D66AC8113AE05BD0060594E /* vl_demo_quickshift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_quickshift.m; path = toolbox/demo/vl_demo_quickshift.m; sourceTree = "<group>"; };
+		2D66AC8213AE05BD0060594E /* vl_demo_sift_basic.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_basic.m; path = toolbox/demo/vl_demo_sift_basic.m; sourceTree = "<group>"; };
+		2D66AC8313AE05BD0060594E /* vl_demo_sift_cmd.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_cmd.m; path = toolbox/demo/vl_demo_sift_cmd.m; sourceTree = "<group>"; };
+		2D66AC8413AE05BD0060594E /* vl_demo_sift_edge.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_edge.m; path = toolbox/demo/vl_demo_sift_edge.m; sourceTree = "<group>"; };
+		2D66AC8513AE05BD0060594E /* vl_demo_sift_match.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_match.m; path = toolbox/demo/vl_demo_sift_match.m; sourceTree = "<group>"; };
+		2D66AC8613AE05BD0060594E /* vl_demo_sift_or.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_or.m; path = toolbox/demo/vl_demo_sift_or.m; sourceTree = "<group>"; };
+		2D66AC8713AE05BD0060594E /* vl_demo_sift_peak.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_peak.m; path = toolbox/demo/vl_demo_sift_peak.m; sourceTree = "<group>"; };
+		2D66AC8813AE05BD0060594E /* vl_demo_sift_vs_ubc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo_sift_vs_ubc.m; path = toolbox/demo/vl_demo_sift_vs_ubc.m; sourceTree = "<group>"; };
+		2D66AC8913AE05BD0060594E /* vl_demo.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_demo.m; path = toolbox/vl_demo.m; sourceTree = "<group>"; };
+		2D66AC8A13AE05BD0060594E /* vl_dgaussian.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_dgaussian.m; path = toolbox/special/vl_dgaussian.m; sourceTree = "<group>"; };
+		2D66AC8B13AE05BD0060594E /* vl_dsift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_dsift.m; path = toolbox/sift/vl_dsift.m; sourceTree = "<group>"; };
+		2D66AC8C13AE05BD0060594E /* vl_dsigmoid.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_dsigmoid.m; path = toolbox/special/vl_dsigmoid.m; sourceTree = "<group>"; };
+		2D66AC8D13AE05BD0060594E /* vl_dwaffine.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_dwaffine.m; path = toolbox/imop/vl_dwaffine.m; sourceTree = "<group>"; };
+		2D66AC8E13AE05BD0060594E /* vl_erfill.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_erfill.m; path = toolbox/mser/vl_erfill.m; sourceTree = "<group>"; };
+		2D66AC8F13AE05BD0060594E /* vl_ertr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ertr.m; path = toolbox/mser/vl_ertr.m; sourceTree = "<group>"; };
+		2D66AC9013AE05BD0060594E /* vl_figaspect.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_figaspect.m; path = toolbox/plotop/vl_figaspect.m; sourceTree = "<group>"; };
+		2D66AC9113AE05BD0060594E /* vl_flatmap.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_flatmap.m; path = toolbox/quickshift/vl_flatmap.m; sourceTree = "<group>"; };
+		2D66AC9213AE05BD0060594E /* vl_gaussian.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_gaussian.m; path = toolbox/special/vl_gaussian.m; sourceTree = "<group>"; };
+		2D66AC9313AE05BD0060594E /* vl_getpid.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_getpid.m; path = toolbox/misc/vl_getpid.m; sourceTree = "<group>"; };
+		2D66AC9413AE05BD0060594E /* vl_grad.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_grad.m; path = toolbox/misc/vl_grad.m; sourceTree = "<group>"; };
+		2D66AC9513AE05BD0060594E /* vl_harris.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_harris.m; path = toolbox/vl_harris.m; sourceTree = "<group>"; };
+		2D66AC9613AE05BD0060594E /* vl_hat.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hat.m; path = toolbox/geometry/vl_hat.m; sourceTree = "<group>"; };
+		2D66AC9713AE05BD0060594E /* vl_help.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_help.m; path = toolbox/vl_help.m; sourceTree = "<group>"; };
+		2D66AC9813AE05BD0060594E /* vl_hikmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hikmeans.m; path = toolbox/kmeans/vl_hikmeans.m; sourceTree = "<group>"; };
+		2D66AC9913AE05BD0060594E /* vl_hikmeanshist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hikmeanshist.m; path = toolbox/kmeans/vl_hikmeanshist.m; sourceTree = "<group>"; };
+		2D66AC9A13AE05BD0060594E /* vl_hikmeanspush.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hikmeanspush.m; path = toolbox/kmeans/vl_hikmeanspush.m; sourceTree = "<group>"; };
+		2D66AC9B13AE05BD0060594E /* vl_histmarg.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_histmarg.m; path = toolbox/misc/vl_histmarg.m; sourceTree = "<group>"; };
+		2D66AC9C13AE05BD0060594E /* vl_homkermap.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_homkermap.m; path = toolbox/misc/vl_homkermap.m; sourceTree = "<group>"; };
+		2D66AC9D13AE05BD0060594E /* vl_ihashfind.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ihashfind.m; path = toolbox/misc/vl_ihashfind.m; sourceTree = "<group>"; };
+		2D66AC9E13AE05BD0060594E /* vl_ihashsum.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ihashsum.m; path = toolbox/misc/vl_ihashsum.m; sourceTree = "<group>"; };
+		2D66AC9F13AE05BD0060594E /* vl_ihat.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ihat.m; path = toolbox/geometry/vl_ihat.m; sourceTree = "<group>"; };
+		2D66ACA013AE05BD0060594E /* vl_ikmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ikmeans.m; path = toolbox/kmeans/vl_ikmeans.m; sourceTree = "<group>"; };
+		2D66ACA113AE05BD0060594E /* vl_ikmeanshist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ikmeanshist.m; path = toolbox/kmeans/vl_ikmeanshist.m; sourceTree = "<group>"; };
+		2D66ACA213AE05BD0060594E /* vl_ikmeanspush.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ikmeanspush.m; path = toolbox/kmeans/vl_ikmeanspush.m; sourceTree = "<group>"; };
+		2D66ACA313AE05BD0060594E /* vl_imarray.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imarray.m; path = toolbox/imop/vl_imarray.m; sourceTree = "<group>"; };
+		2D66ACA413AE05BD0060594E /* vl_imarraysc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imarraysc.m; path = toolbox/imop/vl_imarraysc.m; sourceTree = "<group>"; };
+		2D66ACA513AE05BD0060594E /* vl_imdisttf.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imdisttf.m; path = toolbox/imop/vl_imdisttf.m; sourceTree = "<group>"; };
+		2D66ACA613AE05BD0060594E /* vl_imdown.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imdown.m; path = toolbox/imop/vl_imdown.m; sourceTree = "<group>"; };
+		2D66ACA713AE05BD0060594E /* vl_imgrad.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imgrad.m; path = toolbox/imop/vl_imgrad.m; sourceTree = "<group>"; };
+		2D66ACA813AE05BD0060594E /* vl_imintegral.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imintegral.m; path = toolbox/imop/vl_imintegral.m; sourceTree = "<group>"; };
+		2D66ACA913AE05BD0060594E /* vl_imreadgray.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imreadgray.m; path = toolbox/imop/vl_imreadgray.m; sourceTree = "<group>"; };
+		2D66ACAA13AE05BD0060594E /* vl_imsc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imsc.m; path = toolbox/imop/vl_imsc.m; sourceTree = "<group>"; };
+		2D66ACAB13AE05BD0060594E /* vl_imseg.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imseg.m; path = toolbox/quickshift/vl_imseg.m; sourceTree = "<group>"; };
+		2D66ACAC13AE05BD0060594E /* vl_imsmooth.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imsmooth.m; path = toolbox/imop/vl_imsmooth.m; sourceTree = "<group>"; };
+		2D66ACAD13AE05BD0060594E /* vl_imtest.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imtest.m; path = toolbox/imop/vl_imtest.m; sourceTree = "<group>"; };
+		2D66ACAE13AE05BD0060594E /* vl_imup.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imup.m; path = toolbox/imop/vl_imup.m; sourceTree = "<group>"; };
+		2D66ACAF13AE05BD0060594E /* vl_imwbackward.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imwbackward.m; path = toolbox/imop/vl_imwbackward.m; sourceTree = "<group>"; };
+		2D66ACB013AE05BD0060594E /* vl_imwhiten.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_imwhiten.m; path = toolbox/imop/vl_imwhiten.m; sourceTree = "<group>"; };
+		2D66ACB113AE05BD0060594E /* vl_inthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_inthist.m; path = toolbox/misc/vl_inthist.m; sourceTree = "<group>"; };
+		2D66ACB213AE05BD0060594E /* vl_irodr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_irodr.m; path = toolbox/geometry/vl_irodr.m; sourceTree = "<group>"; };
+		2D66ACB313AE05BD0060594E /* vl_kdtreebuild.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_kdtreebuild.m; path = toolbox/misc/vl_kdtreebuild.m; sourceTree = "<group>"; };
+		2D66ACB413AE05BD0060594E /* vl_kdtreequery.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_kdtreequery.m; path = toolbox/misc/vl_kdtreequery.m; sourceTree = "<group>"; };
+		2D66ACB513AE05BD0060594E /* vl_kmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_kmeans.m; path = toolbox/kmeans/vl_kmeans.m; sourceTree = "<group>"; };
+		2D66ACB613AE05BD0060594E /* vl_lbp.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_lbp.m; path = toolbox/misc/vl_lbp.m; sourceTree = "<group>"; };
+		2D66ACB713AE05BD0060594E /* vl_lbpfliplr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_lbpfliplr.m; path = toolbox/misc/vl_lbpfliplr.m; sourceTree = "<group>"; };
+		2D66ACB813AE05BD0060594E /* vl_linespec2prop.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_linespec2prop.m; path = toolbox/plotop/vl_linespec2prop.m; sourceTree = "<group>"; };
+		2D66ACB913AE05BD0060594E /* vl_localmax.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_localmax.m; path = toolbox/misc/vl_localmax.m; sourceTree = "<group>"; };
+		2D66ACBA13AE05BD0060594E /* vl_mser.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_mser.m; path = toolbox/mser/vl_mser.m; sourceTree = "<group>"; };
+		2D66ACBB13AE05BD0060594E /* vl_noprefix.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_noprefix.m; path = toolbox/vl_noprefix.m; sourceTree = "<group>"; };
+		2D66ACBC13AE05BD0060594E /* vl_numder.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_numder.m; path = toolbox/misc/vl_numder.m; sourceTree = "<group>"; };
+		2D66ACBD13AE05BD0060594E /* vl_numder2.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_numder2.m; path = toolbox/misc/vl_numder2.m; sourceTree = "<group>"; };
+		2D66ACBE13AE05BD0060594E /* vl_override.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_override.m; path = toolbox/misc/vl_override.m; sourceTree = "<group>"; };
+		2D66ACBF13AE05BD0060594E /* vl_pegasos.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_pegasos.m; path = toolbox/misc/vl_pegasos.m; sourceTree = "<group>"; };
+		2D66ACC013AE05BD0060594E /* vl_phow.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_phow.m; path = toolbox/sift/vl_phow.m; sourceTree = "<group>"; };
+		2D66ACC113AE05BD0060594E /* vl_plotframe.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_plotframe.m; path = toolbox/plotop/vl_plotframe.m; sourceTree = "<group>"; };
+		2D66ACC213AE05BD0060594E /* vl_plotgrid.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_plotgrid.m; path = toolbox/plotop/vl_plotgrid.m; sourceTree = "<group>"; };
+		2D66ACC313AE05BD0060594E /* vl_plotpoint.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_plotpoint.m; path = toolbox/plotop/vl_plotpoint.m; sourceTree = "<group>"; };
+		2D66ACC413AE05BD0060594E /* vl_plotsiftdescriptor.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_plotsiftdescriptor.m; path = toolbox/sift/vl_plotsiftdescriptor.m; sourceTree = "<group>"; };
+		2D66ACC513AE05BD0060594E /* vl_pr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_pr.m; path = toolbox/plotop/vl_pr.m; sourceTree = "<group>"; };
+		2D66ACC613AE05BD0060594E /* vl_printsize.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_printsize.m; path = toolbox/plotop/vl_printsize.m; sourceTree = "<group>"; };
+		2D66ACC713AE05BD0060594E /* vl_quickseg.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_quickseg.m; path = toolbox/quickshift/vl_quickseg.m; sourceTree = "<group>"; };
+		2D66ACC813AE05BD0060594E /* vl_quickshift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_quickshift.m; path = toolbox/quickshift/vl_quickshift.m; sourceTree = "<group>"; };
+		2D66ACC913AE05BD0060594E /* vl_quickvis.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_quickvis.m; path = toolbox/quickshift/vl_quickvis.m; sourceTree = "<group>"; };
+		2D66ACCA13AE05BD0060594E /* vl_rcos.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_rcos.m; path = toolbox/special/vl_rcos.m; sourceTree = "<group>"; };
+		2D66ACCB13AE05BD0060594E /* vl_rgb2xyz.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_rgb2xyz.m; path = toolbox/imop/vl_rgb2xyz.m; sourceTree = "<group>"; };
+		2D66ACCC13AE05BD0060594E /* vl_roc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_roc.m; path = toolbox/plotop/vl_roc.m; sourceTree = "<group>"; };
+		2D66ACCD13AE05BD0060594E /* vl_rodr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_rodr.m; path = toolbox/geometry/vl_rodr.m; sourceTree = "<group>"; };
+		2D66ACCE13AE05BD0060594E /* vl_root.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_root.m; path = toolbox/vl_root.m; sourceTree = "<group>"; };
+		2D66ACCF13AE05BD0060594E /* vl_samplinthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_samplinthist.m; path = toolbox/misc/vl_samplinthist.m; sourceTree = "<group>"; };
+		2D66ACD013AE05BD0060594E /* vl_setup.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_setup.m; path = toolbox/vl_setup.m; sourceTree = "<group>"; };
+		2D66ACD113AE05BD0060594E /* vl_sift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_sift.m; path = toolbox/sift/vl_sift.m; sourceTree = "<group>"; };
+		2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_siftdescriptor.m; path = toolbox/sift/vl_siftdescriptor.m; sourceTree = "<group>"; };
+		2D66ACD313AE05BD0060594E /* vl_sigmoid.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_sigmoid.m; path = toolbox/special/vl_sigmoid.m; sourceTree = "<group>"; };
+		2D66ACD413AE05BD0060594E /* vl_simdctrl.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_simdctrl.m; path = toolbox/misc/vl_simdctrl.m; sourceTree = "<group>"; };
+		2D66ACD513AE05BD0060594E /* vl_test_aibhist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_aibhist.m; path = toolbox/test/vl_test_aibhist.m; sourceTree = "<group>"; };
+		2D66ACD613AE05BD0060594E /* vl_test_alldist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_alldist.m; path = toolbox/xtest/vl_test_alldist.m; sourceTree = "<group>"; };
+		2D66ACD713AE05BD0060594E /* vl_test_alldist2_sparse.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_alldist2_sparse.m; path = toolbox/test/vl_test_alldist2_sparse.m; sourceTree = "<group>"; };
+		2D66ACD813AE05BD0060594E /* vl_test_alldist2.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_alldist2.m; path = toolbox/test/vl_test_alldist2.m; sourceTree = "<group>"; };
+		2D66ACD913AE05BD0060594E /* vl_test_argparse.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_argparse.m; path = toolbox/xtest/vl_test_argparse.m; sourceTree = "<group>"; };
+		2D66ACDA13AE05BD0060594E /* vl_test_assert.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_assert.m; path = toolbox/test/vl_test_assert.m; sourceTree = "<group>"; };
+		2D66ACDB13AE05BD0060594E /* vl_test_binsearch.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_binsearch.m; path = toolbox/xtest/vl_test_binsearch.m; sourceTree = "<group>"; };
+		2D66ACDC13AE05BD0060594E /* vl_test_binsum.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_binsum.m; path = toolbox/test/vl_test_binsum.m; sourceTree = "<group>"; };
+		2D66ACDD13AE05BD0060594E /* vl_test_binsum.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_binsum.m; path = toolbox/xtest/vl_test_binsum.m; sourceTree = "<group>"; };
+		2D66ACDE13AE05BD0060594E /* vl_test_dhog_inter.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_dhog_inter.m; path = toolbox/test/vl_test_dhog_inter.m; sourceTree = "<group>"; };
+		2D66ACDF13AE05BD0060594E /* vl_test_dhog.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_dhog.m; path = toolbox/test/vl_test_dhog.m; sourceTree = "<group>"; };
+		2D66ACE013AE05BD0060594E /* vl_test_dsift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_dsift.m; path = toolbox/xtest/vl_test_dsift.m; sourceTree = "<group>"; };
+		2D66ACE113AE05BD0060594E /* vl_test_grad.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_grad.m; path = toolbox/xtest/vl_test_grad.m; sourceTree = "<group>"; };
+		2D66ACE213AE05BD0060594E /* vl_test_hikmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_hikmeans.m; path = toolbox/test/vl_test_hikmeans.m; sourceTree = "<group>"; };
+		2D66ACE313AE05BD0060594E /* vl_test_homkermap.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_homkermap.m; path = toolbox/xtest/vl_test_homkermap.m; sourceTree = "<group>"; };
+		2D66ACE413AE05BD0060594E /* vl_test_homkmap.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_homkmap.m; path = toolbox/test/vl_test_homkmap.m; sourceTree = "<group>"; };
+		2D66ACE513AE05BD0060594E /* vl_test_ihashsum.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_ihashsum.m; path = toolbox/test/vl_test_ihashsum.m; sourceTree = "<group>"; };
+		2D66ACE613AE05BD0060594E /* vl_test_ikmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_ikmeans.m; path = toolbox/test/vl_test_ikmeans.m; sourceTree = "<group>"; };
+		2D66ACE713AE05BD0060594E /* vl_test_imarray.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imarray.m; path = toolbox/xtest/vl_test_imarray.m; sourceTree = "<group>"; };
+		2D66ACE813AE05BD0060594E /* vl_test_imdisttf.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imdisttf.m; path = toolbox/xtest/vl_test_imdisttf.m; sourceTree = "<group>"; };
+		2D66ACE913AE05BD0060594E /* vl_test_imintegral.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imintegral.m; path = toolbox/test/vl_test_imintegral.m; sourceTree = "<group>"; };
+		2D66ACEA13AE05BD0060594E /* vl_test_imintegral.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imintegral.m; path = toolbox/xtest/vl_test_imintegral.m; sourceTree = "<group>"; };
+		2D66ACEB13AE05BD0060594E /* vl_test_imsmooth.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imsmooth.m; path = toolbox/test/vl_test_imsmooth.m; sourceTree = "<group>"; };
+		2D66ACEC13AE05BD0060594E /* vl_test_imsmooth.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imsmooth.m; path = toolbox/xtest/vl_test_imsmooth.m; sourceTree = "<group>"; };
+		2D66ACED13AE05BD0060594E /* vl_test_imwbackward.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imwbackward.m; path = toolbox/xtest/vl_test_imwbackward.m; sourceTree = "<group>"; };
+		2D66ACEE13AE05BD0060594E /* vl_test_imwbackwardmx.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_imwbackwardmx.m; path = toolbox/test/vl_test_imwbackwardmx.m; sourceTree = "<group>"; };
+		2D66ACEF13AE05BD0060594E /* vl_test_init.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_init.m; path = toolbox/xtest/vl_test_init.m; sourceTree = "<group>"; };
+		2D66ACF013AE05BD0060594E /* vl_test_inthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_inthist.m; path = toolbox/test/vl_test_inthist.m; sourceTree = "<group>"; };
+		2D66ACF113AE05BD0060594E /* vl_test_kdtree.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_kdtree.m; path = toolbox/xtest/vl_test_kdtree.m; sourceTree = "<group>"; };
+		2D66ACF213AE05BD0060594E /* vl_test_kmeans.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_kmeans.m; path = toolbox/xtest/vl_test_kmeans.m; sourceTree = "<group>"; };
+		2D66ACF313AE05BD0060594E /* vl_test_lbp.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_lbp.m; path = toolbox/xtest/vl_test_lbp.m; sourceTree = "<group>"; };
+		2D66ACF413AE05BD0060594E /* vl_test_mser.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_mser.m; path = toolbox/test/vl_test_mser.m; sourceTree = "<group>"; };
+		2D66ACF513AE05BD0060594E /* vl_test_pattern.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_pattern.m; path = toolbox/test/vl_test_pattern.m; sourceTree = "<group>"; };
+		2D66ACF613AE05BD0060594E /* vl_test_pegasos.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_pegasos.m; path = toolbox/xtest/vl_test_pegasos.m; sourceTree = "<group>"; };
+		2D66ACF713AE05BD0060594E /* vl_test_phow.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_phow.m; path = toolbox/xtest/vl_test_phow.m; sourceTree = "<group>"; };
+		2D66ACF813AE05BD0060594E /* vl_test_sift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_sift.m; path = toolbox/test/vl_test_sift.m; sourceTree = "<group>"; };
+		2D66ACF913AE05BD0060594E /* vl_test_sift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_sift.m; path = toolbox/xtest/vl_test_sift.m; sourceTree = "<group>"; };
+		2D66ACFA13AE05BD0060594E /* vl_test_twister.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_twister.m; path = toolbox/test/vl_test_twister.m; sourceTree = "<group>"; };
+		2D66ACFB13AE05BD0060594E /* vl_test_twister.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_twister.m; path = toolbox/xtest/vl_test_twister.m; sourceTree = "<group>"; };
+		2D66ACFC13AE05BD0060594E /* vl_test_whistc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test_whistc.m; path = toolbox/xtest/vl_test_whistc.m; sourceTree = "<group>"; };
+		2D66ACFD13AE05BD0060594E /* vl_test.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_test.m; path = toolbox/xtest/vl_test.m; sourceTree = "<group>"; };
+		2D66ACFE13AE05BD0060594E /* vl_tightsubplot.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_tightsubplot.m; path = toolbox/plotop/vl_tightsubplot.m; sourceTree = "<group>"; };
+		2D66ACFF13AE05BD0060594E /* vl_tps.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_tps.m; path = toolbox/imop/vl_tps.m; sourceTree = "<group>"; };
+		2D66AD0013AE05BD0060594E /* vl_tpsu.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_tpsu.m; path = toolbox/imop/vl_tpsu.m; sourceTree = "<group>"; };
+		2D66AD0113AE05BD0060594E /* vl_tune_homkermap_auto.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_tune_homkermap_auto.m; path = toolbox/xtune/vl_tune_homkermap_auto.m; sourceTree = "<group>"; };
+		2D66AD0213AE05BD0060594E /* vl_tune_homkermap.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_tune_homkermap.m; path = toolbox/xtune/vl_tune_homkermap.m; sourceTree = "<group>"; };
+		2D66AD0313AE05BD0060594E /* vl_twister.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_twister.m; path = toolbox/misc/vl_twister.m; sourceTree = "<group>"; };
+		2D66AD0413AE05BD0060594E /* vl_ubcmatch.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ubcmatch.m; path = toolbox/sift/vl_ubcmatch.m; sourceTree = "<group>"; };
+		2D66AD0513AE05BD0060594E /* vl_ubcread.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_ubcread.m; path = toolbox/sift/vl_ubcread.m; sourceTree = "<group>"; };
+		2D66AD0613AE05BD0060594E /* vl_version.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_version.m; path = toolbox/misc/vl_version.m; sourceTree = "<group>"; };
+		2D66AD0713AE05BD0060594E /* vl_waffine.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_waffine.m; path = toolbox/imop/vl_waffine.m; sourceTree = "<group>"; };
+		2D66AD0813AE05BD0060594E /* vl_whistc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_whistc.m; path = toolbox/misc/vl_whistc.m; sourceTree = "<group>"; };
+		2D66AD0913AE05BD0060594E /* vl_witps.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_witps.m; path = toolbox/imop/vl_witps.m; sourceTree = "<group>"; };
+		2D66AD0A13AE05BD0060594E /* vl_wtps.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_wtps.m; path = toolbox/imop/vl_wtps.m; sourceTree = "<group>"; };
+		2D66AD0B13AE05BD0060594E /* vl_xmkdir.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xmkdir.m; path = toolbox/misc/vl_xmkdir.m; sourceTree = "<group>"; };
+		2D66AD0C13AE05BD0060594E /* vl_xyz2lab.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2lab.m; path = toolbox/imop/vl_xyz2lab.m; sourceTree = "<group>"; };
+		2D66AD0D13AE05BD0060594E /* vl_xyz2luv.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2luv.m; path = toolbox/imop/vl_xyz2luv.m; sourceTree = "<group>"; };
+		2D66AD0E13AE05BD0060594E /* vl_xyz2rgb.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2rgb.m; path = toolbox/imop/vl_xyz2rgb.m; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; tabWidth = 2; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
@@ -178,6 +356,7 @@
 				2D6102CF111EE22C00470F4C /* make */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
+				2D66AAAE13AE03B20060594E /* toolbox-mfiles */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D7AD0870E38C15700783252 /* doc */,
 			);
@@ -185,6 +364,90 @@
 			name = vlfeat;
 			sourceTree = "<group>";
 			tabWidth = 2;
+		};
+		2D09A29813AE081700C79C6A /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				2D66AC7013AE05BD0060594E /* vl_demo_aib.m */,
+				2D66AC7113AE05BD0060594E /* vl_demo_alldist.m */,
+				2D66AC7213AE05BD0060594E /* vl_demo_cmd.m */,
+				2D66AC7313AE05BD0060594E /* vl_demo_dsift.m */,
+				2D66AC7413AE05BD0060594E /* vl_demo_imdisttf.m */,
+				2D66AC7513AE05BD0060594E /* vl_demo_kdtree_ann.m */,
+				2D66AC7613AE05BD0060594E /* vl_demo_kdtree_forest.m */,
+				2D66AC7713AE05BD0060594E /* vl_demo_kdtree_plot.m */,
+				2D66AC7813AE05BD0060594E /* vl_demo_kdtree_self.m */,
+				2D66AC7913AE05BD0060594E /* vl_demo_kdtree_sift.m */,
+				2D66AC7A13AE05BD0060594E /* vl_demo_kdtree.m */,
+				2D66AC7B13AE05BD0060594E /* vl_demo_kmeans_init.m */,
+				2D66AC7C13AE05BD0060594E /* vl_demo_kmeans_vs_builtin.m */,
+				2D66AC7D13AE05BD0060594E /* vl_demo_mser_basic.m */,
+				2D66AC7E13AE05BD0060594E /* vl_demo_mser_cmd.m */,
+				2D66AC7F13AE05BD0060594E /* vl_demo_mser_delta.m */,
+				2D66AC8013AE05BD0060594E /* vl_demo_print.m */,
+				2D66AC8113AE05BD0060594E /* vl_demo_quickshift.m */,
+				2D66AC8213AE05BD0060594E /* vl_demo_sift_basic.m */,
+				2D66AC8313AE05BD0060594E /* vl_demo_sift_cmd.m */,
+				2D66AC8413AE05BD0060594E /* vl_demo_sift_edge.m */,
+				2D66AC8513AE05BD0060594E /* vl_demo_sift_match.m */,
+				2D66AC8613AE05BD0060594E /* vl_demo_sift_or.m */,
+				2D66AC8713AE05BD0060594E /* vl_demo_sift_peak.m */,
+				2D66AC8813AE05BD0060594E /* vl_demo_sift_vs_ubc.m */,
+				2D66AC8913AE05BD0060594E /* vl_demo.m */,
+			);
+			name = demo;
+			sourceTree = "<group>";
+		};
+		2D09A29913AE084500C79C6A /* test */ = {
+			isa = PBXGroup;
+			children = (
+				2D66AC6413AE05BD0060594E /* vl_assert_almost_equal.m */,
+				2D66AC6513AE05BD0060594E /* vl_assert_equal.m */,
+				2D66AC6613AE05BD0060594E /* vl_assert_exception.m */,
+				2D66ACD513AE05BD0060594E /* vl_test_aibhist.m */,
+				2D66ACD613AE05BD0060594E /* vl_test_alldist.m */,
+				2D66ACD713AE05BD0060594E /* vl_test_alldist2_sparse.m */,
+				2D66ACD813AE05BD0060594E /* vl_test_alldist2.m */,
+				2D66ACD913AE05BD0060594E /* vl_test_argparse.m */,
+				2D66ACDA13AE05BD0060594E /* vl_test_assert.m */,
+				2D66ACDB13AE05BD0060594E /* vl_test_binsearch.m */,
+				2D66ACDC13AE05BD0060594E /* vl_test_binsum.m */,
+				2D66ACDD13AE05BD0060594E /* vl_test_binsum.m */,
+				2D66ACDE13AE05BD0060594E /* vl_test_dhog_inter.m */,
+				2D66ACDF13AE05BD0060594E /* vl_test_dhog.m */,
+				2D66ACE013AE05BD0060594E /* vl_test_dsift.m */,
+				2D66ACE113AE05BD0060594E /* vl_test_grad.m */,
+				2D66ACE213AE05BD0060594E /* vl_test_hikmeans.m */,
+				2D66ACE313AE05BD0060594E /* vl_test_homkermap.m */,
+				2D66ACE413AE05BD0060594E /* vl_test_homkmap.m */,
+				2D66ACE513AE05BD0060594E /* vl_test_ihashsum.m */,
+				2D66ACE613AE05BD0060594E /* vl_test_ikmeans.m */,
+				2D66ACE713AE05BD0060594E /* vl_test_imarray.m */,
+				2D66ACE813AE05BD0060594E /* vl_test_imdisttf.m */,
+				2D66ACE913AE05BD0060594E /* vl_test_imintegral.m */,
+				2D66ACEA13AE05BD0060594E /* vl_test_imintegral.m */,
+				2D66ACEB13AE05BD0060594E /* vl_test_imsmooth.m */,
+				2D66ACEC13AE05BD0060594E /* vl_test_imsmooth.m */,
+				2D66ACED13AE05BD0060594E /* vl_test_imwbackward.m */,
+				2D66ACEE13AE05BD0060594E /* vl_test_imwbackwardmx.m */,
+				2D66ACEF13AE05BD0060594E /* vl_test_init.m */,
+				2D66ACF013AE05BD0060594E /* vl_test_inthist.m */,
+				2D66ACF113AE05BD0060594E /* vl_test_kdtree.m */,
+				2D66ACF213AE05BD0060594E /* vl_test_kmeans.m */,
+				2D66ACF313AE05BD0060594E /* vl_test_lbp.m */,
+				2D66ACF413AE05BD0060594E /* vl_test_mser.m */,
+				2D66ACF513AE05BD0060594E /* vl_test_pattern.m */,
+				2D66ACF613AE05BD0060594E /* vl_test_pegasos.m */,
+				2D66ACF713AE05BD0060594E /* vl_test_phow.m */,
+				2D66ACF813AE05BD0060594E /* vl_test_sift.m */,
+				2D66ACF913AE05BD0060594E /* vl_test_sift.m */,
+				2D66ACFA13AE05BD0060594E /* vl_test_twister.m */,
+				2D66ACFB13AE05BD0060594E /* vl_test_twister.m */,
+				2D66ACFC13AE05BD0060594E /* vl_test_whistc.m */,
+				2D66ACFD13AE05BD0060594E /* vl_test.m */,
+			);
+			name = test;
+			sourceTree = "<group>";
 		};
 		2D6102CF111EE22C00470F4C /* make */ = {
 			isa = PBXGroup;
@@ -197,6 +460,122 @@
 				2D6102D5111EE22C00470F4C /* octave.mak */,
 			);
 			path = make;
+			sourceTree = "<group>";
+		};
+		2D66AAAE13AE03B20060594E /* toolbox-mfiles */ = {
+			isa = PBXGroup;
+			children = (
+				2D84088F13AE16E8001BA6AD /* design */,
+				2D09A29913AE084500C79C6A /* test */,
+				2D09A29813AE081700C79C6A /* demo */,
+				2D66AC5D13AE05BD0060594E /* vl_aib.m */,
+				2D66AC5E13AE05BD0060594E /* vl_aibcut.m */,
+				2D66AC5F13AE05BD0060594E /* vl_aibcuthist.m */,
+				2D66AC6013AE05BD0060594E /* vl_aibcutpush.m */,
+				2D66AC6113AE05BD0060594E /* vl_aibhist.m */,
+				2D66AC6213AE05BD0060594E /* vl_alldist2.m */,
+				2D66AC6313AE05BD0060594E /* vl_argparse.m */,
+				2D66AC6713AE05BD0060594E /* vl_binsearch.m */,
+				2D66AC6813AE05BD0060594E /* vl_binsum.m */,
+				2D66AC6913AE05BD0060594E /* vl_cf.m */,
+				2D66AC6A13AE05BD0060594E /* vl_click.m */,
+				2D66AC6B13AE05BD0060594E /* vl_clickpoint.m */,
+				2D66AC6C13AE05BD0060594E /* vl_clicksegment.m */,
+				2D66AC6D13AE05BD0060594E /* vl_colsubset.m */,
+				2D66AC6E13AE05BD0060594E /* vl_compile.m */,
+				2D66AC6F13AE05BD0060594E /* vl_ddgaussian.m */,
+				2D66AC8A13AE05BD0060594E /* vl_dgaussian.m */,
+				2D66AC8B13AE05BD0060594E /* vl_dsift.m */,
+				2D66AC8C13AE05BD0060594E /* vl_dsigmoid.m */,
+				2D66AC8D13AE05BD0060594E /* vl_dwaffine.m */,
+				2D66AC8E13AE05BD0060594E /* vl_erfill.m */,
+				2D66AC8F13AE05BD0060594E /* vl_ertr.m */,
+				2D66AC9013AE05BD0060594E /* vl_figaspect.m */,
+				2D66AC9113AE05BD0060594E /* vl_flatmap.m */,
+				2D66AC9213AE05BD0060594E /* vl_gaussian.m */,
+				2D66AC9313AE05BD0060594E /* vl_getpid.m */,
+				2D66AC9413AE05BD0060594E /* vl_grad.m */,
+				2D66AC9513AE05BD0060594E /* vl_harris.m */,
+				2D66AC9613AE05BD0060594E /* vl_hat.m */,
+				2D66AC9713AE05BD0060594E /* vl_help.m */,
+				2D66AC9813AE05BD0060594E /* vl_hikmeans.m */,
+				2D66AC9913AE05BD0060594E /* vl_hikmeanshist.m */,
+				2D66AC9A13AE05BD0060594E /* vl_hikmeanspush.m */,
+				2D66AC9B13AE05BD0060594E /* vl_histmarg.m */,
+				2D66AC9C13AE05BD0060594E /* vl_homkermap.m */,
+				2D66AC9D13AE05BD0060594E /* vl_ihashfind.m */,
+				2D66AC9E13AE05BD0060594E /* vl_ihashsum.m */,
+				2D66AC9F13AE05BD0060594E /* vl_ihat.m */,
+				2D66ACA013AE05BD0060594E /* vl_ikmeans.m */,
+				2D66ACA113AE05BD0060594E /* vl_ikmeanshist.m */,
+				2D66ACA213AE05BD0060594E /* vl_ikmeanspush.m */,
+				2D66ACA313AE05BD0060594E /* vl_imarray.m */,
+				2D66ACA413AE05BD0060594E /* vl_imarraysc.m */,
+				2D66ACA513AE05BD0060594E /* vl_imdisttf.m */,
+				2D66ACA613AE05BD0060594E /* vl_imdown.m */,
+				2D66ACA713AE05BD0060594E /* vl_imgrad.m */,
+				2D66ACA813AE05BD0060594E /* vl_imintegral.m */,
+				2D66ACA913AE05BD0060594E /* vl_imreadgray.m */,
+				2D66ACAA13AE05BD0060594E /* vl_imsc.m */,
+				2D66ACAB13AE05BD0060594E /* vl_imseg.m */,
+				2D66ACAC13AE05BD0060594E /* vl_imsmooth.m */,
+				2D66ACAD13AE05BD0060594E /* vl_imtest.m */,
+				2D66ACAE13AE05BD0060594E /* vl_imup.m */,
+				2D66ACAF13AE05BD0060594E /* vl_imwbackward.m */,
+				2D66ACB013AE05BD0060594E /* vl_imwhiten.m */,
+				2D66ACB113AE05BD0060594E /* vl_inthist.m */,
+				2D66ACB213AE05BD0060594E /* vl_irodr.m */,
+				2D66ACB313AE05BD0060594E /* vl_kdtreebuild.m */,
+				2D66ACB413AE05BD0060594E /* vl_kdtreequery.m */,
+				2D66ACB513AE05BD0060594E /* vl_kmeans.m */,
+				2D66ACB613AE05BD0060594E /* vl_lbp.m */,
+				2D66ACB713AE05BD0060594E /* vl_lbpfliplr.m */,
+				2D66ACB813AE05BD0060594E /* vl_linespec2prop.m */,
+				2D66ACB913AE05BD0060594E /* vl_localmax.m */,
+				2D66ACBA13AE05BD0060594E /* vl_mser.m */,
+				2D66ACBB13AE05BD0060594E /* vl_noprefix.m */,
+				2D66ACBC13AE05BD0060594E /* vl_numder.m */,
+				2D66ACBD13AE05BD0060594E /* vl_numder2.m */,
+				2D66ACBE13AE05BD0060594E /* vl_override.m */,
+				2D66ACBF13AE05BD0060594E /* vl_pegasos.m */,
+				2D66ACC013AE05BD0060594E /* vl_phow.m */,
+				2D66ACC113AE05BD0060594E /* vl_plotframe.m */,
+				2D66ACC213AE05BD0060594E /* vl_plotgrid.m */,
+				2D66ACC313AE05BD0060594E /* vl_plotpoint.m */,
+				2D66ACC413AE05BD0060594E /* vl_plotsiftdescriptor.m */,
+				2D66ACC513AE05BD0060594E /* vl_pr.m */,
+				2D66ACC613AE05BD0060594E /* vl_printsize.m */,
+				2D66ACC713AE05BD0060594E /* vl_quickseg.m */,
+				2D66ACC813AE05BD0060594E /* vl_quickshift.m */,
+				2D66ACC913AE05BD0060594E /* vl_quickvis.m */,
+				2D66ACCA13AE05BD0060594E /* vl_rcos.m */,
+				2D66ACCB13AE05BD0060594E /* vl_rgb2xyz.m */,
+				2D66ACCC13AE05BD0060594E /* vl_roc.m */,
+				2D66ACCD13AE05BD0060594E /* vl_rodr.m */,
+				2D66ACCE13AE05BD0060594E /* vl_root.m */,
+				2D66ACCF13AE05BD0060594E /* vl_samplinthist.m */,
+				2D66ACD013AE05BD0060594E /* vl_setup.m */,
+				2D66ACD113AE05BD0060594E /* vl_sift.m */,
+				2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */,
+				2D66ACD313AE05BD0060594E /* vl_sigmoid.m */,
+				2D66ACD413AE05BD0060594E /* vl_simdctrl.m */,
+				2D66ACFE13AE05BD0060594E /* vl_tightsubplot.m */,
+				2D66ACFF13AE05BD0060594E /* vl_tps.m */,
+				2D66AD0013AE05BD0060594E /* vl_tpsu.m */,
+				2D66AD0313AE05BD0060594E /* vl_twister.m */,
+				2D66AD0413AE05BD0060594E /* vl_ubcmatch.m */,
+				2D66AD0513AE05BD0060594E /* vl_ubcread.m */,
+				2D66AD0613AE05BD0060594E /* vl_version.m */,
+				2D66AD0713AE05BD0060594E /* vl_waffine.m */,
+				2D66AD0813AE05BD0060594E /* vl_whistc.m */,
+				2D66AD0913AE05BD0060594E /* vl_witps.m */,
+				2D66AD0A13AE05BD0060594E /* vl_wtps.m */,
+				2D66AD0B13AE05BD0060594E /* vl_xmkdir.m */,
+				2D66AD0C13AE05BD0060594E /* vl_xyz2lab.m */,
+				2D66AD0D13AE05BD0060594E /* vl_xyz2luv.m */,
+				2D66AD0E13AE05BD0060594E /* vl_xyz2rgb.m */,
+			);
+			name = "toolbox-mfiles";
 			sourceTree = "<group>";
 		};
 		2D72EA930E4776FE005DAA47 /* html */ = {
@@ -377,6 +756,15 @@
 				2D72EA930E4776FE005DAA47 /* html */,
 			);
 			name = doc;
+			sourceTree = "<group>";
+		};
+		2D84088F13AE16E8001BA6AD /* design */ = {
+			isa = PBXGroup;
+			children = (
+				2D66AD0113AE05BD0060594E /* vl_tune_homkermap_auto.m */,
+				2D66AD0213AE05BD0060594E /* vl_tune_homkermap.m */,
+			);
+			name = design;
 			sourceTree = "<group>";
 		};
 		2DBD0B2110F7AB58004DBA31 /* metaprograms */ = {
