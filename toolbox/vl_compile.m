@@ -1,19 +1,20 @@
 function vl_compile(compiler)
-% VL_COMPILE  Compile MEX files
+% VL_COMPILE  Compile VLFeat MEX files
 %   VL_COMPILE() uses MEX() to compile VLFeat MEX files. This command
-%   works only under Windows and is used to re-build problematic binares.
-%   The preferred method of compiling VLFeat on both UNIX and Windows 
-%   is through the provided Makefiles.
+%   works only under Windows and is used to re-build problematic
+%   binaries. The preferred method of compiling VLFeat on both UNIX
+%   and Windows is through the provided Makefiles.
 %
-%   VL_COMPILE() only compiles the MEX files and assumes that the VLFeat
-%   DLL (i.e. the file bin/win{32,64}/vl.dll) has already been built.
-%   This file is produced by the Makefiles.
+%   VL_COMPILE() only compiles the MEX files and assumes that the
+%   VLFeat DLL (i.e. the file VLFEATROOT/bin/win{32,64}/vl.dll) has
+%   already been built. This file is built by the Makefiles.
 %
-%   By default VL_COMPILE() assumes that Visual C++ is the active MATLAB compier.
-%   VL_COMPILE('lcc') assumes that the acive compiler is LCC instead (see MEX -SETUP).
-%   Unfortunately LCC does not seem to be able to compile the latest
-%   versions of VLFeat due to bugs in the support of 64-bit integers.
-%   Therefore it is reccommended to use Visual C++ instead.
+%   By default VL_COMPILE() assumes that Visual C++ is the active
+%   MATLAB compiler. VL_COMPILE('lcc') assumes that the active
+%   compiler is LCC instead (see MEX -SETUP). Unfortunately LCC does
+%   not seem to be able to compile the latest versions of VLFeat due
+%   to bugs in the support of 64-bit integers. Therefore it is
+%   recommended to use Visual C++ instead.
 %
 %   See also: VL_NOPREFIX(), VL_HELP().
 
