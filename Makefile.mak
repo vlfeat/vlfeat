@@ -19,7 +19,7 @@
 #MSVCRLOC   = C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
 #MATLABROOT = C:\Program Files\MATLAB08a
 
-VER  = 0.9.11
+VER = 0.9.12
 ARCH = win32
 
 VCROOT     = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
