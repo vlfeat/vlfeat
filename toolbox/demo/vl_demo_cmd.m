@@ -10,7 +10,7 @@ switch mexext
  case 'mexmaci64'
   arch = 'maci64';
  case 'mexglx'
-	arch = 'glnx32' ;
+	arch = 'glnx86' ;
  case 'mexa64'
 	arch = 'glnxa64' ;
  case 'dll'

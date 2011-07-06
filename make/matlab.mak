@@ -50,7 +50,7 @@ MEX_SUFFIX := mexmaci64
 endif
 
 # Linux on 32 bit processor
-ifeq ($(ARCH),glnx32)
+ifeq ($(ARCH),glnx86)
 MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
 MEX_SUFFIX := mexglx
 endif

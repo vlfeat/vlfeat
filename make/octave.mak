@@ -47,7 +47,7 @@ ifeq ($(ARCH),maci64)
 endif
 
 # Linux on 32 bit processor
-ifeq ($(ARCH),glnx32)
+ifeq ($(ARCH),glnx86)
 OCTAVE_MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
 endif
 
