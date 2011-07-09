@@ -13,7 +13,7 @@ INSTALLING
 
   - maci     (mexmaci)    Mac OS X Intel
   - maci64   (mexmaci64)  Mac OS X Intel (64 bit)
-  - glnx32   (mexglx)     GNU Linux i386
+  - glnx86   (mexglx)     GNU Linux i386
   - glnxa64  (mexa64)     GNU Linux x64
   - win32    (mexw32)     Windows
   - win64    (mexw64)     Windows (64 bit)
