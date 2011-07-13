@@ -111,8 +111,7 @@ APPENDIX
   intrisic. GCC and Visual C both satisfy all the requirements.
 
 CHANGES
-  0.9.13     Improves the compatibility of the binary package with
-             certain unpackers.
+  0.9.13     Fixes Windows binary package.
   0.9.12     Fixes vl_compile and the architecture string on Linux 32 bit.
   0.9.11     Fixes a compatibility problem on older Mac OS X versions.
              A few bugfixes are included too.
