@@ -32,7 +32,7 @@ screen_dpi := 95
 # --------------------------------------------------------------------
 
 .PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
-.PHONY: doc-web, doc-demo
+.PHONY: doc-web, doc-demo, doc-deep
 .PHONY: doc-clean, doc-archclean, doc-distclean
 .PHONY: autorights
 no_dep_targets := doc-clean doc-archclean doc-distclean
@@ -65,9 +65,9 @@ doc-api: doc/api/index.html
 doc-web: doc/index.html
 doc-toolbox: doc/toolbox-src/mdoc.html
 
-doc-deep: all $(doc-dir) $(results-dir)
+doc-deep: matlab-all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "vl_setup('noprefix','demo');vl_demo;exit"
+	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "vl_setup demo;vl_demo;exit"
 
 #
 # Use webdoc.py to generate the website
