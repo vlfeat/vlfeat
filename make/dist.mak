@@ -69,13 +69,11 @@ no_dep_targets += dist-bin-clean dist-bin-archclean dist-bin-distclean
 
 dist-bin-release: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-release:
-	echo Fetching remote tags ;
-	$(GIT) fetch --tags ;
-	echo Cloning VLFeat ;
+	@echo Cloning VLFeat ;
 	test -e "$(tmp-dir)" || $(GIT) clone --no-checkout . "$(tmp-dir)" ; \
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
-	echo Checking out v$(VER) ;
+	@echo Checking out v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags ;
 	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
 	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
@@ -85,10 +83,10 @@ dist-bin-release:
 dist-bin-commit: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit: branch=v$(VER)-$(ARCH)
 dist-bin-commit: dist-bin-release
-	echo Setting $(branch) to v$(VER) ;
+	@echo Setting $(branch) to v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch) ;
-	echo Adding binaries to $(branch) ;
+	@echo Adding binaries to $(branch) ;
 	cd "$(tmp-dir)" ; $(GIT) add -f $(arch_bins) ;
 	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
@@ -105,11 +103,14 @@ dist-bin-commit: dist-bin-release
 dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-release
-	echo Setting up $(branch) to v$(VER) ;
+	@echo Building doc
+	make -C "$(tmp-dir)" ARCH=$(ARCH) doc-deep doc
+	@echo Setting up $(branch) to v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER)
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)
-	echo Adding binaries to $(branch)
+	@echo Adding products to $(branch)
 	cd "$(tmp-dir)" ; $(GIT) add -f $(m_lnk)
+	cd "$(tmp-dir)" ; $(GIT) add doc
 	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
@@ -122,13 +123,13 @@ dist-bin-commit-common: dist-bin-release
 	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch); \
 	fi
 
-dist-bin-merge: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-merge: tmp-dir=tmp-$(NAME)-$(VER)-merge
 dist-bin-merge: branch=v$(VER)-bin
 dist-bin-merge:
-	echo Fetching remote tags ;
-	cd "$(tmp-dir)" ; $(GIT) fetch --tags ;
-	echo Cloning VLFeat ;
-	test -e "$(tmp-dir)" || $(GIT) clone --no-checkout . "$(tmp-dir)" ;
+	@echo Cleaning up merge directory
+	rm -rf "$(tmp-dir)"
+	@echo Cloning VLFeat
+	$(GIT) clone --no-checkout . "$(tmp-dir)" ;
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ;
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
 	echo Creating or resetting and checking out branch $(branch) to v$(VER);
