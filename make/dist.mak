@@ -110,7 +110,7 @@ dist-bin-commit-common: dist-bin-release
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)
 	@echo Adding products to $(branch)
 	cd "$(tmp-dir)" ; $(GIT) add -f $(m_lnk)
-	cd "$(tmp-dir)" ; $(GIT) add doc
+	cd "$(tmp-dir)" ; $(GIT) add -f doc
 	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \
