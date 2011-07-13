@@ -87,6 +87,7 @@ mex_src := $(shell find $(VLDIR)/toolbox -name "*.c")
 mex_tgt := $(addprefix $(MEX_BINDIR)/,\
 	   $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
 mex_dep := $(mex_tgt:.$(MEX_SUFFIX)=.d)
+mex_dll := $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
 
 ifdef MATLAB_PATH
 arch_bins += $(mex_tgt) $(MEX_BINDIR)/lib$(DLL_NAME).$(DLL_SUFFIX)
@@ -101,14 +102,16 @@ mex-all: $(mex_tgt)
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
+$(mex_dll) : $(dll_tgt)
+	cp -v "$(<)" "$(@)"
+
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) $(MEX_CFLAGS) \
 	       -I"$(MATLAB_PATH)/extern/include" -M -MT \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt)
-	@ln -sf "../../../$(dll_tgt)" "$(MEX_BINDIR)/"
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt) $(mex_dll)
 	$(call C,MEX) \
                CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
@@ -199,6 +202,7 @@ matlab-test:
 matlab-info:
 	$(call dump-var,m_src)
 	$(call dump-var,m_lnk)
+	$(call echo-var,mex_dll)
 	$(call echo-var,MATLAB_PATH)
 	$(call echo-var,MATLAB_EXE)
 	$(call echo-var,MEX)
