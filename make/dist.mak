@@ -76,6 +76,7 @@ dist-bin-release:
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
 	echo Checking out v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags ;
 	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
 	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
 	echo Rebuilding binaries for release ;
@@ -103,7 +104,7 @@ dist-bin-commit: dist-bin-release
 
 dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
-dist-bin-commit-common: dist-bin-commit
+dist-bin-commit-common: dist-bin-release
 	echo Setting up $(branch) to v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER)
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)
@@ -131,6 +132,7 @@ dist-bin-merge:
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ;
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
 	echo Creating or resetting and checking out branch $(branch) to v$(VER);
+	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags ;
 	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
 	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER) ;
