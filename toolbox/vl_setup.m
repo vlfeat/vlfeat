@@ -82,7 +82,11 @@ if demo
 end
 
 if ~quiet
-  fprintf('VLFeat %s ready.\n', vl_version) ;
+  try
+    fprintf('VLFeat %s ready.\n', vl_version) ;
+  catch err
+    warning('VLFeat does not seem to be installed correctly. Make sure that the MEX files are compiled.') ;
+  end
 end
 
 if nargout == 0
