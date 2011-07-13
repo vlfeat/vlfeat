@@ -59,9 +59,6 @@ $(eval $(call gendir, results, results))
 VERSION: vl/generic.h
 	echo "$(VER)" > VERSION
 
-docsrc/version.html: Makefile vl/generic.h
-	echo "<code>$(VER)</code>" > docsrc/version.html
-
 doc: doc-api doc-man doc-web
 doc-man: doc/man-src/man.xml doc/man-src/man.html
 doc-api: doc/api/index.html
@@ -115,7 +112,7 @@ doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
-doc/api/index.html: docsrc/doxygen.conf VERSION docsrc/version.html  \
+doc/api/index.html: docsrc/doxygen.conf VERSION                      \
   $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
   doc/doxygen_header.html doc/doxygen_footer.html
 	#$(call C,DOXYGEN) $<
