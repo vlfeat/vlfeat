@@ -445,7 +445,6 @@ bin-commit: bin-release
 	$(GIT) add -f $(bindir)\$(MSVCR) && \
 	$(GIT) add -f $(bindir)\$(MSVCM)
 	@echo Adding MEX files && \
-	$(GIT) add -f $(mexdir)\vl.lib && \
 	$(GIT) add -f $(mexdir)\vl.dll && \
 	$(GIT) add -f $(mexdll) && \
 	$(GIT) add -f $(mexdir)\$(MSMANIFEST)  && \
