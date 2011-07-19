@@ -10,19 +10,7 @@ figure(1) ; clf ;
 % --------------------------------------------------------------------
 
 Ia = imread(fullfile(vl_root,'data','a.jpg')) ;
-
-th = pi/4 ;
-sc = 4 ;
-c = sc*cos(th) ;
-s = sc*sin(th) ;
-A = [c -s; s c] ;
-T = [- size(Ia,2) ; - size(Ia,1)]  / 2 ;
-
-tform = maketform('affine', [A, A * T - T ; 0 0  1]') ;
-Ib = imtransform(Ia,tform,'size',size(Ia), ...
-                 'xdata', [1 size(Ia,2)], ...
-                 'ydata', [1 size(Ia,1)], ...
-                 'fill', 255);
+Ib = imread(fullfile(vl_root,'data','b.jpg')) ;
 
 % --------------------------------------------------------------------
 %                                           Extract features and match
@@ -39,6 +27,11 @@ scores  = scores(perm) ;
 
 figure(1) ; clf ;
 imagesc(cat(2, Ia, Ib)) ;
+axis image off ;
+vl_demo_print('sift_match_1', 1) ;
+
+figure(2) ; clf ;
+imagesc(cat(2, Ia, Ib)) ;
 
 xa = fa(1,matches(1,:)) ;
 xb = fb(1,matches(2,:)) + size(Ia,2) ;
@@ -47,12 +40,11 @@ yb = fb(2,matches(2,:)) ;
 
 hold on ;
 h = line([xa ; xb], [ya ; yb]) ;
-set(h,'linewidth', 2, 'color', 'b') ;
+set(h,'linewidth', 1, 'color', 'b') ;
 
 vl_plotframe(fa(:,matches(1,:))) ;
 fb(1,:) = fb(1,:) + size(Ia,2) ;
 vl_plotframe(fb(:,matches(2,:))) ;
-axis equal ;
-axis off  ;
+axis image off ;
 
-vl_demo_print('sift_match_1', 1) ;
+vl_demo_print('sift_match_2', 1) ;
