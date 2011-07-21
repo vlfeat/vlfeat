@@ -51,11 +51,13 @@ else
 end
 bindir = fullfile('mex',bindir) ;
 
+% Do not use vl_root() to avoid conflicts with other VLFeat
+% installations.
+
 [a,b,c] = fileparts(mfilename('fullpath')) ;
 [a,b,c] = fileparts(a) ;
-path = a ;
+root = a ;
 
-root = vl_root ;
 addpath(fullfile(root,'toolbox'             )) ;
 addpath(fullfile(root,'toolbox','aib'       )) ;
 addpath(fullfile(root,'toolbox','geometry'  )) ;
@@ -82,9 +84,9 @@ if demo
 end
 
 if ~quiet
-  try
+  if exist('vl_version') == 3
     fprintf('VLFeat %s ready.\n', vl_version) ;
-  catch err
+  else
     warning('VLFeat does not seem to be installed correctly. Make sure that the MEX files are compiled.') ;
   end
 end
