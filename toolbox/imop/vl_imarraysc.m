@@ -32,11 +32,11 @@ opts.uniform = false ;
 [opts, varargin] = vl_argparse(opts, varargin) ;
 
 if ndims(A) > 3
-  error('A must be an array with at most three dimensions.') ;
+  error('A has less than three dimensions.') ;
 end
 
 if opts.uniform & ~isempty(opts.clim)
-  error('Only UNIFORM or CLIM can be specified.') ;
+  error('UNIFORM cannot be used in combination with CLIM.') ;
 end
 
 if isinteger(A)
