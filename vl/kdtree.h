@@ -16,7 +16,7 @@ GNU GPLv2, or (at your option) any later version.
 #include "generic.h"
 #include "mathop.h"
 
-#define VL_KDTREE_SPLIT_HEALP_SIZE 5
+#define VL_KDTREE_SPLIT_HEAP_SIZE 5
 
 typedef struct _VlKDTreeNode VlKDTreeNode ;
 typedef struct _VlKDTreeSplitDimension VlKDTreeSplitDimension ;
@@ -96,7 +96,7 @@ typedef struct _VlKDForest
 
   /* build */
   VlKDTreeThresholdingMethod thresholdingMethod ;
-  VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEALP_SIZE] ;
+  VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEAP_SIZE] ;
   vl_size splitHeapNumNodes ;
   vl_size splitHeapSize ;
 

@@ -171,7 +171,7 @@ vl_kdtree_build_recursively
     return ;
   }
 
-  /* compute the dimension with largest variance */
+  /* compute the dimension with largest variance > 0 */
   forest->splitHeapNumNodes = 0 ;
   for (d = 0 ; d < forest->dimension ; ++ d) {
     double mean = 0 ; /* unnormalized */
@@ -195,6 +195,8 @@ vl_kdtree_build_recursively
     secondMoment /= (dataEnd - dataBegin) ;
     variance = secondMoment - mean * mean ;
 
+    if (variance == 0) continue ;
+
     /* keep splitHeapSize most varying dimensions */
     if (forest->splitHeapNumNodes < forest->splitHeapSize) {
       VlKDTreeSplitDimension * splitDimension
@@ -214,16 +216,17 @@ vl_kdtree_build_recursively
     }
   }
 
-  /* toss a dice to decide the splitting dimension */
-  splitDimension = forest->splitHeapArray
-  + (vl_rand_uint32(forest->rand) % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
-
-  /* additional base case: variance is equal to 0 (overlapping points) */
-  if (splitDimension->variance == 0) {
+  /* additional base case: the maximum variance is equal to 0 (overlapping points) */
+  if (forest->splitHeapNumNodes == 0) {
     node->lowerChild = - dataBegin - 1 ;
     node->upperChild = - dataEnd - 1 ;
     return ;
   }
+
+  /* toss a dice to decide the splitting dimension (variance > 0) */
+  splitDimension = forest->splitHeapArray
+  + (vl_rand_uint32(forest->rand) % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
+
   node->splitDimension = splitDimension->dimension ;
 
   /* sort data along largest variance dimension */
@@ -307,7 +310,7 @@ vl_kdforest_new (vl_type dataType,
   self -> numTrees = numTrees ;
   self -> trees = 0 ;
   self -> thresholdingMethod = VL_KDTREE_MEDIAN ;
-  self -> splitHeapSize = (numTrees == 1) ? 1 : VL_KDTREE_SPLIT_HEALP_SIZE ;
+  self -> splitHeapSize = VL_MIN(numTrees, VL_KDTREE_SPLIT_HEAP_SIZE) ;
   self -> splitHeapNumNodes = 0 ;
 
   self -> searchHeapArray = 0 ;
