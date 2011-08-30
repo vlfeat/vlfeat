@@ -111,7 +111,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt) $(mex_dll)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
 	$(call C,MEX) \
                CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
