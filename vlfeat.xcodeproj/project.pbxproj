@@ -303,6 +303,7 @@
 		2D92043C13CDDD860004DC40 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
+		2DA21722141D48DA0047E7C7 /* vl_alphanum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_alphanum.m; path = toolbox/misc/vl_alphanum.m; sourceTree = "<group>"; };
 		2DA21723141D49350047E7C7 /* vl_binsum.def */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = vl_binsum.def; path = toolbox/misc/vl_binsum.def; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		2DAF7CE3139918EA00FA0D07 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = about.html; path = docsrc/about.html; sourceTree = "<group>"; };
 		2DAF7CE4139918EA00FA0D07 /* apps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = apps.html; path = docsrc/apps.html; sourceTree = "<group>"; };
@@ -471,6 +472,7 @@
 				2D09A29913AE084500C79C6A /* test */,
 				2D09A29813AE081700C79C6A /* demo */,
 				2D66AC5D13AE05BD0060594E /* vl_aib.m */,
+				2DA21722141D48DA0047E7C7 /* vl_alphanum.m */,
 				2D66AC5E13AE05BD0060594E /* vl_aibcut.m */,
 				2D66AC5F13AE05BD0060594E /* vl_aibcuthist.m */,
 				2D66AC6013AE05BD0060594E /* vl_aibcutpush.m */,
