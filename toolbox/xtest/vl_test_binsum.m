@@ -34,3 +34,17 @@ X = zeros(3,3,1) ; X(:,:,1) = 17 ;
 R = Z ; R(:,:,3) = 17 ;
 vl_assert_almost_equal(...
   vl_binsum(Z, X, B, 3), R) ;
+
+function test_storage_classes()
+types = {@double, @single, @int64, @uint64, ...
+         @int32, @uint32, @int16, @uint16, ...
+         @int8, @uint8} ;
+for a = types
+  a = a{1} ;
+  for b = types
+    b = b{1} ;
+    vl_assert_almost_equal(...
+      vl_binsum(a(eye(3)), a([1 1 1]),  b([1 2 3]),  1), a(2*eye(3))) ;
+  end
+end
+
