@@ -803,12 +803,15 @@ vl_constructor ()
 {
   VlState * state ;
 #if defined(DEBUG)
-  printf("VLFeat constructor called\n") ;
+  printf("VLFeat DEBUG: constructor begins.\n") ;
 #endif
 
   state = vl_get_state() ;
 
 #if ! defined(VL_DISABLE_THREADS)
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: constructing thread specific state.\n") ;
+#endif
 #if   defined(VL_THREADS_POSIX)
   {
     typedef void (*destructorType)(void * );
@@ -823,6 +826,10 @@ vl_constructor ()
   state->tlsIndex = TlsAlloc () ;
 #endif
 #else
+  /* threading support disabled */
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: constructing the generic thread state instance (threading support disabled).\n") ;
+#endif
   vl_get_state()->threadState = vl_thread_specific_state_new() ;
 #endif
 
@@ -849,6 +856,9 @@ vl_constructor ()
 #endif
   state->simdEnabled = VL_TRUE ;
   state->maxNumThreads = 1 ;
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: constructor ends.\n") ;
+#endif
 }
 
 /** @internal @brief Destruct VLFeat */
@@ -857,12 +867,15 @@ vl_destructor ()
 {
   VlState * state ;
 #if defined(DEBUG)
-  printf("VLFeat destructor called\n") ;
+  printf("VLFeat DEBUG: destructor begins.\n") ;
 #endif
 
   state = vl_get_state() ;
 
 #if ! defined(VL_DISABLE_THREADS)
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: destroying a thread specific state instance.\n") ;
+#endif
 #if   defined(VL_THREADS_POSIX)
   {
     /* Delete the thread state of this thread as the
@@ -900,9 +913,13 @@ vl_destructor ()
   DeleteCriticalSection (&state->mutex) ;
 #endif
 #else
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: destroying the generic thread state instance (threading support disabled).\n") ;
+#endif
   vl_thread_specific_state_delete(vl_get_state()->threadState) ;
 #endif
+
+#if defined(DEBUG)
+  printf("VLFeat DEBUG: destructor ends.\n") ;
+#endif
 }
-
-
-
