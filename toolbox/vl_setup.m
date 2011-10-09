@@ -23,7 +23,7 @@ function path = vl_setup(varargin)
 % GNU GPLv2, or (at your option) any later version.
 
 noprefix = false ;
-quiet = false ;
+quiet = true ;
 xtest = false ;
 demo = false ;
 
@@ -38,6 +38,8 @@ for ai=1:length(varargin)
       demo = true ;
     case {'quiet'}
       quiet = true ;
+    case {'verbose'}
+      quiet = false ;
     otherwise
       error('Unknown option ''%s''.', opt) ;
   end
