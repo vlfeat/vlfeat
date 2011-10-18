@@ -40,7 +40,7 @@ LIB_SUFFIX := a
 endif
 
 # Linux-64
-ifeq ($(ARCH),a64)
+ifeq ($(ARCH),glnxa64)
 LIB_SUFFIX := a
 endif
 
