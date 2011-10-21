@@ -148,7 +148,7 @@ CFLAGS += $(if $(PROFILE), -g,)
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)
-SDKROOT ?= /Developer/SDKs/MacOSX10.6.sdk
+SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
@@ -156,7 +156,7 @@ endif
 
 # Mac OS X Intel 64
 ifeq ($(ARCH),maci64)
-SDKROOT ?= /Developer/SDKs/MacOSX10.6.sdk
+SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
