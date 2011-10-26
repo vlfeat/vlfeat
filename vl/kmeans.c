@@ -1467,7 +1467,9 @@ vl_kmeans_cluster (VlKMeans * self,
     }
 
     /* copy centers to output if current solution is optimal */
-    if (energy < bestEnergy) {
+    /* check repetition == 0 as well in case energy = NaN, which */
+    /* can happen if the data contain NaNs */
+    if (energy < bestEnergy || repetition == 0) {
       void * temp ;
       bestEnergy = energy ;
 
