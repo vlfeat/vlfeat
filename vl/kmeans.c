@@ -551,6 +551,9 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   vl_uint32 * permutations = NULL ;
   vl_size * numSeenSoFar = NULL ;
+  VlRand * rand = vl_get_rand () ;
+  vl_size totNumRestartedCenters = 0 ;
+  vl_size numRestartedCenters = 0 ;
 
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
@@ -598,6 +601,7 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
       clusterMasses[assignments[x]] ++ ;
     }
 
+    numRestartedCenters = 0 ;
     switch (self->distance) {
       case VlDistanceL2:
         memset(self->centers, 0, sizeof(TYPE) * self->dimension * self->numCenters) ;
@@ -607,9 +611,17 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
           for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
-          TYPE mass = clusterMasses[c] ;
           TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          if (clusterMasses[c] > 0) {
+            TYPE mass = clusterMasses[c] ;
+            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          } else {
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+            numRestartedCenters ++ ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
+          }
         }
         break ;
       case VlDistanceL1:
@@ -624,11 +636,28 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
             }
             numSeenSoFar[c] ++ ;
           }
+          /* restart the centers as required  */
+          for (c = 0 ; c < self->numCenters ; ++c) {
+            if (clusterMasses[c] == 0) {
+              TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
+              vl_uindex x = vl_rand_uindex(rand, numData) ;
+              numRestartedCenters ++ ;
+              for (d = 0 ; d < self->dimension ; ++d) {
+                cpt[d] = data[x * self->dimension + d] ;
+              }
+            }
+          }
         }
         break ;
       default:
         abort();
     } /* done compute centers */
+
+    totNumRestartedCenters += numRestartedCenters ;
+    if (self->verbosity && numRestartedCenters) {
+      VL_PRINTF("kmeans: Lloyd iter %d: restarted %d centers\n", iteration,
+                numRestartedCenters) ;
+    }
   } /* next Lloyd iteration */
 
   if (permutations) { vl_free(permutations) ; }
@@ -680,6 +709,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
   vl_uint32 * assignments = vl_malloc (sizeof(vl_uint32) * numData) ;
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
+  VlRand * rand = vl_get_rand () ;
 
 #if (FLT == VL_TYPE_FLOAT)
     VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
@@ -705,6 +735,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size totDistanceComputationsToRefreshCenterDistances = 0 ;
   vl_size totDistanceComputationsToNewCenters = 0 ;
   vl_size totDistanceComputationsToFinalize = 0 ;
+  vl_size totNumRestartedCenters = 0 ;
 
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
@@ -810,6 +841,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     vl_size numDistanceComputationsToRefreshLB = 0 ;
     vl_size numDistanceComputationsToRefreshCenterDistances = 0 ;
     vl_size numDistanceComputationsToNewCenters = 0 ;
+    vl_size numRestartedCenters = 0 ;
 
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /*                         Compute new centers                  */
@@ -829,9 +861,18 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
-          TYPE mass = clusterMasses[c] ;
           TYPE * cpt = newCenters + c * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          if (clusterMasses[c] > 0) {
+            TYPE mass = clusterMasses[c] ;
+            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          } else {
+            /* restart the center */
+            numRestartedCenters ++ ;
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
+          }
         }
         break ;
       case VlDistanceL1:
@@ -845,6 +886,17 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
               data [d + perm[x] * self->dimension] ;
             }
             numSeenSoFar[c] ++ ;
+          }
+        }
+        /* restart the centers as required  */
+        for (c = 0 ; c < self->numCenters ; ++c) {
+          if (clusterMasses[c] == 0) {
+            numRestartedCenters ++ ;
+            TYPE * cpt = newCenters + c * self->dimension ;
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
           }
         }
         break ;
@@ -1052,6 +1104,9 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     totDistanceComputationsToNewCenters
     += numDistanceComputationsToNewCenters ;
 
+    totNumRestartedCenters
+    += numRestartedCenters ;
+
 #ifdef SANITY
     {
       int xx ; int cc ;
@@ -1091,6 +1146,12 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
                 iteration,
                 energy,
                 numDistanceComputations) ;
+      if (numRestartedCenters) {
+        VL_PRINTF("kmeans: Elkan iter %d: restarted %d centers\n",
+                  iteration,
+                  energy,
+                  numRestartedCenters) ;
+      }
       if (self->verbosity > 1) {
         VL_PRINTF("kmeans: Elkan iter %d: total dist. calc. per type: "
                   "UB: %.1f%% (%d), LB: %.1f%% (%d), "
@@ -1150,6 +1211,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     if (self->verbosity) {
       VL_PRINTF("kmeans: Elkan: total dist. calc.: %d (%.2f %% of Lloyd)\n",
                 totDistanceComputations, saving * 100.0) ;
+      if (totNumRestartedCenters) {
+        VL_PRINTF("kmeans: Elkan: there have been %d restarts\n",
+                  totNumRestartedCenters) ;
+      }
     }
 
     if (self->verbosity > 1) {
