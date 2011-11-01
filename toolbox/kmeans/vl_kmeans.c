@@ -97,6 +97,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   dimension = mxGetM (IN(DATA)) ;
   numData = mxGetN (IN(DATA)) ;
 
+  if (dimension == 0) {
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+  }
+
   if (!vlmxIsPlainScalar(IN(NUMCENTERS)) ||
       (numCenters = (vl_size) mxGetScalar(IN(NUMCENTERS))) < 1  ||
       numCenters > numData) {
