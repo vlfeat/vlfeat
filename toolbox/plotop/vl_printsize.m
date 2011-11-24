@@ -4,7 +4,7 @@ function vl_printsize(varargin)
 %   figure so that the width of the figure is the fraction R of a
 %   'uslsetter' page. It also sets the PaperSize property to tightly
 %   match the figure size. In this way, printing to any format crops
-%   the figure as printing to EPS would do.
+%   the figure similar to what printing to EPS would do.
 %
 %   VL_PRINTSIZE(FIG,R) opearates on the specified figure FIG.
 %
