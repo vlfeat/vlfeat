@@ -210,10 +210,13 @@ vl_quickshift_inner(vl_qs_type const * I,
 
 /** -----------------------------------------------------------------
  ** @brief Create a quick shift object
- ** @param image
- ** @param height
- ** @param width
- ** @param channels
+ ** @param image A linear array of the image to process.
+ **        The linear index of a pixel is computed with:
+ **        channel*width*height + row + height * col
+ ** @param height The height (number of rows) of the image.
+ ** @param width The width (number of columns) of the image.
+ ** @param channels The number of channels of the image
+ **        (3 for RGB).
  **
  ** @return New quick shift object.
  **/
