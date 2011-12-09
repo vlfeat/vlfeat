@@ -139,7 +139,7 @@ CLFAGS += $(FEATUREFLAGS)
 # https://github.com/vlfeat/vlfeat/issues/4
 # These error appear as a result of http://wiki.debian.org/ToolChain/DSOLinking that
 # was added between gcc4.4 and gcc4.6.1.
-CLFAGS += -Wl,--no-as-needed
+CFLAGS += -Wl,--no-as-needed
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
