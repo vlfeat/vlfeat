@@ -109,6 +109,7 @@ doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
 doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/q;p'  > doc/doxygen_header.html
+	echo '<div>' >> doc/doxygen_header.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
@@ -116,7 +117,9 @@ doc/api/index.html: docsrc/doxygen.conf VERSION                      \
   $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
   doc/doxygen_header.html doc/doxygen_footer.html
 	#$(call C,DOXYGEN) $<
+	ln -sf docsrc/vlfeat.bib vlfeat.bib
 	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
+	rm vlfeat.bib
 
 #
 # Generate Man documentation

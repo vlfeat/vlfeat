@@ -4,7 +4,7 @@
  **/
 
 /* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson
 
 This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
@@ -12,12 +12,11 @@ GNU GPLv2, or (at your option) any later version.
 
 /**
  @mainpage VLFeat -- Vision Lab Features Library
-
  @version __VLFEAT_VERSION__
- @author Andrea Vedaldi  (vedaldi@cs.ucla.edu)
+ @author Andrea Vedaldi  (vedaldi@robots.ox.ac.uk)
  @author Brian Fulkerson (bfulkers@cs.ucla.edu)
 
- @par Copyright &copy; 2007-11 Andrea Vedaldi and Brian Fulkerson
+ @par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
 
  <em>VLFeat C library contains implementations of common computer
  vision algorithms, with a special focus on visual features for

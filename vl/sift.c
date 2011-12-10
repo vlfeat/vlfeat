@@ -1,7 +1,6 @@
-/** @internal
- ** @file     sift.c
- ** @brief    Scale Invariant Feature Transform (SIFT) - Definition
- ** @author   Andrea Vedaldi
+/** @file sift.c
+ ** @brief Scale Invariant Feature Transform (SIFT) - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -11,25 +10,20 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-/**
-
-@file   sift.h
-@brief  Scale Invariant Feature Transform (SIFT)
-@author Andrea Vedaldi
+/** @file sift.h
 
 @par "Credits:" May people have contributed with suggestions and bug
 reports. Although the following list is certainly incomplete, we would
-like to thank: Brian Fulkerson, Wei Dong, Loic, Giuseppe, Liu, Erwin,
-P. Ivanov, and Q. S. Luo.
+like to thank: Wei Dong, Loic, Giuseppe, Liu, Erwin, P. Ivanov, and
+Q. S. Luo.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section sift Scale Invariant Feature Transform
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-This library module implements a
-@ref sift-usage "SIFT filter object",
-a reusable object to extract SIFT features from one or
-multiple images of the same size.
+@ref sift.h implements a @ref sift-usage "SIFT filter object", a
+reusable object to extract SIFT features @cite{lowe99object} from one
+or multiple images of the same size.
 
 - @ref sift-intro
   - @ref sift-intro-detector
