@@ -122,6 +122,7 @@
 
   <dir name="api">
    <page id="api" name="index" title="C API">
+    <pagestyle href="%pathto:root;doxygen.css"/>
     <div class="doxygen">
      <!-- Doc Here -->
     </div>

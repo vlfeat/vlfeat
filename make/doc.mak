@@ -86,6 +86,7 @@ doc/index.html: \
 	rsync -arv docsrc/images doc
 	rsync -arv docsrc/web.css doc
 	rsync -arv docsrc/pygmentize.css doc
+	rsync -arv docsrc/doxygen.css doc
 
 #
 # Use mdoc.py to create the toolbox documentation that will be
