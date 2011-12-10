@@ -754,17 +754,24 @@ class DocPageStyle(DocNode):
     def publish(self, gen, pageNode = None):
         if pageNode is None: return
         sa = self.getAttributes()
-        gen.putString("<style rel=\"stylesheet\" type=")
-        if sa.has_key("type"):
-            gen.putXMLAttr(expandAttr(sa["type"], pageNode))
-        else:
-            gen.putString("\"text/css\" ")
         if sa.has_key("href"):
+            gen.putString("<link rel=\"stylesheet\" type=")
+            if sa.has_key("type"):
+                gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+            else:
+                gen.putString("\"text/css\" ")
             gen.putString("href=")
             gen.putXMLAttr(expandAttr(sa["href"], pageNode))
-        gen.putString(">")
-        DocNode.publish(self, gen, pageNode)
-        gen.putString("</style>")
+            gen.putString("></style>")
+        else:
+            gen.putString("<style rel=\"stylesheet\" type=")
+            if sa.has_key("type"):
+                gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+            else:
+                gen.putString("\"text/css\" ")
+	        gen.putString(">")
+            DocNode.publish(self, gen, pageNode)
+    	    gen.putString("</style>")
 
     publish = makeGuard(publish)
 
