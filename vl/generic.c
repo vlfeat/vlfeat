@@ -38,10 +38,11 @@ GNU GPLv2, or (at your option) any later version.
    - @ref ikmeans.h  "Integer K-means (IKM)"
    - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
    - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
-   - @ref quickshift.h "Quick shift image segmentation"
    - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
    - @ref homkermap.h "Homogeneous kernel map"
    - @ref pegasos.h  "PEGASOS SVM solver"
+   - @ref slic.h     "SLIC superpixels"
+   - @ref quickshift.h "Quick shift superpixels"
  - Support functionalities
    - @ref host.h      "Platform abstraction"
    - @ref generic.h   "Errors, memory, logging, and others"

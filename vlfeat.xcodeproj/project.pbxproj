@@ -301,6 +301,9 @@
 		2D8E1B551371FB23009CDE11 /* .gitattributes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
 		2D8E1B561371FB23009CDE11 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		2D92043C13CDDD860004DC40 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		2D94E6BC148E48440089ADA5 /* slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = slic.c; sourceTree = "<group>"; };
+		2D94E6BD1490C7C40089ADA5 /* vl_slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_slic.c; path = toolbox/slic/vl_slic.c; sourceTree = "<group>"; };
+		2D94E6BE1490E4120089ADA5 /* slic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slic.h; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
 		2DA21722141D48DA0047E7C7 /* vl_alphanum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_alphanum.m; path = toolbox/misc/vl_alphanum.m; sourceTree = "<group>"; };
@@ -691,6 +694,8 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
+				2D94E6BC148E48440089ADA5 /* slic.c */,
+				2D94E6BE1490E4120089ADA5 /* slic.h */,
 			);
 			path = vl;
 			sourceTree = "<group>";
@@ -736,6 +741,7 @@
 				2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */,
 				2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */,
 				2D86B11F0F24CC9B00E625D6 /* vl_sift.c */,
+				2D94E6BD1490C7C40089ADA5 /* vl_slic.c */,
 				2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */,
 				2D13F02C100A718600C072E8 /* vl_simdctrl.c */,
 				2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */,

@@ -1,6 +1,6 @@
-/** @file    slic.c
- ** @author  Andrea Vedaldi
- ** @brief   Host
+/** @file slic.c
+ ** @author Andrea Vedaldi
+ ** @brief SLIC superpixels - Definition
  **/
 
 /* AUTORIGHTS
@@ -10,19 +10,113 @@
  GNU GPLv2, or (at your option) any later version.
  */
 
+/** @file slic.h
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section slic SLIC superpixels
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref slic.h implements SLIC superpixels, as described by
+@cite{achanta10slic}.
+
+- @ref slic-overview Overview
+- @ref slic-tech Technical details
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection slic-overview Overview
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+SLIC superpixels @cite{achanta10slic} are obtained by a spatially
+localized version of k-means clustering. Similar to mean shift or
+quick shift (@ref quickshift.h), each pixel is associated to a feature
+vector
+
+@f[
+\Psi(x,y) =
+\left[
+\begin{array}{c}
+\lambda x \\
+\lambda y \\
+I(x,y)
+\end{array}
+\right]
+@f]
+
+and then k-means clustering is run on those. As discussed below, the
+coefficient @f$ \lambda @f$ balances the spatial and appearance
+components of the feature vectors, imposing a degree of spatial
+regularization.
+
+SLIC takes two parameters: the nominal size of the regions
+(superpixels) @c regionSize and the strength of the spatial
+regularization @c regularizer. The image is first divided into a grid
+with step @c regionSize. The center of each grid tile is then used to
+initialize a corresponding k-means (up to a small shift to avoid
+image eges). Finally, the k-means centers and clusters are refined by
+using the Lloyd algorithm, yielding segmenting the image. As a
+further restriction and simplification, during the k-means iterations
+each pixel can be assigned to only the <em>2&times;2</em> centers
+corresponding to grid tiles adjecent to the pixel.
+
+The parameter @c regularizer sets the trade-off between clustering
+appearance and spatial regularization. This is obtained by setting
+
+@f[
+ \lambda = \frac{\mathtt{regularizer}}{\mathtt{regionSize}}
+@f]
+
+in the definition of the feature @f$ \psi(x,y) @f$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection slic-tech Technical details
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The image is divided into a regular grid with @f$ M, N @f$ elements,
+where
+
+@f[
+   M = \lceil \frac{\mathtt{imageWidth}}{\mathtt{regionSize}} \rceil,
+   \quad
+   N = \lceil \frac{\mathtt{imageHeight}}{\mathtt{regionSize}} \rceil.
+@f]
+
+A cluster center is initialized from each grid center
+
+@f[
+  x_i = \operatorname{round} i \frac{\mathtt{imageWidth}}{\mathtt{regionSize}}
+  \quad
+  y_j = \operatorname{round} j \frac{\mathtt{imageWidth}}{\mathtt{regionSize}}.
+@f]
+
+In order to avoid placing segment centers on top of image
+discontinuities, the centers are then moved in a 3&times;3
+neighbourohood to minimize the edge strength
+
+@f[
+   \operatorname{edge}(x,y) =
+   \| I(x+1,y) - I(x-1,y) \|_2^2 +
+   \| I(x,y+1) - I(x,y-1) \|_2^2
+@f]
+
+Then superpixels are obtained by using k-means clustering starting
+from the collection of k-means centers
+
+@f[
+  C = \{ \Psi(x_i,y_j), i=0,1,\dots,M-1\ j=0,1,\dots,N-1 \}
+@f]
+
+where the features have been defined above. K-means uses the standard
+LLoyd algorithm alternating computing new assignments of pixels to
+centers and re-estimating the centers as the mean of the assigned
+pixel feature vectors. The only difference compared to standard
+k-means is that each pixel is assigned only
+
+*/
+
 #include "slic.h"
 #include "mathop.h"
-
 #include <math.h>
 #include <string.h>
-
-
-struct _VlSlic
-{
-
-} ;
-
-typedef struct _VlSlic VlSlic ;
 
 /** @brief SLIC superpixel segmentation
  ** @param segmentation segmentation.
