@@ -16,7 +16,7 @@ GNU GPLv2, or (at your option) any later version.
 @section mser Maximally Stable Extremal Regions
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@file mserh.h implements the <em>Maximally Stable Extremal
+@file mser.h implements the <em>Maximally Stable Extremal
 Regions</em> (MSER) feature detetctor @cite{matas03robust}.
 
  - @ref mser-overview

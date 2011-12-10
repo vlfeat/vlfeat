@@ -18,7 +18,7 @@ GNU GPLv2, or (at your option) any later version.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref quickshift.h implements an image segmentation algorithm based on
-the quick shift clustering algorithm @cite{vedaldi08quickshift}.
+the quick shift clustering algorithm @cite{vedaldi08quick}.
 
 - @ref quickshift-intro
 - @ref quickshift-usage
@@ -28,7 +28,7 @@ the quick shift clustering algorithm @cite{vedaldi08quickshift}.
 @subsection quickshift-intro Overview
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Quick shift @cite{vedaldi08quickshift} is a fast mode seeking algorithm,
+Quick shift @cite{vedaldi08quick} is a fast mode seeking algorithm,
 similar to mean shift. The algorithm segments an RGB image (or any
 image with more than one channel) by identifying clusters of pixels in
 the joint spatial and color dimensions. Segments are local
