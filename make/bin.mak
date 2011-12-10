@@ -39,8 +39,14 @@ no_dep_targets += bin-info
 
 bin-all: $(bin_tgt)
 
+# BIN_LDFLAGS includes the libraries to link to and must be
+# specified after the object "$<" that uses them. If not, stricter
+# linkers (e.g. --as-needed option with the GNU toolchain)
+# will break as they will not include the dependencies. See
+# also http://wiki.debian.org/ToolChain/DSOLinking
+
 $(BINDIR)/% : $(VLDIR)/src/%.c $(dll-dir) $(dll_tgt)
-	$(call C,CC) $(BIN_CFLAGS) $(BIN_LDFLAGS) "$<" -o "$@"
+	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$@"
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
 	$(call C,CC) $(BIN_CFLAGS) -M -MT  \

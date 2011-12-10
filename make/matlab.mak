@@ -29,15 +29,21 @@ info: mex-info matlab-info
 
 MEX_ARCH = $(ARCH)
 
+# While it would seem natural to include the linked libraries in
+# MEX_LDFLAGS, by doing so MEX passes them to the linker
+# before the object that uses them (the MEX file),
+# breaking compilation with stricter linkers (see also bin.mak).
+# The solution is to pass them as part of MEX_FLAGS instead.
+
 MEX_FLAGS  = -$(MEX_ARCH)
 MEX_FLAGS += $(if $(DEBUG), -g, -O)
 MEX_FLAGS += $(if $(PROFILE), -O -g,)
-MEX_FLAGS += -lm -largeArrayDims
+MEX_FLAGS += -lm -largeArrayDims -L$(BINDIR) -lvl
 
 MEX_CFLAGS   = $(CFLAGS)
 MEX_CFLAGS  += -I$(VLDIR)/toolbox
 
-MEX_LDFLAGS  = $(LDFLAGS) -L$(BINDIR) -lvl
+MEX_LDFLAGS  = $(LDFLAGS)
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
@@ -113,10 +119,11 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt) $(mex_dll)
 	$(call C,MEX) \
-               CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
+               CFLAGS='$$CFLAGS $(MEX_CFLAGS)'  \
 	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
+               "$(<)" \
 	       $(MEX_FLAGS) \
-	       "$(<)" -outdir "$(dir $(@))"
+	       -outdir "$(dir $(@))"
 
 mex-info:
 	$(call echo-title,MATLAB support)
