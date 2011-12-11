@@ -2,144 +2,144 @@
 
 /* @group Heading Levels */
 
-.doxygen h1 {
+#content .doxygen h1 {
 	font-size: 150%;
 }
 
-.doxygen .title {
+#content .doxygen .title {
 	font-size: 150%;
 	font-weight: bold;
 	margin: 10px 2px;
 }
 
-.doxygen h2 {
+#content .doxygen h2 {
 	font-size: 120%;
 }
 
-.doxygen h3 {
+#content .doxygen h3 {
 	font-size: 100%;
 }
 
-.doxygen dt {
+#content .doxygen dt {
 	font-weight: bold;
 }
 
-.doxygen div.multicol {
+#content .doxygen div.multicol {
 	-moz-column-gap: 1em;
 	-webkit-column-gap: 1em;
 	-moz-column-count: 3;
 	-webkit-column-count: 3;
 }
 
-.doxygen p.startli, 
-.doxygen p.startdd,
-.doxygen p.starttd {
+#content .doxygen p.startli,
+#content .doxygen p.startdd,
+#content .doxygen p.starttd {
 	margin-top: 2px;
 }
 
-.doxygen p.endli {
+#content .doxygen p.endli {
 	margin-bottom: 0px;
 }
 
-.doxygen p.enddd {
+#content .doxygen p.enddd {
 	margin-bottom: 4px;
 }
 
-.doxygen p.endtd {
+#content .doxygen p.endtd {
 	margin-bottom: 2px;
 }
 
 /* @end */
 
-.doxygen caption {
+#content .doxygen caption {
 	font-weight: bold;
 }
 
-.doxygen span.legend {
+#content .doxygen span.legend {
         font-size: 70%;
         text-align: center;
 }
 
-.doxygen h3.version {
+#content .doxygen h3.version {
         font-size: 90%;
         text-align: center;
 }
 
-.doxygen div.qindex, 
-.doxygen div.navtab {
+#content .doxygen div.qindex,
+#content .doxygen div.navtab {
 	background-color: #EBEFF6;
 	border: 1px solid #A3B4D7;
 	text-align: center;
 }
 
-.doxygen div.qindex, 
-.doxygen div.navpath {
+#content .doxygen div.qindex,
+#content .doxygen div.navpath {
 	width: 100%;
 	line-height: 140%;
 }
 
-.doxygen div.navtab {
+#content .doxygen div.navtab {
 	margin-right: 15px;
 }
 
 /* @group Link Styling */
 
-.doxygen a {
+#content .doxygen a {
 	color: #3D578C;
 	font-weight: normal;
 	text-decoration: none;
 }
 
-.doxygen .contents a:visited {
+#content .doxygen .contents a:visited {
 	color: #4665A2;
 }
 
-.doxygen a:hover {
+#content .doxygen a:hover {
 	text-decoration: underline;
 }
 
-.doxygen a.qindex {
+#content .doxygen a.qindex {
 	font-weight: bold;
 }
 
-.doxygen a.qindexHL {
+#content .doxygen a.qindexHL {
 	font-weight: bold;
 	background-color: #9CAFD4;
 	color: #ffffff;
 	border: 1px double #869DCA;
 }
 
-.doxygen .contents a.qindexHL:visited {
+#content .doxygen .contents a.qindexHL:visited {
         color: #ffffff;
 }
 
-.doxygen a.el {
+#content .doxygen a.el {
 	font-weight: bold;
 }
 
-.doxygen a.elRef {
+#content .doxygen a.elRef {
 }
 
-.doxygen a.code {
+#content .doxygen a.code {
 	color: #4665A2;
 }
 
-.doxygen a.codeRef {
+#content .doxygen a.codeRef {
 	color: #4665A2;
 }
 
 /* @end */
 
-.doxygen dl.el {
+#content .doxygen dl.el {
 	margin-left: -1cm;
 }
 
-.doxygen .fragment {
+#content .doxygen .fragment {
 	font-family: monospace, fixed;
 	font-size: 105%;
 }
 
-.doxygen pre.fragment {
+#content .doxygen pre.fragment {
 	border: 1px solid #C4CFE5;
 	background-color: #FBFCFD;
 	padding: 4px 6px;
@@ -150,7 +150,7 @@
 	line-height: 125%;
 }
 
-.doxygen div.ah {
+#content .doxygen div.ah {
 	background-color: black;
 	font-weight: bold;
 	color: #ffffff;
@@ -168,24 +168,24 @@
 	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000);
 }
 
-.doxygen div.groupHeader {
+#content .doxygen div.groupHeader {
 	margin-left: 16px;
 	margin-top: 12px;
 	font-weight: bold;
 }
 
-.doxygen div.groupText {
+#content .doxygen div.groupText {
 	margin-left: 16px;
 	font-style: italic;
 }
 
-.doxygen div.contents {
+#content .doxygen div.contents {
 	margin-top: 10px;
 	margin-left: 8px;
 	margin-right: 8px;
 }
 
-.doxygen td.indexkey {
+#content .doxygen td.indexkey {
 	background-color: #EBEFF6;
 	font-weight: bold;
 	border: 1px solid #C4CFE5;
@@ -193,110 +193,110 @@
 	padding: 2px 10px;
 }
 
-.doxygen td.indexvalue {
+#content .doxygen td.indexvalue {
 	background-color: #EBEFF6;
 	border: 1px solid #C4CFE5;
 	padding: 2px 10px;
 	margin: 2px 0px;
 }
 
-.doxygen tr.memlist {
+#content .doxygen tr.memlist {
 	background-color: #EEF1F7;
 }
 
-.doxygen p.formulaDsp {
+#content .doxygen p.formulaDsp {
 	text-align: center;
 }
 
-.doxygen img.formulaDsp {
-	
+#content .doxygen img.formulaDsp {
+
 }
 
-.doxygen img.formulaInl {
+#content .doxygen img.formulaInl {
 	vertical-align: middle;
 }
 
-.doxygen div.center {
+#content .doxygen div.center {
 	text-align: center;
         margin-top: 0px;
         margin-bottom: 0px;
         padding: 0px;
 }
 
-.doxygen div.center img {
+#content .doxygen div.center img {
 	border: 0px;
 }
 
-.doxygen address.footer {
+#content .doxygen address.footer {
 	text-align: right;
 	padding-right: 12px;
 }
 
-.doxygen img.footer {
+#content .doxygen img.footer {
 	border: 0px;
 	vertical-align: middle;
 }
 
 /* @group Code Colorization */
 
-.doxygen span.keyword {
+#content .doxygen span.keyword {
 	color: #008000
 }
 
-.doxygen span.keywordtype {
+#content .doxygen span.keywordtype {
 	color: #604020
 }
 
-.doxygen span.keywordflow {
+#content .doxygen span.keywordflow {
 	color: #e08000
 }
 
-.doxygen span.comment {
+#content .doxygen span.comment {
 	color: #800000
 }
 
-.doxygen span.preprocessor {
+#content .doxygen span.preprocessor {
 	color: #806020
 }
 
-.doxygen span.stringliteral {
+#content .doxygen span.stringliteral {
 	color: #002080
 }
 
-.doxygen span.charliteral {
+#content .doxygen span.charliteral {
 	color: #008080
 }
 
-.doxygen span.vhdldigit { 
-	color: #ff00ff 
+#content .doxygen span.vhdldigit {
+	color: #ff00ff
 }
 
-.doxygen span.vhdlchar { 
-	color: #000000 
+#content .doxygen span.vhdlchar {
+	color: #000000
 }
 
-.doxygen span.vhdlkeyword { 
-	color: #700070 
+#content .doxygen span.vhdlkeyword {
+	color: #700070
 }
 
-.doxygen span.vhdllogic { 
-	color: #ff0000 
+#content .doxygen span.vhdllogic {
+	color: #ff0000
 }
 
 /* @end */
 
 /*
-.doxygen .search {
+#content .doxygen .search {
 	color: #003399;
 	font-weight: bold;
 }
 
-.doxygen form.search {
+#content .doxygen form.search {
 	margin-bottom: 0px;
 	margin-top: 0px;
 }
 
-.doxygen input.search {
+#content .doxygen input.search {
 	font-size: 75%;
 	color: #000080;
 	font-weight: normal;
@@ -304,73 +304,73 @@
 }
 */
 
-.doxygen td.tiny {
+#content .doxygen td.tiny {
 	font-size: 75%;
 }
 
-.doxygen .dirtab {
+#content .doxygen .dirtab {
 	padding: 4px;
 	border-collapse: collapse;
 	border: 1px solid #A3B4D7;
 }
 
-.doxygen th.dirtab {
+#content .doxygen th.dirtab {
 	background: #EBEFF6;
 	font-weight: bold;
 }
 
-.doxygen hr {
+#content .doxygen hr {
 	height: 0px;
 	border: none;
 	border-top: 1px solid #4A6AAA;
 }
 
-.doxygen hr.footer {
+#content .doxygen hr.footer {
 	height: 1px;
 }
 
 /* @group Member Descriptions */
 
-.doxygen table.memberdecls {
+#content .doxygen table.memberdecls {
 	border-spacing: 0px;
 	padding: 0px;
 }
 
-.doxygen .mdescLeft,
-.doxygen .mdescRight,
-.doxygen .memItemLeft, 
-.doxygen .memItemRight,
-.doxygen .memTemplItemLeft, 
-.doxygen .memTemplItemRight,
-.doxygen .memTemplParams {
+#content .doxygen .mdescLeft,
+#content .doxygen .mdescRight,
+#content .doxygen .memItemLeft,
+#content .doxygen .memItemRight,
+#content .doxygen .memTemplItemLeft,
+#content .doxygen .memTemplItemRight,
+#content .doxygen .memTemplParams {
 	background-color: #F9FAFC;
 	border: none;
 	margin: 4px;
 	padding: 1px 0 0 8px;
 }
 
-.doxygen .mdescLeft,
-.doxygen .mdescRight {
+#content .doxygen .mdescLeft,
+#content .doxygen .mdescRight {
 	padding: 0px 8px 4px 8px;
 	color: #555;
 }
 
-.doxygen .memItemLeft, 
-.doxygen .memItemRight,
-.doxygen .memTemplParams {
+#content .doxygen .memItemLeft,
+#content .doxygen .memItemRight,
+#content .doxygen .memTemplParams {
 	border-top: 1px solid #C4CFE5;
 }
 
-.doxygen .memItemLeft,
-.doxygen .memTemplItemLeft {
+#content .doxygen .memItemLeft,
+#content .doxygen .memTemplItemLeft {
         white-space: nowrap;
 }
 
-.doxygen .memItemRight {
+#content .doxygen .memItemRight {
 	width: 100%;
 }
 
-.doxygen .memTemplParams {
+#content .doxygen .memTemplParams {
 	color: #4665A2;
         white-space: nowrap;
 }
@@ -381,14 +381,14 @@
 
 /* Styles for detailed member documentation */
 
-.doxygen .memtemplate {
+#content .doxygen .memtemplate {
 	font-size: 80%;
 	color: #4665A2;
 	font-weight: normal;
 	margin-left: 9px;
 }
 
-.doxygen .memnav {
+#content .doxygen .memnav {
 	background-color: #EBEFF6;
 	border: 1px solid #A3B4D7;
 	text-align: center;
@@ -397,24 +397,24 @@
 	padding: 2px;
 }
 
-.doxygen .mempage {
+#content .doxygen .mempage {
 	width: 100%;
 }
 
-.doxygen .memitem {
+#content .doxygen .memitem {
 	padding: 0;
 	margin-bottom: 10px;
 	margin-right: 5px;
 }
 
-.doxygen .memname {
+#content .doxygen .memname {
         white-space: nowrap;
         font-weight: bold;
         margin-left: 6px;
 }
 
-.doxygen .memproto,
-.doxygen dl.reflist dt {
+#content .doxygen .memproto,
+#content .doxygen dl.reflist dt {
         border-top: 1px solid #A8B8D9;
         border-left: 1px solid #A8B8D9;
         border-right: 1px solid #A8B8D9;
@@ -440,11 +440,11 @@
 
 }
 
-.doxygen .memdoc,
-.doxygen dl.reflist dd {
-        border-bottom: 1px solid #A8B8D9;      
-        border-left: 1px solid #A8B8D9;      
-        border-right: 1px solid #A8B8D9; 
+#content .doxygen .memdoc,
+#content .doxygen dl.reflist dd {
+        border-bottom: 1px solid #A8B8D9;
+        border-left: 1px solid #A8B8D9;
+        border-right: 1px solid #A8B8D9;
         padding: 2px 5px;
         background-color: #FBFCFD;
         border-top-width: 0;
@@ -464,50 +464,50 @@
         background-image: -webkit-gradient(linear,center top,center bottom,from(#FFFFFF), color-stop(0.6,#FFFFFF), color-stop(0.60,#FFFFFF), color-stop(0.95,#F7F8FB), to(#EEF1F7));
 }
 
-.doxygen dl.reflist dt {
+#content .doxygen dl.reflist dt {
         padding: 5px;
 }
 
-.doxygen dl.reflist dd {
+#content .doxygen dl.reflist dd {
         margin: 0px 0px 10px 0px;
         padding: 5px;
 }
 
-.doxygen .paramkey {
+#content .doxygen .paramkey {
 	text-align: right;
 }
 
-.doxygen .paramtype {
+#content .doxygen .paramtype {
 	white-space: nowrap;
 }
 
-.doxygen .paramname {
+#content .doxygen .paramname {
 	color: #602020;
 	white-space: nowrap;
 }
-.doxygen .paramname em {
+#content .doxygen .paramname em {
 	font-style: normal;
 }
 
-.doxygen .params,
-.doxygen .retval,
-.doxygen .exception,
-.doxygen .tparams {
+#content .doxygen .params,
+#content .doxygen .retval,
+#content .doxygen .exception,
+#content .doxygen .tparams {
         border-spacing: 6px 2px;
-}       
+}
 
-.doxygen .params .paramname, 
-.doxygen .retval .paramname {
+#content .doxygen .params .paramname,
+#content .doxygen .retval .paramname {
         font-weight: bold;
         vertical-align: top;
 }
-        
-.doxygen .params .paramtype {
+
+#content .doxygen .params .paramtype {
         font-style: italic;
         vertical-align: top;
-}       
-        
-.doxygen .params .paramdir {
+}
+
+#content .doxygen .params .paramdir {
         font-family: "courier new",courier,monospace;
         vertical-align: top;
 }
@@ -521,114 +521,114 @@
 
 /* for the tree view */
 
-.doxygen .ftvtree {
+#content .doxygen .ftvtree {
 	font-family: sans-serif;
 	margin: 0px;
 }
 
 /* these are for tree view when used as main index */
 
-.doxygen .directory {
+#content .doxygen .directory {
 	font-size: 9pt;
 	font-weight: bold;
 	margin: 5px;
 }
 
-.doxygen .directory h3 {
+#content .doxygen .directory h3 {
 	margin: 0px;
 	margin-top: 1em;
 	font-size: 11pt;
 }
 
 /*
-.doxygen The following two styles can be used to replace the root node title
-.doxygen with an image of your choice.  Simply uncomment the next two styles,
-.doxygen specify the name of your image and be sure to set 'height' to the
-.doxygen proper pixel height of your image.
+The following two styles can be used to replace the root node title
+with an image of your choice.  Simply uncomment the next two styles,
+specify the name of your image and be sure to set 'height' to the
+proper pixel height of your image.
 */
 
 /*
-.doxygen .directory h3.swap {
+#content .doxygen .directory h3.swap {
 	height: 61px;
 	background-repeat: no-repeat;
 	background-image: url("yourimage.gif");
 }
-.doxygen .directory h3.swap span {
+#content .doxygen .directory h3.swap span {
 	display: none;
 }
 */
 
-.doxygen .directory > h3 {
+#content .doxygen .directory > h3 {
 	margin-top: 0;
 }
 
-.doxygen .directory p {
+#content .doxygen .directory p {
 	margin: 0px;
 	white-space: nowrap;
 }
 
-.doxygen .directory div {
+#content .doxygen .directory div {
 	display: none;
 	margin: 0px;
 }
 
-.doxygen .directory img {
+#content .doxygen .directory img {
 	vertical-align: -30%;
 }
 
 /* these are for tree view when not used as main index */
 
-.doxygen .directory-alt {
+#content .doxygen .directory-alt {
 	font-size: 100%;
 	font-weight: bold;
 }
 
-.doxygen .directory-alt h3 {
+#content .doxygen .directory-alt h3 {
 	margin: 0px;
 	margin-top: 1em;
 	font-size: 11pt;
 }
 
-.doxygen .directory-alt > h3 {
+#content .doxygen .directory-alt > h3 {
 	margin-top: 0;
 }
 
-.doxygen .directory-alt p {
+#content .doxygen .directory-alt p {
 	margin: 0px;
 	white-space: nowrap;
 }
 
-.doxygen .directory-alt div {
+#content .doxygen .directory-alt div {
 	display: none;
 	margin: 0px;
 }
 
-.doxygen .directory-alt img {
+#content .doxygen .directory-alt img {
 	vertical-align: -30%;
 }
 
 /* @end */
 
-.doxygen div.dynheader {
+#content .doxygen div.dynheader {
         margin-top: 8px;
 }
 
-.doxygen address {
+#content .doxygen address {
 	font-style: normal;
 	color: #2A3D61;
 }
 
-.doxygen table.doxtable {
+#content .doxygen table.doxtable {
 	border-collapse:collapse;
 }
 
-.doxygen table.doxtable td,
-.doxygen table.doxtable th {
+#content .doxygen table.doxtable td,
+#content .doxygen table.doxtable th {
 	border: 1px solid #2D4068;
 	padding: 3px 7px 2px;
 }
 
-.doxygen table.doxtable th {
+#content .doxygen table.doxtable th {
 	background-color: #374F7F;
 	color: #FFFFFF;
 	font-size: 110%;
@@ -637,7 +637,7 @@
 	text-align:left;
 }
 
-.doxygen table.fieldtable {
+#content .doxygen table.fieldtable {
         width: 100%;
         margin-bottom: 10px;
         border: 1px solid #A8B8D9;
@@ -650,29 +650,29 @@
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
 }
 
-.doxygen .fieldtable td,
-.doxygen .fieldtable th {
+#content .doxygen .fieldtable td,
+#content .doxygen .fieldtable th {
         padding: 3px 7px 2px;
 }
 
-.doxygen .fieldtable td.fieldtype, 
-.doxygen .fieldtable td.fieldname {
+#content .doxygen .fieldtable td.fieldtype,
+#content .doxygen .fieldtable td.fieldname {
         white-space: nowrap;
         border-right: 1px solid #A8B8D9;
         border-bottom: 1px solid #A8B8D9;
         vertical-align: top;
 }
 
-.doxygen .fieldtable td.fielddoc {
+#content .doxygen .fieldtable td.fielddoc {
         border-bottom: 1px solid #A8B8D9;
         width: 100%;
 }
 
-.doxygen .fieldtable tr:last-child td {
+#content .doxygen .fieldtable tr:last-child td {
         border-bottom: none;
 }
 
-.doxygen .fieldtable th {
+#content .doxygen .fieldtable th {
         background-image:url('nav_f.png');
         background-repeat:repeat-x;
         background-color: #E2E8F2;
@@ -691,7 +691,7 @@
 }
 
 
-.doxygen .tabsearch {
+#content .doxygen .tabsearch {
 	top: 0px;
 	left: 10px;
 	height: 36px;
@@ -701,7 +701,7 @@
 	font-size: 13px;
 }
 
-.doxygen .navpath ul
+#content .doxygen .navpath ul
 {
 	font-size: 11px;
 	background-image:url('tab_b.png');
@@ -715,7 +715,7 @@
 	padding:0px;
 }
 
-.doxygen .navpath li
+#content .doxygen .navpath li
 {
 	list-style-type:none;
 	float:left;
@@ -727,7 +727,7 @@
 	color:#364D7C;
 }
 
-.doxygen .navpath li.navelem a
+#content .doxygen .navpath li.navelem a
 {
 	height:32px;
 	display:block;
@@ -735,12 +735,12 @@
 	outline: none;
 }
 
-.doxygen .navpath li.navelem a:hover
+#content .doxygen .navpath li.navelem a:hover
 {
 	color:#6884BD;
 }
 
-.doxygen .navpath li.footer
+#content .doxygen .navpath li.footer
 {
         list-style-type:none;
         float:right;
@@ -754,21 +754,21 @@
 }
 
 
-.doxygen div.summary
+#content .doxygen div.summary
 {
 	float: right;
 	font-size: 8pt;
 	padding-right: 5px;
 	width: 50%;
 	text-align: right;
-}       
+}
 
-.doxygen div.summary a
+#content .doxygen div.summary a
 {
 	white-space: nowrap;
 }
 
-.doxygen div.ingroups
+#content .doxygen div.ingroups
 {
 	margin-left: 5px;
 	font-size: 8pt;
@@ -777,12 +777,12 @@
 	text-align: left;
 }
 
-.doxygen div.ingroups a
+#content .doxygen div.ingroups a
 {
 	white-space: nowrap;
 }
 
-.doxygen div.header
+#content .doxygen div.header
 {
         background-image:url('nav_h.png');
         background-repeat:repeat-x;
@@ -791,63 +791,63 @@
 	border-bottom: 1px solid #C4CFE5;
 }
 
-.doxygen div.headertitle
+#content .doxygen div.headertitle
 {
 	padding: 5px 5px 5px 7px;
 }
 
-.doxygen dl
+#content .doxygen dl
 {
         padding: 0 0 0 10px;
 }
 
-.doxygen dl.note, dl.warning, 
-.doxygen dl.attention, 
-.doxygen dl.pre, dl.post,
-.doxygen dl.invariant, 
-.doxygen dl.deprecated, 
-.doxygen dl.todo, 
-.doxygen dl.test,
-.doxygen dl.bug
+#content .doxygen dl.note, dl.warning,
+#content .doxygen dl.attention,
+#content .doxygen dl.pre, dl.post,
+#content .doxygen dl.invariant,
+#content .doxygen dl.deprecated,
+#content .doxygen dl.todo,
+#content .doxygen dl.test,
+#content .doxygen dl.bug
 {
         border-left:4px solid;
         padding: 0 0 0 6px;
 }
 
-.doxygen dl.note
+#content .doxygen dl.note
 {
         border-color: #D0C000;
 }
 
-.doxygen dl.warning,
+#content .doxygen dl.warning,
 dl.attention
 {
         border-color: #FF0000;
 }
 
-.doxygen dl.pre,
-.doxygen dl.post,
-.doxygen dl.invariant
+#content .doxygen dl.pre,
+#content .doxygen dl.post,
+#content .doxygen dl.invariant
 {
         border-color: #00D000;
 }
 
-.doxygen dl.deprecated
+#content .doxygen dl.deprecated
 {
         border-color: #505050;
 }
 
-.doxygen dl.todo
+#content .doxygen dl.todo
 {
         border-color: #00C0E0;
 }
 
-.doxygen dl.test
+#content .doxygen dl.test
 {
         border-color: #3030E0;
 }
 
-.doxygen dl.bug
+#content .doxygen dl.bug
 {
         border-color: #C08050;
 }
@@ -858,19 +858,19 @@ dl.attention
 	vertical-align: bottom;
 	border-collapse: separate;
 }
- 
+
 #projectlogo img
-{ 
+{
 	border: 0px none;
 }
- 
+
 #projectname
 {
 	font: 300% Tahoma, Arial,sans-serif;
 	margin: 0px;
 	padding: 2px 0px;
 }
-    
+
 #projectbrief
 {
 	font: 120% Tahoma, Arial,sans-serif;
@@ -893,36 +893,36 @@ dl.attention
 	border-bottom: 1px solid #5373B4;
 }
 
-.doxygen .image
+#content .doxygen .image
 {
         text-align: center;
 }
 
-.doxygen .dotgraph
+#content .doxygen .dotgraph
 {
         text-align: center;
 }
 
-.doxygen .mscgraph
+#content .doxygen .mscgraph
 {
         text-align: center;
 }
 
-.doxygen .caption
+#content .doxygen .caption
 {
 	font-weight: bold;
 }
 
-.doxygen div.zoom
+#content .doxygen div.zoom
 {
 	border: 1px solid #90A5CE;
 }
 
-.doxygen dl.citelist {
+#content .doxygen dl.citelist {
         margin-bottom:50px;
 }
 
-.doxygen dl.citelist dt {
+#content .doxygen dl.citelist dt {
         color:#334975;
         float:left;
         font-weight:bold;
@@ -930,7 +930,7 @@ dl.attention
         padding:5px;
 }
 
-.doxygen dl.citelist dd {
+#content .doxygen dl.citelist dd {
         margin:2px 0;
         padding:5px 0;
 }
@@ -963,4 +963,41 @@ dl.attention
     word-wrap: break-word; /* IE 5.5+ */
   }
 }
+
+#content .doxygen div.tabs,
+#content .doxygen div.tabs2,
+#content .doxygen div.tabs3,
+#content .doxygen div.tabs4 {
+    padding: 0 ;
+    margin: 0 ;
+    border: 1px solid white ;
+    font-size: .9em ;
+}
+#content .doxygen ul.tablist {
+    display: block ;
+    width: 100% ;
+    margin: 5px 0 ;
+    padding: 0 ;
+    padding-bottom: 3px ;
+    border-bottom: 1px solid #aaa ;
+}
+#content .doxygen ul.tablist li {
+    display: inline ;
+    margin: 4px ;
+    padding: 5px ;
+    border: 1px solid #aaa ;
+    background-color: #f6f6f6 ;
+}
+#content .doxygen ul.tablist li.current {
+    background-color: inherit ;
+    border-bottom: 1px solid white ;
+}
+#content .doxygen ul.tablist li a {
+    text-decoration : none ;
+    color: black ;
+}
+#content .doxygen ul.tablist li.current a {
+    font-weight: bold ;
+}
+
 

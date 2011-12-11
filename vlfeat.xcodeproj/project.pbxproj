@@ -210,6 +210,7 @@
 		2D66AD0D13AE05BD0060594E /* vl_xyz2luv.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2luv.m; path = toolbox/imop/vl_xyz2luv.m; sourceTree = "<group>"; };
 		2D66AD0E13AE05BD0060594E /* vl_xyz2rgb.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2rgb.m; path = toolbox/imop/vl_xyz2rgb.m; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
+		2D708F261493C5540079605B /* doxygen.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = doxygen.css; path = docsrc/doxygen.css; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; tabWidth = 2; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
 		2D72EAF10E48A42F005DAA47 /* imopv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv.h; sourceTree = "<group>"; };
@@ -759,6 +760,7 @@
 				2D7AD0B50E38C18600783252 /* web.xml */,
 				2D7AD0860E38C05800783252 /* web.css */,
 				2DAF7CEC139918EA00FA0D07 /* pygmentize.css */,
+				2D708F261493C5540079605B /* doxygen.css */,
 				2D7AD0800E38911C00783252 /* formatter.py */,
 				2D7AD0810E38911C00783252 /* mdoc.py */,
 				2D7AD0820E38911C00783252 /* webdoc.py */,
