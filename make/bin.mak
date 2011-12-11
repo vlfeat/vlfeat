@@ -12,8 +12,26 @@ info: bin-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-BIN_CFLAGS = $(CFLAGS)
+BIN_CFLAGS = $(CFLAGS) -I$(VLDIR)
 BIN_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
+
+# Mac OS X Intel 32
+ifeq ($(ARCH),maci)
+endif
+
+# Mac OS X Intel 64
+ifeq ($(ARCH),maci64)
+endif
+
+# Linux-32
+ifeq ($(ARCH),glnx86)
+BIN_LDFLAGS += -Wl,--rpath,\$$ORIGIN/
+endif
+
+# Linux-64
+ifeq ($(ARCH),glnxa64)
+BIN_LDFLAGS += -Wl,--rpath,\$$ORIGIN/
+endif
 
 # --------------------------------------------------------------------
 #                                                                Build

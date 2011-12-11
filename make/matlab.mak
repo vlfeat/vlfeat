@@ -29,45 +29,39 @@ info: mex-info matlab-info
 
 MEX_ARCH = $(ARCH)
 
-# While it would seem natural to include the linked libraries in
-# MEX_LDFLAGS, by doing so MEX passes them to the linker
-# before the object that uses them (the MEX file),
-# breaking compilation with stricter linkers (see also bin.mak).
-# The solution is to pass them as part of MEX_FLAGS instead.
+MEX_CFLAGS = -I$(VLDIR) -I$(VLDIR)/toolbox
+MEX_LDFLAGS = -L$(BINDIR) -lvl
 
-MEX_FLAGS  = -$(MEX_ARCH)
+MEX_FLAGS  = -$(MEX_ARCH) -largeArrayDims
 MEX_FLAGS += $(if $(DEBUG), -g, -O)
 MEX_FLAGS += $(if $(PROFILE), -O -g,)
-MEX_FLAGS += -lm -largeArrayDims -L$(BINDIR) -lvl
-
-MEX_CFLAGS   = $(CFLAGS)
-MEX_CFLAGS  += -I$(VLDIR)/toolbox
-
-MEX_LDFLAGS  = $(LDFLAGS)
+MEX_FLAGS += CFLAGS='$$CFLAGS $(CFLAGS)'
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(LDFLAGS)'
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 MEX_SUFFIX := mexmaci64
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(LDFLAGS)'
 endif
 
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
-MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexglx
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
-MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexa64
 endif
 
-MEX_BINDIR  := toolbox/mex/$(MEX_SUFFIX)
+MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
 # --------------------------------------------------------------------
 #                                                         Sanity check
@@ -108,21 +102,22 @@ mex-all: $(mex_tgt)
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
-$(mex_dll) : $(dll_tgt)
+$(mex_dll) : $(dll_tgt) $(mex-dir)
 	cp -v "$(<)" "$(@)"
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
-	$(call C,CC) $(MEX_CFLAGS) \
+	$(call C,CC) \
+	       $(MEX_CFLAGS) \
 	       -I"$(MATLAB_PATH)/extern/include" -M -MT \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt) $(mex_dll)
 	$(call C,MEX) \
-               CFLAGS='$$CFLAGS $(MEX_CFLAGS)'  \
-	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
-               "$(<)" \
 	       $(MEX_FLAGS) \
+               $(MEX_CFLAGS) \
+               "$(<)" \
+	       $(MEX_LDFLAGS) \
 	       -outdir "$(dir $(@))"
 
 mex-info:
