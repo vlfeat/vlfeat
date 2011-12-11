@@ -139,7 +139,6 @@ CLFAGS += $(FEATUREFLAGS)
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-CFLAGS += -I$(VLDIR)
 
 CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
 CFLAGS += $(if $(PROFILE), -g,)
@@ -151,7 +150,7 @@ ifeq ($(ARCH),maci)
 SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 endif
 
 # Mac OS X Intel 64
@@ -159,18 +158,18 @@ ifeq ($(ARCH),maci64)
 SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 endif
 
 # Linux-32
 ifeq ($(ARCH),glnx86)
 CFLAGS  += -march=i686
-LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
+LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
-LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
+LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
 # --------------------------------------------------------------------

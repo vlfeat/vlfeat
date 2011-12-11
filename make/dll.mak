@@ -20,6 +20,8 @@ DLL_CFLAGS  = $(CFLAGS)
 DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
 
+DLL_LDFLAGS += -lm
+
 BINDIR = bin/$(ARCH)
 
 # Mac OS X on Intel 32 bit processor
@@ -91,10 +93,12 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
                     -current_version $(VER)                          \
                     -syslibroot $(SDKROOT)                           \
 		    -macosx_version_min $(MACOSX_DEPLOYMENT_TARGET)  \
-	            -o $@ -undefined suppress $^
+	            -o $@ -undefined suppress $^                     \
+	            $(DLL_LDFLAGS)
+
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
-	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
+	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@) $(DLL_LDFLAGS)
 
 dll-clean:
 	rm -f $(dll_dep) $(dll_obj)
@@ -114,6 +118,7 @@ dll-info:
 	$(call echo-var,BINDIR)
 	$(call echo-var,DLL_NAME)
 	$(call echo-var,DLL_CFLAGS)
+	$(call echo-var,DLL_LDFLAGS)
 	$(call echo-var,DLL_SUFFIX)
 	$(call echo-var,LIBTOOL)
 	@echo
