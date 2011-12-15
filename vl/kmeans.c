@@ -1,6 +1,6 @@
-/** @file   kmeans.c
+/** @file kmeans.c
+ ** @brief K-means - Declaration
  ** @author Andrea Vedaldi
- ** @brief  K-means - Declaration
  **/
 
 /* AUTORIGHTS
@@ -10,10 +10,10 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-/** @file kmeans.h
-
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section kmeans-overview Overview
+@page kmeans K-means clustering
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kmeans.h implements a number of algorithm for k-means quantisation.

@@ -1,6 +1,6 @@
-/** @file   kmeans.h
+/** @file kmeans.h
+ ** @brief K-means (@ref kmeans)
  ** @author Andrea Vedaldi
- ** @brief  K-means - Declaration
  **/
 
 /* AUTORIGHTS

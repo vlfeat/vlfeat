@@ -1,5 +1,5 @@
 /** @file quickshift.h
- ** @brief Quick shift image segmentation
+ ** @brief Quick shift (@ref quickshift)
  ** @author Andrea Vedaldi
  ** @author Brian Fulkerson
  **/

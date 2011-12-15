@@ -10,7 +10,12 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-/** @file kdtree.h
+/**
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page kdtree KD-trees and forests
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kdtree.h implements a KD-tree object, a data structure that can
 efficiently index moderately dimensional vector spaces. Both

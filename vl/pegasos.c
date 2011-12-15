@@ -1,6 +1,6 @@
-/** @file     pegasos.c
- ** @brief    PEGASOS SVM - Definition
- ** @author   Andrea Vedaldi
+/** @file pegasos.c
+ ** @brief PEGASOS - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -10,16 +10,20 @@
  GNU GPLv2, or (at your option) any later version.
  */
 
-/** @file pegasos.h
+/**
+<!-- ------------------------------------------------------------- -->
+@page pegasos PEGASOS SVM solver
+@author Andrea Vedaldi
+<!-- ------------------------------------------------------------- -->
 
 @ref pegasos.h provides a basic implementation of the PEGASOS
 @cite{shalev-shwartz07pegasos} linear SVM solver.
 
 - @ref pegasos-overview "Overview"
-- @ref pegasos-algorithm "Algorithm"
-- @ref pegasos-bias "Bias"
-- @ref pegasos-restarting "Restarting"
-- @ref pegasos-kernels "Non-linear kernels"
+  - @ref pegasos-algorithm "Algorithm"
+  - @ref pegasos-bias "Bias"
+  - @ref pegasos-restarting "Restarting"
+  - @ref pegasos-kernels "Non-linear kernels"
 
 <!-- ------------------------------------------------------------ --->
 @section pegasos-overview Overview

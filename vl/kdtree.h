@@ -1,5 +1,5 @@
 /** @file   kdtree.h
- ** @brief  KD-tree
+ ** @brief  KD-tree (@ref kdtree)
  ** @author Andrea Vedaldi
  **/
 

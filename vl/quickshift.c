@@ -1,7 +1,7 @@
 /** @file quickshift.c
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief Quick shift image segmentation - Definition
+ ** @brief Quick shift - Definition
  **/
 
 /* AUTORIGHTS
@@ -11,10 +11,11 @@ This file is part of VLFeat, available under the terms of the
 GNU GPLv2, or (at your option) any later version.
 */
 
-/** @file quickshift.h
-
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section quickshift Quick shift image segmentation
+@page quickshift Quick shift image segmentation
+@author Brian Fulkerson
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref quickshift.h implements an image segmentation algorithm based on
@@ -25,7 +26,7 @@ the quick shift clustering algorithm @cite{vedaldi08quick}.
 - @ref quickshift-tech
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection quickshift-intro Overview
+@section quickshift-intro Overview
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Quick shift @cite{vedaldi08quick} is a fast mode seeking algorithm,
@@ -57,7 +58,7 @@ relatively small distances (the maximum distance can be set to a small
 multiple of the kernel size).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection quickshift-usage Usage
+@section quickshift-usage Usage
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 - Create a new quick shift object (::vl_quickshift_new). The object
@@ -73,7 +74,7 @@ multiple of the kernel size).
 - Delete the quick shift object (::vl_quickshift_delete).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection quickshift-tech Technical details
+@section quickshift-tech Technical details
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 For each pixel <em>(x,y)</em>, quick shift regards @f$ (x,y,I(x,y))

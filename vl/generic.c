@@ -1,6 +1,6 @@
-/** @file    generic.c
- ** @author  Andrea Vedaldi
- ** @brief   Generic - Definition
+/** @file generic.c
+ ** @brief Generic - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS
@@ -11,318 +11,355 @@ GNU GPLv2, or (at your option) any later version.
 */
 
 /**
- @mainpage VLFeat -- Vision Lab Features Library
- @version __VLFEAT_VERSION__
- @author Andrea Vedaldi  (vedaldi@robots.ox.ac.uk)
- @author Brian Fulkerson (bfulkers@cs.ucla.edu)
 
- @par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@mainpage VLFeat -- Vision Lab Features Library
+@version __VLFEAT_VERSION__
+@author Andrea Vedaldi (vedaldi@robots.ox.ac.uk)
+@author Brian Fulkerson (bfulkers@cs.ucla.edu)
+@par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- <em>VLFeat C library contains implementations of common computer
- vision algorithms, with a special focus on visual features for
- matching image regions. Applications include structure from motion
- and object and category detection and recognition.
+<em>VLFeat C library contains implementations of common computer
+vision algorithms, with a special focus on visual features for
+matching image regions. Applications include structure from motion and
+object and category detection and recognition.
 
- We strive to make the library free of clutter, portable (VLFeat is
- largely C-89 compatible), and self- documented. Different parts of
- the library are weakly interdependent, simplifying understanding and
- extraction of code.</em>
+We strive to make the library free of clutter, portable (VLFeat is
+largely C-89 compatible), and self- documented. Different parts of the
+library are weakly interdependent, simplifying understanding and
+extraction of code.</em>
 
- @section main-contents Contents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section main-contents Contents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- - Algorithms
-   - @ref sift.h     "Scale Invariant Feature Transform (SIFT)"
-   - @ref dsift.h    "Dense SIFT (DSIFT)"
-   - @ref mser.h     "Maximally Stable Extremal Regions (MSER)"
-   - @ref kmeans.h   "K-means"
-   - @ref ikmeans.h  "Integer K-means (IKM)"
-   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
-   - @ref aib.h      "Agglomerative Information Bottleneck (AIB)"
-   - @ref kdtree.h   "KDTree (fast and approximate nearest neighbors)"
-   - @ref homkermap.h "Homogeneous kernel map"
-   - @ref pegasos.h  "PEGASOS SVM solver"
-   - @ref slic.h     "SLIC superpixels"
-   - @ref quickshift.h "Quick shift superpixels"
- - Support functionalities
-   - @ref host.h      "Platform abstraction"
-   - @ref generic.h   "Errors, memory, logging, and others"
-   - @ref random.h    "Random number generator"
-   - @ref mathop.h    "Math operations"
-   - @ref heap-def.h  "Generic heap object (priority queue)"
-   - @ref stringop.h  "String operations"
-   - @ref imopv.h     "Image operations"
-   - @ref pgm.h       "PGM reading and writing"
-   - @ref rodrigues.h "Rodrigues formula"
-   - @ref mexutils.h  "MATLAB MEX helper functions"
-   - @ref getopt_long.h "Drop-in @c getopt_long replacement"
- - @ref design          "Design Concepts"
-   - @ref design-objects     "Objects"
-   - @ref design-resources   "Memory and resource management"
-   - @ref design-threads     "Multi-threading"
-   - @ref design-portability "Portability"
- - @ref main-glossary "Glossary"
+- <b>Algorithms</b>
+  - @ref sift
+  - @ref dsift
+  - @ref mser
+  - @ref kmeans
+  - @ref ikmeans.h  "Integer K-means (IKM)"
+  - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
+  - @ref aib
+  - @ref kdtree
+  - @ref homkermap
+  - @ref pegasos
+  - @ref slic
+  - @ref quickshift
+- <b>Support functionalities</b>
+  - @ref host.h      "Platform abstraction"
+  - @ref generic
+  - @ref random.h    "Random number generator"
+  - @ref mathop.h    "Math operations"
+  - @ref heap-def.h  "Generic heap object (priority queue)"
+  - @ref stringop.h  "String operations"
+  - @ref imopv.h     "Image operations"
+  - @ref pgm.h       "PGM reading and writing"
+  - @ref rodrigues.h "Rodrigues formula"
+  - @ref mexutils.h  "MATLAB MEX helper functions"
+  - @ref getopt_long.h "Drop-in @c getopt_long replacement"
+- @ref design
+  - @ref design-objects     "Objects"
+  - @ref design-resources   "Memory and resource management"
+  - @ref design-threads     "Multi-threading"
+  - @ref design-portability "Portability"
+- @ref main-glossary "Glossary"
 
- @section design VLFeat design concepts
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page design VLFeat design concepts
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- VLFeat is designed to be portable and simple to integrate with high
- level languages such as MATLAB. This section illustrates and
- motivates the aspects of the design that are relevant to the users of
- the library.
+VLFeat is designed to be portable and simple to integrate with high
+level languages such as MATLAB. This section illustrates and
+motivates the aspects of the design that are relevant to the users of
+the library.
 
- @subsection design-resources Memory and resource handling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section design-resources Memory and resource handling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- Some VLFeat functions return pointers to memory blocks or
- objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc, or functions
- whose name contains either the keywords @c new or @c copy,
- transfer the ownership of the memory block or object to the
- caller. The caller must dispose explicitly of all the resources he
- owns (by calling ::vl_free for a memory block, or the appropriate
- destructor for an object).
+Some VLFeat functions return pointers to memory blocks or
+objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc, or functions
+whose name contains either the keywords @c new or @c copy,
+transfer the ownership of the memory block or object to the
+caller. The caller must dispose explicitly of all the resources he
+owns (by calling ::vl_free for a memory block, or the appropriate
+destructor for an object).
 
- The memory allocation functions can be customized by
- ::vl_set_alloc_func (which sets the implementations of ::vl_malloc,
- ::vl_realloc, ::vl_calloc and ::vl_free). Remapping the memory
- allocation functions can be done only if there are no currently
- allocated VLFeat memory blocks or objects. The memory allocation
- functions are common to all threads.
+The memory allocation functions can be customized by
+::vl_set_alloc_func (which sets the implementations of ::vl_malloc,
+::vl_realloc, ::vl_calloc and ::vl_free). Remapping the memory
+allocation functions can be done only if there are no currently
+allocated VLFeat memory blocks or objects. The memory allocation
+functions are common to all threads.
 
- VLFeat uses three rules that simplify handling exceptions:
+VLFeat uses three rules that simplify handling exceptions:
 
- - The library allocates local memory only through the reprogrammable
-   ::vl_malloc, ::vl_calloc, and ::vl_realloc functions.
+- The library allocates local memory only through the reprogrammable
+  ::vl_malloc, ::vl_calloc, and ::vl_realloc functions.
 
- - The only resource referenced by VLFeat objects is memory (for
-   instance, it is illegal for an object to reference an open file).
-   Other resources such as files or threads may be allocated within a
-   VLFeat function call, but they are all released before the function
-   ends, or their ownership is directly transferred to the caller.
+- The only resource referenced by VLFeat objects is memory (for
+  instance, it is illegal for an object to reference an open file).
+  Other resources such as files or threads may be allocated within a
+  VLFeat function call, but they are all released before the function
+  ends, or their ownership is directly transferred to the caller.
 
- - The global library state is an exception. It cannot reference any
-   local object created by the caller and uses the standard C memory
-   allocation functions.
+- The global library state is an exception. It cannot reference any
+  local object created by the caller and uses the standard C memory
+  allocation functions.
 
- In this way, the VLFeat local state can be reset at any time simply
- by disposing of all the memory allocated so far. The latter can be
- done easily by mapping the memory allocation functions to
- implementations that track the memory blocks allocated, and simply
- disposing of all such blocks. Since the global state does not
- reference any local object nor uses the remapped memory functions, it
- is unaffected by such an operation; conversely, since no VLFeat
- object references anything but memory, this guarantees that all
- allocated resources are properly disposed (no leaks). This is used
- extensively in the design of MATLAB MEX files (see @ref
- design-matlab).
+In this way, the VLFeat local state can be reset at any time simply
+by disposing of all the memory allocated so far. The latter can be
+done easily by mapping the memory allocation functions to
+implementations that track the memory blocks allocated, and simply
+disposing of all such blocks. Since the global state does not
+reference any local object nor uses the remapped memory functions, it
+is unaffected by such an operation; conversely, since no VLFeat
+object references anything but memory, this guarantees that all
+allocated resources are properly disposed (no leaks). This is used
+extensively in the design of MATLAB MEX files (see @ref
+design-matlab).
 
- @subsection design-objects Objects
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section design-objects Objects
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- Many VLFeat algorithms are availale in the form of
- &ldquo;objects&rdquo;. Notice that the C language, used by VLFeat,
- does not support objects explicitly. Here an object indicates an
- opaque data structure along with a number of functions (methods)
- operationg on it.
+Many VLFeat algorithms are availale in the form of
+&ldquo;objects&rdquo;. Notice that the C language, used by VLFeat,
+does not support objects explicitly. Here an object indicates an
+opaque data structure along with a number of functions (methods)
+operationg on it.
 
- Object names are captilaised and start with the <code>Vl</code>
- prefix (for example ::VlSiftFilt). Object methods are lowercase and
- start with the <code>vl_<object_name>_</code> suffix
- (e.g. ::vl_sift_new). Object methods typraically include a constructor
- (e.g. ::vl_sift_new), a destructor (::vl_sift_delete), some getter
- methods (::vl_sift_get_octave_index), and some setter methods
- (::vl_sift_set_magnif).
+Object names are captilaised and start with the <code>Vl</code>
+prefix (for example ::VlSiftFilt). Object methods are lowercase and
+start with the <code>vl_<object_name>_</code> suffix
+(e.g. ::vl_sift_new). Object methods typraically include a constructor
+(e.g. ::vl_sift_new), a destructor (::vl_sift_delete), some getter
+methods (::vl_sift_get_octave_index), and some setter methods
+(::vl_sift_set_magnif).
 
- @subsection design-threads Multi-threading
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section design-threads Multi-threading
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- VLFeat can be used with multiple threads by treating appropriately
- different kinds of operations:
+VLFeat can be used with multiple threads by treating appropriately
+different kinds of operations:
 
- - <b>Local operations (reentrancy).</b> Most VLFeat operations are
-   reentrant, in the sense that they operate on local data. It is safe
-   to execute such operations concurrently from multiple threads as
-   long as each thread operates on an independent sets of objects or
-   memory blocks.  By contrast, operating on the same object or memory
-   block from multiple threads requires proper synchronization by the
-   user.
+- <b>Local operations (reentrancy).</b> Most VLFeat operations are
+  reentrant, in the sense that they operate on local data. It is safe
+  to execute such operations concurrently from multiple threads as
+  long as each thread operates on an independent sets of objects or
+  memory blocks.  By contrast, operating on the same object or memory
+  block from multiple threads requires proper synchronization by the
+  user.
 
- - <b>Task-specific operations.</b> A few operations are intrinsically
-   non-reentrant but thread-specific. These include: retrieving the
-   last error by ::vl_get_last_error and obtaining the thread-specific
-   random number generator by ::vl_get_rand. VLFeat makes such
-   operations thread-safe by operating on task-specific data.
+- <b>Task-specific operations.</b> A few operations are intrinsically
+  non-reentrant but thread-specific. These include: retrieving the
+  last error by ::vl_get_last_error and obtaining the thread-specific
+  random number generator by ::vl_get_rand. VLFeat makes such
+  operations thread-safe by operating on task-specific data.
 
- - <b>Global operations.</b> A small number of operations are
-   non-reentrant <em>and</em> affect all threads simultaneously. These
-   are restricted to changing certain global configuration parameters,
-   such as the memory allocation functions by
-   ::vl_set_alloc_func. These operations are <em>not</em> thread safe
-   and should be executed before multiple threads are started.
+- <b>Global operations.</b> A small number of operations are
+  non-reentrant <em>and</em> affect all threads simultaneously. These
+  are restricted to changing certain global configuration parameters,
+  such as the memory allocation functions by
+  ::vl_set_alloc_func. These operations are <em>not</em> thread safe
+  and should be executed before multiple threads are started.
 
- Some VLFeat algorithms are randomised. Each thread has his own random
- number generator (an instance of ::VlRand) accessed by
- ::vl_get_rand. To make calculations reproducible the random number
- generator must be seeded appropriately in each thread. Notice also
- that using the same VLFeat object from multiple threads (with
- appropriate synchronization) will cause multiple random number
- generators to be intermixed.
+Some VLFeat algorithms are randomised. Each thread has his own random
+number generator (an instance of ::VlRand) accessed by
+::vl_get_rand. To make calculations reproducible the random number
+generator must be seeded appropriately in each thread. Notice also
+that using the same VLFeat object from multiple threads (with
+appropriate synchronization) will cause multiple random number
+generators to be intermixed.
 
- @subsection design-portability Portability features
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section design-portability Portability features
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- Platform dependent details are isolated in the @ref host.h
- library module. These include:
+Platform dependent details are isolated in the @ref host.h
+library module. These include:
 
- - Atomic types (e.g. ::vl_int32).
- - Special syntaxes for the declaration of symbols exported by the library
-   and inline functions (e.g. ::VL_EXPORT).
- - Host-dependent conversion of data endianess
-   (e.g. ::vl_swap_host_big_endianness_8()).
+- Atomic types (e.g. ::vl_int32).
+- Special syntaxes for the declaration of symbols exported by the library
+  and inline functions (e.g. ::VL_EXPORT).
+- Host-dependent conversion of data endianess
+  (e.g. ::vl_swap_host_big_endianness_8()).
 
- VLFeat uses processor specific features (e.g. Intel SSE) if those are
- available at run time.
+VLFeat uses processor specific features (e.g. Intel SSE) if those are
+available at run time.
 
- <!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
+<!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
 
- @subsection design-matlab MATLAB integration issues
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section design-matlab MATLAB integration issues
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- The VLFeat C library is designed to integrate seamlessly with MATLAB.
- Binary compatibility is simplified by the use of the C language
- (rather than C++). In addition, the library design follows certain
- restrictons that make it compatible with the MATLAB MEX interface.
+The VLFeat C library is designed to integrate seamlessly with MATLAB.
+Binary compatibility is simplified by the use of the C language
+(rather than C++). In addition, the library design follows certain
+restrictons that make it compatible with the MATLAB MEX interface.
 
- The main issue in calling a library function from a MATLAB MEX
- function is that MATLAB can abort the execution of the MEX function
- at any point, either due to an error, or directly upon a user request
- (Ctrl-C) (empirically, however, a MEX function seems to be
- interruptible only during the invocation of certain functions of the
- MEX API such as @c mexErrMsgTxt).
+The main issue in calling a library function from a MATLAB MEX
+function is that MATLAB can abort the execution of the MEX function
+at any point, either due to an error, or directly upon a user request
+(Ctrl-C) (empirically, however, a MEX function seems to be
+interruptible only during the invocation of certain functions of the
+MEX API such as @c mexErrMsgTxt).
 
- When a MEX function is interrupted, resources (memory blocks or
- objects) whose ownership was transferred from VLFeat to the MEX
- function may be leaked. Notice that interrupting a MEX function would
- similarly leak any memory block allocated within the MEX function. To
- solve this issue, MATLAB provides his own memory manager (@c
- mxMalloc, @c mxRealloc, ...). When a MEX file is interrupted or ends,
- all memory blocks allocated by using one of such functions are
- released, preventing leakage.
+When a MEX function is interrupted, resources (memory blocks or
+objects) whose ownership was transferred from VLFeat to the MEX
+function may be leaked. Notice that interrupting a MEX function would
+similarly leak any memory block allocated within the MEX function. To
+solve this issue, MATLAB provides his own memory manager (@c
+mxMalloc, @c mxRealloc, ...). When a MEX file is interrupted or ends,
+all memory blocks allocated by using one of such functions are
+released, preventing leakage.
 
- In order to integrate VLFeat with this model in the most seamless
- way, VLFeat memory allocation functions (::vl_malloc, ::vl_realloc,
- ::vl_calloc) are mapped to the corresponding MEX memory allocation
- functions. Such functions automatically dispose of all the memory
- allocated by a MEX function when the function ends (even because of
- an exception). Because of the restrictions of the library design
- illustrated in @ref design-resources, this operation is safe and
- correctly dispose of VLFeat local state. As a consequence, it is
- possible to call @c mexErrMsgTxt at any point in the MEX function
- without worring about leaking resources.
+In order to integrate VLFeat with this model in the most seamless
+way, VLFeat memory allocation functions (::vl_malloc, ::vl_realloc,
+::vl_calloc) are mapped to the corresponding MEX memory allocation
+functions. Such functions automatically dispose of all the memory
+allocated by a MEX function when the function ends (even because of
+an exception). Because of the restrictions of the library design
+illustrated in @ref design-resources, this operation is safe and
+correctly dispose of VLFeat local state. As a consequence, it is
+possible to call @c mexErrMsgTxt at any point in the MEX function
+without worring about leaking resources.
 
- This however comes at the price of some limitations. Beyond the
- restrictions illustred in @ref design-resources, here we note that no
- VLFeat local resoruce (memory blocks or objects) can persist across
- MEX file invocations. This implies that any result produced by a
- VLFeat MEX function must be converted back to a MATLAB object such as
- a vector or a structure. In particular, there is no direct way of
- creating an object within a MEX file, returning it to MATLAB, and
- passing it again to another MEX file.
+This however comes at the price of some limitations. Beyond the
+restrictions illustred in @ref design-resources, here we note that no
+VLFeat local resoruce (memory blocks or objects) can persist across
+MEX file invocations. This implies that any result produced by a
+VLFeat MEX function must be converted back to a MATLAB object such as
+a vector or a structure. In particular, there is no direct way of
+creating an object within a MEX file, returning it to MATLAB, and
+passing it again to another MEX file.
 
- @section main-metaprogramming Preprocessor metaprogramming
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section main-metaprogramming Preprocessor metaprogramming
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- Part of VLFeat code uses a simple form of perprocessor metaprogramming.
- This technique is used, similarly to C++ templates, to instantiate
- multiple version of a given algorithm for different data types
- (e.g. @c float and @c double).
+Part of VLFeat code uses a simple form of perprocessor metaprogramming.
+This technique is used, similarly to C++ templates, to instantiate
+multiple version of a given algorithm for different data types
+(e.g. @c float and @c double).
 
- In most cases preprocessor metaprogramming is invisible to the library
- user, as it is used only internally.
+In most cases preprocessor metaprogramming is invisible to the library
+user, as it is used only internally.
 
-  @section main-glossary Glossary
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page main-glossary Glossary
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  - <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
-  stacked with column-major order as the sequence \f$(A_{11}, A_{21},
-  \dots, A_{12}, \dots)\f$. More in general, when stacking a multi
-  dimensional array this indicates that the first index is the one
-  varying most quickly, with the other followed in the natural order.
-  - <b>Opaque structure.</b> A structure is opaque if the user is not supposed
-  to access its member directly, but through appropriate interface functions.
-  Opaque structures are commonly used to define objects.
-  - <b>Row-major.</b> A <em>M x N </em> matrix <em>A</em> is
-  stacked with row-major order as the sequence \f$(A_{11}, A_{12},
-  \dots, A_{21}, \dots)\f$. More in general, when stacking a multi
-  dimensional array this indicates that the last index is the one
-  varying most quickly, with the other followed in reverse order.
-  - <b>Feature frame.</b> A <em>feature frame</em> is the geometrical
-  description of a visual features. For instance, the frame of
-  a @ref sift.h "SIFT feature" is oriented disk and the frame of
-  @ref mser.h "MSER feature" is either a compact and connected set or
-  a disk.
-  - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
-  (usually a vector) which describes compactly the appearance of an
-  image region (usually corresponding to a feature frame).
+ - <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
+ stacked with column-major order as the sequence \f$(A_{11}, A_{21},
+ \dots, A_{12}, \dots)\f$. More in general, when stacking a multi
+ dimensional array this indicates that the first index is the one
+ varying most quickly, with the other followed in the natural order.
+ - <b>Opaque structure.</b> A structure is opaque if the user is not supposed
+ to access its member directly, but through appropriate interface functions.
+ Opaque structures are commonly used to define objects.
+ - <b>Row-major.</b> A <em>M x N </em> matrix <em>A</em> is
+ stacked with row-major order as the sequence \f$(A_{11}, A_{12},
+ \dots, A_{21}, \dots)\f$. More in general, when stacking a multi
+ dimensional array this indicates that the last index is the one
+ varying most quickly, with the other followed in reverse order.
+ - <b>Feature frame.</b> A <em>feature frame</em> is the geometrical
+ description of a visual features. For instance, the frame of
+ a @ref sift.h "SIFT feature" is oriented disk and the frame of
+ @ref mser.h "MSER feature" is either a compact and connected set or
+ a disk.
+ - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
+ (usually a vector) which describes compactly the appearance of an
+ image region (usually corresponding to a feature frame).
 **/
 
 /**
- @file generic.h
 
- This module provides the following functionalities:
+@file generic.h
 
- - @ref generic-preproc
- - @ref generic-state
- - @ref generic-error
- - @ref generic-memory
- - @ref generic-logging
- - @ref generic-time
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page generic Preprocssor, library state, etc.
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  @section generic-preproc C preprocessor
+@ref generic.h provides the following functionalities:
 
-  VLFeat provides a few C preprocessor macros of general
-  utility. These include stringification (::VL_STRINGIFY,
-  ::VL_XSTRINGIFY) and concatenation (::VL_CAT, ::VL_XCAT) of symbols.
+- @ref generic-preproc
+- @ref generic-state
+- @ref generic-error
+- @ref generic-memory
+- @ref generic-logging
+- @ref generic-time
 
-  @section generic-state State and configuration parameters
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-preproc C preprocessor helpers
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  VLFeat has some global configuration parameters that can
-  changed. Changing the configuration is thread unsave
-  (@ref design-threads). Use ::vl_set_simd_enabled to toggle the use of
-  a SIMD unit (Intel SSE code), ::vl_set_alloc_func to change
-  the memory allocation functions, and ::vl_set_printf_func
-  to change the logging function.
+VLFeat provides a few C preprocessor macros of general
+utility. These include stringification (::VL_STRINGIFY,
+::VL_XSTRINGIFY) and concatenation (::VL_CAT, ::VL_XCAT) of symbols.
 
-  @section generic-error Error handling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-state VLFeat state and configuration parameters
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  Some VLFeat functions signal errors in a way similar to the
-  standard C library. In case of error, a VLFeat function
-  may return an error code directly,
-  or an invalid result (for instance a negative file descriptor or a null
-  pointer). Then ::vl_get_last_error and ::vl_get_last_error_message can be used
-  to retrieve further details about the error (these functions should be
-  used right after an error has occurred, before any other VLFeat call).
+VLFeat has some global configuration parameters that can
+changed. Changing the configuration is thread unsave
+(@ref design-threads). Use ::vl_set_simd_enabled to toggle the use of
+a SIMD unit (Intel SSE code), ::vl_set_alloc_func to change
+the memory allocation functions, and ::vl_set_printf_func
+to change the logging function.
 
-  @section generic-memory Memory allocation
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-error Error handling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  VLFeat uses the ::vl_malloc, ::vl_realloc, ::vl_calloc and ::vl_free
-  functions to allocate memory. Normally these functions are mapped to
-  the underlying standard C library implementations. However
-  ::vl_set_alloc_func can be used to map them to other
-  implementations.  For instance, in MATALB MEX files these functions
-  are mapped to the MATLAB equivalent which has a garbage collection
-  mechanism to cope with interruptions during execution.
+Some VLFeat functions signal errors in a way similar to the
+standard C library. In case of error, a VLFeat function
+may return an error code directly,
+or an invalid result (for instance a negative file descriptor or a null
+pointer). Then ::vl_get_last_error and ::vl_get_last_error_message can be used
+to retrieve further details about the error (these functions should be
+used right after an error has occurred, before any other VLFeat call).
 
-  @section generic-logging Logging
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-memory Memory allocation
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress
-  or debug informations. These functions are normally mapped to the @c
-  printf function of the underlying standard C library. However
-  ::vl_set_printf_func can be used to map it to a different
-  implementation. For instance, in MATLAB MEX files this function is
-  mapped to @c mexPrintf. Setting the function to @c NULL disables
-  logging.
+VLFeat uses the ::vl_malloc, ::vl_realloc, ::vl_calloc and ::vl_free
+functions to allocate memory. Normally these functions are mapped to
+the underlying standard C library implementations. However
+::vl_set_alloc_func can be used to map them to other
+implementations.  For instance, in MATALB MEX files these functions
+are mapped to the MATLAB equivalent which has a garbage collection
+mechanism to cope with interruptions during execution.
 
-  @section generic-time Measuring time
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-logging Logging
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-  VLFeat provides ::vl_tic and ::vl_toc as an easy way of measuring
-  elapsed time.
+VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress
+or debug informations. These functions are normally mapped to the @c
+printf function of the underlying standard C library. However
+::vl_set_printf_func can be used to map it to a different
+implementation. For instance, in MATLAB MEX files this function is
+mapped to @c mexPrintf. Setting the function to @c NULL disables
+logging.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section generic-time Measuring time
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+VLFeat provides ::vl_tic and ::vl_toc as an easy way of measuring
+elapsed time.
 
 **/
 
 #include "generic.h"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>

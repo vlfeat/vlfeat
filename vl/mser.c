@@ -1,5 +1,5 @@
 /** @file mser.c
- ** @brief  Maximally Stable Extremal Regions (MSER) - Definition
+ ** @brief MSER - Definition
  ** @author Andrea Vedaldi
  **/
 
@@ -13,19 +13,20 @@ GNU GPLv2, or (at your option) any later version.
 /** @file mser.h
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section mser Maximally Stable Extremal Regions
+@page mser Maximally Stable Extremal Regions
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @file mser.h implements the <em>Maximally Stable Extremal
 Regions</em> (MSER) feature detetctor @cite{matas03robust}.
 
- - @ref mser-overview
- - @ref mser-definition
- - @ref mser-vol
- - @ref mser-ell
+- @ref mser-overview
+- @ref mser-definition
+- @ref mser-vol
+- @ref mser-ell
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection mser-overview Maximally Stable Extremal Regions Overview
+@section mser-overview Maximally Stable Extremal Regions Overview
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Running the MSER filter usually involves the following steps:
@@ -39,7 +40,7 @@ Running the MSER filter usually involves the following steps:
 - Delete the MSER filter by ::vl_mser_delete().
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection mser-definition MSER definition
+@section mser-definition MSER definition
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 An extremal region @f$R_l@f$ of an image is a connected component
@@ -143,16 +144,15 @@ tests:
 </table>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection mser-vol Volumetric images
+@section mser-vol Volumetric images
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
 
 The code supports images of arbitrary dimension. For instance, it
 is possible to find the MSER regions of volumetric images or time
 sequences. See ::vl_mser_new() for further details
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection mser-ell Ellipsoids
+@section mser-ell Ellipsoids
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Usually extremal regions are returned as a set of ellipsoids
@@ -176,7 +176,9 @@ order <em>(1,1),(1,2),..,(1,n), (2,2),(2,3)...</em>. In the
 calculations, the pixel coordinate @f$x=(x_1,...,x_n)@f$ use the
 standard index order and ranges.
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection mser-algo Algorithm
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The algorithm is quite efficient. While some details may be
 tricky, the overall idea is easy to grasp.

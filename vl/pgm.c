@@ -1,6 +1,6 @@
-/** @file    pgm.c
- ** @brief   Portable graymap format (PGM) parser - Definition
- ** @author  Andrea Vedaldi
+/** @file pgm.c
+ ** @brief Portable graymap format (PGM) parser - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /* AUTORIGHTS

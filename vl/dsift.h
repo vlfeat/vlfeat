@@ -1,6 +1,7 @@
-/** file   dsift.h
- ** brief  Dense SIFT (DSIFT)
- ** author Andrea Vedaldi
+/** @file dsift.h
+ ** @brief Dense SIFT (@ref dsift)
+ ** @author Andrea Vedaldi
+ ** @author Brian Fulkerson
  **/
 
 /* AUTORIGHTS

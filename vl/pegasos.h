@@ -1,5 +1,5 @@
 /** @file pegasos.h
- ** @brief PEGASOS SVM
+ ** @brief PEGASOS (@ref pegasos)
  ** @author Andrea Vedaldi
  **/
 
