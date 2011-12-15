@@ -349,10 +349,12 @@ vl_kdforest_delete (VlKDForest * self)
       if (self->trees[ti]) {
         if (self->trees[ti]->nodes) vl_free (self->trees[ti]->nodes) ;
         if (self->trees[ti]->dataIndex) vl_free (self->trees[ti]->dataIndex) ;
+        vl_free (self->trees[ti]) ;
       }
     }
     vl_free (self->trees) ;
   }
+  if (self->searchHeapArray) vl_free (self->searchHeapArray) ;
   vl_free (self) ;
 }
 
