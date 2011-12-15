@@ -330,7 +330,7 @@ void vl_slic_segment (vl_uint32 * segmentation,
     }
   }
 
-  vl_free(mass) ;
+  vl_free(masses) ;
   vl_free(centers) ;
 
   /* elimiate small regions */
@@ -399,7 +399,7 @@ void vl_slic_segment (vl_uint32 * segmentation,
       }
     }
     /* restore base 0 indexing of the regions */
-    for (pixel = 0 ; pixel < numPixels ; ++pixel) cleaned[pixel] -- ;
+    for (pixel = 0 ; pixel < (signed)numPixels ; ++pixel) cleaned[pixel] -- ;
 
     memcpy(segmentation, cleaned, numPixels * sizeof(vl_uint32)) ;
     vl_free(cleaned) ;
