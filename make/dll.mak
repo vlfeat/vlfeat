@@ -27,13 +27,11 @@ BINDIR = bin/$(ARCH)
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 DLL_SUFFIX := dylib
-LIBTOOL := libtool
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 DLL_SUFFIX := dylib
-LIBTOOL := libtool
 endif
 
 # Linux-32
@@ -78,7 +76,8 @@ dll: $(dll_tgt)
 $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
 
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
-	$(call C,CC) $(DLL_CFLAGS) -c "$(<)" -o "$(@)"
+	$(call C,CC) $(DLL_CFLAGS)                                   \
+	       -c "$(<)" -o "$(@)"
 
 $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC) $(DLL_CFLAGS)                                   \

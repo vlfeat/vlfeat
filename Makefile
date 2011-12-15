@@ -131,6 +131,7 @@ endif
 
 VLDIR ?= .
 CC ?= cc
+LIBTOOL ?= libtool
 
 FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
 FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
