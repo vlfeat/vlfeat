@@ -1,5 +1,5 @@
 /** @file slic.h
- ** @brief SLIC superpixels
+ ** @brief SLIC superpixels (see @ref slic)
  ** @author Andrea Vedaldi
  **/
 
@@ -15,7 +15,8 @@ void vl_slic_segment (vl_uint32 * segmentation,
                       vl_size height,
                       vl_size numChannels,
                       vl_size regionSize,
-                      float regularization) ;
+                      float regularization,
+                      vl_size minSegmentSize) ;
 
 /* VL_SLIC */
 #endif

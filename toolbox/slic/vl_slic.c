@@ -1,6 +1,5 @@
-/**
- ** @file vl_pegasos.c
- ** @brief vl_pegasos.c
+/** @file vl_slic.c
+ ** @brief vl_slic
  ** @author Andrea Vedaldi
  **/
 
@@ -19,12 +18,14 @@
 
 /* option codes */
 enum {
-  opt_verbose
+  opt_verbose,
+  opt_min_segment_size
 } ;
 
 /* options */
 vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
+  {"MinSegmentSize",    1,   opt_min_segment_size    },
   {0,                   0,   0                       }
 } ;
 
@@ -51,6 +52,7 @@ mexFunction(int nout, mxArray *out[],
   vl_size regionSize ;
   double regularizer ;
   vl_uint32 * segmentation ;
+  int minSegmentSize = -1 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -106,7 +108,20 @@ mexFunction(int nout, mxArray *out[],
       case opt_verbose :
         ++ verbose ;
         break ;
+      case opt_min_segment_size :
+        if (!vlmxIsPlainScalar(optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "MINSEGMENTSIZE is not a plain scalar.") ;
+        }
+        minSegmentSize = mxGetScalar(optarg) ;
+        if (minSegmentSize < 0) {
+          vlmxError(vlmxErrInvalidArgument, "MINSEGMENTSIZE=%d is smaller than zero.", minSegmentSize) ;
+        }
+        break ;
     }
+  }
+
+  if (minSegmentSize < 0) {
+    minSegmentSize = (regionSize * regionSize) / (6*6) ;
   }
 
   if (verbose) {
@@ -114,6 +129,7 @@ mexFunction(int nout, mxArray *out[],
               width, height, numChannels) ;
     mexPrintf("vl_slic: regionSize = %d\n", regionSize) ;
     mexPrintf("vl_slic: regularizer = %g\n", regularizer) ;
+    mexPrintf("vl_slic: minSegmentSize = %d\n", minSegmentSize) ;
   }
 
   /* -----------------------------------------------------------------
@@ -125,5 +141,5 @@ mexFunction(int nout, mxArray *out[],
 
   vl_slic_segment(segmentation,
                   image, height, width, numChannels, /* the image is transposed */
-                  regionSize, regularizer) ;
+                  regionSize, regularizer, minSegmentSize) ;
 }
