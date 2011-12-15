@@ -136,6 +136,11 @@ FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
 FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
 
 CLFAGS += $(FEATUREFLAGS)
+# This line is needed to fix "undefined reference tovl_aib_new"
+# https://github.com/vlfeat/vlfeat/issues/4
+# These error appear as a result of http://wiki.debian.org/ToolChain/DSOLinking that
+# was added between gcc4.4 and gcc4.6.1.
+CFLAGS += -Wl,--no-as-needed
 CFLAGS += -std=c99
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
