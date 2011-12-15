@@ -5,7 +5,7 @@
 # AUTORIGHTS
 
 # MATLAB support is enabled if $(MEX) is executable and if MATLAB root
-# can be set from the output of `$(MEX) -v`. Therefore setting MEX to
+# can be deduced from the output of `$(MEX) -v`. Therefore setting MEX to
 # the empty string disables MATLAB support.
 
 MEX ?= mex
