@@ -18,8 +18,8 @@ info: bin-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-BIN_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)
-BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
+BIN_CFLAGS = $(STD_CFLAGS) -I$(VLDIR) -pthread
+BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl -lm
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)
