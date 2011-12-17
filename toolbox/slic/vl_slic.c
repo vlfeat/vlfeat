@@ -25,7 +25,7 @@ enum {
 /* options */
 vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
-  {"MinSegmentSize",    1,   opt_min_segment_size    },
+  {"MinRegionSize",     1,   opt_min_segment_size    },
   {0,                   0,   0                       }
 } ;
 
@@ -52,7 +52,7 @@ mexFunction(int nout, mxArray *out[],
   vl_size regionSize ;
   double regularizer ;
   vl_uint32 * segmentation ;
-  int minSegmentSize = -1 ;
+  int minRegionSize = -1 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -110,18 +110,18 @@ mexFunction(int nout, mxArray *out[],
         break ;
       case opt_min_segment_size :
         if (!vlmxIsPlainScalar(optarg)) {
-          vlmxError(vlmxErrInvalidArgument, "MINSEGMENTSIZE is not a plain scalar.") ;
+          vlmxError(vlmxErrInvalidArgument, "MINREGIONSIZE is not a plain scalar.") ;
         }
-        minSegmentSize = mxGetScalar(optarg) ;
-        if (minSegmentSize < 0) {
-          vlmxError(vlmxErrInvalidArgument, "MINSEGMENTSIZE=%d is smaller than zero.", minSegmentSize) ;
+        minRegionSize = mxGetScalar(optarg) ;
+        if (minRegionSize < 0) {
+          vlmxError(vlmxErrInvalidArgument, "MINREGIONSIZE=%d is smaller than zero.", minRegionSize) ;
         }
         break ;
     }
   }
 
-  if (minSegmentSize < 0) {
-    minSegmentSize = (regionSize * regionSize) / (6*6) ;
+  if (minRegionSize < 0) {
+    minRegionSize = (regionSize * regionSize) / (6*6) ;
   }
 
   if (verbose) {
@@ -129,7 +129,7 @@ mexFunction(int nout, mxArray *out[],
               width, height, numChannels) ;
     mexPrintf("vl_slic: regionSize = %d\n", regionSize) ;
     mexPrintf("vl_slic: regularizer = %g\n", regularizer) ;
-    mexPrintf("vl_slic: minSegmentSize = %d\n", minSegmentSize) ;
+    mexPrintf("vl_slic: minRegionSize = %d\n", minRegionSize) ;
   }
 
   /* -----------------------------------------------------------------
@@ -141,5 +141,5 @@ mexFunction(int nout, mxArray *out[],
 
   vl_slic_segment(segmentation,
                   image, height, width, numChannels, /* the image is transposed */
-                  regionSize, regularizer, minSegmentSize) ;
+                  regionSize, regularizer, minRegionSize) ;
 }

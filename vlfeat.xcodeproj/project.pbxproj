@@ -210,6 +210,8 @@
 		2D66AD0D13AE05BD0060594E /* vl_xyz2luv.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2luv.m; path = toolbox/imop/vl_xyz2luv.m; sourceTree = "<group>"; };
 		2D66AD0E13AE05BD0060594E /* vl_xyz2rgb.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2rgb.m; path = toolbox/imop/vl_xyz2rgb.m; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
+		2D6E381A149CE4B5005319B7 /* vl_slic.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_slic.m; path = toolbox/slic/vl_slic.m; sourceTree = "<group>"; };
+		2D6E381B149CE4ED005319B7 /* slic.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = slic.html; path = docsrc/slic.html; sourceTree = "<group>"; };
 		2D708F261493C5540079605B /* doxygen.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = doxygen.css; path = docsrc/doxygen.css; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; tabWidth = 2; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
@@ -565,6 +567,7 @@
 				2D66ACD013AE05BD0060594E /* vl_setup.m */,
 				2D66ACD113AE05BD0060594E /* vl_sift.m */,
 				2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */,
+				2D6E381A149CE4B5005319B7 /* vl_slic.m */,
 				2D66ACD313AE05BD0060594E /* vl_sigmoid.m */,
 				2D66ACD413AE05BD0060594E /* vl_simdctrl.m */,
 				2D66ACFE13AE05BD0060594E /* vl_tightsubplot.m */,
@@ -611,6 +614,7 @@
 				2D7AD0AE0E38C18600783252 /* ikm.html */,
 				2D7AD0B00E38C18600783252 /* mser.html */,
 				2D7AD0B10E38C18600783252 /* sift.html */,
+				2D6E381B149CE4ED005319B7 /* slic.html */,
 				2D7AD0B30E38C18600783252 /* tutorials.html */,
 				2D7AD0B40E38C18600783252 /* utils.html */,
 			);
@@ -742,9 +746,9 @@
 				2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */,
 				2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */,
 				2D86B11F0F24CC9B00E625D6 /* vl_sift.c */,
-				2D94E6BD1490C7C40089ADA5 /* vl_slic.c */,
 				2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */,
 				2D13F02C100A718600C072E8 /* vl_simdctrl.c */,
+				2D94E6BD1490C7C40089ADA5 /* vl_slic.c */,
 				2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */,
 				2D86B1220F24CC9B00E625D6 /* vl_twister.c */,
 				2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */,

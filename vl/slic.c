@@ -11,7 +11,6 @@
  */
 
 /**
-
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page slic Simple Linear Iterative Clustering (SLIC)
 @author Andrea Vedaldi
@@ -155,7 +154,7 @@ except for the very first pixel).
  ** @param numChannels number of image channels (depth).
  ** @param regionSize nominal size of the regions.
  ** @param regularization trade-off between appearance and spatial terms.
- ** @param minSegmentSize minimum size of a segment.
+ ** @param minRegionSize minimum size of a segment.
  **
  ** The function computes the SLIC superpixels of the specified image @a image.
  ** @a image is a pointer to an @c width by @c height by @c by numChannles array of @c float.
@@ -173,7 +172,7 @@ void vl_slic_segment (vl_uint32 * segmentation,
                       vl_size numChannels,
                       vl_size regionSize,
                       float regularization,
-                      vl_size minSegmentSize)
+                      vl_size minRegionSize)
 {
   vl_index i, x, y, u, v, k, region ;
   vl_uindex iter ;
@@ -226,8 +225,8 @@ void vl_slic_segment (vl_uint32 * segmentation,
       vl_index centery ;
       float minEdgeValue = VL_INFINITY_F ;
 
-      x = (vl_index) floor(regionSize * (u - 0.5)) ;
-      y = (vl_index) floor(regionSize * (v - 0.5)) ;
+      x = (vl_index) round(regionSize * (u + 0.5)) ;
+      y = (vl_index) round(regionSize * (v + 0.5)) ;
 
       x = VL_MAX(VL_MIN(x, (signed)width-1),0) ;
       y = VL_MAX(VL_MIN(y, (signed)height-1),0) ;
@@ -392,7 +391,7 @@ void vl_slic_segment (vl_uint32 * segmentation,
       }
 
       /* change label to cleanedLabel if the semgent is too small */
-      if (segmentSize < minSegmentSize) {
+      if (segmentSize < minRegionSize) {
         while (segmentSize > 0) {
           cleaned[segment[--segmentSize]] = cleanedLabel ;
         }

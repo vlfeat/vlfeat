@@ -16,7 +16,7 @@ void vl_slic_segment (vl_uint32 * segmentation,
                       vl_size numChannels,
                       vl_size regionSize,
                       float regularization,
-                      vl_size minSegmentSize) ;
+                      vl_size minRegionSize) ;
 
 /* VL_SLIC */
 #endif

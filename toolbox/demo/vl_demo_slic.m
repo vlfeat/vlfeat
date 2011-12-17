@@ -13,6 +13,7 @@ im = imread(fullfile(vl_root,'data','a.jpg')) ;
 im = im2single(im) ;
 im = im(1:128,end-128+1:end,:) ;
 
+figure(1) ; clf ;
 image(im) ;
 axis equal off tight ;
 vl_demo_print('slic_image') ;
@@ -24,7 +25,7 @@ vl_demo_print('slic_image') ;
 regionSizes = [10 30] ;
 regularizers = [0.01 0.1 1] ;
 
-mosaic = {} ;
+figure(2) ; clf ;
 for i = 1:numel(regionSizes)
   for j = 1:numel(regularizers)
     regionSize = regionSizes(i) ;
@@ -37,12 +38,11 @@ for i = 1:numel(regionSizes)
     imp = im ;
     imp([s s+numel(im(:,:,1)) s+2*numel(im(:,:,1))]) = 0 ;
 
-    mosaic{i,j} = imp ;
+    vl_tightsubplot(numel(regionSizes),numel(regularizers), (i-1)*numel(regularizers) + j) ;
+    imagesc(imp) ; axis image off ; hold on ;
+    text(5,5,sprintf('regionSize:%.2g\nregularizer:%.2g', regionSize, regularizer), ...
+         'Background', 'white','VerticalAlignment','top')
   end
 end
 
-mosaic = cell2mat(mosaic) ;
-
-image(mosaic) ;
-axis equal off tight ;
 vl_demo_print('slic_segmentation') ;

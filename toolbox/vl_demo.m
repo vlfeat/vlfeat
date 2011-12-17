@@ -34,6 +34,7 @@ vl_test_imintegral ;
 vl_demo_aib ;
 
 vl_demo_quickshift ;
+vl_demo_slic ;
 
 vl_demo_kdtree ;
 vl_demo_kdtree_sift ;
