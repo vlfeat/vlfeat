@@ -422,11 +422,11 @@ vl_configuration_to_string_copy ()
                       "VLFeat version %s\n"
                       "    Static config: %s\n"
                       "    %d CPU(s): %s\n"
-					  "    Debug: %s\n",
+                      "    Debug: %s\n",
                       vl_get_version_string (),
                       staticString,
                       vl_get_num_cpus(), cpuString,
-					  VL_YESNO(debug,"yes","no")) ;
+                      VL_YESNO(debug)) ;
     length += 1 ;
   }
 
