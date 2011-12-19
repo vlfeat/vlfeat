@@ -32,7 +32,7 @@ MEX_ARCH = $(ARCH)
 MEX_CFLAGS = -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_LDFLAGS = -L$(BINDIR) -lvl
 
-MEX_FLAGS  = -$(MEX_ARCH) -largeArrayDims
+MEX_FLAGS += -$(MEX_ARCH) -largeArrayDims
 MEX_FLAGS += $(if $(DEBUG), -g, -O)
 MEX_FLAGS += $(if $(PROFILE), -O -g,)
 MEX_FLAGS += CFLAGS='$$CFLAGS $(CFLAGS)'
