@@ -154,7 +154,7 @@ vl_floor_d (double x)
 VL_INLINE long int
 vl_ceil_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return (long int) __builtin_ceilf(x) ;
 #else
   return (long int) ceilf(x) ;
@@ -168,8 +168,8 @@ vl_ceil_f (float x)
 VL_INLINE long int
 vl_ceil_d (double x)
 {
-#ifdef VL_COMPILER_GNU
-  return __builtin_lceil(x) ;
+#ifdef VL_COMPILER_GNUC
+  return __builtin_ceil(x) ;
 #else
   return (long int) ceil(x) ;
 #endif
@@ -184,7 +184,7 @@ vl_ceil_d (double x)
 VL_INLINE long int
 vl_round_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_lroundf(x) ;
 #elif VL_COMPILER_MSC
   if (x >= 0.0F) {
@@ -206,7 +206,7 @@ vl_round_f (float x)
 VL_INLINE long int
 vl_round_d (double x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_lround(x) ;
 #elif VL_COMPILER_MSC
   if (x >= 0.0) {
@@ -227,7 +227,7 @@ vl_round_d (double x)
 VL_INLINE float
 vl_abs_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_fabsf (x) ;
 #else
   return fabsf(x) ;
@@ -241,7 +241,7 @@ vl_abs_f (float x)
 VL_INLINE double
 vl_abs_d (double x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_fabs (x) ;
 #else
   return fabs(x) ;
@@ -251,7 +251,7 @@ vl_abs_d (double x)
 VL_INLINE double
 vl_log2_d (double x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_log2(x) ;
 #elif VL_COMPILER_MSC
   return log(x) / 0.693147180559945 ;
@@ -263,7 +263,7 @@ vl_log2_d (double x)
 VL_INLINE float
 vl_log2_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_log2f (x) ;
 #elif VL_COMPILER_MSC
   return logf(x) / 0.6931472F ;
