@@ -468,14 +468,14 @@ bin-commit: bin-release
 	@echo Crearing/resetting and checking out branch $(BRANCH) to v$(VER) && \
 	$(GIT) branch -f $(BRANCH) v$(VER) && \
 	$(GIT) checkout $(BRANCH)
-	@echo Adding binaries && \
-	$(GIT) add -f $(bindir)\$(MSVCR) && \
-	$(GIT) add -f $(bindir)\vl.lib && \
-	$(GIT) add -f $(bindir)\vl.dll && \
+	echo Adding binaries && \
+	$(GIT) add -f "$(bindir)\$(MSVCR)" && \
+	$(GIT) add -f "$(bindir)\vl.lib" && \
+	$(GIT) add -f "$(bindir)\vl.dll" && \
 	$(GIT) add -f $(cmdexe) && \
-	@echo Adding MEX files && \
-	$(GIT) add -f $(mexdir)\$(MSVCR) &&
-	$(GIT) add -f $(mexdir)\vl.dll && \
+	echo Adding MEX files && \
+	$(GIT) add -f "$(mexdir)\$(MSVCR)" && \
+	$(GIT) add -f "$(mexdir)\vl.dll" && \
 	$(GIT) add -f $(mexdll) && \
 	@echo Commiting changes && \
 	$(GIT) commit -m "$(ARCH) binaries for version $(VER)"
