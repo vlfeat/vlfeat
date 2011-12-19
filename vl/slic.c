@@ -225,8 +225,8 @@ void vl_slic_segment (vl_uint32 * segmentation,
       vl_index centery ;
       float minEdgeValue = VL_INFINITY_F ;
 
-      x = (vl_index) round(regionSize * (u + 0.5)) ;
-      y = (vl_index) round(regionSize * (v + 0.5)) ;
+      x = (vl_index) vl_round_d(regionSize * (u + 0.5)) ;
+      y = (vl_index) vl_round_d(regionSize * (v + 0.5)) ;
 
       x = VL_MAX(VL_MIN(x, (signed)width-1),0) ;
       y = VL_MAX(VL_MIN(y, (signed)height-1),0) ;
