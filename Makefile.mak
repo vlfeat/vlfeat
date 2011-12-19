@@ -316,8 +316,7 @@ archclean:
 	if exist $(mexdir) rmdir /S /Q $(mexdir)
 
 distclean:
-	if exist bin\win32 rmdir /S /Q bin\win32
-	if exist bin\win64 rmdir /S /Q bin\win64
+	if exist bin rmdir /S /Q bin
 	if exist toolbox\mex rmdir /S /Q toolbox\mex
 
 info:
