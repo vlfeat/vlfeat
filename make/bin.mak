@@ -12,8 +12,8 @@ info: bin-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-BIN_CFLAGS = $(CFLAGS) -I$(VLDIR)
-BIN_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
+BIN_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)
+BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)

@@ -16,7 +16,7 @@ info: dll-info
 
 DLL_NAME = vl
 
-DLL_CFLAGS  = $(CFLAGS)
+DLL_CFLAGS  = $(STD_CFLAGS)
 DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
 

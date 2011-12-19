@@ -34,8 +34,8 @@ info: octave-info
 OCTAVE_MEX_SUFFIX := mex
 OCTAVE_MEX_BINDIR := toolbox/mex/octave
 OCTAVE_MEX_FLAGS =
-OCTAVE_MEX_CFLAGS = $(CFLAGS) -I$(VLDIR)/toolbox
-OCTAVE_MEX_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
+OCTAVE_MEX_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)/toolbox
+OCTAVE_MEX_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
