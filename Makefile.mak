@@ -2,29 +2,30 @@
 # descrption: Microsoft NMake makefile
 # authors: Andrea Vedaldi, Brian Fulkerson, Mircea Cimpoi
 
+# AUTORIGHTS
+# Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available under the terms of the
+# GNU GPLv2, or (at your option) any later version.
+
 # --------------------------------------------------------------------
 #                                                        Customization
 # --------------------------------------------------------------------
 # To modify this script to run on your platform it is usually
 # sufficient to modify the following variables:
 #
-# MATLABROOT: Path to MATLAB.
-# MSVSVER: Visual Studio version (e.g. 80, 90, 100) [=90 for VS 9.0]
-# MSVCROOT: Visual C++ location [=$(VCInstallDir)].
-# WINSDKROOT: Windows SDK location [=$(WindowsSdkDir)]
+# ARCH: Either win32 or win64 [win64]
+# DEBUG: Set to yes to ativate debugging [no]
+# MATLABROOT: Path to MATLAB
+# MSVSVER: Visual Studio version (e.g. 80, 90, 100) [90 for VS 9.0]
+# MSVCROOT: Visual C++ location [$(VCInstallDir)].
+# WINSDKROOT: Windows SDK location [$(WindowsSdkDir)]
 #
-# Note that some of these variables are defined twice in the script,
-# once for 32 bit and once for 64 bit compilations. Other useful
-# variables include:
-#
-# VER: VLFeat version string
-# ARCH: Either win32 or win64.
-# MSVCR: Visual C++ run time name (e.g. Microsoft.VC90.CRT).
-# MSVCR_FILES: Visual C++ run time files (e.g. CRT dll, manifest).
-# MSVCR_PATH: Visual C++ run time path.
+# Note that some of these variables depend on the architecture
+# (either win32 or win64).
 
 VER = 0.9.14
-ARCH = win32
+ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
 MSVSVER = 90
@@ -41,6 +42,10 @@ WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
 !endif
 
 # Visual Studio redistributable files
+# MSVCR: Visual C++ run time name (e.g. Microsoft.VC90.CRT).
+# MSVCR_FILES: Visual C++ run time files (e.g. CRT dll, manifest).
+# MSVCR_PATH: Visual C++ run time path.
+
 MSVCR = Microsoft.VC$(MSVSVER).CRT
 MSVCR_FILES = msvcr$(MSVSVER).dll
 !if $(MSVSVER) <= 90
@@ -131,6 +136,7 @@ LFLAGS = /MACHINE:X64 \
 # References:
 #   http://www.codeguru.com/forum/showthread.php?t=408061
 #   http://mariusbancila.ro/blog/2010/03/24/visual-studio-2010-changes-for-vc-part-5
+#   http://social.msdn.microsoft.com/Forums/is/vcgeneral/thread/ca9177b2-2d02-42d8-8892-c6a25e6cfadb
 #
 
 bindir = bin\$(ARCH)
