@@ -19,11 +19,13 @@
 #
 # VER: VLFeat version string
 # ARCH: Either win32 or win64.
-# MSVCR: Visual C++ run time files to redestributes (DLLs, manifest).
-# MSVCRLOC: Path to Visual C++ run time files.
+# MSVCR: Visual C++ run time name (e.g. Microsoft.VC90.CRT).
+# MSVCR_FILES: Visual C++ run time files (e.g. CRT dll, manifest).
+# MSVCR_PATH: Visual C++ run time path.
 
 VER = 0.9.14
 ARCH = win32
+DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
 MSVSVER = 90
 MSVCROOT = $(VCInstallDir)
@@ -35,19 +37,19 @@ MSVCROOT = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
 !endif
 
 !if "$(WINSDKROOT)" == ""
-WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0
+WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
 !endif
 
 # Visual Studio redistributable files
 MSVCR = Microsoft.VC$(MSVSVER).CRT
 MSVCR_FILES = msvcr$(MSVSVER).dll
-!if "$(MSVSVER)" <= "90"
+!if $(MSVSVER) <= 90
 MSVCR_FILES = msvcr$(MSVSVER).dll Microsoft.VC$(MSVSVER).CRT.manifest
 !endif
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
 !if "$(ARCH)" == "win32"
-!message === COMPILING FOR 32-BIT ===
+!message === COMPILING FOR 32-BIT
 
 MATLABROOT = C:\Program Files (x86)\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
@@ -64,7 +66,7 @@ LFLAGS = /MACHINE:X86 \
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 64-bit
 !elseif "$(ARCH)" == "win64"
-!message === COMPILING FOR 64-BIT ===
+!message === COMPILING FOR 64-BIT
 
 MATLABROOT = C:\Program Files\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
@@ -73,7 +75,7 @@ MEXEXT = mexw64
 
 CC = "$(MSVCROOT)\bin\amd64\cl.exe"
 LINK = "$(MSVCROOT)\bin\amd64\link.exe"
-!if "$(MSVSVER)" >= "100"
+!if $(MSVSVER) >= 100
 MSVCR_PATH = $(MSVCROOT)\redist\x64\Microsoft.VC$(MSVSVER).CRT
 !else
 MSVCR_PATH = $(MSVCROOT)\redist\amd64\Microsoft.VC$(MSVSVER).CRT
@@ -98,18 +100,20 @@ LFLAGS = /MACHINE:X64 \
 #   _CRT_NO_DEPRECATE  : Do not deprecate `insecure' fscanf, snprintf, ...
 #   __LITTLE_ENDIAN__  : Signal little endian architecture
 #   /I.                : Add VLROOT to include search path
-#   /Z7                : Embedded CodeView debug info in .obj
 #   /MD                : Multi-thread run-time library dynamically linked
 #   /TC                : Source code is C (not C++)
 #   /W3                : Usa all warnings
 #   /Zp8               : Align structures to 8 bytes
 #   /Ox                : Turn on optimizations
+#   /D"DEBUG"          : [DEBUG] Turn on debugging in VLFeat
+#   /Z7                : [DEBUG] Embedded CodeView debug info in .obj
+#   /D"NDEBUG"         : [NO DEBUG] Switches off asserts
 #
 # LFLAGS
 #   /NOLOGO            : LINK does not display splash
 #   /INCREMENTAL:NO    : No incremental linking
 #   /MANIFEST          : See DLL HELL below
-#   /DEBUG             : Generate debug info (.pdb files)
+#   /DEBUG             : [DEBUG] Generate debug info (.pdb files)
 #
 # MEX_FLAGS
 #   -I                 : Include VLFeat
@@ -129,20 +133,28 @@ LFLAGS = /MACHINE:X64 \
 #   http://mariusbancila.ro/blog/2010/03/24/visual-studio-2010-changes-for-vc-part-5
 #
 
-bindir     = bin\$(ARCH)
-mexdir     = toolbox\mex\$(MEXEXT)
-objdir     = $(bindir)\objs
+bindir = bin\$(ARCH)
+mexdir = toolbox\mex\$(MEXEXT)
+objdir = $(bindir)\objs
 
-CFLAGS     = /nologo /TC /MD \
-             /D"_CRT_SECURE_NO_DEPRECATE" \
-             /D"__LITTLE_ENDIAN__" \
-             /I. \
-             /W1 /Z7 /Zp8 /Ox
+CFLAGS = /nologo /TC /MD \
+         /D"_CRT_SECURE_NO_DEPRECATE" \
+         /D"__LITTLE_ENDIAN__" \
+         /I. \
+         /W1 /Zp8 /Ox
 
-LFLAGS     = $(LFLAGS) /NOLOGO \
-             /INCREMENTAL:NO \
-             /MANIFEST \
-             /DEBUG
+LFLAGS = $(LFLAGS) /NOLOGO \
+         /INCREMENTAL:NO \
+         /MANIFEST
+
+!if "$(DEBUG)" != "no"
+!message === DEBUGGING ON
+CFLAGS = $(CFLAGS) /Z7 /D"DEBUG"
+LFLAGS = $(LFLAGS) /DEBUG
+!else
+!message === DEBUGGING OFF
+CFLAGS = $(CFLAGS) /D"NDEBUG"
+!endif
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
@@ -325,8 +337,9 @@ info:
 	@echo ** MSVCROOT    = $(MSVCROOT)
 	@echo ** MSVCR       = $(MSVCR)
 	@echo ** MSVCR_PATH  = $(MSVCR_PATH)
-	@echo ** MSVCR_FILES = $(MSVCR_PATH)
+	@echo ** MSVCR_FILES = $(MSVCR_FILES)
 	@echo ** WINSDKROOT  = $(WINSDKROOT)
+	@echo ** DEBUG       = $(DEBUG)
 
 # --------------------------------------------------------------------
 #                                                          Build rules
