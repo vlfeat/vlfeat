@@ -121,9 +121,9 @@ vl_mod_2pi_d (double x)
   return x ;
 }
 
-/** @brief Fast <code>(int) floor(x)</code>
+/** @brief Floor and convert to integer
  ** @param x argument.
- ** @return @c (int) floor(x)
+ ** @return Similar to @c (int) floor(x)
  **/
 
 VL_INLINE long int
@@ -134,7 +134,7 @@ vl_floor_f (float x)
   else return xi - 1 ;
 }
 
-/** @brief Fast <code>(int) floor(x)</code>
+/** @brief Floor and convert to integer
  ** @see vl_floor_f
  **/
 
@@ -146,28 +146,23 @@ vl_floor_d (double x)
   else return xi - 1 ;
 }
 
-/** @brief Ceil
+/** @brief Ceil and convert to integer
  ** @param x argument.
  ** @return @c lceilf(x)
- ** This function is either the same or similar to C99 @c lceilf().
  **/
 
 VL_INLINE long int
 vl_ceil_f (float x)
 {
 #ifdef VL_COMPILER_GNU
-  return __builtin_lceilf(x) ;
-#elif VL_COMPILER_MSC
-  return (long int) ceilf(x) ;
+  return (long int) __builtin_ceilf(x) ;
 #else
-  return lceilf(x) ;
+  return (long int) ceilf(x) ;
 #endif
 }
 
-/** @brief Ceil
- ** @param x argument.
- ** @return @c lceil(x)
- ** This function is either the same or similar to C99 @c lceil().
+/** @brief Ceil and convert to integer
+ ** @see vl_ceil_f
  **/
 
 VL_INLINE long int
@@ -175,10 +170,8 @@ vl_ceil_d (double x)
 {
 #ifdef VL_COMPILER_GNU
   return __builtin_lceil(x) ;
-#elif VL_COMPILER_MSC
-  return (long int) ceil(x) ;
 #else
-  return lceil(x) ;
+  return (long int) ceil(x) ;
 #endif
 }
 
