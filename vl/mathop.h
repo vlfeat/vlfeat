@@ -126,10 +126,10 @@ vl_mod_2pi_d (double x)
  ** @return @c (int) floor(x)
  **/
 
-VL_INLINE int
+VL_INLINE long int
 vl_floor_f (float x)
 {
-  int xi = (int) x ;
+  long int xi = (long int) x ;
   if (x >= 0 || (float) xi == x) return xi ;
   else return xi - 1 ;
 }
@@ -138,12 +138,92 @@ vl_floor_f (float x)
  ** @see vl_floor_f
  **/
 
-VL_INLINE int
+VL_INLINE long int
 vl_floor_d (double x)
 {
-  int xi = (int) x ;
+  long int xi = (long int) x ;
   if (x >= 0 || (double) xi == x) return xi ;
   else return xi - 1 ;
+}
+
+/** @brief Ceil
+ ** @param x argument.
+ ** @return @c lceilf(x)
+ ** This function is either the same or similar to C99 @c lceilf().
+ **/
+
+VL_INLINE long int
+vl_ceil_f (float x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_lceilf(x) ;
+#elif VL_COMPILER_MSC
+  return (long int) ceilf(x) ;
+#else
+  return lceilf(x) ;
+#endif
+}
+
+/** @brief Ceil
+ ** @param x argument.
+ ** @return @c lceil(x)
+ ** This function is either the same or similar to C99 @c lceil().
+ **/
+
+VL_INLINE long int
+vl_ceil_d (double x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_lceil(x) ;
+#elif VL_COMPILER_MSC
+  return (long int) ceil(x) ;
+#else
+  return lceil(x) ;
+#endif
+}
+
+/** @brief Round
+ ** @param x argument.
+ ** @return @c lroundf(x)
+ ** This function is either the same or similar to C99 @c lroundf().
+ **/
+
+VL_INLINE long int
+vl_round_f (float x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_lroundf(x) ;
+#elif VL_COMPILER_MSC
+  if (x >= 0.0F) {
+    return vl_floor_f(x + 0.5F) ;
+  } else {
+    return vl_ceil_f(x - 0.5F) ;
+  }
+#else
+  return lroundf(x) ;
+#endif
+}
+
+/** @brief Round
+ ** @param x argument.
+ ** @return @c lround(x)
+ ** This function is either the same or similar to C99 @c lround().
+ **/
+
+VL_INLINE long int
+vl_round_d (double x)
+{
+#ifdef VL_COMPILER_GNU
+  return __builtin_lround(x) ;
+#elif VL_COMPILER_MSC
+  if (x >= 0.0) {
+    return vl_floor_d(x + 0.5) ;
+  } else {
+    return vl_ceil_d(x - 0.5) ;
+  }
+#else
+  return lround(x) ;
+#endif
 }
 
 /** @brief Fast @c abs(x)
