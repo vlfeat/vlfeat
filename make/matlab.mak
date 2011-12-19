@@ -1,8 +1,12 @@
-# file:        Makefile.matlab
+# file: matlab.mak
 # description: Build MATALB toolbox
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
 
 # AUTORIGHTS
+# Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available under the terms of the
+# GNU GPLv2, or (at your option) any later version.
 
 # MATLAB support is enabled if $(MEX) is executable and if MATLAB root
 # can be deduced from the output of `$(MEX) -v`. Therefore setting MEX to

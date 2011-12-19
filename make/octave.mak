@@ -1,8 +1,12 @@
-# file:        octave.mak
+# file: octave.mak
 # description: Build MEX files for GNU Octave
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
 
-# AUTORIGTHS
+# AUTORIGHTS
+# Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available under the terms of the
+# GNU GPLv2, or (at your option) any later version.
 
 # Octave support is experimental. Currently, the MEX files compile
 # successfully but a number of bugs and subtle MATLAB

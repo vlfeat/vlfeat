@@ -1,8 +1,12 @@
-# file:        Makfile.doc
-# author:      Andrea Vedaldi
+# file: doc.mak
 # description: Makefile submodule to build the documentation
+# author: Andrea Vedaldi
 
 # AUTORIGHTS
+# Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available under the terms of the
+# GNU GPLv2, or (at your option) any later version.
 
 info: doc-info
 clean: doc-clean

@@ -1,6 +1,12 @@
-# file:        bin.mak
+# file: bin.mak
 # description: Build VLFeat command line utilities
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
+
+# AUTORIGHTS
+# Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+#
+# This file is part of VLFeat, available under the terms of the
+# GNU GPLv2, or (at your option) any later version.
 
 all: bin-all
 clean: bin-clean
