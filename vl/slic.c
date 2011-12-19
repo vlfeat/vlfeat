@@ -272,12 +272,13 @@ void vl_slic_segment (vl_uint32 * segmentation,
             float centery = centers[(2 + numChannels) * region + 1] ;
             float spatial = (x - centerx) * (x - centerx) + (y - centery) * (y - centery) ;
             float appearance = 0 ;
+            float distance ;
             for (k = 0 ; k < (signed)numChannels ; ++k) {
               float centerz = centers[(2 + numChannels) * region + k + 2]  ;
               float z = atimage(x,y,k) ;
               appearance += (z - centerz) * (z - centerz) ;
             }
-            float distance = appearance + factor * spatial ;
+            distance = appearance + factor * spatial ;
             if (minDistance > distance) {
               minDistance = distance ;
               segmentation[x + y * width] = region ;
