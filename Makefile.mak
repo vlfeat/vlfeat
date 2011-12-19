@@ -41,17 +41,6 @@ MSVCROOT = C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
 !endif
 
-# Visual Studio redistributable files
-# MSVCR: Visual C++ run time name (e.g. Microsoft.VC90.CRT).
-# MSVCR_FILES: Visual C++ run time files (e.g. CRT dll, manifest).
-# MSVCR_PATH: Visual C++ run time path.
-
-MSVCR = Microsoft.VC$(MSVSVER).CRT
-MSVCR_FILES = msvcr$(MSVSVER).dll
-!if $(MSVSVER) <= 90
-MSVCR_FILES = msvcr$(MSVSVER).dll Microsoft.VC$(MSVSVER).CRT.manifest
-!endif
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
 !if "$(ARCH)" == "win32"
 !message === COMPILING FOR 32-BIT
@@ -287,13 +276,26 @@ libobj = $(libobj:.c=.obj)
 cmdexe = $(cmdexe:.c=.exe)
 cmdpdb = $(cmdexe:.exe=.pdb)
 
+# Visual Studio redistributable files
+MSVCR = Microsoft.VC$(MSVSVER).CRT
+!if $(MSVSVER) <= 90
+# VS <= 2008 needs a manifest too
+bincrt = $(bindir)\msvcr$(MSVSVER).dll $(bindir)\$(MSVCR).manifest
+mexcrt = $(mexdir)\msvcr$(MSVSVER).dll $(mexdir)\$(MSVCR).manifest
+!else
+bincrt = $(libdir)\msvcr$(MSVSVER).dll
+mexcrt = $(mexdir)\msvcr$(MSVSVER).dll
+!endif
+
 !ifdef MATLABROOT
 all: $(bindir) $(objdir) $(mexdir) \
-     $(bindir)\$(MSVCR) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe) \
-     $(mexdir)\vl.dll  $(mexdir)\$(MSVCR) $(mexdll)
+     $(bincrt) $(bindir)\vl.lib $(bindir)\vl.dll \
+     $(cmdexe) \
+     $(mexcrt) $(mexdir)\vl.dll $(mexdll)
 !else
-all: $(bindir) $(objdir) $(mexdir) \
-     $(bindir)\$(MSVCR) $(bindir)\vl.lib $(bindir)\vl.dll $(cmdexe)
+all: $(bindir) $(objdir) \
+     $(bincrt) $(bindir)\vl.lib $(bindir)\vl.dll \
+     $(cmdexe)
 !endif
 
 BUILD_MEX=@echo .... CC [MEX] $(@) && \
@@ -343,7 +345,8 @@ info:
 	@echo ** MSVCROOT    = $(MSVCROOT)
 	@echo ** MSVCR       = $(MSVCR)
 	@echo ** MSVCR_PATH  = $(MSVCR_PATH)
-	@echo ** MSVCR_FILES = $(MSVCR_FILES)
+	@echo ** bincrt      = $(bincrt)
+	@echo ** mexcrt      = $(mexcrt)
 	@echo ** WINSDKROOT  = $(WINSDKROOT)
 	@echo ** DEBUG       = $(DEBUG)
 
@@ -390,6 +393,13 @@ $(bindir)\vl.dll : $(libobj)
 $(bindir)\vl.lib : $(libobj)
 	@echo ... LIB $(@R).lib
 	@lib $(**) /OUT:"$(@)" /NOLOGO
+
+# redistributable: msvcr__.dll => bin/win{32,64}/msvcr__.dll
+$(bindir)\$(MSVCR).manifest : "$(MSVCR_PATH)\$(MSVCR).manifest"
+        copy $(**) "$(@)"
+
+$(bindir)\msvcr$(MSVSVER).dll: "$(MSVCR_PATH)\msvcr$(MSVSVER).dll"
+        copy $(**) "$(@)"
 
 # --------------------------------------------------------------------
 #                                Rules to compile the VLFeat EXE files
@@ -442,17 +452,12 @@ startmatlab:
 $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
-# --------------------------------------------------------------------
-#            Rules to copy the Visual C run time redestributable files
-# --------------------------------------------------------------------
+# redistributable: msvcr__.dll => bin/win{32,64}/msvcr__.dll
+$(mexdir)\$(MSVCR).manifest : "$(MSVCR_PATH)\$(MSVCR).manifest"
+        copy $(**) "$(@)"
 
-$(bindir)\$(MSVCR):
-	mkdir "$(@)"
-	for %%x in ($(MSVCR_FILES)) do copy "$(MSVCR_PATH)\%%x" "$(@)"
-
-$(mexdir)\$(MSVCR):
-	mkdir "$(@)"
-	for %%x in ($(MSVCR_FILES)) do copy "$(MSVCR_PATH)\%%x" "$(@)"
+$(mexdir)\msvcr$(MSVSVER).dll: "$(MSVCR_PATH)\msvcr$(MSVSVER).dll"
+        copy $(**) "$(@)"
 
 # --------------------------------------------------------------------
 #                                       Rules to post the binary files
@@ -474,13 +479,13 @@ bin-commit: bin-release
 	@echo Crearing/resetting and checking out branch $(BRANCH) to v$(VER) && \
 	$(GIT) branch -f $(BRANCH) v$(VER) && \
 	$(GIT) checkout $(BRANCH)
-	echo Adding binaries && \
-	$(GIT) add -f "$(bindir)\$(MSVCR)" && \
+	@echo Adding binaries && \
+	$(GIT) add -f $(libcrt) && \
 	$(GIT) add -f "$(bindir)\vl.lib" && \
 	$(GIT) add -f "$(bindir)\vl.dll" && \
 	$(GIT) add -f $(cmdexe) && \
-	echo Adding MEX files && \
-	$(GIT) add -f "$(mexdir)\$(MSVCR)" && \
+	@echo Adding MEX files && \
+	$(GIT) add -f $(mexcrt) && \
 	$(GIT) add -f "$(mexdir)\vl.dll" && \
 	$(GIT) add -f $(mexdll) && \
 	@echo Commiting changes && \
