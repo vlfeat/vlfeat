@@ -872,8 +872,8 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
             for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
           } else {
             /* restart the center */
-            numRestartedCenters ++ ;
             vl_uindex x = vl_rand_uindex(rand, numData) ;
+			numRestartedCenters ++ ;
             for (d = 0 ; d < self->dimension ; ++d) {
               cpt[d] = data[x * self->dimension + d] ;
             }
@@ -896,9 +896,9 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
         /* restart the centers as required  */
         for (c = 0 ; c < self->numCenters ; ++c) {
           if (clusterMasses[c] == 0) {
-            numRestartedCenters ++ ;
             TYPE * cpt = newCenters + c * self->dimension ;
             vl_uindex x = vl_rand_uindex(rand, numData) ;
+			numRestartedCenters ++ ;
             for (d = 0 ; d < self->dimension ; ++d) {
               cpt[d] = data[x * self->dimension + d] ;
             }
