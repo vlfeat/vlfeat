@@ -145,6 +145,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\array.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\array.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\dsift.c"
 				>
 			</File>
@@ -253,6 +261,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\lbp.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\lbp.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\mathop.c"
 				>
 			</File>
@@ -274,6 +290,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\mser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\pegasos.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\pegasos.h"
 				>
 			</File>
 			<File
@@ -322,6 +346,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\sift.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\slic.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\slic.h"
 				>
 			</File>
 			<File
@@ -474,6 +506,10 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\misc\vl_simdctrl.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\slic\vl_slic.c"
 				>
 			</File>
 			<File
