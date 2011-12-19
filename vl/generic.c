@@ -407,6 +407,11 @@ vl_configuration_to_string_copy ()
 #else
   "Generic CPU" ;
 #endif
+#if defined(DEBUG)
+  int const debug = 1 ;
+#else
+  int const debug = 0 ;
+#endif
 
   while (string == 0) {
     if (length > 0) {
@@ -416,10 +421,12 @@ vl_configuration_to_string_copy ()
     length = snprintf(string, length,
                       "VLFeat version %s\n"
                       "    Static config: %s\n"
-                      "    %d CPU(s): %s\n",
+                      "    %d CPU(s): %s\n"
+					  "    Debug: %s\n",
                       vl_get_version_string (),
                       staticString,
-                      vl_get_num_cpus(), cpuString) ;
+                      vl_get_num_cpus(), cpuString,
+					  VL_YESNO(debug,"yes","no")) ;
     length += 1 ;
   }
 
