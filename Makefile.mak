@@ -454,7 +454,7 @@ $(mexdir)\$(MSVCR):
 
 bin-release:
 	echo Fetching remote tags && \
-	git fetch --tags && \
+	$(GIT) fetch --tags && \
 	echo Checking out v$(VER) && \
 	$(GIT) checkout v$(VER)
 	echo Rebuilding binaries for release
@@ -464,7 +464,7 @@ bin-release:
 
 bin-commit: bin-release
 	@echo Fetching remote tags && \
-	git fetch --tags
+	$(GIT) fetch --tags
 	@echo Crearing/resetting and checking out branch $(BRANCH) to v$(VER) && \
 	$(GIT) branch -f $(BRANCH) v$(VER) && \
 	$(GIT) checkout $(BRANCH)
