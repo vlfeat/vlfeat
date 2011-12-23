@@ -5,6 +5,8 @@ function Q = vl_imseg(I,labels)
 %
 %   See also: VL_HELP().
 
+% Copyright
+
 [M,N,K] = size(I) ;
 Q = 0*I ;
 for k=1:size(I,3)

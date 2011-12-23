@@ -11,6 +11,8 @@ function [Fx,Fy] = vl_imgrad(F,varargin) ;
 %
 %   See also: GRADIENT(), VL_HELP().
 
+% Copyright
+
 type = 'central' ; % forward, backward
 
 for k=1:2:length(varargin)

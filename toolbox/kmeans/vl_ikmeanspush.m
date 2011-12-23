@@ -4,3 +4,5 @@
 %
 %   See also: VL_IKMEANS(), VL_HELP().
 
+% Copyright
+

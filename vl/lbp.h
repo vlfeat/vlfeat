@@ -1,7 +1,11 @@
-/** @file   lbp.h
- ** @brief  Local Binary Patterns
+/** @file lbp.h
+ ** @brief Local Binary Patterns
  ** @author Andre Vedaldi
  **/
+
+/*
+Copyright
+*/
 
 #include "generic.h"
 

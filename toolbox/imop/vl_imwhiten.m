@@ -12,6 +12,8 @@ function J=vl_imwhiten(I,alpha,cutoff)
 %
 %   See also: VL_HELP().
 
+% Copyright
+
 if ~exist('alpha'),  alpha = 1 ; end
 if ~exist('cutoff'), cutoff = [] ; end
 

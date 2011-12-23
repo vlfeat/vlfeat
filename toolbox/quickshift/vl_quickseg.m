@@ -29,6 +29,8 @@ function [Iseg labels map gaps E] = vl_quickseg(I, ratio, kernelsize, maxdist)
 %
 %   See also: VL_HELP().
 
+% Copyright
+
 I = im2double(I);
 % Add less than one pixel noise to break ties caused by constant regions in an
 % arbitrary fashon

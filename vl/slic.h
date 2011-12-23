@@ -3,6 +3,10 @@
  ** @author Andrea Vedaldi
  **/
 
+/*
+Copyright
+*/
+
 #ifndef VL_SLIC
 #define VL_SLIC
 

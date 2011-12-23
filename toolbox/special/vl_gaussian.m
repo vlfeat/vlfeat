@@ -1,5 +1,5 @@
 function y = vl_gaussian(x)
-% VL_GAUSSIAN  Standard Gaussian density
+% VL_GAUSSIAN  Standard Gaussian density function
 %   Y=VL_GAUSSIAN(X) computes the standard (zero mean, unit variance)
 %   Gaussian density.
 %

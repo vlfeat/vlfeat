@@ -1,7 +1,11 @@
-/** @file   array.h
- ** @brief  Array
+/** @file  array.h
+ ** @brief Array - Definition
  ** @author Andrea Vedaldi
  **/
+
+/*
+Copyright
+*/
 
 #ifndef VL_ARRAY_H
 #define VL_ARRAY_H

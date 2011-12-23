@@ -1,5 +1,5 @@
 function y = vl_ddgaussian(x)
-% VL_DDGAUSSIAN Second derivative of Gaussian density
+% VL_DDGAUSSIAN Second derivative of the Gaussian density function
 %   Y=VL_DDGAUSSIAN(X) computes the second derivative of the standard
 %   Gaussian density.
 %

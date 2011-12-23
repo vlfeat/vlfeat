@@ -8,6 +8,8 @@ function vl_noprefix
 %
 %   See also: VL_COMPILE(), VL_HELP().
 
+% Copyright
+
 root = fileparts(which(mfilename)) ;
 list = listMFilesX(root);
 outDir = fullfile(root, 'noprefix') ;

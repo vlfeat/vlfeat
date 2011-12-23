@@ -16,6 +16,8 @@ function [U,dU,delta]=vl_tpsu(X,Y)
 %
 %   See also: VL_TPS(), VL_HELP().
 
+% Copyright
+
 if exist('tpsumx')
 	U = tpsumx(X,Y) ;
 else

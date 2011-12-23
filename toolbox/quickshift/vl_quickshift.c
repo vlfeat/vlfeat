@@ -5,6 +5,10 @@
  ** @brief:      Quickshift MEX driver
  **/
 
+/*
+Copyright
+*/
+
 #include <mexutils.h>
 
 #include <vl/quickshift.h>

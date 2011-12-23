@@ -5,8 +5,9 @@ function H = vl_hat(om)
 %
 %   See also: VL_IHAT(), VL_HELP().
 
-H = [
-	0      -om(3)  om(2) ;
-	om(3)  0      -om(1) ;
-	-om(2) om(1)   0     ] ;
+% Copyright
+
+H = [0      -om(3)  om(2) ;
+     om(3)  0      -om(1) ;
+     -om(2) om(1)   0     ] ;
 

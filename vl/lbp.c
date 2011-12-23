@@ -1,10 +1,11 @@
-/** @file   lbp.c
- ** @brief  Local Binary Patterns - Definition
+/** @file lbp.c
+ ** @brief Local Binary Patterns - Definition
  ** @author Andrea Vedaldi
  **/
 
-#include "lbp.h"
-#include "mathop.h"
+/*
+Copyright
+*/
 
 /** @file lbp.h
 
@@ -75,7 +76,10 @@ when the image is column major rather than row major.
     gray-scale and rotation invariant texture classification with
     local binary patterns". PAMI, 2010.
 
- **/
+**/
+
+#include "lbp.h"
+#include "mathop.h"
 
 /* ---------------------------------------------------------------- */
 /*                                           Initialization helpers */

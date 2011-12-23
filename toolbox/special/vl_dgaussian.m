@@ -1,5 +1,5 @@
 function y = vl_dgaussian(x)
-% VL_DGAUSSIAN  Derivative of Gaussian density
+% VL_DGAUSSIAN  Derivative of the Gaussian density function
 %   Y=VL_DGAUSSIAN(X) evaluates the derivative of the standard Gaussian
 %   density.
 %

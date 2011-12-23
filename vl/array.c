@@ -1,7 +1,11 @@
-/** @file   array.h
- ** @brief  Array
+/** @file array.h
+ ** @brief Array
  ** @author Andrea Vedaldi
  **/
+
+/*
+Copyright
+*/
 
 #include "array.h"
 #include <string.h>

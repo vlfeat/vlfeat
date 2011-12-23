@@ -3,6 +3,10 @@
  ** @author Andrea Vedaldi
  **/
 
+/*
+Copyright
+*/
+
 #ifndef VL_PEGASOS_H
 #define VL_PEGASOS_H
 

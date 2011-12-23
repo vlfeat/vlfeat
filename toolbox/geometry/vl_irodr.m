@@ -16,3 +16,4 @@
 %
 %   See also: VL_RODR(), VL_HELP().
 
+% Copyright

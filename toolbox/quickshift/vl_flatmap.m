@@ -6,6 +6,8 @@ function [map, C] = vl_flatmap(map)
 %
 %   See also: VL_HELP().
 
+% Copyright
+
 % follow the parents list to the root nodes (where nothing changes)
 while 1
   map_ = map(map) ;
