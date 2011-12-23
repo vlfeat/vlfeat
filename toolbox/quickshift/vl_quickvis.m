@@ -23,6 +23,12 @@ function [Iedge dists map gaps] = vl_quickvis(I, ratio, kernelsize, maxdist, max
 %
 %   See Also: VL_QUICKSHIFT(), VL_QUICKSEG(), VL_HELP().
 
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
+
 if nargin == 4
   dists = maxdist;
   maxdist = max(dists);
