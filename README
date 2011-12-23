@@ -115,7 +115,8 @@ CHANGES
   0.9.14     Adds SLIC superpixels. Improves Windows binary package. Adds
              support for Visual Studio 2010. Adds
              VL_ALPHANUM(). Improves documentation layout and add a
-             proper bibliography. Bugfixes and other minor improvements.
+             proper bibliography. Bugfixes and other minor
+             improvements.  Moves from the GPL to the BSD license.
   0.9.13     Fixes Windows binary package.
   0.9.12     Fixes vl_compile and the architecture string on Linux 32 bit.
   0.9.11     Fixes a compatibility problem on older Mac OS X versions.

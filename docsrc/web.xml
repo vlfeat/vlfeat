@@ -90,6 +90,7 @@
 
  <page id="home" name="index" title="Home"> <include src="index.html"/>
   <page id="about" name="about" title="About"><include src="about.html"/></page>
+  <page id="license" name="license" title="License"><include src="license.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
   <page id="install.matlab" name="install-matlab" title="MATLAB install">
