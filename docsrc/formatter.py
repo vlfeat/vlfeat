@@ -3,11 +3,11 @@
 # author:      Andrea Vedaldi
 # description: Utility to format MATLAB comments.
 
-# AUTORIGHTS
-# Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
 #
-# This file is part of VLFeat, available in the terms of the GNU
-# General Public License version 2.
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 """
 MDOC fromats the help block of a MATLAB M-file based on a simple set
@@ -46,7 +46,7 @@ __version__          = '0.1'
 __date__             = '2008-01-01'
 __description__      = 'MDoc formatting module'
 __long_description__ = __doc__
-__license__          = 'GPL'
+__license__          = 'BSD'
 __author__           = 'Andrea Vedaldi'
 
 # terminal
