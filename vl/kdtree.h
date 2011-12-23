@@ -275,4 +275,3 @@ vl_kdforest_get_data_type (VlKDForest const * self)
 
 /* VL_KDTREE_H */
 #endif
-

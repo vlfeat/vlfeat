@@ -32,4 +32,3 @@ for i = 0:7
 end
 
 f = f(:, end:-1:1, perm) ;
-

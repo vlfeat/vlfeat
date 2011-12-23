@@ -623,4 +623,3 @@ vl_swap_host_big_endianness_2 (void *dst, void* src)
 
 /* VL_HOST_H */
 #endif
-

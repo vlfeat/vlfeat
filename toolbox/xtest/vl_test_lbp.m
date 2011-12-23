@@ -42,4 +42,3 @@ I = randn(256,256,1,'single') ;
 f = vl_lbp(fliplr(I), 8) ;
 f_ = vl_lbpfliplr(vl_lbp(I, 8)) ;
 vl_assert_almost_equal(f,f_,1e-3) ;
-

@@ -638,4 +638,3 @@ void vl_aib_process(VlAIB *aib)
     for(; i < aib->nvalues - 1 ; i++)
         aib->costs[i+1] = VL_NAN_D ;
 }
-

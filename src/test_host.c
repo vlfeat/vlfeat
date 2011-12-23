@@ -17,4 +17,3 @@ main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_free(string) ;
   return 0 ;
 }
-

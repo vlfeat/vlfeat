@@ -69,4 +69,3 @@ vl_homogeneouskernelmap_evaluate_f (VlHomogeneousKernelMap const * self,
                                     double x) ;
 /* VL_HOMKERMAP_H */
 #endif
-

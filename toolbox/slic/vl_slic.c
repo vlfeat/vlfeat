@@ -144,4 +144,3 @@ mexFunction(int nout, mxArray *out[],
                   image, height, width, numChannels, /* the image is transposed */
                   regionSize, regularizer, minRegionSize) ;
 }
-

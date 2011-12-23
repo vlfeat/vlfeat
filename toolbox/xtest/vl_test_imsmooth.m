@@ -65,4 +65,3 @@ for k=1:size(I,3)
   I(:,:,k) = conv2(g,g,I(:,:,k),'same');
 end
 I = I(1:step:end,1:step:end,:) ;
-

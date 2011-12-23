@@ -169,4 +169,3 @@ yv = [y(1,:) ; y(end,:) ; nans] ;
 
 x=[xstars(:)' xh(:)' xv(:)'] ;
 y=[ystars(:)' yh(:)' yv(:)'] ;
-

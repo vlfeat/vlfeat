@@ -334,4 +334,3 @@ vl_kmeans_set_initialization (VlKMeans * self,
 
 /* VL_IKMEANS_H */
 #endif
-

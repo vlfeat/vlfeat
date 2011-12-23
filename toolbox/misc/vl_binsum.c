@@ -133,4 +133,3 @@ VL_XCAT4(_vl_binsum_,TYPE(V),_,TYPE(I))(out[0], IN(VALUES), IN(INDEXES), dim) ; 
       vlmxError(vlmxErrInvalidArgument, "ACCUMULATOR is not of one of the supported storage classes.") ;
   }
 }
-

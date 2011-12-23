@@ -40,4 +40,3 @@ VL_EXPORT int vl_string_casei_cmp (const char * string1, const char * string2) ;
 
 /* VL_STRINGOP_H */
 #endif
-

@@ -297,4 +297,3 @@ vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_uint8 const *data, int N)
     }
   }
 }
-

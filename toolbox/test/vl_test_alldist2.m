@@ -62,5 +62,3 @@ disp(vl_alldist2( int32(X),   int32(Y), 'chi2'  )) ;
 disp(vl_alldist2(uint8(X),   uint8(Y) , 'chi2'  )) ;
 disp(vl_alldist2(uint16(X),  uint16(Y), 'chi2'  )) ;
 disp(vl_alldist2(uint32(X),  uint32(Y), 'chi2'  )) ;
-
-

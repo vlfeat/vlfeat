@@ -166,4 +166,3 @@ function [frames, descrs] = vl_phow(im, varargin)
   descrs = cell2mat(descrs) ;
   frames = cell2mat(frames) ;
 end
-

@@ -267,4 +267,3 @@ vl_file_meta_get_double (VlFileMeta *self, double *x)
 
 /* VL_GENERIC_DRIVER */
 #endif
-

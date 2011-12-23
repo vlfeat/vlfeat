@@ -28,6 +28,3 @@ disp(h)
 for i=1:size(id,2)
   disp(vl_ihashfind(id,next,K, id(:,i)));
 end
-
-
-

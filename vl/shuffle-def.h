@@ -99,4 +99,3 @@ VL_SHUFFLE_shuffle
 #undef VL_SHUFFLE_shuffle
 #undef VL_SHUFFLE_type
 #undef VL_SHUFFLE_array
-

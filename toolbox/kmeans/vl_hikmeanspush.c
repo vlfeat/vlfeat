@@ -233,4 +233,3 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     for (j = 0 ; j < N*depth ; j++) ids [j] ++ ;
   }
 }
-

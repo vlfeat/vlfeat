@@ -43,4 +43,3 @@ if nargout > 1
   invLn = invL(1:K, end-K+1:end) ;
   S = invLn * U * invLn ;
 end
-

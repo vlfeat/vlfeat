@@ -53,4 +53,3 @@ void _vl_imconvcoltri_vd_sse2 (double* dst, int dst_stride,
 
 /* VL_IMOPV_SSE2_H */
 #endif
-

@@ -47,4 +47,3 @@ x = linspace(-1,1,20) ;
 k = vl_alldist(abs(x), 'kchi2') .* (sign(x)'*sign(x)) ;
 psix = vl_homkermap(x, 3, 'kchi2') ;
 assert(norm(k - psix'*psix) < 1e-2) ;
-

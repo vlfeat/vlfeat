@@ -103,4 +103,3 @@ data = guidata(gcbo) ;
 data.exit = 1 ;
 guidata(obj,data) ;
 uiresume(gcbo) ;
-

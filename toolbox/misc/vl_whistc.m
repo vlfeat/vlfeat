@@ -43,4 +43,3 @@ end
 dimensions(dim) = numEdges ;
 h = zeros(dimensions) ;
 h = vl_binsum(h, w, binIndexes, dim) ;
-

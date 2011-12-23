@@ -125,5 +125,3 @@ mexFunction(int nout, mxArray *out[],
     mxFree(indexes) ;
   }
 }
-
-

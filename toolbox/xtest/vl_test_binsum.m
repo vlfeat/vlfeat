@@ -47,5 +47,3 @@ for a = types
       vl_binsum(a(eye(3)), a([1 1 1]),  b([1 2 3]),  1), a(2*eye(3))) ;
   end
 end
-
-

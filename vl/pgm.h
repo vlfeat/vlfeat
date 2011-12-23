@@ -73,4 +73,3 @@ VL_EXPORT int vl_pgm_read_new_f    (char const *name,
 
 /* VL_PGM_H */
 #endif
-

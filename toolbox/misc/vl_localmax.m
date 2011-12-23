@@ -43,5 +43,3 @@
 
 % TODO: Companion REFINELOCALMAX
 % TODO: Do something smarter at boundaries
-
-

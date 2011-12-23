@@ -195,4 +195,3 @@ end
 function h = spline(x,y,spec,varargin)
 prop = vl_linespec2prop(spec) ;
 h = line(x,y,prop{:},varargin{:}) ;
-

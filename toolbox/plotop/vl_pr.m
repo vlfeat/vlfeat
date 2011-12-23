@@ -124,4 +124,3 @@ if opts.stable
 else
   scores = [+inf scores(1:stop)] ;
 end
-

@@ -352,4 +352,3 @@ vl_dsift_get_window_size(VlDsiftFilter const * self)
 
 /*  VL_DSIFT_H */
 #endif
-

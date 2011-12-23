@@ -12,4 +12,3 @@ function vl_assert_almost_equal(x, y, varargin)
   assert(all(isnan(y(i))), varargin{:}) ;
   assert(max(abs(x(~i) - y(~i))) < epsilon, varargin{:}) ;
 end
-

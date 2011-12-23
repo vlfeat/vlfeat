@@ -499,4 +499,3 @@ VL_XCAT(vl_homogeneouskernelmap_evaluate_,SFX)
 #undef FLT
 #undef VL_HOMKERMAP_INSTANTIATING
 #endif /* VL_HOMKERMAP_INSTANTIATING */
-

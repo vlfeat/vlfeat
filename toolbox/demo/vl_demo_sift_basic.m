@@ -79,4 +79,3 @@ h1   = vl_plotframe(f) ; set(h1,'color','k','linewidth',4) ;
 h2   = vl_plotframe(f) ; set(h2,'color','y','linewidth',2) ;
 
 vl_demo_print('sift_basic_5') ;
-

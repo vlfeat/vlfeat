@@ -443,4 +443,3 @@ VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)
 
 /* VL_MATHOP_INSTANTIATING */
 #endif
-

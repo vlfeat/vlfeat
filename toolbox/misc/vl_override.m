@@ -151,5 +151,3 @@ for fi=1:length(fieldNames)
     field = fieldNames{fi} ;
   end
 end
-
-

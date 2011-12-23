@@ -67,7 +67,3 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
 
 /* VL_MATHOP_SSE2_INSTANTIATING */
 #endif
-
-
-
-

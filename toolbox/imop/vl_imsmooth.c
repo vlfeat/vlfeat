@@ -360,4 +360,3 @@ mexFunction(int nout, mxArray *out[],
 
 /* VL_IMSMOOTH_INSTANTIATING */
 #endif
-

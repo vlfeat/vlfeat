@@ -175,4 +175,3 @@ vl_hikm_set_max_niters (VlHIKMTree *f, int max_niters)
 
 /* VL_HIKMEANS_H */
 #endif
-

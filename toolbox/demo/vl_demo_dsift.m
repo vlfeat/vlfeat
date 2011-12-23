@@ -80,4 +80,3 @@ axis square ;
 
 figure(1) ; vl_demo_print('dsift_accuracy') ;
 figure(2) ; vl_demo_print('dsift_speedup') ;
-

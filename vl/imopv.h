@@ -107,4 +107,3 @@ vl_image_distance_transform_f (float const * image,
 
 /* VL_IMOPV_H */
 #endif
-

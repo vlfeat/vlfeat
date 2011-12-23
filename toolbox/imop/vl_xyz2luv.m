@@ -81,4 +81,3 @@ u = 13 * L .* (up - upw) ;
 v = 13 * L .* (vp - vpw) ;
 
 J = cat(3,L,u,v) ;
-

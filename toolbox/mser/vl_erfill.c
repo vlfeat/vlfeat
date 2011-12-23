@@ -206,4 +206,3 @@ mexFunction(int nout, mxArray *out[],
   mxFree( nsubs_pt   ) ;
   mxFree( subs_pt    ) ;
 }
-

@@ -968,4 +968,3 @@ vl_destructor ()
   printf("VLFeat DEBUG: destructor ends.\n") ;
 #endif
 }
-

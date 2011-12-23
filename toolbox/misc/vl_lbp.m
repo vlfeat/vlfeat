@@ -11,4 +11,3 @@
 %   See also: VL_HELP().
 
 % AUTORIGHTS
-

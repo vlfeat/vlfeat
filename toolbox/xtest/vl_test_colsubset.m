@@ -23,4 +23,3 @@ vl_assert_equal([2 3 4 1 0], vl_colsubset(s.x, .5, 'smallest')) ;
 
 function test_random(s)
 assert(numel(intersect(s.x, vl_colsubset(s.x, 5, 'random'))) == 5) ;
-

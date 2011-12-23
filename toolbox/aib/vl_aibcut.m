@@ -101,4 +101,3 @@ map(cut)        = 1:n ;
 map(short >  0) = map(short(short > 0)) ;
 map(short == 0) = 0 ;
 map(mu+1:end)   = 0 ;
-

@@ -183,4 +183,3 @@ mexFunction(int nout, mxArray *out[],
     vl_homogeneouskernelmap_delete (map) ;
   }
 }
-

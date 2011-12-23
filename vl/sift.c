@@ -2210,4 +2210,3 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
 
   k->sigma = sigma ;
 }
-

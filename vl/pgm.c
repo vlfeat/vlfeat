@@ -580,4 +580,3 @@ int vl_pgm_write_f (char const *name, float const* data, int width, int height)
   vl_free (buffer) ;
   return err ;
 }
-

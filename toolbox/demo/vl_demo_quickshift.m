@@ -42,4 +42,3 @@ imagesc(Iedge);
 axis equal off tight;
 colormap gray;
 vl_demo_print('quickshift_qvis') ;
-

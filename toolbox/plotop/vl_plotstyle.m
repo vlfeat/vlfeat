@@ -72,4 +72,3 @@ end
 if numel(index) == 1
   style = [style{:}] ;
 end
-

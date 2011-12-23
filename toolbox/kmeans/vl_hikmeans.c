@@ -228,4 +228,3 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   /* vl_hikm_delete (tree) ; */
 }
-

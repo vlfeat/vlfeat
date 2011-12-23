@@ -216,4 +216,3 @@ mexFunction(int nout, mxArray *out[],
     mxFree(pairs_begin) ;
   }
 }
-

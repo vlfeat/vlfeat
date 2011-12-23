@@ -184,4 +184,3 @@ mexFunction(int nout, mxArray *out[],
   vl_kdforest_delete (forest) ;
   vl_free (neighbors) ;
 }
-

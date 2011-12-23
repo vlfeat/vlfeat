@@ -778,4 +778,3 @@ void vl_dsift_process (VlDsiftFilter* self, float const* im)
     } /* for framey */
   }
 }
-

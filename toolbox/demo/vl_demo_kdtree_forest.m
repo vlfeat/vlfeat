@@ -57,4 +57,3 @@ function vl_demo_kdtree_forest
   set(gca,'xtick',[],'ytick',[]) ;
   vl_demo_print(5,'kdtree_forest_query') ;
 end
-

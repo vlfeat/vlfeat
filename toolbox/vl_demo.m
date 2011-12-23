@@ -46,4 +46,3 @@ vl_demo_imdisttf ;
 
 rmpath(demo_path);
 rmpath(test_path);
-

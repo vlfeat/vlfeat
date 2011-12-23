@@ -49,4 +49,3 @@ for t = [1 2 3 4]
   set(gca,'xtick',[],'ytick',[]) ;
   vl_demo_print(t, sprintf('kdtree_ann_%d', t)) ;
 end
-

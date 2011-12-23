@@ -182,4 +182,3 @@ mexFunction(int nout, mxArray *out[],
     }
   } /* next guy to search for */
 }
-

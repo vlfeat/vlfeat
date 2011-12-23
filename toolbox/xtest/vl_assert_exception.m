@@ -19,4 +19,3 @@ catch
 end
 assert(0, 'The function did not generate an exception.') ;
 end
-

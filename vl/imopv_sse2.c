@@ -286,4 +286,3 @@ VL_XCAT(_vl_imconvcoltri_v, SFX, sse2)
 
 /* ! VL_DISABLE_SSE2 */
 #endif
-

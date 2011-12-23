@@ -324,4 +324,3 @@ getopt_long(int argc, char *const argv[],
 
   return ret_val ;
 }
-

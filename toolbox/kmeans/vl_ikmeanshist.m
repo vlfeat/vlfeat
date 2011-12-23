@@ -13,4 +13,3 @@ function h = vl_ikmeanshist(K,asgn)
 
 h = zeros(K,1) ;
 h = vl_binsum(h, 1, double(asgn)) ;
-

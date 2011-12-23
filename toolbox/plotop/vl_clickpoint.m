@@ -77,7 +77,3 @@ if( plot_marker )
   pause(.1);
   delete(h) ;
 end
-
-
-
-

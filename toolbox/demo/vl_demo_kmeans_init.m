@@ -58,4 +58,3 @@ st = [std(energy.vlrs) std(energy.vlpp)] ;
 bar(mu) ; hold on ;
 errorbar(mu, st, 'linestyle', 'none', 'color', 'r', 'linewidth', 4) ;
 title('Energy') ;
-

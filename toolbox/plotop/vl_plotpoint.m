@@ -31,4 +31,3 @@ switch size(V,1)
   otherwise
     error(['V must be either 2xK or 3xK.']) ;
 end
-

@@ -172,4 +172,3 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("ikmeans: done\n") ;
   }
 }
-

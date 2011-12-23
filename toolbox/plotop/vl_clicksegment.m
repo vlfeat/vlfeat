@@ -32,5 +32,3 @@ if isempty(P2)
 end
 delete(h) ;
 if ~was_hold, hold off ; end
-
-

@@ -16,4 +16,3 @@
 %   INTHIST.
 %
 %   See also: VL_INTHIST(), VL_IMINTEGRAL(), VL_HELP().
-

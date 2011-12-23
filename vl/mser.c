@@ -987,5 +987,3 @@ vl_mser_ell_fit (VlMserFilt* f)
   /* save back */
   f-> nell = nmer ;
 }
-
-

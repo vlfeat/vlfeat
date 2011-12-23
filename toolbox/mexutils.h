@@ -787,4 +787,3 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
 /* MEXUTILS_H */
 #endif
-

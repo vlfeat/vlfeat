@@ -102,4 +102,3 @@ end
 if ~isempty(teardownFunc), teardownFunc(state) ; end
 
 results = cat(2, results{:}) ;
-

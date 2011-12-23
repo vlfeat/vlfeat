@@ -150,4 +150,3 @@ switch algType
   case 'alldist2'
     tic ; D = vl_alldist2(X, distType) ; elaps = toc ;
 end
-

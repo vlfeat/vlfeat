@@ -51,4 +51,3 @@
 % the terms of the BSD license (see the COPYING file).
 
 help vl_help.m
-

@@ -46,4 +46,3 @@ end
 I = reshape(I, M*N, K) ;
 J = inv(A)*I' ;
 J = reshape(J'.^(1/gamma), M, N, K) ;
-

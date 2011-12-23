@@ -197,4 +197,3 @@ VL_QSORT_sort
 #undef VL_QSORT_sort_recursive
 #undef VL_QSORT_type
 #undef VL_QSORT_array
-

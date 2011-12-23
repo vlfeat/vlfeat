@@ -86,4 +86,3 @@ mexFunction(int nout, mxArray *out[],
     dR_pt += 9*3 ;
   }
 }
-

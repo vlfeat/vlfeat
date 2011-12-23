@@ -77,4 +77,3 @@ mexFunction(int nout, mxArray *out[],
     X_pt -= 2*NP ;
   }
 }
-

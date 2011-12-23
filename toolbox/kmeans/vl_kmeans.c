@@ -280,5 +280,3 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   vl_kmeans_delete (kmeans) ;
 }
-
-

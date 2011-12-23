@@ -523,7 +523,3 @@ snprintf(compilerString, 1024,
     return string ;
   }
 }
-
-
-
-

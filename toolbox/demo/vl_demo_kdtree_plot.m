@@ -36,4 +36,3 @@ end
 if upperChild > 1
   h = [h vl_demo_kdtree_plot(kdtree, upperChild, xlimUpper, ylimUpper)] ;
 end
-

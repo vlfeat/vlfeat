@@ -233,4 +233,3 @@ mexFunction(int nout, mxArray *out[],
     vl_sift_delete (filt) ;
   } /* job done */
 }
-

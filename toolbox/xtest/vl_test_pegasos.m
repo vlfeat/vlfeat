@@ -90,4 +90,3 @@ w(3) = - model.rho / biasMultiplier ;
 format long ;
 disp('model w:')
 disp(w)
-

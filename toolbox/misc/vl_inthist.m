@@ -22,4 +22,3 @@
 %   See also: VL_IMINTEGRAL(), VL_SAMPLEINTHIST(), VL_HELP().
 
 % Authors: Andrea Vedaldi
-

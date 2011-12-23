@@ -685,4 +685,3 @@ vl_kdforest_query (VlKDForest * self,
 
   return self->searchNumComparisons ;
 }
-

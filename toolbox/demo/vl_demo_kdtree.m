@@ -54,4 +54,3 @@ function vl_demo_kdtree
   end
 
 end
-

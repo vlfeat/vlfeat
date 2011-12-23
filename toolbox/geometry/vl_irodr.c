@@ -83,4 +83,3 @@ mexFunction(int nout, mxArray *out[],
   }
 
 }
-

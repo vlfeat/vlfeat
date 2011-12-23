@@ -222,5 +222,3 @@ for i=1:size(data,2)
   end
   kdtree.trees(1).dataIndex = uint32(1:kdtree.numData) ;
 end
-
-

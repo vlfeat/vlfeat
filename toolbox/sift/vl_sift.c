@@ -486,4 +486,3 @@ mexFunction(int nout, mxArray *out[],
 
   } /* end: do job */
 }
-

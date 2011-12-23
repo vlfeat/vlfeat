@@ -225,5 +225,3 @@ vl_rand_uint32 (VlRand * self)
 #undef mti
 #undef mt
 }
-
-

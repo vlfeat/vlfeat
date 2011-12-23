@@ -13,4 +13,3 @@ s.sortedStrings = ...
 function test_basic(s)
 sorted = vl_alphanum(s.strings) ;
 assert(isequal(sorted,s.sortedStrings)) ;
-

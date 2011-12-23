@@ -101,4 +101,3 @@ if nargout == 0
 else
   J = vl_imarray(A,varargin{:}, 'cmap', opts.cmap) ;
 end
-

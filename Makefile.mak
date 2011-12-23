@@ -493,4 +493,3 @@ bin-commit: bin-release
 	$(GIT) push -v --force bin $(BRANCH):refs/heads/$(BRANCH) && \
 	$(GIT) checkout v$(VER) && \
 	$(GIT) branch -D $(BRANCH)
-

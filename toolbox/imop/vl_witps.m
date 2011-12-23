@@ -46,5 +46,3 @@ end
 [M,N] = size(xp1) ;
 x1 = reshape(X(1,:),M,N) ;
 x2 = reshape(X(2,:),M,N) ;
-
-

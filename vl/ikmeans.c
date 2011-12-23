@@ -229,4 +229,3 @@ vl_ikm_push_one (vl_ikm_acc const *centers,
 #include "ikmeans_init.tc"
 #include "ikmeans_lloyd.tc"
 #include "ikmeans_elkan.tc"
-

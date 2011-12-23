@@ -78,4 +78,3 @@ k = 903.3 ;
 b=zeros(size(a)) ;
 b(sp) = a(sp).^(1/3) ;
 b(sm) = (k*a(sm) + 16)/116 ;
-

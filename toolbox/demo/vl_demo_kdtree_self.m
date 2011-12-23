@@ -34,4 +34,3 @@ vl_demo_kdtree_plot(kdtree.trees(1), 1, xl, yl) ;
 line([X(1,:) ; X(1,i(2,:))], ...
      [X(2,:) ; X(2,i(2,:))], 'linewidth', 2) ;
 vl_demo_print('kdtree_self') ;
-

@@ -416,4 +416,3 @@ vl_sift_set_window_size (VlSiftFilt *f, double x)
 
 /* VL_SIFT_H */
 #endif
-

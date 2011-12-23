@@ -162,4 +162,3 @@ mexFunction(int nout, mxArray *out[],
   out[OUT_TREE] = new_array_from_kdforest (forest) ;
   vl_kdforest_delete (forest) ;
 }
-

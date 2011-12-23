@@ -230,4 +230,3 @@ mexFunction(int nout, mxArray *out[],
   out[OUT_ID]   = id_ ;
   out[OUT_NEXT] = next_ ;
 }
-

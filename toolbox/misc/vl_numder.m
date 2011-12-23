@@ -22,4 +22,3 @@ for n=1:N
   di  = (fxn - fx) / dx ;
   d(:,n) = di(:) ;
 end
-

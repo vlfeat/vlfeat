@@ -377,4 +377,3 @@ vl_string_casei_cmp (const char * string1, const char * string2)
     (int)tolower((char unsigned)*string1) -
     (int)tolower((char unsigned)*string2) ;
 }
-

@@ -27,5 +27,3 @@ VL_EXPORT void vl_irodrigues (double* om_pt, double* dom_pt, const double* R_pt)
 
 /* VL_RODRIGUES */
 #endif
-
-

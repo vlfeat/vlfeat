@@ -37,4 +37,3 @@ for b=ben
           b.size, b.step, 1e3*b.elaps_full, 1e3*b.elaps_fast, ...
           b.elaps_full/b.elaps_fast);
 end
-

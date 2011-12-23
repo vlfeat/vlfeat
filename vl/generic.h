@@ -404,4 +404,3 @@ vl_free (void *ptr)
 
 /* VL_GENERIC_H */
 #endif
-

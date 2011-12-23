@@ -330,4 +330,3 @@ autorights: distclean
 ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(deps)
 endif
-

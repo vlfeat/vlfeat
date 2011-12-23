@@ -200,6 +200,3 @@ vl_array_delete (VlArray * self)
   vl_array_dealloc(self) ;
   vl_free(self) ;
 }
-
-
-

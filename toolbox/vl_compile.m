@@ -156,5 +156,3 @@ if ~exist(dst, 'dir')
   fprintf('Creating directory ''%s''.', dst) ;
   mkdir(dst) ;
 end
-
-

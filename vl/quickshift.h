@@ -208,4 +208,3 @@ vl_quickshift_set_medoid (VlQS *q, vl_bool medoid)
 
 
 #endif
-

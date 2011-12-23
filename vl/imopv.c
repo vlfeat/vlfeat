@@ -686,4 +686,3 @@ VL_XCAT(vl_imintegral_, SFX)
 /* VL_IMOPV_INSTANTIATING */
 #undef VL_IMOPV_INSTANTIATING
 #endif
-

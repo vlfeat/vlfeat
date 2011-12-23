@@ -106,4 +106,3 @@ if nargout > 1
     details.rho   = 2*gamma ./ (1 + gamma) ;
   end
 end
-

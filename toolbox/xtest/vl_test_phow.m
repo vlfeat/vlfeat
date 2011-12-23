@@ -21,4 +21,3 @@ assert(size(d,1) == 128*3) ;
 function test_opponent(s)
 [f,d] = vl_phow(s.I, 'color', 'opponent') ;
 assert(size(d,1) == 128*3) ;
-

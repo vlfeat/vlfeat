@@ -343,5 +343,3 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
 #undef FLT
 #undef VL_PEGAOS_INSTANTIATING
 #endif
-
-

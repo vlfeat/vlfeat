@@ -29,4 +29,3 @@ end
 sz = sz(dims(:)) ;
 sz = [sz ones(1,2-length(dims(:)))] ;
 H = reshape(H, sz) ;
-

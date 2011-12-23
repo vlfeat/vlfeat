@@ -45,4 +45,3 @@ void vl_pegasos_train_binary_svm_f (float * model,
 
 /* VL_PEGASOS_H */
 #endif
-

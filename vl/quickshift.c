@@ -458,4 +458,3 @@ void vl_quickshift_delete(VlQS * q)
     vl_free(q);
   }
 }
-

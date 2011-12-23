@@ -28,4 +28,3 @@ cmd = fullfile(vl_root,'bin',arch,[name ext]) ;
 str = ['"' cmd '" ' args] ;
 disp(str);
 [err,msg] = system(str) ;
-

@@ -419,4 +419,3 @@ vl_mser_get_ell_num (VlMserFilt const* f)
 
 /* VL_MSER */
 #endif
-

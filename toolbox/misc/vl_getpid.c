@@ -42,4 +42,3 @@ mexFunction(int nout, mxArray *out[],
 #endif
   out[0] = vlmxCreatePlainScalar (pid) ;
 }
-

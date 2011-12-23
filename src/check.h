@@ -35,4 +35,3 @@ fprintf(stdout, "%s passed\n", __FILE__)
 
 /* __CHECK_H__ */
 #endif
-

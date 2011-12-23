@@ -73,5 +73,3 @@ mexFunction(int nout, mxArray *out[],
     out[0] = mxCreateString(buffer) ;
   }
 }
-
-

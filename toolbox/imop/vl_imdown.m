@@ -38,4 +38,3 @@ switch lower(opts.method)
   otherwise
     error('Unknown downsampling method ''%s''.', method) ;
 end
-

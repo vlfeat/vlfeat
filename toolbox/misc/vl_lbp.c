@@ -88,5 +88,3 @@ mexFunction(int nout, mxArray *out[],
     vl_lbp_delete(lbp) ;
   }
 }
-
-

@@ -67,4 +67,3 @@ end
 % Now we have the nodes of the cut. Accumulate.
 hist = zeros(1, cut_size) ;
 hist = vl_binsum(hist, ones(size(y)), y) ;
-

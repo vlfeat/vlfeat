@@ -22,4 +22,3 @@ o =  ones(length(x(:)),1) ;
 
 dWx = [ x(:) z      y(:) z      o z ] ;
 dWy = [ z    x(:)   z    y(:)   z o ] ;
-

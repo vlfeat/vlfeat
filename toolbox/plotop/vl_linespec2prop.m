@@ -46,4 +46,3 @@ switch spec
   otherwise
     prop = {spec_} ;
 end
-

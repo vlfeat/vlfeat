@@ -75,4 +75,3 @@ for iter = 1:10
                       repmat(assignments, dimension+1, 1), 2) ;
   centers = centers(1:end-1, :) ./ repmat(centers(end,:), dimension, 1) ;
 end
-

@@ -46,4 +46,3 @@ switch lower(opts.type)
   otherwise
     error('Difference type ''%s'' unknown.', opts.type) ;
 end
-

@@ -329,4 +329,3 @@ void vl_irodrigues(double* om_pt, double* dom_pt, const double* R_pt)
 #undef R
 #undef W
 }
-

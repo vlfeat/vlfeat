@@ -49,4 +49,3 @@ for d=1:D
   p = p * K + double(path(d,:))  ;
   h = vl_binsum(h, 1, p + 1) ;
 end
-

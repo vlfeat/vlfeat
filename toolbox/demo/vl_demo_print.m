@@ -48,4 +48,3 @@ end
 filePath = fullfile(figDir, [name '.eps']) ;
 print(fig, '-depsc2', filePath) ;
 fprintf('%s: wrote file ''%s''\n', mfilename,  filePath) ;
-

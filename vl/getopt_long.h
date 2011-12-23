@@ -41,5 +41,3 @@ VL_EXPORT int getopt_long(int argc, char * const argv[],
 
 /* VL_GETOPT_LONG_H */
 #endif
-
-

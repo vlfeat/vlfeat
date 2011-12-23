@@ -16,4 +16,3 @@ function y = vl_dgaussian(x)
 % the terms of the BSD license (see the COPYING file).
 
 y = -x/sqrt(2*pi) .* exp(-0.5*x.^2) ;
-

@@ -97,4 +97,3 @@ end
 if nargout == 0
   clear path ;
 end
-

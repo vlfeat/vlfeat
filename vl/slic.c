@@ -407,4 +407,3 @@ void vl_slic_segment (vl_uint32 * segmentation,
     vl_free(segment) ;
   }
 }
-

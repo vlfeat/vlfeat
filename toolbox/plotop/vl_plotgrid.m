@@ -36,4 +36,3 @@ h = line([xh' xv'], [yh' yv'],lineprop{:}) ;
 if ~washold
   hold off ;
 end
-

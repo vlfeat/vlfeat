@@ -128,4 +128,3 @@ mexFunction(int nout, mxArray *out[],
     abort() ;
   }
 }
-

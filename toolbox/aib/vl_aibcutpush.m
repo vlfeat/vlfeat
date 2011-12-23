@@ -14,4 +14,3 @@ function y = vl_aibcutpush(map, x)
 % the terms of the BSD license (see the COPYING file).
 
 y = map(x) ;
-

@@ -1569,4 +1569,3 @@ vl_kmeans_cluster (VlKMeans * self,
 #undef TYPE
 #undef FLT
 #undef VL_KMEANS_INSTANTIATING
-

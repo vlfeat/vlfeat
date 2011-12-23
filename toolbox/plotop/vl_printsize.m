@@ -109,4 +109,3 @@ end
 set(fig, 'PaperPosition', position, ...
          'PaperSize', 2 * position(1:2) + position(3:4)) ;
 end
-

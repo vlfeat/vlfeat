@@ -43,5 +43,3 @@ mexFunction(int nout, mxArray *out[],
 
   vl_set_simd_enabled ((vl_bool) mxGetScalar(IN(ENABLED))) ;
 }
-
-

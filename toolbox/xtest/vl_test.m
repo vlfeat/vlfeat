@@ -59,4 +59,3 @@ if nargin < 2
 else
   feval(str2func(sprintf('vl_test_%s', suite)), test) ;
 end
-

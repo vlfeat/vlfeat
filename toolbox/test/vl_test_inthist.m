@@ -47,7 +47,3 @@ boxes = min(boxes, 10) ;
 boxes = uint32(boxes) ;
 
 h = samplinthist(H, boxes) ;
-
-
-
-

@@ -77,4 +77,3 @@ if ~isempty(tree.sub)
     x2 = [x2 x2p] ;
   end
 end
-

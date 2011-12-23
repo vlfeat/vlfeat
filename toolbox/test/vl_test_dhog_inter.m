@@ -36,4 +36,3 @@ while 1
   set(h,'linewidth',4) ;
   set(h_,'linewidth',2) ;
 end
-

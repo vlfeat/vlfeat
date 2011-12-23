@@ -18,4 +18,3 @@ for s=.75*(1+cos(linspace(0,2*pi,100)))/2+.25
   J = vl_imwbackward(ur,vr,vl_imsmooth(I,1/s*.5),up,vp) ;
   imagesc(J) ; drawnow ;
 end
-

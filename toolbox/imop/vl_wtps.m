@@ -34,4 +34,3 @@ Xp=[Yp, zeros(2,3)]*reshape(phi,K,M*N) ;
 
 xp1 = reshape(Xp(1,:),M,N) ;
 xp2 = reshape(Xp(2,:),M,N) ;
-

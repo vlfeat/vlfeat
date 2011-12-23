@@ -39,4 +39,3 @@ mu = [mean(energy.builtin) mean(energy.vl) mean(energy.vlpp)] ;
 st = [std(energy.builtin) std(energy.vl) std(energy.vlpp)] ;
 bar(mu) ; hold on ;
 errorbar(mu, st, 'linestyle', 'none', 'color', 'r', 'linewidth', 4) ;
-

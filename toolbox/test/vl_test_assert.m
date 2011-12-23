@@ -11,5 +11,3 @@ if condition
 else
   fprintf('%s ... FAIL\n', testName) ;
 end
-
-

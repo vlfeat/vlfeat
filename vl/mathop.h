@@ -610,4 +610,3 @@ vl_eval_vector_comparison_on_all_pairs_d (double * result, vl_size dimension,
 
 /* VL_MATHOP_H */
 #endif
-

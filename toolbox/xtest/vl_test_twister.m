@@ -38,4 +38,3 @@ function test_square()
 a=rand(10) ;
 b=vl_twister(10) ;
 vl_assert_equal(a,b,'VL_TWISTER(N)') ;
-

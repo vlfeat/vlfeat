@@ -285,4 +285,3 @@ mexFunction(int nout, mxArray *out[],
   }
   mxDestroyArray(Pcx_cpy);
 }
-

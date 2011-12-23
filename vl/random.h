@@ -157,4 +157,3 @@ vl_rand_res53 (VlRand * self)
 
 /* VL_RANDOM_H */
 #endif
-

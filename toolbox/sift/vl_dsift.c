@@ -281,4 +281,3 @@ mexFunction(int nout, mxArray *out[],
     vl_dsift_delete (dsift) ;
   }
 }
-

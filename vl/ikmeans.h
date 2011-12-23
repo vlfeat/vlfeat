@@ -171,4 +171,3 @@ vl_ikm_set_max_niters (VlIKMFilt *f, int max_niters)
 
 /* VL_IKMEANS_H */
 #endif
-

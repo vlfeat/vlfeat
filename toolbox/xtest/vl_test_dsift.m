@@ -60,4 +60,3 @@ for wi = 1:length(windowSizeRange)
   error = std(d_(:) - d(:)) / std(d(:)) ;
   assert(error < 0.1,  'dsift and sift equivalence') ;
 end
-

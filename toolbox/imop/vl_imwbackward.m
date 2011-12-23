@@ -63,5 +63,3 @@ else
 		end
 	end
 end
-
-

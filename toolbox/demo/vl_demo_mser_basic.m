@@ -79,4 +79,3 @@ set(h,'color','g','linewidth',3) ;
 
 hold on ; axis equal ; axis off ;
 vl_demo_print('mser_basic_contours_both') ;
-

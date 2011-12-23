@@ -70,4 +70,3 @@ legend({'5% differnce', '10% difference', '20% difference', 'others'}, ...
        'location', 'northeastoutside') ;
 set(findobj(3, '-property', 'fontsize'), 'fontsize', 11) ;
 vl_demo_print('sift_vs_ubc_3') ;
-

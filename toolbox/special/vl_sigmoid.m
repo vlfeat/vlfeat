@@ -20,5 +20,3 @@ function y = vl_sigmoid(x)
 % the terms of the BSD license (see the COPYING file).
 
 y = 1 ./ (1 + exp(-x)) ;
-
-

@@ -146,4 +146,3 @@ mexFunction(int nout, mxArray *out[],
 
   vl_ikm_delete (ikmf) ;
 }
-

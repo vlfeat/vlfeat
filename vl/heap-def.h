@@ -462,4 +462,3 @@ VL_HEAP_update
 #undef VL_HEAP_type
 #undef VL_HEAP_array
 #undef VL_HEAP_array_const
-

@@ -256,4 +256,3 @@ mexFunction(int nout, mxArray *out[],
   if (permutation) vl_free(permutation) ;
 
 }
-

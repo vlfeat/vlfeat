@@ -110,4 +110,3 @@ double * vl_aib_get_costs(VlAIB const * aib)
 
 /* VL_AIB_H */
 #endif
-

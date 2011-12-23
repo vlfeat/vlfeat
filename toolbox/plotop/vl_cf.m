@@ -26,4 +26,3 @@ end
 if nargout < 1
   clear h ;
 end
-

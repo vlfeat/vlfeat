@@ -99,4 +99,3 @@ VL_EXPORT void vl_array_delete (VlArray * self) ;
 
 /* VL_ARRAY_H */
 #endif
-

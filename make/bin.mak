@@ -96,4 +96,3 @@ bin-info:
 # Local variables:
 # mode: Makefile
 # End:
-
