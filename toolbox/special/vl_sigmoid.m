@@ -5,7 +5,7 @@ function y = vl_sigmoid(x)
 %    Y = 1 ./ (1 + EXP(X)) ;
 %
 %   Remark::
-%     Useful properties of the vl_sigmoid are:
+%     Useful properties of the sigmoid function are:
 %
 %     -  1 - VL_SIGMOID(X) = VL_SIGMOID(-X)
 %     -  Centered sigmoid: 2 * VL_SIGMOID(X) - 1 ;
