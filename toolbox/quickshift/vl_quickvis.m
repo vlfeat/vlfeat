@@ -95,3 +95,4 @@ function borders = getborders(map)
 dx = conv2(map, [-1 1], 'same');
 dy = conv2(map, [-1 1]', 'same');
 borders = find(dx ~= 0 | dy ~= 0);
+

@@ -38,11 +38,11 @@ function h=vl_plotframe(frames,varargin)
 %
 %  See also: VL_HELP().
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 % number of vertices drawn for each frame
 np        = 40 ;
@@ -210,3 +210,4 @@ A(1,:) = sqrt(S(1,:).*S(3,:) - S(2,:).^2) ./ tmp ;
 A(2,:) = zeros(1,length(tmp));
 A(3,:) = S(2,:) ./ tmp ;
 A(4,:) = tmp ;
+

@@ -55,3 +55,4 @@ labels = reshape(labels, size(map));
 
 % imseg builds an average description of the region by color
 Iseg = vl_imseg(I, labels);
+

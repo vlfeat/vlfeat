@@ -16,3 +16,4 @@ xr = 1:size(s.I,2) ;
 yr = 1:size(s.I,1) ;
 [x,y] = meshgrid(xr,yr) ;
 vl_assert_exception(@() vl_imwbackward(xr,yr,single(s.I),x,y), 'vl:invalidArgument') ;
+

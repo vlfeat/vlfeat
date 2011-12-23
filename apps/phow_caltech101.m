@@ -306,3 +306,4 @@ psix = vl_homkermap(hist, 1, .7, 'kchi2') ;
 scores = model.w' * psix + model.b' ;
 [score, best] = max(scores) ;
 className = model.classes{best} ;
+

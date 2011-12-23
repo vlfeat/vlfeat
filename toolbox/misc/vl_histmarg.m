@@ -13,11 +13,11 @@ function H = vl_histmarg(H, dims)
 
 % Authors: Andrea Vedaldi
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 sz = size(H) ;
 
@@ -29,3 +29,4 @@ end
 sz = sz(dims(:)) ;
 sz = [sz ones(1,2-length(dims(:)))] ;
 H = reshape(H, sz) ;
+

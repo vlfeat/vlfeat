@@ -28,3 +28,4 @@
 %     S. Susstrunk. SLIC superpixels. Technical report, EPFL, 2010.
 %
 %   See also:: http://www.vlfeat.org/doc/api/slic.html, VL_HELP().
+

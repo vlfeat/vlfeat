@@ -15,3 +15,4 @@
 %   this case OM and DOM are arrays with K slices, one per rotation.
 %
 %   See also: VL_RODR(), VL_HELP().
+

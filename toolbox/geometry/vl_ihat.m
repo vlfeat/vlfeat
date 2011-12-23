@@ -6,3 +6,4 @@ function om = vl_ihat( H )
 %   See also: VL_HAT(), VL_HELP().
 
 om = [H(3,2);H(1,3);H(2,1)] ;
+

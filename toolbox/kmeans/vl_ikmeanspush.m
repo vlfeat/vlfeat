@@ -3,3 +3,4 @@
 %   clusters of centers C returning the cluster indeces I.
 %
 %   See also: VL_IKMEANS(), VL_HELP().
+

@@ -1,11 +1,11 @@
 function results = vl_test_kmeans(varargin)
 % VL_TEST_KMEANS
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 vl_test_init ;
 
@@ -75,3 +75,4 @@ for iter = 1:10
                       repmat(assignments, dimension+1, 1), 2) ;
   centers = centers(1:end-1, :) ./ repmat(centers(end,:), dimension, 1) ;
 end
+

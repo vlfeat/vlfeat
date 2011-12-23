@@ -45,3 +45,4 @@ f= f([2 1 5 4 3],:) ;
 imagesc(m) ;
 hold on ;
 vl_plotframe(f) ;
+

@@ -38,3 +38,4 @@ VL_INLINE vl_size vl_lbp_get_dimension(VlLbp * self)
   return self->dimension ;
 }
 
+

@@ -7,3 +7,4 @@ function y = vl_dsigmoid(x)
 
 t = vl_sigmoid(x) ;
 y = t .* (1 - t) ;
+

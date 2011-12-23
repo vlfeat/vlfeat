@@ -36,3 +36,4 @@ A1 = cat(3,A1{:}) ;
 A2 = cell2mat(A) ;
 B = vl_imarray(A1, 'layout', [M N]) ;
 vl_assert_equal(A2,B) ;
+

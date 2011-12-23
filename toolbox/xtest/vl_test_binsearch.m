@@ -37,3 +37,4 @@ a = reshape(1:100,10,10) ;
 b = reshape(1:.5:100.5, 2, []) ;
 c = floor(b) ;
 vl_assert_equal(vl_binsearch(a,b), c) ;
+

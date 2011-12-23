@@ -37,3 +37,4 @@ f_ = load(p_frm,'-ASCII')' ; f_(1:2,:) = f_(1:2,:) + 1 ;
 if(any(r ~= r_) | any(any(abs(f - f_)>1e-5)))
   warning('demo_mser_cmd: failed consistency test of commmand line and MATLAB drivers.') ;
 end
+

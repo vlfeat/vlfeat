@@ -36,3 +36,4 @@ end
 
 % Apply filter
 J = real(ifft2(fft2(I).*fftshift(filt))) ;
+

@@ -48,3 +48,4 @@ vl_plotframe(fb(:,matches(2,:))) ;
 axis image off ;
 
 vl_demo_print('sift_match_2', 1) ;
+

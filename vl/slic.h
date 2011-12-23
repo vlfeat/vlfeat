@@ -20,3 +20,4 @@ void vl_slic_segment (vl_uint32 * segmentation,
 
 /* VL_SLIC */
 #endif
+

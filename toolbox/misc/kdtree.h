@@ -371,3 +371,4 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
   }
   return forest ;
 }
+

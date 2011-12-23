@@ -35,3 +35,4 @@ if any(any(any(H_ ~= H__)))
   fprintf('R correct:\n') ; disp(H_) ;
   error('vl_binsum regression test failed') ;
 end
+

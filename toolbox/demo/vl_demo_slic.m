@@ -46,3 +46,4 @@ for i = 1:numel(regionSizes)
 end
 
 vl_demo_print('slic_segmentation') ;
+

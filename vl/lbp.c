@@ -257,3 +257,4 @@ vl_lbp_process (VlLbp * self,
   } /* next cell to normalize */
 }
 
+

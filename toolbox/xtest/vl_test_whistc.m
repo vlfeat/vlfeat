@@ -47,3 +47,4 @@ vl_assert_equal(histc(x, []), vl_whistc(x, o, [])) ;
 vl_assert_equal(histc(x, [], 1), vl_whistc(x, o, [], 1)) ;
 vl_assert_equal(histc(x, [], 2), vl_whistc(x, o, [], 2)) ;
 vl_assert_equal(histc(x, [], 3), vl_whistc(x, o, [], 3)) ;
+

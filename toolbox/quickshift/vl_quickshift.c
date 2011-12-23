@@ -145,3 +145,4 @@ mexFunction(int nout, mxArray *out[],
   /* Delete quick shift object */
   vl_quickshift_delete(q);
 }
+

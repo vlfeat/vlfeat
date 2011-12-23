@@ -5,3 +5,4 @@ switch lower(type)
   case 'box'
     I = imread(fullfile(vl_root, 'data', 'box.pgm')) ;
 end
+

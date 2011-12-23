@@ -46,3 +46,4 @@ plot(C(1,:),C(2,:),'ko','markersize',10','linewidth',6) ;
 plot(C(1,:),C(2,:),'yo','markersize',10','linewidth',1) ;
 
 axis off ; axis equal ;
+

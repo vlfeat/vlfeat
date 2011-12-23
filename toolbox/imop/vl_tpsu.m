@@ -54,3 +54,4 @@ sel = find(r ~= 0) ;
 y(sel) = - 4 * r(sel) .* log(r(sel)) - 2 * r(sel) ;
 
 
+

@@ -44,3 +44,4 @@ switch type
     error(['Difference type ''', type, ''' unknown']) ;
 end
 
+

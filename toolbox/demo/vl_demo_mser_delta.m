@@ -36,3 +36,4 @@ for delta=deltar
 
   vl_demo_print(sprintf('mser_delta_%d',find(delta==deltar))) ;
 end
+

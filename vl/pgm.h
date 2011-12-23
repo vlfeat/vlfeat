@@ -3,11 +3,12 @@
  ** @author  Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_PGM_H
@@ -46,8 +47,8 @@ typedef struct _VlPgmImage
  ** @{ */
 VL_EXPORT int vl_pgm_extract_head  (FILE *f, VlPgmImage       *im) ;
 VL_EXPORT int vl_pgm_extract_data  (FILE *f, VlPgmImage const *im, void *data) ;
-VL_EXPORT int vl_pgm_insert        (FILE *f, 
-                                    VlPgmImage const *im, 
+VL_EXPORT int vl_pgm_insert        (FILE *f,
+                                    VlPgmImage const *im,
                                     void const*data ) ;
 VL_EXPORT int vl_pgm_get_npixels   (VlPgmImage const *im) ;
 VL_EXPORT int vl_pgm_get_bpp       (VlPgmImage const *im) ;
@@ -56,10 +57,10 @@ VL_EXPORT int vl_pgm_get_bpp       (VlPgmImage const *im) ;
 /** @name Helper functions
  ** @{ */
 VL_EXPORT int vl_pgm_write         (char const *name,
-                                    vl_uint8 const *data, 
+                                    vl_uint8 const *data,
                                     int width, int height) ;
 VL_EXPORT int vl_pgm_write_f       (char const *name,
-                                    float const *data, 
+                                    float const *data,
                                     int width, int height) ;
 VL_EXPORT int vl_pgm_read_new      (char const *name,
                                     VlPgmImage *im,
@@ -72,3 +73,4 @@ VL_EXPORT int vl_pgm_read_new_f    (char const *name,
 
 /* VL_PGM_H */
 #endif
+

@@ -29,11 +29,11 @@ function [cut, map, short] = vl_aibcut(parents, n)
 %
 %  See also: VL_HELP(), VL_AIB().
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 % --------------------------------------------------------------------
 %                                           Determine nodes in the cut
@@ -101,3 +101,4 @@ map(cut)        = 1:n ;
 map(short >  0) = map(short(short > 0)) ;
 map(short == 0) = 0 ;
 map(mu+1:end)   = 0 ;
+

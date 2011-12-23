@@ -109,3 +109,4 @@ legend('MATLAB','command line','original SIFT') ;
 
 axis equal ; axis off ; axis tight ;
 vl_demo_print('sift_cmd_4') ;
+

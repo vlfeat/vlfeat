@@ -78,3 +78,4 @@ i = round((X(2,:) + D) / d) ;
 j = max(min(j,K),1) ;
 i = max(min(i,K),1) ;
 f = sub2ind([K K],i,j) ;
+
