@@ -1,4 +1,15 @@
-/* works in place! */
+/** @file inthist.tc
+ ** @brief vl_intist.c helper
+ ** @author Andrea Vedaldi
+ **/
+
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
+
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
 #define JOIN_(a,b) a ## b
 #define JOIN(a,b) JOIN_(a,b)
@@ -6,12 +17,12 @@
 #undef INTEGRAL
 #define INTEGRAL JOIN(integral_, SFX)
 
-/* 
+/*
    This function is 'transpose safe': The integral histogram SRC can
    be either column major or row major, as long as WIDTH is the
    fastest varying dimension.
 */
-void INTEGRAL (T* dst, 
+void INTEGRAL (T* dst,
                int dstStride,
                T const* src,
                int srcWidth, int srcHeight, int srcStride)
@@ -26,7 +37,7 @@ void INTEGRAL (T* dst,
     dst += 1 ;
     src += 1 ;
   }
-  
+
   for (y = 1 ; y < srcHeight ; ++ y) {
     dst += dstStride - srcWidth ;
     src += srcStride - srcWidth ;
@@ -34,7 +45,7 @@ void INTEGRAL (T* dst,
     *dst = *(dst - dstStride) + *src ;
     dst += 1 ;
     src += 1 ;
-    
+
     for (x = 1 ; x < srcWidth ; ++ x) {
       *dst =  *(dst - dstStride) - *(dst - dstStride - 1) +  *(dst - 1)  + *src ;
       dst += 1 ;
@@ -42,4 +53,3 @@ void INTEGRAL (T* dst,
     }
   }
 }
-
