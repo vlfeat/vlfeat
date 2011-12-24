@@ -479,7 +479,7 @@ bin-commit: bin-release
 	$(GIT) branch -f $(BRANCH) v$(VER) && \
 	$(GIT) checkout $(BRANCH)
 	@echo Adding binaries && \
-	$(GIT) add -f $(libcrt) && \
+	$(GIT) add -f $(bincrt) && \
 	$(GIT) add -f "$(bindir)\vl.lib" && \
 	$(GIT) add -f "$(bindir)\vl.dll" && \
 	$(GIT) add -f $(cmdexe) && \
