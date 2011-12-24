@@ -277,8 +277,8 @@ include make/octave.mak
 include make/doc.mak
 include make/dist.mak
 
-.PHONY: clean, archclean, distclean, info, help, autorights
-no_dep_targets += clean archclean distclean info help autorights
+.PHONY: clean, archclean, distclean, info, help
+no_dep_targets += clean archclean distclean info help
 
 clean:
 	rm -f  `find . -name '*~'`
@@ -304,22 +304,17 @@ info:
 	@printf "\nThere are %s lines of code.\n" \
 	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 
+# Holw help works: cat this file,
+# skip the first block until an empty line is found (twice)
+# print the first block until an empty line,
+# remove the `# ' prefix from each remaining line
+
 help:
 	@cat Makefile | \
 	sed -n '1,/^$$/!p' | \
+	sed -n '1,/^$$/!p' | \
 	sed -n '1,/^$$/p' | \
 	sed 's/^# \{0,1\}\(.*\)$$/\1/'
-
-autorights: distclean
-	autorights                                                   \
-	  toolbox vl                                                 \
-	  --recursive                                                \
-	  --verbose                                                  \
-	  --template docsrc/copylet.txt                              \
-	  --years 2007-10                                            \
-	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
-	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
-	  --program "VLFeat"
 
 # --------------------------------------------------------------------
 #                                                 Include dependencies
