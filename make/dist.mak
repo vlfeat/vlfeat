@@ -110,7 +110,7 @@ dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-release
 	@echo Building doc
-	make -C "$(tmp-dir)" ARCH=$(ARCH) doc-deep doc
+	make -C "$(tmp-dir)" ARCH=$(ARCH) doc-deep
 	@echo Setting up $(branch) to v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER)
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)

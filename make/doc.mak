@@ -69,9 +69,10 @@ doc-api: doc/api/index.html
 doc-web: doc/index.html
 doc-toolbox: doc/toolbox-src/mdoc.html
 
-doc-deep: matlab-all $(doc-dir) $(results-dir)
+doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "clear mex;vl_setup demo;vl_demo;exit"
+	$(MAKE) doc
 
 #
 # Use webdoc.py to generate the website
