@@ -1,6 +1,6 @@
-/** @file    random.c
- ** @brief   Random number generator - Definition
- ** @author  Andrea Vedaldi
+/** @file random.c
+ ** @brief Random number generator - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /*

@@ -1,6 +1,6 @@
-/** @file    mathop_sse2.h
- ** @brief   mathop for sse2 declaration
- ** @author  Andrea Vedaldi
+/** @file mathop_sse2.h
+ ** @brief mathop for sse2
+ ** @author Andrea Vedaldi
  **/
 
 /*

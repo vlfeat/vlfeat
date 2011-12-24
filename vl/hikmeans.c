@@ -1,7 +1,7 @@
-/** @file   hikmeans.c
+/** @file hikmeans.c
+ ** @brief Hierarchical Integer K-Means Clustering - Declaration
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Hierarchical Integer K-Means Clustering - Declaration
  **/
 
 /*

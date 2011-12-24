@@ -12,7 +12,6 @@ the terms of the BSD license (see the COPYING file).
 */
 
 /**
-
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @mainpage VLFeat -- Vision Lab Features Library
 @version __VLFEAT_VERSION__

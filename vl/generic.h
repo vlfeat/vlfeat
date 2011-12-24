@@ -1,4 +1,4 @@
-/** @file  generic.h
+/** @file generic.h
  ** @brief Generic (@ref generic)
  ** @author Andrea Vedaldi
  **/

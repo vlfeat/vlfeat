@@ -1,6 +1,6 @@
-/** @file    pgm.h
- ** @brief   Portable graymap format (PGM) parser
- ** @author  Andrea Vedaldi
+/** @file pgm.h
+ ** @brief Portable graymap format (PGM) parser
+ ** @author Andrea Vedaldi
  **/
 
 /*

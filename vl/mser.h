@@ -1,4 +1,4 @@
-/** @file  mser.h
+/** @file mser.h
  ** @brief MSER (@ref mser)
  ** @author Andrea Vedaldi
  **/

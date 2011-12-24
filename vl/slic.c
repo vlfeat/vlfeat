@@ -1,6 +1,6 @@
 /** @file slic.c
- ** @author Andrea Vedaldi
  ** @brief SLIC superpixels - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /*

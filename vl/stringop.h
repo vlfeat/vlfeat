@@ -1,6 +1,6 @@
-/** file   stringop.h
- ** brief  String operations
- ** author Andrea Vedaldi
+/** @file stringop.h
+ ** @brief String operations
+ ** @author Andrea Vedaldi
  **/
 
 /*

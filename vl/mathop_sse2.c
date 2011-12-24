@@ -1,5 +1,5 @@
-/** @file   mathop_sse2.c
- ** @brief  mathop for SSE2 definition
+/** @file mathop_sse2.c
+ ** @brief mathop for SSE2 - Definition
  ** @author Andrea Vedaldi
  **/
 

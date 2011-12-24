@@ -1,7 +1,6 @@
-/** @internal
- ** @file     imopv_sse2.h
- ** @author   Andrea Vedaldi
- ** @brief    Vectorized image operations - SSE2
+/** @file imopv_sse2.h
+ ** @brief Vectorized image operations - SSE2
+ ** @author Andrea Vedaldi
  **/
 
 /*

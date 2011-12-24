@@ -1,7 +1,7 @@
-/** @file   ikmeans.c
+/** @file ikmeans.c
+ ** @brief Integer K-Means clustering - Definition
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Integer K-Means clustering - Definition
  **/
 
 /*

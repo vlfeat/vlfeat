@@ -1,6 +1,6 @@
-/** @file    random.h
- ** @brief   Random number generator
- ** @author  Andrea Vedaldi
+/** @file random.h
+ ** @brief Random number generator
+ ** @author Andrea Vedaldi
  **/
 
 /*

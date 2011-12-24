@@ -1,12 +1,6 @@
-/** @file rodrigues.h
- ** @author Andrea Vedaldi
+/** @file rodirgues.h
  ** @brief Rodrigues formulas
- **
- ** @section rodrigues Rodrigues formulas
- **
- ** - Use vl_rodrigues() to compute the Rodrigues formula and its derivative.
- ** - Use vl_irodrigues() to compute the inverse Rodrigues formula and
- **   its derivative.
+ ** @author Andrea Vedaldi
  **/
 
 /*
@@ -16,6 +10,16 @@ All rights reserved.
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
+
+/** @file rodrigues.h
+ 
+@section rodrigues Rodrigues formulas
+
+- Use vl_rodrigues() to compute the Rodrigues formula and its derivative.
+- Use vl_irodrigues() to compute the inverse Rodrigues formula and
+  its derivative.
+
+**/
 
 #ifndef VL_RODRIGUES
 #define VL_RODRIGUES

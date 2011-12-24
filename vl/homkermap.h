@@ -1,6 +1,6 @@
 /** @file homkermap.h
- ** @author Andrea Vedaldi
  ** @brief Homogeneous kernel map (@ref homkermap)
+ ** @author Andrea Vedaldi
  **/
 
 /*

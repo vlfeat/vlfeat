@@ -1,6 +1,6 @@
-/** file:        rodirgues.c
- ** author:      Andrea Vedaldi
- ** description: Rodrigues formulas
+/** @file rodirgues.c
+ ** @brief Rodrigues formulas - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /*

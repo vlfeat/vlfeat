@@ -1,8 +1,7 @@
-/** @internal
- ** @file   ikmeans_lloyd.tc
+/** @file ikmeans_lloyd.tc
+ ** @brief Integer K-Means - LLoyd Algorithm - Definition
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Integer K-Means - LLoyd Algorithm - Definition
  **/
 
 /*

@@ -1,6 +1,6 @@
-/** @file    host.h
- ** @author  Andrea Vedaldi
- ** @brief   Host
+/** @file host.h
+ ** @brief Host
+ ** @author Andrea Vedaldi
  **/
 
 /*

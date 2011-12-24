@@ -1,7 +1,6 @@
-/** @internal
- ** @file   ikmeans_elkan.tc
+/** @file ikmeans_elkan.tc
+ ** @brief Integer K-Means - Elkan Algorithm - Definition
  ** @author Andrea Vedaldi
- ** @brief  Integer K-Means - Elkan Algorithm - Definition
  **/
 
 /*

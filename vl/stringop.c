@@ -1,6 +1,6 @@
-/** @file   stringop.c
+/** @file stringop.c
+ ** @brief String operations - Definition
  ** @author Andrea Vedaldi
- ** @brief  String operations - Definition
  **/
 
 /*

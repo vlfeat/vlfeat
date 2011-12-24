@@ -1,6 +1,6 @@
 /** @file homkermap.c
- ** @author Andrea Vedaldi
  ** @brief Homogeneous kernel map - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /*
@@ -13,10 +13,10 @@ the terms of the BSD license (see the COPYING file).
 
 /** @file homkermap.h
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @page homkermap Homogeneous kernel map
 @author Andrea Vedaldi
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 @ref homkermap.h implements the homogeneous kernel maps
 introduced in @cite{vedaldi10efficient},@cite{vedaldi11efficient}.
@@ -30,9 +30,9 @@ such as the intersection, @f$ \chij^2 @f$, and Jensen-Shannon ones.
 - @ref homkermap-usage
 - @ref homkermap-tech
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @section homkermap-overview Overview
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 The <em>homogeneous kernel map</em> is a finite dimensional linear
 approximation of homgeneous kernels, including the intersection,
@@ -73,9 +73,9 @@ on top of dataset that has been encoded by the homogeneous kernel map
 is therefore approximately equivalent to using a method based
 on the corresponding non-linear kernel.
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @subsection homkermap-overview-negative Extension to the negative reals
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 Any positive (semi-)definite kernel @f$ k(x,y) @f$ defined on the
 non-negative reals @f$ x,y \in \mathbb{R}_+ @f$ can be extended to the
@@ -96,9 +96,9 @@ extensions are possible, such as
 where @f$ H @f$ is the Heavyside function, but may require higher
 dimensional feature maps.
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @subsection homkermap-overview-homogeneity Homogeneity order
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 Any (1-)homogeneous kernel @f$ k_1(x,y) @f$ can be extended to a so
 called gamma-homgeneous kernel @f$ k_\gamma(x,y) @f$ by the definition
@@ -110,9 +110,9 @@ called gamma-homgeneous kernel @f$ k_\gamma(x,y) @f$ by the definition
 Smaller value of @f$ \gamma @f$ enhance the kernel non-linearity and
 are sometimes beneficial in applications (see [1,2] for details).
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @subsection homkermap-overview-window Windowing and period
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 This section discusses aspects of the homogeneous kernel map which are
 more technical and may be skipped. The homogeneous kernel map
@@ -141,9 +141,9 @@ or of a <em>rectangular window</em> (@f$ W(\lambda) =
 the kernel. Empirically, the rectangular window seems to have a slight
 edge in applications.
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @section homkermap-usage Usage
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 The homogeneous kernel map is implemented as an object of type
 ::VlHomogeneousKernelMap. To use thois object, first create an
@@ -171,9 +171,9 @@ evaluation. The table spans values of @f$ x @f$ in the range
 @f$[2^{-20}, 2^{8}) @f$. In particular, values smaller than @f$
 2^{-20} @f$ are treated as zeroes (which result in a null feature).
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @section homkermap-tech Technical details
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 The code uses the expressions given in @cite{vedaldi10efficient},@cite{vedaldi11efficient}
 to compute in closed form the maps @f$ \Psi(x) @f$ for the suppoerted kernel types.  For

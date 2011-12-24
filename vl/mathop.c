@@ -1,6 +1,6 @@
-/** @file    mathop.c
- ** @brief   Math operations - Definition
- ** @author  Andrea Vedaldi
+/** @file mathop.c
+ ** @brief Math operations - Definition
+ ** @author Andrea Vedaldi
  **/
 
 /*

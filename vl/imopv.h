@@ -1,6 +1,6 @@
-/** @file   imopv.h
+/** @file imopv.h
+ ** @brief Vectorized image operations
  ** @author Andrea Vedaldi
- ** @brief  Vectorized image operations
  **/
 
 /*

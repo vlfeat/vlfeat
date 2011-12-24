@@ -1,6 +1,6 @@
-/** file   getopt_long.h
- ** brief  getopt_long
- ** author Andrea Vedaldi
+/** @file getopt_long.h
+ ** @brief getopt_long
+ ** @author Andrea Vedaldi
  **/
 
 /*

@@ -12,7 +12,6 @@ the terms of the BSD license (see the COPYING file).
 */
 
 /**
-
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page sift Scale Invariant Feature Transform (SIFT)
 @author Andrea Vedaldi

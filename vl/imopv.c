@@ -1,6 +1,6 @@
-/** @file   imopv.c
+/** @file imopv.c
+ ** @brief Vectorized image operations - Definition
  ** @author Andrea Vedaldi
- ** @brief  Vectorized image operations - Definition
  **/
 
 /*

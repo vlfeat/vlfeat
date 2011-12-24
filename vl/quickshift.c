@@ -1,7 +1,7 @@
 /** @file quickshift.c
+ ** @brief Quick shift - Definition
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief Quick shift - Definition
  **/
 
 /*

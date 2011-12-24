@@ -1,7 +1,6 @@
-/** @internal
- ** @file   ikmeans_init.tc
+/** @file ikmeans_init.tc
+ ** @brief Integer K-Means - Initialization - Definition
  ** @author Andrea Vedaldi
- ** @brief  Integer K-Means - Initialization - Definition
  **/
 
 /*

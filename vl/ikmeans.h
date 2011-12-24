@@ -1,7 +1,7 @@
-/** @file   ikmeans.h
+/** @file ikmeans.h
+ ** @brief Integer K-Means clustering
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Integer K-Means clustering
  **/
 
 /*
