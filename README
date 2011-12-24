@@ -1,35 +1,63 @@
                      VisionLab Features Library
                   Andrea Vedaldi and Brian Fulkerson
 
+ABOUT
+  The VLFeat open source library implements popular computer vision
+  algorithms including SIFT, MSER, k-means, hierarchical k-means,
+  agglomerative information bottleneck, and quick shift. It is written
+  in C for efficiency and compatibility, with interfaces in MATLAB for
+  ease of use, and detailed documentation throughout. It supports
+  Windows, Mac OS X, and Linux.
+
+  VLFeat is distributed under the BSD license (see the COPYING file).
+
+  Most of the documentation is available online at
+  http://www.vlfeat.org/index.html or compiled in HTML format in
+  `doc/index.html'.
+
 INSTALLING
-  In most cases, you do not need to compile or build the documentation
-  as described below. Instead, to use with MATLAB, simply cd to the
-  toolbox directory and type vl_setup.
+  If you downloaded VLFeat binary package, installation is trivial.
+  The binaries are found in the `bin/ARCH' directory, where ARCH
+  depends on the architecture of your machine. VLFeat supports the
+  following ones out of the box:
 
-  Binaries are created in the bin/XXX directory, where XXX changes
-  depending on the architecture. VLFeat supports the following (the
-  naming reflects MATLAB architecture naming for the MEX command the
-  MEX file extension differs and is reported in parenthesis):
+    ARCH     MEXEXT     DESCRIPTION
+    -----------------------------------------------
+    maci     mexmaci    Mac OS X Intel
+    maci64   mexmaci64  Mac OS X Intel (64 bit)
+    glnx86   mexglx     GNU Linux
+    glnxa64  mexa64     GNU Linux (64 bit)
+    win32    mexw32     Windows
+    win64    mexw64     Windows (64 bit)
 
-  - maci     (mexmaci)    Mac OS X Intel
-  - maci64   (mexmaci64)  Mac OS X Intel (64 bit)
-  - glnx86   (mexglx)     GNU Linux
-  - glnxa64  (mexa64)     GNU Linux (64 bit)
-  - win32    (mexw32)     Windows
-  - win64    (mexw64)     Windows (64 bit)
+  The `bin' directory contains also a copy of the VLFeat DLL (and of
+  the appropriate C runtime DLL in the case of Windows).
 
-  The executable binaries can be installed anywhere in the command
-  line path (the directory contains also the static library).
+  The VLFeat MATLAB toolbox can be found in the `toolbox'
+  directory. To use it with MATLAB, run the VL_SETUP command as
 
-  More details may be found in the provided HTML documentation
-  (doc/index.html).
+  > cd VLFEATROOT/toolbox ; vl_setup
+
+  or
+
+  > run VLFEATROOT/toolbox/vl_setup
+
+  You can make this permanent by adding the line to MATLAB startup.m
+  file.
+
+  An HTML copy of the documentation can be found in `doc/index.html'. The
+  same documentation is available online at http://www.vlfeat.org/index.html.
 
 COMPILING
-  The core library and command line utilities require a common C
-  compiler supporting the C-90 standard and some C-99 extension (GCC
-  and Visual C will do) plus a few common extension (see APPENDIX). To
-  compile MATLAB support, MATLAB should also be installed and the
-  MATLAB MEX command should be working correctly.
+  If you downloaded VLFeat source package or just want to compile your
+  own version, all you need is a standard compiler setup.
+
+  UNIX. In Mac OS X and Linux you will need GNU GCC and GNU Make. In
+  fact, most C-90 compilers will do, although a few C-99 features are
+  used.
+
+  To compile MATLAB support, MATLAB should also be installed and the
+  MATLAB MEX command should be available from the command line.
 
   In general, issuing
 
@@ -41,34 +69,23 @@ COMPILING
 
   or refer to http://www.vlfeat.org for further instructions.
 
-  WINDOWS. VLFeat bundels a Microsoft NMAKE Makefile (Makefile.mak)
-  script that has been tested under Visual C++ 2008 Express and MATLAB
-  R2008a (minor adjustments may be required for other versions). Open
-  the Visual C terminal, cd into the VLFeat directory and issue.
+  WINDOWS. In Windows you will need Visual Studio 2008 or 2010.
+  VLFeat includes a Microsoft NMAKE Makefile (Makefile.mak). Open the
+  Visual C command prompty (make sure you run the 64 bit version if
+  your host is 64 bit), into the VLFeat directory and issue.
 
-  > nmake /f Makefile.mak
+  > nmake /f Makefile.mak ARCH=win32
 
-  For Windows 64 use
+  or
 
   > nmake /f Makefile.mak ARCH=win64
 
-  If you do not have Visual C++ 2008, or you have an older version of
-  MATLAB and wish to compile the mex files _only_, then you may start
-  from our binary distribution. Enter the toolbox directory:
+  depending on your architecture.
 
-  > cd toolbox
-
-  And run our mex compilation script from the MATLAB command line:
-
-  > vl_compile
-
-  This has been tested with MATLAB R14 and lcc, but other
-  configurations should only require minor tweaking.
 
 CREATING THE DOCUMENTATION
-  This task is handled by various Makefile that have been tested under
-  Mac OS X and Linux only. Compiling the documentation requires the
-  following additional tools
+  Creating the documentation requires a UNIX platform (either Linux
+  or Mac OS X) and the following tools
 
   - fig2dev (part of transfig)
   - a modern LaTeX with
@@ -76,13 +93,13 @@ CREATING THE DOCUMENTATION
     + dvips
     + htlatex (possibily part of TeX4ht)
     + dvipng  (possibily a separated package)
-  - doxygen
+  - doxygen (a recent version)
 
   FIGURES. Figures are preprocessed by typing
 
   > make -C doc/figures
 
-  However you need to run some MATLAB code to generate part of the
+  However, you need to run MATLAB programs to generate most of the
   figures to start with. To this end, load MATLAB and (provided that
   everything is compiled and installed correctly) type
 
@@ -94,11 +111,11 @@ CREATING THE DOCUMENTATION
   > make doc
 
   SOURCE CODE DOCUMENTATION. To compile the source code documentation
-  type
+  issue
 
   > make doc-api
 
-  See the file doc/index.html for an overview.
+  The start of the documentation is the file `doc/index.html'.
 
 APPENDIX
   CODE COMPATIBILITY. In addition to the C-90 standard, the C compiler
@@ -108,15 +125,15 @@ APPENDIX
   - variadic macro support
 
   The SSE accelerated code requires the compiler to support Intel
-  intrisic. GCC and Visual C both satisfy all the requirements.
+  intrisic. GCC and Visual C satisfy all the requirements.
 
 CHANGES
-
-  0.9.14     Adds SLIC superpixels. Improves Windows binary package. Adds
-             support for Visual Studio 2010. Adds
-             VL_ALPHANUM(). Improves documentation layout and add a
-             proper bibliography. Bugfixes and other minor
-             improvements.  Moves from the GPL to the BSD license.
+  0.9.14     Added SLIC superpixels and VL_ALPHANUM(). Improved
+             Windows binary package and added support for Visual
+             Studio 2010. Improved the documentation layout and added
+             a proper bibliography. Bugfixes and other minor
+             improvements. Moved from the GPL to the less restrictive
+             BSD license.
   0.9.13     Fixes Windows binary package.
   0.9.12     Fixes vl_compile and the architecture string on Linux 32 bit.
   0.9.11     Fixes a compatibility problem on older Mac OS X versions.
