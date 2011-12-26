@@ -213,12 +213,17 @@ vl_quickshift_inner(vl_qs_type const * I,
 
 /** -----------------------------------------------------------------
  ** @brief Create a quick shift object
- ** @param image
- ** @param height
- ** @param width
- ** @param channels
+ ** @param image the image.
+ ** @param height the height (number of rows) of the image.
+ ** @param width the width (number of columns) of the image.
+ ** @param channels the number of channels of the image.
+ ** @return new quick shift object.
  **
- ** @return New quick shift object.
+ ** The @c image is an array of ::vl_qs_type values with three
+ ** dimensions (respectively @c widht, @c height, and @c
+ ** channels). Typically, a color (e.g, RGB) image has three
+ ** channels. The linear index of a pixel is computed with:
+ ** @c channels * @c width* @c height + @c row + @c height * @c col.
  **/
 
 VL_EXPORT

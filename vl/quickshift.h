@@ -131,9 +131,9 @@ vl_quickshift_get_medoid (VlQS const *q)
 /** ------------------------------------------------------------------
  ** @brief Get parents.
  ** @param q quick shift object.
- ** @return a height x width matrix containing linearized links to the
- **         parents in the quick shift tree. If there is no parent, the
- **         parent will be set to the index of the node.
+ ** @return a @c height x @c width matrix where each element contains the
+ **         linear index of its parent node. The node is a root if its
+ **         value is its own linear index.
  **/
 
 VL_INLINE int *
@@ -146,7 +146,8 @@ vl_quickshift_get_parents (VlQS const *q)
  ** @brief Get dists.
  ** @param q quick shift object.
  ** @return for each pixel, the distance in feature space to the pixel
- **         that is its parent in the quick shift tree.
+ **         that is its parent in the quick shift tree. The distance is
+ **         set to 'inf' if the pixel is a root node.
  **/
 
 VL_INLINE vl_qs_type *
