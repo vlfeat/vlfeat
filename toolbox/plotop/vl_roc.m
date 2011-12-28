@@ -1,14 +1,14 @@
 function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 % VL_ROC Compute ROC curve
-%  [TP,TN] = VL_ROC(LABELS, SCORES) computes the receiver operating
-%  characteristic (ROC curve). LABELS are the ground thruth labels (+1
+%  [TP,TN] = VL_ROC(LABELS, SCORES) computes the Receiver Operating
+%  Characteristic (ROC curve). LABELS are the ground thruth labels (+1
 %  or -1) and SCORE is the scores assigned to them by a classifier
 %  (higher scores correspond to positive labels).
 %
 %  [TP,TN] are the true positive and true negative rates for
 %  incereasing values of the decision threshold.
 %
-%  Set the zero the lables of samples to ignore in the evaluation.
+%  Samples with LABELS equal to zero are ignored in the evaluation.
 %
 %  Set to -INF the score of samples which are never retrieved. In
 %  this case the PR curve will have maximum recall < 1.
@@ -25,6 +25,24 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %
 %  VL_ROC(...) with no output arguments plots the VL_ROC diagram in
 %  the current axis.
+%
+%  VL_ROC() acccepts the following options:
+%
+%  Plot:: []
+%    Setting this option turns on plotting. Set to 'TrueNegative' or
+%    'TN' to plot TP(S) (recall) vs. TN(S). Set to 'FalseNegative' or
+%    'FN' to plot TP(S) (recall) vs. FP(S) = 1 - TN(S).
+%
+%  NumNegatives:: []
+%    Specifies a number of negative labels to use. If equal to [],
+%    then negative labels are simpy counted from the LABELS
+%    array. Otherwise, the function hallucinates the specified number
+%    of negatives (that must be at least as large as the acual number
+%    of negatives found in LABELS). The additinal negative labels are
+%    assumed to have score equal to -INF. This is useful to evaluate
+%    large retrieval system in which one stores ony a handful of top
+%    results for efficiency reasons. Note that the larger NumNegatives
+%    is, the better the results are going to look.
 %
 %  About the ROC curve::
 %    Consider a classifier that predicts as positive all lables Y
@@ -72,14 +90,7 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %     Natural operating point:: Assumes P[Y=+1] = P / (P + N).
 %     Uniform operating point:: Assumes P[Y=+1] = 1/2.
 %
-%   VL_ROC() acccepts the following options:
-%
-%   Plot:: []
-%     Setting this option turns on plotting. Set to 'TrueNegative' or
-%     'TN' to plot TP(S) (recall) vs. TN(S). Set to 'FalseNegative' or
-%     'FN' to plot TP(S) (recall) vs. FP(S) = 1 - TN(S).
-%
-%  See also: VL_PR(), VL_HELP().
+%  See also: VL_PR(), VL_DET(), VL_HELP().
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
@@ -88,6 +99,7 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 % the terms of the BSD license (see the COPYING file).
 
 opts.plot = [] ;
+opts.numNegatives = [] ;
 opts = vl_argparse(opts, varargin) ;
 
 % make row vectors
@@ -102,11 +114,20 @@ labels = labels(perm) ;
 stop = max(find(scores > -inf)) ;
 
 % Compute number of true positives, false positives, and overall
-% peositives. Note that labels==0 don't increase any of the counts.
+% positives and negatvies. Note that LABELS==0 don't increase any of
+% the counts.
 tp = [0 cumsum(labels(1:stop) > 0)] ;
 fp = [0 cumsum(labels(1:stop) < 0)] ;
 p = sum(labels > 0) ;
 n = sum(labels < 0) ;
+
+% Account for the total negative data, if this is specified.
+if ~isempty(opts.numNegatives)
+  if n > opts.numNegatives
+    warning('NUMNEGATIVES is smaller than the number of negatives in LABELS.') ;
+  end
+  n = opts.numNegatives ;
+end
 
 % compute the rates
 tpr = tp / (p + eps) ;
@@ -119,8 +140,7 @@ tnr = 1 - fpr ;
 %                                                      Additional info
 % --------------------------------------------------------------------
 
-if nargout > 0 | nargout == 0
-
+if nargout > 2 | nargout == 0
   % equal error rate
   i1 = max(find(tpr >= tnr)) ;
   i2 = max(find(tnr >= tpr)) ;
@@ -184,7 +204,7 @@ if ~isempty(opts.plot) || (nargout == 0)
   xlim([0 1]) ;
   ylim([0 1]) ;
   axis square ;
-  title(sprintf('ROC (AUC = %.3g)', area), 'interpreter', 'none') ;
+  title(sprintf('ROC (AUC = %.3g %%)', 100 * area), 'interpreter', 'none') ;
   legend('ROC', ...
          sprintf('eer %.3g %%', 100 * eer), ...
          sprintf('op. unif. %.3g %%', 100 * ur), ...
@@ -192,6 +212,8 @@ if ~isempty(opts.plot) || (nargout == 0)
          'ROC rand.', 'Location', 'SouthWest') ;
 end
 
+% --------------------------------------------------------------------
 function h = spline(x,y,spec,varargin)
+% --------------------------------------------------------------------
 prop = vl_linespec2prop(spec) ;
 h = line(x,y,prop{:},varargin{:}) ;
