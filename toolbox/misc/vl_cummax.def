@@ -1,0 +1,94 @@
+/** @file vl_cummax.def
+ ** @brief vl_cummax MEX helper template
+ ** @author Andrea Vedaldi
+ **/
+
+/* Copyright
+*/
+
+/* include this file for different values of ITERATE_1 */
+#ifndef ITERATE_1
+# define ITERATE_1 1
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 2
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 3
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 4
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 5
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 6
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 7
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 8
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 9
+# include "vl_cummax.def"
+# undef ITERATE_1
+# define ITERATE_1 10
+# include "vl_cummax.def"
+# undef ITERATE_1
+#endif
+
+/*
+For each value of ITERATE_1, instantiate the algorithm for a different
+data type.
+*/
+
+#if defined(ITERATE_1)
+# define __VALUE_T__ TYPE(ITERATE_1)
+
+/*
+The algorithm scans in linear order the input data X. X indexed as
+X[i1,i2,i3,...,iD] where D is the number of dimensions. In order to
+operate on the d-th dimension, one defines the output Y as
+
+                   / MAX(Y[i1,i2,...,id - 1,...], X[i1,i2,...,id,...]),  if id > 0 (OP),
+  Y[i1,i2,...]  = <
+                   \ X[i1,i2,...,id,...],                                if id = 0 (COPY).
+
+So by scanning X in column major, one has id = 0 while i1,i2,...,id-1
+traverse the first STRIDE = D1*D2*...*D_{d-1} elements and performs a
+COPY operation. Then id is incremented by one and remains > 0 until
+D1*D2*...*D_{d-1}*Dd elemenets are visited overall, and performs OP
+operations (MAX in this case). Then id = 0 again and so on until all
+elements are visited.  */
+
+VL_INLINE void
+VL_XCAT(_vl_cummax_,__VALUE_T__)
+(mxArray * Y_array,
+ mxArray const * X_array,
+ vl_size stride,
+ vl_size dimension)
+{
+  __VALUE_T__ const * x = (__VALUE_T__*) mxGetData(X_array) ;
+  __VALUE_T__ const * x_stop = x + mxGetNumberOfElements(X_array) ;
+  __VALUE_T__ * y = (__VALUE_T__*) mxGetData(Y_array) ;
+  while (x < x_stop) {
+    __VALUE_T__ const *  x_ops_stop  = x + stride ;
+    /* copy stride elements */
+    while (x < x_ops_stop) {
+      *y++ = *x++ ;
+    }
+    /* op stride * (dimension - 1) */
+    x_ops_stop += stride * (dimension - 1) ;
+    while (x < x_ops_stop) {
+      *y = VL_MAX(*x, *(y - stride)) ;
+      ++ y ;
+      ++ x ;
+    }
+  }
+}
+
+#undef __VALUE_T__
+#endif

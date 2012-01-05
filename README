@@ -128,6 +128,7 @@ APPENDIX
   intrisic. GCC and Visual C satisfy all the requirements.
 
 CHANGES
+  0.9.15     Added VL_CUMMAX().
   0.9.14     Added SLIC superpixels and VL_ALPHANUM(). Improved
              Windows binary package and added support for Visual
              Studio 2010. Improved the documentation layout and added
