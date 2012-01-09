@@ -45,6 +45,11 @@ pre, code {
 code {
     color: #BA2121 ;
 }
+code a {
+    font-weight: bold ;
+    text-decoration: none ;
+    color: inherit ! important ;
+}
 #pagebody {
     background-color: white ;
     padding-bottom: 1px ;
