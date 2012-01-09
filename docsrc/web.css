@@ -303,6 +303,13 @@ code a {
 {
     padding-right: 0em ;
 }
+#content ul.text {
+    padding-right: 10em ;
+}
+#content ul.text li {
+    margin-top: 1em ;
+    margin-bottom: 1em ;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                             Mdoc */
