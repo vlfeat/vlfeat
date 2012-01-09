@@ -84,13 +84,15 @@ def lex(line):
 # --------------------------------------------------------------------
     """
     Parse the string LINE to a terminal symbol. Each line corresponds
-    to exactly one terminal type. However, terminal types are the leaf
-    of a hierarchy of types.
+    to exactly one terminal type. Terminal types are the leaf of a
+    hierarchy of types.
     """
 
+    # a blank line
     match = re.match(r"\s*\n?$", line) ;
     if match: return B()
 
+    # a line of the type '  content::inner_content'
     match = re.match(r"(\s*)(.*)::(.*)\n?$", line)
     if match:
         x = DL()
@@ -99,6 +101,7 @@ def lex(line):
         x.inner_content = match.group(3)
         return x
 
+    # a line of the type '  - inner_contet'
     match = re.match(r"(\s*)([-\*#]\s*)(\S.*)\n?$", line)
     if match:
         x = BL()
@@ -109,6 +112,7 @@ def lex(line):
         x.content       = x.bullet + x.inner_content
         return x
 
+    # a line of the type  '   content'
     match = re.match(r"(\s*)(\S.*)\n?$", line)
     if match:
         x = PL()
