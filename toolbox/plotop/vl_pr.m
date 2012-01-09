@@ -1,50 +1,114 @@
-function [recall, precision, info, scores] = vl_pr(labels, scores, varargin)
-% VL_PR Compute precision-recall curve
-%  [RECALL, PRECISION] = VL_PR(LABELS, SCORES) computes the
-%  precision-recall (PR) curve. LABELS are the ground thruth labels
-%  (+1 or -1) and SCORES are the scores associated to them by a
-%  classifier (lager scores correspond to positive guesses).
+function [recall, precision, info] = vl_pr(labels, scores, varargin)
+%VL_PR   Precision-recall curve.
+%   [RECALL, PRECISION] = VL_PR(LABELS, SCORES) computes the
+%   precision-recall (PR) curve. LABELS are the ground truth labels,
+%   greather than zero for a positive sample and smaller than zero for
+%   a negative one. SCORES are the scores of the samples obtained from
+%   a classifier, where lager scores should correspond to positive
+%   samples.
 %
-%  RECALL and PRECISION are the recall and the precision for
-%  increasing values of the decision threshold.
+%   Samples are ranked by decreasing scores, starting from rank 1.
+%   PRECISION(K) and RECALL(K) are the precison and recall when
+%   samples of rank smaller or equal to K-1 are predicted to be
+%   positive and the remaining to be negative. So for example
+%   PRECISION(3) is the percentage of positive samples in the two
+%   samples with largest score. PRECISION(1) is the precision when no
+%   samples are predicted to be positive and is conventionally set to
+%   the value 1.
 %
-%  Set the zero the lables of data points to ignore in the evaluation.
+%   Set the zero the lables of samples that should be ignored in the
+%   evaluation. Set to -INF the scores of samples which are not
+%   retrieved. If there are samples with -INF score, then the PR curve
+%   may have maximum recall smaller than 1, unless the INCLUDEINF
+%   option is used (see below). The options NUMNEGATIVES and
+%   NUMPOSITIVES can be used to specify additional samples with -INF
+%   score (see below).
 %
-%  Set to -INF the score of data points which are never retrieved. In
-%  this case the PR curve will have maximum recall < 1.
+%   [RECALL, PRECISION, INFO] = VL_PR(...) returns and additional
+%   structure INFO with the following fields:
 %
-%  VL_PR() accepts the following options:
+%   info.auc::
+%     The area under the precision-recall curve. If the INTERPOLATE
+%     option is set to FALSE, then trapezoidal interpolation is used
+%     to integrate the PR curve. If the INTERPOLATE option is set to
+%     TRUE, then the curve is piecewise constant and no other
+%     approximation is introduced in the calculation of the area. In
+%     the latter case, INFO.AUC is the same as INFO.AP.
 %
-%  InludeInf:: [false]
-%    If set to true, data with -INF score is included in the
-%    evaluation and the maximum recall is 1 even if -INF scores are
-%    present.
+%   info.ap::
+%     Average precision as defined by TREC. This is the average of the
+%     precision observed each time a new positive sample is
+%     recalled. In this calculation, any sample with -INF score
+%     (unless INCLUDEINF is used) and any additional positive induced
+%     by NUMPOSITIVES has precision equal to zero. If the INTERPOLATE
+%     option is set to true, the AP is computed from the interpolated
+%     precision and the result is the same as INFO.AUC. Note that AP
+%     as defined by TREC normally does not use interpolation [1].
 %
-%  Stable:: [false]
-%    If set to true, RECALL and PRECISION are in the samre order of
-%    LABELS and SCORES rather than being sorted by increasing
-%    RECALL. This option implies INCLUDEINF.
+%   info.ap_interp_11::
+%     11-points interpolated average precision as defined by TREC.
+%     This is the average of the maximum precision for recall levels
+%     greather than 0.0, 0.1, 0.2, ..., 1.0. This measure was used in
+%     the PASCAL VOC challenge up to the 2008 edition.
 %
-%  About the PR curve::
-%    This section uses the same symbols used in the documentation of
-%    the VL_ROC() function. In addition to those quantities, define:
+%   info.auc_pa08::
+%     Deprecated. It is the same of INFO.AP_INTERP_11.
 %
-%      PRECISION(S) = TP(S) / (TP(S) + FP(S))
-%      RECALL(S) = TP(S) / P = TPR(S)
+%   VL_PR(...) with no output arguments plots the PR curve in the
+%   current axis.
 %
-%    The precision is the fraction of positivie predictions which are
-%    correct, and the recall is the fraction of positive labels that
-%    have been correctly classified (recalled). Notice that the
-%    recall is also equal to the true positive rate for the ROC curve
-%    (see VL_ROC()).
+%   VL_PR() accepts the following options:
 %
-%  Remark::
-%    Precision (P) is undefined for those values of the
-%    classifier threshold for which no example is classified as
-%    positive. Conventionally, a precision of P=1 is assigned to such
-%    cases.
+%   Interpolate:: false
+%     If set to true, use interpolated precision. The interpolated
+%     precision is defined as the maximum precision for a given recall
+%     level and onwards. Here it is implemented as the culumative
+%     maximum from low to high scores of the precision.
 %
-%  See also: VL_ROC(), VL_HELP().
+%   NumPositives:: []
+%   NumNegatives:: []
+%     If set to a number, pretend that LABELS contains this may
+%     positive/negative labels. NUMPOSITIVES/NUMNEGATIVES cannot be
+%     smaller than the actual number of positive/negative entrires in
+%     LABELS. The additional positive/negative labels are appended to
+%     the end of the sequence, as if they had -INF scores (not
+%     retrieved). This is useful to evaluate large retrieval systems
+%     for which one stores ony a handful of top results for efficiency
+%     reasons.
+%
+%   IncludeInf:: false
+%     If set to true, data with -INF score SCORES is included in the
+%     evaluation and the maximum recall is 1 even if -INF scores are
+%     present. This option does not include any additional positive or
+%     negative data introduced by specifying NUMPOSITIVES and
+%     NUMNEGATIVES.
+%
+%   Stable:: false
+%     If set to true, RECALL and PRECISION are returned the same order
+%     of LABELS and SCORES rather than being sorted by decreasing
+%     score (increasing recall). Samples with -INF scores are assigned
+%     RECALL and PRECISION equal to NaN.
+%
+%   About the PR curve::
+%     This section uses the same symbols used in the documentation of
+%     the VL_ROC() function. In addition to those quantities, define:
+%
+%       PRECISION(S) = TP(S) / (TP(S) + FP(S))
+%       RECALL(S) = TPR(S) = TP(S) / P
+%
+%     The precision is the fraction of positivie predictions which are
+%     correct, and the recall is the fraction of positive labels that
+%     have been correctly classified (recalled). Notice that the recall
+%     is also equal to the true positive rate for the ROC curve (see
+%     VL_ROC()).
+%
+%   REFERENCES:
+%   [1] C. D. Manning, P. Raghavan, and H. Schutze. An Introduction to
+%   Information Retrieval. Cambridge University Press, 2008.
+%
+%   See also VL_ROC(), VL_HELP().
+
+% Author: Andrea Vedaldi
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
@@ -52,75 +116,90 @@ function [recall, precision, info, scores] = vl_pr(labels, scores, varargin)
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
-opts.includeInf = false ;
+[tp, fp, p, n, perm, varargin] = vl_tpfp(labels, scores, varargin{:}) ;
 opts.stable = false ;
+opts.interpolate = false ;
 opts = vl_argparse(opts,varargin) ;
 
-% make row vectors
-labels = labels(:)' ;
-scores = scores(:)' ;
-
-% sort by descending scores
-[scores, perm] = sort(scores, 'descend') ;
-labels = labels(perm) ;
-
-% assume that data with -INF score is never retrieved
-if opts.includeInf | opts.stable
-  stop = length(scores) ;
-else
-  stop = max(find(scores > -inf)) ;
-end
-
-% Compute number of true positives, false positives, and overall
-% positives. Note that lables==0 do not increase neither TP nor FP nor
-% affect P.
-tp = [0 cumsum(labels(1:stop) == +1)] ;
-fp = [0 cumsum(labels(1:stop) == -1)] ;
-p = sum(labels == +1) ;
-
 % compute precision and recall
-recall = tp / (p + eps) ;
-precision = (tp + eps) ./ (tp + fp + eps) ;
+small = 1e-10 ;
+recall = tp / max(p, small) ;
+precision = max(tp, small) ./ max(tp + fp, small) ;
 
-% compute AUC
-if length(recall) > 1
-  auc = sum((precision(1:end-1) + precision(2:end)) .* diff(recall)) / 2 ;
-else
-  auc = 0 ;
+% interpolate precision if needed
+if opts.interpolate
+  precision = fliplr(vl_cummax(fliplr(precision))) ;
 end
 
-% compute AUC according to TRECVID / PASCAL VOC <= 2009
-ap = 0;
-for t=0 : 0.1 : 1
-  p_ = max(precision(recall>=t));
-  if isempty(p_)
-    p_=0;
+% --------------------------------------------------------------------
+%                                                      Additional info
+% --------------------------------------------------------------------
+
+if nargout > 2 || nargout == 0
+
+  % area under the curve using trapezoid interpolation
+  if ~opts.interpolate
+    info.auc = 0.5 * sum((precision(1:end-1) + precision(2:end)) .* diff(recall)) ;
   end
-  ap = ap + p_ / 11 ;
+
+  % average precision (for each recalled positive sample)
+  sel = find(diff(recall)) + 1 ;
+  info.ap = sum(precision(sel)) / p ;
+  if opts.interpolate
+    info.auc = info.ap ;
+  end
+
+  % TREC 11 points average interpolated precision
+  info.ap_interp_11 = 0.0 ;
+  for rc = linspace(0,1,11)
+    pr = max([0, precision(recall >= rc)]) ;
+    info.ap_interp_11 = info.ap_interp_11 + pr / 11 ;
+  end
+
+  % legacy definition
+  info.auc_pa08 = info.ap_interp_11 ;
 end
 
-info.auc = auc ;
-info.auc_pa08 = ap ;
+% --------------------------------------------------------------------
+%                                                                 Plot
+% --------------------------------------------------------------------
 
-% make a figure if there are no output arguments
 if nargout == 0
   cla ; hold on ;
   plot(recall,precision,'linewidth',2) ;
-  line([0 1], [1 1] * p / length(labels), 'color', 'r', 'linestyle', '--') ;
+  spline([0 1], [1 1] * p / length(labels), 'r--', 'linewidth', 2) ;
   axis square ; grid on ;
   xlim([0 1]) ; xlabel('recall') ;
   ylim([0 1]) ; ylabel('precision') ;
-  title(sprintf('Precision-recall (AP = %.2f %%)', info.auc * 100)) ;
-  legend('PR', 'random classifier', 'Location', 'NorthWestOutside') ;
+  title(sprintf('PR (AUC: %.2f%%, AP: %.2f%%, AP11: %.2f%%)', ...
+                info.auc * 100, ...
+                info.ap * 100, ...
+                info.ap_interp_11 * 100)) ;
+  if opts.interpolate
+    legend('PR interp.', 'PR rand.', 'Location', 'SouthEast') ;
+  else
+    legend('PR', 'PR rand.', 'Location', 'SouthEast') ;
+  end
   clear recall precision info ;
 end
 
+% --------------------------------------------------------------------
+%                                                        Stable output
+% --------------------------------------------------------------------
+
 if opts.stable
-  recall(1) = [] ;
   precision(1) = [] ;
-  recall(perm) = recall ;
-  precision(perm) = precision ;
-  scores(perm(1:stop)) = scores(1:stop) ;
-else
-  scores = [+inf scores(1:stop)] ;
+  recall(1) = [] ;
+  precision_ = precision ;
+  recall_ = recall ;
+  precision = NaN(size(precision)) ;
+  recall = NaN(size(recall)) ;
+  precision(perm) = precision_ ;
+  recall(perm) = recall_ ;
 end
+
+% --------------------------------------------------------------------
+function h = spline(x,y,spec,varargin)
+% --------------------------------------------------------------------
+prop = vl_linespec2prop(spec) ;
+h = line(x,y,prop{:},varargin{:}) ;
