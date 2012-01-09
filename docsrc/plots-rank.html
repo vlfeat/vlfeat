@@ -1,0 +1,224 @@
+<!DOCTYPE group PUBLIC
+"-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p><em>This tutorial illustrates the use of the functions
+<code><a href='%pathto:vl_roc;'>vl_roc</a></code>,
+<code><a href='%pathto:vl_roc;'>vl_det</a></code>, and
+<code><a href='%pathto:vl_roc;'>vl_pr</a></code> to generate ROC, DET,
+and precision-recall curves.</em></p>
+
+<p>VLFeat includes support for plotting starndard information
+retrieval curves such as the <em>Receiver Operating Characteristic
+(ROC)</em> and the <em>Precision-Recall (PR)</em> curves.</p>
+
+<p>Consider a set of samples with labels <code>labels</code> and
+score <code>scores</code>. <code>scores</code> is typically the output
+of a classifier, with higher scores corresponding to positive
+labels. Ideally, sorting the data by decreasing scores should leave
+all the positive samples first and the negative samples last.  In
+practice, a classifier is not perfect and the ranking is not ideal.
+The tools discussed in this tutorial allow to evaluate and visualize
+the quality of the ranking.</p>
+
+<p>For the sake of the illustration generate some data randomly as
+follows:</p>
+
+<precode type='matlab'>
+numPos = 20 ;
+numNeg = 100 ;
+labels = [ones(1, numPos) -ones(1,numNeg)] ;
+scores = randn(size(labels)) + labels ;
+</precode>
+
+<p>In this case, there have five times more negative samples than
+positive ones. The scores are correlated to the labels as expected,
+but do not allow for a perfect separation of the two classes.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="plots-rank.roc">ROC and DET curves</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ 
+<p>To visualize the quality of the ranking, one can plot the ROC curve
+by using the <code><a href='%pathto:vl_roc;'>vl_roc</a></code>
+function:</p>
+
+<precode type='matlab'>
+vl_roc(labels, scores) ;
+</precode>
+
+<p>This produces the figure</p>
+
+<div class='figure'>
+<img src="%pathto:root;demo/plots_rank_roc.jpg"/>
+<div class='caption'>An example ROC curve.</div>
+</div>
+
+<p>The ROC curve is the parametric curve given by the true positve
+rate (TPR) against the true negative rate (TNR). These two quantities
+can be obtained from <code>vl_roc</code> as follows:</p>
+
+<precode type='matlab'>
+[tpr, tnr] = vl_roc(labels, scores) ;
+</precode>
+
+<p>The TPR value <code>tpr(k)</code> is the percentage of positive
+samples that have rank smaller or equal than <code>k</code> (where
+ranks are assigned by decreasing scores). <code>tnr(k)</code> is
+instead the percentage of negative samples that have rank larger
+than <code>k</code>. Therefore, if one classifies the samples with
+rank smaller or equal than <code>k</code> to be positive and the rest
+to be negative, <code>tpr(k)</code> and <code>tnr(k)</code> are
+repsectively the probability that a positive/negative sample is
+classified correctly.</p>
+
+<p>Moving from rank <code>k</code> to rank <code>k+1</code>, if the
+sample of rank <code>k+1</code> is positive then <code>tpr</code>
+increases; otherwise <code>tnr</code> decreases. An ideal classifier
+has all the positive samples first, and the corresponding ROC curve is
+one that describes two sides of the unit square.</p>
+
+<p>The <em>Area Under the Curve (AUC)</em> is an indicator of the
+overall quality of a ROC curve. For example, the ROC of the ideal
+classifier has AUC equal to 1. Another indicator is the <em>Equal
+Error Rate (EER)</em>, the point on the ROC curve that corresponds to
+have an equal probability of miss-classifying a positive or negative
+sample. This point is obtained by intersecting the ROC curve with a
+diagonal of the unit square. Both AUC and EER can be computed
+by <code>vl_roc</code>:</p>
+
+<precode type='matlab'>
+[tpr, tnr, info] = vl_roc(labels, scores) ;
+disp(info.auc) ;
+disp(info.eer) ;
+</precode>
+
+<p><code>vl_roc</code> has a couple of useful functionalities:</p>
+
+<ul class='text'>
+<li>Any sample with label equal to zero is effecitvely ignored in the
+evaluation.</li>
+
+<li>Samples with scores equal to <code>-inf</code> are assumed to be
+never retrieved by the classifier. For these, the TNR is
+conventionally set to be equal to zero.</li>
+
+<li>Additional negative and positive samples with <code>-inf</code>
+score can be added to the evaluation by means of
+the <code>numNegatives</code> and <code>numPositives</code>
+options. For example,
+<code>vl_roc(labels,scores,'numNegatives',1e4)</code> sets the number
+of negative samples to 10,000. This can be useful when evaluating
+large retrieval systems, for which one may want to record
+in <code>labels</code> and <code>scores</code> only the top ranked
+results from a classifier.</li>
+
+<li>Different variants of the ROC plot can be produced. For example
+<code>vl_roc(labels,scores,'plot','tptn')</code> swaps the two axis,
+plotting the TNR against the TPR.  Since the TPR is also the recall
+(i.e., the percentage of positive samples retrieved up to a certain
+rank), this makes the plot more directly comparable to
+a <a href="plots-rank.pr">precision-recall plot</a>.
+<div class='figure'>
+<img src="%pathto:root;demo/plots_rank_roc_variants.jpg"/>
+<div class='caption'>Variants of the ROC plot.</div>
+</div>
+</li>
+</ul>
+
+<p>A limitation of the ROC curves in evaluating a typical retrieval
+system is that they put equal emphasis on false positive and false
+negative errors. In a tipical retrieval application, however, the vast
+majority of the samples are negative, so the false negative rate is
+typically very small for any operating point of interest. Therefore
+the emphasis is usually on the very first portion of the rank, where
+the few positive samples should concentrate. This can be emphasized by
+using either <a href="plots-rank.pr">precision-recall plot</a> or a
+variant of the ROC curves called <em>Detection Error Tradeoff (DET)
+curves</em>.</p>
+
+<p>A DET curve plots the FNR (also called <em>false alarm rate</em>)
+against teh FPR (also called <em>miss rate</em>) in logarithmic
+coordiantes.  It can be generated
+by <code><a href='%pathto:vl_det;'>vl_det</a></code> function
+call:</p>
+
+<div class='figure'>
+<img src="%pathto:root;demo/plots_rank_det.jpg"/>
+<div class='caption'>An example DET curve.</div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="plots-rank.pr">Precision-recall curves</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Both ROC and DET curves normalize out the relative proportions of
+positive and negative samples. By contrast, a <em>Precision-Recall
+(PR)</em> curve reflects this directly. One can plot the PR curve by
+using the <code><a href='%pathto:vl_pr;'>vl_pr</a></code>
+function:</p>
+
+<precode type='matlab'>
+vl_pr(labels, scores) ;
+</precode>
+
+<p>This produces the figure</p>
+
+<div class='figure'>
+<img src="%pathto:root;demo/plots_rank_pr.jpg"/>
+<div class='caption'>An example precision-recall curve.</div>
+</div>
+
+<p>The PR curve is the parametric curve given by precision and
+recall. These two quantities can be obtained from <code>vl_roc</code>
+as follows:</p>
+
+<precode type='matlab'>
+[recall, precision] = vl_roc(labels, scores) ;
+</precode>
+
+<p>The precision value <code>precision(k)</code> is the proportion of
+samples with rank smaller or equal than <code>k-1</code> that are
+positive(where ranks are assigned by decreasing
+scores). <code>recall(k)</code> is instead the percentage of positive
+samples that have rank smaller or equal than <code>k-1</code>. For
+example, if the first two samples are one positive and one
+negative, <code>precision(3)</code> is 1/2. If there are in total 5
+positive samples, then <code>recall(3)</code> is 1/5.</p>
+
+<p>Moving from rank <code>k</code> to rank <code>k+1</code>, if the
+sample of rank <code>k+1</code> is positive then
+both <code>precision</code> and <code>recall</code> increase;
+otherwise <code>precision</code> decreases and <code>recall</code>
+stays constant. This gives the PR curve a characteristic
+saw-shape. For aan ideal classifier that ranks all the positive
+samples first the PR curve is one that describes two sides of the unit
+square.</p>
+
+<p>Similar to the ROC curves, the <em>Area Under the Curve (AUC)</em>
+can be used to summarize the quality of a ranking in term of precision
+and recall. This can be obtained as <code>info.auc</code> by</p>
+
+<precode type='matlab'>
+[rc, pr, info] = vl_pr(labels, scores) ;
+disp(info.auc) ;
+disp(info.ap) ;
+disp(info.ap_interp_11) ;
+</precode>
+
+<p>The AUC is obtained by trapezoidal interpolation of the precision.
+An alternative and usually almost equivalent metric is the <em>Average
+Precision (AP)</em>, returned as <code>info.ap</code>. This is the
+average of the precision obtained every time a new positive sample is
+recalled. It is the same as the AUC if precision is interpolated by
+constant segments and is the definition used by TREC most
+often. Finally, the <em>11 points interpolated average precision</em>,
+returned as <code>info.ap_interp_11</code>. This is an older TREC
+definition and is obtained by taking the average of eleven precision
+values, obtained as the maximum precision for recalls largerer than
+0.0, 0.1, ..., 1.0. This particular metric was used, for example, in
+the PASCAL VOC challenge until the 2008 edition.</p>
+
+</group>

@@ -44,5 +44,7 @@ vl_demo_kdtree_ann ;
 
 vl_demo_imdisttf ;
 
+vl_demo_plots_rank ;
+
 rmpath(demo_path);
 rmpath(test_path);
