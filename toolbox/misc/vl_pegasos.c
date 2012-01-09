@@ -1,7 +1,6 @@
-/** @internal
- ** @file     vl_pegasos.c
- ** @brief    vl_pegasos.c
- ** @author   Andrea Vedaldi
+/** @file vl_pegasos.c
+ ** @brief vl_pegasos MEX definition
+ ** @author Andrea Vedaldi
  **/
 
 /*
