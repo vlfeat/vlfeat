@@ -78,8 +78,8 @@ class MFile:
 
         self.funcname = funcname.upper()
         self.path     = os.path.join(basedir, dirname, name)
-        self.mdocname = os.path.join(dirname, funcname).replace(os.path.sep, '_')
-        self.webname  = os.path.join(dirname, funcname).replace(os.path.sep, '.')
+        self.mdocname = funcname.replace(os.path.sep, '_')
+        self.webname  = funcname.replace(os.path.sep, '.')
         self.htmlname = self.mdocname + '.html'
         self.wikiname = 'MDoc_' + (os.path.join(dirname, funcname)
                                    .upper().replace(os.path.sep, '_'))
