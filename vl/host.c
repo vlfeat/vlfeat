@@ -152,7 +152,7 @@ the terms of the BSD license (see the COPYING file).
 
  These macros translate according to the following tables:
 
- <table style="font-size:70%;">
+ <table class="doxtable" style="font-size:70%;">
  <caption>Macros for exporting library symbols</caption>
  <tr>
  <td>Platform</td>
@@ -174,7 +174,7 @@ the terms of the BSD license (see the COPYING file).
  </tr>
  </table>
 
- <table style="font-size:70%;">
+ <table class="doxtable" style="font-size:70%;">
  <caption>Macros for declaring inline functions</caption>
  <tr>
  <td>Platform</td>
@@ -234,7 +234,7 @@ the terms of the BSD license (see the COPYING file).
  to a file. For the latter two cases, one usually saves data in big
  endian (network) order regardless of the host CPU.
 
-@section Multi-threading host-threads
+@section host-threads Multi-threading
 
 The file defines #VL_THREADS_WIN if multi-threading support is
 enabled and the host supports Windows threads and #VL_THREADS_POSIX if
@@ -271,6 +271,12 @@ it supports POSIX threads.
 
 /** @def VL_COMPILER_MSC
  ** @brief Defined if the host compiler is Microsoft Visual C++.
+ ** @see @ref host-compiler
+ **/
+
+/** @def VL_COMPILER_LCC
+ ** @brief Defined if the host compiler is LCC.
+ ** @deprecated The LCC is not supported anymore.
  ** @see @ref host-compiler
  **/
 
@@ -322,21 +328,25 @@ it supports POSIX threads.
 /** @def VL_DISABLE_SSE2
  ** @brief Defined if SSE2 support if disabled
  **
- ** Define this symbol to disable SSE2 support.
+ ** Define this symbol during compliation of the library and linking
+ ** to another project to disable VLFeat SSE2 support.
  **/
 
 /** @def VL_DISABLE_THREADS
  ** @brief Defined if multi-threading support is disabled
  **
- ** Define this symbol to disable multi-threading support.
+ ** Define this symbol during compilation of the library and linking
+ ** to anogher project to disable VLFeat multi-threading support.
  **/
 
 /** @def VL_THREADS_WIN
- ** @biref Defined if the host uses Windows threads.
+ ** @brief Defined if the host uses Windows threads.
+ ** @see @ref host-threads
  **/
 
 /** @def VL_THREADS_POSIX
  ** @brief Defiend if the host uses POISX threads.
+ ** @see @ref host-threads
  **/
 
 /** --------------------------------------------------------------- */

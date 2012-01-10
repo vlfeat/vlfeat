@@ -181,25 +181,34 @@ the terms of the BSD license (see the COPYING file).
     defined(__linux__) || \
     defined(__DOXYGEN__)
 #define VL_OS_LINUX 1
-#define VL_THREADS_POSIX 1
 #endif
 
 #if (defined(__APPLE__) & defined(__MACH__)) || \
      defined(__DOXYGEN__)
 #define VL_OS_MACOSX 1
-#define VL_THREADS_POSIX 1
 #endif
 
 #if defined(__WIN32__) || \
     defined(_WIN32)    || \
     defined(__DOXYGEN__)
 #define VL_OS_WIN 1
-#define VL_THREADS_WIN 1
 #endif
 
 #if defined(_WIN64) || \
     defined(__DOXYGEN__)
 #define VL_OS_WIN64 1
+#endif
+/** @} */
+
+/** @name Identifying the host threading library
+ ** @{ */
+#if defined(VL_OS_MACOSX) || defined(VL_OS_LINUX) || \
+defined(__DOXYGEN__)
+#define VL_THREADS_POSIX 1
+#endif
+
+#if defined(VL_OS_WIN) || defined(VL_OS_WIN64) || \
+defined(__DOXYGEN__)
 #define VL_THREADS_WIN 1
 #endif
 /** @} */
