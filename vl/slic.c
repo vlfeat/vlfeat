@@ -58,7 +58,7 @@ initialize a corresponding k-means (up to a small shift to avoid
 image edges). Finally, the k-means centers and clusters are refined by
 using the Lloyd algorithm, yielding segmenting the image. As a
 further restriction and simplification, during the k-means iterations
-each pixel can be assigned to only the <em>2&times;2</em> centers
+each pixel can be assigned to only the <em>2 x 2</em> centers
 corresponding to grid tiles adjacent to the pixel.
 
 The parameter @c regularizer sets the trade-off between clustering
@@ -104,7 +104,7 @@ center
 @f]
 
 In order to avoid placing these centers on top of image
-discontinuities, the centers are then moved in a 3&times;3
+discontinuities, the centers are then moved in a 3 x 3
 neighbourohood to minimize the edge strength
 
 @f[
