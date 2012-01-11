@@ -64,7 +64,8 @@ extraction of code.</em>
   - @ref design-resources   "Memory and resource management"
   - @ref design-threads     "Multi-threading"
   - @ref design-portability "Portability"
-- @ref main-glossary "Glossary"
+- @ref dev
+- @ref main-glossary
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page design VLFeat design concepts
@@ -275,6 +276,119 @@ user, as it is used only internally.
  - <b>Feature descriptor.</b> A <em>feature descriptor</em> is a quantity
  (usually a vector) which describes compactly the appearance of an
  image region (usually corresponding to a feature frame).
+**/
+
+/**
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page dev Developing the library
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dev-doc Coding style
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<ul>
+
+<li><b>Develop a sensibility for good-looking code.</b> The coding
+style should be as uniform as possible throughoug the library. The
+style is specified by this set of rules. However, the quality of the
+code can only be guaranteed by a reasonable application of the rules
+and combined with one's eye for good code.</li>
+
+<li><b>No whitespaces at the end of lines.</b> Whitespaces introduce
+invisible changes in the code that are however picked up by control
+version systems such as Git.</li>
+
+<li><b>Descriptive variable names.</b> Most variable names start with
+a lower case letter and are capitalized, e.g., @c numElements. Only
+the following abbreviations are considered acceptable: @c num. The @c
+dimension of a vector is the number of elements it contains (for other
+objects that could be a @c size, a @c length, or a @c
+numElements). For multi-dimensional arrays, @c dimensions could
+indicate the array with each of the @c numDimensions dimensions.</li>
+
+<li><b>Short variable names.</b> For indexes in short for loops it is
+fine to use short index names such as @c i, @c j, and @c k. For example:
+
+@code
+for (i = 0 ; i < numEntries ; ++i) values[i] ++ ;
+@endcode
+
+is considered acceptable.</li>
+
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dev-doc Documenting the code
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The VLFeat C library code contains its own in documentation <a
+href='http://www.stack.nl/~dimitri/doxygen/'>Doxygen</a> format. The
+documentation consists in generic pages, such as the @ref index
+"index" and the page you are reading, and documentations for each
+specifid library module, usually corresponding to a certain heaader
+file.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection devl-doc-modules Documenting the library modules
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+A library module groups a number of data types and functions that
+implement a certain functionaltiy of VLFeat. Consider a module called
+<em>Example Module</em>. Then one would typically have:
+
+<ul>
+<li>A header or declaration file @c example-module.h. Such a file has an
+heading of the type:
+
+@verbinclude example-module-doc.h
+
+This comment block contains a file directive, causing the file to be
+included in the documentation, a brief directive, specifying a short
+description of what the file is, and a list of authors. A
+(non-Doxygen) comment block with a short the copyright notice follows.
+The brief directive should include a <code>@@ref</code> directive to point
+to the main documentation page describing the module, if there is one.
+</li>
+
+<li> An implementation or definition file @c example-module.c. This file
+has an heading of the type:
+
+@verbinclude example-module-doc.c
+
+This is similar to the declearation file, except for the content of the
+brief comment.
+</li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection devl-doc-functions Documenting the library functions
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection devl-doc-bib Bibliographic references
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Since version 0.9.14, the VLFeat C library documentation makes use of
+a proper bibliographic reference in BibTeX format (see the file @c
+docsrc/vlfeat.bib). Doxygen uses this file when it sees instances of
+the <code>@@cite{xyz}</code> command.  Here @c xyz is a BibTeX
+key. For example, @c vlfeat.bib file contains the entry:
+
+<pre>
+@@inproceedings{martin97the-det-curve,
+	Author = {A. Martin and G. Doddington and T. Kamm and M. Ordowski and M. Przybocki},
+	Booktitle = {Proc. Conf. on Speech Communication and Technology},
+	Title = {The {DET} curve in assessment of detection task performance},
+	Year = {1997}}
+</pre>
+
+For example, the Doxygen directive
+<code>@@cite{martin97the-det-curve}</code> generates the output
+@cite{martin97the-det-curve}, which is a link to the corresponding
+entry in the bibliography.
+
 **/
 
 /**
