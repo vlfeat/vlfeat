@@ -77,8 +77,7 @@ mexFunction(int nout, mxArray *out[],
     vlmxError(vlmxErrTooManyInputArguments, NULL) ;
   }
 
-  
-/* get information on the data */
+  /* get information on the data */
   if (!mxIsNumeric(IN(X))) {
     vlmxError(vlmxErrInvalidArgument, "X is not a numeric array.") ;
   }
@@ -106,15 +105,15 @@ mexFunction(int nout, mxArray *out[],
 
   if (whichDimension >= 1) {
     /*
-      Compute the stride to whichDimension
+      Compute the stride to whichDimension.
     */
     for (k = 0 ; k < whichDimension - 1 ; ++k) {
       stride *= dimensions[k] ;
     }
   } else {
     /*
-      Pick first non-singleton dimension, if any. Note that in this case
-      stride = 1.
+      Pick the first non-singleton dimension, if any. Note that in
+      this case the stride is equal to 1.
     */
     for (k = 0 ; k < (signed)numDimensions-1 && dimensions[k] == 1 ; ++k) ;
     whichDimension = k + 1 ;
