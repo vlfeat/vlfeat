@@ -277,6 +277,8 @@
 		2D7AD0B50E38C18600783252 /* web.xml */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 1; lastKnownFileType = text.xml; name = web.xml; path = docsrc/web.xml; sourceTree = "<group>"; tabWidth = 1; };
 		2D8061FE118229AB0092BDD1 /* pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pegasos.c; sourceTree = "<group>"; };
 		2D8061FF118229AB0092BDD1 /* pegasos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pegasos.h; sourceTree = "<group>"; };
+		2D85DE1314CD78AC00BDAE4E /* hog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hog.h; sourceTree = "<group>"; };
+		2D85DE1414CD78BB00BDAE4E /* hog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hog.c; sourceTree = "<group>"; };
 		2D86B1080F24CC9B00E625D6 /* vl_aib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_aib.c; path = toolbox/aib/vl_aib.c; sourceTree = "<group>"; };
 		2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_aibhist.c; path = toolbox/aib/vl_aibhist.c; sourceTree = "<group>"; };
 		2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_alldist2.c; path = toolbox/misc/vl_alldist2.c; sourceTree = "<group>"; };
@@ -333,6 +335,7 @@
 		2DB1A290110CE32F00E02BD8 /* samplinthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = samplinthist.tc; path = toolbox/misc/samplinthist.tc; sourceTree = "<group>"; };
 		2DB1A2A1110D09B200E02BD8 /* vl_quickshift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_quickshift.c; path = toolbox/quickshift/vl_quickshift.c; sourceTree = "<group>"; };
 		2DB1A2A2110D09B200E02BD8 /* vl_version.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
+		2DB6ABF214CDB7B500A27D16 /* vl_hog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_hog.c; path = toolbox/misc/vl_hog.c; sourceTree = "<group>"; };
 		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
 		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
 		2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; indentWidth = 8; path = Makefile.mak; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
@@ -684,6 +687,8 @@
 				2D4EB0C010F3C1E800ADA534 /* kmeans.h */,
 				2DDA2307124BD104003F6A9D /* lbp.c */,
 				2DDA2306124BD104003F6A9D /* lbp.h */,
+				2D85DE1314CD78AC00BDAE4E /* hog.h */,
+				2D85DE1414CD78BB00BDAE4E /* hog.c */,
 				2D732E8E0CF8C2E40099B03C /* mathop.c */,
 				2D732E8F0CF8C2E40099B03C /* mathop.h */,
 				2D13EEE1100A511200C072E8 /* mathop_sse2.c */,
@@ -744,6 +749,7 @@
 				2DFF4C370FF1033B00E5D79C /* vl_kdtreequery.c */,
 				2D4EB0C110F3C21600ADA534 /* vl_kmeans.c */,
 				2D48402412195B1600E13F49 /* vl_lbp.c */,
+				2DB6ABF214CDB7B500A27D16 /* vl_hog.c */,
 				2D86B11B0F24CC9B00E625D6 /* vl_localmax.c */,
 				2D86B11C0F24CC9B00E625D6 /* vl_mser.c */,
 				2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */,
