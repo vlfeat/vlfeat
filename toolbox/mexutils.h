@@ -654,28 +654,73 @@ vlmxEnvelopeArrayInVlArray (VlArray * v, mxArray * x)
 
 /** ------------------------------------------------------------------
  ** @brief Case insensitive string comparison
- **
  ** @param s1 first string.
  ** @param s2 second string.
+ ** @return comparison result.
  **
- ** @return 0 if the strings are equal, >0 if the first string is
- ** greater (in lexicographical order) and <0 otherwise.
+ ** The comparison result is equal to 0 if the strings are equal, >0
+ ** if the first string is greater than the second (in lexicographical
+ ** order), and <0 otherwise.
  **/
 
 static int
-uStrICmp(const char *s1, const char *s2)
+vlmxCompareStringsI(const char *s1, const char *s2)
 {
-  while (tolower((unsigned char)*s1) ==
-         tolower((unsigned char)*s2))
+  /*
+   Since tolower has an int argument, characters must be unsigned
+   otherwise will be sign-extended when converted to int.
+   */
+  while (tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
   {
-    if (*s1 == 0)
-      return 0;
+    if (*s1 == 0) return 0 ; /* implies *s2 == 0 */
     s1++;
     s2++;
   }
-  return
-    (int)tolower((unsigned char)*s1) -
-    (int)tolower((unsigned char)*s2) ;
+  return tolower((unsigned char)*s1) - tolower((unsigned char)*s2) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Case insensitive string comparison with array
+ ** @param array first string (as a MATLAB array).
+ ** @param string second string.
+ ** @return comparison result.
+ **
+ ** The comparison result is equal to 0 if the strings are equal, >0
+ ** if the first string is greater than the second (in lexicographical
+ ** order), and <0 otherwise.
+ **/
+
+static int
+vlmxCompareToStringI(mxArray const * array, char const  * string)
+{
+  mxChar const * s1 = (mxChar const *) mxGetData(array) ;
+  char unsigned const * s2 = (char unsigned const*) string ;
+  vl_size n = mxGetNumberOfElements(array) ;
+
+  /*
+   Since tolower has an int argument, characters must be unsigned
+   otherwise will be sign-extended when converted to int.
+   */
+  while (n && tolower((unsigned)*s1) == tolower(*s2)) {
+    if (*s2 == 0) return 1 ; /* s2 terminated on 0, but s1 did not terminate yet */
+    s1 ++ ;
+    s2 ++ ;
+    n -- ;
+  }
+  return tolower(n ? (unsigned)*s1 : 0) - tolower(*s2) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Case insensitive string equality test with array
+ ** @param array first string (as a MATLAB array).
+ ** @param string second string.
+ ** @return true if the strings are equal.
+ **/
+
+static int
+vlmxIsEqualToStringI(mxArray const * array, char const  * string)
+{
+  return vlmxCompareToStringI(array, string) == 0 ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -757,7 +802,7 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
   /* now lookup the string in the option table */
   for (i = 0 ; options[i].name != 0 ; ++i) {
-    if (uStrICmp(name, options[i].name) == 0) {
+    if (vlmxCompareStringsI(name, options[i].name) == 0) {
       opt = options[i].val ;
       break ;
     }

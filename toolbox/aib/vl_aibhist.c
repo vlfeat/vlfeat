@@ -79,7 +79,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     }
     mxGetString(in[IN_OPT], buf, buflen) ;
     buf [buflen - 1] = 0 ;
-    if (!uStrICmp("hist", buf)) {
+    if (!vlmxCompareStringsI("hist", buf)) {
       mexErrMsgTxt("OPT must be equal to 'hist'") ;
     }
     histmode = 1 ;

@@ -211,9 +211,9 @@ mexFunction(int nout, mxArray *out[],
         }
         mxGetString(optarg, buf, buflen) ;
         buf [buflen - 1] = 0 ;
-        if (uStrICmp("zero", buf) == 0) {
+        if (vlmxCompareStringsI("zero", buf) == 0) {
           padding = VL_PAD_BY_ZERO ;
-        } else if (uStrICmp("continuity", buf) == 0) {
+        } else if (vlmxCompareStringsI("continuity", buf) == 0) {
           padding = VL_PAD_BY_CONTINUITY ;
         } else {
           vlmxError(vlmxErrInvalidArgument,
@@ -245,9 +245,9 @@ mexFunction(int nout, mxArray *out[],
         }
         mxGetString(optarg, buf, buflen) ;
         buf [buflen - 1] = 0 ;
-        if (uStrICmp("gaussian", buf) == 0) {
+        if (vlmxCompareStringsI("gaussian", buf) == 0) {
           kernel = GAUSSIAN ;
-        } else if (uStrICmp("triangular", buf) == 0) {
+        } else if (vlmxCompareStringsI("triangular", buf) == 0) {
           kernel = TRIANGULAR ;
         } else {
           vlmxError(vlmxErrInvalidArgument,

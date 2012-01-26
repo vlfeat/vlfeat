@@ -136,11 +136,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vlmxError (vlmxErrInvalidArgument,
                     "ALGORITHM argument too long.") ;
         }
-        if (uStrICmp("lloyd", buf) == 0) {
+        if (vlmxCompareStringsI("lloyd", buf) == 0) {
           algorithm = VlKMeansLloyd ;
-        } else if (uStrICmp("elkan", buf) == 0) {
+        } else if (vlmxCompareStringsI("elkan", buf) == 0) {
           algorithm = VlKMeansElkan ;
-        } else if (uStrICmp("ann", buf) == 0) {
+        } else if (vlmxCompareStringsI("ann", buf) == 0) {
           algorithm = VlKMeansANN ;
         } else {
           vlmxError (vlmxErrInvalidArgument,
@@ -157,10 +157,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vlmxError (vlmxErrInvalidArgument,
                     "INITIALIZATION argument too long.") ;
         }
-        if (uStrICmp("plusplus", buf) == 0 ||
-            uStrICmp("++", buf) == 0) {
+        if (vlmxCompareStringsI("plusplus", buf) == 0 ||
+            vlmxCompareStringsI("++", buf) == 0) {
           initialization = VlKMeansPlusPlus ;
-        } else if (uStrICmp("randsel", buf) == 0) {
+        } else if (vlmxCompareStringsI("randsel", buf) == 0) {
           initialization = VlKMeansRandomSelection ;
         } else {
           vlmxError (vlmxErrInvalidArgument,
@@ -177,11 +177,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vlmxError (vlmxErrInvalidArgument,
                     "DISTANCE argument too long.") ;
         }
-        if (uStrICmp("l2", buf) == 0) {
+        if (vlmxCompareStringsI("l2", buf) == 0) {
           distance = VlDistanceL2 ;
-        } else if (uStrICmp("l1", buf) == 0) {
+        } else if (vlmxCompareStringsI("l1", buf) == 0) {
           distance = VlDistanceL1 ;
-        } else if (uStrICmp("chi2", buf) == 0) {
+        } else if (vlmxCompareStringsI("chi2", buf) == 0) {
           distance = VlDistanceChi2 ;
         } else {
           vlmxError (vlmxErrInvalidArgument,
