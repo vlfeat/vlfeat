@@ -110,6 +110,10 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
               "than the number of data.") ;
   }
 
+  if (dimension == 0) {
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+  }
+
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     char buf [1024] ;
 
