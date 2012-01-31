@@ -20,8 +20,8 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %   retrieved. If there are samples with -INF score, then the ROC curve
 %   may have maximum TPR and TNR smaller than 1.
 %
-%   [TPR,TNR,INFO] = VL_ROC(...) returns and additional
-%   structure INFO with the following fields:
+%   [TPR,TNR,INFO] = VL_ROC(...) returns an additional structure INFO
+%   with the following fields:
 %
 %   info.auc:: Area under the ROC curve (AUC).
 %     The ROC curve has a `staircase shape' because for each sample

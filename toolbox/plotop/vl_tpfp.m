@@ -51,7 +51,7 @@ end
 if opts.includeInf
   stop = length(scores) ;
 else
-  stop = max(find(scores(perm) > -inf)) ;
+  stop = max(find(scores > -inf)) ;
 end
 perm = perm(1:stop) ;
 labels = labels(perm) ;

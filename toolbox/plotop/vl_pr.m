@@ -11,7 +11,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   PRECISION(K) and RECALL(K) are the precison and recall when
 %   samples of rank smaller or equal to K-1 are predicted to be
 %   positive and the remaining to be negative. So for example
-%   PRECISION(3) is the percentage of positive samples in the two
+%   PRECISION(3) is the percentage of positive samples among the two
 %   samples with largest score. PRECISION(1) is the precision when no
 %   samples are predicted to be positive and is conventionally set to
 %   the value 1.
@@ -24,7 +24,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   NUMPOSITIVES can be used to specify additional samples with -INF
 %   score (see below).
 %
-%   [RECALL, PRECISION, INFO] = VL_PR(...) returns and additional
+%   [RECALL, PRECISION, INFO] = VL_PR(...) returns an additional
 %   structure INFO with the following fields:
 %
 %   info.auc::
