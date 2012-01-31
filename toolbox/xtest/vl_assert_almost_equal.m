@@ -8,7 +8,17 @@ function vl_assert_almost_equal(x, y, varargin)
   end
   assert(isequal(class(x), class(y)), varargin{:}) ;
   assert(isequal(size(x),size(y)), varargin{:}) ;
-  i = isnan(x) ;
-  assert(all(isnan(y(i))), varargin{:}) ;
-  assert(max(abs(x(~i) - y(~i))) < epsilon, varargin{:}) ;
+  if isstruct(x)
+    fx = fieldnames(x) ;
+    fy = fieldnames(y) ;
+    assert(isequal(fx,fy), varargin{:}) ;
+    for i=1:numel(fx)
+      vl_assert_almost_equal(x.(fx{i}), y.(fy{i}), epsilon, varargin{:}) ;
+    end
+  else
+    i = isnan(x) ;
+    j = isnan(y) ;
+    assert(isequal(i,j), varargin{:}) ;
+    assert(max(abs(x(~i) - y(~i))) < epsilon, varargin{:}) ;
+  end
 end
