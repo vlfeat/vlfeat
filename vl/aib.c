@@ -1,118 +1,123 @@
-/** @internal
- ** @file     aib.c
- ** @author   Brian Fulkerson
- ** @author   Andrea Vedaldi
- ** @brief    Agglomerative Information Bottleneck (AIB) - Definition
+/** @file aib.c
+ ** @brief AIB - Definition
+ ** @author Brian Fulkerson
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
-/** @file aib.h
- ** @brief  Agglomerative Information Bottleneck (AIB)
- 
- This provides an implementation of Agglomerative Information
- Bottleneck (AIB) as first described in:
- 
- [Slonim] <em>N. Slonim and N. Tishby. Agglomerative information
- bottleneck.  In Proc. NIPS, 1999</em>
+/**
 
- AIB takes a discrete valued feature \f$x\f$ and a label \f$c\f$ and
- gradually compresses \f$x\f$ by iteratively merging values which 
- minimize the loss in mutual information \f$I(x,c)\f$.
- 
- While the algorithm is equivalent to the one described in [Slonim],
- it has some speedups that enable handling much larger datasets. Let
- <em>N</em> be the number of feature values and <em>C</em> the number
- of labels. The algorithm of [Slonim] is \f$O(N^2)\f$ in space and \f$O(C
- N^3)\f$ in time. This algorithm is \f$O(N)\f$ space and \f$O(C N^2)\f$
- time in common cases (\f$O(C N^3)\f$ in the worst case).
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page aib Agglomerative Information Bottleneck (AIB)
+@author Brian Fulkerson
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- @section aib-overview Overview
+@ref aib.h implemens the Agglomerative Information Bottleneck (AIB)
+algorithm as first described in @cite{slonim99agglomerative}.
 
- Given a discrete feature @f$x \in \mathcal{X} = \{x_1,\dots,x_N\}@f$
- and a category label @f$c = 1,\dots,C@f$ with joint probability
- @f$p(x,c)@f$, AIB computes a compressed feature @f$[x]_{ij}@f$ by
- merging two values @f$x_i@f$ and @f$x_j@f$.  Among all the pairs
- @f$ij@f$, AIB chooses the one that yields the smallest loss in the
- mutual information
+AIB takes a discrete valued feature @f$x@f$ and a label @f$c@f$ and
+gradually compresses @f$x@f$ by iteratively merging values which
+minimize the loss in mutual information @f$I(x,c)@f$.
 
- @f[
-    D_{ij} = I(x,c) - I([x]_{ij},c) = 
-    \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   +
-    \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   -    
-    \sum_c (p(x_i)+p(x_j)) \log \frac {p(x_i,c)+p(x_i,c)}{(p(x_i)+p(x_j))p(c)}
- @f]
+While the algorithm is equivalent to the one described in
+@cite{slonim99agglomerative}, it has some speedups that enable
+handling much larger datasets. Let <em>N</em> be the number of feature
+values and <em>C</em> the number of labels. The algorithm of
+@cite{slonim99agglomerative} is @f$O(N^2)@f$ in space and @f$O(C
+N^3)@f$ in time. This algorithm is @f$O(N)@f$ space and @f$O(C N^2)@f$
+time in common cases (@f$O(C N^3)@f$ in the worst case).
 
- AIB iterates this procedure until the desired level of
- compression is achieved.
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section aib-overview Overview
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
- @section aib-algorithm Algorithm details
+Given a discrete feature @f$x \in \mathcal{X} = \{x_1,\dots,x_N\}@f$
+and a category label @f$c = 1,\dots,C@f$ with joint probability
+@f$p(x,c)@f$, AIB computes a compressed feature @f$[x]_{ij}@f$ by
+merging two values @f$x_i@f$ and @f$x_j@f$.  Among all the pairs
+@f$ij@f$, AIB chooses the one that yields the smallest loss in the
+mutual information
 
- Computing \f$D_{ij}\f$ requires \f$O(C)\f$ operations. For example,
- in standard AIB we need to calculate
- @f[
-    D_{ij} = I(x,c) - I([x]_{ij},c) = 
-    \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   +
-    \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   -    
-    \sum_c (p(x_i)+p(x_j)) \log \frac {p(x_i,c)+p(x_i,c)}{(p(x_i)+p(x_j))p(c)}
- @f]
+@f[
+   D_{ij} = I(x,c) - I([x]_{ij},c) =
+   \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   +
+   \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   -
+   \sum_c (p(x_i)+p(x_j)) \log \frac {p(x_i,c)+p(x_i,c)}{(p(x_i)+p(x_j))p(c)}
+@f]
 
- Thus in a basic implementation of AIB, finding the optimal pair
- \f$ij\f$ of feature values requires \f$O(CN^2)\f$ operations in
- total. In order to join all the \f$N\f$ values, we repeat this
- procedure \f$O(N)\f$ times, yielding \f$O(N^3 C)\f$ time and
- \f$O(1)\f$ space complexity (this does not account for the space need
- to store the input).
+AIB iterates this procedure until the desired level of
+compression is achieved.
 
- The complexity can be improved by reusing computations. For instance,
- we can store the matrix \f$D = [ D_{ij} ]\f$ (which requires
- \f$O(N^2)\f$ space). Then, after joining \f$ij\f$, all of the matrix
- <em>D</em> except the rows and columns (the matrix is symmetric) of
- indexes <em>i</em> and <em>j</em> is unchanged. These two rows and
- columns are deleted and a new row and column, whose computation
- requires \f$O(NC)\f$ operations, are added for the merged value
- \f$x_{ij}\f$.  Finding the minimal element of the matrix still requires
- \f$O(N^2)\f$ operations, so the complexity of this algorithm is
- \f$O(N^2C + N^3)\f$ time and \f$O(N^2)\f$ space.
+@section aib-algorithm Algorithm details
 
- We can obtain a much better expected complexity as follows. First,
- instead of storing the whole matrix <em>D</em>, we store the smallest
- element (index and value) of each row as \f$(q_i, D_i)\f$ (notice
- that this is also the best element of each column since <em>D</em>
- is symmetric). This requires \f$O(N)\f$ space and finding the
- minimal element of the matrix requires \f$O(N)\f$ operations. 
- After joining \f$ij\f$, we have to efficiently update this
- representation. This is done as follows:
- 
- - The entries \f$(q_i,D_i)\f$ and \f$(q_j,D_j)\f$ are deleted.
- - A new entry \f$(q_{ij},D_{ij})\f$ for the joint value \f$x_{ij}\f$
-   is added. This requires \f$O(CN)\f$ operations.
- - We test which other entries \f$(q_{k},D_{k})\f$ need to
-   be updated. Recall that \f$(q_{k},D_{k})\f$ means that, before the
-   merge, the value
-   closest to \f$x_k\f$ was \f$x_{q_k}\f$ at a distance \f$D_k\f$. Then
-   - If \f$q_k \not = i\f$, \f$q_k \not = j\f$ and \f$D_{k,ij} \geq D_k\f$, then
-     \f$q_k\f$ is still the closest element and we do not do anything.
-   - If \f$q_k \not = i\f$, \f$q_k \not = j\f$ and \f$D_{k,ij} <
-     D_k\f$, then the closest element is \f$ij\f$ and we update the
-     entry in constant time.
-   - If \f$q_k = i\f$ or \f$q_k = j\f$, then we need to re-compute
-     the closest element in \f$O(CN)\f$ operations.
+Computing @f$D_{ij}@f$ requires @f$O(C)@f$ operations. For example, in
+standard AIB we need to calculate
 
-  This algorithm requires only \f$O(N)\f$ space and \f$O(\gamma(N) C
-  N^2)\f$ time, where \f$\gamma(N)\f$ is the expected number of times
-  we fall in the last case. In common cases one has \f$\gamma(N)
-  \approx \mathrm{const.}\f$, so the time saving is significant.
- 
+@f[
+   D_{ij} = I(x,c) - I([x]_{ij},c) =
+   \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   +
+   \sum_c p(x_i) \log \frac{p(x_i,c)}{p(x_i)p(c)}   -
+   \sum_c (p(x_i)+p(x_j)) \log \frac {p(x_i,c)+p(x_i,c)}{(p(x_i)+p(x_j))p(c)}
+@f]
+
+Thus in a basic implementation of AIB, finding the optimal pair
+@f$ij@f$ of feature values requires @f$O(CN^2)@f$ operations in
+total. In order to join all the @f$N@f$ values, we repeat this
+procedure @f$O(N)@f$ times, yielding @f$O(N^3 C)@f$ time and
+@f$O(1)@f$ space complexity (this does not account for the space need
+to store the input).
+
+The complexity can be improved by reusing computations. For instance,
+we can store the matrix @f$D = [ D_{ij} ]@f$ (which requires
+@f$O(N^2)@f$ space). Then, after joining @f$ij@f$, all of the matrix
+<em>D</em> except the rows and columns (the matrix is symmetric) of
+indexes <em>i</em> and <em>j</em> is unchanged. These two rows and
+columns are deleted and a new row and column, whose computation
+requires @f$O(NC)@f$ operations, are added for the merged value
+@f$x_{ij}@f$.  Finding the minimal element of the matrix still
+requires @f$O(N^2)@f$ operations, so the complexity of this algorithm
+is @f$O(N^2C + N^3)@f$ time and @f$O(N^2)@f$ space.
+
+We can obtain a much better expected complexity as follows. First,
+instead of storing the whole matrix <em>D</em>, we store the smallest
+element (index and value) of each row as @f$(q_i, D_i)@f$ (notice that
+this is also the best element of each column since <em>D</em> is
+symmetric). This requires @f$O(N)@f$ space and finding the minimal
+element of the matrix requires @f$O(N)@f$ operations.  After joining
+@f$ij@f$, we have to efficiently update this representation. This is
+done as follows:
+
+- The entries @f$(q_i,D_i)@f$ and @f$(q_j,D_j)@f$ are deleted.
+- A new entry @f$(q_{ij},D_{ij})@f$ for the joint value @f$x_{ij}@f$
+  is added. This requires @f$O(CN)@f$ operations.
+- We test which other entries @f$(q_{k},D_{k})@f$ need to
+  be updated. Recall that @f$(q_{k},D_{k})@f$ means that, before the
+  merge, the value
+  closest to @f$x_k@f$ was @f$x_{q_k}@f$ at a distance @f$D_k@f$. Then
+  - If @f$q_k \not = i@f$, @f$q_k \not = j@f$ and @f$D_{k,ij} \geq D_k@f$, then
+    @f$q_k@f$ is still the closest element and we do not do anything.
+  - If @f$q_k \not = i@f$, @f$q_k \not = j@f$ and @f$D_{k,ij} <
+    D_k@f$, then the closest element is @f$ij@f$ and we update the
+    entry in constant time.
+  - If @f$q_k = i@f$ or @f$q_k = j@f$, then we need to re-compute
+    the closest element in @f$O(CN)@f$ operations.
+
+This algorithm requires only @f$O(N)@f$ space and @f$O(\gamma(N) C
+N^2)@f$ time, where @f$\gamma(N)@f$ is the expected number of times we
+fall in the last case. In common cases one has @f$\gamma(N) \approx
+\mathrm{const.}@f$, so the time saving is significant.
+
 **/
 
 #include "aib.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
@@ -122,10 +127,10 @@ GNU GPLv2, or (at your option) any later version.
 #define BETA_MAX DBL_MAX
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Normalizes an array of probabilities to sum to 1
  **
- ** @param P        The array of probabilities 
+ ** @param P        The array of probabilities
  ** @param nelem    The number of elements in the array
  **
  ** @return Modifies P to contain values which sum to 1
@@ -142,10 +147,10 @@ void vl_aib_normalize_P (double * P, vl_uint nelem)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Allocates and creates a list of nodes
  **
- ** @param nentries   The size of the list which will be created 
+ ** @param nentries   The size of the list which will be created
  **
  ** @return an array containing elements 0...nentries
  **/
@@ -161,7 +166,7 @@ vl_uint *vl_aib_new_nodelist (vl_uint nentries)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Allocates and creates the marginal distribution Px
  **
  ** @param Pcx   A two-dimensional array of probabilities
@@ -216,11 +221,11 @@ double * vl_aib_new_Pc(double * Pcx, vl_uint nvalues, vl_uint nlabels)
  **
  ** @param aib      A pointer to the internal data structure
  ** @param besti    The index of one member of the pair which has mininum beta
- ** @param bestj    The index of the other member of the pair which 
+ ** @param bestj    The index of the other member of the pair which
  **                 minimizes beta
  ** @param minbeta  The minimum beta value corresponding to (@a i, @a j)
  **
- ** Searches @a aib->beta to find the minimum value and fills @a minbeta and 
+ ** Searches @a aib->beta to find the minimum value and fills @a minbeta and
  ** @a besti and @a bestj with this information.
  **/
 
@@ -244,13 +249,13 @@ void vl_aib_min_beta
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Merges two nodes i,j in the internal datastructure
  **
  ** @param aib  A pointer to the internal data structure
  ** @param i    The index of one member of the pair to merge
  ** @param j    The index of the other member of the pair to merge
- ** @param new  The index of the new node which corresponds to the union of 
+ ** @param new  The index of the new node which corresponds to the union of
  **             (@a i, @a j).
  **
  ** Nodes are merged by replacing the entry @a i with the union of @c
@@ -263,44 +268,44 @@ void vl_aib_min_beta
  ** list.
  **/
 
-void 
+void
 vl_aib_merge_nodes (VlAIB * aib, vl_uint i, vl_uint j, vl_uint new)
 {
   vl_uint last_entry = aib->nentries - 1 ;
   vl_uint c, n ;
-  
+
   /* clear the list of nodes to update */
   aib->nwhich = 0;
-  
+
   /* make sure that i is smaller than j */
   if(i > j) { vl_uint tmp = j; j = i; i = tmp; }
-  
+
   /* -----------------------------------------------------------------
    *                    Merge entries i and j, storing the result in i
    * -------------------------------------------------------------- */
 
-  aib-> Px   [i] += aib->Px[j] ; 
+  aib-> Px   [i] += aib->Px[j] ;
   aib-> beta [i]  = BETA_MAX ;
-  aib-> nodes[i]  = new ; 
+  aib-> nodes[i]  = new ;
 
-  for (c = 0; c < aib->nlabels; c++) 
+  for (c = 0; c < aib->nlabels; c++)
     aib-> Pcx [i*aib->nlabels + c] += aib-> Pcx [j*aib->nlabels + c] ;
-    
+
   /* -----------------------------------------------------------------
    *                                              Move last entry to j
    * -------------------------------------------------------------- */
-  
-  aib-> Px    [j]  = aib-> Px    [last_entry]; 
+
+  aib-> Px    [j]  = aib-> Px    [last_entry];
   aib-> beta  [j]  = aib-> beta  [last_entry];
-  aib-> bidx  [j]  = aib-> bidx  [last_entry]; 
+  aib-> bidx  [j]  = aib-> bidx  [last_entry];
   aib-> nodes [j]  = aib-> nodes [last_entry];
 
   for (c = 0 ;  c < aib->nlabels ; c++)
     aib-> Pcx[j*aib->nlabels + c] = aib-> Pcx [last_entry*aib->nlabels + c] ;
-  
+
   /* delete last entry */
   aib-> nentries -- ;
-  
+
   /* -----------------------------------------------------------------
    *                                        Scan for entries to update
    * -------------------------------------------------------------- */
@@ -314,7 +319,7 @@ vl_aib_merge_nodes (VlAIB * aib, vl_uint i, vl_uint j, vl_uint new)
    * Additionaly, since we moved the last entry back to the entry j,
    * we need to adjust the valeus of bidx to reflect this.
    */
-  
+
   for (n = 0 ; n < aib->nentries; n++) {
     if(aib->bidx[n] == i || aib->bidx[n] == j) {
         aib->bidx  [n] = 0;
@@ -328,7 +333,7 @@ vl_aib_merge_nodes (VlAIB * aib, vl_uint i, vl_uint j, vl_uint new)
 }
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief Updates @c aib->beta and @c aib->bidx according to @c aib->which
  **
  ** @param aib AIB data structure.
@@ -337,12 +342,12 @@ vl_aib_merge_nodes (VlAIB * aib, vl_uint i, vl_uint j, vl_uint new)
  ** i listed in @c aib->which.  @c beta[i] is the minimal variation of mutual
  ** information (or other score) caused by merging entry @c i with another entry
  ** and @c bidx[i] is the index of this best matching entry.
- ** 
+ **
  ** Notice that for each entry @c i that we need to update, a full
  ** scan of all the other entries must be performed.
  **/
 
-void 
+void
 vl_aib_update_beta (VlAIB * aib)
 {
 
@@ -352,37 +357,37 @@ vl_aib_update_beta (VlAIB * aib)
   double * Px  = aib->Px;
   double * Pcx = aib->Pcx;
   double * tmp = vl_malloc(sizeof(double)*aib->nentries);
-  vl_uint a, b, c ; 
-  
-  /* 
+  vl_uint a, b, c ;
+
+  /*
    * T1 = I(x,c) - I([x]_ij) = A + B - C
    *
-   * A  = \sum_c p(xa,c)           \log ( p(xa,c)          /  p(xa)       ) 
-   * B  = \sum_c p(xb,c)           \log ( p(xb,c)          /  p(xb)       ) 
+   * A  = \sum_c p(xa,c)           \log ( p(xa,c)          /  p(xa)       )
+   * B  = \sum_c p(xb,c)           \log ( p(xb,c)          /  p(xb)       )
    * C  = \sum_c (p(xa,c)+p(xb,c)) \log ((p(xa,c)+p(xb,c)) / (p(xa)+p(xb)))
    *
    * C  = C1 + C2
    * C1 = \sum_c (p(xa,c)+p(xb,c)) \log (p(xa,c)+p(xb,c))
    * C2 = - (p(xa)+p(xb) \log (p(xa)+p(xb))
    */
- 
+
   /* precalculate A and B */
   for (a = 0; a < aib->nentries; a++) {
     tmp[a] = 0;
     for (c = 0; c < aib->nlabels; c++) {
-        double Pac = Pcx [a*aib->nlabels + c] ;       
+        double Pac = Pcx [a*aib->nlabels + c] ;
         if(Pac != 0) tmp[a] += Pac * log (Pac / Px[a]) ;
     }
   }
-  
+
   /* for each entry listed in which */
-  for (i = 0 ; i < aib->nwhich; i++) {    
+  for (i = 0 ; i < aib->nwhich; i++) {
     a = aib->which[i];
 
     /* for each other entry */
     for(b = 0 ; b < aib->nentries ; b++) {
       double T1 = 0 ;
-      
+
       if (a == b || Px [a] == 0 || Px [b] == 0) continue ;
 
 
@@ -395,14 +400,14 @@ vl_aib_update_beta (VlAIB * aib)
         if (Pac == 0 && Pbc == 0) continue;
         T1 += - PLOGP ((Pac + Pbc)) ;                 /* - C1 */
       }
-      
-      /* 
+
+      /*
        * Now we have beta(a,b). We check wether this is the best beta
        * for entries a and b.
        */
       {
         double beta = T1 ;
-        
+
         if (beta < aib->beta[a])
           {
             aib->beta[a] = beta;
@@ -435,34 +440,34 @@ void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
     *H = 0;
     *I = 0;
 
-    /* 
+    /*
      * H(x)   = - sum_x p(x)    \ log p(x)
      * I(x,c) =   sum_xc p(x,c) \ log (p(x,c) / p(x)p(c))
      */
-    
+
     /* for each entry */
     for(r = 0 ; r< aib->nentries ; r++) {
-      
+
       if (aib->Px[r] == 0) continue ;
       *H += -log(aib->Px[r]) * aib->Px[r] ;
-      
+
       for(c=0; c<aib->nlabels; c++) {
         if (aib->Pcx[r*aib->nlabels+c] == 0) continue;
-        *I += aib->Pcx[r*aib->nlabels+c] * 
+        *I += aib->Pcx[r*aib->nlabels+c] *
           log (aib->Pcx[r*aib->nlabels+c] / (aib->Px[r]*aib->Pc[c])) ;
       }
-    }   
+    }
 }
 
 /** ------------------------------------------------------------------
  ** @brief Allocates and initializes the internal data structure
  **
  ** @param Pcx      A pointer to a 2D array of probabilities
- ** @param nvalues    The number of rows in the array     
+ ** @param nvalues    The number of rows in the array
  ** @param nlabels    The number of columns in the array
  **
- ** Creates a new @a VlAIB struct containing pointers to all the data that 
- ** will be used during the AIB process. 
+ ** Creates a new @a VlAIB struct containing pointers to all the data that
+ ** will be used during the AIB process.
  **
  ** Allocates memory for the following:
  ** - Px (nvalues*sizeof(double))
@@ -476,7 +481,7 @@ void vl_aib_calculate_information(VlAIB * aib, double * I, double * H)
  **
  ** Since it simply copies to pointer to Pcx, the total additional memory
  ** requirement is:
- ** 
+ **
  ** (3*nvalues+nlabels)*sizeof(double) + 4*nvalues*sizeof(vl_uint)
  **
  ** @returns An allocated and initialized @a VlAIB pointer
@@ -502,19 +507,19 @@ VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels)
 
     for(i = 0 ; i < aib->nentries ; i++)
       aib->beta [i] = BETA_MAX ;
-    
+
     /* Initially we must consider all nodes */
     aib->nwhich = aib->nvalues;
     aib->which  = vl_aib_new_nodelist (aib->nwhich) ;
-    
+
     aib->parents = vl_malloc(sizeof(vl_uint)*(aib->nvalues*2-1));
     /* Initially, all parents point to a nonexistent node */
     for (i = 0 ; i < 2 * aib->nvalues - 1 ; i++)
-      aib->parents [i] = 2 * aib->nvalues ; 
+      aib->parents [i] = 2 * aib->nvalues ;
 
     /* Allocate cost output vector */
     aib->costs = vl_malloc (sizeof(double) * (aib->nvalues - 1 + 1)) ;
-  
+
 
     return aib ;
 }
@@ -524,7 +529,7 @@ VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels)
  ** @param aib data structure to delete.
  **/
 
-void 
+void
 vl_aib_delete (VlAIB * aib)
 {
   if (aib) {
@@ -569,14 +574,14 @@ vl_aib_delete (VlAIB * aib)
  ** and their nodes have parents indexing a non-existent tree node (a
  ** value bigger than @c 2*nvalues-1).
  **
- ** Then the function will also compute the information level after each 
+ ** Then the function will also compute the information level after each
  ** merge. vl_get_costs will return a vector with the information level
  ** after each merge. @a
  ** cost has @c nvalues entries: The first is the value of the cost
  ** functional before any merge, and the others are the cost after the
  ** @c nvalues-1 merges.
- ** 
- **/ 
+ **
+ **/
 
 VL_EXPORT
 void vl_aib_process(VlAIB *aib)
@@ -588,22 +593,22 @@ void vl_aib_process(VlAIB *aib)
     /* Calculate initial value of cost function */
     vl_aib_calculate_information (aib, &I, &H) ;
     aib->costs[0] = I;
-    
+
     /* Initially which = all */
-    
+
     /* For each merge */
     for(i = 0 ; i < aib->nvalues - 1 ; i++) {
-      
+
       /* update entries in aib-> which */
       vl_aib_update_beta(aib);
-      
+
       /* find best pair of nodes to merge */
       vl_aib_min_beta (aib, &besti, &bestj, &minbeta);
 
       if(minbeta == BETA_MAX)
         /* only null-probability entries remain */
         break;
-      
+
       /* Add the parent pointers for the new node */
       newnode = aib->nvalues + i ;
       nodei = aib->nodes[besti];
@@ -612,17 +617,17 @@ void vl_aib_process(VlAIB *aib)
       aib->parents [nodei] = newnode ;
       aib->parents [nodej] = newnode ;
       aib->parents [newnode] = 0 ;
-      
+
       /* Merge the nodes which produced the minimum beta */
       vl_aib_merge_nodes (aib, besti, bestj, newnode) ;
       vl_aib_calculate_information (aib, &I, &H) ;
 
       aib->costs[i+1] = I;
-      
-      VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n", 
-                 nodei, 
-                 nodej, 
-                 newnode,                  
+
+      VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n",
+                 nodei,
+                 nodej,
+                 newnode,
                  minbeta,
                  I,
                  H,
@@ -632,4 +637,4 @@ void vl_aib_process(VlAIB *aib)
     /* fill ignored entries with NaNs */
     for(; i < aib->nvalues - 1 ; i++)
         aib->costs[i+1] = VL_NAN_D ;
-} 
+}

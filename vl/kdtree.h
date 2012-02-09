@@ -1,13 +1,14 @@
-/** @file   kdtree.h
- ** @brief  KD-tree
+/** @file kdtree.h
+ ** @brief KD-tree (@ref kdtree)
  ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_KDTREE_H
@@ -16,7 +17,7 @@ GNU GPLv2, or (at your option) any later version.
 #include "generic.h"
 #include "mathop.h"
 
-#define VL_KDTREE_SPLIT_HEALP_SIZE 5
+#define VL_KDTREE_SPLIT_HEAP_SIZE 5
 
 typedef struct _VlKDTreeNode VlKDTreeNode ;
 typedef struct _VlKDTreeSplitDimension VlKDTreeSplitDimension ;
@@ -96,7 +97,7 @@ typedef struct _VlKDForest
 
   /* build */
   VlKDTreeThresholdingMethod thresholdingMethod ;
-  VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEALP_SIZE] ;
+  VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEAP_SIZE] ;
   vl_size splitHeapNumNodes ;
   vl_size splitHeapSize ;
 

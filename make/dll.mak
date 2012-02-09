@@ -1,8 +1,12 @@
-# file:        Makefile.dll
+# file: dll.mak
 # description: Build VLFeat DLL
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
 
-# AUTORIGHTS
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 all: dll-all
 clean: dll-clean
@@ -16,22 +20,22 @@ info: dll-info
 
 DLL_NAME = vl
 
-DLL_CFLAGS  = $(CFLAGS)
+DLL_CFLAGS  = $(STD_CFLAGS)
 DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
+
+DLL_LDFLAGS += -lm
 
 BINDIR = bin/$(ARCH)
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 DLL_SUFFIX := dylib
-LIBTOOL := libtool
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 DLL_SUFFIX := dylib
-LIBTOOL := libtool
 endif
 
 # Linux-32
@@ -76,7 +80,8 @@ dll: $(dll_tgt)
 $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
 
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
-	$(call C,CC) $(DLL_CFLAGS) -c "$(<)" -o "$(@)"
+	$(call C,CC) $(DLL_CFLAGS)                                   \
+	       -c "$(<)" -o "$(@)"
 
 $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC) $(DLL_CFLAGS)                                   \
@@ -91,10 +96,12 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
                     -current_version $(VER)                          \
                     -syslibroot $(SDKROOT)                           \
 		    -macosx_version_min $(MACOSX_DEPLOYMENT_TARGET)  \
-	            -o $@ -undefined suppress $^
+	            -o $@ -undefined suppress $^                     \
+	            $(DLL_LDFLAGS)
+
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
-	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@)
+	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@) $(DLL_LDFLAGS)
 
 dll-clean:
 	rm -f $(dll_dep) $(dll_obj)
@@ -114,6 +121,7 @@ dll-info:
 	$(call echo-var,BINDIR)
 	$(call echo-var,DLL_NAME)
 	$(call echo-var,DLL_CFLAGS)
+	$(call echo-var,DLL_LDFLAGS)
 	$(call echo-var,DLL_SUFFIX)
 	$(call echo-var,LIBTOOL)
 	@echo

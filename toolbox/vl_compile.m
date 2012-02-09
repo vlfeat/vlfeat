@@ -20,11 +20,11 @@ function vl_compile(compiler)
 
 % Authors: Andrea Vedadli, Jonghyun Choi
 
-% AUTORIGHTS
-% Copyright (C) 2007-11 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 if nargin < 1, compiler = 'visualc' ; end
 switch lower(compiler)
@@ -156,4 +156,3 @@ if ~exist(dst, 'dir')
   fprintf('Creating directory ''%s''.', dst) ;
   mkdir(dst) ;
 end
-

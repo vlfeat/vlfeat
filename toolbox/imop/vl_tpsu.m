@@ -16,6 +16,12 @@ function [U,dU,delta]=vl_tpsu(X,Y)
 %
 %   See also: VL_TPS(), VL_HELP().
 
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
+
 if exist('tpsumx')
 	U = tpsumx(X,Y) ;
 else
@@ -52,5 +58,3 @@ function y = drb(r)
 y = zeros(size(r)) ;
 sel = find(r ~= 0) ;
 y(sel) = - 4 * r(sel) .* log(r(sel)) - 2 * r(sel) ;
-
-

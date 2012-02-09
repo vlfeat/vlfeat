@@ -2,8 +2,8 @@ function [Y, sel] = vl_colsubset(X,n,varargin)
 % VL_COLSUBSET Select a given number of columns
 %   Y = VL_COLSUBSET(X, N) returns a random subset Y of N columns of
 %   X. The selection is order-preserving and without replacement. If N
-%   is larger or equal to the number of columns of X (e.g. N=+Inf),
-%   then the function returns Y = X.
+%   is larger or equal to the number of columns of X (e.g. N = Inf),
+%   then the function returns all the columns (i.e., Y = X).
 %
 %   If 0 < N < 1, then the function returns a fraction N of the
 %   columns (rounded to the closest integer).
@@ -14,26 +14,32 @@ function [Y, sel] = vl_colsubset(X,n,varargin)
 %   The function accepts the following options:
 %
 %   Beginning::
-%     Causes the first N columns to be returned.
+%     Returns the fist N columns.
 %
 %   Ending::
-%     Causes the last N columns to be returned.
+%     Returns the last N columns.
 %
-%   Random::
-%     Causes a random selection of columns to be returned (default).
+%   Random:: [default]
+%     Returns N columns selected at random (using RANDPERM()).
 %
 %   Uniform::
-%     Causes N equally spaced columns to be returned.
+%     Returns N uniformly spaced columns.
+%
+%   Largest::
+%     Returns the N largest columns (using SORTROWS()).
+%
+%   Smallest::
+%     Returns the N smallest columns (using SORTROWS()).
 %
 %  See also: VL_HELP().
 
 % Authors: Andrea Vedaldi
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 if nargin < 2, n = 1 ; end
 
@@ -41,19 +47,18 @@ mode = 'random' ;
 i = 1 ;
 while i <= length(varargin)
   switch lower(varargin{i})
-    case 'beginning'
-      mode = 'beginning' ; i = i + 1 ;
-    case 'ending'
-      mode = 'ending' ; i = i + 1 ;
-    case 'random' ;
-      mode = 'random' ; i = i + 1 ;
-    case 'uniform'
-      mode = 'uniform' ; i = i +1 ;
+    case {'beginning', ...
+          'ending', ...
+          'random', ...
+          'uniform', ...
+          'largest', ...
+          'smallest'}
+      mode = lower(varargin{1}) ;
+      i = i + 1 ;
     otherwise
       error('Unknown option ''%s''.', varargin{i}) ;
   end
 end
-
 
 m = size(X,2) ;
 
@@ -83,6 +88,12 @@ switch mode
     else
       sel = round(linspace(1, m, min(m,n))) ;
     end
+  case 'largest'
+    [drop, perm] = sortrows(X') ;
+    sel = sort(perm(end-n+1:end)) ;
+  case 'smallest'
+    [drop, perm] = sortrows(X') ;
+    sel = sort(perm(1:n)) ;
 end
 
 Y = X(:, sel) ;

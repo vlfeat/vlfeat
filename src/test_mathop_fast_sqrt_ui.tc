@@ -4,7 +4,7 @@
   T x, acc, acc_ ;
   double elaps ;
   int neval  ;
-  
+
   vl_tic() ;
   neval = 0 ;
   x = 0 ;
@@ -18,7 +18,7 @@
   elaps = vl_toc() ;
   VL_PRINTF ("%20s", "vl_fast_sqrt_ui" VL_XSTRINGIFY(SFX)) ;
   VL_PRINTF (" %10.2f %10.2g %010" FL "x\n", elaps, (double) neval / elaps, acc) ;
-  
+
   vl_tic() ;
   neval = 0 ;
   x = 0 ;
@@ -33,7 +33,7 @@
   VL_PRINTF ("%20s", "baseline") ;
   VL_PRINTF (" %10.2f %10.2g %010" FL "x\n", elaps, (double) neval / elaps, acc) ;
 
-  
+
   if (acc != acc_) {
     VL_PRINTF ("error: vl_fast_sqrt_ui" VL_XSTRINGIFY(SFX) " != floor(sqrt((double) x))\n") ;
     error = 1 ;
@@ -41,4 +41,3 @@
 }
 
 #undef FL
-

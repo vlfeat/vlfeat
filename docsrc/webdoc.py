@@ -3,11 +3,11 @@
 # author:      Andrea Vedaldien
 # description: Implementation of webdoc.
 
-# AUTORIGHTS
-# Copyright (C) 2007-09 Andrea Vedaldi and Brian Fulkerson
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
 #
-# This file is part of VLFeat, available in the terms of the GNU
-# General Public License version 2.
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 import types
 import xml.sax
@@ -754,17 +754,24 @@ class DocPageStyle(DocNode):
     def publish(self, gen, pageNode = None):
         if pageNode is None: return
         sa = self.getAttributes()
-        gen.putString("<style rel=\"stylesheet\" type=")
-        if sa.has_key("type"):
-            gen.putXMLAttr(expandAttr(sa["type"], pageNode))
-        else:
-            gen.putString("\"text/css\" ")
         if sa.has_key("href"):
+            gen.putString("<link rel=\"stylesheet\" type=")
+            if sa.has_key("type"):
+                gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+            else:
+                gen.putString("\"text/css\" ")
             gen.putString("href=")
             gen.putXMLAttr(expandAttr(sa["href"], pageNode))
-        gen.putString(">")
-        DocNode.publish(self, gen, pageNode)
-        gen.putString("</style>")
+            gen.putString("></style>")
+        else:
+            gen.putString("<style rel=\"stylesheet\" type=")
+            if sa.has_key("type"):
+                gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+            else:
+                gen.putString("\"text/css\" ")
+	        gen.putString(">")
+            DocNode.publish(self, gen, pageNode)
+    	    gen.putString("</style>")
 
     publish = makeGuard(publish)
 

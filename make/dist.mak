@@ -1,6 +1,12 @@
-# file:        Makefile.dist
+# file: dist.mak
 # description: Build VLFeat DLL
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
+
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 clean: dist-bin-clean
 archclean: dist-bin-archclean
@@ -104,7 +110,7 @@ dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-release
 	@echo Building doc
-	make -C "$(tmp-dir)" ARCH=$(ARCH) doc-deep doc
+	make -C "$(tmp-dir)" ARCH=$(ARCH) doc-deep
 	@echo Setting up $(branch) to v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER)
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch)

@@ -3,7 +3,7 @@
 #define F_MIN VL_XCAT(SFX2, _MIN)
 
 {
-  T x ; 
+  T x ;
   T dx ;
   T maxErr = 0 ;
   T acc ;
@@ -18,41 +18,41 @@
     T err = ABS (y_ - y) / y * 100 ;
     maxErr = VL_MAX(maxErr, err) ;
   }
-  
+
   VL_PRINTF ("%20s (max relative error: %.6f%%)\n",  funcName, maxErr) ;
   if (maxErr > 0.001) {
     VL_PRINTF ("error: %s: relative error is too large!\n", funcName) ;
     error = 1 ;
   }
-  
+
   vl_tic() ;
   numEval = 0 ;
   acc = 0 ;
   for (x = F_MIN, dx = F_EPS ; x < F_MAX ; x += dx, dx *= 1 + 1e-6 ) {
     T y  = VL_XCAT(vl_fast_resqrt_, SFX)(x) ;
     acc += y ;
-    numEval += 1 ;    
+    numEval += 1 ;
   }
   elaps = vl_toc() ;
-  
-  VL_PRINTF ("%20s %10.2g %10.2g\n", 
+
+  VL_PRINTF ("%20s %10.2g %10.2g\n",
              funcName,
-             elaps, 
+             elaps,
              numEval / elaps) ;
-  
+
   vl_tic() ;
   numEval = 0 ;
   acc = 0 ;
   for (x = F_MIN, dx = F_EPS ; x < F_MAX ; x += dx, dx *= 1 + 1e-6 ) {
     T y  = ONE / SQRT (x) ;
     acc += y ;
-    numEval += 1 ;    
+    numEval += 1 ;
   }
   elaps = vl_toc() ;
 
-  VL_PRINTF ("%20s %10.2g %10.2g\n", 
+  VL_PRINTF ("%20s %10.2g %10.2g\n",
              "baseline",
-             elaps, 
+             elaps,
              numEval / elaps) ;
 }
 

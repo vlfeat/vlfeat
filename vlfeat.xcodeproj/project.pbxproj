@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXFileReference section */
@@ -210,6 +210,9 @@
 		2D66AD0D13AE05BD0060594E /* vl_xyz2luv.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2luv.m; path = toolbox/imop/vl_xyz2luv.m; sourceTree = "<group>"; };
 		2D66AD0E13AE05BD0060594E /* vl_xyz2rgb.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_xyz2rgb.m; path = toolbox/imop/vl_xyz2rgb.m; sourceTree = "<group>"; };
 		2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_mathop_abs.c; sourceTree = "<group>"; };
+		2D6E381A149CE4B5005319B7 /* vl_slic.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_slic.m; path = toolbox/slic/vl_slic.m; sourceTree = "<group>"; };
+		2D6E381B149CE4ED005319B7 /* slic.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = slic.html; path = docsrc/slic.html; sourceTree = "<group>"; };
+		2D708F261493C5540079605B /* doxygen.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = doxygen.css; path = docsrc/doxygen.css; sourceTree = "<group>"; };
 		2D70CC780DDE1135000A23DE /* mexutils.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = mexutils.h; path = toolbox/mexutils.h; sourceTree = "<group>"; tabWidth = 2; };
 		2D72EAF00E48A42F005DAA47 /* imopv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imopv.c; sourceTree = "<group>"; };
 		2D72EAF10E48A42F005DAA47 /* imopv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imopv.h; sourceTree = "<group>"; };
@@ -301,8 +304,13 @@
 		2D8E1B551371FB23009CDE11 /* .gitattributes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
 		2D8E1B561371FB23009CDE11 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		2D92043C13CDDD860004DC40 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		2D94E6BC148E48440089ADA5 /* slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = slic.c; sourceTree = "<group>"; };
+		2D94E6BD1490C7C40089ADA5 /* vl_slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_slic.c; path = toolbox/slic/vl_slic.c; sourceTree = "<group>"; };
+		2D94E6BE1490E4120089ADA5 /* slic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slic.h; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
 		2D99420410ECD6E300502DF6 /* index.html */ = {isa = PBXFileReference; explicitFileType = text.html.documentation; fileEncoding = 4; name = index.html; path = doc/index.html; sourceTree = "<group>"; };
+		2DA21722141D48DA0047E7C7 /* vl_alphanum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_alphanum.m; path = toolbox/misc/vl_alphanum.m; sourceTree = "<group>"; };
+		2DA21723141D49350047E7C7 /* vl_binsum.def */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = vl_binsum.def; path = toolbox/misc/vl_binsum.def; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		2DAF7CE3139918EA00FA0D07 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = about.html; path = docsrc/about.html; sourceTree = "<group>"; };
 		2DAF7CE4139918EA00FA0D07 /* apps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = apps.html; path = docsrc/apps.html; sourceTree = "<group>"; };
 		2DAF7CE5139918EA00FA0D07 /* compiling.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = compiling.html; path = docsrc/compiling.html; sourceTree = "<group>"; };
@@ -470,6 +478,7 @@
 				2D09A29913AE084500C79C6A /* test */,
 				2D09A29813AE081700C79C6A /* demo */,
 				2D66AC5D13AE05BD0060594E /* vl_aib.m */,
+				2DA21722141D48DA0047E7C7 /* vl_alphanum.m */,
 				2D66AC5E13AE05BD0060594E /* vl_aibcut.m */,
 				2D66AC5F13AE05BD0060594E /* vl_aibcuthist.m */,
 				2D66AC6013AE05BD0060594E /* vl_aibcutpush.m */,
@@ -558,6 +567,7 @@
 				2D66ACD013AE05BD0060594E /* vl_setup.m */,
 				2D66ACD113AE05BD0060594E /* vl_sift.m */,
 				2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */,
+				2D6E381A149CE4B5005319B7 /* vl_slic.m */,
 				2D66ACD313AE05BD0060594E /* vl_sigmoid.m */,
 				2D66ACD413AE05BD0060594E /* vl_simdctrl.m */,
 				2D66ACFE13AE05BD0060594E /* vl_tightsubplot.m */,
@@ -604,6 +614,7 @@
 				2D7AD0AE0E38C18600783252 /* ikm.html */,
 				2D7AD0B00E38C18600783252 /* mser.html */,
 				2D7AD0B10E38C18600783252 /* sift.html */,
+				2D6E381B149CE4ED005319B7 /* slic.html */,
 				2D7AD0B30E38C18600783252 /* tutorials.html */,
 				2D7AD0B40E38C18600783252 /* utils.html */,
 			);
@@ -688,6 +699,8 @@
 				2D732E970CF8C2E40099B03C /* sift.h */,
 				2D732E980CF8C2E40099B03C /* stringop.c */,
 				2D732E990CF8C2E40099B03C /* stringop.h */,
+				2D94E6BC148E48440089ADA5 /* slic.c */,
+				2D94E6BE1490E4120089ADA5 /* slic.h */,
 			);
 			path = vl;
 			sourceTree = "<group>";
@@ -705,6 +718,7 @@
 				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
 				2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */,
 				2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */,
+				2DA21723141D49350047E7C7 /* vl_binsum.def */,
 				2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */,
 				2D86B10E0F24CC9B00E625D6 /* vl_erfill.c */,
 				2D86B10F0F24CC9B00E625D6 /* vl_getpid.c */,
@@ -734,6 +748,7 @@
 				2D86B11F0F24CC9B00E625D6 /* vl_sift.c */,
 				2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */,
 				2D13F02C100A718600C072E8 /* vl_simdctrl.c */,
+				2D94E6BD1490C7C40089ADA5 /* vl_slic.c */,
 				2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */,
 				2D86B1220F24CC9B00E625D6 /* vl_twister.c */,
 				2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */,
@@ -749,6 +764,7 @@
 				2D7AD0B50E38C18600783252 /* web.xml */,
 				2D7AD0860E38C05800783252 /* web.css */,
 				2DAF7CEC139918EA00FA0D07 /* pygmentize.css */,
+				2D708F261493C5540079605B /* doxygen.css */,
 				2D7AD0800E38911C00783252 /* formatter.py */,
 				2D7AD0810E38911C00783252 /* mdoc.py */,
 				2D7AD0820E38911C00783252 /* webdoc.py */,
@@ -827,8 +843,11 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "vlfeat" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -863,16 +882,15 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab09B.app;
+				MATLABROOT = /Applications/Matlab_R2011A.app;
 				MEX = "$(MATLABROOT)/bin/mex";
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
-				PREBINDING = NO;
 				PROFILE = "";
 				PYTHON = "MACOSX_DEPLOYMENT_TARGET=10.6 python";
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SDKROOT = macosx;
 				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
 			};
@@ -912,16 +930,15 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
-				MATLABROOT = /Applications/Matlab09B.app;
+				MATLABROOT = /Applications/Matlab_R2011A.app;
 				MEX = "$(MATLABROOT)/bin/mex";
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
-				PREBINDING = NO;
 				PROFILE = YES;
 				PYTHON = "MACOSX_DEPLOYMENT_TARGET=10.6 python";
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SDKROOT = macosx;
 				VERB = YES;
 				VLDIR = "$(PROJECT_DIR)";
 			};

@@ -15,3 +15,9 @@
 %   this case OM and DOM are arrays with K slices, one per rotation.
 %
 %   See also: VL_RODR(), VL_HELP().
+
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).

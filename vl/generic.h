@@ -1,13 +1,14 @@
-/** @file    generic.h
- ** @author  Andrea Vedaldi
- ** @brief   Generic
+/** @file generic.h
+ ** @brief Generic (@ref generic)
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_GENERIC_H
@@ -30,7 +31,7 @@ GNU GPLv2, or (at your option) any later version.
 #endif
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.13"
+#define VL_VERSION_STRING "0.9.14"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024

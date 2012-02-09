@@ -16,14 +16,14 @@ function path = vl_setup(varargin)
 
 % Authors: Andrea Vedaldi and Brian Fulkerson
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 noprefix = false ;
-quiet = false ;
+quiet = true ;
 xtest = false ;
 demo = false ;
 
@@ -38,6 +38,8 @@ for ai=1:length(varargin)
       demo = true ;
     case {'quiet'}
       quiet = true ;
+    case {'verbose'}
+      quiet = false ;
     otherwise
       error('Unknown option ''%s''.', opt) ;
   end
@@ -51,11 +53,13 @@ else
 end
 bindir = fullfile('mex',bindir) ;
 
+% Do not use vl_root() to avoid conflicts with other VLFeat
+% installations.
+
 [a,b,c] = fileparts(mfilename('fullpath')) ;
 [a,b,c] = fileparts(a) ;
-path = a ;
+root = a ;
 
-root = vl_root ;
 addpath(fullfile(root,'toolbox'             )) ;
 addpath(fullfile(root,'toolbox','aib'       )) ;
 addpath(fullfile(root,'toolbox','geometry'  )) ;
@@ -67,6 +71,7 @@ addpath(fullfile(root,'toolbox','plotop'    )) ;
 addpath(fullfile(root,'toolbox','quickshift')) ;
 addpath(fullfile(root,'toolbox','sift'      )) ;
 addpath(fullfile(root,'toolbox','special'   )) ;
+addpath(fullfile(root,'toolbox','slic'      )) ;
 addpath(fullfile(root,'toolbox',bindir      )) ;
 
 if noprefix
@@ -82,9 +87,9 @@ if demo
 end
 
 if ~quiet
-  try
+  if exist('vl_version') == 3
     fprintf('VLFeat %s ready.\n', vl_version) ;
-  catch err
+  else
     warning('VLFeat does not seem to be installed correctly. Make sure that the MEX files are compiled.') ;
   end
 end

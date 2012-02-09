@@ -1,13 +1,174 @@
-/** @file   kmeans.c
+/** @file kmeans.c
+ ** @brief K-means - Declaration
  ** @author Andrea Vedaldi
- ** @brief  K-means - Declaration
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
+
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page kmeans K-means clustering
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref kmeans.h implements a number of algorithm for k-means quantisation.
+It supports
+
+- data of type @c float or @c double;
+- @e l1 and @e l2 distances;
+- random selection and <code>k-means++</code> @cite{arthur07k-means}
+  initialization methods;
+- the basic Lloyd @cite{lloyd82least} and the accelerated Elkan
+  @cite{elkan03using} optimization methods.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section kmeans-usage Usage
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+To use @ref kmeans.h to learn clusters from some training data,
+instantiate a ::VlKMeans object, set the configuration parameters,
+initialise the cluster centers, and run the trainig code.  For
+instance, to learn @c numCenters clusters from @c numData vectors of
+dimension @c dimension and storage type @c float using L2 distance and
+at most 100 Lloyd iterations of the Lloyd algorithm use:
+
+@code
+#include <vl/kmeans.h>
+
+VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
+VlVectorComparisonType distance = VlDistanceL2 ;
+KMeans * kmeans = vl_kmeans_new (algorithm, distance, VL_TYPE_FLOAT) ;
+vl_kmeans_seed_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
+vl_kmeans_set_max_num_iterations (kmeans, 100) ;
+vl_kmeans_refine_centers (kmeans, data, numData) ;
+@endcode
+
+Use ::vl_kmeans_get_energy to get the solution energy (or an upper
+bound for the Elkan algorithm) and ::vl_kmeans_get_centers to obtain
+the @c numCluster cluster centers. Use ::vl_kmeans_quantize to
+quantize new data points.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-usage-init Initialization algorithms
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref kmeans.h supports the following cluster initialization algorithms:
+
+- <b>Random data points</b> (::vl_kmeans_seed_centers_with_rand_data)
+  initialize the centers from a random selection of the training data.
+- <b>k-means++</b> (::vl_kmeans_seed_centers_plus_plus) initialize the
+  centers from a random selection of the training data while
+  attempting to obtain a good coverage of the dataset. This is the
+  strategy from @cite{arthur07k-means}.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-usage-optimizers Optimization algorithms
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref kmeans.h supports the following optimization algorithms:
+
+- <b>Lloyd</b> @cite{lloyd82least} (::VlKMeansLloyd). This is the
+  standard k-means algorithm, alternating the estimation of the
+  point-to-cluster memebrship and of the cluster centers (means in the
+  Euclidean case). Estimating membership requires computing the
+  distance of each point to all cluster centers, which can be
+  extremely slow.
+
+- <b>Elkan</b> @cite{elkan03using} (::VlKMeansElkan). This is a
+  variation of @cite{lloyd82least} that uses the triangular inequality
+  to avoid many distance calculations when assigning points to
+  clusters and is typically much faster than
+  @cite{lloyd82least}. However, it uses storage proportional to the
+  square of the number of clusters, which makes it unpractical for a
+  very large number of clusters.
+
+@section kmeans-tech Technical details
+
+Given data points @f$ x_1, \dots, x_n \in \mathbb{R}^d @f$, k-means
+searches for @f$ k @f$ vectors @f$ c_1, \dots, c_n \in \mathbb{R}^d @f$
+(cluster centers) and a function @f$ \pi : \{1, \dots, n\}
+\rightarrow \{1, \dots, k\} @f$ (cluster memberships)
+that minimize the objective:
+
+@f[
+  E(c_1,\dots,c_n,\pi) = \sum_{i=1}^n d^2(x_i, c_{\pi(i)})
+@f]
+
+A simple procedure due to Lloyd @cite{lloyd82least}
+to locally optimize this objective
+alternates estimating the cluster centers and the membeship function.
+Specifically, given the membership function @f$ \pi @f$,
+the objective can be minimized independently for eac @f$ c_k @f$
+by minimizing
+
+@f[
+  \sum_{i : \pi(i) = k} d^2(x_i, c_k)
+@f]
+
+For the Euclidean distance, the minimizer is simply the mean of the points
+assigned to that cluster. For other distances, the minimizer is
+a generalized average. For instance, for the @f$ l^1 @f$ distance,
+this is the median. Assuming that computing the average is linear
+in the number of points and the data dimension,
+this step requires @f$ O(nd) @f$ operations.
+
+Similarly, given the centers @f$ c_1, \dots, c_k @f$, the objective
+can be optimized independently for the membership @f$ \pi(i) @f$ of
+each point @f$ x_i @f$ by minimizing @f$ d^2(x_i, c_{\pi(i)}) @f$
+over @f$ \pi(i) \in \{1, \dots, k\} @f$. Assuming that computing
+a distance is @f$ O(d) @f$, this step requires @f$ O(ndk) @f$ operations
+and dominates the other.
+
+The algorithm usually starts by initializing the centers from a
+random selection of the data point.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-tech-kmeanspp Initialization by k-means++
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@cite{arthur07k-means} proposes a randomized initialization
+of the centers which improves
+upon random selection. The first center @f$ c_1 @f$ is selected at random
+from the data points @f$ x_1, \dots, x_n @f$ and
+the distance from this center to all points @f$ d^2(x_i, c_1) @f$ is
+computed. Then the second center @f$ c_2 @f$ is selected at random
+from the data points with probability proportional to the distance, and
+the procedure is repeated using the minimum distance to the centers
+collected so far.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-tech-elkan Speeding up by using the triangular inequality
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+[3] proposes to use the triangular inequality to avoid most
+distances calculations when computing point-to-cluster membership
+and the cluster centers did not change much from the previous iteration.
+
+This uses two key ideas:
+
+- If a point @f$ x_i @f$ is very close to its current
+  center @f$  c_{\pi(i)} @f$ and this center is very far from another
+  center @f$ c @f$, then the point cannot be assigned to @f$ c @f$.
+  Specifically, if @f$ d(x_i, c_{\pi(i)}) \leq d(c_{\pi(i)}, c) / 2 @f$,
+  then also @f$ d(x_i, c_{\pi(i)}) \leq d(x_i, c) @f$.
+
+- If a center @f$ c @f$ is updated to @f$ \hat c @f$, then the variation
+  of the distance of the center to any point can be bounded by
+  @f$ d(x, c) - d(c, \hat c) \leq d(x, \hat c) \leq d(x,c) + d(c, \hat c) @f$.
+
+The first idea is used by keeping track of the inter-center distances and
+exlcuding reassigments to centers too far away from the current assigned
+center. The second idea is used by keeping for each point an upper bound
+to the distance to the currently assigned center and a lower bound to the
+distance to all the other centers. Unless such bounds do not intersect,
+then a point need not to be reassigned. See [3] for details.
+
 */
 
 #include "kmeans.h"
@@ -15,161 +176,6 @@ GNU GPLv2, or (at your option) any later version.
 #include "mathop.h"
 #include <string.h>
 
-/** @file kmeans.h
-
- @section kmeans-overview Overview
-
- @ref kmeans.h implements a number of algorithm for k-means quantisation.
- It supports
-
- - data of type @c float or @c double;
- - @e l1 and @e l2 distances;
- - random selection and <code>k-means++</code> initialization methods;
- - basic Lloyd and accelerated Elkan optimization methods.
-
- @section kmeans-usage Usage
-
- To use @ref kmeans.h to learn clusters from some training data,
- instantiate a ::VlKMeans object, set the configuration
- parameters, initialise the cluster centers, and run the trainig code.
- For instance, to learn @c numCenters clusters from
- @c numData vectors of dimension @c dimension
- and storage type @c float using L2 distance
- and at most 100 Lloyd iterations of the Lloyd algorithm use:
-
- @code
- #include <vl/kmeans.h>
-
- VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
- VlVectorComparisonType distance = VlDistanceL2 ;
- KMeans * kmeans = vl_kmeans_new (algorithm, distance, VL_TYPE_FLOAT) ;
- vl_kmeans_seed_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
- vl_kmeans_set_max_num_iterations (kmeans, 100) ;
- vl_kmeans_refine_centers (kmeans, data, numData) ;
- @endcode
-
- Use ::vl_kmeans_get_energy to get the solution energy (or an upper
- bound for the Elkan algorithm) and ::vl_kmeans_get_centers
- to obtain the @c numCluster cluster centers. Use ::vl_kmeans_quantize
- to quantize new data points.
-
- @subsection kmeans-usage-init Initialization algorithms
-
- @ref kmeans.h supports the following cluster initialization algorithms:
-
- - <b>Random data points</b> (::vl_kmeans_seed_centers_with_rand_data)
-   initialize the centers from a random selection of the training data.
- - <b>k-means++</b> (::vl_kmeans_seed_centers_plus_plus) initialize
-   the centers from a random selection of the training data while
-   attempting to obtain a good coverage of the dataset. This is
-   the strategy from [1].
-
- @subsection kmeans-usage-optimizers Optimization algorithms
-
- @ref kmeans.h supports the following optimization algorithms:
-
- - <b>Lloyd</b> [2] (::VlKMeansLloyd). This is the standard k-means algorithm,
-   alternating the estimation of the point-to-cluster memebrship and
-   of the cluster centers (means in the Euclidean case). Estimating
-   membership requires computing the distance of each point to all
-   cluster centers, which can be extremely slow.
- - <b>Elkan</b> [3] (::VlKMeansElkan). This is a variation of [2] that uses
-   the triangular inequality to avoid many distance calculations
-   when assigning points to clusters and is typically much
-   faster than [2]. However, it uses storage
-   proportional to the square of the number of clusters, which
-   makes it unpractical for a very large number of clusters.
-
- @section kmeans-tech Technical details
-
- Given data points @f$ x_1, \dots, x_n \in \mathbb{R}^d @f$, k-means
- searches for @f$ k @f$ vectors @f$ c_1, \dots, c_n \in \mathbb{R}^d @f$
- (cluster centers) and a function @f$ \pi : \{1, \dots, n\}
- \rightarrow \{1, \dots, k\} @f$ (cluster memberships)
- that minimize the objective:
-
- @f[
-   E(c_1,\dots,c_n,\pi) = \sum_{i=1}^n d^2(x_i, c_{\pi(i)})
- @f]
-
- A simple procedure due to Lloyd [2] to locally optimize this objective
- alternates estimating the cluster centers and the membeship function.
- Specifically, given the membership function @f$ \pi @f$,
- the objective can be minimized independently for eac @f$ c_k @f$
- by minimizing
-
- @f[
-   \sum_{i : \pi(i) = k} d^2(x_i, c_k)
- @f]
-
- For the Euclidean distance, the minimizer is simply the mean of the points
- assigned to that cluster. For other distances, the minimizer is
- a generalized average. For instance, for the @f$ l^1 @f$ distance,
- this is the median. Assuming that computing the average is linear
- in the number of points and the data dimension,
- this step requires @f$ O(nd) @f$ operations.
-
- Similarly, given the centers @f$ c_1, \dots, c_k @f$, the objective
- can be optimized independently for the membership @f$ \pi(i) @f$ of
- each point @f$ x_i @f$ by minimizing @f$ d^2(x_i, c_{\pi(i)}) @f$
- over @f$ \pi(i) \in \{1, \dots, k\} @f$. Assuming that computing
- a distance is @f$ O(d) @f$, this step requires @f$ O(ndk) @f$ operations
- and dominates the other.
-
- The algorithm usually starts by initializing the centers from a
- random selection of the data point.
-
- @subsection kmeans-tech-kmeanspp Initialization by k-means++
-
- [1] proposes a randomized initialization of the centers which improves
- upon random selection. The first center @f$ c_1 @f$ is selected at random
- from the data points @f$ x_1, \dots, x_n @f$ and
- the distance from this center to all points @f$ d^2(x_i, c_1) @f$ is
- computed. Then the second center @f$ c_2 @f$ is selected at random
- from the data points with probability proportional to the distance, and
- the procedure is repeated using the minimum distance to the centers
- collected so far.
-
- @subsection kmeans-tech-elkan Speeding up by using the triangular inequality
-
- [3] proposes to use the triangular inequality to avoid most
- distances calculations when computing point-to-cluster membership
- and the cluster centers did not change much from the previous iteration.
-
- This uses two key ideas:
-
- - If a point @f$ x_i @f$ is very close to its current
-   center @f$  c_{\pi(i)} @f$ and this center is very far from another
-   center @f$ c @f$, then the point cannot be assigned to @f$ c @f$.
-   Specifically, if @f$ d(x_i, c_{\pi(i)}) \leq d(c_{\pi(i)}, c) / 2 @f$,
-   then also @f$ d(x_i, c_{\pi(i)}) \leq d(x_i, c) @f$.
-
- - If a center @f$ c @f$ is updated to @f$ \hat c @f$, then the variation
-   of the distance of the center to any point can be bounded by
-   @f$ d(x, c) - d(c, \hat c) \leq d(x, \hat c) \leq d(x,c) + d(c, \hat c) @f$.
-
- The first idea is used by keeping track of the inter-center distances and
- exlcuding reassigments to centers too far away from the current assigned
- center. The second idea is used by keeping for each point an upper bound
- to the distance to the currently assigned center and a lower bound to the
- distance to all the other centers. Unless such bounds do not intersect,
- then a point need not to be reassigned. See [3] for details.
-
- @section kmeans-references References
-
- - [1] D. Arthur and S. Vassilvitskii.
-   <em>k-means++: The advantages of careful seeding.</em>
-   In Proc. ACM-SIAM Symp. on Discrete Algorithms, 2007.
-
- - [2] S. Lloyd.
-   <em>Least square quantization in PCM.</em>
-   IEEE Trans. on Information Theory, 28(2), 1982.
-
- - [3] C. Elkan.
-   <em>Using the triangle inequality to accelerate k-means.</em>
-   In Proc. ICML, 2003.
-
- */
 /* ================================================================ */
 #ifndef VL_KMEANS_INSTANTIATING
 
@@ -551,6 +557,9 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   vl_uint32 * permutations = NULL ;
   vl_size * numSeenSoFar = NULL ;
+  VlRand * rand = vl_get_rand () ;
+  vl_size totNumRestartedCenters = 0 ;
+  vl_size numRestartedCenters = 0 ;
 
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
@@ -598,6 +607,7 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
       clusterMasses[assignments[x]] ++ ;
     }
 
+    numRestartedCenters = 0 ;
     switch (self->distance) {
       case VlDistanceL2:
         memset(self->centers, 0, sizeof(TYPE) * self->dimension * self->numCenters) ;
@@ -607,9 +617,17 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
           for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
-          TYPE mass = clusterMasses[c] ;
           TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          if (clusterMasses[c] > 0) {
+            TYPE mass = clusterMasses[c] ;
+            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          } else {
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+            numRestartedCenters ++ ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
+          }
         }
         break ;
       case VlDistanceL1:
@@ -624,11 +642,28 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
             }
             numSeenSoFar[c] ++ ;
           }
+          /* restart the centers as required  */
+          for (c = 0 ; c < self->numCenters ; ++c) {
+            if (clusterMasses[c] == 0) {
+              TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
+              vl_uindex x = vl_rand_uindex(rand, numData) ;
+              numRestartedCenters ++ ;
+              for (d = 0 ; d < self->dimension ; ++d) {
+                cpt[d] = data[x * self->dimension + d] ;
+              }
+            }
+          }
         }
         break ;
       default:
         abort();
     } /* done compute centers */
+
+    totNumRestartedCenters += numRestartedCenters ;
+    if (self->verbosity && numRestartedCenters) {
+      VL_PRINTF("kmeans: Lloyd iter %d: restarted %d centers\n", iteration,
+                numRestartedCenters) ;
+    }
   } /* next Lloyd iteration */
 
   if (permutations) { vl_free(permutations) ; }
@@ -680,6 +715,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
   vl_uint32 * assignments = vl_malloc (sizeof(vl_uint32) * numData) ;
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
+  VlRand * rand = vl_get_rand () ;
 
 #if (FLT == VL_TYPE_FLOAT)
     VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
@@ -705,6 +741,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size totDistanceComputationsToRefreshCenterDistances = 0 ;
   vl_size totDistanceComputationsToNewCenters = 0 ;
   vl_size totDistanceComputationsToFinalize = 0 ;
+  vl_size totNumRestartedCenters = 0 ;
 
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
@@ -810,6 +847,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     vl_size numDistanceComputationsToRefreshLB = 0 ;
     vl_size numDistanceComputationsToRefreshCenterDistances = 0 ;
     vl_size numDistanceComputationsToNewCenters = 0 ;
+    vl_size numRestartedCenters = 0 ;
 
     /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
     /*                         Compute new centers                  */
@@ -829,9 +867,18 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
-          TYPE mass = clusterMasses[c] ;
           TYPE * cpt = newCenters + c * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          if (clusterMasses[c] > 0) {
+            TYPE mass = clusterMasses[c] ;
+            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+          } else {
+            /* restart the center */
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+			numRestartedCenters ++ ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
+          }
         }
         break ;
       case VlDistanceL1:
@@ -845,6 +892,17 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
               data [d + perm[x] * self->dimension] ;
             }
             numSeenSoFar[c] ++ ;
+          }
+        }
+        /* restart the centers as required  */
+        for (c = 0 ; c < self->numCenters ; ++c) {
+          if (clusterMasses[c] == 0) {
+            TYPE * cpt = newCenters + c * self->dimension ;
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+			numRestartedCenters ++ ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
           }
         }
         break ;
@@ -1052,6 +1110,9 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     totDistanceComputationsToNewCenters
     += numDistanceComputationsToNewCenters ;
 
+    totNumRestartedCenters
+    += numRestartedCenters ;
+
 #ifdef SANITY
     {
       int xx ; int cc ;
@@ -1091,6 +1152,12 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
                 iteration,
                 energy,
                 numDistanceComputations) ;
+      if (numRestartedCenters) {
+        VL_PRINTF("kmeans: Elkan iter %d: restarted %d centers\n",
+                  iteration,
+                  energy,
+                  numRestartedCenters) ;
+      }
       if (self->verbosity > 1) {
         VL_PRINTF("kmeans: Elkan iter %d: total dist. calc. per type: "
                   "UB: %.1f%% (%d), LB: %.1f%% (%d), "
@@ -1150,6 +1217,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     if (self->verbosity) {
       VL_PRINTF("kmeans: Elkan: total dist. calc.: %d (%.2f %% of Lloyd)\n",
                 totDistanceComputations, saving * 100.0) ;
+      if (totNumRestartedCenters) {
+        VL_PRINTF("kmeans: Elkan: there have been %d restarts\n",
+                  totNumRestartedCenters) ;
+      }
     }
 
     if (self->verbosity > 1) {
@@ -1467,7 +1538,9 @@ vl_kmeans_cluster (VlKMeans * self,
     }
 
     /* copy centers to output if current solution is optimal */
-    if (energy < bestEnergy) {
+    /* check repetition == 0 as well in case energy = NaN, which */
+    /* can happen if the data contain NaNs */
+    if (energy < bestEnergy || repetition == 0) {
       void * temp ;
       bestEnergy = energy ;
 

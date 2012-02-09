@@ -1,7 +1,11 @@
-/** @file     pegasos.h
- ** @brief    PEGASOS SVM
- ** @author   Andrea Vedaldi
+/** @file pegasos.h
+ ** @brief PEGASOS (@ref pegasos)
+ ** @author Andrea Vedaldi
  **/
+
+/*
+Copyright
+*/
 
 #ifndef VL_PEGASOS_H
 #define VL_PEGASOS_H

@@ -11,6 +11,12 @@ function [Fx,Fy] = vl_imgrad(F,varargin) ;
 %
 %   See also: GRADIENT(), VL_HELP().
 
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
+
 type = 'central' ; % forward, backward
 
 for k=1:2:length(varargin)
@@ -43,4 +49,3 @@ switch type
   otherwise
     error(['Difference type ''', type, ''' unknown']) ;
 end
-

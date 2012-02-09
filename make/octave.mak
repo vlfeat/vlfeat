@@ -1,8 +1,12 @@
-# file:        octave.mak
+# file: octave.mak
 # description: Build MEX files for GNU Octave
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
 
-# AUTORIGTHS
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 # Octave support is experimental. Currently, the MEX files compile
 # successfully but a number of bugs and subtle MATLAB
@@ -34,8 +38,8 @@ info: octave-info
 OCTAVE_MEX_SUFFIX := mex
 OCTAVE_MEX_BINDIR := toolbox/mex/octave
 OCTAVE_MEX_FLAGS =
-OCTAVE_MEX_CFLAGS = $(CFLAGS) -I$(VLDIR)/toolbox
-OCTAVE_MEX_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
+OCTAVE_MEX_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)/toolbox
+OCTAVE_MEX_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)

@@ -50,7 +50,7 @@
    <div class="clear">&nbsp;</div>
   </div> <!-- pagebody -->
   <div id="footer">
-   &copy; 2005-11 Andrea Vedaldi and Brian Fulkerson
+   &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
   </div> <!-- footer -->
 
   <!-- Google Analytics Begins -->
@@ -90,6 +90,7 @@
 
  <page id="home" name="index" title="Home"> <include src="index.html"/>
   <page id="about" name="about" title="About"><include src="about.html"/></page>
+  <page id="license" name="license" title="License"><include src="license.html"/></page>
  </page>
  <page id="download" name="download" title="Download"><include src="download.html"/>
   <page id="install.matlab" name="install-matlab" title="MATLAB install">
@@ -122,6 +123,7 @@
 
   <dir name="api">
    <page id="api" name="index" title="C API">
+    <pagestyle href="%pathto:root;doxygen.css"/>
     <div class="doxygen">
      <!-- Doc Here -->
     </div>
@@ -148,6 +150,7 @@
    <page id="tut.hikm" name="hikm" title="HIKM"> <include src="hikm.html"/></page>
    <page id="tut.aib"  name="aib" title="AIB">  <include src="aib.html"/></page>
    <page id="tut.qs" name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
+   <page id="tut.slic" name="slic" title="SLIC"> <include src="slic.html"/></page>
    <page id="tut.kdtree"  name="kdtree" title="kd-tree">  <include src="kdtree.html"/></page>
    <page id="tut.imdisttf" name="imdisttf" title="Distance transf.">  <include src="imdisttf.html"/></page>
    <page id="tut.utils" name="utils" title="Utils"> <include src="utils.html"/></page>

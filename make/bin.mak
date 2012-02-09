@@ -1,6 +1,12 @@
-# file:        bin.mak
+# file: bin.mak
 # description: Build VLFeat command line utilities
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
+
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 all: bin-all
 clean: bin-clean
@@ -12,8 +18,26 @@ info: bin-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-BIN_CFLAGS = $(CFLAGS)
-BIN_LDFLAGS = $(LDFLAGS) -L$(BINDIR) -lvl
+BIN_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)
+BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
+
+# Mac OS X Intel 32
+ifeq ($(ARCH),maci)
+endif
+
+# Mac OS X Intel 64
+ifeq ($(ARCH),maci64)
+endif
+
+# Linux-32
+ifeq ($(ARCH),glnx86)
+BIN_LDFLAGS += -Wl,--rpath,\$$ORIGIN/
+endif
+
+# Linux-64
+ifeq ($(ARCH),glnxa64)
+BIN_LDFLAGS += -Wl,--rpath,\$$ORIGIN/
+endif
 
 # --------------------------------------------------------------------
 #                                                                Build
@@ -39,8 +63,14 @@ no_dep_targets += bin-info
 
 bin-all: $(bin_tgt)
 
+# BIN_LDFLAGS includes the libraries to link to and must be
+# specified after the object "$<" that uses them. If not, stricter
+# linkers (e.g. --as-needed option with the GNU toolchain)
+# will break as they will not include the dependencies. See
+# also http://wiki.debian.org/ToolChain/DSOLinking
+
 $(BINDIR)/% : $(VLDIR)/src/%.c $(dll-dir) $(dll_tgt)
-	$(call C,CC) $(BIN_CFLAGS) $(BIN_LDFLAGS) "$<" -o "$@"
+	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$@"
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
 	$(call C,CC) $(BIN_CFLAGS) -M -MT  \

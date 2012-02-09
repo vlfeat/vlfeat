@@ -1,4 +1,0 @@
-Copyright (C) <YEARS/> <AUTHORS/>
-
-This file is part of <PROGRAM/>, available under the terms of the
-GNU GPLv2, or (at your option) any later version.

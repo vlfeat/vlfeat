@@ -1,6 +1,12 @@
-# file:        Makefile
-# author:      Andrea Vedaldi
+# file: Makefile
 # description: Build everything
+# author: Andrea Vedaldi
+
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 # VLFEAT BUILDING INSTRUCTIONS
 #
@@ -133,46 +139,46 @@ VLDIR ?= .
 CC ?= cc
 AR ?= ar
 RANLIB ?= ranlib
+LIBTOOL ?= libtool
 
-FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
-FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
+STD_CLFAGS = $(CFLAGS)
+STD_CFLAGS += -std=c99
+STD_CFLAGS += -Wall -Wextra
+STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
+STD_CFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
+STD_CFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
+STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
+STD_CFLAGS += $(if $(PROFILE), -g,)
 
-CLFAGS += $(FEATUREFLAGS)
-CFLAGS += -std=c99
-CFLAGS += -Wall -Wextra
-CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-CFLAGS += -I$(VLDIR)
-
-CFLAGS += $(if $(DEBUG), -DVL_DEBUG -O0 -g, -DNDEBUG -O3)
-CFLAGS += $(if $(PROFILE), -g,)
+STD_LDFLAGS = $(LDFLAGS)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)
-SDKROOT ?= /Developer/SDKs/MacOSX10.6.sdk
+SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
-CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+STD_LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 endif
 
 # Mac OS X Intel 64
 ifeq ($(ARCH),maci64)
-SDKROOT ?= /Developer/SDKs/MacOSX10.6.sdk
+SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
-CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-LDFLAGS += -lm -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+STD_LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 endif
 
 # Linux-32
 ifeq ($(ARCH),glnx86)
-CFLAGS  += -march=i686
-LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
+STD_CFLAGS += -march=i686
+STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
-LDFLAGS += -lm -Wl,--rpath,\$$ORIGIN/
+STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
 # --------------------------------------------------------------------
@@ -274,8 +280,8 @@ include make/octave.mak
 include make/doc.mak
 include make/dist.mak
 
-.PHONY: clean, archclean, distclean, info, help, autorights
-no_dep_targets += clean archclean distclean info help autorights
+.PHONY: clean, archclean, distclean, info, help
+no_dep_targets += clean archclean distclean info help
 
 clean:
 	rm -f  `find . -name '*~'`
@@ -295,28 +301,23 @@ info:
 	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
-	$(call echo-var,CFLAGS)
-	$(call echo-var,LDFLAGS)
 	$(call echo-var,CC)
+	$(call echo-var,STD_CFLAGS)
+	$(call echo-var,STD_LDFLAGS)
 	@printf "\nThere are %s lines of code.\n" \
 	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
+
+# Holw help works: cat this file,
+# skip the first block until an empty line is found (twice)
+# print the first block until an empty line,
+# remove the `# ' prefix from each remaining line
 
 help:
 	@cat Makefile | \
 	sed -n '1,/^$$/!p' | \
+	sed -n '1,/^$$/!p' | \
 	sed -n '1,/^$$/p' | \
 	sed 's/^# \{0,1\}\(.*\)$$/\1/'
-
-autorights: distclean
-	autorights                                                   \
-	  toolbox vl                                                 \
-	  --recursive                                                \
-	  --verbose                                                  \
-	  --template docsrc/copylet.txt                              \
-	  --years 2007-10                                            \
-	  --authors "Andrea Vedaldi and Brian Fulkerson"             \
-	  --holders "Andrea Vedaldi and Brian Fulkerson"             \
-	  --program "VLFeat"
 
 # --------------------------------------------------------------------
 #                                                 Include dependencies

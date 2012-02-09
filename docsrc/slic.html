@@ -1,0 +1,47 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p><b>SLIC</b> is superpixel extraction (segmentation) method based on
+a local version of k-means. For a detailed description of the
+algorithm, see the <a href="%pathto:root;api/slic.html">SLIC API
+reference</a>.</p>
+
+<p>This demo shows how to use SLIC to extract superpixels from this
+image:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/slic_image.jpg"/>
+  <div class="caption">The image to be segmented</div>
+</div>
+
+<p>In the simplest form, SLIC can be called as:</p>
+
+<precode type='matlab'>
+% im contains the input RGB image as a SINGLE array
+regionSize = 10 ;
+regularizer = 10 ;
+segments = vl_slic(im, regionSize, regularizer) ;
+</precode>
+
+<p>By making varting <code>regionSize</code> and
+<code>regularizer</code> one obtains the segmentations:</p>
+
+<div class="figure">
+<image src="%pathto:root;demo/slic_segmentation.jpg"/>
+<div class="caption">SLIC segmentations <code>regionSize</code>
+spaning the values 10,30, and
+<code>regularizer</code> the values 0.01, 0.1, 1.</div>
+</div>
+
+<p>SLIC is often intended to be applied on top of LAB rather than RGB
+images. To do this, simpyl convert the image to LAB format before
+calling <code>vl_slic</code>.</p>
+
+<precode type='matlab'>
+% IM contains the image in RGB format as before
+imlab = vl_xyz2lab(vl_rgb2xyz(im)) ;
+segments = vl_slic(imlab, 10, 0.1) ;
+</precode>
+
+</group>

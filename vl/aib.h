@@ -1,14 +1,15 @@
-/** @file   aib.h
+/** @file aib.h
+ ** @brief AIB (@ref aib)
  ** @author Brian Fulkerson
  ** @author Andrea Vedaldi
- ** @brief  Agglomerative Information Bottleneck (AIB)
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_AIB_H
@@ -18,7 +19,7 @@ GNU GPLv2, or (at your option) any later version.
 #include "mathop.h"
 
 /** ------------------------------------------------------------------
- ** @internal 
+ ** @internal
  ** @brief AIB algorithm data
  **
  ** The implementation is quite straightforward, but the way feature
@@ -44,7 +45,7 @@ typedef struct _VlAIB
 
   vl_uint   *which ;    /**< List of entries to update */
   vl_uint    nwhich ;   /**< Number of entries to update */
-  
+
   double    *Pcx;       /**< Joint probability table */
   double    *Px;        /**< Marginal. */
   double    *Pc;        /**< Marginal. */
@@ -61,14 +62,14 @@ typedef struct _VlAIB
 VL_EXPORT
 VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels);
 
-VL_EXPORT 
+VL_EXPORT
 void vl_aib_delete (VlAIB * aib);
 /** @} */
 
 /** @name Process data
  ** @{
  **/
-VL_EXPORT 
+VL_EXPORT
 void vl_aib_process(VlAIB * aib);
 /** @} */
 
@@ -89,7 +90,7 @@ VL_INLINE double  * vl_aib_get_costs(VlAIB const * aib);
  ** @param aib AIB filter.
  ** @return An array of parents
  **/
-VL_INLINE 
+VL_INLINE
 vl_uint * vl_aib_get_parents(VlAIB const * aib)
 {
   return aib->parents;
@@ -101,7 +102,7 @@ vl_uint * vl_aib_get_parents(VlAIB const * aib)
  ** @param aib AIB filter.
  ** @return An array of costs
  **/
-VL_INLINE 
+VL_INLINE
 double * vl_aib_get_costs(VlAIB const * aib)
 {
   return aib->costs;

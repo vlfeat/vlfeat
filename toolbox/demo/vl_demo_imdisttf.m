@@ -32,5 +32,3 @@ figure(1) ; vl_demo_print('imdisttf_src') ;
 figure(2) ; vl_demo_print('imdisttf_edge') ;
 figure(3) ; vl_demo_print('imdisttf_neigh') ;
 figure(4) ; vl_demo_print('imdisttf_dist') ;
-
-

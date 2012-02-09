@@ -1,8 +1,12 @@
-# file:        Makfile.doc
-# author:      Andrea Vedaldi
+# file: doc.mak
 # description: Makefile submodule to build the documentation
+# author: Andrea Vedaldi
 
-# AUTORIGHTS
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 info: doc-info
 clean: doc-clean
@@ -65,9 +69,10 @@ doc-api: doc/api/index.html
 doc-web: doc/index.html
 doc-toolbox: doc/toolbox-src/mdoc.html
 
-doc-deep: matlab-all $(doc-dir) $(results-dir)
+doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "clear mex;vl_setup demo;vl_demo;exit"
+	$(MAKE) doc
 
 #
 # Use webdoc.py to generate the website
@@ -86,6 +91,7 @@ doc/index.html: \
 	rsync -arv docsrc/images doc
 	rsync -arv docsrc/web.css doc
 	rsync -arv docsrc/pygmentize.css doc
+	rsync -arv docsrc/doxygen.css doc
 
 #
 # Use mdoc.py to create the toolbox documentation that will be
@@ -109,6 +115,7 @@ doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
 doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/q;p'  > doc/doxygen_header.html
+	echo '<div>' >> doc/doxygen_header.html
 	cat doc/api/index.html | \
 	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
 
@@ -116,7 +123,9 @@ doc/api/index.html: docsrc/doxygen.conf VERSION                      \
   $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
   doc/doxygen_header.html doc/doxygen_footer.html
 	#$(call C,DOXYGEN) $<
+	ln -sf docsrc/vlfeat.bib vlfeat.bib
 	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
+	rm vlfeat.bib
 
 #
 # Generate Man documentation

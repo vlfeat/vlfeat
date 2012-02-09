@@ -11,7 +11,7 @@ def wikidoc(pagename, htmlfile):
     f = open(htmlfile)
     doclines = f.readlines()
     f.close()
-    
+
     starttag = "<!-- WIKIDOC START -->"
     endtag   = "<!-- WIKIDOC END -->"
     doclines.insert(0, starttag + '\n')
@@ -30,7 +30,7 @@ def wikidoc(pagename, htmlfile):
         if wikilines[i].strip() == endtag   and endline == -1:   endline = i
 
     if startline == -1 or endline == -1 or startline >= endline:
-        print "Wikidoc warning: Didn't find tags for", pagename 
+        print "Wikidoc warning: Didn't find tags for", pagename
         startline = 0
         endline = 0
 
@@ -46,4 +46,3 @@ if __name__ == '__main__':
 
     print "wikidoc: using", sys.argv[1], "for page", sys.argv[2]
     wikidoc(sys.argv[1], sys.argv[2])
-

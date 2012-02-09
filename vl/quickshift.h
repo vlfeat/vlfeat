@@ -1,14 +1,15 @@
-/** @file     quickshift.h
- ** @brief    Quick shift image segmentation
- ** @author   Andrea Vedaldi
- ** @author   Brian Fulkerson
+/** @file quickshift.h
+ ** @brief Quick shift (@ref quickshift)
+ ** @author Andrea Vedaldi
+ ** @author Brian Fulkerson
  **/
- 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
+
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_QUICKSHIFT_H
@@ -39,7 +40,7 @@ typedef struct _VlQS
   vl_bool medoid;
   vl_qs_type sigma;
   vl_qs_type tau;
- 
+
   int *parents ;
   vl_qs_type *dists ;
   vl_qs_type *density ;
@@ -93,11 +94,11 @@ VL_INLINE void vl_quickshift_set_medoid (VlQS *f, vl_bool medoid) ;
  ** @brief Get tau.
  ** @param q quick shift object.
  ** @return the maximum distance in the feature space between nodes in the
- **         quick shift tree.  
+ **         quick shift tree.
  **/
 
 VL_INLINE vl_qs_type
-vl_quickshift_get_max_dist (VlQS const *q) 
+vl_quickshift_get_max_dist (VlQS const *q)
 {
   return q->tau ;
 }
@@ -106,11 +107,11 @@ vl_quickshift_get_max_dist (VlQS const *q)
  ** @brief Get sigma.
  ** @param q quick shift object.
  ** @return the standard deviation of the kernel used in the Parzen density
- **         estimate.  
+ **         estimate.
  **/
 
 VL_INLINE vl_qs_type
-vl_quickshift_get_kernel_size (VlQS const *q) 
+vl_quickshift_get_kernel_size (VlQS const *q)
 {
   return q->sigma ;
 }
@@ -122,7 +123,7 @@ vl_quickshift_get_kernel_size (VlQS const *q)
  **/
 
 VL_INLINE vl_bool
-vl_quickshift_get_medoid (VlQS const *q) 
+vl_quickshift_get_medoid (VlQS const *q)
 {
   return q->medoid ;
 }
@@ -136,7 +137,7 @@ vl_quickshift_get_medoid (VlQS const *q)
  **/
 
 VL_INLINE int *
-vl_quickshift_get_parents (VlQS const *q) 
+vl_quickshift_get_parents (VlQS const *q)
 {
   return q->parents ;
 }
@@ -149,7 +150,7 @@ vl_quickshift_get_parents (VlQS const *q)
  **/
 
 VL_INLINE vl_qs_type *
-vl_quickshift_get_dists (VlQS const *q) 
+vl_quickshift_get_dists (VlQS const *q)
 {
   return q->dists ;
 }
@@ -161,7 +162,7 @@ vl_quickshift_get_dists (VlQS const *q)
  **/
 
 VL_INLINE vl_qs_type *
-vl_quickshift_get_density (VlQS const *q) 
+vl_quickshift_get_density (VlQS const *q)
 {
   return q->density ;
 }
@@ -170,24 +171,24 @@ vl_quickshift_get_density (VlQS const *q)
  ** @brief Set sigma
  ** @param q quick shift object.
  ** @param sigma standard deviation of the kernel used in the Parzen density
- **        estimate.  
+ **        estimate.
  **/
 
 VL_INLINE void
-vl_quickshift_set_kernel_size (VlQS *q, vl_qs_type sigma) 
+vl_quickshift_set_kernel_size (VlQS *q, vl_qs_type sigma)
 {
   q -> sigma = sigma ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Set max distance 
+ ** @brief Set max distance
  ** @param q quick shift object.
  ** @param tau the maximum distance in the feature space between nodes in the
- **            quick shift tree.  
+ **            quick shift tree.
  **/
 
 VL_INLINE void
-vl_quickshift_set_max_dist (VlQS *q, vl_qs_type tau) 
+vl_quickshift_set_max_dist (VlQS *q, vl_qs_type tau)
 {
   q -> tau = tau ;
 }
@@ -200,7 +201,7 @@ vl_quickshift_set_max_dist (VlQS *q, vl_qs_type tau)
  **/
 
 VL_INLINE void
-vl_quickshift_set_medoid (VlQS *q, vl_bool medoid) 
+vl_quickshift_set_medoid (VlQS *q, vl_bool medoid)
 {
   q -> medoid = medoid ;
 }

@@ -1,14 +1,14 @@
-/** @file     mser.h
- ** @brief    Maximally Stable Extremal Regions (MSER)
- ** @author   Andrea Vedaldi
- ** 
+/** @file mser.h
+ ** @brief MSER (@ref mser)
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_MSER
@@ -16,8 +16,8 @@ GNU GPLv2, or (at your option) any later version.
 
 #include "generic.h"
 
-/** @brief MSER image data type 
- ** 
+/** @brief MSER image data type
+ **
  ** This is the data type of the image pixels. It has to be an
  ** integer.
  **/
@@ -29,7 +29,7 @@ typedef vl_uint8 vl_mser_pix ;
  **/
 #define VL_MSER_PIX_MAXVAL 256
 
-/** @brief MSER Filter 
+/** @brief MSER Filter
  **
  ** The MSER filter computes the Maximally Stable Extremal Regions of
  ** an image.
@@ -44,7 +44,7 @@ typedef struct _VlMserFilt VlMserFilt ;
 typedef struct _VlMserStats VlMserStats ;
 
 /** @brief MSER filter statistics definition */
-struct _VlMserStats 
+struct _VlMserStats
 {
   int num_extremal ;      /**< number of extremal regions                                */
   int num_unstable ;      /**< number of unstable extremal regions                       */
@@ -61,10 +61,10 @@ VL_EXPORT VlMserFilt*      vl_mser_new     (int ndims, int const* dims) ;
 VL_EXPORT void             vl_mser_delete  (VlMserFilt *f) ;
 /** @} */
 
-/** @name Processing 
+/** @name Processing
  ** @{
  **/
-VL_EXPORT void             vl_mser_process (VlMserFilt *f, 
+VL_EXPORT void             vl_mser_process (VlMserFilt *f,
                                             vl_mser_pix const *im) ;
 VL_EXPORT void             vl_mser_ell_fit (VlMserFilt *f) ;
 /** @} */
@@ -104,7 +104,7 @@ VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
  *                                                   INLINE DEFINITIONS
  * ================================================================== */
 
-/** @internal @brief MSER accumulator data type 
+/** @internal @brief MSER accumulator data type
  **
  ** This is a large integer type. It should be large enough to contain
  ** a number equal to the area (volume) of the image by the image
@@ -142,7 +142,7 @@ typedef float vl_mser_acc ;
  **
  ** VlMserReg::region is the extremal region identifier. Not all
  ** regions are extremal regions however; if the region is NOT
- ** extremal, this field is set to .... 
+ ** extremal, this field is set to ....
  **/
 struct _VlMserReg
 {
@@ -195,12 +195,12 @@ struct _VlMserExtrReg
 typedef struct _VlMserExtrReg VlMserExtrReg ;
 
 /* ----------------------------------------------------------------- */
-/** @internal @brief MSER filter 
+/** @internal @brief MSER filter
  ** @see @ref mser
  **/
 struct _VlMserFilt
-{  
-  
+{
+
   /** @name Image data and meta data @internal */
   /*@{*/
   int                ndims ;   /**< number of dimensions                    */
@@ -255,7 +255,7 @@ struct _VlMserFilt
  ** @return value of @c delta.
  **/
 VL_INLINE vl_mser_pix
-vl_mser_get_delta (VlMserFilt const *f) 
+vl_mser_get_delta (VlMserFilt const *f)
 {
   return f-> delta ;
 }
@@ -276,7 +276,7 @@ vl_mser_set_delta (VlMserFilt *f, vl_mser_pix x)
  ** @return value of @c minimum diversity.
  **/
 VL_INLINE double
-vl_mser_get_min_diversity (VlMserFilt const *f) 
+vl_mser_get_min_diversity (VlMserFilt const *f)
 {
   return f-> min_diversity ;
 }
@@ -286,7 +286,7 @@ vl_mser_get_min_diversity (VlMserFilt const *f)
  ** @param x value of @c minimum diversity.
  **/
 VL_INLINE void
-vl_mser_set_min_diversity (VlMserFilt *f, double x) 
+vl_mser_set_min_diversity (VlMserFilt *f, double x)
 {
   f-> min_diversity = x ;
 }
@@ -297,7 +297,7 @@ vl_mser_set_min_diversity (VlMserFilt *f, double x)
  ** @return statistics.
  **/
 VL_INLINE VlMserStats const*
-vl_mser_get_stats (VlMserFilt const *f) 
+vl_mser_get_stats (VlMserFilt const *f)
 {
   return & f-> stats ;
 }
@@ -308,7 +308,7 @@ vl_mser_get_stats (VlMserFilt const *f)
  ** @return maximum region area.
  **/
 VL_INLINE double
-vl_mser_get_max_area (VlMserFilt const *f) 
+vl_mser_get_max_area (VlMserFilt const *f)
 {
   return f-> max_area ;
 }
@@ -318,7 +318,7 @@ vl_mser_get_max_area (VlMserFilt const *f)
  ** @param x maximum region area.
  **/
 VL_INLINE void
-vl_mser_set_max_area (VlMserFilt *f, double x) 
+vl_mser_set_max_area (VlMserFilt *f, double x)
 {
   f-> max_area = x ;
 }
@@ -329,7 +329,7 @@ vl_mser_set_max_area (VlMserFilt *f, double x)
  ** @return minimum region area.
  **/
 VL_INLINE double
-vl_mser_get_min_area (VlMserFilt const *f) 
+vl_mser_get_min_area (VlMserFilt const *f)
 {
   return f-> min_area ;
 }
@@ -339,7 +339,7 @@ vl_mser_get_min_area (VlMserFilt const *f)
  ** @param x minimum region area.
  **/
 VL_INLINE void
-vl_mser_set_min_area (VlMserFilt *f, double x) 
+vl_mser_set_min_area (VlMserFilt *f, double x)
 {
   f-> min_area = x ;
 }
@@ -350,7 +350,7 @@ vl_mser_set_min_area (VlMserFilt *f, double x)
  ** @return maximum region variation.
  **/
 VL_INLINE double
-vl_mser_get_max_variation (VlMserFilt const *f) 
+vl_mser_get_max_variation (VlMserFilt const *f)
 {
   return f-> max_variation ;
 }
@@ -360,7 +360,7 @@ vl_mser_get_max_variation (VlMserFilt const *f)
  ** @param x maximum region variation.
  **/
 VL_INLINE void
-vl_mser_set_max_variation (VlMserFilt *f, double x) 
+vl_mser_set_max_variation (VlMserFilt *f, double x)
 {
   f-> max_variation = x ;
 }

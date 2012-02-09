@@ -1,13 +1,14 @@
-/** @file    mathop.h
- ** @brief   Math operations
- ** @author  Andrea Vedaldi
+/** @file mathop.h
+ ** @brief Math operations
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_MATHOP_H
@@ -121,29 +122,102 @@ vl_mod_2pi_d (double x)
   return x ;
 }
 
-/** @brief Fast <code>(int) floor(x)</code>
+/** @brief Floor and convert to integer
  ** @param x argument.
- ** @return @c (int) floor(x)
+ ** @return Similar to @c (int) floor(x)
  **/
 
-VL_INLINE int
+VL_INLINE long int
 vl_floor_f (float x)
 {
-  int xi = (int) x ;
+  long int xi = (long int) x ;
   if (x >= 0 || (float) xi == x) return xi ;
   else return xi - 1 ;
 }
 
-/** @brief Fast <code>(int) floor(x)</code>
+/** @brief Floor and convert to integer
  ** @see vl_floor_f
  **/
 
-VL_INLINE int
+VL_INLINE long int
 vl_floor_d (double x)
 {
-  int xi = (int) x ;
+  long int xi = (long int) x ;
   if (x >= 0 || (double) xi == x) return xi ;
   else return xi - 1 ;
+}
+
+/** @brief Ceil and convert to integer
+ ** @param x argument.
+ ** @return @c lceilf(x)
+ **/
+
+VL_INLINE long int
+vl_ceil_f (float x)
+{
+#ifdef VL_COMPILER_GNUC
+  return (long int) __builtin_ceilf(x) ;
+#else
+  return (long int) ceilf(x) ;
+#endif
+}
+
+/** @brief Ceil and convert to integer
+ ** @see vl_ceil_f
+ **/
+
+VL_INLINE long int
+vl_ceil_d (double x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_ceil(x) ;
+#else
+  return (long int) ceil(x) ;
+#endif
+}
+
+/** @brief Round
+ ** @param x argument.
+ ** @return @c lroundf(x)
+ ** This function is either the same or similar to C99 @c lroundf().
+ **/
+
+VL_INLINE long int
+vl_round_f (float x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_lroundf(x) ;
+#elif VL_COMPILER_MSC
+  if (x >= 0.0F) {
+    return vl_floor_f(x + 0.5F) ;
+  } else {
+    return vl_ceil_f(x - 0.5F) ;
+  }
+#else
+  return lroundf(x) ;
+#endif
+}
+
+/** @brief Round
+ ** @param x argument.
+ ** @return @c lround(x)
+ ** This function is either the same or similar to C99 @c lround().
+ **/
+
+VL_INLINE long int
+vl_round_d (double x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_lround(x) ;
+#elif VL_COMPILER_MSC
+  if (x >= 0.0) {
+    return vl_floor_d(x + 0.5) ;
+  } else {
+    return vl_ceil_d(x - 0.5) ;
+  }
+#else
+  return lround(x) ;
+#endif
 }
 
 /** @brief Fast @c abs(x)
@@ -154,7 +228,7 @@ vl_floor_d (double x)
 VL_INLINE float
 vl_abs_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_fabsf (x) ;
 #else
   return fabsf(x) ;
@@ -168,7 +242,7 @@ vl_abs_f (float x)
 VL_INLINE double
 vl_abs_d (double x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_fabs (x) ;
 #else
   return fabs(x) ;
@@ -178,7 +252,7 @@ vl_abs_d (double x)
 VL_INLINE double
 vl_log2_d (double x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_log2(x) ;
 #elif VL_COMPILER_MSC
   return log(x) / 0.693147180559945 ;
@@ -190,7 +264,7 @@ vl_log2_d (double x)
 VL_INLINE float
 vl_log2_f (float x)
 {
-#ifdef VL_COMPILER_GNU
+#ifdef VL_COMPILER_GNUC
   return __builtin_log2f (x) ;
 #elif VL_COMPILER_MSC
   return logf(x) / 0.6931472F ;

@@ -11,11 +11,11 @@ function [x1,x2]=vl_witps(xp1,xp2,Y,Yp)
 %
 %   See also: VL_WTPS(), VL_HELP().
 
-% AUTORIGHTS
-% Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% All rights reserved.
 %
-% This file is part of VLFeat, available under the terms of the
-% GNU GPLv2, or (at your option) any later version.
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 % Initial guess by inverting the control points
 [x1,x2] = vl_wtps(vl_tps(xp1,xp2,Yp),Y) ;
@@ -46,4 +46,3 @@ end
 [M,N] = size(xp1) ;
 x1 = reshape(X(1,:),M,N) ;
 x2 = reshape(X(2,:),M,N) ;
-

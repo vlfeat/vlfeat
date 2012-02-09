@@ -1,90 +1,88 @@
-/** @file   kdtree.c
- ** @brief  KD-tree - Definition
+/** @file kdtree.c
+ ** @brief KD-tree - Definition
  ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
+
+/**
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page kdtree KD-trees and forests
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref kdtree.h implements a KD-tree object, a data structure that can
+efficiently index moderately dimensional vector spaces. Both
+best-bin-first @cite{beis97shape} and randomized KD-tree forests are
+implemented
+@cite{silpa-anan08optimised},@cite{muja09fast}. Applications include
+fast matching of feature descriptors.
+
+- @ref kdtree-overview
+- @ref kdtree-tech
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section kdtree-overview Overview
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+To create a ::VlKDForest object use ::vl_kdforest_new specifying the
+dimensionality of the data and the number of trees in the forest.
+With one tree only, the algorithm is analogous to @cite{beis97shape}
+(best-bin KDTree). Multiple trees correspond to the randomized KDTree
+forest as in @cite{silpa-anan08optimised},@cite{muja09fast}.
+
+To let the KD-tree index some data use ::vl_kdforest_build. Note that
+for efficiency KD-tree does not copy the data but retains a pointer to
+it. Therefore the data must exist (and not change) until the KD-tree
+is deleted. To delete the KD-tree object, use ::vl_kdforest_delete.
+
+To find the N nearest neighbors to a query point use
+::vl_kdforest_query. To set a maximum number of comparisons per query
+and calculate approximate nearest neighbors use
+::vl_kdforest_set_max_num_comparisons.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section kdtree-tech Technical details
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+::VlKDForest implements the best-bin-first kd-tree of @cite{beis97shape}.
+
+<b>Construction.</b> Given a set of points @f$ x_1,\dots,x_n \in
+\mathbb{R}^d @f$, the algorithm recursively partitions the @e d
+dimensional Euclidean space @f$ \mathbb{R}^d @f$ into (hyper-)
+rectangles.
+
+Partitions are organized into a binary tree with the root
+corresponding to the whole space @f$ \mathbb{R}^d @f$. The algorithm
+refines each partition by dividing it into two halves by thresholding
+along a given dimension. Both the splitting dimension and the
+threshold are determined as a statistic of the data points contained
+in the partition. The splitting dimension is the one which has largest
+sample variance and the splitting threshold is either the sample mean
+or the median. Leaves are atomic partitions and they contain a list of
+zero or more data points (typically one).
+
+<b>Querying.</b> Querying amounts to finding the N data points closer
+to a given query point @f$ x_q \in \mathbb{R}^d @f$. This is done by
+branch-and-bound. A search state is an active partition (initially the
+root) and it is weighed by the lower bound on the distance of any
+point in the partition and the query point. Such a lower bound is
+trivial to compute because partitions are hyper-rectangles.
+
+**/
 
 #include "kdtree.h"
 #include "generic.h"
 #include "random.h"
 #include "mathop.h"
-
 #include <stdlib.h>
-
-/** @file kdtree.h
- **
- ** ::VlKDForest implements a KD-tree object data structure useful to
- ** index moderately dimensional vector spaces. It can be used to
- ** quickly match two groups of feature descriptors.
- **
- ** - @ref kdtree-overview
- ** - @ref kdtree-tech
- **
- ** @section kdtree-overview Overview
- **
- ** To create a ::VlKDForest object use ::vl_kdforest_new specifying
- ** the dimensionality of the data and the number of trees in the
- ** forest.  With one tree only, the algorithm is analogous to [1]
- ** (best-bin KDTree). Multiple trees correspond to the randomized
- ** KDTree forest as in [2,3].
- **
- ** To let the KD-tree index some data use ::vl_kdforest_build. Note
- ** that for efficiency KD-tree does not copy the data but retains a
- ** pointer to it. Therefore the data must exist (and not change)
- ** until the KD-tree is deleted. To delete the KD-tree object, use
- ** ::vl_kdforest_delete.
- **
- ** To find the N nearest neighbors to a query point use
- ** ::vl_kdforest_query. To set a maximum number of comparisons per
- ** query and calculate approximate nearest neighbors use
- ** ::vl_kdforest_set_max_num_comparisons.
- **
- ** @section kdtree-tech Technical details
- ** @sa @ref kdtree-references
- **
- ** ::VlKDForest implements the best-bin-first kd-tree of [1].
- **
- ** <b>Construction.</b> Given a set
- ** of points @f$ x_1,\dots,x_n \in \mathbb{R}^d @f$, the algorithm
- ** recursively partitions the @e d dimensional Euclidean space @f$
- ** \mathbb{R}^d @f$ into (hyper-) rectangles.
- **
- ** Partitions are organized into a binary tree with the root
- ** corresponding to the whole space @f$ \mathbb{R}^d @f$. The
- ** algorithm refines each partition by dividing it into two halves by
- ** thresholding along a given dimension. Both the splitting dimension
- ** and the threshold are determined as a statistic of the data points
- ** contained in the partition. The splitting dimension is the one
- ** which has largest sample variance and the splitting threshold is
- ** either the sample mean or the median. Leaves are atomic partitions
- ** and they contain a list of zero or more data points (typically
- ** one).
- **
- ** <b>Querying.</b> Querying amounts to finding the N data points closer to a given
- ** query point @f$ x_q \in \mathbb{R}^d @f$. This is done by
- ** branch-and-bound. A search state is an active partition (initially
- ** the root) and it is weighed by the lower bound on the distance of
- ** any point in the partition and the query point. Such a lower bound
- ** is trivial to compute because partitions are hyper-rectangles.
- **
- ** @section kdtree-references References
- **
- ** [1] J. S. Beis and D. G. Lowe. Shape indexing using approximate
- ** nearest-neighbour search in high-dimensional spaces. In
- ** Proc. CVPR, 1997.
- **
- ** [2] C. Silpa-Anan and R. Hartley. Optimised KD-trees for fast
- ** image descriptor matching. In Proc. CVPR, 2008.
- **
- ** [3] M. Muja and D. G. Lowe. Fast approximate nearest neighbors
- ** with automatic algorithmic configuration. In Proc. VISAPP, 2009.
- **/
 
 #define VL_HEAP_prefix     vl_kdforest_search_heap
 #define VL_HEAP_type       VlKDForestSearchState
@@ -171,7 +169,7 @@ vl_kdtree_build_recursively
     return ;
   }
 
-  /* compute the dimension with largest variance */
+  /* compute the dimension with largest variance > 0 */
   forest->splitHeapNumNodes = 0 ;
   for (d = 0 ; d < forest->dimension ; ++ d) {
     double mean = 0 ; /* unnormalized */
@@ -195,6 +193,8 @@ vl_kdtree_build_recursively
     secondMoment /= (dataEnd - dataBegin) ;
     variance = secondMoment - mean * mean ;
 
+    if (variance == 0) continue ;
+
     /* keep splitHeapSize most varying dimensions */
     if (forest->splitHeapNumNodes < forest->splitHeapSize) {
       VlKDTreeSplitDimension * splitDimension
@@ -214,16 +214,17 @@ vl_kdtree_build_recursively
     }
   }
 
-  /* toss a dice to decide the splitting dimension */
-  splitDimension = forest->splitHeapArray
-  + (vl_rand_uint32(forest->rand) % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
-
-  /* additional base case: variance is equal to 0 (overlapping points) */
-  if (splitDimension->variance == 0) {
+  /* additional base case: the maximum variance is equal to 0 (overlapping points) */
+  if (forest->splitHeapNumNodes == 0) {
     node->lowerChild = - dataBegin - 1 ;
     node->upperChild = - dataEnd - 1 ;
     return ;
   }
+
+  /* toss a dice to decide the splitting dimension (variance > 0) */
+  splitDimension = forest->splitHeapArray
+  + (vl_rand_uint32(forest->rand) % VL_MIN(forest->splitHeapSize, forest->splitHeapNumNodes)) ;
+
   node->splitDimension = splitDimension->dimension ;
 
   /* sort data along largest variance dimension */
@@ -307,7 +308,7 @@ vl_kdforest_new (vl_type dataType,
   self -> numTrees = numTrees ;
   self -> trees = 0 ;
   self -> thresholdingMethod = VL_KDTREE_MEDIAN ;
-  self -> splitHeapSize = (numTrees == 1) ? 1 : VL_KDTREE_SPLIT_HEALP_SIZE ;
+  self -> splitHeapSize = VL_MIN(numTrees, VL_KDTREE_SPLIT_HEAP_SIZE) ;
   self -> splitHeapNumNodes = 0 ;
 
   self -> searchHeapArray = 0 ;
@@ -349,10 +350,12 @@ vl_kdforest_delete (VlKDForest * self)
       if (self->trees[ti]) {
         if (self->trees[ti]->nodes) vl_free (self->trees[ti]->nodes) ;
         if (self->trees[ti]->dataIndex) vl_free (self->trees[ti]->dataIndex) ;
+        vl_free (self->trees[ti]) ;
       }
     }
     vl_free (self->trees) ;
   }
+  if (self->searchHeapArray) vl_free (self->searchHeapArray) ;
   vl_free (self) ;
 }
 

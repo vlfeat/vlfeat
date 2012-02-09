@@ -1,40 +1,44 @@
-/** @file     pegasos.c
- ** @brief    PEGASOS SVM - Definition
- ** @author   Andrea Vedaldi
+/** @file pegasos.c
+ ** @brief PEGASOS - Definition
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
- Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
- This file is part of VLFeat, available under the terms of the
- GNU GPLv2, or (at your option) any later version.
- */
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
-/** @file pegasos.h
+/**
+<!-- ------------------------------------------------------------- -->
+@page pegasos PEGASOS SVM solver
+@author Andrea Vedaldi
+<!-- ------------------------------------------------------------- -->
 
-@ref pegasos.h provides a basic implementation of the PEGASOS [1]
-linear SVM solver.
+@ref pegasos.h provides a basic implementation of the PEGASOS
+@cite{shalev-shwartz07pegasos} linear SVM solver.
 
 - @ref pegasos-overview "Overview"
-- @ref pegasos-algorithm "Algorithm"
-- @ref pegasos-bias "Bias"
-- @ref pegasos-restarting "Restarting"
-- @ref pegasos-kernels "Non-linear kernels"
-- @ref pegasos-references "References"
+  - @ref pegasos-algorithm "Algorithm"
+  - @ref pegasos-bias "Bias"
+  - @ref pegasos-restarting "Restarting"
+  - @ref pegasos-kernels "Non-linear kernels"
 
 <!-- ------------------------------------------------------------ --->
 @section pegasos-overview Overview
 <!-- ------------------------------------------------------------ --->
 
-PEGASOS solves the <em>linear</em> SVM learning problem
+PEGASOS solves the <em>linear</em> SxVM learning problem
 
 @f[
  \min_{w} \frac{\lambda}{2} \|w\|^2 + \frac{1}{m} \sum_{i=1}^n
  \ell(w; (x_i,y_i))
 @f]
 
-where @f$ x_i @f$ are data vectors in @f$ \mathbb{R}^d @f$, @f$ y_i \in
-\{-1,1\} @f$ are binary labels,  @f$ \lambda > 0 @f$ is the
+where @f$ x_i @f$ are data vectors in @f$ \mathbb{R}^d @f$, @f$ y_i
+\in \{-1,1\} @f$ are binary labels, @f$ \lambda > 0 @f$ is the
 regularization parameter, and
 
 @f[
@@ -61,8 +65,8 @@ PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
 @subsection pegasos-algorithm Algorithm
 <!-- ------------------------------------------------------------ --->
 
-PEGASOS is a stochastic subgradient optimizer. At the <em>t</em>-th
-iteration the algorithm:
+PEGASOS @cite{shalev-shwartz07pegasos} is a stochastic subgradient
+optimizer. At the <em>t</em>-th iteration the algorithm:
 
 - Samples uniformly at random as subset @f$ A_t@f$ of <em>k</em> of
   training pairs @f$(x,y)@f$ from the <em>m</em> pairs provided for
@@ -82,7 +86,7 @@ iteration the algorithm:
      w_t = \min\{1, \sqrt{\lambda}/\|w\|\} w_{t+1/2}.
   @f]
   The hypersfere is guaranteed to contain the optimal weight vector
-  @f$ w^* @f$ [1].
+  @f$ w^* @f$ @cite{shalev-shwartz07pegasos}.
 
 VLFeat implementation fixes to one the size of the mini batches @f$ k
 @f$.
@@ -155,13 +159,6 @@ incomplete Cholesky decomposition @f$ V^\top V @f$ of the Gram matrix
 kernels (e.g. intersection, Chi2) the explicit feature map computed by
 @ref homkermap.h can be used.
 
-<!-- ------------------------------------------------------------ --->
-@section pegasos-references References
-<!-- ------------------------------------------------------------ --->
-
-[1] S. Shalev-Shwartz, Y. Singer, and N. Srebro.
-    <em>Pegasos: Primal estimated sub-GrAdient SOlver for SVM.</em>
-    In Proc. ICML, 2007.
 */
 
 /** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size,double const*)
@@ -346,4 +343,3 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
 #undef FLT
 #undef VL_PEGAOS_INSTANTIATING
 #endif
-

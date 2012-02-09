@@ -37,4 +37,3 @@ opts2_.field2 = 2 ;
 opts2 = vl_argparse(opts2, args) ;
 
 assert(isequal(opts1,opts1_), isequal(opts2,opts2_)) ;
-

@@ -1,11 +1,15 @@
-# file:        Makefile.matlab
+# file: matlab.mak
 # description: Build MATALB toolbox
-# author:      Andrea Vedaldi
+# author: Andrea Vedaldi
 
-# AUTORIGHTS
+# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 # MATLAB support is enabled if $(MEX) is executable and if MATLAB root
-# can be set from the output of `$(MEX) -v`. Therefore setting MEX to
+# can be deduced from the output of `$(MEX) -v`. Therefore setting MEX to
 # the empty string disables MATLAB support.
 
 MEX ?= mex
@@ -29,39 +33,40 @@ info: mex-info matlab-info
 
 MEX_ARCH = $(ARCH)
 
-MEX_FLAGS  = -$(MEX_ARCH)
+MEX_CFLAGS = -I$(VLDIR) -I$(VLDIR)/toolbox
+MEX_LDFLAGS = -L$(BINDIR) -lvl
+
+MEX_FLAGS = $(MEXFLAGS)
+MEX_FLAGS += -$(MEX_ARCH) -largeArrayDims
 MEX_FLAGS += $(if $(DEBUG), -g, -O)
 MEX_FLAGS += $(if $(PROFILE), -O -g,)
-MEX_FLAGS += -lm -largeArrayDims
-
-MEX_CFLAGS   = $(CFLAGS)
-MEX_CFLAGS  += -I$(VLDIR)/toolbox
-
-MEX_LDFLAGS  = $(LDFLAGS) -L$(BINDIR) -lvl
+MEX_FLAGS += CFLAGS='$$CFLAGS $(STD_CFLAGS)'
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 MEX_SUFFIX := mexmaci64
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 endif
 
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
-MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexglx
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
-MEX_LDFLAGS += -Wl,--rpath,\\\$$ORIGIN/
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexa64
 endif
 
-MEX_BINDIR  := toolbox/mex/$(MEX_SUFFIX)
+MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
 # --------------------------------------------------------------------
 #                                                         Sanity check
@@ -102,21 +107,23 @@ mex-all: $(mex_tgt)
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
-$(mex_dll) : $(dll_tgt)
+$(mex_dll) : $(dll_tgt) $(mex-dir)
 	cp -v "$(<)" "$(@)"
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
-	$(call C,CC) $(MEX_CFLAGS) \
+	$(call C,CC) \
+	       $(MEX_CFLAGS) \
 	       -I"$(MATLAB_PATH)/extern/include" -M -MT \
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(dll_tgt) $(mex_dll)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
 	$(call C,MEX) \
-               CFLAGS='$$CFLAGS  $(MEX_CFLAGS)'  \
-	       LDFLAGS='$$LDFLAGS $(MEX_LDFLAGS)' \
 	       $(MEX_FLAGS) \
-	       "$(<)" -outdir "$(dir $(@))"
+               $(MEX_CFLAGS) \
+               "$(<)" \
+	       $(MEX_LDFLAGS) \
+	       -outdir "$(dir $(@))"
 
 mex-info:
 	$(call echo-title,MATLAB support)

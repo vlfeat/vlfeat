@@ -1,7 +1,15 @@
-/** @file   lbp.h
- ** @brief  Local Binary Patterns
- ** @author Andre Vedaldi
+/** @file lbp.h
+ ** @brief Local Binary Patterns
+ ** @author Andrea Vedaldi
  **/
+
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
+
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
 #include "generic.h"
 
@@ -37,4 +45,3 @@ VL_INLINE vl_size vl_lbp_get_dimension(VlLbp * self)
 {
   return self->dimension ;
 }
-

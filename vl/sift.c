@@ -1,35 +1,29 @@
-/** @internal
- ** @file     sift.c
- ** @brief    Scale Invariant Feature Transform (SIFT) - Definition
- ** @author   Andrea Vedaldi
+/** @file sift.c
+ ** @brief SIFT - Definition
+ ** @author Andrea Vedaldi
  **/
 
-/* AUTORIGHTS
-Copyright (C) 2007-10 Andrea Vedaldi and Brian Fulkerson
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
 
-This file is part of VLFeat, available under the terms of the
-GNU GPLv2, or (at your option) any later version.
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 /**
-
-@file   sift.h
-@brief  Scale Invariant Feature Transform (SIFT)
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page sift Scale Invariant Feature Transform (SIFT)
 @author Andrea Vedaldi
-
 @par "Credits:" May people have contributed with suggestions and bug
 reports. Although the following list is certainly incomplete, we would
-like to thank: Brian Fulkerson, Wei Dong, Loic, Giuseppe, Liu, Erwin,
-P. Ivanov, and Q. S. Luo.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section sift Scale Invariant Feature Transform
+like to thank: Wei Dong, Loic, Giuseppe, Liu, Erwin, P. Ivanov, and
+Q. S. Luo.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-This library module implements a
-@ref sift-usage "SIFT filter object",
-a reusable object to extract SIFT features from one or
-multiple images of the same size.
+@ref sift.h implements a @ref sift-usage "SIFT filter object", a
+reusable object to extract SIFT features @cite{lowe99object} from one
+or multiple images.
 
 - @ref sift-intro
   - @ref sift-intro-detector
@@ -560,14 +554,16 @@ Then all quantities can be computed in the image frame directly. For instance,
 the image at infinite resolution in the two frames are related by
 
 @f[
- \hat I_0(\hat\mathbf{x})  = I_0(\mathbf{x}), \qquad   \mathbf{x} = A \hat\mathbf{x} + T.
+ \hat I_0(\hat{\mathbf{x}})  = I_0(\mathbf{x}),
+ \qquad
+ \mathbf{x} = A \hat{\mathbf{x}} + T.
 @f]
 
 The canonized image at scale @f$ \hat \sigma @f$ is in relation with the scaled image
 
 @f[
- \hat I_{\hat{\sigma}}(\hat\mathbf{x})  = I_{A\hat{\sigma}}(\mathbf{x}),
- \qquad \mathbf{x} = A \hat\mathbf{x} + T
+ \hat I_{\hat{\sigma}}(\hat{\mathbf{x}})  = I_{A\hat{\sigma}}(\mathbf{x}),
+ \qquad \mathbf{x} = A \hat{\mathbf{x}} + T
 @f]
 
 where, by generalizing the previous definitions, we have
@@ -588,9 +584,9 @@ where, by generalizing the previous definitions, we have
 Deriving shows that the gradient fields are in relation
 
 @f[
-  \hat J(\hat \mathbf{x}) = J(\mathbf{x}) A,
+  \hat J(\hat{\mathbf{x}}) = J(\mathbf{x}) A,
  \quad J(\mathbf{x}) = (\nabla I_{A\hat\sigma})(\mathbf{x}),
- \qquad \mathbf{x} = A \hat\mathbf{x} + T.
+ \qquad \mathbf{x} = A \hat{\mathbf{x}} + T.
 @f]
 
 Therefore we can compute the descriptor either in the image or canonical frame as:
@@ -599,11 +595,11 @@ Therefore we can compute the descriptor either in the image or canonical frame a
  h(t,i,j)
  &=&
  \int
- g_{\hat \sigma_\mathrm{win}}(\hat \mathbf{x})\,
- w_\mathrm{ang}(\angle \hat J(\hat\mathbf{x}) - \theta_t)\,
- w_{ij}(\hat\mathbf{x})\,
- |\hat J(\hat \mathbf{x})|\,
- d\hat \mathbf{x}
+ g_{\hat \sigma_\mathrm{win}}(\hat{\mathbf{x}})\,
+ w_\mathrm{ang}(\angle \hat J(\hat{\mathbf{x}}) - \theta_t)\,
+ w_{ij}(\hat{\mathbf{x}})\,
+ |\hat J(\hat{\mathbf{x}})|\,
+ d\hat{\mathbf{x}}
  \\
  &=& \int
  g_{A \hat \sigma_\mathrm{win}}(\mathbf{x} - T)\,
@@ -616,7 +612,7 @@ Therefore we can compute the descriptor either in the image or canonical frame a
 where we defined the product of the two spatial binning functions
 
 @f[
- w_{ij}(\hat\mathbf{x}) = w(\hat x - \hat x_i) w(\hat y - \hat y_j)
+ w_{ij}(\hat{\mathbf{x}}) = w(\hat x - \hat x_i) w(\hat y - \hat y_j)
 @f]
 
 
@@ -636,7 +632,7 @@ and orientation @f$ \theta @f$, the affine transformation @f$ (A,T)
 @f$ reduces to the similarity transformation
 
 @f[
-     \mathbf{x} = m \sigma R(\theta) \hat \mathbf{x} + T
+     \mathbf{x} = m \sigma R(\theta) \hat{\mathbf{x}} + T
 @f]
 
 where @f$ R(\theta) @f$ is a counter-clockwise rotation of @f$ \theta

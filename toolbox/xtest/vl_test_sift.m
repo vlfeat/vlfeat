@@ -41,6 +41,3 @@ quant80 = round(.8 * size(f,2)) ;
 % check for less than one pixel error at 80% quantile
 assert(error(quant80) < 1, ...
        'sift detector did not produce enough keypoints similar to UBC ones') ;
-
-
-
