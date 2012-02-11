@@ -283,7 +283,7 @@ MSVCR = Microsoft.VC$(MSVSVER).CRT
 bincrt = $(bindir)\msvcr$(MSVSVER).dll $(bindir)\$(MSVCR).manifest
 mexcrt = $(mexdir)\msvcr$(MSVSVER).dll $(mexdir)\$(MSVCR).manifest
 !else
-bincrt = $(libdir)\msvcr$(MSVSVER).dll
+bincrt = $(bindir)\msvcr$(MSVSVER).dll
 mexcrt = $(mexdir)\msvcr$(MSVSVER).dll
 !endif
 
