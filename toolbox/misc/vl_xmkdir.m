@@ -3,14 +3,18 @@ function vl_xmkdir(path, varargin)
 %   VL_XMKDIR(PATH) creates all directory specified by PATH if they
 %   do not exist (existing directories are skipped).
 %
+%   The function is meant as a silent replacement of MATLAB's builtin
+%   MKDIR() function. It can also be used to show more clearly what
+%   directories are or would be created by the command.
+%
 %   The function accepts the following options:
 %
-%   Pretend:: [false]
-%     Set to true to avoid creating any directory but print which
-%     directories would be created (implies 'Verbose',true).
+%   Pretend:: false
+%     If TRUE the function does not create any directoty (implies
+%     'Verbose').
 %
-%   Verbose:: [false]
-%     Set to true to print the operations performed.
+%   Verbose:: false
+%     If TRUE the function prints the operations performed.
 %
 %   See also: VL_HELP().
 
@@ -22,32 +26,37 @@ function vl_xmkdir(path, varargin)
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
-pretend = false ;
-verbose = false ;
+opts.pretend = false ;
+opts.verbose = false ;
+opts = vl_argparse(opts,varargin) ;
 
-for ai=1:2:length(varargin)
-  opt = varargin{ai} ;
-  arg = varargin{ai+1} ;
-  switch lower(opt)
-    case 'pretend'
-      pretend = arg ;
-    case 'verbose'
-      verbose = arg ;
-    otherwise
-      error('Unknown option ''%s''.', opt) ;
-  end
-end
-
-verbose = verbose | pretend ;
-
-if isempty(path)
-  return ;
-end
+opts.verbose = opts.verbose | opts.pretend ;
 
 [subPath, name, ext] = fileparts(path) ;
 name = [name ext] ;
 
-% subPath is equal to path if path = '/'
+% Paths are parsed as sequences of blocks
+%
+% ('/', 'DIR1/', 'DIR2/', ... , 'DIRK/') + DIRNAME
+%
+% So for example:
+%
+% ''    -> () + ''
+% a     -> () + 'a'
+% a/    -> ('a/') + ''
+% a/b   -> ('a/') + 'b'
+% a/b/  -> ('a/', 'b/') + ''
+% /     -> ('/') + ''
+% /a    -> ('/') + 'a'
+% /a/   -> ('/', 'a/') + ''
+% /a/b  -> ('/', 'a/') + 'b'
+% /a/b/ -> ('/, 'a/', 'b/) + ''
+%
+% DIRNAME is empty if PATH ends with / and is correctly extracted in
+% this way by FILEPARTS(). SUBDIR is always different from PATH except
+% for the base cases PATH='/' or PATH='', for which the recursion
+% stops.
+
 if ~strcmp(subPath, path)
   vl_xmkdir(subPath, varargin{:}) ;
 end
@@ -57,22 +66,22 @@ if isempty(name)
   return ;
 end
 
-if verbose
+if opts.verbose
   fprintf('%s: directory ''%s'' in ''%s''', mfilename, name, subPath) ;
 end
 
 if ~exist(path, 'dir')
-  if pretend && verbose
+  if opts.pretend && opts.verbose
     fprintf(' does not exist, would create.\n') ;
   else
-    mkdir(subPath, name) ;
-    if verbose
+    [success,message,messageId] = mkdir(fullfile(subPath, name)) ;
+    if opts.verbose
       fprintf(' did not exist, created.\n') ;
     end
   end
 else
-  if verbose
-    if pretend
+  if opts.verbose
+    if opts.pretend
       fprintf(' exists, would not create.\n') ;
     else
       fprintf(' exists, not creating.\n') ;
