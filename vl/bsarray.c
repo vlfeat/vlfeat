@@ -14,107 +14,66 @@ Copyright Statement
 #include <assert.h>
 
 
+
 /*  */
 VL_EXPORT 
-VlBlockSparseArrayHeader* vl_bsarray_new(vl_uint32 transpose, vl_uint32 numberOfBlocks,  vl_uint32** data)
+VlBlockSparseArrayHeader* vl_bsarray_new (vl_uint32 dataByteDimension )
 {
-  vl_uindex k, i, j, l,  dimension ;
-  vl_uint32 type ;
-  vl_uint32 length = 0 ; 
+  VlBlockSparseArrayHeader* bsArray = (VlBlockSparseArrayHeader*) vl_malloc(sizeof(VlBlockSparseArrayHeader) + dataByteDimension) ; 
 
-  VlBlockHeader *block ; 
+  bsArray->numberOfBlocks = 0 ; 
+  bsArray->byteDimension = dataByteDimension ; 
+  
+  return bsArray ;
+}
 
-  dimension = sizeof(VlBlockSparseArrayHeader) ;
+/*  */
+VL_EXPORT 
+VlBlockSparseArrayHeader*  vl_bsarray_add_block (VlBlockSparseArrayHeader *bsArray,VlBlockHeader *block ) 
+{
+  vl_uint32 allocatedMemory, blockLength ; 
+  VlBlockHeader *newBlock ; 
 
-  /* Check dimension of array*/
-  for (j = 0,i = 0; j < numberOfBlocks; j++)
+  /* need to allocate more memory? */
+  allocatedMemory = vl_bsarray_allocated_memory(bsArray) ; 
+
+  if (bsArray->byteDimension - allocatedMemory <  block->blockLength + sizeof(VlBlockHeader) )
     {
-      type = data[i][0];
-      switch (type)
-	{
-	case VL_BLOCK_DENSE :
-	  dimension += sizeof(VlBlockHeader) + data[i][3]*sizeof(vl_uint32) ;
-	  i += 2 ;
-	  break ;
-	case VL_BLOCK_CONSTANT :
-	  dimension += sizeof(VlBlockHeader) + sizeof(vl_uint32) ;
-	  i += 2 ;
-	  break ;
-	case VL_BLOCK_SPARSE :
-	  dimension += sizeof(VlSparseBlockHeader) + data[i][4]*2*sizeof(vl_uint32);
-	  i += 3 ; 
-	  break ;
-	}
+      /* Aggressive choice, reduces number of reallocations of memory */
+      
+      
+      bsArray = (VlBlockSparseArrayHeader *)vl_realloc((void*)bsArray,sizeof(VlBlockSparseArrayHeader) + VL_MAX(allocatedMemory*2,block->blockLength + sizeof(VlBlockHeader)) ) ;
+
+      bsArray->byteDimension =  VL_MAX(allocatedMemory*2,block->blockLength + sizeof(VlBlockHeader)) ; 
+      
     }
 
+  blockLength = block->blockLength ; 
 
-  /* Allocates memory */
-  void *bsarray = (void*) vl_malloc(dimension) ;
+  newBlock = (VlBlockHeader*) (((void*)bsArray) + sizeof(VlBlockSparseArrayHeader)+ allocatedMemory) ;
 
-  /* Initializes relative pointer internal to the bsarray */
-  k = 0 ;
+  memcpy(newBlock,block,sizeof(VlBlockHeader) + blockLength ) ;
 
-  /* Initializes Header */
-  ((VlBlockSparseArrayHeader*)bsarray)->transpose = transpose ;
-  ((VlBlockSparseArrayHeader*)bsarray)->length = length ;
-  ((VlBlockSparseArrayHeader*)bsarray)->byteDimension = dimension ; 
-  ((VlBlockSparseArrayHeader*)bsarray)->numberOfBlocks = numberOfBlocks ; 
-  /* update pointer */
-  k += sizeof(VlBlockSparseArrayHeader);
-  
+  bsArray->numberOfBlocks++ ; 
 
-  /* Read blocks */
-  for (j = 0,i = 0; j < numberOfBlocks; j++)
+  return bsArray ; 
+}
+
+/* free not used memory */
+VL_EXPORT
+VlBlockSparseArrayHeader *  vl_bsarray_finalise (VlBlockSparseArrayHeader *bsArray) 
+{
+  vl_uint32 allocatedMemory ; 
+
+  allocatedMemory = vl_bsarray_allocated_memory(bsArray) ; 
+
+  if (bsArray->byteDimension > allocatedMemory)
     {
-
- 
-      block = (VlBlockHeader*)(bsarray + k) ;
-      block->blockType =  data[i][0] ;
-      block->numericType = data[i][1] ;
-      block->pos = data[i][2] - 1 ;
-      block->length = data[i][3] ;
-      
-      /* Updates array length */
-      length += block->length ;
-
-      
-
-      switch (block->blockType)
-	{
-	case VL_BLOCK_DENSE :
-	  k +=  sizeof(VlBlockHeader) ;
-	  memcpy(bsarray+k,data[i+1],block->length*sizeof(vl_uint32));
-	  k += block->length*sizeof(vl_uint32) ;
-	  i += 2 ;
-	  break ;
-	case VL_BLOCK_CONSTANT :
-	  k +=  sizeof(VlBlockHeader) ;
-	  memcpy(bsarray+k,data[i+1],sizeof(vl_uint32));
-	  k += sizeof(vl_uint32) ;
-	  i += 2 ;
-	  break ;
-	case VL_BLOCK_SPARSE :
-	  l = data[i][4] ; 
-	  *((vl_uint32*)(bsarray+ k + sizeof(VlBlockHeader))) = l ;
-	  k += sizeof(VlSparseBlockHeader)  ; 
- 
-	  memcpy(bsarray+k,data[i+1],l*sizeof(vl_uint32)) ;
-	  k += l*sizeof(vl_uint32) ;
-
-	  memcpy(bsarray+k,data[i+2],l*sizeof(vl_uint32)) ;
-	  k += l*sizeof(vl_uint32) ;
-	  
-	  i += 3 ;
-	  
-	  break ;
-	}
-
+      bsArray = (VlBlockSparseArrayHeader *)vl_realloc((void*)bsArray,sizeof(VlBlockSparseArrayHeader) + allocatedMemory) ;
+      bsArray->byteDimension = allocatedMemory ; 
     }
-  
-  assert(dimension == k);
-  ((VlBlockSparseArrayHeader*)bsarray)->length = length ;
 
-  return (VlBlockSparseArrayHeader*)bsarray ; 
+  return bsArray ; 
 }
 
 
@@ -122,111 +81,168 @@ VlBlockSparseArrayHeader* vl_bsarray_new(vl_uint32 transpose, vl_uint32 numberOf
 VL_EXPORT 
 void vl_bsarray_delete (VlBlockSparseArrayHeader* bsarray)
 {
-  vl_free((void*)bsarray) ;
+  vl_free(bsarray) ;
 }
-
 
 /*  */
 VL_EXPORT 
-VlBlockSparseArrayIterator* vl_bsarray_iterator_new (VlBlockSparseArrayHeader* bsarray) 
+double*  vl_bsarray_full (VlBlockSparseArrayHeader* bsArray) 
 {
-  VlBlockSparseArrayIterator* iter = (VlBlockSparseArrayIterator*) vl_malloc(sizeof(VlBlockSparseArrayIterator)) ;
+  double* output ; 
+
+  vl_uint32 M ; 
   
-  iter->currentPos = 0 ;
-  iter->bsarray = bsarray ;
-
-  return iter ;
-}
-
-
-/*  */
-VL_EXPORT 
-void vl_bsarray_iterator_delete (VlBlockSparseArrayIterator* iter) 
-{
-  vl_free(iter) ;
-}
-
-/*  */
-VL_EXPORT 
-VlBlockHeader* vl_bsarray_iterator_next (VlBlockSparseArrayIterator* iter) 
-{
-  VlSparseBlockHeader* sparseBlock ; 
-  if (iter->currentPos + sizeof(VlSparseBlockHeader)>= iter->bsarray->byteDimension)
-    {
-      return NULL;
-    }
-
-  VlBlockHeader* block = (VlBlockHeader*) (((void*)iter->bsarray) + sizeof(VlBlockSparseArrayHeader) + iter->currentPos);
-
-  /* Updates current byte position */
-  switch (block->blockType)
-    {
-    case VL_BLOCK_DENSE :
-      iter->currentPos += sizeof(VlBlockHeader) + block->length*sizeof(vl_uint32) ;
-      break ;
-    case VL_BLOCK_CONSTANT :
-      iter->currentPos += sizeof(VlBlockHeader) + sizeof(vl_uint32) ;
-      break ;
-    case VL_BLOCK_SPARSE :
-      sparseBlock = (VlSparseBlockHeader*) block;
-      iter->currentPos += sizeof(VlSparseBlockHeader) + 2*sparseBlock->numberOfElements*sizeof(vl_uint32) ;
-      break ;
-    }
-
-  return block ;
-  
-}
-
-
-/*  */
-VL_EXPORT 
-double vl_bsarray_mtimes (VlBlockSparseArrayHeader* a, float* b ) 
-{
-  VlBlockSparseArrayIterator *iter ;
   VlBlockHeader *block ;  
 
-  VlSparseBlockHeader* sparseBlock ; 
+  vl_uint32 i, j,pos, *index, numElements ;
 
-  double acc = 0 ;
+  M = vl_bsarray_length(bsArray) ;
 
-  vl_uint32 i, pos, *index ;
+  output = (double*) vl_calloc(M,sizeof(double)) ;
 
-  
-  iter = vl_bsarray_iterator_new (a) ;
-
-
-  while (block = vl_bsarray_iterator_next(iter))
+    
+  pos = sizeof(VlBlockSparseArrayHeader) ; 
+  for ( i = 0; i < bsArray->numberOfBlocks ; i++ )
     {
+      block = (VlBlockHeader*) (((void*)bsArray) + pos) ; 
       switch (block->blockType)
 	{
 	case VL_BLOCK_DENSE :
-	  for (i = 0 ; i <  block->length; i++)
+	  for (j = 0 ; j <  block->blockLength / sizeof(vl_uint32); j++)
 	    {
-	      acc += (double)(*((float*)((vl_uint32*)block) + 4 + i)*b[i + block->pos]) ;
+	      output[j + block->position] = (double)(*((float*)(((void*)block) + sizeof(VlBlockHeader) + j*sizeof(vl_uint32)))) ;
 	    }
 	  break ;
 	case VL_BLOCK_CONSTANT :
-	  for (i = 0 ; i <  block->length; i++)
+	  numElements = *((vl_uint32*)(((void*)block) + sizeof(VlBlockHeader))) ; 
+       
+	  for (j = 0 ; j <  numElements; j++)
 	    {
-	      acc += b[i + block->pos] ;
+	      output[j + block->position] = (double)(*((float*)(((void*)block) + sizeof(VlBlockHeader) +sizeof(vl_uint32)))) ; 
 	    }
-	  acc *= (double)(*((float*)((vl_uint32*)block) + 4)) ; 
 	  break ;
 	case VL_BLOCK_SPARSE :
-	  sparseBlock = (VlSparseBlockHeader*) block ; 
 	  
-	  index = (vl_uint32*) block ; 
+	  numElements = (block->blockLength - sizeof(vl_uint32))  / (sizeof(vl_uint32)*2) ; 
 
-	  for (i = 0 ; i <  sparseBlock->numberOfElements; i++)
+	  index = (vl_uint32*)(((void*)block) + sizeof(VlSparseBlockHeader)) ;
+
+	  for (j = 0 ; j <  numElements*2; j += 2)
 	    {
-	      pos = *(index + 5 + i) - 1;
-	      acc += (double)(*((float*) (index + 5 + i+sparseBlock->numberOfElements)) * b[block->pos + pos]) ;
+	      output[block->position + *(index + j)] = (double)(*((float*)(index + j + 1))) ;
 	    }
 
 	  break ;
 	}
-      
+      pos += block->blockLength + sizeof(VlBlockHeader) ;
+    }
+
+  return output ; 
+}
+
+
+/*  */
+VL_EXPORT 
+double vl_bsarray_get (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) 
+{
+  vl_uint32 i, bytePos ; 
+  VlBlockHeader *tempBlock, *prevBlock ;
+
+  if (bsArray->numberOfBlocks == 0)
+    {
+      return 0 ;
+    }
+
+
+  bytePos = sizeof(VlBlockSparseArrayHeader) ; 
+
+  tempBlock = NULL ; 
+
+  for ( i = 0; i < bsArray->numberOfBlocks; i++)
+    {
+      prevBlock = tempBlock ; 
+      tempBlock = (VlBlockHeader*) (((void*)bsArray) + pos) ; 
+
+      if (pos < tempBlock->position)
+	{
+	  if (prevBlock == NULL)
+	    {
+	      return 0 ;
+	    }
+
+	  if (pos > prevBlock->position)
+	    {
+	      switch (prevBlock->blockType)
+		{
+		case VL_BLOCK_DENSE:
+		  return vl_block_dense_get(prevBlock,pos - prevBlock->position) ;
+		case VL_BLOCK_CONSTANT:
+		  return vl_block_constant_get(prevBlock,pos - prevBlock->position) ;
+		case VL_BLOCK_SPARSE:
+		  return vl_block_sparse_get(prevBlock,pos - prevBlock->position) ;
+		}
+	    }
+	  else
+	    {
+	      return 0 ;
+	    }
+	}
+
+      pos += tempBlock->blockLength + sizeof(VlBlockHeader) ;
+    }
+
+  return 0 ;
+
+}
+
+
+/*  */
+VL_EXPORT 
+double vl_bsarray_mtimes (VlBlockSparseArrayHeader* bsArray, double* b ) 
+{
+  VlBlockHeader *block ;  
+
+  double acc = 0 ;
+
+  vl_uint32 i, j,pos, *index, numElements ;
+
+  
+  pos = sizeof(VlBlockSparseArrayHeader) ; 
+  for ( i = 0; i < bsArray->numberOfBlocks ; i++ )
+    {
+      block = (VlBlockHeader*) (((void*)bsArray) + pos) ; 
+      switch (block->blockType)
+	{
+	case VL_BLOCK_DENSE :
+	  for (j = 0 ; j <  block->blockLength / sizeof(vl_uint32); j++)
+	    {
+	      acc += (double)(*((float*)(((void*)block) + sizeof(VlBlockHeader) + j*sizeof(vl_uint32)))*b[j + block->position]) ;
+	    }
+	  break ;
+	case VL_BLOCK_CONSTANT :
+	  numElements = *((vl_uint32*)(((void*)block) + sizeof(VlBlockHeader))) ; 
+	  for (j = 0 ; j <  numElements; j++)
+	    {
+	      acc += b[j + block->position] ;
+	    }
+	  acc *= (double)(*((float*)(((void*)block) + sizeof(VlBlockHeader) + sizeof(vl_uint32)))) ; 
+	  break ;
+	case VL_BLOCK_SPARSE :
+	  
+	  numElements = (block->blockLength - sizeof(vl_uint32)) / (sizeof(vl_uint32)*2) ; 
+
+	  index = (vl_uint32*)(((void*)block) + sizeof(VlSparseBlockHeader)) ;
+
+	  for (j = 0 ; j <  numElements*2; j += 2)
+	    {
+	      acc += (double)(*((float*)(index + j + 1)) * b[block->position + *(index + j)]) ;
+	    }
+
+	  break ;
+	}
+      pos += block->blockLength + sizeof(VlBlockHeader) ;
     }
 
   return acc ; 
 }
+

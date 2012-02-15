@@ -24,7 +24,7 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_MTIMES=0} ;
     
   VlBlockSparseArrayHeader* bsarray ;
-  float* fullArray ; 
+  double* fullArray ; 
 
   double* acc ; 
 
@@ -43,7 +43,7 @@ mexFunction(int nout, mxArray *out[],
     }
 
   bsarray = (VlBlockSparseArrayHeader*) mxGetData(in[IN_BSARRAY]) ;
-  fullArray = (float*) mxGetData(in[IN_FULL_ARRAY]) ;
+  fullArray = (double*) mxGetData(in[IN_FULL_ARRAY]) ;
 
    /* ...............................................................
    *                                                   Define output
