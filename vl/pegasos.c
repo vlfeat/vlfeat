@@ -214,48 +214,52 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
 #include "mathop.h"
 #include <math.h>
 
-#define FLT VL_TYPE_FLOAT
 #define VL_PEGASOS_INSTANTIATING
+#define DIAGNOSTICS
+#define SFX _diagnostics
 #include "pegasos.c"
 
-#define FLT VL_TYPE_DOUBLE
 #define VL_PEGASOS_INSTANTIATING
+#define SFX
 #include "pegasos.c"
 
 /* VL_PEGAOS_INSTANTIATING */
 #else
 
-#include "float.th"
+
 
 VL_EXPORT void
-VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
-                                          T const * data,
-                                          vl_size dimension,
-                                          vl_size numSamples,
-                                          vl_int8 const * labels,
-                                          double regularizer,
-                                          double biasMultiplier,
-                                          vl_uindex startingIteration,
-                                          vl_size numIterations,
-                                          VlRand * randomGenerator,
-                                          vl_uint32 const * permutation,
-                                          vl_size permutationSize,
-                                          T const * preconditioner)
+VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
+					 void const * data,
+					 vl_size numSamples,
+					 vl_int8 const * labels,
+					 vlSvmInnerProductFunction innerProduct,
+					 vlSvmAccumulatorFunction accumulator,
+					 VlRand* randomGenerator,
+					 vl_uint32 const * permutation,
+					 vl_size permutationSize
+#ifdef DIAGNOSTICS
+					 ,vlSvmDiagnostics diagnostics,
+					 vl_size diagnosticsFrequency
+#endif
+					 ) 
 {
+  vl_tic() ; 
   vl_uindex iteration ;
   vl_uindex iteration0 ;
-  vl_uindex i ;
-  T const * x ;
-  T acc, learningRate, y ;
-  double lambda = regularizer ;
+  
+  vl_size i ; 
+
+  double acc, learningRate, y ;
+  double lambda = svm->regularizer ;
   vl_size const regularizationPeriod = 10 ;
 
-#if (FLT == VL_TYPE_FLOAT)
-  VlFloatVectorComparisonFunction dotFn =
-#else
-  VlDoubleVectorComparisonFunction dotFn =
+#ifdef DIAGNOSTICS
+  VlSvmStatus* status ;
+
+  status = (VlSvmStatus*) vl_malloc(sizeof(VlSvmStatus)) ;
 #endif
-  VL_XCAT(vl_get_vector_comparison_function_,SFX)(VlKernelL2) ;
+
 
   if (randomGenerator == NULL && permutation == NULL) {
     randomGenerator = vl_get_rand() ;
@@ -263,8 +267,8 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
 
   assert(lambda > 0.0) ;
   assert(randomGenerator == NULL || permutation == NULL) ;
-  assert(startingIteration >= 1) ;
-
+  //assert(svm->iterationsSoFar >= 0) ;
+  
   /*
    Choose iteration0 to start with small enoguh steps. Recall that
    the learning rate is
@@ -280,66 +284,94 @@ VL_XCAT(vl_pegasos_train_binary_svm_,SFX)(T *  model,
    the margin, only scale needs to be updated.
    */
 
-  for (iteration = startingIteration ;
-       iteration < startingIteration + numIterations ;
-       ++ iteration) {
-    /* pick a sample  */
-    vl_uindex k ;
-    if (permutation == NULL) {
-      k = vl_rand_uindex(randomGenerator, numSamples) ;
-    } else {
-      k = permutation[iteration % permutationSize] ;
-      assert(k < numSamples) ;
-    }
-
-    x = data + dimension * k ;
-    y = labels[k] ;
-
-    /* compute learning rate */
-    learningRate = 1.0 / ((iteration + iteration0) * lambda) ;
-
-    /* regularizer step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-    if (iteration % regularizationPeriod == 0) {
-      T eta = (T) learningRate * regularizationPeriod * lambda ;
-      if (preconditioner) {
-        for (i = 0 ; i < dimension + (biasMultiplier != 0) ; ++i) {
-          model[i] -= eta * preconditioner[i] * model[i] ;
-        }
+  for ( ++(svm->iterationsSoFar) ;
+       svm->iterationsSoFar <  svm->maxIterations ;
+       ++ svm->iterationsSoFar) 
+    {
+      /* pick a sample  */
+      vl_uindex k ;
+      if (permutation == NULL) {
+	k = vl_rand_uindex(randomGenerator, numSamples) ;
       } else {
-        for (i = 0 ; i < dimension + (biasMultiplier != 0) ; ++i) {
-          model[i] -= eta * model[i] ;
-        }
+	k = permutation[svm->iterationsSoFar % permutationSize] ;
+	assert(k < numSamples) ;
       }
+
+
+      y = labels[k] ;
+
+      /* compute learning rate */
+      learningRate = 1.0 / ((svm->iterationsSoFar + iteration0) * lambda) ;
+
+      /* regularizer step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+      if (svm->iterationsSoFar % regularizationPeriod == 0) {
+	double eta =  learningRate * regularizationPeriod * lambda ;
+
+	
+	if (svm->preConditioner) 
+	  {
+	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i) 
+	      {
+		svm->model[i] -= eta * svm->preConditioner[i] * svm->model[i] ;
+	      }
+	  }
+	else 
+	  {
+	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i) 
+	      {
+		svm->model[i] -= eta * svm->model[i] ;
+	      }
+	  }
+      
+      }
+
+      /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+      acc = innerProduct(svm->model, svm->dimension, data, k) ;
+      if (svm->biasMultiplier) 
+	acc += svm->biasMultiplier * svm->model[svm->dimension] ;
+
+      if (y * acc < (double) 1.0) {
+	double eta = y * learningRate ;
+
+	acc = 0 ;
+
+	accumulator(svm,svm->dimension,data,k,eta) ;
+      
+
+	if (svm->biasMultiplier) 
+	  {
+	    if (svm->preConditioner)
+	      svm->model[svm->dimension] += eta * svm->preConditioner[svm->dimension] * svm->biasMultiplier ;
+	    else
+	      svm->model[svm->dimension] += eta * svm->biasMultiplier ;
+	  }
+      
+      }
+
+#ifdef DIAGNOSTICS
+
+      if (svm->iterationsSoFar % diagnosticsFrequency == 0)
+	{
+	  svm->elapsedTime += vl_toc() ; 
+	  vlSvmComputeDiagnostics(svm, status, data, numSamples, labels, innerProduct ); 
+
+	  diagnostics(svm,status) ; 
+
+	  vl_tic() ; 
+	}
+  
+#endif
     }
 
-    /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-    acc = dotFn(dimension, x, model) ;
-    if (biasMultiplier) acc += biasMultiplier * model[dimension] ;
-
-    if (y * acc < (T) 1.0) {
-      T eta = y * learningRate ;
-
-      acc = 0 ;
-      if (preconditioner) {
-        for (i = 0 ; i < dimension ; ++i) {
-          model[i] += eta * preconditioner[i] * x[i] ;
-        }
-        if (biasMultiplier) {
-          model[dimension] += eta * preconditioner[dimension] * biasMultiplier ;
-        }
-      } else {
-        for (i = 0 ; i < dimension ; ++i) {
-          model[i] += eta * x[i] ;
-        }
-        if (biasMultiplier) {
-          model[dimension] += eta * biasMultiplier ;
-        }
-      }
-    }
-  }
+  
+#ifdef DIAGNOSTICS
+      vl_free(status) ; 
+     
+#endif
+       svm->elapsedTime += vl_toc() ; 
 }
 
 /* VL_PEGAOS_INSTANTIATING */
-#undef FLT
-#undef VL_PEGAOS_INSTANTIATING
+#undef DIAGNOSTICS
+#undef VL_PEGASOS_INSTANTIATING
 #endif
