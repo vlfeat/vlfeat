@@ -29,7 +29,9 @@ not detected correctly, it can be specified manually. For instance</p>
 $ make ARCH=glnx86
 </precode>
 <p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
-to obtain a list of other useful options.</p>
+to obtain a list of other useful options. You can also use <code>make info</code>
+to obtain a list of the configuration parameters used by the Makefile,
+which might allow you do debug any potential issue.</p>
 
 <p><b>MATLAB support.</b> In order for MATLAB support to be compiled,
 the MATLAB <code>mex</code> script must be in the current path. If it
@@ -110,12 +112,6 @@ MATLAB MEX files from within MATLAB (using the <code>vl_compile</code>
 command). This is meant to help less experienced users that may need
 to recompile the mex file due to binary incompatibilities with older
 MATLAB versions.</p>
-
-<div class="parbox">
-<p><b>MATLAB 7.0 and earlier</b> require recompiling the MEX files by
- the provided <code>vl_compile</code> command.
-</p>
-</div>
 
 <h3>Windows troubleshooting</h3>
 

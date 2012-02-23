@@ -136,7 +136,6 @@ endif
 # --------------------------------------------------------------------
 
 VLDIR ?= .
-CC ?= cc
 LIBTOOL ?= libtool
 
 STD_CLFAGS = $(CFLAGS)
@@ -154,29 +153,35 @@ STD_LDFLAGS = $(LDFLAGS)
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)
-SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
+#SDKROOT ?= $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+CC = gcc
 endif
 
 # Mac OS X Intel 64
 ifeq ($(ARCH),maci64)
-SDKROOT ?= /Developer/SDKs/MacOSX10.7.sdk
+#SDKROOT ?= $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+CC = gcc
 endif
 
 # Linux-32
 ifeq ($(ARCH),glnx86)
 STD_CFLAGS += -march=i686
 STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
+CC = gcc
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
 STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
+CC = gcc
 endif
 
 # --------------------------------------------------------------------

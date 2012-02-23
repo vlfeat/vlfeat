@@ -53,7 +53,7 @@ COMPILING
   own version, all you need is a standard compiler setup.
 
   UNIX. In Mac OS X and Linux you will need GNU GCC and GNU Make. In
-  fact, most C-90 compilers will do, although a few C-99 features are
+  fact, most C-90 compilers should do, although a few C-99 features are
   used.
 
   To compile MATLAB support, MATLAB should also be installed and the
@@ -128,7 +128,8 @@ APPENDIX
   intrisic. GCC and Visual C satisfy all the requirements.
 
 CHANGES
-  0.9.15     Added VL_CUMMAX().
+  0.9.15     Added VL_CUMMAX(). Added support for Xcode 4.3, improved
+             support for past and future Xcode versions.
   0.9.14     Added SLIC superpixels and VL_ALPHANUM(). Improved
              Windows binary package and added support for Visual
              Studio 2010. Improved the documentation layout and added
