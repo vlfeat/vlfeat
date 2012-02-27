@@ -15,6 +15,23 @@
 #include "mathop.h"
 #include <string.h>
 
+/**
+
+@subsection hog-conventions
+
+The orientation of a gradient is expressed as the angle it forms with the
+horizontal axis of the image. Angles are measured clock-wise (as the vertical
+image axis points downards), and the null angle corresponds to
+an horizontal vector pointing right. The quantized directed
+orientations are @f$ \mathrm{k} \pi / \mathrm{numOrientations} @f$, where
+@c k is an index that varies in the ingeger
+range @f$ \{0, \dots, 2\mathrm{numOrientations} - 1\} @f$.
+
+Note that the orientations refere to the gradient direction; edges
+are assumed to be oriented at ninteen degrees from the gradients.
+
+ **/
+
 /* ---------------------------------------------------------------- */
 /** @brief Create a new HOG object
  ** @param variant HOG descriptor variant.
@@ -124,7 +141,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
   self->glyphs = vl_calloc(self->glyphSize * self->glyphSize * self->numOrientations, sizeof(float)) ;
 #define atglyph(x,y,k) self->glyphs[(x) + self->glyphSize * (y) + self->glyphSize * self->glyphSize * (k)]
   for (o = 0 ; o < (signed)self->numOrientations ; ++o) {
-    double angle = fmod(o * VL_PI / self->numOrientations +  VL_PI/2, VL_PI) ;
+    double angle = fmod(o * VL_PI / self->numOrientations, VL_PI) ;
     double x2 = self->glyphSize * cos(angle) / 2 ;
     double y2 = self->glyphSize * sin(angle) / 2 ;
 
@@ -356,7 +373,7 @@ vl_hog_prepare_buffers (VlHog * self, vl_size width, vl_size height, vl_size cel
       self->hogHeight == hogHeight) {
     /* a suitable buffer is already allocated */
     memset(self->hog, 0, sizeof(float) * hogWidth * hogHeight * self->numOrientations * 2) ;
-    memset(self->hog, 0, sizeof(float) * hogWidth * hogHeight) ;
+    memset(self->hogNorm, 0, sizeof(float) * hogWidth * hogHeight) ;
     return ;
   }
 
@@ -376,8 +393,20 @@ vl_hog_prepare_buffers (VlHog * self, vl_size width, vl_size height, vl_size cel
   self->hogHeight = hogHeight ;
 }
 
+
+vl_size vl_hog_get_width (VlHog * self)
+{
+  return self->hogWidth ;
+}
+
+vl_size vl_hog_get_height (VlHog * self)
+{
+  return self->hogHeight ;
+}
+
+
 /* ---------------------------------------------------------------- */
-/** @brief Compute HOG features
+/** @brief Process features starting from an image
  ** @param self HOG object.
  ** @param features HOG features (output).
  ** @param image image to process.
@@ -398,27 +427,25 @@ vl_hog_prepare_buffers (VlHog * self, vl_size width, vl_size height, vl_size cel
  **/
 
 void
-vl_hog_process (VlHog * self,
-                float * features,
-                float const * image,
-                vl_size width, vl_size height, vl_size numChannels,
-                vl_size cellSize)
+vl_hog_put_image (VlHog * self,
+                  float const * image,
+                  vl_size width, vl_size height, vl_size numChannels,
+                  vl_size cellSize)
 {
+  vl_size hogStride ;
   vl_size channelStride = width * height ;
   vl_index x, y ;
   vl_uindex k ;
-  vl_size hogStride ;
 
   assert(self) ;
   assert(image) ;
-  assert(features) ;
-
-#define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
-#define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
   /* clear features */
   vl_hog_prepare_buffers(self, width, height, cellSize) ;
   hogStride = self->hogWidth * self->hogHeight ;
+
+#define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
+#define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
   /* compute gradients and map the to HOG cells by bilinear interpolation */
   for (y = 1 ; y < (signed)height - 1 ; ++y) {
@@ -434,7 +461,7 @@ vl_hog_process (VlHog * self,
       /*
        Compute the gradient at (x,y). The image channel with
        the maximum gradient at each location is selected.
-      */
+       */
       {
         float const * iter = image + y * width + x ;
         float grad2 = 0 ;
@@ -500,6 +527,106 @@ vl_hog_process (VlHog * self,
       }
     } /* next x */
   } /* next y */
+}
+
+/* ---------------------------------------------------------------- */
+VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
+                                       float const * modulus,
+                                       float const * angle,
+                                       vl_size width, vl_size height,
+                                       vl_size cellSize)
+{
+  vl_size hogStride ;
+  vl_index x, y ;
+  float factor ;
+  float offset ;
+
+  assert(self) ;
+  assert(modulus) ;
+  assert(angle) ;
+
+  /* clear features */
+  vl_hog_prepare_buffers(self, width, height, cellSize) ;
+  hogStride = self->hogWidth * self->hogHeight ;
+  factor = (float) (self->numOrientations / VL_PI) ;
+  offset = 0.5f ;
+
+#define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
+#define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
+
+  /* compute gradients and map the to HOG cells by bilinear interpolation */
+  for (y = 0 ; y < (signed)height ; ++y) {
+    for (x = 0 ; x < (signed)width ; ++x) {
+      float hx, hy, wx1, wx2, wy1, wy2 ;
+      vl_index binx, biny ;
+      int orientation ;
+      float thisAngle = *angle++ ;
+      float thisModulus = *modulus++ ;
+
+      if (thisModulus == 0) continue ;
+
+      orientation = (int) (factor * thisAngle + offset) ;
+      orientation %= 2*self->numOrientations ;
+      if (orientation < 0) { orientation += 2*self->numOrientations ; }
+
+      /*
+       Accumulate the gradient. hx is the distance of the
+       pixel x to the cell center at its left, in units of cellSize.
+       With this parametrixation, a pixel on the cell center
+       has hx = 0, which gradually increases to 1 moving to the next
+       center.
+       */
+      hx = (x + 0.5) / cellSize - 0.5 ;
+      hy = (y + 0.5) / cellSize - 0.5 ;
+      binx = vl_floor_f(hx) ;
+      biny = vl_floor_f(hy) ;
+      wx2 = hx - binx ;
+      wy2 = hy - biny ;
+      wx1 = 1.0 - wx2 ;
+      wy1 = 1.0 - wy2 ;
+
+      if (binx >= 0 && biny >=0) {
+        at(binx,biny,orientation) += thisModulus * wx1 * wy1 ;
+      }
+      if (binx < (signed)self->hogWidth - 1 && biny >=0) {
+        at(binx+1,biny,orientation) += thisModulus * wx2 * wy1 ;
+      }
+      if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
+        at(binx+1,biny+1,orientation) += thisModulus * wx2 * wy2 ;
+      }
+      if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
+        at(binx,biny+1,orientation) += thisModulus * wx1 * wy2 ;
+      }
+    } /* next x */
+  } /* next y */
+}
+
+
+/* ---------------------------------------------------------------- */
+/** @brief Extract HOG features
+ ** @param self HOG object.
+ ** @param features HOG features (output).
+ **
+ ** The buffer @c hog must be a three-dimensional array.
+ ** The first two dimensions are @c (width + cellSize/2)/cellSize and
+ ** @c (height + cellSize/2)/cellSize, where divisions are integer.
+ ** This is approximately @c width/cellSize and @c height/cellSize,
+ ** adjusted so that the last cell is at least half contained in the
+ ** image.
+ **
+ ** The image @c width and @c height must be not smaller than three
+ ** pixels and not smaller than @c cellSize.
+ **/
+
+void
+vl_hog_extract (VlHog * self, float * features)
+{
+  vl_index x, y ;
+  vl_uindex k ;
+  vl_size hogStride = self->hogWidth * self->hogHeight ;
+
+#define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
+#define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
   /*
    Computes the squared L2 norm of each HOG cell. This is the norm of the
@@ -559,9 +686,6 @@ vl_hog_process (VlHog * self,
     float const * iter = self->hog ;
     for (y = 0 ; y < (signed)self->hogHeight ; ++y) {
       for (x = 0 ; x < (signed)self->hogWidth ; ++x) {
-
-        /*
-        */
 
         /* norm of upper-left, upper-right, ... blocks */
         vl_index xm = VL_MAX(x - 1, 0) ;

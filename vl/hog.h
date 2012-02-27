@@ -55,6 +55,21 @@ VL_EXPORT void vl_hog_process (VlHog * self,
                                vl_size width, vl_size height, vl_size numChannels,
                                vl_size cellSize) ;
 
+VL_EXPORT void vl_hog_put_image (VlHog * self,
+                                 float const * image,
+                                 vl_size width, vl_size height, vl_size numChannels,
+                                 vl_size cellSize) ;
+
+VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
+                                       float const * modulus,
+                                       float const * angle,
+                                       vl_size width, vl_size height, vl_size cellSize) ;
+
+VL_EXPORT void vl_hog_extract (VlHog * self, float * features) ;
+VL_EXPORT vl_size vl_hog_get_height (VlHog * self) ;
+VL_EXPORT vl_size vl_hog_get_width (VlHog * self) ;
+
+
 VL_EXPORT void vl_hog_render (VlHog const * self,
                               float * image,
                               float const * features,

@@ -16,7 +16,7 @@
 
 /* option codes */
 enum {
-  opt_verbose, opt_variant, opt_num_orientations
+  opt_verbose, opt_variant, opt_num_orientations, opt_polar_field
 } ;
 
 /* options */
@@ -24,6 +24,7 @@ vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
   {"Variant",           1,   opt_variant             },
   {"NumOrientations",   1,   opt_num_orientations    },
+  {"PolarField",        0,   opt_polar_field         },
   {0,                   0,   0                       }
 } ;
 
@@ -38,6 +39,7 @@ mexFunction(int nout, mxArray *out[],
   vl_size width, height, numChannels ;
   vl_size cellSize = 16 ;
   vl_size numOrientations = 9 ;
+  vl_bool isPolarField = VL_FALSE ;
   VlHogVariant variant = VlHogVariantUoctti ;
   char const * variantName ;
   enum {IN_I = 0, IN_CELLSIZE, IN_END} ;
@@ -155,10 +157,19 @@ mexFunction(int nout, mxArray *out[],
         numOrientations = mxGetScalar(optarg) ;
         break;
 
+      case opt_polar_field :
+        isPolarField = VL_TRUE ;
+        break ;
+
       case opt_verbose :
         ++ verbose ;
         break ;
     }
+  }
+
+  if (isPolarField && numChannels != 2) {
+    vlmxError(vlmxErrInvalidArgument, "NUMCHANNELS=%d is not equal to two and POLARFIELD is TRUE.",
+              numChannels) ;
   }
 
   /* -----------------------------------------------------------------
@@ -175,10 +186,17 @@ mexFunction(int nout, mxArray *out[],
     case ExtractFeatures :
     {
       /* recall that MATLAB images are transposed */
-      VlHog * hog = vl_hog_new(variant, numOrientations, VL_TRUE) ;
+      VlHog * hog = vl_hog_new (variant, numOrientations, VL_TRUE) ;
       mwSize dimensions [3] ;
-      dimensions[0] = (height + cellSize/2) / cellSize ;
-      dimensions[1] = (width + cellSize/2) / cellSize ;
+
+      if (isPolarField) {
+        vl_hog_put_polar_field(hog, image, image + (height*width), height, width, cellSize) ;
+      } else {
+        vl_hog_put_image(hog, image, height, width, numChannels, cellSize) ;
+      }
+
+      dimensions[0] = vl_hog_get_width(hog) ;
+      dimensions[1] = vl_hog_get_height(hog) ;
       dimensions[2] = vl_hog_get_dimension(hog) ;
 
       if (verbose) {
@@ -189,9 +207,7 @@ mexFunction(int nout, mxArray *out[],
       }
 
       OUT(FEATURES) = mxCreateNumericArray(3, dimensions, mxSINGLE_CLASS, mxREAL) ;
-      vl_hog_process(hog, mxGetData(OUT(FEATURES)),
-                     image, height, width, numChannels,
-                     cellSize) ;
+      vl_hog_extract (hog, mxGetData(OUT(FEATURES))) ;
       vl_hog_delete(hog) ;
       break ;
     }
