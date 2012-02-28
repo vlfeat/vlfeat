@@ -206,6 +206,12 @@ mexFunction(int nout, mxArray *out[],
         mexPrintf("vl_hog: descriptor: [%d x %d x %d]\n", dimensions[0], dimensions[1], dimensions[2]) ;
         mexPrintf("vl_hog: number of orientations: %d\n", numOrientations) ;
         mexPrintf("vl_hog: variant: %s\n", variantName) ;
+        mexPrintf("vl_hog: input: ") ;
+        if (isPolarField) {
+          mexPrintf("polar field\n") ;
+        } else {
+          mexPrintf("stanard image\n") ;
+        }
       }
 
       OUT(FEATURES) = mxCreateNumericArray(3, dimensions, mxSINGLE_CLASS, mxREAL) ;
