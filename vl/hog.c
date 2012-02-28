@@ -141,7 +141,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
   self->glyphs = vl_calloc(self->glyphSize * self->glyphSize * self->numOrientations, sizeof(float)) ;
 #define atglyph(x,y,k) self->glyphs[(x) + self->glyphSize * (y) + self->glyphSize * self->glyphSize * (k)]
   for (o = 0 ; o < (signed)self->numOrientations ; ++o) {
-    double angle = fmod(o * VL_PI / self->numOrientations, VL_PI) ;
+    double angle = fmod(o * VL_PI / self->numOrientations + VL_PI/2, VL_PI) ;
     double x2 = self->glyphSize * cos(angle) / 2 ;
     double y2 = self->glyphSize * sin(angle) / 2 ;
 
@@ -563,7 +563,7 @@ VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
       float thisAngle = *angle++ ;
       float thisModulus = *modulus++ ;
 
-      if (thisModulus == 0) continue ;
+      if (thisModulus == 0.0F) continue ;
 
       orientation = (int) (factor * thisAngle + offset) ;
       orientation %= 2*self->numOrientations ;

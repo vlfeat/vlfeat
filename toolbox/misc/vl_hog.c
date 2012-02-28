@@ -190,7 +190,9 @@ mexFunction(int nout, mxArray *out[],
       mwSize dimensions [3] ;
 
       if (isPolarField) {
-        vl_hog_put_polar_field(hog, image, image + (height*width), height, width, cellSize) ;
+        float * modulus = image ;
+        float * angle = image + height * width ;
+        vl_hog_put_polar_field(hog, modulus, angle, height, width, cellSize) ;
       } else {
         vl_hog_put_image(hog, image, height, width, numChannels, cellSize) ;
       }
