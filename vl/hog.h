@@ -63,6 +63,7 @@ VL_EXPORT void vl_hog_put_image (VlHog * self,
 VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
                                        float const * modulus,
                                        float const * angle,
+                                       vl_bool directed,
                                        vl_size width, vl_size height, vl_size cellSize) ;
 
 VL_EXPORT void vl_hog_extract (VlHog * self, float * features) ;

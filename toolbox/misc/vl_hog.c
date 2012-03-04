@@ -16,18 +16,30 @@
 
 /* option codes */
 enum {
-  opt_verbose, opt_variant, opt_num_orientations, opt_polar_field
+  opt_verbose, opt_variant,
+  opt_num_orientations,
+  opt_directed_polar_field,
+  opt_undirected_polar_field
 } ;
 
 /* options */
 vlmxOption  options [] = {
-  {"Verbose",           0,   opt_verbose             },
-  {"Variant",           1,   opt_variant             },
-  {"NumOrientations",   1,   opt_num_orientations    },
-  {"PolarField",        0,   opt_polar_field         },
-  {0,                   0,   0                       }
+  {"Verbose",              0,   opt_verbose                      },
+  {"Variant",              1,   opt_variant                      },
+  {"NumOrientations",      1,   opt_num_orientations             },
+  {"DirectedPolarField",   0,   opt_directed_polar_field         },
+  {"UndirectedPolarField", 0,   opt_undirected_polar_field       },
+  {0,                      0,   0                                }
 } ;
 
+enum Mode {ExtractFeatures, Render, GetPermutation} ;
+enum InputType {Image, DirectedPolarField, UndirectedPolarField} ;
+
+static char const * inputTypeNames [] = {
+  "Image",
+  "DirectedPolarField",
+  "UndirectedPolarField"
+} ;
 
 void
 mexFunction(int nout, mxArray *out[],
@@ -39,16 +51,19 @@ mexFunction(int nout, mxArray *out[],
   vl_size width, height, numChannels ;
   vl_size cellSize = 16 ;
   vl_size numOrientations = 9 ;
-  vl_bool isPolarField = VL_FALSE ;
   VlHogVariant variant = VlHogVariantUoctti ;
   char const * variantName ;
   enum {IN_I = 0, IN_CELLSIZE, IN_END} ;
   enum {OUT_FEATURES = 0} ;
-  enum Mode {ExtractFeatures, Render, GetPermutation} mode = ExtractFeatures ;
+  char const * inputTypeName = NULL ;
 
   vl_bool verbose = 0 ;
   int opt, next ;
   mxArray const *optarg ;
+
+  enum Mode mode = ExtractFeatures ;
+  enum InputType inputType = Image ;
+
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
@@ -157,19 +172,18 @@ mexFunction(int nout, mxArray *out[],
         numOrientations = mxGetScalar(optarg) ;
         break;
 
-      case opt_polar_field :
-        isPolarField = VL_TRUE ;
+      case opt_directed_polar_field :
+        inputType = DirectedPolarField ;
+        break ;
+
+      case opt_undirected_polar_field :
+        inputType = UndirectedPolarField ;
         break ;
 
       case opt_verbose :
         ++ verbose ;
         break ;
     }
-  }
-
-  if (isPolarField && numChannels != 2) {
-    vlmxError(vlmxErrInvalidArgument, "NUMCHANNELS=%d is not equal to two and POLARFIELD is TRUE.",
-              numChannels) ;
   }
 
   /* -----------------------------------------------------------------
@@ -189,12 +203,25 @@ mexFunction(int nout, mxArray *out[],
       VlHog * hog = vl_hog_new (variant, numOrientations, VL_TRUE) ;
       mwSize dimensions [3] ;
 
-      if (isPolarField) {
-        float * modulus = image ;
-        float * angle = image + height * width ;
-        vl_hog_put_polar_field(hog, modulus, angle, height, width, cellSize) ;
-      } else {
+      if ((inputType == DirectedPolarField ||
+           inputType == UndirectedPolarField) &&
+          numChannels != 2) {
+        vlmxError(vlmxErrInvalidArgument,
+                  "NUMCHANNELS=%d is not equal to two with input of type %s.",
+                  numChannels, inputTypeNames[inputType]) ;
+      }
+
+      switch (inputType) {
+      case Image:
         vl_hog_put_image(hog, image, height, width, numChannels, cellSize) ;
+        break ;
+      case DirectedPolarField:
+      case UndirectedPolarField:
+        vl_hog_put_polar_field(hog, image, image + height*width,
+                               inputType == DirectedPolarField,
+                               height, width, cellSize) ;
+      default:
+        assert(0) ;
       }
 
       dimensions[0] = vl_hog_get_width(hog) ;
@@ -206,12 +233,7 @@ mexFunction(int nout, mxArray *out[],
         mexPrintf("vl_hog: descriptor: [%d x %d x %d]\n", dimensions[0], dimensions[1], dimensions[2]) ;
         mexPrintf("vl_hog: number of orientations: %d\n", numOrientations) ;
         mexPrintf("vl_hog: variant: %s\n", variantName) ;
-        mexPrintf("vl_hog: input: ") ;
-        if (isPolarField) {
-          mexPrintf("polar field\n") ;
-        } else {
-          mexPrintf("stanard image\n") ;
-        }
+        mexPrintf("vl_hog: input type: %s\n", inputTypeNames[inputType]) ;
       }
 
       OUT(FEATURES) = mxCreateNumericArray(3, dimensions, mxSINGLE_CLASS, mxREAL) ;

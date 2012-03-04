@@ -341,12 +341,33 @@ vl_hog_render (VlHog const * self,
 /* ---------------------------------------------------------------- */
 /** @brief Get the dimension of the HOG features
  ** @param self HOG object.
+ ** @return imension of a HOG cell descriptors.
  **/
 
 vl_size
 vl_hog_get_dimension (VlHog const * self)
 {
   return self->dimension ;
+}
+
+/** @brief Get the width of the HOG cell array
+ ** @param self HOG object.
+ ** @return number of HOG cells in the horizontal direction.
+ **/
+
+vl_size vl_hog_get_width (VlHog * self)
+{
+  return self->hogWidth ;
+}
+
+/** @brief Get the height of the HOG cell array
+ ** @param self HOG object.
+ ** @return number of HOG cells in the vertical direction.
+ **/
+
+vl_size vl_hog_get_height (VlHog * self)
+{
+  return self->hogHeight ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -392,18 +413,6 @@ vl_hog_prepare_buffers (VlHog * self, vl_size width, vl_size height, vl_size cel
   self->hogWidth = hogWidth ;
   self->hogHeight = hogHeight ;
 }
-
-
-vl_size vl_hog_get_width (VlHog * self)
-{
-  return self->hogWidth ;
-}
-
-vl_size vl_hog_get_height (VlHog * self)
-{
-  return self->hogHeight ;
-}
-
 
 /* ---------------------------------------------------------------- */
 /** @brief Process features starting from an image
@@ -533,6 +542,7 @@ vl_hog_put_image (VlHog * self,
 VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
                                        float const * modulus,
                                        float const * angle,
+                                       vl_bool directed,
                                        vl_size width, vl_size height,
                                        vl_size cellSize)
 {
@@ -548,13 +558,13 @@ VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
   /* clear features */
   vl_hog_prepare_buffers(self, width, height, cellSize) ;
   hogStride = self->hogWidth * self->hogHeight ;
-  factor = (float) (self->numOrientations / VL_PI) ;
+  factor = (float) (self->numOrientations / (VL_PI + 10 * VL_EPSILON_F)) ;
   offset = 0.5f ;
 
 #define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
 #define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
-  /* compute gradients and map the to HOG cells by bilinear interpolation */
+  /* fill HOG cells from gradient field */
   for (y = 0 ; y < (signed)height ; ++y) {
     for (x = 0 ; x < (signed)width ; ++x) {
       float hx, hy, wx1, wx2, wy1, wy2 ;
@@ -566,8 +576,14 @@ VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
       if (thisModulus == 0.0F) continue ;
 
       orientation = (int) (factor * thisAngle + offset) ;
-      orientation %= 2*self->numOrientations ;
-      if (orientation < 0) { orientation += 2*self->numOrientations ; }
+
+      if (directed) {
+        orientation %= 2*self->numOrientations ;
+        if (orientation < 0) { orientation += 2*self->numOrientations ; }
+      } else {
+        orientation %= self->numOrientations ;
+        if (orientation < 0) { orientation += self->numOrientations ; }
+      }
 
       /*
        Accumulate the gradient. hx is the distance of the
