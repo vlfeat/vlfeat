@@ -26,30 +26,30 @@ mexFunction(int nout, mxArray *out[],
   VlBlockSparseArrayHeader* bsarray ;
 
 
-  double *output ; 
+  double *output ;
 
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin > 1) 
+  if (nin > 1)
     {
       mexErrMsgTxt("One argument required.") ;
     }
- 
-  if (nout > 1) 
+
+  if (nout > 1)
     {
       mexErrMsgTxt("One output required.") ;
     }
 
   bsarray = (VlBlockSparseArrayHeader*) mxGetData(in[IN_BSARRAY]) ;
-  
+
   /* ...............................................................
    *                                                     Fill output
    * ............................................................ */
-  
-  output = vl_bsarray_full(bsarray) ; 
+
+  output = vl_bsarray_full(bsarray) ;
 
 
   /* ...............................................................
@@ -70,9 +70,9 @@ mexFunction(int nout, mxArray *out[],
   dims [1] = 1 ;
   mxSetPr         (out[OUT_FULL_ARRAY], (double*)output) ;
   mxSetDimensions (out[OUT_FULL_ARRAY], dims, 2) ;
-  
 
-  
 
-  
+
+
+
 }

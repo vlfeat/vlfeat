@@ -15,29 +15,29 @@ Copyright Statement
 #include <vl/bsarray.h>
 
 VL_INLINE
-VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHeader * bsArray,const vl_uint32 * data, vl_uindex M, vl_uint32 type) 
+VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHeader * bsArray,const vl_uint32 * data, vl_uindex M, vl_uint32 type)
 {
-  vl_uindex  i ; 
-  
-  vl_uint32  pos ; 
+  vl_uindex  i ;
 
-  vl_uint32 index = 0 ;  
-  vl_uint32 length = 0 ; 
-  vl_uint32 zeros = 0 ; 
+  vl_uint32  pos ;
+
+  vl_uint32 index = 0 ;
+  vl_uint32 length = 0 ;
+  vl_uint32 zeros = 0 ;
 
   vl_bool block = 1 ;
 
-  VlBlockHeader *tempBlock ; 
+  VlBlockHeader *tempBlock ;
 
-  vl_uint32 threshold = sizeof(VlBlockHeader) / sizeof(vl_uint32) ; 
+  vl_uint32 threshold = sizeof(VlBlockHeader) / sizeof(vl_uint32) ;
 
- 
+
 
 
 
   if (data[0] == 0)
     block = 0;
-  
+
 
   for (i = 0; i < M; i++,length++)
     {
@@ -47,12 +47,12 @@ VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHea
 	    zeros++ ;
 	  else
 	    zeros = 0 ;
-	  
+
 	  if (zeros > threshold)
 	    {
-	      block = 0 ; 
-	      
-	      length -= threshold ; 
+	      block = 0 ;
+
+	      length -= threshold ;
 
 	      if (isSparseBlock(data +index,length))
 		{
@@ -67,31 +67,31 @@ VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHea
 		  tempBlock = getDenseBlock(data+index,length,index,type) ;
 		}
 
-	      
-	    
+
+
 	      bsArray = vl_bsarray_add_block(bsArray,tempBlock,VL_FALSE) ;
 	      vl_free(tempBlock) ;
 	      index = i ;
-	      length = 0 ; 
-	      zeros = 0 ; 
+	      length = 0 ;
+	      zeros = 0 ;
 	    }
-	  
-	  
+
+
 	}
       else
 	{
 	  if (data[i] != 0 )
 	    {
 	      block = 1 ;
-	      index = i ; 
+	      index = i ;
 	      length = 0 ;
-	      zeros = 0 ; 
+	      zeros = 0 ;
 	    }
 	}
     }
-  
+
   if (block)
-    { 
+    {
 
       if (isSparseBlock(data +index,length))
 	{
@@ -106,21 +106,21 @@ VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHea
 	  tempBlock = getDenseBlock(data+index,length,index,type) ;
 	}
 
-	       
+
       bsArray = vl_bsarray_add_block(bsArray,tempBlock,VL_FALSE) ;
       vl_free(tempBlock) ;
     }
   else
     {
-      pos = bsArray->numberOfBlocks - 1 ; 
+      pos = bsArray->numberOfBlocks - 1 ;
 
       tempBlock = vl_bsarray_get_block(bsArray,pos) ;
 
       if (tempBlock->blockType == VL_BLOCK_SPARSE)
 	{
 	  VlSparseBlockHeader* sparseBlock = (VlSparseBlockHeader*) tempBlock ;
-	  sparseBlock->length += length ; 
-	} 
+	  sparseBlock->length += length ;
+	}
       else
 	{
 	  tempBlock = getSparseBlock(data+index,length,index,type) ;
@@ -129,10 +129,10 @@ VlBlockSparseArrayHeader * vl_bsarray_automatic_extraction(VlBlockSparseArrayHea
 	}
     }
 
-  
 
-  return bsArray ; 
-} 
+
+  return bsArray ;
+}
 
 
 /* VL_BSARRAY_UTILS_H */

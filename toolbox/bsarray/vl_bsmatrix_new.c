@@ -23,32 +23,32 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_DATA, IN_END} ;
   enum {OUT_DATA=0} ;
 
-  VlBlockSparseMatrixListHeader *bsMatrix ; 
+  VlBlockSparseMatrixListHeader *bsMatrix ;
 
-  VlBlockSparseArrayHeader *bsArray ; 
+  VlBlockSparseArrayHeader *bsArray ;
 
-  mwSize  M, N,i ; 
+  mwSize  M, N,i ;
 
-  vl_uint32* data,type ; 
- 
-  if (nin > 1) 
+  vl_uint32* data,type ;
+
+  if (nin > 1)
     {
       mexErrMsgTxt("Only one argument required.") ;
     }
 
-  if (nout > 1) 
+  if (nout > 1)
     {
       mexErrMsgTxt("Only One output provided.") ;
     }
 
-  bsMatrix = vl_bsmatrix_list_new(0) ; 
+  bsMatrix = vl_bsmatrix_list_new(0) ;
 
   if (nin == 1)
     {
       M = mxGetM (in[IN_DATA]) ;
       N = mxGetN (in[IN_DATA]) ;
 
-      if (mxIsSingle(in[IN_DATA])) 
+      if (mxIsSingle(in[IN_DATA]))
 	type = VL_TYPE_FLOAT ;
       else if (mxIsUint32(in[IN_DATA]))
 	type = VL_TYPE_UINT32 ;
@@ -57,7 +57,7 @@ mexFunction(int nout, mxArray *out[],
       else
 	mexErrMsgTxt("Input type not supported.") ;
 
-      data = (vl_uint32*) mxGetData(in[IN_DATA]) ; 
+      data = (vl_uint32*) mxGetData(in[IN_DATA]) ;
 
       for (i = 0; i < M*N; i += M)
 	{
@@ -71,13 +71,13 @@ mexFunction(int nout, mxArray *out[],
 
 	  /* bsArray = vl_bsarray_add_block(bsArray,tBlock,VL_FALSE); */
 
-	  bsMatrix = vl_bsmatrix_list_add_column(bsMatrix,bsArray,VL_FALSE) ; 
+	  bsMatrix = vl_bsmatrix_list_add_column(bsMatrix,bsArray,VL_FALSE) ;
 
-	  vl_bsarray_delete(bsArray) ; 
+	  vl_bsarray_delete(bsArray) ;
 	}
     }
 
-  bsMatrix = (VlBlockSparseMatrixListHeader*)vl_bsmatrix_finalise((VlBlockSparseMatrixHeader*)bsMatrix) ; 
+  bsMatrix = (VlBlockSparseMatrixListHeader*)vl_bsmatrix_finalise((VlBlockSparseMatrixHeader*)bsMatrix) ;
 
   /* ...............................................................
    *                                                       Save back

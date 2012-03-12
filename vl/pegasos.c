@@ -239,18 +239,18 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 					 VlRand* randomGenerator,
 					 vl_uint32 const * permutation,
 					 vl_size permutationSize,
-					 vlSvmFeatureMap mapFunc, 
+					 vlSvmFeatureMap mapFunc,
 					 const void * map
 #ifdef DIAGNOSTICS
 					 ,vlSvmDiagnostics diagnostics,
 					 vl_size diagnosticsFrequency
 #endif
-					 ) 
+					 )
 {
-  vl_tic() ; 
+  vl_tic() ;
   vl_uindex iteration0 ;
-  
-  vl_size i ; 
+
+  vl_size i ;
 
   double acc, learningRate, y ;
   double lambda = svm->regularizer ;
@@ -270,7 +270,7 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
   assert(lambda > 0.0) ;
   assert(randomGenerator == NULL || permutation == NULL) ;
   //assert(svm->iterationsSoFar >= 0) ;
-  
+
   /*
    Choose iteration0 to start with small enoguh steps. Recall that
    the learning rate is
@@ -288,7 +288,7 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 
   for ( ++(svm->iterationsSoFar) ;
        svm->iterationsSoFar <  svm->maxIterations ;
-       ++ svm->iterationsSoFar) 
+       ++ svm->iterationsSoFar)
     {
       /* pick a sample  */
       vl_uindex k ;
@@ -309,27 +309,27 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
       if (svm->iterationsSoFar % regularizationPeriod == 0) {
 	double eta =  learningRate * regularizationPeriod * lambda ;
 
-	
-	if (svm->preConditioner) 
+
+	if (svm->preConditioner)
 	  {
-	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i) 
+	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i)
 	      {
 		svm->model[i] -= eta * svm->preConditioner[i] * svm->model[i] ;
 	      }
 	  }
-	else 
+	else
 	  {
-	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i) 
+	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i)
 	      {
 		svm->model[i] -= eta * svm->model[i] ;
 	      }
 	  }
-      
+
       }
 
       /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
       acc = innerProduct(svm->model, svm->dimension, data, dataDimension, k,mapFunc,map) ;
-      if (svm->biasMultiplier) 
+      if (svm->biasMultiplier)
 	acc += svm->biasMultiplier * svm->model[svm->dimension] ;
 
       if (y * acc < (double) 1.0) {
@@ -338,39 +338,39 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 	acc = 0 ;
 
 	accumulator(svm,svm->dimension,data,dataDimension,k,eta,mapFunc,map) ;
-      
 
-	if (svm->biasMultiplier) 
+
+	if (svm->biasMultiplier)
 	  {
 	    if (svm->preConditioner)
 	      svm->model[svm->dimension] += eta * svm->preConditioner[svm->dimension] * svm->biasMultiplier ;
 	    else
 	      svm->model[svm->dimension] += eta * svm->biasMultiplier ;
 	  }
-      
+
       }
 
 #ifdef DIAGNOSTICS
 
       if (svm->iterationsSoFar % diagnosticsFrequency == 0)
 	{
-	  svm->elapsedTime += vl_toc() ; 
-	  vlSvmComputeDiagnostics(svm, status, data, dataDimension, numSamples, labels, innerProduct, mapFunc, map  ); 
+	  svm->elapsedTime += vl_toc() ;
+	  vlSvmComputeDiagnostics(svm, status, data, dataDimension, numSamples, labels, innerProduct, mapFunc, map  );
 
-	  diagnostics(svm,status) ; 
+	  diagnostics(svm,status) ;
 
-	  vl_tic() ; 
+	  vl_tic() ;
 	}
-  
+
 #endif
     }
 
-  
+
 #ifdef DIAGNOSTICS
-      vl_free(status) ; 
-     
+      vl_free(status) ;
+
 #endif
-       svm->elapsedTime += vl_toc() ; 
+       svm->elapsedTime += vl_toc() ;
 }
 
 /* VL_PEGAOS_INSTANTIATING */

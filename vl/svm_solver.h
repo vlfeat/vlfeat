@@ -1,5 +1,5 @@
 /** @file svm_solver.h
- ** @brief Generic SVM solver 
+ ** @brief Generic SVM solver
  ** @author Daniele Perrone
  **/
 
@@ -13,37 +13,37 @@ Copyright Statement
 #include "generic.h"
 
 typedef struct _VlSvm {
-  double * model ; 
+  double * model ;
   vl_size dimension ;
-  vl_size iterationsSoFar ; 
-  vl_size maxIterations ; 
-  double regularizer ; 
+  vl_size iterationsSoFar ;
+  vl_size maxIterations ;
+  double regularizer ;
   double biasMultiplier ;
-  double * preConditioner ; 
-  
+  double * preConditioner ;
+
   double elapsedTime ;
 } VlSvm ;
 
 typedef struct _VlSvmStatus {
   double energy ;
   double regularizer ;
-  double lossPos ; 
-  double lossNeg ; 
+  double lossPos ;
+  double lossNeg ;
   double hardLossPos ;
-  double hardLossNeg ; 
+  double hardLossNeg ;
 } VlSvmStatus ;
 
 
 /* Atomic Functions used by a svn solver */
-typedef void (*vlSvmFeatureMap)(const void* map, double * destination,vl_size stride,double x) ; 
+typedef void (*vlSvmFeatureMap)(const void* map, double * destination,vl_size stride,double x) ;
 
-typedef double (*vlSvmInnerProductFunction)(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ; 
+typedef double (*vlSvmInnerProductFunction)(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ;
 
-typedef void (*vlSvmAccumulatorFunction)(VlSvm* model,  vl_size modelDimension, const void* data, vl_size dataDimension, vl_uindex element, double multiplier,vlSvmFeatureMap mapFunc, const void * map) ; 
+typedef void (*vlSvmAccumulatorFunction)(VlSvm* model,  vl_size modelDimension, const void* data, vl_size dataDimension, vl_uindex element, double multiplier,vlSvmFeatureMap mapFunc, const void * map) ;
 
 
 /* Diagnostic function */
-typedef void (*vlSvmDiagnostics) (VlSvm *svm, VlSvmStatus* status) ;  
+typedef void (*vlSvmDiagnostics) (VlSvm *svm, VlSvmStatus* status) ;
 
 
 /* Training Functions (Does it make sense?)*/
@@ -56,14 +56,14 @@ typedef void (*vlSvmDiagnostics) (VlSvm *svm, VlSvmStatus* status) ;
 
 /* Standard Atomic Functions  */
 VL_EXPORT
-double vlSvmInnerProductFunction_d(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ; 
+double vlSvmInnerProductFunction_d(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ;
 
 VL_EXPORT
 void vlSvmAccumulatorFunction_d(VlSvm* svm,  vl_size modelDimension, const void* data, vl_size dataDimension, vl_uindex element, double multiplier, vlSvmFeatureMap mapFunc, const void * map) ;
 
 
 VL_EXPORT
-double vlSvmInnerProductFunction_f(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ; 
+double vlSvmInnerProductFunction_f(const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map) ;
 
 VL_EXPORT
 void vlSvmAccumulatorFunction_f(VlSvm* svm,  vl_size modelDimension, const void* data, vl_size dataDimension, vl_uindex element, double multiplier, vlSvmFeatureMap mapFunc, const void * map) ;

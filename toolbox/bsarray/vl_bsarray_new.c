@@ -32,12 +32,12 @@ Copyright Statement
 
 /*   values = (double*) mxGetData(array) ;  */
 
-  
+
 /*   block = (VlSparseBlockHeader*) vl_malloc(sizeof(VlSparseBlockHeader) + nz*2*sizeof(vl_uint32)) ; */
 
 /*   block->header.blockType = VL_BLOCK_SPARSE ;  */
 /*   block->header.blockLength = (nz*2 + 1)*sizeof(vl_uint32) ;  */
-  
+
 /*   block->header.numericType = VL_TYPE_FLOAT ; */
 
 /*   /\* if (mxIsSingle(array)) *\/ */
@@ -56,12 +56,12 @@ Copyright Statement
 /*   for (i = 0,k = 0; i < nz; i++,k += 2) */
 /*     { */
 /*       *((vl_uint32*)(((void*)block) + sizeof(VlSparseBlockHeader) + k*sizeof(vl_uint32))) = (vl_uint32)rows[i] ;  */
-   
+
 /*       temp = (float) values[i] ;  */
 
 /*       *((vl_uint32*)(((void*)block) + sizeof(VlSparseBlockHeader) + (k+1)*sizeof(vl_uint32))) = *((vl_uint32*)(&temp)) ;  */
-	
-      
+
+
 /*     } */
 
 
@@ -74,10 +74,10 @@ Copyright Statement
 /*   VlConstantBlockHeader* block ; */
 
 /*   block = (VlConstantBlockHeader*) vl_malloc(sizeof(VlConstantBlockHeader)) ; */
-  
+
 /*   block->header.blockType = VL_BLOCK_CONSTANT ;  */
 /*   block->header.blockLength = 2*sizeof(vl_uint32) ;  */
-  
+
 /*   if (mxIsSingle(array)) */
 /*       block->header.numericType = VL_TYPE_FLOAT ;  */
 /*   else if (mxIsUint32(array)) */
@@ -103,9 +103,9 @@ Copyright Statement
 /*   mwSize M, i  ;  */
 
 /*   VlBlockHeader* block ; */
-  
+
 /*   vl_uint32* data; */
-  
+
 /*   M = mxGetM(array) ; */
 
 /*   data = (vl_uint32*) mxGetData(array) ;  */
@@ -114,7 +114,7 @@ Copyright Statement
 
 /*   block->blockType = VL_BLOCK_DENSE ;  */
 /*   block->blockLength = M*sizeof(vl_uint32) ;  */
-  
+
 /*   if (mxIsSingle(array)) */
 /*       block->numericType = VL_TYPE_FLOAT ;  */
 /*   else if (mxIsUint32(array)) */
@@ -161,7 +161,7 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_DATA=0} ;
 
 
-  int automatic = 0 ; 
+  int automatic = 0 ;
 
   mxArray const *optarg ;
 
@@ -169,20 +169,20 @@ mexFunction(int nout, mxArray *out[],
   int i,opt ;
   const mxArray* temp ;
   vl_uint32 type, position = 0 ;
-  mwSize  M, N ; 
+  mwSize  M, N ;
 
-  VlBlockHeader *block ; 
+  VlBlockHeader *block ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin < 1) 
+  if (nin < 1)
     {
       mexErrMsgTxt("One argument required.") ;
     }
 
-  if (nout > 1) 
+  if (nout > 1)
     {
       mexErrMsgTxt("Onle one output provided.") ;
     }
@@ -198,13 +198,13 @@ mexFunction(int nout, mxArray *out[],
 	  mexErrMsgTxt("Invalid Input.") ;
       }
     }
-  
-  
-  
+
+
+
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
-  
+
 
 
 VlBlockSparseArrayHeader* bsArray = vl_bsarray_new(0) ;
@@ -213,7 +213,7 @@ VlBlockSparseArrayHeader* bsArray = vl_bsarray_new(0) ;
    {
      M = mxGetM (in[IN_DATA]) ;
 
-     if (mxIsSingle(in[IN_DATA])) 
+     if (mxIsSingle(in[IN_DATA]))
        type = VL_TYPE_FLOAT ;
      else if (mxIsUint32(in[IN_DATA]))
        type = VL_TYPE_UINT32 ;
@@ -222,24 +222,24 @@ VlBlockSparseArrayHeader* bsArray = vl_bsarray_new(0) ;
      else
        mexErrMsgTxt("Input type not supported.") ;
 
-     bsArray = vl_bsarray_automatic_extraction(bsArray,(vl_uint32*)mxGetData(in[IN_DATA]),M,type) ; 
+     bsArray = vl_bsarray_automatic_extraction(bsArray,(vl_uint32*)mxGetData(in[IN_DATA]),M,type) ;
    }
  else
    {
      for (i = 0; i < nin;i++)
        {
-	 temp = in[i] ; 
+	 temp = in[i] ;
 
 	 M = mxGetM (temp) ;
 	 N = mxGetN (temp) ;
 
-      
+
 	 if (!mxIsSparse(temp) && M == 1 && N == 1)
 	   {
-	     if (mxGetScalar(temp) - 1 < position) 
-	       mexErrMsgTxt("Blocks can't overlap.") ; 
+	     if (mxGetScalar(temp) - 1 < position)
+	       mexErrMsgTxt("Blocks can't overlap.") ;
 
-	     position = mxGetScalar(temp) - 1 ; 
+	     position = mxGetScalar(temp) - 1 ;
 
 	     continue ;
 	   }
@@ -253,8 +253,8 @@ VlBlockSparseArrayHeader* bsArray = vl_bsarray_new(0) ;
 	   {
 	     mexErrMsgTxt("Input must be a one dimensional array.") ;
 	   }
-      
-	 if (mxIsSingle(temp)) 
+
+	 if (mxIsSingle(temp))
 	   type = VL_TYPE_FLOAT ;
 	 else if (mxIsUint32(temp))
 	   type = VL_TYPE_UINT32 ;
@@ -262,36 +262,36 @@ VlBlockSparseArrayHeader* bsArray = vl_bsarray_new(0) ;
 	   type = VL_TYPE_INT32 ;
 	 else
 	   mexErrMsgTxt("Input type not supported.") ;
-	 
+
 
 	 if (isSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp)))
 	   {
-	     block = getSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ; 
-	     
+	     block = getSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
+
 	   }
 	 else if (isConstantBlock((vl_uint32*)mxGetData(temp),mxGetM(temp)))
 	   {
 	     block = getConstantBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
-	     
+
 	   }
 	 else
 	   {
 	     block = getDenseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
-	     
+
 	   }
-	 
+
 	 bsArray = vl_bsarray_add_block(bsArray,block,VL_FALSE) ;
 	 vl_free(block) ;
 
-	 position += M ; 
+	 position += M ;
        }
    }
-  
 
-  
-  
 
-  bsArray = vl_bsarray_finalise(bsArray) ; 
+
+
+
+  bsArray = vl_bsarray_finalise(bsArray) ;
 
   /* ...............................................................
    *                                                       Save back

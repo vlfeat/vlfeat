@@ -39,14 +39,14 @@ if ~all(single(A2F(:)) == A2T(:))
     error('A2F not correct!');
 end
 
-A1Q = vl_bsarray_mtimes(A1,A2F) ; 
+A1Q = vl_bsarray_mtimes(A1,A2F) ;
 
 if (A1F'*A2F ~= A1Q)
     error('mtimes not working.') ;
 end
 
 
-A3 = vl_bsarray_new(single(A2F(:)),'Auto') ; 
+A3 = vl_bsarray_new(single(A2F(:)),'Auto') ;
 
 A3F = vl_bsarray_full(A3);
 

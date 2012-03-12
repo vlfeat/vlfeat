@@ -1,5 +1,5 @@
 /** @file bsarray.h
- ** @brief Block Sparse Array 
+ ** @brief Block Sparse Array
  ** @author Daniele Perrone
  **/
 
@@ -39,52 +39,52 @@ typedef struct _VlSparseBlockHeader {
 typedef struct _VlConstantBlockHeader {
   VlBlockHeader header ;
   vl_uint32 length ;
-  vl_uint32 value ; 
+  vl_uint32 value ;
 } VlConstantBlockHeader ;
 
 /* Block Sparse Array Struct */
 typedef struct _VlBlockSparseArrayHeader {
-  vl_uint32 byteDimension ; 
+  vl_uint32 byteDimension ;
   vl_uint32 numberOfBlocks ;
 } VlBlockSparseArrayHeader ;
-  
+
 
 
 
 
 /* VlBlockSparseArray Public Functions */
 /*  */
-VL_EXPORT 
-VlBlockSparseArrayHeader* vl_bsarray_new (vl_uint32 dataByteDimension ) ; 
+VL_EXPORT
+VlBlockSparseArrayHeader* vl_bsarray_new (vl_uint32 dataByteDimension ) ;
 
 /*  */
-VL_EXPORT 
-VlBlockSparseArrayHeader*  vl_bsarray_add_block (VlBlockSparseArrayHeader *bsArray,VlBlockHeader *block, vl_bool copy ) ; 
+VL_EXPORT
+VlBlockSparseArrayHeader*  vl_bsarray_add_block (VlBlockSparseArrayHeader *bsArray,VlBlockHeader *block, vl_bool copy ) ;
 
 /* frees not used memory */
 VL_EXPORT
 VlBlockSparseArrayHeader *  vl_bsarray_finalise (VlBlockSparseArrayHeader *bsArray) ;
 
 /*  */
-VL_EXPORT 
-void vl_bsarray_delete (VlBlockSparseArrayHeader* bsArray) ; 
+VL_EXPORT
+void vl_bsarray_delete (VlBlockSparseArrayHeader* bsArray) ;
 
 /*  */
-VL_EXPORT 
-double* vl_bsarray_full (VlBlockSparseArrayHeader* bsArray) ; 
+VL_EXPORT
+double* vl_bsarray_full (VlBlockSparseArrayHeader* bsArray) ;
 
 /*  */
-VL_EXPORT 
-double vl_bsarray_get (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ; 
+VL_EXPORT
+double vl_bsarray_get (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ;
 
 /*  */
-VL_EXPORT 
+VL_EXPORT
 double vl_bsarray_mtimes (const VlBlockSparseArrayHeader* bsArray, const double* b ) ;
 
 
 
 /* TODO */
-//VL_EXPORT 
+//VL_EXPORT
 //double vl_bsarray_accumulate (VlBlockSparseArrayHeader* a, double b ) ;
 
 
@@ -96,7 +96,7 @@ double vl_bsarray_mtimes (const VlBlockSparseArrayHeader* bsArray, const double*
 /* Utility Functions */
 
 /*  */
-VL_EXPORT 
+VL_EXPORT
 VlBlockHeader* getSparseBlock(const vl_uint32* array, vl_uindex M, vl_uindex position, vl_uint32 type) ;
 
 /*  */
@@ -122,15 +122,15 @@ vl_uint32 vl_bsarray_length(VlBlockSparseArrayHeader *bsArray) ;
 
 /*  */
 VL_EXPORT
-VlBlockHeader* vl_bsarray_get_block (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ; 
+VlBlockHeader* vl_bsarray_get_block (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ;
 
 /*  */
 VL_EXPORT
-double innerProductSparseBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ; 
+double innerProductSparseBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ;
 
 /*  */
 VL_EXPORT
-double innerProductConstantBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ; 
+double innerProductConstantBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ;
 
 /*  */
 VL_EXPORT

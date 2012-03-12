@@ -24,7 +24,7 @@ void vl_pegasos_train_binary_svm (VlSvm * svm,
 				  VlRand* randomGenerator,
 				  vl_uint32 const * permutation,
 				  vl_size permutationSize,
-				  vlSvmFeatureMap mapFunc, 
+				  vlSvmFeatureMap mapFunc,
 				  const void * map) ;
 
 VL_EXPORT
@@ -38,7 +38,7 @@ void vl_pegasos_train_binary_svm_diagnostics (VlSvm * svm,
 					      VlRand* randomGenerator,
 					      vl_uint32 const * permutation,
 					      vl_size permutationSize,
-					      vlSvmFeatureMap mapFunc, 
+					      vlSvmFeatureMap mapFunc,
 					      const void * map,
 					      vlSvmDiagnostics diagnostics,
 					      vl_size diagnosticsFrequency) ;

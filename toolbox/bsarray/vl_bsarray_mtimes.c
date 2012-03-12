@@ -22,22 +22,22 @@ mexFunction(int nout, mxArray *out[],
 {
   enum {IN_BSARRAY=0,IN_FULL_ARRAY=1, IN_END} ;
   enum {OUT_MTIMES=0} ;
-    
-  VlBlockSparseArrayHeader* bsarray ;
-  double* fullArray ; 
 
-  double* acc ; 
+  VlBlockSparseArrayHeader* bsarray ;
+  double* fullArray ;
+
+  double* acc ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin > 2) 
+  if (nin > 2)
     {
       mexErrMsgTxt("One argument required.") ;
     }
- 
-  if (nout > 1) 
+
+  if (nout > 1)
     {
       mexErrMsgTxt("One output required.") ;
     }
@@ -62,6 +62,6 @@ mexFunction(int nout, mxArray *out[],
    *                                                     Fill output
    * ............................................................ */
 
-  *acc = vl_bsarray_mtimes (bsarray, fullArray ) ;  
-  
+  *acc = vl_bsarray_mtimes (bsarray, fullArray ) ;
+
 }

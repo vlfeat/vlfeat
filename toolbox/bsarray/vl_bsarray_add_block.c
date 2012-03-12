@@ -26,7 +26,7 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_BSARRAY, IN_BLOCK, IN_END} ;
   enum {OUT_DATA=0} ;
 
-  mwSize  M, N ; 
+  mwSize  M, N ;
 
   int i ;
 
@@ -34,40 +34,40 @@ mexFunction(int nout, mxArray *out[],
 
   VlBlockSparseArrayHeader* bsArray ;
   VlBlockHeader *block ;
-  
+
   vl_uint32 type, position = 0 ;
 
-  vl_bool copy = VL_TRUE ; 
-  
-  if (nin < 2) 
+  vl_bool copy = VL_TRUE ;
+
+  if (nin < 2)
     {
       mexErrMsgTxt("One argument required.") ;
     }
 
-  if (nout > 1) 
+  if (nout > 1)
     {
       mexErrMsgTxt("One output required.") ;
     }
 
   bsArray = (VlBlockSparseArrayHeader*) mxGetData(in[IN_BSARRAY]) ;
 
-  position = vl_bsarray_length(bsArray) ; 
+  position = vl_bsarray_length(bsArray) ;
 
-  
+
   for (i = 1; i < nin;i++)
        {
-	 temp = in[i] ; 
+	 temp = in[i] ;
 
 	 M = mxGetM (temp) ;
 	 N = mxGetN (temp) ;
 
-      
+
 	 if (!mxIsSparse(temp) && M == 1 && N == 1)
 	   {
-	     if (mxGetScalar(temp) - 1 < position) 
-	       mexErrMsgTxt("Blocks can't overlap.") ; 
+	     if (mxGetScalar(temp) - 1 < position)
+	       mexErrMsgTxt("Blocks can't overlap.") ;
 
-	     position = mxGetScalar(temp) - 1 ; 
+	     position = mxGetScalar(temp) - 1 ;
 
 	     continue ;
 	   }
@@ -81,8 +81,8 @@ mexFunction(int nout, mxArray *out[],
 	   {
 	     mexErrMsgTxt("Input must be a one dimensional array.") ;
 	   }
-      
-	 if (mxIsSingle(temp)) 
+
+	 if (mxIsSingle(temp))
 	   type = VL_TYPE_FLOAT ;
 	 else if (mxIsUint32(temp))
 	   type = VL_TYPE_UINT32 ;
@@ -90,33 +90,33 @@ mexFunction(int nout, mxArray *out[],
 	   type = VL_TYPE_INT32 ;
 	 else
 	   mexErrMsgTxt("Input type not supported.") ;
-	 
+
 
 	 if (isSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp)))
 	   {
-	     block = getSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ; 
-	     
+	     block = getSparseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
+
 	   }
 	 else if (isConstantBlock((vl_uint32*)mxGetData(temp),mxGetM(temp)))
 	   {
 	     block = getConstantBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
-	     
+
 	   }
 	 else
 	   {
 	     block = getDenseBlock((vl_uint32*)mxGetData(temp),mxGetM(temp),position,type) ;
-	     
+
 	   }
-	 
+
 	 bsArray = vl_bsarray_add_block(bsArray,block,copy) ;
 	 vl_free(block) ;
 
-	 copy = VL_FALSE ; 
+	 copy = VL_FALSE ;
 
-	 position += M ; 
+	 position += M ;
        }
 
-  bsArray = vl_bsarray_finalise(bsArray) ; 
+  bsArray = vl_bsarray_finalise(bsArray) ;
 
   /* ...............................................................
    *                                                       Save back

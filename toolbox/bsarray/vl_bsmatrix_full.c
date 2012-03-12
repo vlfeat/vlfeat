@@ -27,33 +27,33 @@ mexFunction(int nout, mxArray *out[],
   VlBlockSparseMatrixHeader* bsMatrix;
 
   vl_uint32 i, N ;
-  vl_uint32 M = 0 ; 
+  vl_uint32 M = 0 ;
 
-  double *output ; 
-  
-  VlBlockSparseArrayHeader* column ; 
+  double *output ;
+
+  VlBlockSparseArrayHeader* column ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin > 1) 
+  if (nin > 1)
     {
       mexErrMsgTxt("One argument required.") ;
     }
- 
-  if (nout > 1) 
+
+  if (nout > 1)
     {
       mexErrMsgTxt("One output required.") ;
     }
 
   bsMatrix = (VlBlockSparseMatrixHeader*) mxGetData(in[IN_BSARRAY]) ;
 
-  N = bsMatrix->numColumns ; 
+  N = bsMatrix->numColumns ;
 
   if (N != 0)
     {
-      column = vl_bsmatrix_get_column (bsMatrix, 0) ; 
+      column = vl_bsmatrix_get_column (bsMatrix, 0) ;
 
       M = vl_bsarray_length(column) ;
     }
@@ -61,8 +61,8 @@ mexFunction(int nout, mxArray *out[],
   /* ...............................................................
    *                                                     Fill output
    * ............................................................ */
-  
-  output = vl_bsmatrix_full(bsMatrix) ; 
+
+  output = vl_bsmatrix_full(bsMatrix) ;
 
   /* ...............................................................
    *                                                   Define output
@@ -82,7 +82,7 @@ mexFunction(int nout, mxArray *out[],
   dims [1] = N ;
   mxSetPr         (out[OUT_FULL_ARRAY], (double*)output) ;
   mxSetDimensions (out[OUT_FULL_ARRAY], dims, 2) ;
-  
+
 
 
 }
