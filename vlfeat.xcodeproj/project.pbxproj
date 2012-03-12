@@ -7,6 +7,22 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		2D0E4B16150E43B800CE27B5 /* bsarray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bsarray.c; path = vl/bsarray.c; sourceTree = "<group>"; };
+		2D0E4B17150E43B800CE27B5 /* bsarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsarray.h; path = vl/bsarray.h; sourceTree = "<group>"; };
+		2D0E4B18150E43B800CE27B5 /* bsmatrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bsmatrix.c; path = vl/bsmatrix.c; sourceTree = "<group>"; };
+		2D0E4B19150E43B800CE27B5 /* bsmatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsmatrix.h; path = vl/bsmatrix.h; sourceTree = "<group>"; };
+		2D0E4B1A150E43B800CE27B5 /* svm_solver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = svm_solver.c; path = vl/svm_solver.c; sourceTree = "<group>"; };
+		2D0E4B1B150E43B800CE27B5 /* svm_solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = svm_solver.h; path = vl/svm_solver.h; sourceTree = "<group>"; };
+		2D0E4B1D150E441600CE27B5 /* vl_demo_bsarray_basic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_demo_bsarray_basic.m; path = toolbox/demo/vl_demo_bsarray_basic.m; sourceTree = "<group>"; };
+		2D0E4B1E150E442700CE27B5 /* bsarray_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bsarray_utils.h; path = toolbox/bsarray/bsarray_utils.h; sourceTree = "<group>"; };
+		2D0E4B1F150E442700CE27B5 /* vl_bsarray_add_block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsarray_add_block.c; path = toolbox/bsarray/vl_bsarray_add_block.c; sourceTree = "<group>"; };
+		2D0E4B20150E442700CE27B5 /* vl_bsarray_full.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsarray_full.c; path = toolbox/bsarray/vl_bsarray_full.c; sourceTree = "<group>"; };
+		2D0E4B21150E442700CE27B5 /* vl_bsarray_mtimes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsarray_mtimes.c; path = toolbox/bsarray/vl_bsarray_mtimes.c; sourceTree = "<group>"; };
+		2D0E4B22150E442700CE27B5 /* vl_bsarray_new.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsarray_new.c; path = toolbox/bsarray/vl_bsarray_new.c; sourceTree = "<group>"; };
+		2D0E4B23150E442700CE27B5 /* vl_bsarray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_bsarray.m; path = toolbox/bsarray/vl_bsarray.m; sourceTree = "<group>"; };
+		2D0E4B24150E442700CE27B5 /* vl_bsmatrix_add_column.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsmatrix_add_column.c; path = toolbox/bsarray/vl_bsmatrix_add_column.c; sourceTree = "<group>"; };
+		2D0E4B25150E442700CE27B5 /* vl_bsmatrix_full.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsmatrix_full.c; path = toolbox/bsarray/vl_bsmatrix_full.c; sourceTree = "<group>"; };
+		2D0E4B26150E442700CE27B5 /* vl_bsmatrix_new.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_bsmatrix_new.c; path = toolbox/bsarray/vl_bsmatrix_new.c; sourceTree = "<group>"; };
 		2D0E6C4B1003E0DF00F0864E /* float.th */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = float.th; sourceTree = "<group>"; };
 		2D13EEE1100A511200C072E8 /* mathop_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mathop_sse2.c; sourceTree = "<group>"; };
 		2D13EEE4100A539200C072E8 /* mathop_sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mathop_sse2.h; sourceTree = "<group>"; };
@@ -369,6 +385,7 @@
 				2D99420410ECD6E300502DF6 /* index.html */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
 				2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */,
+				2D0E4B15150E435600CE27B5 /* dperrone */,
 				2D6102CF111EE22C00470F4C /* make */,
 				2D732E7D0CF8C2E40099B03C /* vl */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
@@ -463,6 +480,39 @@
 				2D66ACFD13AE05BD0060594E /* vl_test.m */,
 			);
 			name = test;
+			sourceTree = "<group>";
+		};
+		2D0E4B15150E435600CE27B5 /* dperrone */ = {
+			isa = PBXGroup;
+			children = (
+				2D0E4B16150E43B800CE27B5 /* bsarray.c */,
+				2D0E4B17150E43B800CE27B5 /* bsarray.h */,
+				2D0E4B18150E43B800CE27B5 /* bsmatrix.c */,
+				2D0E4B19150E43B800CE27B5 /* bsmatrix.h */,
+				2D0E4B1A150E43B800CE27B5 /* svm_solver.c */,
+				2D0E4B1B150E43B800CE27B5 /* svm_solver.h */,
+				2D8061FE118229AB0092BDD1 /* pegasos.c */,
+				2D8061FF118229AB0092BDD1 /* pegasos.h */,
+				2D0E4B1C150E43C500CE27B5 /* toolbox */,
+			);
+			name = dperrone;
+			sourceTree = "<group>";
+		};
+		2D0E4B1C150E43C500CE27B5 /* toolbox */ = {
+			isa = PBXGroup;
+			children = (
+				2D0E4B1E150E442700CE27B5 /* bsarray_utils.h */,
+				2D0E4B1F150E442700CE27B5 /* vl_bsarray_add_block.c */,
+				2D0E4B20150E442700CE27B5 /* vl_bsarray_full.c */,
+				2D0E4B21150E442700CE27B5 /* vl_bsarray_mtimes.c */,
+				2D0E4B22150E442700CE27B5 /* vl_bsarray_new.c */,
+				2D0E4B23150E442700CE27B5 /* vl_bsarray.m */,
+				2D0E4B24150E442700CE27B5 /* vl_bsmatrix_add_column.c */,
+				2D0E4B25150E442700CE27B5 /* vl_bsmatrix_full.c */,
+				2D0E4B26150E442700CE27B5 /* vl_bsmatrix_new.c */,
+				2D0E4B1D150E441600CE27B5 /* vl_demo_bsarray_basic.m */,
+			);
+			name = toolbox;
 			sourceTree = "<group>";
 		};
 		2D6102CF111EE22C00470F4C /* make */ = {
@@ -697,8 +747,6 @@
 				2D13EEE4100A539200C072E8 /* mathop_sse2.h */,
 				2D732E900CF8C2E40099B03C /* mser.c */,
 				2D732E910CF8C2E40099B03C /* mser.h */,
-				2D8061FE118229AB0092BDD1 /* pegasos.c */,
-				2D8061FF118229AB0092BDD1 /* pegasos.h */,
 				2D732E920CF8C2E40099B03C /* pgm.c */,
 				2D732E930CF8C2E40099B03C /* pgm.h */,
 				2D765BAF0FEC076700D08578 /* quickshift.c */,

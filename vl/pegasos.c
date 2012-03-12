@@ -328,7 +328,8 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
       }
 
       /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-      acc = innerProduct(svm->model, svm->dimension, data, dataDimension, k,mapFunc,map) ;
+      acc = innerProduct(svm->model, svm->dimension, data, dataDimension, k, mapFunc,map) ;
+      //innerProduct(svm,  data, k) ;
       if (svm->biasMultiplier)
 	acc += svm->biasMultiplier * svm->model[svm->dimension] ;
 
