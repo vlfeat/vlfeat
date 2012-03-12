@@ -5,18 +5,22 @@
 % --------------------------------------------------------------------
 
 %size of the blocks
-M = 10;
+M = 30;
 N = 1;
 
 % Creates a bsarray from a sequence of blocks. If each block is a MxN
 % matrix, and L is the number of blocks, the result will be a
 % bsarray of L*MxN. The blocks can have different number of rows,
 % but must have the same number of columns.
-SP = sparse(zeros(M,N));
-SP(5,1) = 1;
-SP(10,1) = 10;
+SP = single(zeros(M,N));
+SP(10,1) = 1;
+SP(20,1) = 10;
 R = single(randn(M,N));
-A1 = vl_bsarray_new(R,single(ones(M,N)),SP);
+A1 = vl_bsarray_new(R);
+
+
+A1 = vl_bsarray_add_block(A1,single(ones(M,N)),SP);
+
 
 A1T = [R; single(ones(M,N)); single(full(SP))];
 
@@ -39,4 +43,13 @@ A1Q = vl_bsarray_mtimes(A1,A2F) ;
 
 if (A1F'*A2F ~= A1Q)
     error('mtimes not working.') ;
+end
+
+
+A3 = vl_bsarray_new(single(A2F(:)),'Auto') ; 
+
+A3F = vl_bsarray_full(A3);
+
+if ~all(single(A3F(:)) == single(A2F(:)))
+    error('A2F not correct!');
 end

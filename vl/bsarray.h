@@ -11,6 +11,7 @@ Copyright Statement
 #define VL_BSARRAY_H
 
 #include "generic.h"
+#include "svm_solver.h"
 
 
 /* Block Types */
@@ -58,9 +59,9 @@ VlBlockSparseArrayHeader* vl_bsarray_new (vl_uint32 dataByteDimension ) ;
 
 /*  */
 VL_EXPORT 
-VlBlockSparseArrayHeader*  vl_bsarray_add_block (VlBlockSparseArrayHeader *bsArray,VlBlockHeader *block ) ; 
+VlBlockSparseArrayHeader*  vl_bsarray_add_block (VlBlockSparseArrayHeader *bsArray,VlBlockHeader *block, vl_bool copy ) ; 
 
-/* free not used memory */
+/* frees not used memory */
 VL_EXPORT
 VlBlockSparseArrayHeader *  vl_bsarray_finalise (VlBlockSparseArrayHeader *bsArray) ;
 
@@ -78,7 +79,7 @@ double vl_bsarray_get (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ;
 
 /*  */
 VL_EXPORT 
-double vl_bsarray_mtimes (VlBlockSparseArrayHeader* bsArray, double* b ) ;
+double vl_bsarray_mtimes (const VlBlockSparseArrayHeader* bsArray, const double* b ) ;
 
 
 
@@ -94,113 +95,57 @@ double vl_bsarray_mtimes (VlBlockSparseArrayHeader* bsArray, double* b ) ;
 
 /* Utility Functions */
 
-VL_INLINE
-vl_uint32 vl_bsarray_length(VlBlockSparseArrayHeader *bsArray) 
-{
-  vl_uint32 i, pos,length ;
-
-  VlBlockHeader *block ;
-
-  
-  length = 0 ; 
-  
-  pos = sizeof(VlBlockSparseArrayHeader) ; 
-  for ( i = 0; i < bsArray->numberOfBlocks ; i++ )
-    {
-      block = (VlBlockHeader*) (((void*)bsArray) + pos) ; 
-
-      switch(block->blockType)
-	{
-	case VL_BLOCK_SPARSE:
-	case VL_BLOCK_CONSTANT:
-	  length = block->position + *((vl_uint32*)(((void*)block) + sizeof(VlBlockHeader))) ; 
-	  break ;
-	case VL_BLOCK_DENSE:
-	  length = block->position + block->blockLength / sizeof(vl_uint32) ; 
-	} 
-
-      pos += block->blockLength + sizeof(VlBlockHeader) ;
-    }
-
-  return length ; 
-}
-
-VL_INLINE
-vl_uint32 vl_bsarray_allocated_memory(VlBlockSparseArrayHeader *bsArray) 
-{
-  vl_uint32 i, pos ;
-
-  VlBlockHeader *tempBlock ;
-
-  
-  vl_uint32 allocatedMemory  = 0 ;
-  
-  pos = sizeof(VlBlockSparseArrayHeader) ; 
-  for ( i = 0; i < bsArray->numberOfBlocks ; i++ )
-    {
-      tempBlock = (VlBlockHeader*) (((void*)bsArray) + pos) ; 
-
-      allocatedMemory += tempBlock->blockLength + sizeof(VlBlockHeader) ; 
-
-      pos += tempBlock->blockLength + sizeof(VlBlockHeader) ;
-    }
-
-  return allocatedMemory ; 
-}
+/*  */
+VL_EXPORT 
+VlBlockHeader* getSparseBlock(const vl_uint32* array, vl_uindex M, vl_uindex position, vl_uint32 type) ;
 
 /*  */
-VL_INLINE
-vl_uint32 vl_block_dense_get(VlBlockHeader* block, vl_uint32 pos)
-{
-  if (pos >= block->blockLength / sizeof(vl_uint32))
-    {
-      return 0 ;
-    }
-
-  return *((vl_uint32*)(((void*) block) + sizeof(VlBlockHeader) + pos*sizeof(vl_uint32))) ; 
-}
+VL_EXPORT
+VlBlockHeader* getConstantBlock(const vl_uint32* array, vl_uindex M, vl_uindex position, vl_uint32 type) ;
 
 /*  */
-VL_INLINE
-vl_uint32 vl_block_constant_get(VlBlockHeader* block, vl_uint32 pos)
-{
-  if (pos >= *((vl_uint32*)(((void*) block) + sizeof(VlBlockHeader))))
-    {
-      return 0 ;
-    }
-
-  return *((vl_uint32*)(((void*) block) + sizeof(VlBlockHeader) + sizeof(vl_uint32))) ; 
-}
+VL_EXPORT
+VlBlockHeader* getDenseBlock(const vl_uint32* array, vl_uindex M, vl_uindex position, vl_uint32 type) ;
 
 /*  */
-VL_INLINE
-vl_uint32 vl_block_sparse_get(VlBlockHeader* block, vl_uint32 pos)
-{
-  vl_uint32 numElements, i, *index ; 
+VL_EXPORT
+vl_bool isSparseBlock (const vl_uint32* array, vl_uindex M) ;
 
-  if (pos >= *((vl_uint32*)(((void*) block) + sizeof(VlBlockHeader))))
-    {
-      return 0 ;
-    }
+/*  */
+VL_EXPORT
+vl_bool isConstantBlock (const vl_uint32* array, vl_uindex M) ;
 
-  numElements = (block->blockLength - sizeof(vl_uint32)) / (sizeof(vl_uint32)*2) ; 
 
-  index = (vl_uint32*)(((void*)block) + sizeof(VlSparseBlockHeader)) ;
+/*  */
+VL_EXPORT
+vl_uint32 vl_bsarray_length(VlBlockSparseArrayHeader *bsArray) ;
 
-  for (i = 0; i < numElements; i += 2) 
-    {
-      if (pos == *(index + i))
-	{
-	  return *(index + i + 1) ;
-	}
-      if (pos < *(index + i))
-	{
-	  return 0 ; 
-	}
-    }
+/*  */
+VL_EXPORT
+VlBlockHeader* vl_bsarray_get_block (VlBlockSparseArrayHeader* bsArray, vl_uint32 pos) ; 
 
-  return 0 ;
-}
+/*  */
+VL_EXPORT
+double innerProductSparseBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ; 
 
+/*  */
+VL_EXPORT
+double innerProductConstantBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ; 
+
+/*  */
+VL_EXPORT
+double innerProductDenseBlock(const VlBlockHeader* block, const double * array, vl_uint32 position, vl_size order, vlSvmFeatureMap mapFunc, const void * map) ;
+
+/*  */
+VL_EXPORT
+void accumulatorSparseBlock(const VlBlockHeader* block, double * array, vl_uint32 position, double * preConditioner, double multiplier, vl_size order, vlSvmFeatureMap mapFunc, const void * map) ;
+
+/*  */
+VL_EXPORT
+void accumulatorConstantBlock(const VlBlockHeader* block, double * array, vl_uint32 position, double * preConditioner, double multiplier, vl_size order, vlSvmFeatureMap mapFunc, const void * map)  ;
+
+/*  */
+VL_EXPORT
+void accumulatorDenseBlock(const VlBlockHeader* block, double * array, vl_uint32 position, double * preConditioner, double multiplier, vl_size order, vlSvmFeatureMap mapFunc, const void * map) ;
 /* VL_BSARRAY_H */
 #endif

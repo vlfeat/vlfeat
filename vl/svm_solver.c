@@ -60,7 +60,7 @@ void deleteSvm (VlSvm* svm)
 
 
 VL_EXPORT void
-vlSvmComputeDiagnostics(VlSvm *svm, VlSvmStatus* status, void const * data,vl_size numSamples, const vl_int8 * labels, vlSvmInnerProductFunction innerProduct)
+vlSvmComputeDiagnostics(VlSvm *svm, VlSvmStatus* status, void const * data,vl_size dataDimension, vl_size numSamples, const vl_int8 * labels, vlSvmInnerProductFunction innerProduct, vlSvmFeatureMap mapFunc, const void * map )
 {
   vl_size i, k ;
   vl_size numPos = 0 ;
@@ -82,7 +82,7 @@ vlSvmComputeDiagnostics(VlSvm *svm, VlSvmStatus* status, void const * data,vl_si
 
   for (k = 0; k < numSamples; k++)
     {
-      pd = innerProduct(svm->model,svm->dimension,data,k) ;
+      pd = innerProduct(svm->model,svm->dimension,data,dataDimension,k,mapFunc,map) ;
       if (svm->biasMultiplier)
 	{
 	  pd += svm->model[svm->dimension]*svm->biasMultiplier ;
@@ -128,17 +128,38 @@ vlSvmComputeDiagnostics(VlSvm *svm, VlSvmStatus* status, void const * data,vl_si
 #include "float.th"
 
 VL_EXPORT double
-VL_XCAT(vlSvmInnerProductFunction_,SFX) (const double* model, vl_size dimension,  const void* data, vl_uindex element)
+VL_XCAT(vlSvmInnerProductFunction_,SFX) (const double* model, vl_size modelDimension,  const void* data, vl_size dataDimension, vl_uindex element, vlSvmFeatureMap mapFunc, const void * map)
 {
-  vl_size i ; 
+  vl_size i, j ; 
   T* tData ; 
   double res = 0;
 
+ 
+
   tData  = (T*) data ;
   
-  for (i = 0; i < dimension; i++) 
+  if (mapFunc)
     {
-      res += model[i]*(double)(tData[element*dimension + i]) ;
+      vl_size order = modelDimension / dataDimension ; 
+
+      double temp[order] ; 
+
+      for (i = 0; i < dataDimension; i++) 
+	{
+	  mapFunc(map,temp,1,tData[element*dataDimension + i]); 
+      
+	  for (j = 0; j < order; j++)
+	    { 
+	      res += model[i*order + j]*temp[j] ;
+	    }
+	}
+    }
+  else
+    {
+      for (i = 0; i < dataDimension; i++) 
+	{
+	  res += model[i]*(double)(tData[element*dataDimension + i]) ;
+	}
     }
 
   return res ; 
@@ -146,24 +167,54 @@ VL_XCAT(vlSvmInnerProductFunction_,SFX) (const double* model, vl_size dimension,
 
 
 VL_EXPORT void
-VL_XCAT(vlSvmAccumulatorFunction_,SFX)(VlSvm* svm,  vl_size dimension, const void* data, vl_uindex element, double multiplier) 
+VL_XCAT(vlSvmAccumulatorFunction_,SFX)(VlSvm* svm,  vl_size modelDimension, const void* data, vl_size dataDimension, vl_uindex element, double multiplier, vlSvmFeatureMap mapFunc, const void * map)
 {
-  vl_size i ; 
+  vl_size i,j ; 
   T* tData ; 
 
   tData  = (T*) data ;
-
   
-  if (svm->preConditioner)
-    for (i = 0; i < dimension; i++) 
-      {
-	svm->model[i] += multiplier * svm->preConditioner[i] * tData[element*dimension + i] ;
-      }	
+  if (mapFunc)
+    {
+      vl_size order = modelDimension / dataDimension ; 
+
+      double temp[order] ; 
+      
+      
+      
+      if (svm->preConditioner)
+	for (i = 0; i < dataDimension; i++) 
+	  {
+	    mapFunc(map,temp,1,tData[element*dataDimension + i]);
+	    for (j = 0; j < order; j++)
+	      {
+		svm->model[i*order + j] += multiplier * svm->preConditioner[i*order + j] * temp[j] ;
+	      }
+	  }	
+      else
+	for (i = 0; i < dataDimension; i++) 
+	  {
+	    mapFunc(map,temp,1,tData[element*dataDimension + i]);
+	    for (j = 0; j < order; j++)
+	      {
+		svm->model[i*order + j] += multiplier * temp[j] ;
+	      }
+	  }
+    }
   else
-    for (i = 0; i < dimension; i++) 
-      {
-	svm->model[i] += multiplier * tData[element*dimension + i] ;
-      }
+    {
+      if (svm->preConditioner)
+	for (i = 0; i < dataDimension; i++) 
+	  {
+	    svm->model[i] += multiplier * svm->preConditioner[i] * tData[element*dataDimension + i] ;
+	  }	
+      else
+	for (i = 0; i < dataDimension; i++) 
+	  {
+	    svm->model[i] += multiplier * tData[element*dataDimension + i] ;
+	  }
+    }
+  
 	
 }
 

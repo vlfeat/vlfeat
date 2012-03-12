@@ -231,13 +231,16 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
 VL_EXPORT void
 VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 					 void const * data,
+					 vl_size dataDimension,
 					 vl_size numSamples,
 					 vl_int8 const * labels,
 					 vlSvmInnerProductFunction innerProduct,
 					 vlSvmAccumulatorFunction accumulator,
 					 VlRand* randomGenerator,
 					 vl_uint32 const * permutation,
-					 vl_size permutationSize
+					 vl_size permutationSize,
+					 vlSvmFeatureMap mapFunc, 
+					 const void * map
 #ifdef DIAGNOSTICS
 					 ,vlSvmDiagnostics diagnostics,
 					 vl_size diagnosticsFrequency
@@ -245,7 +248,6 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 					 ) 
 {
   vl_tic() ; 
-  vl_uindex iteration ;
   vl_uindex iteration0 ;
   
   vl_size i ; 
@@ -326,7 +328,7 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
       }
 
       /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-      acc = innerProduct(svm->model, svm->dimension, data, k) ;
+      acc = innerProduct(svm->model, svm->dimension, data, dataDimension, k,mapFunc,map) ;
       if (svm->biasMultiplier) 
 	acc += svm->biasMultiplier * svm->model[svm->dimension] ;
 
@@ -335,7 +337,7 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 
 	acc = 0 ;
 
-	accumulator(svm,svm->dimension,data,k,eta) ;
+	accumulator(svm,svm->dimension,data,dataDimension,k,eta,mapFunc,map) ;
       
 
 	if (svm->biasMultiplier) 
@@ -353,7 +355,7 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
       if (svm->iterationsSoFar % diagnosticsFrequency == 0)
 	{
 	  svm->elapsedTime += vl_toc() ; 
-	  vlSvmComputeDiagnostics(svm, status, data, numSamples, labels, innerProduct ); 
+	  vlSvmComputeDiagnostics(svm, status, data, dataDimension, numSamples, labels, innerProduct, mapFunc, map  ); 
 
 	  diagnostics(svm,status) ; 
 

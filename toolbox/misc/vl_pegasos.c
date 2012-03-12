@@ -14,6 +14,12 @@ the terms of the BSD license (see the COPYING file).
 #include <mexutils.h>
 #include <vl/pegasos.h>
 #include <vl/svm_solver.h>
+#include <vl/bsmatrix.h>
+
+#include <vl/homkermap.h>
+
+
+#include <vl/stringop.h>
 
 #include <assert.h>
 #include <string.h>
@@ -177,12 +183,13 @@ void diagnosticsDispatcher(VlSvm* svm, VlSvmStatus *status)
 enum {
   opt_verbose, opt_bias_multiplier, opt_num_iterations,
   opt_starting_iteration, opt_starting_model, opt_permutation,
-  opt_preconditioner, opt_diagnostics, opt_diagnostics_freq
+  opt_preconditioner, opt_diagnostics, opt_diagnostics_freq, opt_block_sparse, opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS, opt_gamma, opt_period, opt_window,opt_order
 } ;
 
 /* options */
 vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
+  {"BlockSparse",       0,   opt_block_sparse        },
   {"BiasMultiplier",    1,   opt_bias_multiplier     },
   {"NumIterations",     1,   opt_num_iterations      },
   {"StartingIteration", 1,   opt_starting_iteration  },
@@ -191,6 +198,15 @@ vlmxOption  options [] = {
   {"Preconditioner",    1,   opt_preconditioner      },
   {"DiagnosticsFunction",       1,   opt_diagnostics         },
   {"DiagnosticsFreq",   1, opt_diagnostics_freq      },
+  {"homkermap",         0,   opt_homkermap           },
+  {"kl1",               0,   opt_KL1                 },
+  {"kchi2",             0,   opt_KCHI2               },
+  {"kjs",               0,   opt_KJS                 },
+  {"kinters",           0,   opt_KINTERS             },
+  {"order",             1,   opt_order               },
+  {"gamma",             1,   opt_gamma               },
+  {"period",            1,   opt_period              },
+  {"window",            1,   opt_window              },
   {0,                   0,   0                       }
 } ;
 
@@ -215,6 +231,9 @@ mexFunction(int nout, mxArray *out[],
   VlSvm* svm ;
   
   vl_size preconditionerDimension = 0 ;
+  vl_size dataDimension ; 
+
+  vl_uint32* matlabPermutation ; 
 
   svm = (VlSvm*) vl_malloc(sizeof(VlSvm)) ; 
 
@@ -237,8 +256,27 @@ mexFunction(int nout, mxArray *out[],
   vlSvmInnerProductFunction innerProduct ;
   vlSvmAccumulatorFunction accumulator ; 
  
+  /* maps */
+  vlSvmFeatureMap mapFunc  = NULL ; 
 
+  /* Homkermap */
+  VlHomogeneousKernelType kernelType = VlHomogeneousKernelChi2 ;
+  VlHomogeneousKernelMapWindowType windowType = VlHomogeneousKernelMapWindowRectangular ;
+  mwSize numDimensions ;
+  mwSize const * dimensions ;
+  mxClassID dataClassId ;
+  double gamma = 1.0 ;
+  int n = 0 ;
+  double period = -1 ;
+
+  vl_bool homkermap = VL_FALSE ; 
+  void * map = NULL;
+
+  /* diagnostics */
   vl_size diagnosticsFrequency = 10 ;
+  
+  /* Block Sparse Matrix */
+  vl_bool blockSparse = VL_FALSE ; 
 
   VL_USE_MATLAB_ENV ;
 
@@ -262,24 +300,21 @@ mexFunction(int nout, mxArray *out[],
               "DATA must be a real matrix.") ;
   }
 
-  data = mxGetData (IN(DATA)) ;
-  svm->dimension = mxGetM(IN(DATA)) ;
-  numSamples = mxGetN(IN(DATA)) ;
+  
 
   switch (dataClass) {
   case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
   case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
+  case mxUINT32_CLASS : dataType = VL_TYPE_UINT32; break ; 
   default:
     vlmxError(vlmxErrInvalidArgument,
-              "DATA must be either SINGLE or DOUBLE.") ;
+              "DATA must be either SINGLE or DOUBLE or Block Sparse UINT32.") ;
   }
 
   if (mxGetClassID(IN(LABELS)) != mxINT8_CLASS) {
     vlmxError(vlmxErrInvalidArgument, "LABELS must be INT8.") ;
   }
-  if (! vlmxIsVector(IN(LABELS), numSamples)) {
-    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
-  }
+  
 
   if (! vlmxIsPlainScalar(IN(LAMBDA))) {
     vlmxError(vlmxErrInvalidArgument, "LAMBDA is not a plain scalar.") ;
@@ -333,19 +368,7 @@ mexFunction(int nout, mxArray *out[],
       }
       permutationSize = mxGetNumberOfElements(optarg) ;
       permutation = mxMalloc(sizeof(vl_uint32) * permutationSize) ;
-      {
-	/* adjust indexing */
-	vl_uint32 const * matlabPermutation = mxGetData(optarg) ;
-	vl_uindex k ;
-	for (k = 0 ; k < permutationSize ; ++k) {
-	  permutation[k] = matlabPermutation[k] - 1 ;
-	  if (permutation[k] >= numSamples) {
-	    vlmxError(vlmxErrInconsistentData,
-		      "Permutation indexes out of bounds: PERMUTATION(%d) = %d > %d = number of data samples.",
-		      k + 1, permutation[k] + 1, numSamples) ;
-	  }
-	}
-      }
+      matlabPermutation = mxGetData(optarg) ;
       break ;
 
     case opt_preconditioner :
@@ -377,8 +400,112 @@ mexFunction(int nout, mxArray *out[],
     case opt_verbose :
       ++ verbose ;
       break ;
+    case opt_block_sparse :
+      if (dataType != VL_TYPE_UINT32)
+	vlmxError(vlmxErrInvalidArgument, "Invalid Block Sparse Array.") ;
+
+      blockSparse = VL_TRUE ; 
+      break;
+    case opt_homkermap:
+      homkermap = VL_TRUE ; 
+      break ; 
+    case opt_KINTERS:
+    case opt_KL1:
+      kernelType = VlHomogeneousKernelIntersection ;
+      break ;
+    case opt_KCHI2:
+      kernelType = VlHomogeneousKernelChi2 ;
+      break ;
+    case opt_KJS:
+      kernelType = VlHomogeneousKernelJS ;
+      break ;
+    case opt_period:
+      if (! vlmxIsPlainScalar(optarg)){
+	vlmxError(vlmxErrInvalidArgument, "PERIOD is not a scalar.") ;
+      }
+      period = *mxGetPr(optarg) ;
+      if (period <= 0) {
+	vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
+      }
+      break ;
+    case opt_order:
+      if (! vlmxIsPlainScalar(optarg)) 
+	{
+	  vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
+	}
+      n = *mxGetPr(optarg) ;
+      if (n < 0) 
+	{
+	  vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
+	}
+      
+      break ;
+    case opt_gamma:
+      if (! vlmxIsPlainScalar(optarg)){
+	vlmxError(vlmxErrInvalidArgument, "GAMMA is not a scalar.") ;
+      }
+      gamma = *mxGetPr(optarg) ;
+      if (gamma <= 0) {
+	vlmxError(vlmxErrInvalidArgument, "GAMMA is not positive.") ;
+      }
+      break ;
+    case opt_window:
+      if (! vlmxIsString(optarg,-1)){
+	vlmxError(vlmxErrInvalidArgument, "WINDOW is not a string.") ;
+      } else {
+	char buffer [1024] ;
+	mxGetString(optarg, buffer, sizeof(buffer) / sizeof(char)) ;
+	if (vl_string_casei_cmp("uniform", buffer) == 0) {
+	  windowType = VlHomogeneousKernelMapWindowUniform ;
+	} else if (vl_string_casei_cmp("rectangular", buffer) == 0) {
+	  windowType = VlHomogeneousKernelMapWindowRectangular ;
+	} else {
+	  vlmxError(vlmxErrInvalidArgument, "WINDOW=%s is not recognized.", buffer) ;
+	}
+      }
+      break ;
     }
   }
+
+
+  data = mxGetData (IN(DATA)) ;
+  if (!blockSparse)
+    {
+      dataDimension = mxGetM(IN(DATA)) ;
+      numSamples = mxGetN(IN(DATA)) ;
+    }
+  else
+    {
+      VlBlockSparseMatrixHeader * bsMatrix = (VlBlockSparseMatrixHeader *) data ; 
+      
+      numSamples = bsMatrix->numColumns ; 
+
+      VlBlockSparseArrayHeader * bsArray = vl_bsmatrix_get_column(bsMatrix,0) ; 
+
+      dataDimension = vl_bsarray_length(bsArray) ; 
+
+    }
+  
+  svm->dimension = (2*n + 1)*dataDimension; 
+
+  if (! vlmxIsVector(IN(LABELS), numSamples)) {
+    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
+  }
+
+
+  if (permutation)
+    {
+      /* adjust indexing */
+      vl_uindex k ;
+      for (k = 0 ; k < permutationSize ; ++k) {
+	permutation[k] = matlabPermutation[k] - 1 ;
+	if (permutation[k] >= numSamples) {
+	  vlmxError(vlmxErrInconsistentData,
+		    "Permutation indexes out of bounds: PERMUTATION(%d) = %d > %d = number of data samples.",
+		    k + 1, permutation[k] + 1, numSamples) ;
+	}
+      }
+    }
 
   if (svm->preConditioner && preconditionerDimension != (svm->dimension + (svm->biasMultiplier > 0))) {
     vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER has incompatible dimension.") ;
@@ -414,14 +541,26 @@ mexFunction(int nout, mxArray *out[],
     innerProduct = (vlSvmInnerProductFunction)&vlSvmInnerProductFunction_d ; 
     accumulator = (vlSvmAccumulatorFunction)&vlSvmAccumulatorFunction_d ; 
     break ;
+  case VL_TYPE_UINT32:
+    if (!blockSparse)
+      vlmxError(vlmxErrInvalidArgument, "Invalid Data Type.") ;
+    innerProduct = (vlSvmInnerProductFunction)&vlSvmInnerProductFunctionBlockSparseMatrixList ; 
+    accumulator = (vlSvmAccumulatorFunction)&vlSvmAccumulatorFunctionBlockSparseMatrixList ;
+    break ;
   }
+  if (homkermap)
+    {
+      map = vl_homogeneouskernelmap_new (kernelType, gamma, n, period, windowType) ;
+      
+      mapFunc = (vlSvmFeatureMap)&vl_homogeneouskernelmap_evaluate_d ; 
 
+    }
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
 
   if (diagnosticsHandle)
-    vl_pegasos_train_binary_svm_diagnostics(svm,data,
+    vl_pegasos_train_binary_svm_diagnostics(svm,data,dataDimension,
 					    numSamples,
 					    (vl_int8 const *)mxGetData(IN(LABELS)),
 					    innerProduct,
@@ -429,17 +568,21 @@ mexFunction(int nout, mxArray *out[],
 					    NULL,
 					    permutation,
 					    permutationSize,
+					    mapFunc,
+					    map,
 					    diagnosticsDispatcher,
 					    diagnosticsFrequency) ;
   else
-    vl_pegasos_train_binary_svm (svm,data,
-				  numSamples,
-				  (vl_int8 const *)mxGetData(IN(LABELS)),
-				  innerProduct,
-				  accumulator,
-				  NULL,
-				  permutation,
-				  permutationSize) ;
+    vl_pegasos_train_binary_svm (svm,data,dataDimension,
+				 numSamples,
+				 (vl_int8 const *)mxGetData(IN(LABELS)),
+				 innerProduct,
+				 accumulator,
+				 NULL,
+				 permutation,
+				 permutationSize,
+				 mapFunc,
+				 map) ;
 
 
   /* -----------------------------------------------------------------
