@@ -208,67 +208,150 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
  ** @see ::vl_pegasos_train_binary_svm_d
  **/
 
-#ifndef VL_PEGASOS_INSTANTIATING
-
 #include "pegasos.h"
 #include "mathop.h"
 #include <math.h>
 
-#define VL_PEGASOS_INSTANTIATING
-#define DIAGNOSTICS
-#define SFX _diagnostics
-#include "pegasos.c"
+void
+vl_svm_compute_diagnostics(VlSvmPegasos *svm,
+                           void * data,
+                           vl_size numSamples,
+                           vl_int8 const * labels,
+                           VlSvmInnerProductFunction innerProduct)
+{
+  vl_size i, k ;
+  vl_size numPos = 0 ;
+  vl_size numNeg = 0 ;
+  double pd ;
+  svm->objective->regularizer = 0.0 ;
 
-#define VL_PEGASOS_INSTANTIATING
-#define SFX
-#include "pegasos.c"
+  for (i = 0; i < svm->dimension; i++)
+    {
+      svm->objective->regularizer += svm->model[i] * svm->model[i] ;
+    }
 
-/* VL_PEGAOS_INSTANTIATING */
-#else
+  svm->objective->regularizer *= svm->lambda * 0.5 ;
 
+  svm->objective->lossPos = 0 ;
+  svm->objective->lossNeg = 0 ;
+  svm->objective->hardLossPos = 0 ;
+  svm->objective->hardLossNeg = 0 ;
+
+  for (k = 0; k < numSamples; k++)
+    {
+      pd = innerProduct(data,k,svm->model) ;
+      if (svm->biasMultiplier)
+	{
+	  pd += svm->model[svm->dimension]*svm->biasMultiplier ;
+	}
+
+      pd = VL_MAX(1 - labels[k]*pd, 0.0) ;
+
+      if (labels[k] < 0)
+	{
+	  svm->objective->lossNeg += pd ;
+	  svm->objective->hardLossNeg += (pd > 0) ;
+	  numNeg++ ;
+	}
+      else
+	{
+	  svm->objective->lossPos += pd ;
+	  svm->objective->hardLossPos += (pd > 0) ;
+	  numPos++ ;
+	}
+    }
+
+  svm->objective->lossNeg /= numNeg ;
+  svm->objective->hardLossNeg /= numNeg ;
+
+  svm->objective->lossPos /= numPos ;
+  svm->objective->hardLossPos /= numPos ;
+
+  svm->objective->energy = svm->objective->regularizer + svm->objective->lossPos + svm->objective->lossNeg ;
+}
+
+
+VL_EXPORT
+VlSvmPegasosSolver* vl_svmpegasos_new (vl_size dimension,
+                                       double lambda)
+{
+  VlSvmPegasos  * svm ;
+  svm = (VlSvmPegasos*) vl_malloc(sizeof(VlSvmPegasos)) ;
+
+  svm->model = (double*) vl_calloc(dimension, sizeof(double)) ;
+  svm->dimension = dimension ;
+
+  svm->objective = (VlSvmObjective*) vl_malloc(sizeof(VlSvmObjective)) ;
+
+  
+  svm->maxIterations = (vl_size) 10 / (lambda + 1) ;
+
+  assert(lambda > 0.0) ;
+
+  svm->lambda = lambda ;
+
+
+  svm->epsilon = -1 ;
+  svm->biasMultiplier = 0 ;
+  svm->bias = 0 ;
+
+  svm->biasLearningRate = 1 ;
+
+  svm->energyCheckFrequency = 100 ;
+
+  svm->randomGenerator = NULL ; 
+}
+
+VL_EXPORT
+void vl_pegasos_delete (VlSvmPegasos * svm)
+{
+  if (svm->model)
+    vl_free(svm->model) ;
+
+  if (svm->objective)
+    vl_free(svm->objective) ;
+
+  if (svm->preConditioner)
+    vl_free(svm->preConditioner) ;
+
+  if (svm->permutation)
+    vl_free(svm->permutation) ;
+
+  vl_free(svm) ;
+}
 
 
 VL_EXPORT void
-VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
-					 void const * data,
-					 vl_size dataDimension,
-					 vl_size numSamples,
-					 vl_int8 const * labels,
-					 vlSvmInnerProductFunction innerProduct,
-					 vlSvmAccumulatorFunction accumulator,
-					 VlRand* randomGenerator,
-					 vl_uint32 const * permutation,
-					 vl_size permutationSize,
-					 vlSvmFeatureMap mapFunc,
-					 const void * map
-#ifdef DIAGNOSTICS
-					 ,vlSvmDiagnostics diagnostics,
-					 vl_size diagnosticsFrequency
-#endif
-					 )
+vl_svmpegasos_train(VlSvmPegasos * svm,
+                    void * data,
+                    vl_size numSamples,
+                    vl_int8 const * labels,
+                    VlSvmInnerProductFunction innerProduct,
+                    VlSvmAccumulatorFunction accumulator,
+                    void * validation,
+                    vl_size validationNumSamples,
+                    vl_int8 const * validationLabels,
+                    VlSvmDiagnostics diagnostics,
+                    void * diagnosticCallerRef)
 {
   vl_tic() ;
   vl_uindex iteration0 ;
 
+  double energy ;
+
   vl_size i ;
 
   double acc, learningRate, y ;
-  double lambda = svm->regularizer ;
+  double lambda = svm->lambda ;
   vl_size const regularizationPeriod = 10 ;
 
-#ifdef DIAGNOSTICS
-  VlSvmStatus* status ;
 
-  status = (VlSvmStatus*) vl_malloc(sizeof(VlSvmStatus)) ;
-#endif
-
-
-  if (randomGenerator == NULL && permutation == NULL) {
-    randomGenerator = vl_get_rand() ;
+  if (svm->randomGenerator == NULL && svm->permutation == NULL) {
+    svm->randomGenerator = vl_get_rand() ;
   }
 
-  assert(lambda > 0.0) ;
-  assert(randomGenerator == NULL || permutation == NULL) ;
+
+  assert(svm->randomGenerator == NULL || svm->permutation == NULL) ;
   //assert(svm->iterationsSoFar >= 0) ;
 
   /*
@@ -292,10 +375,10 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
     {
       /* pick a sample  */
       vl_uindex k ;
-      if (permutation == NULL) {
+      if (svm->permutation == NULL) {
 	k = vl_rand_uindex(randomGenerator, numSamples) ;
       } else {
-	k = permutation[svm->iterationsSoFar % permutationSize] ;
+	k = svm->permutation[svm->iterationsSoFar % svm->permutationSize] ;
 	assert(k < numSamples) ;
       }
 
@@ -310,71 +393,66 @@ VL_XCAT(vl_pegasos_train_binary_svm,SFX)(VlSvm * svm,
 	double eta =  learningRate * regularizationPeriod * lambda ;
 
 
-	if (svm->preConditioner)
-	  {
-	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i)
-	      {
-		svm->model[i] -= eta * svm->preConditioner[i] * svm->model[i] ;
-	      }
-	  }
-	else
-	  {
-	    for (i = 0 ; i < svm->dimension + (svm->biasMultiplier != 0) ; ++i)
-	      {
-		svm->model[i] -= eta * svm->model[i] ;
-	      }
-	  }
+	
+        for (i = 0 ; i < svm->dimension  ; ++i)
+          {
+            svm->model[i] -= eta * svm->model[i] ;
+          }
+        if (svm->biasMultiplier)
+          svm->bias -= eta * svm->biasLearningRate * svm->bias ;
+	  
 
       }
 
       /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-      acc = innerProduct(svm->model, svm->dimension, data, dataDimension, k, mapFunc,map) ;
-      //innerProduct(svm,  data, k) ;
+      acc = innerProduct(data,k,svm->model) ;
+
       if (svm->biasMultiplier)
-	acc += svm->biasMultiplier * svm->model[svm->dimension] ;
+	acc += svm->biasMultiplier * svm->bias ;
 
       if (y * acc < (double) 1.0) {
 	double eta = y * learningRate ;
 
 	acc = 0 ;
 
-	accumulator(svm,svm->dimension,data,dataDimension,k,eta,mapFunc,map) ;
+	accumulator(data,k,svm->model,eta) ;
 
 
 	if (svm->biasMultiplier)
 	  {
-	    if (svm->preConditioner)
-	      svm->model[svm->dimension] += eta * svm->preConditioner[svm->dimension] * svm->biasMultiplier ;
-	    else
-	      svm->model[svm->dimension] += eta * svm->biasMultiplier ;
+            svm->bias += eta * svm->biasLearningRate * svm->biasMultiplier ;
 	  }
 
       }
 
-#ifdef DIAGNOSTICS
-
-      if (svm->iterationsSoFar % diagnosticsFrequency == 0)
+      if (svm->iterationsSoFar % svm->energyCheckFrequency == 0)
 	{
 	  svm->elapsedTime += vl_toc() ;
-	  vlSvmComputeDiagnostics(svm, status, data, dataDimension, numSamples, labels, innerProduct, mapFunc, map  );
+          if(validation)
+            vl_svm_compute_diagnostics(svm,
+                                       validation,
+                                       validationNumSamples,
+                                       validationLabels,
+                                       innerProduct) ;
+          else
+            vl_svm_compute_diagnostics(svm,
+                                       data,
+                                       numSamples,
+                                       labels,
+                                       innerProduct) ;
 
-	  diagnostics(svm,status) ;
+
+          if (diagnostics)
+            diagnostics(diagnosticCallerRef,svm) ;
+
+          if(svm->epsilon > 0 && abs(energy - svm->objective->energy) < svm->epsilon)
+            break ;
 
 	  vl_tic() ;
 	}
 
-#endif
     }
 
 
-#ifdef DIAGNOSTICS
-      vl_free(status) ;
-
-#endif
-       svm->elapsedTime += vl_toc() ;
+  svm->elapsedTime += vl_toc() ;
 }
-
-/* VL_PEGAOS_INSTANTIATING */
-#undef DIAGNOSTICS
-#undef VL_PEGASOS_INSTANTIATING
-#endif
