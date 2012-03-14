@@ -49,7 +49,7 @@ typedef struct _VlSvmDataset {
 
 
 VL_EXPORT
-VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension) ; 
+VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension) ;
 
 VL_EXPORT
 void vl_svmdataset_set_map (VlSvmDataset * data, void * map,VlSvmFeatureMap mapFunc, vl_size order) ;

@@ -8,7 +8,7 @@ Copyright Statement
 */
 #ifndef VL_SVM_INVARIANTS
 
-#include "svm_dataset.h"
+#include "svmdataset.h"
 #include <string.h>
 #include <math.h>
 
@@ -32,7 +32,6 @@ void vl_svmdataset_set_map (VlSvmDataset * data, void * map, VlSvmFeatureMap map
   data->mapFunc = mapFunc ;
   data->order = order ;
 
-  return data ;
 }
 
 VL_EXPORT
@@ -46,11 +45,11 @@ void vl_svmdataset_delete (VlSvmDataset * dataset)
 
 #define FLT VL_TYPE_FLOAT
 #define VL_SVM_INVARIANTS
-#include "svm_dataset.c"
+#include "svmdataset.c"
 
 #define FLT VL_TYPE_DOUBLE
 #define VL_SVM_INVARIANTS
-#include "svm_dataset.c"
+#include "svmdataset.c"
 
 /* VL_SVM_INVARIANTS */
 
@@ -66,30 +65,30 @@ VL_XCAT(vl_svm_innnerproduct_,SFX) (const void* data, const vl_uindex element,
   T* tData ;
   double res = 0 ;
 
+  VlSvmDataset* sdata = (VlSvmDataset*) data ;
 
+  tData  = (T*) sdata->data ;
 
-  tData  = (T*) data->data ;
-
-  if (data->mapFunc)
+  if (sdata->mapFunc)
     {
 
-      double temp[data->order] ;
+      double temp[sdata->order] ;
 
-      for (i = 0; i < data->dimension; i++)
+      for (i = 0; i < sdata->dimension; i++)
 	{
-	  data->mapFunc(data->map,temp,1,tData[element*data->dimension + i]);
+	  sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]);
 
-	  for (j = 0; j < data->order; j++)
+	  for (j = 0; j < sdata->order; j++)
 	    {
-	      res += model[i*data->order + j]*temp[j] ;
+	      res += model[i*sdata->order + j]*temp[j] ;
 	    }
 	}
     }
   else
     {
-      for (i = 0; i < data->dimension; i++)
+      for (i = 0; i < sdata->dimension; i++)
 	{
-	  res += model[i]*(double)(tData[element*data->dimension + i]) ;
+	  res += model[i]*(double)(tData[element*sdata->dimension + i]) ;
 	}
     }
 
@@ -106,28 +105,31 @@ VL_XCAT(vl_svm_accumulator_,SFX)(const void* data,
   vl_size i,j ;
   T* tData ;
 
-  tData  = (T*) data->data ;
 
-  if (data->mapFunc)
+  VlSvmDataset* sdata = (VlSvmDataset*) data ;
+
+  tData  = (T*) sdata->data ;
+
+  if (sdata->mapFunc)
     {
 
-      double temp[data->order] ;
+      double temp[sdata->order] ;
 
-      
-      for (i = 0; i < data->dimension; i++)
+
+      for (i = 0; i < sdata->dimension; i++)
         {
-          data->mapFunc(data->map,temp,1,tData[element*data->dimension + i]) ;
-          for (j = 0; j < data->order; j++)
+          sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]) ;
+          for (j = 0; j < sdata->order; j++)
             {
-              model[i*data->order + j] += multiplier * temp[j] ;
+              model[i*sdata->order + j] += multiplier * temp[j] ;
             }
         }
     }
   else
     {
-      for (i = 0; i < data->dimension; i++)
+      for (i = 0; i < sdata->dimension; i++)
         {
-          model[i] += multiplier * tData[element*data->dimension + i] ;
+          model[i] += multiplier * tData[element*sdata->dimension + i] ;
         }
     }
 

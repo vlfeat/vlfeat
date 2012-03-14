@@ -28,7 +28,7 @@ typedef struct _VlSvmObjective {
 /** @brief Pegasos Svm Solver  */
 typedef struct _VlSvmPegasos {
   double *  model ;
-  double bias ; 
+  double bias ;
   vl_size dimension ;
   vl_size iterations ;
   vl_size maxIterations ;
@@ -39,7 +39,7 @@ typedef struct _VlSvmPegasos {
   vl_size energyFrequency ;
   double  biasLearningRate ;
   VlSvmObjective*  objective ;
-  VlRand* randomGenerator ; 
+  VlRand* randomGenerator ;
   vl_uint32 * permutation ;
   vl_size permutationSize ;
 } VlSvmPegasos ;
@@ -73,7 +73,7 @@ void vl_svmpegasos_train (VlSvmPegasos * svm,
  ** @{
  **/
 VL_INLINE double* vl_svmpegasos_get_model             (VlSvmPegasos const *self) ;
-VL_INLINE double* vl_svmpegasos_get_bias              (VlSvmPegasos const *self) ;
+VL_INLINE double  vl_svmpegasos_get_bias              (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_dimension         (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_iterations        (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_maxiterations     (VlSvmPegasos const *self) ;
@@ -93,13 +93,14 @@ VL_INLINE vl_size vl_svmpegasos_get_permutation_size  (VlSvmPegasos const *self)
  ** @{
  **/
 VL_INLINE void vl_svmpegasos_set_maxiterations   (VlSvmPegasos *self, vl_size i) ;
+VL_INLINE void vl_svmpegasos_set_iterations      (VlSvmPegasos *self, vl_size i) ;
 VL_INLINE void vl_svmpegasos_set_epsilon         (VlSvmPegasos *self, double e) ;
 VL_INLINE void vl_svmpegasos_set_lambda          (VlSvmPegasos *self, double l) ;
 VL_INLINE void vl_svmpegasos_set_bias_multiplier (VlSvmPegasos *self, double b) ;
 VL_INLINE void vl_svmpegasos_set_energy_frequency(VlSvmPegasos *self, vl_size e) ;
 VL_INLINE void vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double  blr) ;
-VL_INLINE void vl_svmpegasos_set_random_generator(VlSvmPegasos const *self, VlRand * r) ;
-VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos const *self, vl_uint32 p,
+VL_INLINE void vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r) ;
+VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos *self, vl_uint32* p,
                                                   vl_size psize) ;
 /** @} */
 
@@ -113,10 +114,10 @@ VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos const *self, vl_u
  ** @return pointer to model.
  **/
 
-VL_INLINE double* 
+VL_INLINE double*
 vl_svmpegasos_get_model (VlSvmPegasos const *self)
 {
-  return self->model ; 
+  return self->model ;
 }
 
 /** ------------------------------------------------------------------
@@ -125,10 +126,10 @@ vl_svmpegasos_get_model (VlSvmPegasos const *self)
  ** @return bias value.
  **/
 
-VL_INLINE double 
+VL_INLINE double
 vl_svmpegasos_get_bias (VlSvmPegasos const *self)
 {
-  return self->bias ; 
+  return self->bias ;
 }
 
 /** ------------------------------------------------------------------
@@ -140,7 +141,7 @@ vl_svmpegasos_get_bias (VlSvmPegasos const *self)
 VL_INLINE vl_size
 vl_svmpegasos_get_dimension (VlSvmPegasos const *self)
 {
-  return self->dimension ; 
+  return self->dimension ;
 }
 
 /** ------------------------------------------------------------------
@@ -152,7 +153,7 @@ vl_svmpegasos_get_dimension (VlSvmPegasos const *self)
 VL_INLINE vl_size
 vl_svmpegasos_get_iterations (VlSvmPegasos const *self)
 {
-  return self->iterations ; 
+  return self->iterations ;
 }
 
 /** ------------------------------------------------------------------
@@ -164,7 +165,7 @@ vl_svmpegasos_get_iterations (VlSvmPegasos const *self)
 VL_INLINE vl_size
 vl_svmpegasos_get_maxiterations (VlSvmPegasos const *self)
 {
-  return self->maxIterations ; 
+  return self->maxIterations ;
 }
 
 /** ------------------------------------------------------------------
@@ -176,7 +177,7 @@ vl_svmpegasos_get_maxiterations (VlSvmPegasos const *self)
 VL_INLINE double
 vl_svmpegasos_get_epsilon (VlSvmPegasos const *self)
 {
-  return self->epsilon ; 
+  return self->epsilon ;
 }
 
 /** ------------------------------------------------------------------
@@ -188,7 +189,7 @@ vl_svmpegasos_get_epsilon (VlSvmPegasos const *self)
 VL_INLINE double
 vl_svmpegasos_get_lambda (VlSvmPegasos const *self)
 {
-  return self->lambda ; 
+  return self->lambda ;
 }
 
 /** ------------------------------------------------------------------
@@ -200,7 +201,7 @@ vl_svmpegasos_get_lambda (VlSvmPegasos const *self)
 VL_INLINE double
 vl_svmpegasos_get_bias_multiplier (VlSvmPegasos const *self)
 {
-  return self->biasMultiplier ; 
+  return self->biasMultiplier ;
 }
 
 /** ------------------------------------------------------------------
@@ -212,11 +213,11 @@ vl_svmpegasos_get_bias_multiplier (VlSvmPegasos const *self)
 VL_INLINE double
 vl_svmpegasos_get_elapsed_time (VlSvmPegasos const *self)
 {
-  return self->elapsedTime ; 
+  return self->elapsedTime ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get how frequent the full energy is computed. 
+ ** @brief Get how frequent the full energy is computed.
  ** @param self Pegasos Svm Solver.
  ** @return energy computation frequency.
  **/
@@ -224,7 +225,7 @@ vl_svmpegasos_get_elapsed_time (VlSvmPegasos const *self)
 VL_INLINE vl_size
 vl_svmpegasos_get_energy_frequency (VlSvmPegasos const *self)
 {
-  return self->energyFrequency ; 
+  return self->energyFrequency ;
 }
 
 /** ------------------------------------------------------------------
@@ -236,7 +237,7 @@ vl_svmpegasos_get_energy_frequency (VlSvmPegasos const *self)
 VL_INLINE double
 vl_svmpegasos_get_bias_learningrate (VlSvmPegasos const *self)
 {
-  return self->biasLearningRate ; 
+  return self->biasLearningRate ;
 }
 
 /** ------------------------------------------------------------------
@@ -245,10 +246,10 @@ vl_svmpegasos_get_bias_learningrate (VlSvmPegasos const *self)
  ** @return objective energy.
  **/
 
-VL_INLINE double*
+VL_INLINE VlSvmObjective*
 vl_svmpegasos_get_objective (VlSvmPegasos const *self)
 {
-  return self->objective ; 
+  return self->objective ;
 }
 
 /** ------------------------------------------------------------------
@@ -260,7 +261,7 @@ vl_svmpegasos_get_objective (VlSvmPegasos const *self)
 VL_INLINE VlRand*
 vl_svmpegasos_get_random_generator (VlSvmPegasos const *self)
 {
-  return self->randomGenerator ; 
+  return self->randomGenerator ;
 }
 
 /** ------------------------------------------------------------------
@@ -272,7 +273,7 @@ vl_svmpegasos_get_random_generator (VlSvmPegasos const *self)
 VL_INLINE vl_uint32*
 vl_svmpegasos_get_permutation (VlSvmPegasos const *self)
 {
-  return self->permutation ; 
+  return self->permutation ;
 }
 
 /** ------------------------------------------------------------------
@@ -282,9 +283,9 @@ vl_svmpegasos_get_permutation (VlSvmPegasos const *self)
  **/
 
 VL_INLINE vl_size
-vl_svmpegasos_get_permutation (VlSvmPegasos const *self)
+vl_svmpegasos_get_permutationsize (VlSvmPegasos const *self)
 {
-  return self->permutationSize ; 
+  return self->permutationSize ;
 }
 
 /** ------------------------------------------------------------------
@@ -296,7 +297,19 @@ vl_svmpegasos_get_permutation (VlSvmPegasos const *self)
 VL_INLINE void
 vl_svmpegasos_set_maxiterations (VlSvmPegasos *self, vl_size i)
 {
-  self->maxIterations = maxIterations ; 
+  self->maxIterations = i ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set pegasos performed iterations.
+ ** @param self Pegasos Svm Solver.
+ ** @param i pegasos performed iterations.
+ **/
+
+VL_INLINE void
+vl_svmpegasos_set_iterations (VlSvmPegasos *self, vl_size i)
+{
+  self->iterations = i ;
 }
 
 /** ------------------------------------------------------------------
@@ -306,9 +319,9 @@ vl_svmpegasos_set_maxiterations (VlSvmPegasos *self, vl_size i)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_epsilon (VlSvmPegasos *self, vl_size e)
+vl_svmpegasos_set_epsilon (VlSvmPegasos *self, double e)
 {
-  self->epsilon = epsilon ; 
+  self->epsilon = e ;
 }
 
 /** ------------------------------------------------------------------
@@ -318,9 +331,9 @@ vl_svmpegasos_set_epsilon (VlSvmPegasos *self, vl_size e)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_lambda (VlSvmPegasos *self, vl_size l)
+vl_svmpegasos_set_lambda (VlSvmPegasos *self, double l)
 {
-  self->lambda = lambda ; 
+  self->lambda = l ;
 }
 
 /** ------------------------------------------------------------------
@@ -330,9 +343,9 @@ vl_svmpegasos_set_lambda (VlSvmPegasos *self, vl_size l)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_bias_multiplier (VlSvmPegasos *self, vl_size b)
+vl_svmpegasos_set_bias_multiplier (VlSvmPegasos *self, double b)
 {
-  self->biasMultiplier = biasMultiplier ; 
+  self->biasMultiplier = b ;
 }
 
 /** ------------------------------------------------------------------
@@ -344,7 +357,7 @@ vl_svmpegasos_set_bias_multiplier (VlSvmPegasos *self, vl_size b)
 VL_INLINE void
 vl_svmpegasos_set_energy_frequency (VlSvmPegasos *self, vl_size e)
 {
-  self->energyFrequency = energyFrequency ; 
+  self->energyFrequency = e ;
 }
 
 /** ------------------------------------------------------------------
@@ -354,9 +367,9 @@ vl_svmpegasos_set_energy_frequency (VlSvmPegasos *self, vl_size e)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, vl_size blr)
+vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double blr)
 {
-  self->biasLearningrate = blr ; 
+  self->biasLearningRate = blr ;
 }
 
 /** ------------------------------------------------------------------
@@ -366,9 +379,9 @@ vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, vl_size blr)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_random_generator(VlSvmPegasos const *self, VlRand * r)
+vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r)
 {
-  self->randomGenerator = r ; 
+  self->randomGenerator = r ;
 }
 
 /** ------------------------------------------------------------------
@@ -379,11 +392,11 @@ vl_svmpegasos_set_random_generator(VlSvmPegasos const *self, VlRand * r)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_permutation(VlSvmPegasos const *self, vl_uint32 p,
+vl_svmpegasos_set_permutation(VlSvmPegasos *self, vl_uint32* p,
                                    vl_size psize)
 {
   self->permutation = p ;
-  self->permutationSize = psize ; 
+  self->permutationSize = psize ;
 }
 
 /* VL_PEGASOS_H */

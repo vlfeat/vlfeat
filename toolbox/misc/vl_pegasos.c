@@ -26,152 +26,151 @@ the terms of the BSD license (see the COPYING file).
 
 #include "kdtree.h"
 
-/* Diagnostics */
-enum {model=0,
-      dimension,
-      iterationsSoFar,
+/* Info */
+enum {dimension,
+      iterations,
       maxIterations,
-      regularizer,
+      epsilon,
+      lambda,
       biasMultiplier,
-      preConditioner,
+      biasLearningRate,
+      energyFrequency,
       elapsedTime,
       energy,
       regularizerTerm,
-      lossPoss,
+      lossPos,
       lossNeg,
       hardLossPos,
       hardLossNeg};
 
-void setValue(mxArray* array, double value)
+static
+void setDoubleValue(mxArray* array, double value)
 {
   double* temp = (double*) mxGetData(array) ;
   *temp = value ;
 }
 
-mxArray * createOutputStruct(VlSvm* svm)
+static
+void setUintValue(mxArray* array, double value)
+{
+  vl_uint32 * temp = (vl_uint32*) mxGetData(array) ;
+  *temp = value ;
+}
+
+
+static
+mxArray * createInfoStruct(VlSvmPegasos* svm)
 {
   mwSize dims[] = {1 , 1} ;
 
-  const char* names [8] = {"model","dimension","iterationsSoFar","maxIterations","regularizer","biasMultiplier","preConditioner","elapsedTime"} ;
-  mxArray* output = mxCreateStructArray(1, dims,
-				       8, names);
+  const char* names [15] = {"dimension", "iterations", "maxIterations",
+                           "epsilon", "lambda", "biasMultiplier",
+                           "biasLearningRate", "energyFrequency", "elapsedTime",
+                           "energy", "regularizerTerm", "lossPos",
+                           "lossNeg", "hardLossPos", "hardLossNeg"} ;
 
-  vl_size extDimension = svm->dimension + (svm->biasMultiplier != 0) ;
+  mxArray* output = mxCreateStructArray(1, dims, 15, names);
 
-  mxArray * model = mxCreateNumericMatrix(extDimension, 1,mxDOUBLE_CLASS, mxREAL) ;
+  mxArray * dimension = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  setUintValue(dimension,svm->dimension) ;
 
-  memcpy(mxGetData(model),svm->model,extDimension*sizeof(double)) ;
+  mxArray * iterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  setUintValue(iterations,svm->iterations) ;
 
-  mxArray * dimension = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-  setValue(dimension,svm->dimension) ;
+  mxArray * maxIterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  setUintValue(maxIterations,svm->maxIterations) ;
 
+  mxArray * epsilon = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(epsilon,svm->epsilon) ;
 
-  mxArray * iterationsSoFar = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(iterationsSoFar,svm->iterationsSoFar) ;
-
-
-  mxArray * maxIterations = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(maxIterations,svm->maxIterations) ;
-
-  mxArray * regularizer = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(regularizer,svm->regularizer) ;
+  mxArray * lambda = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(lambda,svm->lambda) ;
 
   mxArray * biasMultiplier = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(biasMultiplier,svm->biasMultiplier) ;
 
-  setValue(maxIterations,svm->maxIterations) ;
+  mxArray * biasLearningRate = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(biasLearningRate,svm->biasLearningRate) ;
 
-  mxArray * preConditioner = mxCreateNumericMatrix(extDimension, 1,mxDOUBLE_CLASS, mxREAL) ;
-  if (svm->preConditioner)
-    memcpy(mxGetData(preConditioner),svm->preConditioner,extDimension*sizeof(double)) ;
+  mxArray * energyFrequency = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  setUintValue(energyFrequency,svm->energyFrequency) ;
 
   mxArray * elapsedTime = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(elapsedTime,svm->elapsedTime) ;
 
-  setValue(elapsedTime,svm->elapsedTime) ;
 
-  mxSetField(output, 0, "model", model) ;
   mxSetField(output, 0, "dimension", dimension) ;
-  mxSetField(output, 0, "iterationsSoFar", iterationsSoFar) ;
+  mxSetField(output, 0, "iterationsSoFar", iteration) ;
   mxSetField(output, 0, "maxIterations", maxIterations) ;
-  mxSetField(output, 0, "regularizer", regularizer) ;
+  mxSetField(output, 0, "epsilon", maxIterations) ;
+  mxSetField(output, 0, "lambda", lambda) ;
   mxSetField(output, 0, "biasMultiplier", biasMultiplier) ;
-  mxSetField(output, 0, "preConditioner", preConditioner) ;
+  mxSetField(output, 0, "biasLearningRate", biasLearningRate) ;
+  mxSetField(output, 0, "energyFrequency", energyFrequency) ;
   mxSetField(output, 0, "elapsedTime", elapsedTime) ;
 
-  return output ;
-}
 
-mxArray * createDiagnosticsStruct(VlSvm* svm, VlSvmStatus* status)
-{
-  mxArray * output = createOutputStruct(svm) ;
+  if (svm->objective)
+    {
+      mxArray * energy = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(energy,svm->objective->energy) ;
 
-  mxAddField (output,"energy") ;
-  mxAddField (output,"regularizerTerm") ;
-  mxAddField (output,"lossPos") ;
-  mxAddField (output,"lossNeg") ;
-  mxAddField (output,"hardLossPos") ;
-  mxAddField (output,"hardLossNeg") ;
+      mxArray * regularizerTerm = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(regularizerTerm,svm->objective->regularizer) ;
 
+      mxArray * lossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(lossPos,svm->objective->lossPos) ;
 
-  mxArray * energy = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      mxArray * lossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(lossNeg,svm->objective->lossNeg) ;
 
-  setValue(energy,status->energy) ;
+      mxArray * hardLossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(hardLossPos,svm->objective->hardLossPos) ;
 
-  mxArray * regularizerTerm = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      mxArray * hardLossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      setDoubleValue(hardLossNeg,svm->objective->hardLossNeg) ;
 
-  setValue(regularizerTerm,status->regularizer) ;
+      mxSetField(output, 0, "energy", energy) ;
+      mxSetField(output, 0, "regularizerTerm", regularizerTerm) ;
+      mxSetField(output, 0, "lossPos", lossPos) ;
+      mxSetField(output, 0, "lossNeg", lossNeg) ;
+      mxSetField(output, 0, "hardLossPos", hardLossPos) ;
+      mxSetField(output, 0, "hardLossNeg", hardLossNeg) ;
 
-  mxArray * lossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(lossPos,status->lossPos) ;
-
-  mxArray * lossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(lossNeg,status->lossNeg) ;
-
-  mxArray * hardLossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(hardLossPos,status->hardLossPos) ;
-
-  mxArray * hardLossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-
-  setValue(hardLossNeg,status->hardLossNeg) ;
-
-
-  mxSetField(output, 0, "energy", energy) ;
-  mxSetField(output, 0, "regularizerTerm", regularizerTerm) ;
-  mxSetField(output, 0, "lossPos", lossPos) ;
-  mxSetField(output, 0, "lossNeg", lossNeg) ;
-  mxSetField(output, 0, "hardLossPos", hardLossPos) ;
-  mxSetField(output, 0, "hardLossNeg", hardLossNeg) ;
+    }
 
   return output ;
 }
 
 
-mxArray* diagnosticsHandle = NULL ;
-int            verbose = 0 ;
 
-void diagnosticsDispatcher(VlSvm* svm, VlSvmStatus *status)
+
+typedef struct _DiagnosticsDispatcher {
+  mxArray* diagnosticsHandle ;
+  mxArray * callerRef ;
+  int verbose ;
+} DiagnosticsDispatcher ;
+
+
+void diagnosticsDispatcher(DiagnosticsDispatcher * self, VlSvmPegasos* svm)
 {
   if (diagnosticsHandle)
     {
-      mxArray *lhs,*rhs[2];
+      mxArray *lhs,*rhs[3];
 
-      rhs[0] = diagnosticsHandle ;
-      rhs[1] =  createDiagnosticsStruct(svm,status) ;
+      rhs[0] = self->diagnosticsHandle ;
+      rhs[1] = self->callerRef ;
+      rhs[2] =  createDiagnosticsStruct(svm) ;
 
       if( mxIsClass( rhs[0] , "function_handle"))
-	mexCallMATLAB(0,&lhs,2,rhs,"feval");
+	mexCallMATLAB(0,&lhs,3,rhs,"feval");
 
-      if (verbose)
+      if (self->verbose)
 	{
 	  mexPrintf("vl_pegasos: Iteration = %d\n",svm->iterationsSoFar) ;
 	  mexPrintf("vl_pegasos: elapsed time = %f\n",svm->elapsedTime) ;
 
-	  mexPrintf("vl_pegasos: energy = %f\n",status->energy) ;
+	  mexPrintf("vl_pegasos: energy = %f\n",svm->objective->energy) ;
 	}
     }
 
@@ -183,29 +182,27 @@ void diagnosticsDispatcher(VlSvm* svm, VlSvmStatus *status)
 enum {
   opt_verbose, opt_bias_multiplier, opt_num_iterations,
   opt_starting_iteration, opt_starting_model, opt_permutation,
-  opt_preconditioner, opt_diagnostics, opt_diagnostics_freq, opt_block_sparse, opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS, opt_gamma, opt_period, opt_window,opt_order
+  opt_bias_learningrate, opt_diagnostics, opt_diagnostics_freq, opt_block_sparse, opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS, opt_gamma, opt_period, opt_window
 } ;
 
 /* options */
 vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
-  {"BlockSparse",       0,   opt_block_sparse        },
   {"BiasMultiplier",    1,   opt_bias_multiplier     },
   {"NumIterations",     1,   opt_num_iterations      },
   {"StartingIteration", 1,   opt_starting_iteration  },
   {"StartingModel",     1,   opt_starting_model      },
   {"Permutation",       1,   opt_permutation         },
-  {"Preconditioner",    1,   opt_preconditioner      },
+  {"BiasLearningRate",    1,   opt_bias_learningrate     },
   {"DiagnosticsFunction",       1,   opt_diagnostics         },
   {"DiagnosticsFreq",   1, opt_diagnostics_freq      },
-  {"homkermap",         0,   opt_homkermap           },
+  {"homkermap",         1,   opt_homkermap           },
   {"kl1",               0,   opt_KL1                 },
   {"kchi2",             0,   opt_KCHI2               },
   {"kjs",               0,   opt_KJS                 },
   {"kinters",           0,   opt_KINTERS             },
   {"order",             1,   opt_order               },
   {"gamma",             1,   opt_gamma               },
-  {"period",            1,   opt_period              },
   {"window",            1,   opt_window              },
   {0,                   0,   0                       }
 } ;
@@ -222,28 +219,18 @@ mexFunction(int nout, mxArray *out[],
   enum {OUT_MODEL = 0} ;
 
 
+  int            verbose = 0 ;
   int            opt ;
   int            next = IN_END ;
   mxArray const *optarg ;
 
   mxArray *inputModel = NULL;
 
-  VlSvm* svm ;
+  VlSvmPegasos* svm ;
 
-  vl_size preconditionerDimension = 0 ;
   vl_size dataDimension ;
 
   vl_uint32* matlabPermutation ;
-
-  svm = (VlSvm*) vl_malloc(sizeof(VlSvm)) ;
-
-  svm->biasMultiplier = 0 ;
-  svm->preConditioner = NULL ;
-
-  svm->maxIterations = 0 ;
-  svm->iterationsSoFar = 0 ;
-
-  svm->elapsedTime = 0 ;
 
   void * data ;
   mxClassID dataClass ;
@@ -301,14 +288,42 @@ mexFunction(int nout, mxArray *out[],
   }
 
 
+  data = mxGetData (IN(DATA)) ;
+
+  dataDimension = mxGetM(IN(DATA)) ;
+  numSamples = mxGetN(IN(DATA)) ;
+
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+    if  (opt == opt_homkermap)
+      {
+        homkermap = VL_TRUE ;
+        if (! vlmxIsPlainScalar(optarg))
+          {
+            vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
+          }
+        n = *mxGetPr(optarg) ;
+        if (n < 0)
+          {
+            vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
+          }
+
+      }
+  }
+
+
+
+  if (! vlmxIsVector(IN(LABELS), numSamples)) {
+    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
+  }
+
+
 
   switch (dataClass) {
   case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
   case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
-  case mxUINT32_CLASS : dataType = VL_TYPE_UINT32; break ;
   default:
     vlmxError(vlmxErrInvalidArgument,
-              "DATA must be either SINGLE or DOUBLE or Block Sparse UINT32.") ;
+              "DATA must be either SINGLE or DOUBLE.") ;
   }
 
   if (mxGetClassID(IN(LABELS)) != mxINT8_CLASS) {
@@ -319,7 +334,8 @@ mexFunction(int nout, mxArray *out[],
   if (! vlmxIsPlainScalar(IN(LAMBDA))) {
     vlmxError(vlmxErrInvalidArgument, "LAMBDA is not a plain scalar.") ;
   }
-  svm->regularizer = *mxGetPr(IN(LAMBDA)) ;
+
+  svm = vl_svmpegasos_new ((2*n + 1)*dataDimension,*mxGetPr(IN(LAMBDA)) ;
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
@@ -327,7 +343,7 @@ mexFunction(int nout, mxArray *out[],
       if (!vlmxIsPlainScalar(optarg)) {
 	vlmxError(vlmxErrInvalidArgument, "BIASMULTIPLIER is not a plain scalar.") ;
       }
-      svm->biasMultiplier = *mxGetPr(optarg) ;
+      vl_svmpegasos_set_bias_multiplier(svm, *mxGetPr(optarg)) ;
       break ;
 
     case opt_num_iterations :
@@ -337,7 +353,7 @@ mexFunction(int nout, mxArray *out[],
       if (*mxGetPr(optarg) < 0) {
 	vlmxError(vlmxErrInvalidArgument, "NUMITERATIONS is negative.") ;
       }
-      svm->maxIterations = (vl_size) *mxGetPr(optarg) ;
+      vl_svmpegasos_set_maxiterations(svm, (vl_size) *mxGetPr(optarg)) ;
       break ;
 
     case opt_starting_iteration :
@@ -347,7 +363,7 @@ mexFunction(int nout, mxArray *out[],
       if (*mxGetPr(optarg) < 1) {
 	vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is smaller than 1.") ;
       }
-      svm->iterationsSoFar = (vl_size) *mxGetPr(optarg) ;
+      vl_svmpegasos_set_iterations(svm, (vl_size) *mxGetPr(optarg)) ;
       break ;
 
     case opt_starting_model :
@@ -369,19 +385,29 @@ mexFunction(int nout, mxArray *out[],
       permutationSize = mxGetNumberOfElements(optarg) ;
       permutation = mxMalloc(sizeof(vl_uint32) * permutationSize) ;
       matlabPermutation = mxGetData(optarg) ;
+      {
+        /* adjust indexing */
+        vl_uindex k ;
+        for (k = 0 ; k < permutationSize ; ++k) {
+          permutation[k] = matlabPermutation[k] - 1 ;
+          if (permutation[k] >= numSamples) {
+            vlmxError(vlmxErrInconsistentData,
+                      "Permutation indexes out of bounds: PERMUTATION(%d) = %d > %d = number of data samples.",
+                      k + 1, permutation[k] + 1, numSamples) ;
+          }
+        }
+      }
+      vl_svmpegasos_set_permutation(svm,permutation,permutationSize) ;
       break ;
 
-    case opt_preconditioner :
-      if (!vlmxIsVector(optarg, -1) ||
-	  mxIsComplex(optarg) ||
-	  !mxIsNumeric(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER is not a real vector.") ;
-      }
+    case opt_bias_learningrate :
+      if (!vlmxIsPlainScalar(optarg)) {
+	vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE is not a plain scalar.") ;
+
       if (mxGetClassID(optarg) != mxDOUBLE_CLASS) {
-	vlmxError(vlmxErrInvalidArgument, "PRECODNITIONER storage class must be double.") ;
+	vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE must be double.") ;
       }
-      svm->preConditioner = (double*) mxGetData(optarg) ;
-      preconditionerDimension = mxGetNumberOfElements(optarg) ;
+      vl_svmpegasos_set_bias_learningrate(svm, (double)*mxGetPr(optarg)) ;
       break ;
     case opt_diagnostics :
 
@@ -390,24 +416,15 @@ mexFunction(int nout, mxArray *out[],
       }
       diagnosticsHandle = (mxArray*)(optarg) ;
       break ;
-    case opt_diagnostics_freq :
+    case opt_energy_freq :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "DIAGNOSTICSFREQ is not a plain scalar.") ;
+	vlmxError(vlmxErrInvalidArgument, "ENERGYFREQ is not a plain scalar.") ;
       }
-      diagnosticsFrequency = *mxGetPr(optarg) ;
+      vl_svmpegasos_set_energy_frequency (svm, (vl_size)*mxGetPr(optarg)) ;
 
       break ;
     case opt_verbose :
       ++ verbose ;
-      break ;
-    case opt_block_sparse :
-      if (dataType != VL_TYPE_UINT32)
-	vlmxError(vlmxErrInvalidArgument, "Invalid Block Sparse Array.") ;
-
-      blockSparse = VL_TRUE ;
-      break;
-    case opt_homkermap:
-      homkermap = VL_TRUE ;
       break ;
     case opt_KINTERS:
     case opt_KL1:
@@ -427,18 +444,6 @@ mexFunction(int nout, mxArray *out[],
       if (period <= 0) {
 	vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
       }
-      break ;
-    case opt_order:
-      if (! vlmxIsPlainScalar(optarg))
-	{
-	  vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
-	}
-      n = *mxGetPr(optarg) ;
-      if (n < 0)
-	{
-	  vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
-	}
-
       break ;
     case opt_gamma:
       if (! vlmxIsPlainScalar(optarg)){
@@ -468,44 +473,9 @@ mexFunction(int nout, mxArray *out[],
   }
 
 
-  data = mxGetData (IN(DATA)) ;
-  if (!blockSparse)
-    {
-      dataDimension = mxGetM(IN(DATA)) ;
-      numSamples = mxGetN(IN(DATA)) ;
-    }
-  else
-    {
-      VlBlockSparseMatrixHeader * bsMatrix = (VlBlockSparseMatrixHeader *) data ;
-
-      numSamples = bsMatrix->numColumns ;
-
-      VlBlockSparseArrayHeader * bsArray = vl_bsmatrix_get_column(bsMatrix,0) ;
-
-      dataDimension = vl_bsarray_length(bsArray) ;
-
-    }
-
-  svm->dimension = (2*n + 1)*dataDimension;
-
-  if (! vlmxIsVector(IN(LABELS), numSamples)) {
-    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
-  }
 
 
-  if (permutation)
-    {
-      /* adjust indexing */
-      vl_uindex k ;
-      for (k = 0 ; k < permutationSize ; ++k) {
-	permutation[k] = matlabPermutation[k] - 1 ;
-	if (permutation[k] >= numSamples) {
-	  vlmxError(vlmxErrInconsistentData,
-		    "Permutation indexes out of bounds: PERMUTATION(%d) = %d > %d = number of data samples.",
-		    k + 1, permutation[k] + 1, numSamples) ;
-	}
-      }
-    }
+
 
   if (svm->preConditioner && preconditionerDimension != (svm->dimension + (svm->biasMultiplier > 0))) {
     vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER has incompatible dimension.") ;
@@ -560,7 +530,7 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
   if (diagnosticsHandle)
-    vl_pegasos_train_binary_svm_diagnostics(svm,data,dataDimension,
+    vl_pegasos_train s(svm,data,dataDimension,
 					    numSamples,
 					    (vl_int8 const *)mxGetData(IN(LABELS)),
 					    innerProduct,

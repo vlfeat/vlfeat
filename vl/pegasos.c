@@ -272,7 +272,7 @@ vl_svm_compute_diagnostics(VlSvmPegasos *svm,
 
 
 VL_EXPORT
-VlSvmPegasosSolver* vl_svmpegasos_new (vl_size dimension,
+VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
                                        double lambda)
 {
   VlSvmPegasos  * svm ;
@@ -283,7 +283,7 @@ VlSvmPegasosSolver* vl_svmpegasos_new (vl_size dimension,
 
   svm->objective = (VlSvmObjective*) vl_malloc(sizeof(VlSvmObjective)) ;
 
-  
+
   svm->maxIterations = (vl_size) 10 / (lambda + 1) ;
 
   assert(lambda > 0.0) ;
@@ -297,9 +297,11 @@ VlSvmPegasosSolver* vl_svmpegasos_new (vl_size dimension,
 
   svm->biasLearningRate = 1 ;
 
-  svm->energyCheckFrequency = 100 ;
+  svm->energyFrequency = 100 ;
 
-  svm->randomGenerator = NULL ; 
+  svm->randomGenerator = NULL ;
+
+  return svm ;
 }
 
 VL_EXPORT
@@ -310,9 +312,6 @@ void vl_pegasos_delete (VlSvmPegasos * svm)
 
   if (svm->objective)
     vl_free(svm->objective) ;
-
-  if (svm->preConditioner)
-    vl_free(svm->preConditioner) ;
 
   if (svm->permutation)
     vl_free(svm->permutation) ;
@@ -337,7 +336,7 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
   vl_tic() ;
   vl_uindex iteration0 ;
 
-  double energy ;
+  double energy = 0;
 
   vl_size i ;
 
@@ -369,16 +368,16 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
    the margin, only scale needs to be updated.
    */
 
-  for ( ++(svm->iterationsSoFar) ;
-       svm->iterationsSoFar <  svm->maxIterations ;
-       ++ svm->iterationsSoFar)
+  for ( ++(svm->iterations) ;
+       svm->iterations <  svm->maxIterations ;
+       ++ svm->iterations)
     {
       /* pick a sample  */
       vl_uindex k ;
       if (svm->permutation == NULL) {
-	k = vl_rand_uindex(randomGenerator, numSamples) ;
+	k = vl_rand_uindex(svm->randomGenerator, numSamples) ;
       } else {
-	k = svm->permutation[svm->iterationsSoFar % svm->permutationSize] ;
+	k = svm->permutation[svm->iterations % svm->permutationSize] ;
 	assert(k < numSamples) ;
       }
 
@@ -386,21 +385,21 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
       y = labels[k] ;
 
       /* compute learning rate */
-      learningRate = 1.0 / ((svm->iterationsSoFar + iteration0) * lambda) ;
+      learningRate = 1.0 / ((svm->iterations + iteration0) * lambda) ;
 
       /* regularizer step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-      if (svm->iterationsSoFar % regularizationPeriod == 0) {
+      if (svm->iterations % regularizationPeriod == 0) {
 	double eta =  learningRate * regularizationPeriod * lambda ;
 
 
-	
+
         for (i = 0 ; i < svm->dimension  ; ++i)
           {
             svm->model[i] -= eta * svm->model[i] ;
           }
         if (svm->biasMultiplier)
           svm->bias -= eta * svm->biasLearningRate * svm->bias ;
-	  
+
 
       }
 
@@ -425,7 +424,7 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
 
       }
 
-      if (svm->iterationsSoFar % svm->energyCheckFrequency == 0)
+      if (svm->iterations % svm->energyFrequency == 0)
 	{
 	  svm->elapsedTime += vl_toc() ;
           if(validation)
@@ -448,6 +447,7 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
           if(svm->epsilon > 0 && abs(energy - svm->objective->energy) < svm->epsilon)
             break ;
 
+          energy = svm->objective->energy ;
 	  vl_tic() ;
 	}
 
