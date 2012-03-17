@@ -1406,15 +1406,16 @@ vl_sift_detect (VlSiftFilt * f)
     {
       double val   = at(0,0,0)
         + 0.5 * (Dx * b[0] + Dy * b[1] + Ds * b[2]) ;
-      double score = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
+      double peak_score = vl_abs_d(val);
+      double edge_score = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
       double xn = x + b[0] ;
       double yn = y + b[1] ;
       double sn = s + b[2] ;
 
       vl_bool good =
-        vl_abs_d (val)  > tp                  &&
-        score           < (te+1)*(te+1)/te    &&
-        score           >= 0                  &&
+        peak_score      > tp                  &&
+        edge_score      < (te+1)*(te+1)/te    &&
+        edge_score      >= 0                  &&
         vl_abs_d (b[0]) <  1.5                &&
         vl_abs_d (b[1]) <  1.5                &&
         vl_abs_d (b[2]) <  1.5                &&
@@ -1426,14 +1427,16 @@ vl_sift_detect (VlSiftFilt * f)
         sn              <= s_max ;
 
       if (good) {
-        k-> o     = f->o_cur ;
-        k-> ix    = x ;
-        k-> iy    = y ;
-        k-> is    = s ;
-        k-> s     = sn ;
-        k-> x     = xn * xper ;
-        k-> y     = yn * xper ;
-        k-> sigma = f->sigma0 * pow (2.0, sn/f->S) * xper ;
+        k-> o          = f->o_cur ;
+        k-> ix         = x ;
+        k-> iy         = y ;
+        k-> is         = s ;
+        k-> s          = sn ;
+        k-> x          = xn * xper ;
+        k-> y          = yn * xper ;
+        k-> sigma      = f->sigma0 * pow (2.0, sn/f->S) * xper ;
+        k-> peak_score = peak_score;
+        k-> edge_score = edge_score;
         ++ k ;
       }
 
