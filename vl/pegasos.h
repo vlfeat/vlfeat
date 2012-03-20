@@ -14,6 +14,8 @@ Copyright
 #include "svmdataset.h"
 
 
+
+
 /** @brief Binary Svm Objective Function */
 typedef struct _VlSvmObjective {
   double energy ;
@@ -25,6 +27,9 @@ typedef struct _VlSvmObjective {
 } VlSvmObjective ;
 
 
+/* Diagnostic function */
+typedef void (*VlSvmDiagnostics) (void *svm) ;
+
 /** @brief Pegasos Svm Solver  */
 typedef struct _VlSvmPegasos {
   double *  model ;
@@ -32,41 +37,47 @@ typedef struct _VlSvmPegasos {
   vl_size dimension ;
   vl_size iterations ;
   vl_size maxIterations ;
-  double epsilon ;
+  double epsilon ;               /* stopping crietiorn threshold */
   double lambda ;
   double biasMultiplier ;
   double elapsedTime ;
-  vl_size energyFrequency ;
+  vl_size energyFrequency ;      /* frequency of computation of svm energy */
   double  biasLearningRate ;
   VlSvmObjective*  objective ;
   VlRand* randomGenerator ;
-  vl_uint32 * permutation ;
+  vl_uint32 * permutation ;      /* data permutation  */
   vl_size permutationSize ;
+  VlSvmDiagnostics diagnostic ; /* diagnostic function */
+  void * diagnosticCallerRef ;
 } VlSvmPegasos ;
 
-/* Diagnostic function */
-typedef void (*VlSvmDiagnostics) (void * diagnosticCallerRef, VlSvmPegasos *svm) ;
 
 VL_EXPORT
 VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
                                  double lambda) ;
 
 VL_EXPORT
-void vl_svmpegasos_delete (VlSvmPegasos* svm) ;
+void vl_svmpegasos_delete (VlSvmPegasos* svm, vl_bool freeModel) ;
 
 
 VL_EXPORT
 void vl_svmpegasos_train (VlSvmPegasos * svm,
                           void * data,
                           vl_size numSamples,
-                          vl_int8 const * labels,
-                          VlSvmInnerProductFunction innerProduct,
-                          VlSvmAccumulatorFunction accumulator,
-                          void * validation,
-                          vl_size validationNumSamples,
-                          vl_int8 const * validationLabels,
-                          VlSvmDiagnostics diagnostics,
-                          void * diagnosticCallerRef) ;
+                          VlSvmDatasetInnerProduct innerProduct,
+                          VlSvmDatasetAccumulator accumulator,
+                          vl_int8 const * labels) ;
+
+VL_EXPORT
+void vl_svmpegasos_train_validation_data (VlSvmPegasos * svm,
+                                          void * data,
+                                          vl_size numSamples,
+                                          VlSvmDatasetInnerProduct innerProduct,
+                                          VlSvmDatasetAccumulator accumulator,
+                                          vl_int8 const * labels,
+                                          void * validation,
+                                          vl_size validationNumSamples,
+                                          vl_int8 const * validationLabels) ;
 
 
 /** @name Retrieve data and parameters
@@ -87,11 +98,15 @@ VL_INLINE VlSvmObjective* vl_svmpegasos_get_objective (VlSvmPegasos const *self)
 VL_INLINE VlRand* vl_svmpegasos_get_random_generator  (VlSvmPegasos const *self) ;
 VL_INLINE vl_uint32* vl_svmpegasos_get_permutation    (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_permutation_size  (VlSvmPegasos const *self) ;
+VL_INLINE VlSvmDiagnostics vl_svmpegasos_get_diagnostic (VlSvmPegasos const *self) ;
+VL_INLINE void* vl_svmpegasos_get_diagnostic_caller_ref  (VlSvmPegasos const *self) ;
 /** @} */
 
 /** @name Set parameters
  ** @{
  **/
+VL_INLINE void vl_svmpegasos_set_model           (VlSvmPegasos *self, double * m) ;
+VL_INLINE void vl_svmpegasos_set_bias            (VlSvmPegasos *self, double  b) ;
 VL_INLINE void vl_svmpegasos_set_maxiterations   (VlSvmPegasos *self, vl_size i) ;
 VL_INLINE void vl_svmpegasos_set_iterations      (VlSvmPegasos *self, vl_size i) ;
 VL_INLINE void vl_svmpegasos_set_epsilon         (VlSvmPegasos *self, double e) ;
@@ -102,6 +117,8 @@ VL_INLINE void vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double  
 VL_INLINE void vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r) ;
 VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos *self, vl_uint32* p,
                                                   vl_size psize) ;
+VL_INLINE void vl_svmpegasos_set_diagnostic (VlSvmPegasos *self, VlSvmDiagnostics d,
+                                             void * cr) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -289,9 +306,62 @@ vl_svmpegasos_get_permutationsize (VlSvmPegasos const *self)
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Get Diagnostic Function.
+ ** @param self Pegasos Svm Solver.
+ ** @return pointer to diagnostic function.
+ **/
+
+VL_INLINE VlSvmDiagnostics
+vl_svmpegasos_get_diagnostic (VlSvmPegasos const *self)
+{
+  return self->diagnostic ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get Diagnostic Function Caller Reference Object.
+ ** @param self Pegasos Svm Solver.
+ ** @return pointer to diagnostic function caller reference object.
+ **/
+
+VL_INLINE void*
+vl_svmpegasos_get_diagnostic_caller_ref (VlSvmPegasos const *self)
+{
+  return self->diagnosticCallerRef ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set pegasos model.
+ ** @param self Pegasos Svm Solver.
+ ** @param m svm model.
+ **
+ ** If there is a model already allocated, this method frees it
+ ** before substituting it with the new one.
+ **/
+
+VL_INLINE void
+vl_svmpegasos_set_model (VlSvmPegasos *self, double* m)
+{
+  if(self->model)
+    vl_free(self->model) ;
+  self->model = m ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set pegasos bias.
+ ** @param self Pegasos Svm Solver.
+ ** @param b bias.
+ **/
+
+VL_INLINE void
+vl_svmpegasos_set_bias (VlSvmPegasos *self, double b)
+{
+  self->bias = b ;
+}
+
+/** ------------------------------------------------------------------
  ** @brief Set pegasos max iterations.
  ** @param self Pegasos Svm Solver.
- ** @param i pegasos max iterations
+ ** @param i pegasos max iterations.
  **/
 
 VL_INLINE void
@@ -397,6 +467,21 @@ vl_svmpegasos_set_permutation(VlSvmPegasos *self, vl_uint32* p,
 {
   self->permutation = p ;
   self->permutationSize = psize ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set Diagnostic Function.
+ ** @param self Pegasos Svm Solver.
+ ** @param d Diagnostic Function.
+ ** @param cr Diagnostic Function Caller Reference.
+ **/
+
+VL_INLINE void
+vl_svmpegasos_set_diagnostic(VlSvmPegasos *self, VlSvmDiagnostics d,
+                             void * cr)
+{
+  self->diagnostic = d ;
+  self->diagnosticCallerRef = cr ;
 }
 
 /* VL_PEGASOS_H */

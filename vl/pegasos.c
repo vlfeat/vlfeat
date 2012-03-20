@@ -208,16 +208,18 @@ kernels (e.g. intersection, Chi2) the explicit feature map computed by
  ** @see ::vl_pegasos_train_binary_svm_d
  **/
 
+#ifndef VL_PEGASOS_INVARIANTS
+
 #include "pegasos.h"
 #include "mathop.h"
 #include <math.h>
 
 void
-vl_svm_compute_diagnostics(VlSvmPegasos *svm,
-                           void * data,
-                           vl_size numSamples,
-                           vl_int8 const * labels,
-                           VlSvmInnerProductFunction innerProduct)
+vl_svm_compute_diagnostic(VlSvmPegasos *svm,
+                          void * data,
+                          vl_size numSamples,
+                          vl_int8 const * labels,
+                          VlSvmDatasetInnerProduct innerProduct)
 {
   vl_size i, k ;
   vl_size numPos = 0 ;
@@ -242,7 +244,7 @@ vl_svm_compute_diagnostics(VlSvmPegasos *svm,
       pd = innerProduct(data,k,svm->model) ;
       if (svm->biasMultiplier)
 	{
-	  pd += svm->model[svm->dimension]*svm->biasMultiplier ;
+	  pd += svm->bias*svm->biasMultiplier ;
 	}
 
       pd = VL_MAX(1 - labels[k]*pd, 0.0) ;
@@ -275,15 +277,14 @@ VL_EXPORT
 VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
                                        double lambda)
 {
-  VlSvmPegasos  * svm ;
-  svm = (VlSvmPegasos*) vl_malloc(sizeof(VlSvmPegasos)) ;
+  VlSvmPegasos  * svm = (VlSvmPegasos*) vl_malloc(sizeof(VlSvmPegasos)) ;
 
   svm->model = (double*) vl_calloc(dimension, sizeof(double)) ;
   svm->dimension = dimension ;
 
   svm->objective = (VlSvmObjective*) vl_malloc(sizeof(VlSvmObjective)) ;
 
-
+  svm->iterations = 0 ;
   svm->maxIterations = (vl_size) 10 / (lambda + 1) ;
 
   assert(lambda > 0.0) ;
@@ -295,43 +296,62 @@ VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
   svm->biasMultiplier = 0 ;
   svm->bias = 0 ;
 
+  svm->elapsedTime = 0 ;
+
   svm->biasLearningRate = 1 ;
 
   svm->energyFrequency = 100 ;
 
   svm->randomGenerator = NULL ;
 
+  svm->permutation = NULL ;
+
+  svm->diagnosticCallerRef = NULL ;
+
+  svm->diagnostic = NULL ;
+
   return svm ;
 }
 
 VL_EXPORT
-void vl_pegasos_delete (VlSvmPegasos * svm)
+void vl_svmpegasos_delete (VlSvmPegasos * svm, vl_bool freeModel)
 {
-  if (svm->model)
-    vl_free(svm->model) ;
+  if (svm->model && freeModel)
+     vl_free(svm->model) ;
 
   if (svm->objective)
     vl_free(svm->objective) ;
 
-  if (svm->permutation)
-    vl_free(svm->permutation) ;
-
   vl_free(svm) ;
 }
 
+#define SFX _validation_data
+#define VALIDATION
+#define VL_PEGASOS_INVARIANTS
+#include "pegasos.c"
+
+#define SFX
+#define VL_PEGASOS_INVARIANTS
+#include "pegasos.c"
+
+/* VL_PEGASOS_INVARIANTS */
+
+#else
+
 
 VL_EXPORT void
-vl_svmpegasos_train(VlSvmPegasos * svm,
-                    void * data,
-                    vl_size numSamples,
-                    vl_int8 const * labels,
-                    VlSvmInnerProductFunction innerProduct,
-                    VlSvmAccumulatorFunction accumulator,
-                    void * validation,
-                    vl_size validationNumSamples,
-                    vl_int8 const * validationLabels,
-                    VlSvmDiagnostics diagnostics,
-                    void * diagnosticCallerRef)
+VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
+                                 void * data,
+                                 vl_size numSamples,
+                                 VlSvmDatasetInnerProduct innerProduct,
+                                 VlSvmDatasetAccumulator accumulator,
+                                 vl_int8 const * labels
+#ifdef VALIDATION
+                                 ,void * validation,
+                                 vl_size validationNumSamples,
+                                 vl_int8 const * validationLabels
+#endif
+                                 )
 {
   vl_tic() ;
   vl_uindex iteration0 ;
@@ -368,9 +388,9 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
    the margin, only scale needs to be updated.
    */
 
-  for ( ++(svm->iterations) ;
+  for (  ;
        svm->iterations <  svm->maxIterations ;
-       ++ svm->iterations)
+        ++(svm->iterations))
     {
       /* pick a sample  */
       vl_uindex k ;
@@ -427,24 +447,24 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
       if (svm->iterations % svm->energyFrequency == 0)
 	{
 	  svm->elapsedTime += vl_toc() ;
-          if(validation)
-            vl_svm_compute_diagnostics(svm,
+#ifdef VALIDATION
+            vl_svm_compute_diagnostic(svm,
                                        validation,
                                        validationNumSamples,
                                        validationLabels,
                                        innerProduct) ;
-          else
-            vl_svm_compute_diagnostics(svm,
+#else
+            vl_svm_compute_diagnostic(svm,
                                        data,
                                        numSamples,
                                        labels,
                                        innerProduct) ;
 
+#endif
+          if (svm->diagnostic)
+            svm->diagnostic(svm) ;
 
-          if (diagnostics)
-            diagnostics(diagnosticCallerRef,svm) ;
-
-          if(svm->epsilon > 0 && abs(energy - svm->objective->energy) < svm->epsilon)
+          if(svm->epsilon > 0 && vl_abs_d(energy - svm->objective->energy) < svm->epsilon)
             break ;
 
           energy = svm->objective->energy ;
@@ -456,3 +476,8 @@ vl_svmpegasos_train(VlSvmPegasos * svm,
 
   svm->elapsedTime += vl_toc() ;
 }
+/* VL_SVM_INVARIANTS */
+#undef SFX
+#undef VALIDATION
+#undef VL_PEGASOS_INVARIANTS
+#endif

@@ -21,11 +21,15 @@ VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension)
   dataset->data = data ;
   dataset->dimension = dimension ;
 
+  dataset->map = NULL ;
+  dataset->mapFunc = NULL ;
+  dataset->order = 1 ;
+
   return dataset ;
 }
 
 VL_EXPORT
-void vl_svmdataset_set_map (VlSvmDataset * data, void * map, VlSvmFeatureMap mapFunc, vl_size order)
+void vl_svmdataset_set_map (VlSvmDataset * data, void * map, VlSvmDatasetFeatureMap mapFunc, vl_size order)
 {
 
   data->map  = map ;
@@ -58,8 +62,8 @@ void vl_svmdataset_delete (VlSvmDataset * dataset)
 #include "float.th"
 
 VL_EXPORT double
-VL_XCAT(vl_svm_innnerproduct_,SFX) (const void* data, const vl_uindex element,
-                                    const double* model)
+VL_XCAT(vl_svmdataset_innerproduct_,SFX) (const void* data, const vl_uindex element,
+                                           const double* model)
 {
   vl_size i, j ;
   T* tData ;
@@ -97,10 +101,10 @@ VL_XCAT(vl_svm_innnerproduct_,SFX) (const void* data, const vl_uindex element,
 
 
 VL_EXPORT void
-VL_XCAT(vl_svm_accumulator_,SFX)(const void* data,
-                                 const vl_uindex element,
-                                 double * model,
-                                 const double multiplier)
+VL_XCAT(vl_svmdataset_accumulator_,SFX)(const void* data,
+                                        const vl_uindex element,
+                                        double * model,
+                                        const double multiplier)
 {
   vl_size i,j ;
   T* tData ;
@@ -140,5 +144,5 @@ VL_XCAT(vl_svm_accumulator_,SFX)(const void* data,
 
 /* VL_SVM_INVARIANTS */
 #undef FLT
-#undef VL_PEGAOS_INSTANTIATING
+#undef VL_SVM_INVARIANTS
 #endif
