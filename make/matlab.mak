@@ -106,7 +106,7 @@ endif
 
 vpath vl_%.c $(shell find $(VLDIR)/toolbox -type d)
 
-mex-all: $(mex_tgt)
+mex-all: $(mex_dll) $(mex_tgt)
 
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
@@ -121,7 +121,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
 	       "$(<)" -MF "$(@)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
 	$(call C,MEX) \
 	       $(MEX_FLAGS) \
                $(MEX_CFLAGS) \
