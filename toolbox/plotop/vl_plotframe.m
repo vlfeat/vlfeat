@@ -1,4 +1,4 @@
-function h=vl_plotframe(frames,varargin)
+function h = vl_plotframe(frames,varargin)
 % VL_PLOTFRAME  Plot feature frame
 %  VL_PLOTFRAME(FRAME) plots the frames FRAME.  Frames are attributed
 %  image regions (as, for example, extracted by a feature detector). A
@@ -25,15 +25,15 @@ function h=vl_plotframe(frames,varargin)
 %     + FRAME(1:2)   center
 %     + FRAME(3:6)   stacking of A such that ELLIPSE = {A x : |x| = 1}
 %
-%  H=VL_PLOTFRAME(...) returns the handle of the graphical object
+%  H = VL_PLOTFRAME(...) returns the handle of the graphical object
 %  representing the frames.
 %
-%  VL_PLOTFRAME(FRAMES) where FRAMES is a matrix whose column are FRAME
-%  vectors plots all frames simultaneously. Using this call is much
-%  faster than calling VL_PLOTFRAME() for each frame.
+%  VL_PLOTFRAME(FRAMES) where FRAMES is a matrix whose column are
+%  FRAME vectors plots all frames simultaneously. Using this call is
+%  much faster than calling VL_PLOTFRAME() for each frame.
 %
-%  VL_PLOTFRAME(FRAMES,...) passes any extra argument to the underlying
-%  plot function. The first optional argument can be a line
+%  VL_PLOTFRAME(FRAMES,...) passes any extra argument to the
+%  underlying plot function. The first optional argument can be a line
 %  specification string such as the one used by PLOT().
 %
 %  See also: VL_HELP().
@@ -45,7 +45,7 @@ function h=vl_plotframe(frames,varargin)
 % the terms of the BSD license (see the COPYING file).
 
 % number of vertices drawn for each frame
-np        = 40 ;
+np = 40 ;
 
 lineprop = {} ;
 if length(varargin) > 0
@@ -141,36 +141,20 @@ function eframes = frame2oell(frames)
 %   almost equivalent for all kind of regions and are immediately
 %   reduced to the most general case.
 
-%
 % Determine the kind of frames
-%
 [D,K] = size(frames) ;
-
 switch D
-  case 2
-    kind = 'point' ;
-
-  case 3
-    kind = 'disk' ;
-
-  case 4
-    kind = 'odisk' ;
-
-  case 5
-    kind = 'ellipse' ;
-
-  case 6
-    kind = 'oellipse' ;
-
+  case 2, kind = 'point' ;
+  case 3, kind = 'disk' ;
+  case 4, kind = 'odisk' ;
+  case 5, kind = 'ellipse' ;
+  case 6, kind = 'oellipse' ;
   otherwise
     error(['FRAMES format is unknown']) ;
 end
-
 eframes = zeros(6,K) ;
 
-%
-% Do converison
-%
+% Convert frames to oriented ellipses
 switch kind
   case 'point'
     eframes(1:2,:) = frames(1:2,:) ;
@@ -195,8 +179,6 @@ switch kind
   case 'oellipse'
     eframes = frames ;
 end
-
-
 
 % --------------------------------------------------------------------
 function A = mapFromS(S)
