@@ -1277,6 +1277,8 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
       return
       VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)(self, data, numData) ;
       break ;
+    case VlKMeansANN:
+      VL_PRINTF("ANN is not implemented yet, aborting!");
     default:
       abort() ;
   }
