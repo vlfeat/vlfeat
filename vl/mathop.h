@@ -338,7 +338,7 @@ vl_fast_atan2_d (double y, double x)
   double angle, r ;
   double const c3 = 0.1821 ;
   double const c1 = 0.9675 ;
-  double abs_y    = vl_abs_d (y) + VL_EPSILON_D ;
+  double abs_y = vl_abs_d (y) + VL_EPSILON_D ;
 
   if (x >= 0) {
     r = (x - abs_y) / (x + abs_y) ;
@@ -607,6 +607,24 @@ vl_eval_vector_comparison_on_all_pairs_d (double * result, vl_size dimension,
                                           double const * X, vl_size numDataX,
                                           double const * Y, vl_size numDataY,
                                           VlDoubleVectorComparisonFunction function) ;
+
+/* ---------------------------------------------------------------- */
+/*                                               Numerical analysis */
+/* ---------------------------------------------------------------- */
+
+VL_EXPORT void
+vl_svd2 (double* S, double *U, double *V, double const *M) ;
+
+VL_EXPORT void
+vl_lapack_dlasv2 (double *smin,
+                  double *smax,
+                  double *sv,
+                  double *cv,
+                  double *su,
+                  double *cu,
+                  double f,
+                  double g,
+                  double h) ;
 
 /* VL_MATHOP_H */
 #endif
