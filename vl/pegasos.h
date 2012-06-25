@@ -1,7 +1,7 @@
 /** @file pegasos.h
  ** @brief PEGASOS (@ref pegasos)
  ** @author Andrea Vedaldi
- ** @author Daniele Perrone 2012
+ ** @author Daniele Perrone
  **/
 
 /*
@@ -13,53 +13,72 @@ Copyright
 
 #include "svmdataset.h"
 
-
-
-
-/** @brief Binary Svm Objective Function */
+/** @brief Binary Svm Objective Function
+ **
+ ** This structure keeps some statistics on a specific classifier
+ ** learned via Pegasos Svm Solver.
+ **
+ **/
 typedef struct _VlSvmObjective {
-  double energy ;
-  double regularizer ;
-  double lossPos ;
-  double lossNeg ;
-  double hardLossPos ;
-  double hardLossNeg ;
+  double energy ;               /**< full energy value. */
+  double regularizer ;          /**< regularization term. */
+  double lossPos ;              /**< energy term due to false positives. */
+  double lossNeg ;              /**< energy term due to false negatives. */
+  double hardLossPos ;          /**< number of false positives. */
+  double hardLossNeg ;          /**< number of false negatives. */
 } VlSvmObjective ;
 
 
-/* Diagnostic function */
+/** @typedef VlSvmDiagnostics
+ ** @brief Pointer to a function called at each iteration for
+ ** diagnostics purpose.
+ **
+ ** This type defines a function will be called at each iteration of
+ ** the algorithm. The parameter svm is an instance of the Svm Status @ref
+ ** VlSvmPegasos.
+ **
+ **/
 typedef void (*VlSvmDiagnostics) (void *svm) ;
 
-/** @brief Pegasos Svm Solver  */
+/** @brief Pegasos Svm Solver
+ **
+ ** This structure represents the status of an svm solver.
+ **/
 typedef struct _VlSvmPegasos {
-  double *  model ;
-  double bias ;
-  vl_size dimension ;
-  vl_size iterations ;
-  vl_size maxIterations ;
-  double epsilon ;               /* stopping crietiorn threshold */
-  double lambda ;
-  double biasMultiplier ;
-  double elapsedTime ;
-  vl_size energyFrequency ;      /* frequency of computation of svm energy */
-  double  biasLearningRate ;
-  VlSvmObjective*  objective ;
-  VlRand* randomGenerator ;
-  vl_uint32 * permutation ;      /* data permutation  */
-  vl_size permutationSize ;
-  VlSvmDiagnostics diagnostic ; /* diagnostic function */
-  void * diagnosticCallerRef ;
+  double *  model ;             /**< svm model. */
+  double bias ;                 /**< bias element.  */
+  vl_size dimension ;           /**< model length.  */
+  vl_size iterations ;          /**< number of iterations.  */
+  vl_size maxIterations ;       /**< maximum number of iterations.  */
+  double epsilon ;               /**< stopping criterion threshold */
+  double lambda ;                /**< Pegasos parameter.  */
+  double biasMultiplier ;        /**< bias strength multiplier.  */
+  double elapsedTime ;           /**< elapsed time from algorithm start.  */
+  vl_size energyFrequency ;      /**< frequency of computation of svm energy */
+  double  biasLearningRate ;     /**< frequency of bias learning.  */
+  VlSvmObjective*  objective ;   /**<  value and statistics of
+                                    objective function. */
+  VlRand* randomGenerator ;      /**< random generator.  */
+  vl_uint32 * permutation ;      /**< data permutation.  */
+  vl_size permutationSize ;      /**< permutation size.  */
+  VlSvmDiagnostics diagnostic ; /**< diagnostic function. */
+  void * diagnosticCallerRef ;  /**< reference to caller.  */
 } VlSvmPegasos ;
 
-
+/** @name Create and destroy
+ ** @{
+ **/
 VL_EXPORT
 VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
                                  double lambda) ;
 
 VL_EXPORT
 void vl_svmpegasos_delete (VlSvmPegasos* svm, vl_bool freeModel) ;
+/** @} */
 
-
+/** @name Training Fuctions
+ ** @{
+ **/
 VL_EXPORT
 void vl_svmpegasos_train (VlSvmPegasos * svm,
                           void * data,
@@ -78,7 +97,7 @@ void vl_svmpegasos_train_validation_data (VlSvmPegasos * svm,
                                           void * validation,
                                           vl_size validationNumSamples,
                                           vl_int8 const * validationLabels) ;
-
+/** @} */
 
 /** @name Retrieve data and parameters
  ** @{

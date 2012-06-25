@@ -1,5 +1,5 @@
-/** @file svm_dataset.h
- ** @brief Generic SVM Dataset
+/** @file svmdataset.h
+ ** @brief SVM Dataset
  ** @author Daniele Perrone
  **/
 
@@ -16,16 +16,25 @@ Copyright Statement
 /*                                                                  */
 /* ---------------------------------------------------------------- */
 
-/** @brief Feature map function type */
+/** @typedef VlSvmDatasetFeatureMap
+ ** @brief Pointer to a function that maps the value in @x to
+ ** @destination using the feature map @map
+ **/
 typedef void (*VlSvmDatasetFeatureMap)(const void* map, double * destination,
                                 const vl_size stride, const double x) ;
 
-/** @brief Inner product function type */
+/** @typedef VlSvmDatasetInnerProduct
+ ** @brief Pointer to a function that defines the inner product
+ ** between the data point at position @element and the SVM model
+ **/
 typedef double (*VlSvmDatasetInnerProduct)(const void* data,
                                             const vl_uindex element,
                                             const double* model) ;
 
-/** @brief Accumulator function type */
+/** @typedef VlSvmDatasetAccumulator
+ ** @brief Pointer to a function that adds to @model the data point at
+ ** position @element multiplied by the constant @multiplier
+ **/
 typedef void (*VlSvmDatasetAccumulator)(const void* data,
                                          const vl_uindex element,
                                          double * model,
@@ -36,29 +45,45 @@ typedef void (*VlSvmDatasetAccumulator)(const void* data,
 /*                                                                  */
 /* ---------------------------------------------------------------- */
 
-/** @brief Svm Float Dataset */
+/** @brief Svm Dataset
+ **
+ ** This structure is a wrapper for a generic SVM dataset. It should
+ ** be provided with a set of functions of type
+ ** @ref VlSvmDatasetInnerProduct and @ref VlSvmDatasetAccumulator
+ **/
 typedef struct _VlSvmDataset {
-  void * data ;
-  vl_size dimension ;
-  void* map ; /* Feature Map */
-  VlSvmDatasetFeatureMap mapFunc ;
-  vl_size order ;
+  void * data ;                 /**< pointer to data */
+  vl_size dimension ;           /**< data point dimension */
+  void* map ;                   /**< feature Map */
+  VlSvmDatasetFeatureMap mapFunc ; /**< function that defines the feature map*/
+  vl_size order ;                  /**< order of expansion of the feture map */
 } VlSvmDataset ;
 
-
+/** @name Create and destroy
+ ** @{
+ **/
 VL_EXPORT
 VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension) ;
 
 VL_EXPORT
-void vl_svmdataset_set_map (VlSvmDataset * data, void * map,VlSvmDatasetFeatureMap mapFunc, vl_size order) ;
-
-VL_EXPORT
 void vl_svmdataset_delete (VlSvmDataset * dataset) ;
+/** @} */
+
+/** @name Set map
+ ** @{
+ **/
+VL_EXPORT
+void vl_svmdataset_set_map (VlSvmDataset * data, void * map,
+                            VlSvmDatasetFeatureMap mapFunc, vl_size order) ;
+/** @} */
 
 /* ---------------------------------------------------------------- */
 /*    Standard Atomic Functions                                     */
 /* ---------------------------------------------------------------- */
 
+/** @name Standard dataset functions
+ ** @{
+ **/
 VL_EXPORT
 double vl_svmdataset_innerproduct_d(const void* data,
                                     const vl_uindex element,
@@ -80,7 +105,7 @@ void vl_svmdataset_accumulator_f(const void* data,
                                  const vl_uindex element,
                                  double * model,
                                  const double multiplier) ;
-
+/** @} */
 
 /** @name Retrieve data and parameters
  ** @{

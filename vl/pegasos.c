@@ -1,6 +1,7 @@
 /** @file pegasos.c
  ** @brief PEGASOS - Definition
  ** @author Andrea Vedaldi
+ ** @author Daniele Perrone
  **/
 
 /*
@@ -15,6 +16,7 @@ the terms of the BSD license (see the COPYING file).
 <!-- ------------------------------------------------------------- -->
 @page pegasos PEGASOS SVM solver
 @author Andrea Vedaldi
+@author Daniele Perrone
 <!-- ------------------------------------------------------------- -->
 
 @ref pegasos.h provides a basic implementation of the PEGASOS
@@ -57,9 +59,8 @@ i01-loss of the decision function:
  \ell(w;(x,y)) \geq \frac{1}{2}(1 - y F(x)).
 @f]
 
-PEGASOS is accessed by calling ::vl_pegasos_train_binary_svm_d or
- ::vl_pegasos_train_binary_svm_f, operating respectively on @c double
- or @c float data.
+PEGASOS is accessed by calling ::vl_svmpegasos_train or
+ ::vl_svmpegasos_train_validation_data.
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-algorithm Algorithm
@@ -97,26 +98,26 @@ VLFeat implementation fixes to one the size of the mini batches @f$ k
 
 PEGASOS SVM formulation does not incorporate a bias. To learn an SVM
 with bias, the each data vector @f$ x @f$ can be extended by a
-constant component @f$ B @f$ (called @c biasMultiplier in the
+constant component @f$ B @f$ (called @c svm->biasMultiplier in the
 code). In this case, the model @f$ w @f$ has dimension @f$ D + 1 @f$
 and the SVM discriminat function is given by @f$ F(x) =
-\operatorname{sign} (\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$. If the
-bias multiplier <em>B</em> is large enough, the weight @f$ w_{d+1} @f$
-remains small and it has small contribution in the SVM regularization
-term @f$ \| w \|^2 @f$, better approximating the case of an SVM with
-bias. Unfortunately, setting the bias multiplier @f$ B @f$ to a large
-value makes the optimization harder.
+\operatorname{sign} (\langle w_{1:d}, x\rangle+ w_{d+1} B) @f$.
+In our implementation the bias is kept in the variabl @c svm->bias and
+the model has dimension @f$ D @f$.
+If the bias multiplier <em>B</em> is large enough, the weight @f$
+w_{d+1} @f$ remains small and it has small contribution in the SVM
+regularization term @f$ \| w \|^2 @f$, better approximating the case
+of an SVM with bias. Unfortunately, setting the bias multiplier @f$ B
+@f$ to a large value makes the optimization harder.
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-restarting Restarting
 <!-- ------------------------------------------------------------ --->
 
-VLFeat PEGASOS implementation can be restatred after any given number
+VLFeat PEGASOS implementation can be restarted after any given number
 of iterations. This is useful to compute intermediate statistics or to
-load new data from disk for large datasets.  The state of the
-algorithm, which is required for restarting, is limited to the current
-estimate @f$ w_t @f$ of the SVM weight vector and the iteration number
-@f$ t @f$.
+load new data from disk for large datasets.  It sufficient to use the
+Svm state object as input for the next run.
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-permutation Permutation
@@ -159,53 +160,67 @@ incomplete Cholesky decomposition @f$ V^\top V @f$ of the Gram matrix
 kernels (e.g. intersection, Chi2) the explicit feature map computed by
 @ref homkermap.h can be used.
 
+For additive kernels it is also possible to perform the feature
+expansion online inside the solver, setting the specific feature map
+via ::vl_svmdataset_set_map. This is particular useful to keep the
+size of the training data small, when the number of the samples is big
+or the memory is limited.
+
 */
 
-/** @fn vl_pegasos_train_binary_svm_d(double*,double const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size,double const*)
- ** @param model (out) the learned model.
+/** @fn vl_svmpegasos_train (VlSvmPegasos *, void *, vl_size, VlSvmDatasetInnerProduct, VlSvmDatasetAccumulator, vl_int8 const * )
+ ** @param svm (in & out) svm status.
  ** @param data training vectors.
- ** @param dimension data dimension.
  ** @param numSamples number of training data vectors.
+ ** @param innerProduct function defining the innerProduct between the
+ ** model and a data point.
+ ** @param accumulator function definint the sum between the model and
+ ** a data point.
  ** @param labels labels of the training vectors.
- ** @param regularizer value of the regularizer coefficient @f$ \lambda @f$.
- ** @param biasMultiplier value of the bias multiplier @f$ B @f$.
- ** @param startingIteration number of the first iteration.
- ** @param numIterations number of iterations to perform.
- ** @param randomGenerator random number generator.
- ** @param permutation order in which the data is accessed.
- ** @param permutationSize length of @c permutation.
- ** @param preconditioner diagonal precoditioner.
  **
- ** The function runs PEGASOS on the specified data. The vector @a
- ** model must have either dimension equal to @a dimension if @a
- ** biasMultiplier is zero, or @a dimension + 1 if @a biasMultiplier
- ** is larger than zero.
+ ** The function runs PEGASOS on the specified data. The structure svm
+ ** should be initialized using @ref vl_svmpegasos_new. The vector @a
+ ** svm->model must have the dimension equal to @a svm->dimension. if a
+ ** bias is used,  @a svm->biasMultiplier must be non-zero, and the
+ ** output value will be saved in @a svm->bias.
  **
  ** The function runs PEGASOS for iterations <em>t</em> in the
- ** interval [@a fistIteration, @a lastIteration]. Together with the
- ** fact that the initial model can be set arbitrarily, this enable
- ** restarting PEGASOS from any point.
+ ** interval [@a svm->iterations, @a svm->maxIterations]. If the
+ ** intial status is initializied using @ref vl_svmpegasos_new
+ ** svm->iterations is equal to zero.
  **
  ** PEGASOS select the next point for computing the gradient at
- ** random. If @a randomGenerator is @c NULL, the default random
+ ** random. If @a svm->randomGenerator is @c NULL, the default random
  ** generator (as returned by ::vl_get_rand()) is used.
  **
- ** Alternatively, if @a permutation is not @c NULL, then points are
+ ** Alternatively, if @a svm->permutation is not @c NULL, then points are
  ** sampled in the order specified by this vector of indexes (this is
  ** cycled through). In this way It is an error to set both @a
- ** randomGenerator and @a permutation to non-null values.
- **
- ** @c preconditioner specifies a diagonal preconditioner for the
- ** minimization problem (it is often useful to slow down the steps
- ** for the bias term, if the latter is used). Set @c preconditioner to NULL
- ** to avoid using a preconditioner. The precodnitioner should have the
- ** same dimension of the model, plus one if an SVM with bias is learned.
+ ** svm->randomGenerator and @a svm->permutation to non-null values.
  **
  ** See the @ref pegasos-overview overview for details.
  **/
 
-/** @fn vl_pegasos_train_binary_svm_f(float*,float const*,vl_size,vl_size,vl_int8 const*,double,double,vl_uindex,vl_size,VlRand*,vl_uint32 const*,vl_size,float const*)
- ** @see ::vl_pegasos_train_binary_svm_d
+/** @fn vl_svmpegasos_train_validation_data (VlSvmPegasos *, void *, vl_size, VlSvmDatasetInnerProduct, VlSvmDatasetAccumulator, vl_int8 const *, void * validation,
+                                 vl_size validationNumSamples,
+                                 vl_int8 const * validationLabels)
+ ** @param svm (in & out) svm status.
+ ** @param data training vectors.
+ ** @param numSamples number of training data vectors.
+ ** @param innerProduct function defining the innerProduct between the
+ ** model and a data point.
+ ** @param accumulator function definint the sum between the model and
+ ** a data point.
+ ** @param labels labels of the training vectors.
+ ** @param validation validation data.
+ ** @param validationNumSamples number of validation data vectors.
+ ** @param validationLabels labels of the validation data.
+ **
+ ** The function is the same algorithm of @ref vl_svmpegasos_train, but
+ ** computes the objective function statistics on a validation
+ ** dataset, instead of using the training dataset also for this purpose.
+ **
+ ** @see ::vl_svmpegasos_train
  **/
 
 #ifndef VL_PEGASOS_INVARIANTS
@@ -272,6 +287,17 @@ vl_svm_compute_diagnostic(VlSvmPegasos *svm,
   svm->objective->energy = svm->objective->regularizer + svm->objective->lossPos + svm->objective->lossNeg ;
 }
 
+/** ------------------------------------------------------------------
+ ** @brief Create a new @ref VlSvmPegasos structure
+ **
+ ** @param dimension   svm model dimension.
+ ** @param lambda      pegasos regularization parameter.
+ **
+ ** This function allocates and returns a new @ref VlSvmPegasos structure.
+ **
+ ** @return the new @ref VlSvmPegasos structure.
+ ** @sa ::vl_svmpegasos_delete().
+ **/
 
 VL_EXPORT
 VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
@@ -312,6 +338,15 @@ VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
 
   return svm ;
 }
+
+/** -------------------------------------------------------------------
+ ** @brief Delete a @ref VlSvmPegasos structure
+ **
+ ** @param @ref VlSvmPegasos structure.
+ **
+ ** The function frees the resources allocated by
+ ** ::vl_svmpegasos_new().
+ **/
 
 VL_EXPORT
 void vl_svmpegasos_delete (VlSvmPegasos * svm, vl_bool freeModel)

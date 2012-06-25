@@ -1,6 +1,7 @@
-/** @file vl_pegasos.c
- ** @brief vl_pegasos MEX definition
+/** @file vl_svmpegasos.c
+ ** @brief vl_svmpegasos MEX definition
  ** @author Andrea Vedaldi
+ ** @author Daniele Perrone
  **/
 
 /*
@@ -62,7 +63,6 @@ void setUintValue(mxArray* array, vl_uint32 value)
   vl_uint32 * temp = (vl_uint32*) mxGetData(array) ;
   *temp = value ;
 }
-
 
 
 mxArray * createInfoStruct(VlSvmPegasos* svm)
@@ -214,13 +214,6 @@ vlmxOption  options [] = {
   {"DiagnosticFunction",1,   opt_diagnostic          },
   {"DiagnosticCallRef",1,   opt_diagnostic_caller_ref          },
   {"EnergyFreq",        1, opt_energy_freq           },
-  {"homkermap",         1,   opt_homkermap           },
-  {"kl1",               0,   opt_KL1                 },
-  {"kchi2",             0,   opt_KCHI2               },
-  {"kjs",               0,   opt_KJS                 },
-  {"kinters",           0,   opt_KINTERS             },
-  {"gamma",             1,   opt_gamma               },
-  {"window",            1,   opt_window              },
   {0,                   0,   0                       }
 } ;
 
@@ -281,7 +274,7 @@ mexFunction(int nout, mxArray *out[],
   double period = -1 ;
 
   vl_bool homkermap = VL_FALSE ;
-  void * map = NULL;
+  void * map = NULL ;
 
 
   VL_USE_MATLAB_ENV ;
