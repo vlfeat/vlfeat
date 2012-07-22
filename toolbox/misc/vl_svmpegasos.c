@@ -50,6 +50,15 @@ enum {dimension,
       hardLossPos,
       hardLossNeg};
 
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Set value of scalar double mxArray
+ **
+ ** @param array scalar mxArray.
+ ** @param value new value.
+ **
+ **/
+
 
 void setDoubleValue(mxArray* array, double value)
 {
@@ -57,6 +66,14 @@ void setDoubleValue(mxArray* array, double value)
   *temp = value ;
 }
 
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Set value of scalar integer  mxArray
+ **
+ ** @param array scalar mxArray.
+ ** @param value new value.
+ **
+ **/
 
 void setUintValue(mxArray* array, vl_uint32 value)
 {
@@ -64,6 +81,202 @@ void setUintValue(mxArray* array, vl_uint32 value)
   *temp = value ;
 }
 
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Get training data from training dataset struct
+ **
+ ** @param trainingData Matlab training dataset struct.
+ ** @param data  pointer variable where to save the data pointer.
+ ** @param dataDimension pointer to variable where to save data dimension.
+ ** @param dataType pointer to variable where to save data type.
+ ** @param numSamples pointer to variable where to save the number of samples.
+ ** @param labels pointer to variable where to save the set of labels.
+ **
+ ** The function extracts the information provided in the Matlab
+ ** training set struct.
+ **
+ **/
+
+void  getTrainingData(const mxArray* trainingData, void** data, vl_size* dataDimension, vl_type* dataType, vl_size* numSamples, vl_int8** labels)
+{
+  mxClassID dataClass ;
+  mxArray* field = NULL ;
+
+
+  if (! mxIsStruct(trainingData))
+    vlmxError(vlmxErrInvalidArgument,
+              "DATA must be a valid TRAINING SET Struct.") ;
+
+  /* Get data */
+  field = mxGetField(trainingData, 0, "data") ;
+  if (field == NULL)
+    vlmxError(vlmxErrInvalidArgument,
+              "DATA array missing in TRAINING SET Struct.") ;
+  *data = mxGetData (field) ;
+
+  *dataDimension = mxGetM(field) ;
+  *numSamples = mxGetN(field) ;
+
+  dataClass = mxGetClassID(field) ;
+
+  switch (dataClass) {
+  case mxSINGLE_CLASS : *dataType = VL_TYPE_FLOAT ; break ;
+  case mxDOUBLE_CLASS : *dataType = VL_TYPE_DOUBLE ; break ;
+  default:
+    vlmxError(vlmxErrInvalidArgument,
+              "DATA must be either SINGLE or DOUBLE.") ;
+  }
+
+  /* Get labels */
+  field = mxGetField(trainingData, 0, "labels") ;
+  if (field == NULL)
+    vlmxError(vlmxErrInvalidArgument,
+              "DATA array missing in TRAINING SET Struct.") ;
+  if (mxGetClassID(field) != mxINT8_CLASS)
+    vlmxError(vlmxErrInvalidArgument, "LABELS must be INT8.") ;
+
+  if (! vlmxIsVector(field, *numSamples)) {
+    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
+  }
+
+  *labels = (vl_int8*) mxGetData(field) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Set a point map to the training dataset
+ **
+ ** @param trainingData Matlab training dataset struct.
+ ** @param dataset      dataset struct to be passed to pegasos SVM.
+ ** @param n            pointer to a variable where the order of the
+ ** map is saved.
+ **
+ ** The function checks if a map is present in @a trainingData and add
+ ** it to @a dataset.
+ **
+ **/
+
+void  setMap(const mxArray* trainingData, VlSvmDataset* dataset, int* n)
+{
+  mxArray* field = NULL ;
+  mxArray* subfield = NULL ;
+
+  /* map function */
+  VlSvmDatasetFeatureMap mapFunc  = NULL ;
+
+  /* Homkermap */
+  VlHomogeneousKernelType kernelType = VlHomogeneousKernelChi2 ;
+  VlHomogeneousKernelMapWindowType windowType = VlHomogeneousKernelMapWindowRectangular ;
+  double gamma = 1.0 ;
+  double period = -1 ;
+
+  void * map = NULL ;
+
+  field = mxGetField(trainingData, 0, "map") ;
+  if (field != NULL)
+    {
+      subfield = mxGetField(field, 0, "order") ;
+      if (subfield != NULL)
+        {
+          if (! vlmxIsPlainScalar(subfield))
+            {
+              vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
+            }
+          *n = *mxGetPr(subfield) ;
+          if (*n < 0)
+            {
+              vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
+            }
+
+          subfield = mxGetField(field, 0, "kernelType") ;
+          if (subfield != NULL)
+            {
+              char buffer [1024] ;
+              mxGetString(subfield, buffer, sizeof(buffer) / sizeof(char)) ;
+              if (vl_string_casei_cmp("kl1", buffer) == 0)
+                kernelType = VlHomogeneousKernelIntersection ;
+              else if (vl_string_casei_cmp("kjs", buffer) == 0)
+                kernelType = VlHomogeneousKernelJS ;
+              else if (vl_string_casei_cmp("kinters", buffer) == 0)
+                kernelType = VlHomogeneousKernelIntersection ;
+            }
+
+          /* get window type */
+          subfield = mxGetField(field, 0, "windowType") ;
+          if (subfield != NULL)
+            {
+              char buffer [1024] ;
+              mxGetString(subfield, buffer, sizeof(buffer) / sizeof(char)) ;
+              if (vl_string_casei_cmp("uniform", buffer) == 0)
+                windowType = VlHomogeneousKernelMapWindowUniform ;
+
+            }
+
+          /* get gamma */
+          subfield = mxGetField(field, 0, "gamma") ;
+          if (subfield != NULL)
+            {
+              if (! vlmxIsPlainScalar(subfield))
+                vlmxError(vlmxErrInvalidArgument, "GAMMA is not a scalar.") ;
+
+              gamma = *mxGetPr(subfield) ;
+              if (gamma <= 0)
+                vlmxError(vlmxErrInvalidArgument, "GAMMA is not positive.") ;
+
+            }
+
+          /* get period */
+          subfield = mxGetField(field, 0, "period") ;
+          if (subfield != NULL)
+            {
+              if (! vlmxIsPlainScalar(subfield))
+                vlmxError(vlmxErrInvalidArgument, "PERIOD is not a scalar.") ;
+
+              period = *mxGetPr(subfield) ;
+              if (period <= 0)
+                vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
+
+            }
+          else
+            period = -1 ;
+
+          map = vl_homogeneouskernelmap_new (kernelType, gamma, *n, period, windowType) ;
+
+          mapFunc = (VlSvmDatasetFeatureMap)&vl_homogeneouskernelmap_evaluate_d ;
+
+          vl_svmdataset_set_map(dataset,map,mapFunc,2*(*n) + 1) ;
+
+        }
+      else
+        vlmxError(vlmxErrInvalidArgument, "Unknown feature map type.") ;
+    }
+}
+
+
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Create a Matlab struct with diagnostics informations.
+ **
+ ** @param svm SVM status.
+ **
+ **  The function create a Matlab struct with the following fields:
+ **  - dimension: SVM dimension.
+ **  - iterations: number of iterations performed so far.
+ **  - maxIterations: maximum number of iterations.
+ **  - epsilon: SVM stop criterion.
+ **  - lambda: SVM pegasos paramater.
+ **  - biasMultiplier: constant multiplying the SVM bias.
+ **  - biasLearningRate: learning rate for the SVM bias.
+ **  - energyFrequency: rate of SVM energy update.
+ **  - elapseTime: elapsed time since the start of the SVM learning.
+ **  - energy: SVM energy value.
+ **  - regulizerTerm: value of the only SVM regulizer term.
+ **  - lossPos: value of loss function only for data points labeled positives.
+ **  - lossNeg: value of loss function only for data points labeled negatives.
+ **  - hardLossPos: number of points labeled negative instead of positive.
+ **  - hardLossNeg: number of points labeled positive instead of negative.
+ **
+ **/
 
 mxArray * createInfoStruct(VlSvmPegasos* svm)
 {
@@ -150,7 +363,18 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
 
 
 
-
+/** ------------------------------------------------------------------
+ ** @internal
+ ** @brief Diagnostics Callback.
+ **
+ ** @param svm SVM status.
+ **
+ **  The function is the callbach called by pegasos SVM when the full
+ **  energy and the diagnostic informations are computed. Is a Matlab
+ **  Callback has been given in input, the function calls it passing
+ **  the same informations as a matlab struct.
+ **
+ **/
 
 void diagnosticDispatcher(VlSvmPegasos* svm)
 {
@@ -197,7 +421,7 @@ void diagnosticDispatcher(VlSvmPegasos* svm)
 /* option codes */
 enum {
   opt_verbose, opt_bias_multiplier, opt_max_iterations, opt_epsilon, opt_starting_iteration, opt_starting_model, opt_permutation,
-  opt_bias_learningrate, opt_diagnostic, opt_energy_freq, opt_diagnostic_caller_ref, opt_block_sparse, opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS, opt_gamma, opt_period, opt_window, opt_starting_bias
+  opt_bias_learningrate, opt_diagnostic, opt_energy_freq, opt_diagnostic_caller_ref, opt_block_sparse, opt_starting_bias
 } ;
 
 /* options */
@@ -225,7 +449,7 @@ void
 mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
-  enum {IN_DATA, IN_LABELS, IN_LAMBDA, IN_END} ;
+  enum {IN_DATA, IN_LAMBDA, IN_END} ;
   enum {OUT_MODEL = 0, OUT_BIAS, OUT_INFO} ;
 
 
@@ -244,10 +468,10 @@ mexFunction(int nout, mxArray *out[],
 
   vl_uint32* matlabPermutation ;
 
-  void * data ;
-  mxClassID dataClass ;
+  void * data = NULL ;
   vl_type dataType ;
-  vl_size numSamples ;
+  vl_size numSamples = 0 ;
+  vl_int8 * labels = NULL ;
 
   vl_uint32 * permutation  = NULL ;
   vl_size permutationSize = 0 ;
@@ -263,18 +487,7 @@ mexFunction(int nout, mxArray *out[],
   VlSvmDatasetInnerProduct innerProduct ;
   VlSvmDatasetAccumulator accumulator ;
 
-  /* maps */
-  VlSvmDatasetFeatureMap mapFunc  = NULL ;
-
-  /* Homkermap */
-  VlHomogeneousKernelType kernelType = VlHomogeneousKernelChi2 ;
-  VlHomogeneousKernelMapWindowType windowType = VlHomogeneousKernelMapWindowRectangular ;
-  double gamma = 1.0 ;
   int n = 0 ;
-  double period = -1 ;
-
-  vl_bool homkermap = VL_FALSE ;
-  void * map = NULL ;
 
 
   VL_USE_MATLAB_ENV ;
@@ -283,7 +496,7 @@ mexFunction(int nout, mxArray *out[],
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin < 3) {
+  if (nin < 2) {
     vlmxError(vlmxErrInvalidArgument,
               "At least three arguments are required.") ;
   } else if (nout > 3) {
@@ -291,62 +504,21 @@ mexFunction(int nout, mxArray *out[],
               "Too many output arguments.");
   }
 
-  dataClass = mxGetClassID(IN(DATA)) ;
-
-  if (! vlmxIsMatrix (IN(DATA), -1, -1) ||
-      ! vlmxIsReal (IN(DATA))) {
-    vlmxError(vlmxErrInvalidArgument,
-              "DATA must be a real matrix.") ;
-  }
 
 
-  data = mxGetData (IN(DATA)) ;
+  getTrainingData(IN(DATA),&data,&dataDimension,&dataType,&numSamples,&labels) ;
 
-  dataDimension = mxGetM(IN(DATA)) ;
-  numSamples = mxGetN(IN(DATA)) ;
+  VlSvmDataset* dataset = vl_svmdataset_new(data,dataDimension) ;
 
-  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
-    if  (opt == opt_homkermap)
-      {
-        homkermap = VL_TRUE ;
-        if (! vlmxIsPlainScalar(optarg))
-          {
-            vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
-          }
-        n = *mxGetPr(optarg) ;
-        if (n < 0)
-          {
-            vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
-          }
+  setMap(IN(DATA),dataset,&n) ;
 
-      }
-  }
-
-  next = IN_END ;
-
-  if (! vlmxIsVector(IN(LABELS), numSamples)) {
-    vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
-  }
-
-
-  switch (dataClass) {
-  case mxSINGLE_CLASS : dataType = VL_TYPE_FLOAT ; break ;
-  case mxDOUBLE_CLASS : dataType = VL_TYPE_DOUBLE ; break ;
-  default:
-    vlmxError(vlmxErrInvalidArgument,
-              "DATA must be either SINGLE or DOUBLE.") ;
-  }
-
-  if (mxGetClassID(IN(LABELS)) != mxINT8_CLASS) {
-    vlmxError(vlmxErrInvalidArgument, "LABELS must be INT8.") ;
-  }
-
+  svm = vl_svmpegasos_new ((2*n + 1)*dataDimension,*mxGetPr(IN(LAMBDA))) ;
 
   if (! vlmxIsPlainScalar(IN(LAMBDA))) {
     vlmxError(vlmxErrInvalidArgument, "LAMBDA is not a plain scalar.") ;
   }
 
-  svm = vl_svmpegasos_new ((2*n + 1)*dataDimension,*mxGetPr(IN(LAMBDA))) ;
+
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
@@ -459,49 +631,6 @@ mexFunction(int nout, mxArray *out[],
       ++ verbose ;
       disp->verbose = 1 ;
       break ;
-    case opt_KINTERS:
-    case opt_KL1:
-      kernelType = VlHomogeneousKernelIntersection ;
-      break ;
-    case opt_KCHI2:
-      kernelType = VlHomogeneousKernelChi2 ;
-      break ;
-    case opt_KJS:
-      kernelType = VlHomogeneousKernelJS ;
-      break ;
-    case opt_period:
-      if (! vlmxIsPlainScalar(optarg)){
-        vlmxError(vlmxErrInvalidArgument, "PERIOD is not a scalar.") ;
-      }
-      period = *mxGetPr(optarg) ;
-      if (period <= 0) {
-        vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
-      }
-      break ;
-    case opt_gamma:
-      if (! vlmxIsPlainScalar(optarg)){
-        vlmxError(vlmxErrInvalidArgument, "GAMMA is not a scalar.") ;
-      }
-      gamma = *mxGetPr(optarg) ;
-      if (gamma <= 0) {
-        vlmxError(vlmxErrInvalidArgument, "GAMMA is not positive.") ;
-      }
-      break ;
-    case opt_window:
-      if (! vlmxIsString(optarg,-1)){
-        vlmxError(vlmxErrInvalidArgument, "WINDOW is not a string.") ;
-      } else {
-        char buffer [1024] ;
-        mxGetString(optarg, buffer, sizeof(buffer) / sizeof(char)) ;
-        if (vl_string_casei_cmp("uniform", buffer) == 0) {
-          windowType = VlHomogeneousKernelMapWindowUniform ;
-        } else if (vl_string_casei_cmp("rectangular", buffer) == 0) {
-          windowType = VlHomogeneousKernelMapWindowRectangular ;
-        } else {
-          vlmxError(vlmxErrInvalidArgument, "WINDOW=%s is not recognized.", buffer) ;
-        }
-      }
-      break ;
     }
   }
 
@@ -526,17 +655,9 @@ mexFunction(int nout, mxArray *out[],
 
   }
 
-  VlSvmDataset* dataset = vl_svmdataset_new(data,dataDimension) ;
 
-  if (homkermap)
-    {
-      map = vl_homogeneouskernelmap_new (kernelType, gamma, n, period, windowType) ;
 
-      mapFunc = (VlSvmDatasetFeatureMap)&vl_homogeneouskernelmap_evaluate_d ;
 
-      vl_svmdataset_set_map(dataset,map,mapFunc,2*n + 1) ;
-
-    }
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
@@ -545,8 +666,7 @@ mexFunction(int nout, mxArray *out[],
     vl_svmpegasos_set_diagnostic (svm, (VlSvmDiagnostics)&diagnosticDispatcher, disp) ;
 
 
-  vl_svmpegasos_train (svm,dataset, numSamples,innerProduct, accumulator,
-                       (vl_int8 const *)mxGetData(IN(LABELS))) ;
+  vl_svmpegasos_train (svm,dataset, numSamples,innerProduct, accumulator,labels) ;
 
 
   /* -----------------------------------------------------------------
@@ -589,9 +709,9 @@ mexFunction(int nout, mxArray *out[],
     }
 
 
-  if (homkermap)
+  if (dataset->map)
     {
-      vl_homogeneouskernelmap_delete(map);
+      vl_homogeneouskernelmap_delete(dataset->map);
     }
   vl_svmdataset_delete(dataset) ;
   vl_svmpegasos_delete(svm,freeModel) ;
