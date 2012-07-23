@@ -459,7 +459,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
     case opt_starting_bias :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINFBIAS is not a plain scalar.") ;
+	vlmxError(vlmxErrInvalidArgument, "STARTINGBIAS is not a plain scalar.") ;
       }
       vl_svmpegasos_set_bias(svm, (double) *mxGetPr(optarg)) ;
       break ;

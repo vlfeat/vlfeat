@@ -26,10 +26,14 @@ function test_problem_1(s)
 for conv = {@single,@double}
   vl_twister('state',0) ;
   conv = conv{1} ;
-  [w b] = vl_pegasos(conv(s.X), int8(s.y), s.lambda, ...
+  [w b info] = vl_pegasos(conv(s.X), int8(s.y), s.lambda, ...
                  'MaxIterations', 100000, ...
                  'BiasMultiplier', s.biasMultiplier, ...
                  'BiasLearningRate', .1) ;
+  
+  % test input
+  vl_assert_equal(info.biasMultiplier,s.biasMultiplier); 
+  vl_assert_almost_equal(info.biasLearningRate,.1,1e-3); 
   vl_assert_almost_equal(conv([w; b]), conv(s.w), 0.1) ;
 end
 

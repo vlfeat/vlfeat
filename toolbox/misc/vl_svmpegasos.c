@@ -261,7 +261,7 @@ void  setMap(const mxArray* trainingData, VlSvmDataset* dataset, int* n)
  **
  **  The function create a Matlab struct with the following fields:
  **  - dimension: SVM dimension.
- **  - iterations: number of iterations performed so far.
+ **  - iterations: number of iterations performed.
  **  - maxIterations: maximum number of iterations.
  **  - epsilon: SVM stop criterion.
  **  - lambda: SVM pegasos paramater.
@@ -270,11 +270,11 @@ void  setMap(const mxArray* trainingData, VlSvmDataset* dataset, int* n)
  **  - energyFrequency: rate of SVM energy update.
  **  - elapseTime: elapsed time since the start of the SVM learning.
  **  - energy: SVM energy value.
- **  - regulizerTerm: value of the only SVM regulizer term.
+ **  - regulizerTerm: value of the SVM regulizer term.
  **  - lossPos: value of loss function only for data points labeled positives.
  **  - lossNeg: value of loss function only for data points labeled negatives.
- **  - hardLossPos: number of points labeled negative instead of positive.
- **  - hardLossNeg: number of points labeled positive instead of negative.
+ **  - hardLossPos: number of mislabeled positive points.
+ **  - hardLossNeg: number of mislabeled negative points.
  **
  **/
 
@@ -421,7 +421,7 @@ void diagnosticDispatcher(VlSvmPegasos* svm)
 /* option codes */
 enum {
   opt_verbose, opt_bias_multiplier, opt_max_iterations, opt_epsilon, opt_starting_iteration, opt_starting_model, opt_permutation,
-  opt_bias_learningrate, opt_diagnostic, opt_energy_freq, opt_diagnostic_caller_ref, opt_block_sparse, opt_starting_bias
+  opt_bias_learningrate, opt_diagnostic, opt_energy_freq, opt_diagnostic_caller_ref, opt_block_sparse, opt_starting_bias, opt_validation_data
 } ;
 
 /* options */
@@ -438,6 +438,7 @@ vlmxOption  options [] = {
   {"DiagnosticFunction",1,   opt_diagnostic          },
   {"DiagnosticCallRef",1,   opt_diagnostic_caller_ref          },
   {"EnergyFreq",        1, opt_energy_freq           },
+  {"ValidationData",    1, opt_validation_data       },
   {0,                   0,   0                       }
 } ;
 
@@ -484,12 +485,22 @@ mexFunction(int nout, mxArray *out[],
   disp->callerRef = NULL ;
   disp->verbose = 0 ;
 
-  VlSvmDatasetInnerProduct innerProduct ;
-  VlSvmDatasetAccumulator accumulator ;
+  VlSvmDatasetInnerProduct innerProduct = NULL ;
+  VlSvmDatasetAccumulator accumulator = NULL ;
 
   int n = 0 ;
 
+  /* Validation Data */
+  void * validationData = NULL ;
+  vl_size validationDataDimension ;
+  vl_type validationDataType ;
+  vl_size validationNumSamples = 0 ;
+  vl_int8 * validationLabels = NULL ;
+  
+  int validationN = 0 ; 
 
+  VlSvmDataset* validationDataset = NULL ; 
+  
   VL_USE_MATLAB_ENV ;
 
   /* -----------------------------------------------------------------
@@ -570,7 +581,7 @@ mexFunction(int nout, mxArray *out[],
       break ;
     case opt_starting_bias :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINFBIAS is not a plain scalar.") ;
+	vlmxError(vlmxErrInvalidArgument, "STARTINGBIAS is not a plain scalar.") ;
       }
       vl_svmpegasos_set_bias(svm, (double) *mxGetPr(optarg)) ;
       break ;
@@ -627,6 +638,19 @@ mexFunction(int nout, mxArray *out[],
       vl_svmpegasos_set_energy_frequency (svm, (vl_size)*mxGetPr(optarg)) ;
 
       break ;
+    case opt_validation_data :
+      getTrainingData(optarg,&validationData,&validationDataDimension,&validationDataType,&validationNumSamples,&validationLabels) ;
+
+      if (validationDataType != dataType)
+        vlmxError(vlmxErrInvalidArgument, "VALIDATIONDATA type must be the same of DATA type.") ;
+
+      validationDataset = vl_svmdataset_new(validationData,validationDataDimension) ;
+
+      setMap(optarg,validationDataset,&validationN) ;
+
+      if (validationDataDimension*(1+2*validationN) != dataDimension*(1+2*n))
+        vlmxError(vlmxErrInvalidArgument, "VALIDATIONDATA dimension must be the same of DATA dimension.") ;
+      break ;
     case opt_verbose :
       ++ verbose ;
       disp->verbose = 1 ;
@@ -665,9 +689,12 @@ mexFunction(int nout, mxArray *out[],
   if (disp->diagnosticsHandle)
     vl_svmpegasos_set_diagnostic (svm, (VlSvmDiagnostics)&diagnosticDispatcher, disp) ;
 
-
-  vl_svmpegasos_train (svm,dataset, numSamples,innerProduct, accumulator,labels) ;
-
+  if (validationDataset == NULL)
+    vl_svmpegasos_train (svm,dataset, numSamples,innerProduct, accumulator,labels) ;
+  else
+    vl_svmpegasos_train_validation_data (svm,dataset, numSamples,innerProduct, 
+                                         accumulator,labels, validationDataset, 
+                                         validationNumSamples, validationLabels) ;
 
   /* -----------------------------------------------------------------
    *                                                            Output
