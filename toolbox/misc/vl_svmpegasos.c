@@ -380,30 +380,38 @@ void diagnosticDispatcher(VlSvmPegasos* svm)
 {
   if (svm->diagnosticCallerRef)
     {
-      mxArray *lhs,*rhs[3];
+      mxArray *lhs[1],*rhs[3];
 
+      lhs[0] = NULL ; 
 
       DiagnosticsDispatcher* dispatcherObject = (DiagnosticsDispatcher*)  svm->diagnosticCallerRef ;
 
+
       rhs[0] = dispatcherObject->diagnosticsHandle ;
+
+      rhs[1] =  createInfoStruct(svm) ;
+
       if (dispatcherObject->callerRef)
-        rhs[1] = dispatcherObject->callerRef ;
+        rhs[2] = dispatcherObject->callerRef ;
       else
         {
           mwSize dims[2] ;
           dims[0] = 1 ;
           dims[1] = 1 ;
-          rhs[1] = mxCreateNumericArray(2, dims,
+          rhs[2] = mxCreateNumericArray(2, dims,
                                            mxDOUBLE_CLASS, mxREAL) ;
         }
-      rhs[2] =  createInfoStruct(svm) ;
+      
 
 
       if( mxIsClass( rhs[0] , "function_handle"))
-        mexCallMATLAB(0,&lhs,3,rhs,"feval");
+        mexCallMATLAB(1,lhs,3,rhs,"feval");
 
 
-      mxDestroyArray(rhs[2]) ;
+      if (lhs[0])
+        dispatcherObject->callerRef = lhs[0] ; 
+
+      mxDestroyArray(rhs[1]) ;
 
       if (dispatcherObject->verbose)
         {
