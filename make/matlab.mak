@@ -46,12 +46,16 @@ MEX_FLAGS += CFLAGS='$$CFLAGS $(STD_CFLAGS)'
 ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
+MEX_FLAGS += CC='$(CC)'
+MEX_FLAGS += LD='$(CC)'
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 MEX_SUFFIX := mexmaci64
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
+MEX_FLAGS += CC='$(CC)'
+MEX_FLAGS += LD='$(CC)'
 endif
 
 # Linux on 32 bit processor
