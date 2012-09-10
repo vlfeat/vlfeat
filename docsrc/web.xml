@@ -9,6 +9,10 @@
 
 <html>
  <meta>
+  <!-- Favicon -->
+  <link rel="icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
+
   <!-- Stylesheets -->
   <link href="%pathto:root;web.css" rel="stylesheet" type="text/css"/>
   <link href="%pathto:root;pygmentize.css" rel="stylesheet" type="text/css"/>
