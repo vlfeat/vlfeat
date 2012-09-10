@@ -17,7 +17,130 @@
 
 /**
 
-@subsection hog-conventions
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page hog Histogram of Oriented Gradients (HOG) features
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref hog.h implements the Histogram of Oriented Gradients (HOG) features
+in the variants of Dalal Triggs @cite{dalal05histograms} and of UOCTTI
+@cite{felzenszwalb09object}. Applications include object detection
+and deformable object detection.
+
+- @ref hog-overview
+- @ref hog-tech
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section hog-overview Overview
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+HOG is a standard image feature used, among others, in object detection
+and deformable object detection. It decomposes the image into square cells
+of a given size (typically eight pixels), compute a histogram of oriented
+gradient in each cell (similar to @ref sift), and then renormalizes
+the cells by looking into adjacent blocks.
+
+VLFeat implements two HOG variants: the original one of Dalal-Triggs
+@cite{dalal05histograms} and the one proposed in Felzenszwalb et al.
+@cite{felzenszwalb09object}.
+
+In order to use HOG, start by creating a new HOG object, set the desired
+parameters, pass a (color or grayscale) image, and read off the results.
+
+@code
+VlHog * hog = vl_hog_new(VlHogVariantDalalTriggs, numOrientations, VL_FALSE) ;
+vl_hog_put_image(hog, image, height, width, numChannels, cellSize) ;
+hogWidth = vl_hog_get_width(hog) ;
+hogHeight = vl_hog_get_height(hog) ;
+hogDimenison = vl_hog_get_dimension(hog) ;
+hogArray = vl_malloc(hogWidth*hogHeight*hogDimension*sizeof(float)) ;
+vl_hog_extract(hog, hogArray) ;
+vl_hog_delete(hog) ;
+@endcode
+
+HOG is a feature array of the dimension returned by ::vl_hog_get_width,
+::vl_hog_get_height, with each feature (histogram) having
+dimension ::vl_hog_get_dimension. The array is stored in row major order,
+with the slowest varying dimension beying the dimension indexing the histogram
+elements.
+
+The number of entreis in the histogram as well as their meaning depends
+on the HOG variant and is detailed later. However, it is usually
+unnecessary to know such details. @ref hog.h provides support for
+creating an inconic representation of a HOG feature array:
+
+@code
+glyphSize = vl_hog_get_glyph_size(hog) ;
+imageHeight = glyphSize * hogArrayHeight ;
+imageWidth = glyphSize * hogArrayWidth ;
+image = vl_malloc(sizeof(float)*imageWidth*imageHeight) ;
+vl_hog_render(hog, image, hogArray) ;
+@endcode
+
+It is often convenient to mirror HOG features from left to right. This
+can be obtained by mirroring an array of HOG cells, but the content
+of each cell must also be rearranged. This can be done by
+the permutation obtaiend by ::vl_hog_get_permutation.
+
+@ref hog.h supports creating an iconic representatio of a HOG feature
+array
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section hog-tech Technical details
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+HOG divdes the input image into square cells of size @c cellSize,
+fitting as many cells as possible, filling the image domain from
+the upper-left corner down to the right one. For each row and column,
+the last cell is at least half contained in the image.
+More precisely, the number of cells obtained in this manner is:
+
+@code
+hogWidth = (width + cellSize/2) / cellSize ;
+hogHeight = (height + cellSize/2) / cellSize ;
+@endcode
+
+Then the image gradient @f$ \nabla \ell(x,y) @f$
+is computed by using central difference (for colour image
+the channel with the largest gradient at that pixel is used).
+The gradient @f$ \nabla \ell(x,y) @f$ is assigned to one of @c 2*numOrientations orientation in the
+range @f$ [0,2\pi) @f$ (see @ref hog-conventions for details).
+Contributions are then accumulated by using bilinear interpolation
+to four neigbhour cells, as in @ref sift.
+This results in an histogram  @f$h_d@f$ of dimension
+2*numOrientations, called of @e directed orientations
+since it accounts for the direction as well as the orientation
+of the gradient. A second histogram @f$h_u@f$ of undirected orientations
+of half the size is obtained by folding @f$ h_d @f$ into two.
+
+Let a block of cell be a @f$ 2\times 2 @f$ sub-array of cells.
+Let the norm of a block be the @f$ l^2 @f$ norm of the stacking of the
+respective unoriented histogram. Given a HOG cell, four normalisation
+factors are then obtained as the inverse of the norm of the four
+blocks that contain the cell.
+
+For the Dalal-Triggs variant, each histogram @f$ h_d @f$ is copied
+four times, normalised using the four different normalisation factors,
+the four vectors are stacked, saturated at 0.2, and finally stored as the descriptor
+of the cell. This results in a @c numOrientations * 4 dimensional
+cell descriptor.
+
+For the UOCCTI descriptor, the same is done for both the undirected
+as well as the directed orientation histograms. This would yield
+a dimension of @c 4*(2+1)*numOrientations elements, but the resulting
+vector is projected down to @c (2+1)*numOrientations elements
+by averaging corresponding histogram dimensions. This was shown to
+be an algebraic approximation of PCA for descriptors computed on natural
+images.
+
+In addition, for the UOCTTI variant the l1 norm of each of the
+four l2 normalised undirected histograms is computed and stored
+as additional four dimensions, for a total of
+@c 4+3*numOrientations dimensions.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection hog-conventions Conventions
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The orientation of a gradient is expressed as the angle it forms with the
 horizontal axis of the image. Angles are measured clock-wise (as the vertical
@@ -27,10 +150,10 @@ orientations are @f$ \mathrm{k} \pi / \mathrm{numOrientations} @f$, where
 @c k is an index that varies in the ingeger
 range @f$ \{0, \dots, 2\mathrm{numOrientations} - 1\} @f$.
 
-Note that the orientations refere to the gradient direction; edges
-are assumed to be oriented at ninteen degrees from the gradients.
+Note that the orientations capture the orientation of the gradeint;
+image edges would be oriented at 90 degrees from these.
 
- **/
+**/
 
 /* ---------------------------------------------------------------- */
 /** @brief Create a new HOG object
@@ -417,7 +540,6 @@ vl_hog_prepare_buffers (VlHog * self, vl_size width, vl_size height, vl_size cel
 /* ---------------------------------------------------------------- */
 /** @brief Process features starting from an image
  ** @param self HOG object.
- ** @param features HOG features (output).
  ** @param image image to process.
  ** @param width image width.
  ** @param height image height.
@@ -490,7 +612,7 @@ vl_hog_put_image (VlHog * self,
 
       /*
        Map the gradient to the closest orientation bin. There are
-       numOrientations orientation in the interval [0,2pi).
+       numOrientations orientation in the interval [0,pi).
        The next numOriantations are the symmetric ones, for a total
        of 2*numOrientation directed orientations.
        */
@@ -683,7 +805,7 @@ vl_hog_extract (VlHog * self, float * features)
    of cells, computes a descriptor vector for each by stacking the corresponding
    2x2 HOG cells, and L2 normalizes (and truncates) the result.
 
-   Each of the cell HOG are used in four blocks. These are then decomposed
+   Thus each HOG cell appears in four blocks. These are then decomposed
    again to produce descriptors for each cell. Each descriptor is simply
    the stacking of the portion of each block descriptor that arised
    from that cell. This process result in a descriptor
@@ -719,12 +841,15 @@ vl_hog_extract (VlHog * self, float * features)
         float norm8 = atNorm(x,yp) ;
         float norm9 = atNorm(xp,yp) ;
 
+        /* each factor is the inverse of the l2 norm of one of the 2x2 blocs surrounding
+           cell x,y */
 #if 0
         float factor1 = 1.0f / VL_MAX(sqrtf(norm1 + norm2 + norm4 + norm5), 1e-10f) ;
         float factor2 = 1.0f / VL_MAX(sqrtf(norm2 + norm3 + norm5 + norm6), 1e-10f) ;
         float factor3 = 1.0f / VL_MAX(sqrtf(norm4 + norm5 + norm7 + norm8), 1e-10f) ;
         float factor4 = 1.0f / VL_MAX(sqrtf(norm5 + norm6 + norm8 + norm9), 1e-10f) ;
 #else
+        /* as implemented in UOCTTI code */
         float factor1 = 1.0f / sqrtf(norm1 + norm2 + norm4 + norm5 + 1e-4) ;
         float factor2 = 1.0f / sqrtf(norm2 + norm3 + norm5 + norm6 + 1e-4) ;
         float factor3 = 1.0f / sqrtf(norm4 + norm5 + norm7 + norm8 + 1e-4) ;
