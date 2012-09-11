@@ -150,6 +150,10 @@ code a {
     font-style: italic ;
     color: red ! important ;
 }
+#google {
+    float: right ;
+    width: 50% ;
+}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                               Main content style */

@@ -8,7 +8,7 @@
  <template id="template.default">
 
 <html>
- <meta>
+ <head>
   <!-- Favicon -->
   <link rel="icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
   <link rel="shortcut icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
@@ -21,24 +21,36 @@
 
   <!-- Scripts-->
   %pagescript;
- </meta>
+
+  <!-- Google Custom Search -->
+  <script>
+    (function() {
+    var cx = '003215582122030917471:oq23albfeam';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+    '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+    })();
+  </script>
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-4936091-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+ </head>
 
  <!-- Body Start -->
  <body>
   <div id="header">
-   <!-- Google CSE Search Box Begins -->
-   <form action="http://www.vlfeat.org/search.html" id="cse-search-box">
-    <div>
-     <input type="hidden" name="cx" value="003215582122030917471:oq23albfeam" />
-     <input type="hidden" name="cof" value="FORID:11" />
-     <input type="hidden" name="ie" value="UTF-8" />
-     <input type="text" name="q" size="31" />
-     <input type="submit" name="sa" value="Search" />
-    </div>
-   </form>
-   <script type="text/javascript"
-    src="http://www.google.com/coop/cse/brand?form=cse-search-box&amp;lang=en"></script>
-   <!-- Google CSE Search Box Ends -->
+   <!-- Google CSE Search Box -->
+   <div class="gcse-searchbox-only" id="google" data-resultsUrl="http://www.vlfeat.org/search.html"></div>
    <h1><a class="plain" href="%pathto:home;"><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></a></h1>
   </div>
   <div id="headbanner">
@@ -56,34 +68,8 @@
   <div id="footer">
    &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
   </div> <!-- footer -->
-
-  <!-- Google Analytics Begins -->
-  <script type="text/javascript">
-   //<![CDATA[
-    var localre = /vlfeat.org/;
-    if(document.location.host.search(localre) != -1)
-    {
-   var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-   document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-   }
-   //]]>
-  </script>
-  <script type="text/javascript">
-    //<![CDATA[
-    var localre = /vlfeat.org/;
-    if(document.location.host.search(localre) != -1)
-    {
-
-   try {
-   var pageTracker = _gat._getTracker("UA-4936091-2");
-   pageTracker._trackPageview();
-   } catch(err) {}
-
-   }
-   //]]>
-  </script>
-  <!-- Google Analytics Ends -->
  </body>
+ <!-- Body ends -->
 </html>
 
  </template>
@@ -115,7 +101,6 @@
  </page>
 
  <page id="doc" name="doc" title="Documentation">
-
   <include src="doc.html"/>
 
   <dir name="mdoc">
@@ -141,7 +126,6 @@
     <include src="doc/man-src/man.xml"/>
    </page>
   </dir>
-
  </page>
 
  <dir name="overview">
@@ -171,25 +155,21 @@
      <page id="apps.sift-mosaic.code" name="sift-mosaic-code" title="sift_mosaic.m" hide="yes">
        <pre><include src="../apps/sift_mosaic.m" type="text"/></pre>
      </page>
-
    </page>
  </dir>
 
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+ <!-- Helper pages                                                 -->
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+ <!-- Generate a not-found page -->
+ <page id="notfound" name="notfound" title="404 - Page not found" hide="yes">
+   <include src="notfound.html"/>
+ </page>
+
  <!-- Generate an additional page to hold search results -->
  <page name="search" id="search" title="Search" hide="yes">
-  <!-- Google CSE Search Results Begins -->
-  <div id="cse-search-results"></div>
-  <script type="text/javascript">
-   //<![CDATA[
-   var googleSearchIframeName = "cse-search-results";
-   var googleSearchFormName = "cse-search-box";
-   var googleSearchFrameWidth = 600;
-   var googleSearchDomain = "www.google.com";
-   var googleSearchPath = "/cse";
-   //]]>
-  </script>
-  <script type="text/javascript" src="http://www.google.com/afsonline/show_afs_search.js"></script>
-  <!-- Google CSE Search Results Ends -->
+   <gcse:searchresults-only></gcse:searchresults-only>
  </page>
 
 </site>
