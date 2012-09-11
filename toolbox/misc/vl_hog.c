@@ -228,6 +228,7 @@ mexFunction(int nout, mxArray *out[],
         vl_hog_put_polar_field(hog, image, image + height*width,
                                inputType == DirectedPolarField,
                                height, width, cellSize) ;
+          break ;
       default:
         assert(0) ;
       }

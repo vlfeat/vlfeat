@@ -24,8 +24,16 @@
 %
 %   DirectedPolarField::
 %     By specifying this flag the image IM is interpreted as samples
-%     from a 2D vector field specified by their argument and
-%     modulus.
+%     from a 2D vector field specified by their argument IM(:,:,2) and
+%     modulus IM(:,:,1).
+%
+%   UndirectedPolarField::
+%     Same as above, but wraps angles in [0,pi).
+%
+%   BilinearOrientations::
+%     This flags activates the use of bilinear interpolation to assign
+%     orientations to bins. This produces a smoother feature, but is
+%     not some other implementations (e.g. UoCTTI).
 %
 %   Example:: computing and visualizing HOG features
 %     hog = vl_hog(im2single(im)) ; % compute HOG features

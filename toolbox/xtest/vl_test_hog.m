@@ -5,8 +5,8 @@ vl_test_init ;
 function s = setup()
 s.im = im2single(imread(fullfile(vl_root,'data','a.jpg'))) ;
 [x,y]= meshgrid(linspace(-1,1,128)) ;
-s.im = single(x.^2+y.^2);
-%s.imSmall = s.im(1:128,1:128,:) ;
+s.round = single(x.^2+y.^2);
+s.imSmall = s.im(1:128,1:128,:) ;
 s.imSmall = s.im ;
 s.imSmallFlipped = s.imSmall(:,end:-1:1,:) ;
 
@@ -37,4 +37,23 @@ for cellSize = [4 8 16]
       vl_assert_almost_equal(hog1,hog2,1e-3) ;
     end
   end
+end
+
+function test_polar(s)
+cellSize = 8 ;
+im = s.round ;
+for b = [0 1]
+  if b
+    args = {'bilinearOrientations'} ;
+  else
+    args = {} ;
+  end
+  hog1 = vl_hog(im, cellSize, args{:}) ;
+  [ix,iy] = vl_grad(im) ;
+  m = sqrt(ix.^2 + iy.^2) ;
+  a = atan2(iy,ix) ;
+  m(:,[1 end]) = 0 ;
+  m([1 end],:) = 0 ;
+  hog2 = vl_hog(cat(3,m,a), cellSize, 'DirectedPolarField', args{:}) ;
+  vl_assert_almost_equal(hog1,hog2,norm(hog1(:))/1000) ;
 end

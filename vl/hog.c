@@ -672,7 +672,8 @@ vl_hog_put_image (VlHog * self,
       }
 
       if (self->useBilinearOrientationAssigment) {
-        float angle0 = acosf(orientationWeights[0]) ;
+        /* min(1.0,...) guards against small overflows causing NaNs */
+        float angle0 = acosf(VL_MIN(orientationWeights[0],1.0)) ;
         orientationWeights[1] = angle0 / (M_PI / self->numOrientations) ;
         orientationWeights[0] = 1 - orientationWeights[1] ;
       } else {
@@ -692,6 +693,7 @@ vl_hog_put_image (VlHog * self,
         orientation = orientationBins[o] ;
         if (orientation < 0) continue ;
 
+        /*  (x - (w-1)/2) / w = (x + 0.5)/w - 0.5 */        
         hx = (x + 0.5) / cellSize - 0.5 ;
         hy = (y + 0.5) / cellSize - 0.5 ;
         binx = vl_floor_f(hx) ;
@@ -750,9 +752,9 @@ void vl_hog_put_polar_field (VlHog * self,
                              vl_size cellSize)
 {
   vl_size hogStride ;
-  vl_index x, y ;
-  float factor ;
-  float offset ;
+  vl_index x, y, o ;
+  vl_index period = self->numOrientations * (directed ? 2 : 1) ;
+  double angleStep = VL_PI / self->numOrientations ;
 
   assert(self) ;
   assert(modulus) ;
@@ -761,8 +763,6 @@ void vl_hog_put_polar_field (VlHog * self,
   /* clear features */
   vl_hog_prepare_buffers(self, width, height, cellSize) ;
   hogStride = self->hogWidth * self->hogHeight ;
-  factor = (float) (self->numOrientations / (VL_PI + 10 * VL_EPSILON_F)) ;
-  offset = 0.5f ;
 
 #define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
 #define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
@@ -770,52 +770,77 @@ void vl_hog_put_polar_field (VlHog * self,
   /* fill HOG cells from gradient field */
   for (y = 0 ; y < (signed)height ; ++y) {
     for (x = 0 ; x < (signed)width ; ++x) {
-      float hx, hy, wx1, wx2, wy1, wy2 ;
-      vl_index binx, biny ;
-      int orientation ;
+      float ho, hx, hy, wo1, wo2, wx1, wx2, wy1, wy2 ;
+      vl_index bino, binx, biny ;
+      float orientationWeights [2] = {0,0} ;
+      vl_index orientationBins [2] = {-1,-1} ;
+      vl_index orientation = 0 ;
       float thisAngle = *angle++ ;
       float thisModulus = *modulus++ ;
 
-      if (thisModulus == 0.0F) continue ;
+      if (thisModulus <= 0.0f) continue ;
 
-      orientation = (int) (factor * thisAngle + offset) ;
+      /*  (x - (w-1)/2) / w = (x + 0.5)/w - 0.5 */
 
-      if (directed) {
-        orientation %= 2*self->numOrientations ;
-        if (orientation < 0) { orientation += 2*self->numOrientations ; }
+      ho = (float)thisAngle / angleStep ;
+      bino = vl_floor_f(ho) ;
+      wo2 = ho - bino ;
+      wo1 = 1.0f - wo2 ;
+      
+      while (bino < 0) { bino += self->numOrientations * 2 ; }
+      
+      if (self->useBilinearOrientationAssigment) {
+        orientationBins[0] = bino % period ;
+        orientationBins[1] = (bino + 1) % period ;
+        orientationWeights[0] = wo1 ;
+        orientationWeights[1] = wo2 ;
       } else {
-        orientation %= self->numOrientations ;
-        if (orientation < 0) { orientation += self->numOrientations ; }
+        orientationBins[0] = (bino + ((wo1 > wo2) ? 0 : 1)) % period ;
+        orientationWeights[0] = 1 ;
+        orientationBins[1] = -1 ;
       }
 
-      /*
-       Accumulate the gradient. hx is the distance of the
-       pixel x to the cell center at its left, in units of cellSize.
-       With this parametrixation, a pixel on the cell center
-       has hx = 0, which gradually increases to 1 moving to the next
-       center.
-       */
-      hx = (x + 0.5) / cellSize - 0.5 ;
-      hy = (y + 0.5) / cellSize - 0.5 ;
-      binx = vl_floor_f(hx) ;
-      biny = vl_floor_f(hy) ;
-      wx2 = hx - binx ;
-      wy2 = hy - biny ;
-      wx1 = 1.0 - wx2 ;
-      wy1 = 1.0 - wy2 ;
-
-      if (binx >= 0 && biny >=0) {
-        at(binx,biny,orientation) += thisModulus * wx1 * wy1 ;
-      }
-      if (binx < (signed)self->hogWidth - 1 && biny >=0) {
-        at(binx+1,biny,orientation) += thisModulus * wx2 * wy1 ;
-      }
-      if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
-        at(binx+1,biny+1,orientation) += thisModulus * wx2 * wy2 ;
-      }
-      if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
-        at(binx,biny+1,orientation) += thisModulus * wx1 * wy2 ;
-      }
+      for (o = 0 ; o < 2 ; ++o) {
+        /*
+         Accumulate the gradient. hx is the distance of the
+         pixel x to the cell center at its left, in units of cellSize.
+         With this parametrixation, a pixel on the cell center
+         has hx = 0, which gradually increases to 1 moving to the next
+         center.
+         */
+        
+        orientation = orientationBins[o] ;
+        if (orientation < 0) continue ;
+        
+        hx = (x + 0.5) / cellSize - 0.5 ;
+        hy = (y + 0.5) / cellSize - 0.5 ;
+        binx = vl_floor_f(hx) ;
+        biny = vl_floor_f(hy) ;
+        wx2 = hx - binx ;
+        wy2 = hy - biny ;
+        wx1 = 1.0 - wx2 ;
+        wy1 = 1.0 - wy2 ;
+        
+        wx1 *= orientationWeights[o] ;
+        wx2 *= orientationWeights[o] ;
+        wy1 *= orientationWeights[o] ;
+        wy2 *= orientationWeights[o] ;
+        
+        /*VL_PRINTF("%d %d - %d %d %f %f - %f %f %f %f - %d \n ",x,y,binx,biny,hx,hy,wx1,wx2,wy1,wy2,o);*/
+        
+        if (binx >= 0 && biny >=0) {
+          at(binx,biny,orientation) += thisModulus * wx1 * wy1 ;
+        }
+        if (binx < (signed)self->hogWidth - 1 && biny >=0) {
+          at(binx+1,biny,orientation) += thisModulus * wx2 * wy1 ;
+        }
+        if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
+          at(binx+1,biny+1,orientation) += thisModulus * wx2 * wy2 ;
+        }
+        if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
+          at(binx,biny+1,orientation) += thisModulus * wx1 * wy2 ;
+        }
+      } /* next o */
     } /* next x */
   } /* next y */
 }

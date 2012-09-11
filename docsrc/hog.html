@@ -146,4 +146,23 @@ significantly:</p>
 equal to 3, 4, 5, 9, and 21 repsectively.</div>
 </div>
 
+<p>Another useful option is <code>BilinearOrientations</code> switching
+on the bilinear orientation assignment of the gradient (this is not used
+in certain implementation like UoCTTI).</p>
+
+<precode type='matlab'>
+% Specify the number of orientations
+hog = vl_hog(im,cellSize,'numOrientations', 4) ;
+imhog = vl_hog('render', hog, 'numOrientations', 4) ;
+</precode>
+
+<p>resulting in</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_bilinear_orientations.jpg"/>
+  <div class="caption">From left to right: input image, hard
+  orientation assigments for <code>numOrientations</code> equals to
+  four, and soft orientation assigments.</div>
+</div>
+
 </group>

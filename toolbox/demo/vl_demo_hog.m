@@ -59,7 +59,7 @@ imHog = vl_hog('render', hog) ;
 imHogFromFlippedImage = vl_hog('render', hogFromFlippedImage) ;
 imFlippedHog = vl_hog('render', flippedHog) ;
 
-figure(5) ; clf ;
+figure(4) ; clf ;
 subplot(1,3,1) ; imagesc(imHog) ;
 axis image off ; title('HOG features') ;
 subplot(1,3,2) ; imagesc(imHogFromFlippedImage) ;
@@ -73,7 +73,7 @@ vl_demo_print('hog_flipping',1) ;
 %                                                 Other HOG parameters
 % --------------------------------------------------------------------
 
-figure(4) ; clf ;
+figure(5) ; clf ;
 numOrientationsRange = [3, 4, 5, 9, 21] ;
 for i = 1:numel(numOrientationsRange)
   vl_tightsubplot(1, numel(numOrientationsRange), i) ;
@@ -85,3 +85,20 @@ for i = 1:numel(numOrientationsRange)
   colormap gray ;
 end
 vl_demo_print('hog_num_orientations',.9) ;
+
+figure(6) ; clf ;
+[x,y] = meshgrid(linspace(-1,1,128)) ;
+im = single(sqrt(x.^2+y.^2)) ;
+hog1 = vl_hog(im,cellSize,'numOrientations', 4) ;
+hog2 = vl_hog(im,cellSize,'numOrientations', 4,'bilinearOrientations') ;
+imhog1 = vl_hog('render',hog1,'numOrientations', 4) ;
+imhog2 = vl_hog('render',hog2,'numOrientations', 4) ;
+
+subplot(1,3,1) ; imagesc(im) ;
+axis image off ; title('Input image') ;
+subplot(1,3,2) ; imagesc(imhog1) ;
+axis image off ; title('Hard orientation assignments') ;
+subplot(1,3,3) ; imagesc(imhog2) ;
+axis image off ; title('Soft orientation assignments') ;
+colormap gray ;
+vl_demo_print('hog_bilinear_orientations',1) ;
