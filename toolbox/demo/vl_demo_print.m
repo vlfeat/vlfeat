@@ -7,7 +7,7 @@ function vl_demo_print(varargin)
 %   express the figure width relative to the page width. If not
 %   specified, R is assumed to be 1/2.
 %
-%   Remarks:: The figure paper type is set to letter, which is 8.5 x
+%   Remarks:: The figure paper type is set to letter, that has size 8.5 x
 %     11 inches. When converted for web viewing, images are rasterized
 %     at either 75 or 95 DPI, The documentation system converts images
 %     to bitmap with a resolution of 75 DPI, which makes a letter size
