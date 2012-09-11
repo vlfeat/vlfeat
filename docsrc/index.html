@@ -29,17 +29,16 @@
     style="text-decoration:none">ACM OpenSource Award 2010</a>
   </div>
 
-  <p>The <b>VLFeat</b> <a
-  href="%pathto:license;">open
-  source</a> library implements popular computer vision algorithms
-  including
-  <em>SIFT</em>, <em>MSER</em>, <em>k-means</em>, <em>hierarchical
-  k-means</em>, <em>agglomerative information bottleneck, and quick
-  shift</em>.  It is written in C for efficiency and compatibility,
+  <p>The <b>VLFeat</b> <a href="%pathto:license;">open source</a>
+  library implements popular computer vision algorithms including
+  <em>HOG</em>, <em>SIFT</em>, <em>MSER</em>, <em>k-means</em>, <em>hierarchical
+  k-means</em>, <em>agglomerative information
+  bottleneck</em>, <em>SLIC superpixels</em>, and <em>quick
+  shift</em>. It is written in C for efficiency and compatibility,
   with interfaces in MATLAB for ease of use, and detailed
   documentation throughout. It supports
-  <em>Windows</em>, <em>Mac OS X</em>, and <em>Linux</em>. The latest version of
-  VLFeat is <code>%env:VERSION;</code>.</p>
+  <em>Windows</em>, <em>Mac OS X</em>, and <em>Linux</em>. The latest
+  version of VLFeat is <code>%env:VERSION;</code>.</p>
 
  <table class="boxes">
  <tr>
@@ -72,7 +71,8 @@
  <div class="box">
   <h1>Tutorials</h1>
   <ul>
-  <li>Features:  <a href="%pathto:tut.sift;">SIFT</a>, <a href="%pathto:tut.mser;">MSER</a>,
+  <li>Features: <a href="%pathto:tut.hog;">HOG</a>, <a href="%pathto:tut.sift;">SIFT</a>,
+    <a href="%pathto:tut.mser;">MSER</a>,
     <a href="%pathto:tut.qs;">Quick shift</a>, <a href="%pathto:tut.slic;">SLIC</a></li>
   <li>Clustering: <a href="%pathto:tut.ikm;">IKM</a>, <a href="%pathto:tut.hikm;">HIKM</a>,
     <a href="%pathto:tut.aib;">AIB</a></li>
@@ -84,7 +84,7 @@
   <li><a href="%pathto:apps.caltech-101;">Caltech-101 classification</a></li>
   <li><a href="%pathto:apps.sift-mosaic;">SIFT matching for
   auto-stitching</a></li>
-  <li><a href="%pathto:apps;">All applications</a></li>
+  <li><a href="%pathto:apps;">All example applications</a></li>
   </ul>
  </div></td>
  <td style="height:15em;padding-left:0.5em;padding-top:0.5em;">
@@ -99,14 +99,31 @@
  Howpublished = {\url{http://www.vlfeat.org/}}
 </pre>
 <h1>Acknowledgments</h1>
-<p><a href="http://vision.ucla.edu">UCLA Vision
-Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG</a>.</p>
+<p><a shape="rect"
+href="http://www.pascal-network.org/"><img src="images/PASCAL2.png"
+style="height:4em;" alt="PASCAL2 credits"></img></a>
+<br clear="none"/><a href="http://vision.ucla.edu">UCLA Vision
+Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford
+VGG</a>.</p>
 </div></td></tr></table>
 
  <h2 style="clear:left;">News</h2>
 
  <div class="clear">&nsbp;</div>
  <dl id="changes">
+   <dt><span class="date">11/9/2012</span> VLFeat 0.9.15 released</dt>
+   <dd>VLFeat 0.9.15 adds the HOG features. This is the first point
+     update supported by the <b>PASCAL Harvest</b> (many more to come
+     shortly!). A big thank to our sponsor.
+     [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.15">Details</a>].
+   </dd>
+   <dt><span class="date">10/1/2012</span>
+     <span style="color:red;">PASCAL2 Harvest funding</span></dt>
+   <dd>In the upcoming months many new functionalities will be added
+     to VLFeat thanks to the <a shape="rect"
+     href="http://www.pascal-network.org/?q=node/19">PASCAL
+     Harvest</a>! See <a href='%pathto:about;'>here</a> for details.
+   </dd>
    <dt><span class="date">24/12/2011</span> VLFeat 0.9.14 released</dt>
    <dd>VLFeat 0.9.14 adds SLIC superpixels, improves the
      documentation, and contains other improvements and
@@ -134,7 +151,9 @@ Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford VGG</a>.</p>
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.10">Details</a>].
    </dd>
    <dt><span class="date">28/10/2010</span> VLFeat wins the ACM Multimedia Open Source Awards!</dt>
-   <dd>VLFeat 0.9.9 was awarded the <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/">ACM Multimedia Open Source Award 2010</a>.
+   <dd>VLFeat 0.9.9 was awarded
+   the <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/">ACM
+   Multimedia Open Source Award</a>.
    </dd>
    <dt><span class="date">14/6/2010</span> VLFeat 0.9.9 released</dt>
    <dd>VLFeat 0.9.9 adds a new sample application (SIFT matching) and
