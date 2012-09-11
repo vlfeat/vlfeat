@@ -18,6 +18,7 @@
 		2D3E1F2C15FE93480035AA1E /* license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = license.html; path = docsrc/license.html; sourceTree = "<group>"; };
 		2D3E1F2D15FE93480035AA1E /* plots-rank.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "plots-rank.html"; path = "docsrc/plots-rank.html"; sourceTree = "<group>"; };
 		2D3E1F2E15FE93480035AA1E /* vlfeat.bib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = vlfeat.bib; path = docsrc/vlfeat.bib; sourceTree = "<group>"; };
+		2D3E1F2F15FFE6110035AA1E /* vl_hog.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hog.m; path = toolbox/misc/vl_hog.m; sourceTree = "<group>"; };
 		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
 		2D48402412195B1600E13F49 /* vl_lbp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_lbp.c; path = toolbox/misc/vl_lbp.c; sourceTree = "<group>"; };
 		2D4EB0BF10F3C1E800ADA534 /* kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmeans.c; sourceTree = "<group>"; };
@@ -513,6 +514,7 @@
 				2D66AC9413AE05BD0060594E /* vl_grad.m */,
 				2D66AC9513AE05BD0060594E /* vl_harris.m */,
 				2D66AC9613AE05BD0060594E /* vl_hat.m */,
+				2D3E1F2F15FFE6110035AA1E /* vl_hog.m */,
 				2D66AC9713AE05BD0060594E /* vl_help.m */,
 				2D66AC9813AE05BD0060594E /* vl_hikmeans.m */,
 				2D66AC9913AE05BD0060594E /* vl_hikmeanshist.m */,
