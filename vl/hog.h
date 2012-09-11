@@ -26,6 +26,7 @@ struct VlHog_
   vl_size dimension ;
   vl_size numOrientations ;
   vl_bool transposed ;
+  vl_bool useBilinearOrientationAssigment ;
 
   /* left-right flip permutation */
   vl_index * permutation ;

@@ -123,7 +123,8 @@ For the Dalal-Triggs variant, each histogram @f$ h_d @f$ is copied
 four times, normalised using the four different normalisation factors,
 the four vectors are stacked, saturated at 0.2, and finally stored as the descriptor
 of the cell. This results in a @c numOrientations * 4 dimensional
-cell descriptor.
+cell descriptor. Blocks are visited from left to right and top to bottom
+when forming the final descriptor.
 
 For the UOCCTI descriptor, the same is done for both the undirected
 as well as the directed orientation histograms. This would yield
@@ -181,6 +182,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
   self->numOrientations = numOrientations ;
   self->glyphSize = 21 ;
   self->transposed = transposed ;
+  self->useBilinearOrientationAssigment = VL_TRUE ;
   self->orientationX = vl_malloc(sizeof(float) * self->numOrientations) ;
   self->orientationY = vl_malloc(sizeof(float) * self->numOrientations) ;
 
@@ -237,16 +239,26 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
         self->permutation[o + self->numOrientations] = (op + self->numOrientations) % (2*self->numOrientations) ;
         self->permutation[o + 2*self->numOrientations] = (op % self->numOrientations) + 2*self->numOrientations ;
       }
-      for (o = self->numOrientations * 3 ; o < (signed)self->dimension ; ++o) {
-        self->permutation[o] = o ;
+      for (k = 0 ; k < 4 ; ++k) {
+        /* The texture features correspond to four displaced block around
+         a cell. These permute with a lr flip as for DalalTriggs. */
+        vl_index blockx = k % 2 ;
+        vl_index blocky = k / 2 ;
+        vl_index q = (1 - blockx) + blocky * 2 ;
+        self->permutation[k + self->numOrientations * 3] = q + self->numOrientations * 3 ;
       }
       break ;
 
     case VlHogVariantDalalTriggs:
       for(k = 0 ; k < 4 ; ++k) {
+        /* Find the corresponding block. Blocks are listed in order 1,2,3,4,...
+           from left to right and top to bottom */
+        vl_index blockx = k % 2 ;
+        vl_index blocky = k / 2 ;
+        vl_index q = (1 - blockx) + blocky * 2 ;
         for(o = 0 ; o < (signed)self->numOrientations ; ++o) {
           vl_index op = self->numOrientations - o ;
-          self->permutation[o + k*self->numOrientations] = (op % self->numOrientations) + k*self->numOrientations ;
+          self->permutation[o + k*self->numOrientations] = (op % self->numOrientations) + q*self->numOrientations ;
         }
       }
       break ;
@@ -578,7 +590,6 @@ vl_hog_put_image (VlHog * self,
   hogStride = self->hogWidth * self->hogHeight ;
 
 #define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
-#define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
   /* compute gradients and map the to HOG cells by bilinear interpolation */
   for (y = 1 ; y < (signed)height - 1 ; ++y) {
@@ -586,10 +597,11 @@ vl_hog_put_image (VlHog * self,
       float gradx ;
       float grady ;
       float grad ;
-      float orientationScore = 0;
+      float orientationWeights [2] = {0,0} ;
+      vl_index orientationBins [2] = {-1,-1} ;
       vl_index orientation = 0 ;
       float hx, hy, wx1, wx2, wy1, wy2 ;
-      vl_index binx, biny ;
+      vl_index binx, biny, o ;
 
       /*
        Compute the gradient at (x,y). The image channel with
@@ -610,54 +622,84 @@ vl_hog_put_image (VlHog * self,
           iter += channelStride ;
         }
         grad = sqrtf(grad2) ;
+        gradx /= VL_MAX(grad, 1e-10) ;
+        grady /= VL_MAX(grad, 1e-10) ;
       }
 
       /*
-       Map the gradient to the closest orientation bin. There are
-       numOrientations orientation in the interval [0,pi).
+       Map the gradient to the closest and second closets orientation bins.
+       There are numOrientations orientation in the interval [0,pi).
        The next numOriantations are the symmetric ones, for a total
        of 2*numOrientation directed orientations.
        */
       for (k = 0 ; k < self->numOrientations ; ++k) {
-        float orientationScore_
-        = gradx * self->orientationX[k] +  grady * self->orientationY[k] ;
-        if (orientationScore_ > orientationScore) {
-          orientation = k ;
-          orientationScore = orientationScore_ ;
-        } else if (-orientationScore_ > orientationScore) {
-          orientation = k + self->numOrientations ;
-          orientationScore = - orientationScore_ ;
+        float orientationScore_ = gradx * self->orientationX[k] +  grady * self->orientationY[k] ;
+        vl_index orientationBin_ = k ;
+        if (orientationScore_ < 0) {
+          orientationScore_ = - orientationScore_ ;
+          orientationBin_ += self->numOrientations ;
+        }
+        if (orientationScore_ > orientationWeights[0]) {
+          orientationBins[1] = orientationBins[0] ;
+          orientationWeights[1] = orientationWeights[0] ;
+          orientationBins[0] = orientationBin_ ; ;
+          orientationWeights[0] = orientationScore_ ;
+        } else if (orientationScore_ > orientationWeights[1]) {
+          orientationBins[1] = orientationBin_ ;
+          orientationWeights[1] = orientationScore_ ;
         }
       }
 
-      /*
-       Accumulate the gradient. hx is the distance of the
-       pixel x to the cell center at its left, in units of cellSize.
-       With this parametrixation, a pixel on the cell center
-       has hx = 0, which gradually increases to 1 moving to the next
-       center.
-       */
-      hx = (x + 0.5) / cellSize - 0.5 ;
-      hy = (y + 0.5) / cellSize - 0.5 ;
-      binx = vl_floor_f(hx) ;
-      biny = vl_floor_f(hy) ;
-      wx2 = hx - binx ;
-      wy2 = hy - biny ;
-      wx1 = 1.0 - wx2 ;
-      wy1 = 1.0 - wy2 ;
+      if (self->useBilinearOrientationAssigment) {
+        float angle0 = acosf(orientationWeights[0]) ;
+        orientationWeights[1] = angle0 / (M_PI / self->numOrientations) ;
+        orientationWeights[0] = 1 - orientationWeights[1] ;
+      } else {
+        orientationWeights[0] = 1 ;
+        orientationBins[1] = -1 ;
+      }
 
-      if (binx >= 0 && biny >=0) {
-        at(binx,biny,orientation) += grad * wx1 * wy1 ;
-      }
-      if (binx < (signed)self->hogWidth - 1 && biny >=0) {
-        at(binx+1,biny,orientation) += grad * wx2 * wy1 ;
-      }
-      if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
-        at(binx+1,biny+1,orientation) += grad * wx2 * wy2 ;
-      }
-      if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
-        at(binx,biny+1,orientation) += grad * wx1 * wy2 ;
-      }
+      for (o = 0 ; o < 2 ; ++o) {
+        /*
+         Accumulate the gradient. hx is the distance of the
+         pixel x to the cell center at its left, in units of cellSize.
+         With this parametrixation, a pixel on the cell center
+         has hx = 0, which gradually increases to 1 moving to the next
+         center.
+         */
+
+        orientation = orientationBins[o] ;
+        if (orientation < 0) continue ;
+
+        hx = (x + 0.5) / cellSize - 0.5 ;
+        hy = (y + 0.5) / cellSize - 0.5 ;
+        binx = vl_floor_f(hx) ;
+        biny = vl_floor_f(hy) ;
+        wx2 = hx - binx ;
+        wy2 = hy - biny ;
+        wx1 = 1.0 - wx2 ;
+        wy1 = 1.0 - wy2 ;
+
+        wx1 *= orientationWeights[o] ;
+        wx2 *= orientationWeights[o] ;
+        wy1 *= orientationWeights[o] ;
+        wy2 *= orientationWeights[o] ;
+
+        /*VL_PRINTF("%d %d - %d %d %f %f - %f %f %f %f - %d \n ",x,y,binx,biny,hx,hy,wx1,wx2,wy1,wy2,o);*/
+
+        if (binx >= 0 && biny >=0) {
+          at(binx,biny,orientation) += grad * wx1 * wy1 ;
+        }
+        if (binx < (signed)self->hogWidth - 1 && biny >=0) {
+          at(binx+1,biny,orientation) += grad * wx2 * wy1 ;
+        }
+        if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
+          at(binx+1,biny+1,orientation) += grad * wx2 * wy2 ;
+        }
+        if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
+          at(binx,biny+1,orientation) += grad * wx1 * wy2 ;
+        }
+      } /* next o */
     } /* next x */
   } /* next y */
 }
@@ -774,7 +816,7 @@ vl_hog_extract (VlHog * self, float * features)
   vl_index x, y ;
   vl_uindex k ;
   vl_size hogStride = self->hogWidth * self->hogHeight ;
-  
+
   assert(features) ;
 
 #define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
@@ -791,9 +833,10 @@ vl_hog_extract (VlHog * self, float * features)
     for (k = 0 ; k < self->numOrientations ; ++k) {
       float * niter = self->hogNorm ;
       float * niterEnd = self->hogNorm + self->hogWidth * self->hogHeight ;
+      vl_size stride = self->hogWidth*self->hogHeight*self->numOrientations ;
       while (niter != niterEnd) {
         float h1 = *iter ;
-        float h2 = *(iter + self->hogWidth*self->hogHeight*self->numOrientations) ;
+        float h2 = *(iter + stride) ;
         float h = h1 + h2 ;
         *niter += h * h ;
         niter++ ;
@@ -845,71 +888,90 @@ vl_hog_extract (VlHog * self, float * features)
         vl_index ym = VL_MAX(y - 1, 0) ;
         vl_index yp = VL_MIN(y + 1, (signed)self->hogHeight - 1) ;
 
-        float norm1 = atNorm(xm,ym) ;
-        float norm2 = atNorm(x,ym) ;
-        float norm3 = atNorm(xp,ym) ;
-        float norm4 = atNorm(xm,y) ;
-        float norm5 = atNorm(x,y) ;
-        float norm6 = atNorm(xp,y) ;
-        float norm7 = atNorm(xm,yp) ;
-        float norm8 = atNorm(x,yp) ;
-        float norm9 = atNorm(xp,yp) ;
+        double norm1 = atNorm(xm,ym) ;
+        double norm2 = atNorm(x,ym) ;
+        double norm3 = atNorm(xp,ym) ;
+        double norm4 = atNorm(xm,y) ;
+        double norm5 = atNorm(x,y) ;
+        double norm6 = atNorm(xp,y) ;
+        double norm7 = atNorm(xm,yp) ;
+        double norm8 = atNorm(x,yp) ;
+        double norm9 = atNorm(xp,yp) ;
 
-        /* each factor is the inverse of the l2 norm of one of the 2x2 blocs surrounding
+        double factor1, factor2, factor3, factor4 ;
+
+        /* each factor is the inverse of the l2 norm of one of the 2x2 blocks surrounding
            cell x,y */
 #if 0
-        float factor1 = 1.0f / VL_MAX(sqrtf(norm1 + norm2 + norm4 + norm5), 1e-10f) ;
-        float factor2 = 1.0f / VL_MAX(sqrtf(norm2 + norm3 + norm5 + norm6), 1e-10f) ;
-        float factor3 = 1.0f / VL_MAX(sqrtf(norm4 + norm5 + norm7 + norm8), 1e-10f) ;
-        float factor4 = 1.0f / VL_MAX(sqrtf(norm5 + norm6 + norm8 + norm9), 1e-10f) ;
+        if (self->transposed) {
+          /* if the image is transposed, y and x are swapped */
+          factor1 = 1.0 / VL_MAX(sqrt(norm1 + norm2 + norm4 + norm5), 1e-10) ;
+          factor3 = 1.0 / VL_MAX(sqrt(norm2 + norm3 + norm5 + norm6), 1e-10) ;
+          factor2 = 1.0 / VL_MAX(sqrt(norm4 + norm5 + norm7 + norm8), 1e-10) ;
+          factor4 = 1.0 / VL_MAX(sqrt(norm5 + norm6 + norm8 + norm9), 1e-10) ;
+        } else {
+          factor1 = 1.0 / VL_MAX(sqrt(norm1 + norm2 + norm4 + norm5), 1e-10) ;
+          factor2 = 1.0 / VL_MAX(sqrt(norm2 + norm3 + norm5 + norm6), 1e-10) ;
+          factor3 = 1.0 / VL_MAX(sqrt(norm4 + norm5 + norm7 + norm8), 1e-10) ;
+          factor4 = 1.0 / VL_MAX(sqrt(norm5 + norm6 + norm8 + norm9), 1e-10) ;
+        }
 #else
         /* as implemented in UOCTTI code */
-        float factor1 = 1.0f / sqrtf(norm1 + norm2 + norm4 + norm5 + 1e-4) ;
-        float factor2 = 1.0f / sqrtf(norm2 + norm3 + norm5 + norm6 + 1e-4) ;
-        float factor3 = 1.0f / sqrtf(norm4 + norm5 + norm7 + norm8 + 1e-4) ;
-        float factor4 = 1.0f / sqrtf(norm5 + norm6 + norm8 + norm9 + 1e-4) ;
+        if (self->transposed) {
+          /* if the image is transposed, y and x are swapped */
+          factor1 = 1.0 / sqrt(norm1 + norm2 + norm4 + norm5 + 1e-4) ;
+          factor3 = 1.0 / sqrt(norm2 + norm3 + norm5 + norm6 + 1e-4) ;
+          factor2 = 1.0 / sqrt(norm4 + norm5 + norm7 + norm8 + 1e-4) ;
+          factor4 = 1.0 / sqrt(norm5 + norm6 + norm8 + norm9 + 1e-4) ;
+        } else {
+          factor1 = 1.0 / sqrt(norm1 + norm2 + norm4 + norm5 + 1e-4) ;
+          factor2 = 1.0 / sqrt(norm2 + norm3 + norm5 + norm6 + 1e-4) ;
+          factor3 = 1.0 / sqrt(norm4 + norm5 + norm7 + norm8 + 1e-4) ;
+          factor4 = 1.0 / sqrt(norm5 + norm6 + norm8 + norm9 + 1e-4) ;
+        }
 #endif
-        float t1 = 0 ;
-        float t2 = 0 ;
-        float t3 = 0 ;
-        float t4 = 0 ;
+
+        double t1 = 0 ;
+        double t2 = 0 ;
+        double t3 = 0 ;
+        double t4 = 0 ;
 
         float * oiter = features + x + self->hogWidth * y ;
 
         for (k = 0 ; k < self->numOrientations ; ++k) {
-          float ha = iter[hogStride * k] ;
-          float hb = iter[hogStride * (k + self->numOrientations)] ;
-          float hc ;
+          double ha = iter[hogStride * k] ;
+          double hb = iter[hogStride * (k + self->numOrientations)] ;
+          double hc ;
 
-          float ha1 = factor1 * ha ;
-          float ha2 = factor2 * ha ;
-          float ha3 = factor3 * ha ;
-          float ha4 = factor4 * ha ;
+          double ha1 = factor1 * ha ;
+          double ha2 = factor2 * ha ;
+          double ha3 = factor3 * ha ;
+          double ha4 = factor4 * ha ;
 
-          float hb1 = factor1 * hb ;
-          float hb2 = factor2 * hb ;
-          float hb3 = factor3 * hb ;
-          float hb4 = factor4 * hb ;
+          double hb1 = factor1 * hb ;
+          double hb2 = factor2 * hb ;
+          double hb3 = factor3 * hb ;
+          double hb4 = factor4 * hb ;
 
-          float hc1 = ha1 + hb1 ;
-          float hc2 = ha2 + hb2 ;
-          float hc3 = ha3 + hb3 ;
-          float hc4 = ha4 + hb4 ;
+          double hc1 = ha1 + hb1 ;
+          double hc2 = ha2 + hb2 ;
+          double hc3 = ha3 + hb3 ;
+          double hc4 = ha4 + hb4 ;
 
-          ha1 = VL_MIN(0.2f, ha1) ;
-          ha2 = VL_MIN(0.2f, ha2) ;
-          ha3 = VL_MIN(0.2f, ha3) ;
-          ha4 = VL_MIN(0.2f, ha4) ;
+          ha1 = VL_MIN(0.2, ha1) ;
+          ha2 = VL_MIN(0.2, ha2) ;
+          ha3 = VL_MIN(0.2, ha3) ;
+          ha4 = VL_MIN(0.2, ha4) ;
 
-          hb1 = VL_MIN(0.2f, hb1) ;
-          hb2 = VL_MIN(0.2f, hb2) ;
-          hb3 = VL_MIN(0.2f, hb3) ;
-          hb4 = VL_MIN(0.2f, hb4) ;
+          hb1 = VL_MIN(0.2, hb1) ;
+          hb2 = VL_MIN(0.2, hb2) ;
+          hb3 = VL_MIN(0.2, hb3) ;
+          hb4 = VL_MIN(0.2, hb4) ;
 
-          hc1 = VL_MIN(0.2f, hc1) ;
-          hc2 = VL_MIN(0.2f, hc2) ;
-          hc3 = VL_MIN(0.2f, hc3) ;
-          hc4 = VL_MIN(0.2f, hc4) ;
+          hc1 = VL_MIN(0.2, hc1) ;
+          hc2 = VL_MIN(0.2, hc2) ;
+          hc3 = VL_MIN(0.2, hc3) ;
+          hc4 = VL_MIN(0.2, hc4) ;
 
           t1 += hc1 ;
           t2 += hc2 ;
@@ -918,9 +980,9 @@ vl_hog_extract (VlHog * self, float * features)
 
           switch (self->variant) {
             case VlHogVariantUoctti :
-              ha = 0.5f * (ha1 + ha2 + ha3 + ha4) ;
-              hb = 0.5f * (hb1 + hb2 + hb3 + hb4) ;
-              hc = 0.5f * (hc1 + hc2 + hc3 + hc4) ;
+              ha = 0.5 * (ha1 + ha2 + ha3 + ha4) ;
+              hb = 0.5 * (hb1 + hb2 + hb3 + hb4) ;
+              hc = 0.5 * (hc1 + hc2 + hc3 + hc4) ;
               *oiter = ha ;
               *(oiter + hogStride * self->numOrientations) = hb ;
               *(oiter + 2 * hogStride * self->numOrientations) = hc ;
