@@ -55,7 +55,6 @@ mexFunction(int nout, mxArray *out[],
   char const * variantName ;
   enum {IN_I = 0, IN_CELLSIZE, IN_END} ;
   enum {OUT_FEATURES = 0} ;
-  char const * inputTypeName = NULL ;
 
   vl_bool verbose = 0 ;
   int opt, next ;
@@ -158,7 +157,7 @@ mexFunction(int nout, mxArray *out[],
         } else if (vlmxIsEqualToStringI(optarg, "dalaltriggs")) {
           variant = VlHogVariantDalalTriggs ;
         } else {
-          vlmxError(vlmxErrInvalidArgument, "Unknown VARIANT.") ;
+          vlmxError(vlmxErrInvalidArgument, "The option VARIANT has an unknown value.") ;
         }
         break ;
 

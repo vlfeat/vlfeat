@@ -1,0 +1,149 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>The <b>HOG</b> features are widely use for object detection. HOG
+decomposes an image into small squared cells, computes an hisrogram of
+oriented gradients in each cell, normalizes the result using a
+block-wise pattern, and return a descriptor for each cell.</p>
+
+<p>Stacking the cells into a squared image region can be used as an
+image window descriptor for object detection, for example by means of
+an SVM.</p>
+
+<p>This tutorial shows how to use the VLFeat
+function <code>vl_hog</code> to compute HOG features of various kind
+and manipilate them.</p>
+
+<ul>
+ <li><a href="%pathto:tut.hog.basic;">Basic HOG computation</a></li>
+ <li><a href="%pathto:tut.hog.flip;">Flipping HOG from left to right</a></li>
+ <li><a href="%pathto:tut.hog.params;">Other HOG parameters</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hog.basic">Basic HOG computation</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>We start by considering an example inputimage:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_image.jpg"/>
+  <div class="caption">An example image.</div>
+</div>
+
+<p>HOG is computed by calling the <code>vl_hog</code> function:</p>
+
+<precode type='matlab'>
+cellSize = 8 ;
+hog = vl_hog(im, cellSize, 'verbose') ;
+</precode>
+
+<p>The same function can also be used to generate a pictorial
+rendition of the features, although this unavoidably destroyis some of
+the information contained in the feature itself. To this end, use the
+<code>render</code> command:</p>
+
+<precode type='matlab'>
+imhog = vl_hog('render', hog, 'verbose') ;
+</precode>
+
+<p>This should produce the following image:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_features.jpg"/>
+  <div class="caption">Standard HOG features with a cell size of eight pixels.</div>
+</div>
+
+<p>HOG is an array of cells, with the third dimension spanning feature
+components:</p>
+
+<precode type='matlab'>
+> size(hog)
+
+ans =
+
+    16    16    31
+</precode>
+
+<p>In this case the feature has 31 dimensions. HOG exists in many
+variants. VLFeat supports two: the UoCTTI variant (used by default)
+and the original Dalal-Triggs variant (with 2&times;2 square HOG
+blocks for normalisation). The main difference is that the UoCTTI
+variant computes bot directed and undirected gradients as well as a
+four dimensional texture-energy feautre, but projects the result down
+to 31 dimensions. Dalal-Triggs works instead with undirected gradients
+only and does not do any compression, for a total of 36
+dimension. The Dalal-Triggs variant can be computed as</p>
+
+<precode type='matlab'>
+% Dalal-Triggs variant
+cellSize = 8 ;
+hog = vl_hog(im, cellSize, 'verbose', 'variant', 'dalaltriggs') ;
+imhog = vl_hog('render', hog, 'verbose', 'variant', 'dalaltriggs') ;
+</precode>
+
+<p>The result is visually very similar:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_features_dalal_triggs.jpg"/>
+  <div class="caption">Dalal-Triggs variant. Differences with the
+  standard version are difficult to appreciated in the
+  rendition.</div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hog.flip">Flipping HOG from left to right</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Often it is necessary to flip HOG features from left to right (for
+example in order to model an axis symmetric object). This can be obtained
+analytically from the feature itself by permuting the histogram dimensions
+appropriately. The permutation is obtained as follows:</p>
+
+<precode type='matlab'>
+% Get permutation to flip a HOG cell from left to right
+perm = vl_hog('permutation') ;
+</precode>
+
+<p>Then these two examples produce identical results (provided that
+the image contains an exact numver of cells:</p>
+
+<precode type='matlab'>
+imHog = vl_hog('render', hog) ;
+imHogFromFlippedImage = vl_hog('render', hogFromFlippedImage) ;
+imFlippedHog = vl_hog('render', flippedHog) ;
+</precode>
+
+<p>This is shown in the figure:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_flipping.jpg"/>
+  <div class="caption">Flipping HOG features from left to right either
+  by flipping the input image or the features directly.</div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.hog.params">Other HOG parameters</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p><code>vl_hog</code> supports other parameters as well. For example,
+one can specify the number of orientations in the histograms by the
+<code>numOrientations</code> option:</p>
+
+<precode type='matlab'>
+% Specify the number of orientations
+hog = vl_hog(im, cellSize, 'verbose', 'numOrientations', o) ;
+imhog = vl_hog('render', hog, 'verbose', 'numOrientations', o) ;
+</precode>
+
+<p>Changing the number of orientations changes the features quite
+significantly:</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/hog_num_orientations.jpg"/>
+  <div class="caption">HOG features for <code>numOrientations</code>
+equal to 3, 4, 5, 9, and 21 repsectively.</div>
+</div>
+
+</group>

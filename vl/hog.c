@@ -82,8 +82,8 @@ can be obtained by mirroring an array of HOG cells, but the content
 of each cell must also be rearranged. This can be done by
 the permutation obtaiend by ::vl_hog_get_permutation.
 
-@ref hog.h supports creating an iconic representatio of a HOG feature
-array
+Furthermore, @ref hog.h suppots computing HOG features not from
+images but from vector fields ::vl_
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section hog-tech Technical details
@@ -478,7 +478,8 @@ vl_hog_get_dimension (VlHog const * self)
  ** @return number of HOG cells in the horizontal direction.
  **/
 
-vl_size vl_hog_get_width (VlHog * self)
+vl_size
+vl_hog_get_width (VlHog * self)
 {
   return self->hogWidth ;
 }
@@ -488,7 +489,8 @@ vl_size vl_hog_get_width (VlHog * self)
  ** @return number of HOG cells in the vertical direction.
  **/
 
-vl_size vl_hog_get_height (VlHog * self)
+vl_size
+vl_hog_get_height (VlHog * self)
 {
   return self->hogHeight ;
 }
@@ -661,12 +663,28 @@ vl_hog_put_image (VlHog * self,
 }
 
 /* ---------------------------------------------------------------- */
-VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
-                                       float const * modulus,
-                                       float const * angle,
-                                       vl_bool directed,
-                                       vl_size width, vl_size height,
-                                       vl_size cellSize)
+/** @brief Process features starting from a field in polar notation
+ ** @param self HOG object.
+ ** @param modulus modulus of the vectors at each image location.
+ ** @param angle angle of the vectors at each image location.
+ ** @param directed wrap the angle at 2pi (directed) or pi (undirected).
+ ** @param width image width.
+ ** @param height image height.
+ ** @param numChannels number of image channles.
+ ** @param cellSize size of a HOG cell.
+ **
+ ** The function behaves like ::vl_hog_put_image, but foregoes the internal
+ ** computation of the gradient field allowing the user to specify
+ ** their own. Angles are measure clockwise (y axis pointing downwards)
+ ** starting from the x axis (pointing right).
+ **/
+
+void vl_hog_put_polar_field (VlHog * self,
+                             float const * modulus,
+                             float const * angle,
+                             vl_bool directed,
+                             vl_size width, vl_size height,
+                             vl_size cellSize)
 {
   vl_size hogStride ;
   vl_index x, y ;
@@ -745,15 +763,9 @@ VL_EXPORT void vl_hog_put_polar_field (VlHog * self,
  ** @param self HOG object.
  ** @param features HOG features (output).
  **
- ** The buffer @c hog must be a three-dimensional array.
- ** The first two dimensions are @c (width + cellSize/2)/cellSize and
- ** @c (height + cellSize/2)/cellSize, where divisions are integer.
- ** This is approximately @c width/cellSize and @c height/cellSize,
- ** adjusted so that the last cell is at least half contained in the
- ** image.
- **
- ** The image @c width and @c height must be not smaller than three
- ** pixels and not smaller than @c cellSize.
+ ** This method is called after ::vl_hog_put_image or ::vl_hog_put_polar_field
+ ** in order to retrieve the computed HOG features. The buffer @c features must have the dimensions returned by
+ ** ::vl_hog_get_width, ::vl_hog_get_height, and ::vl_hog_get_dimension.
  **/
 
 void
@@ -762,6 +774,8 @@ vl_hog_extract (VlHog * self, float * features)
   vl_index x, y ;
   vl_uindex k ;
   vl_size hogStride = self->hogWidth * self->hogHeight ;
+  
+  assert(features) ;
 
 #define at(x,y,k) (self->hog[(x) + (y) * self->hogWidth + (k) * hogStride])
 #define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
