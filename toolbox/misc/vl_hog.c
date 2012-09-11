@@ -19,7 +19,8 @@ enum {
   opt_verbose, opt_variant,
   opt_num_orientations,
   opt_directed_polar_field,
-  opt_undirected_polar_field
+  opt_undirected_polar_field,
+  opt_bilinear_orientations
 } ;
 
 /* options */
@@ -29,6 +30,7 @@ vlmxOption  options [] = {
   {"NumOrientations",      1,   opt_num_orientations             },
   {"DirectedPolarField",   0,   opt_directed_polar_field         },
   {"UndirectedPolarField", 0,   opt_undirected_polar_field       },
+  {"BilinearOrientations", 0,   opt_bilinear_orientations        },
   {0,                      0,   0                                }
 } ;
 
@@ -51,6 +53,7 @@ mexFunction(int nout, mxArray *out[],
   vl_size width, height, numChannels ;
   vl_size cellSize = 16 ;
   vl_size numOrientations = 9 ;
+  vl_bool bilinearOrientations = VL_FALSE ;
   VlHogVariant variant = VlHogVariantUoctti ;
   char const * variantName ;
   enum {IN_I = 0, IN_CELLSIZE, IN_END} ;
@@ -179,6 +182,10 @@ mexFunction(int nout, mxArray *out[],
         inputType = UndirectedPolarField ;
         break ;
 
+      case opt_bilinear_orientations :
+        bilinearOrientations = VL_TRUE ;
+        break ;
+
       case opt_verbose :
         ++ verbose ;
         break ;
@@ -201,6 +208,8 @@ mexFunction(int nout, mxArray *out[],
       /* recall that MATLAB images are transposed */
       VlHog * hog = vl_hog_new (variant, numOrientations, VL_TRUE) ;
       mwSize dimensions [3] ;
+
+      vl_hog_set_use_bilinear_orientation_assignments (hog, bilinearOrientations) ;
 
       if ((inputType == DirectedPolarField ||
            inputType == UndirectedPolarField) &&
@@ -231,6 +240,7 @@ mexFunction(int nout, mxArray *out[],
         mexPrintf("vl_hog: image: [%d x %d x %d]\n", height, width, numChannels) ;
         mexPrintf("vl_hog: descriptor: [%d x %d x %d]\n", dimensions[0], dimensions[1], dimensions[2]) ;
         mexPrintf("vl_hog: number of orientations: %d\n", numOrientations) ;
+        mexPrintf("vl_hog: bilinear orientation assignments: %s\n", VL_YESNO(vl_hog_get_use_bilinear_orientation_assignments(hog))) ;
         mexPrintf("vl_hog: variant: %s\n", variantName) ;
         mexPrintf("vl_hog: input type: %s\n", inputTypeNames[inputType]) ;
       }

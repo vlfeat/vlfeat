@@ -182,7 +182,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
   self->numOrientations = numOrientations ;
   self->glyphSize = 21 ;
   self->transposed = transposed ;
-  self->useBilinearOrientationAssigment = VL_TRUE ;
+  self->useBilinearOrientationAssigment = VL_FALSE ;
   self->orientationX = vl_malloc(sizeof(float) * self->numOrientations) ;
   self->orientationY = vl_malloc(sizeof(float) * self->numOrientations) ;
 
@@ -383,6 +383,27 @@ vl_index const *
 vl_hog_get_permutation (VlHog const * self)
 {
   return self->permutation ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Set wether to use bilinear interpolation assignments
+ ** @param self HOG object.
+ ** @param @c true if orientations should be assigned with bilinear interpolation.
+ **/
+
+vl_bool
+vl_hog_get_use_bilinear_orientation_assignments (VlHog const * self) {
+  return self->useBilinearOrientationAssigment ;
+}
+
+/** @brief Get wether bilinear interpolation assignments are used
+ ** @param self HOG object.
+ ** @return @c true if orientations are be assigned with bilinear interpolation.
+ **/
+
+void
+vl_hog_set_use_bilinear_orientation_assignments (VlHog * self, vl_bool x) {
+  self->useBilinearOrientationAssigment = x ;
 }
 
 /* ---------------------------------------------------------------- */

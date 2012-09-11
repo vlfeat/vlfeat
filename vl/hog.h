@@ -82,5 +82,8 @@ VL_EXPORT vl_size vl_hog_get_dimension (VlHog const * self) ;
 VL_EXPORT vl_index const * vl_hog_get_permutation (VlHog const * self) ;
 VL_EXPORT vl_size vl_hog_get_glyph_size (VlHog const * self) ;
 
+VL_EXPORT vl_bool vl_hog_get_use_bilinear_orientation_assignments (VlHog const * self) ;
+VL_EXPORT void vl_hog_set_use_bilinear_orientation_assignments (VlHog * self, vl_bool x) ;
+
 /* VL_HOG_H */
 #endif
