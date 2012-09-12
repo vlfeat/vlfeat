@@ -27,6 +27,9 @@ LATEX      ?= latex
 PYTHON     ?= python
 GROFF      ?= groff
 TIDY       ?= tidy
+INKSCAPE   ?= inkscape
+MV         ?= mv
+SED        ?= sed
 
 # 95 DPI makes a letter page 808 pixels large
 screen_dpi := 95
@@ -42,6 +45,7 @@ screen_dpi := 95
 no_dep_targets := doc-clean doc-archclean doc-distclean
 
 fig_src  := $(wildcard docsrc/figures/*.fig)
+svg_src  := $(wildcard docsrc/figures/*.svg)
 demo_src := $(wildcard doc/demo/*.eps)
 html_src := $(wildcard docsrc/*.html)
 man_src  := $(wildcard src/*.1)
@@ -49,7 +53,7 @@ man_src  += $(wildcard src/*.7)
 
 pdf_tgt := #$(fig_src:.fig=.pdf)
 eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
-png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png))
+png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png)) $(subst docsrc/,doc/,$(svg_src:.svg=.png)) 
 jpg_tgt := $(demo_src:.eps=.jpg)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
@@ -183,6 +187,11 @@ doc/figures/%.eps : doc/figures/%.dvi
 
 doc/figures/%-raw.tex : docsrc/figures/%.fig
 	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@
+
+doc/figures/%-raw.ps doc/figures/%-raw.tex: docsrc/figures/%.svg
+	$(call C,INKSCAPE) --export-ps=doc/figures/$(*)-raw.ps --export-latex $<
+	$(call C,MV) doc/figures/$(*)-raw.ps_tex doc/figures/$(*)-raw.tex
+	$(call C,SED) -e 's/$(*)-raw.ps/doc\/figures\/$(*)-raw.ps/g' -i .bak 'doc/figures/$(*)-raw.tex'
 
 doc/figures/%-raw.ps : docsrc/figures/%.fig
 	$(call C,FIG2DEV) -L pstex $< $@
