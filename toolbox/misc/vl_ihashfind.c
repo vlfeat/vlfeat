@@ -75,7 +75,7 @@ mexFunction(int nout, mxArray *out[],
   enum { OUT_SEL } ;
 
   vl_uint32 const * next ;
-  vl_uint32       * sel ;
+  vl_uint32 * sel ;
   vl_uint8 const  * id ;
   vl_uint8 const  * x ;
 
@@ -95,7 +95,7 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("NEXT must be UINT32.") ;
   }
 
-  if(! mxIsNumeric(in[IN_X])   || mxGetClassID(in[IN_X])   != mxUINT8_CLASS) {
+  if(! mxIsNumeric(in[IN_X])   || mxGetClassID(in[IN_X])!= mxUINT8_CLASS) {
     mexErrMsgTxt("X must be UINT8") ;
   }
 
@@ -154,6 +154,11 @@ mexFunction(int nout, mxArray *out[],
     unsigned int h1, h2 ;
     unsigned int j, p = 0 ;
 
+    if (is_null (x + i * ndims, ndims)) {
+      *sel++ = 0 ;
+      continue ;
+    }
+
     h1 = fnv_hash(x + i * ndims, ndims) % K ;
     h2 = h1 | 0x1 ; /* this needs to be odd */
 
@@ -169,6 +174,7 @@ mexFunction(int nout, mxArray *out[],
     /* handle extended table */
     while (! is_null (id + p * ndims,                ndims) &&
            ! is_equal(id + p * ndims, x + i * ndims, ndims)) {
+      if (next[p] == 0) break ;
       p = next [p] - 1 ;
     }
 
