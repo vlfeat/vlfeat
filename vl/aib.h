@@ -54,6 +54,8 @@ typedef struct _VlAIB
 
   vl_uint   *parents;   /**< Array of parents */
   double    *costs;     /**< Cost of each merge */
+
+  vl_uint verbosity ; /** Verbosity level */
 } VlAIB;
 
 /** @name Create and destroy
@@ -96,7 +98,6 @@ vl_uint * vl_aib_get_parents(VlAIB const * aib)
   return aib->parents;
 }
 
-
 /** ------------------------------------------------------------------
  ** @brief Get a list of merge costs
  ** @param aib AIB filter.
@@ -106,6 +107,27 @@ VL_INLINE
 double * vl_aib_get_costs(VlAIB const * aib)
 {
   return aib->costs;
+}
+
+/* ----------------------------------------------------------------- */
+/** @brief Set the verbosity
+ ** @param self AIB object.
+ ** @param verbosity a non-negative integer.
+ **/
+VL_INLINE void
+vl_aib_set_verbosity (VlAIB * self, int verbosity)
+{
+  self->verbosity = verbosity ;
+}
+
+/** @brief Get the verbosity
+ ** @param self AIB object.
+ ** @return the verbosity level.
+ **/
+VL_INLINE int
+vl_aib_get_verbosity (VlAIB const * self)
+{
+  return self->verbosity ;
 }
 
 /* VL_AIB_H */

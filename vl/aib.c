@@ -491,6 +491,7 @@ VlAIB * vl_aib_new(double * Pcx, vl_uint nvalues, vl_uint nlabels)
     VlAIB * aib = vl_malloc(sizeof(VlAIB));
     vl_uint i ;
 
+    aib->verbosity = 0 ;
     aib->Pcx   = Pcx ;
     aib->nvalues = nvalues ;
     aib->nlabels = nlabels ;
@@ -624,14 +625,16 @@ void vl_aib_process(VlAIB *aib)
 
       aib->costs[i+1] = I;
 
-      VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n",
-                 nodei,
-                 nodej,
-                 newnode,
-                 minbeta,
-                 I,
-                 H,
-                 aib->nwhich) ;
+      if (aib->verbosity > 0) {
+        VL_PRINTF ("aib: (%5d,%5d)=%5d dE: %10.3g I: %6.4g H: %6.4g updt: %5d\n",
+                   nodei,
+                   nodej,
+                   newnode,
+                   minbeta,
+                   I,
+                   H,
+                   aib->nwhich) ;
+      }
     }
 
     /* fill ignored entries with NaNs */
