@@ -9,7 +9,8 @@
 %
 %   INTHIST is the [M,N,K] integral histogram obtained by integrating
 %   the label maps (an integral histogram is just an array of K
-%   integral images, one for each of the K labels).
+%   integral images, one for each of the K labels). All layers of
+%   labels are accumulated to the same integral histogram.
 %
 %   The total number of labels K is obtained as the maximum value of
 %   LABELS. VL_INTHIST(..., 'NUMLABELS', K) specifies the number of

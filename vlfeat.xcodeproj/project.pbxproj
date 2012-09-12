@@ -149,7 +149,7 @@
 		2D66ACCC13AE05BD0060594E /* vl_roc.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_roc.m; path = toolbox/plotop/vl_roc.m; sourceTree = "<group>"; };
 		2D66ACCD13AE05BD0060594E /* vl_rodr.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_rodr.m; path = toolbox/geometry/vl_rodr.m; sourceTree = "<group>"; };
 		2D66ACCE13AE05BD0060594E /* vl_root.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_root.m; path = toolbox/vl_root.m; sourceTree = "<group>"; };
-		2D66ACCF13AE05BD0060594E /* vl_samplinthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_samplinthist.m; path = toolbox/misc/vl_samplinthist.m; sourceTree = "<group>"; };
+		2D66ACCF13AE05BD0060594E /* vl_sampleinthist.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_sampleinthist.m; path = toolbox/misc/vl_sampleinthist.m; sourceTree = "<group>"; };
 		2D66ACD013AE05BD0060594E /* vl_setup.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_setup.m; path = toolbox/vl_setup.m; sourceTree = "<group>"; };
 		2D66ACD113AE05BD0060594E /* vl_sift.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_sift.m; path = toolbox/sift/vl_sift.m; sourceTree = "<group>"; };
 		2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_siftdescriptor.m; path = toolbox/sift/vl_siftdescriptor.m; sourceTree = "<group>"; };
@@ -301,7 +301,7 @@
 		2D86B11B0F24CC9B00E625D6 /* vl_localmax.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_localmax.c; path = toolbox/misc/vl_localmax.c; sourceTree = "<group>"; };
 		2D86B11C0F24CC9B00E625D6 /* vl_mser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_mser.c; path = toolbox/mser/vl_mser.c; sourceTree = "<group>"; };
 		2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_rodr.c; path = toolbox/geometry/vl_rodr.c; sourceTree = "<group>"; };
-		2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_samplinthist.c; path = toolbox/misc/vl_samplinthist.c; sourceTree = "<group>"; };
+		2D86B11E0F24CC9B00E625D6 /* vl_sampleinthist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_sampleinthist.c; path = toolbox/misc/vl_sampleinthist.c; sourceTree = "<group>"; };
 		2D86B11F0F24CC9B00E625D6 /* vl_sift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_sift.c; path = toolbox/sift/vl_sift.c; sourceTree = "<group>"; };
 		2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_siftdescriptor.c; path = toolbox/sift/vl_siftdescriptor.c; sourceTree = "<group>"; };
 		2D86B1210F24CC9B00E625D6 /* vl_tpsumx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_tpsumx.c; path = toolbox/imop/vl_tpsumx.c; sourceTree = "<group>"; };
@@ -571,7 +571,7 @@
 				2D66ACCC13AE05BD0060594E /* vl_roc.m */,
 				2D66ACCD13AE05BD0060594E /* vl_rodr.m */,
 				2D66ACCE13AE05BD0060594E /* vl_root.m */,
-				2D66ACCF13AE05BD0060594E /* vl_samplinthist.m */,
+				2D66ACCF13AE05BD0060594E /* vl_sampleinthist.m */,
 				2D66ACD013AE05BD0060594E /* vl_setup.m */,
 				2D66ACD113AE05BD0060594E /* vl_sift.m */,
 				2D66ACD213AE05BD0060594E /* vl_siftdescriptor.m */,
@@ -757,7 +757,7 @@
 				2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */,
 				2DB1A2A1110D09B200E02BD8 /* vl_quickshift.c */,
 				2D86B11D0F24CC9B00E625D6 /* vl_rodr.c */,
-				2D86B11E0F24CC9B00E625D6 /* vl_samplinthist.c */,
+				2D86B11E0F24CC9B00E625D6 /* vl_sampleinthist.c */,
 				2D86B11F0F24CC9B00E625D6 /* vl_sift.c */,
 				2D86B1200F24CC9B00E625D6 /* vl_siftdescriptor.c */,
 				2D13F02C100A718600C072E8 /* vl_simdctrl.c */,
