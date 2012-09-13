@@ -118,6 +118,10 @@ VLFeat PEGASOS implementation can be restarted after any given number
 of iterations. This is useful to compute intermediate statistics or to
 load new data from disk for large datasets.  It sufficient to use the
 Svm state object as input for the next run.
+Notice that a model learned using a "stopped-restarted" solver could
+slightly differ from one learned from a unique run of the solver. The
+difference could be more noticable if the user provides a permutation
+to decide the order of the data points visits.   
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-permutation Permutation

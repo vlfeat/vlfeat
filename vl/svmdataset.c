@@ -12,7 +12,7 @@ Copyright Statement
 
 Any SVM solver requires a set of training data in order to learn a correspondent classifier.
 
-Nonetheless, regardless the kind of SVM solver, the training data is used and accessed in a similar manner.
+Regardless the kind of SVM solver, the training data is used and accessed in a similar manner.
 
 In @ref svmdataset.h we define an abstraction that separates the particular SVM algorithm from the representation of the data. Such abstraction is defined via two type of functions:
 - Inner Product ::VlSvmDatasetInnerProduct .

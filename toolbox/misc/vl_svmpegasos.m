@@ -10,7 +10,7 @@
 %   the number of training vectors in X.
 %
 %   The training struct DATA is created using the function
-%   VL_MAKETRAININGDATA.
+%   VL_MAKETRAININGSET.
 % 
 %   [W B INFO] = VL_SVMPEGASOS(DATA, LAMBDA) learns a linear SVM W
 %   and a bias B given training struct DATA, and the regularization
@@ -40,7 +40,7 @@
 % 
 %   hardLossNeg::
 %     Number of mislabeled negative points.
-% 
+%   
 %   ALGORITHM. PEGASOS is an implementation of stochastic subgradient
 %   descent. At each iteration a data point is selected at random, the
 %   subgradient of the cost function relative to that data point is
