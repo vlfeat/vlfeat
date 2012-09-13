@@ -101,7 +101,7 @@
 <h1>Acknowledgments</h1>
 <p><a shape="rect"
 href="http://www.pascal-network.org/"><img src="images/PASCAL2.png"
-style="height:4em;" alt="PASCAL2 credits"></img></a>
+style="height:4em;" alt="PASCAL2 credits"></img></a>, <a href="%pathto:about;">The VLFeat Team</a>,
 <br clear="none"/><a href="http://vision.ucla.edu">UCLA Vision
 Lab</a>, <a href="http://www.robots.ox.ac.uk/~vgg/">Oxford
 VGG</a>.</p>
@@ -112,10 +112,20 @@ VGG</a>.</p>
  <div class="clear">&nsbp;</div>
  <dl id="changes">
    <dt><span class="date">11/9/2012</span> VLFeat 0.9.15 released</dt>
-   <dd>VLFeat 0.9.15 adds the HOG features. This is the first point
-     update supported by the <b>PASCAL Harvest</b> (many more to come
-     shortly!). A big thank to our sponsor.
-     [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.15">Details</a>].
+   <dd>Added VL_HOG() (HOG features). Added VL_SVMPEGASOS() and a
+   vastly improved SVM implementation. Added IHASHSUM (hashed
+   counting). Improved INTHIST (integral histogram). Added
+   VL_CUMMAX(). Improved the implementation of VL_ROC() and
+   VL_PR(). Added VL_DET() (Detection Error Trade-off (DET)
+   curves). Improved the verbosity control to AIB. Added support for
+   Xcode 4.3, improved support for past and future Xcode
+   versions. Completed the migration of the old test code in
+   toolbox/test, moving the functionality to the new unit tests
+   toolbox/xtest. Credited authorship to the VLFeat Team. This is the
+   first point update supported by the <a shape="rect"
+   href="roadmap.html"><b>PASCAL Harvest</b></a> (several more to come
+   shortly). A big thank to our sponsor!
+   [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.15">Details</a>].
    </dd>
    <dt><span class="date">10/1/2012</span>
      <span style="color:red;">PASCAL2 Harvest funding</span></dt>
@@ -155,6 +165,7 @@ VGG</a>.</p>
    the <a href="http://www.acmmm10.org/2010/10/open-source-software-competition-winners/">ACM
    Multimedia Open Source Award</a>.
    </dd>
+   <!--
    <dt><span class="date">14/6/2010</span> VLFeat 0.9.9 released</dt>
    <dd>VLFeat 0.9.9 adds a new sample application (SIFT matching) and
      minor refinements.
@@ -170,7 +181,6 @@ the <a href="http://www.vlfeat.org/cvpr10">tutorial web page</a>.</dd>
      of PEGASOS for SVM learning, and many other improvements.
      [<a href="http://github.com/vlfeat/vlfeat/commits/v0.9.8">Details</a>].
    </dd>
-   <!--
    <dt><span class="date">16/01/2010</span> VLFeat 0.9.7 released</dt>
    <dd>VLFeat 0.9.7 updates the binary distribution to be backward
      compatible with Mac OS X 10.5 (Leopard).
