@@ -41,7 +41,8 @@ PERMANENT INSTALLATION, COMPILING, LINKING, COMMAND LINE UTILITIES
   * Compiling from source: http://www.vlfeat.org/compiling.html
 
 CHANGES
-  0.9.15     Added VL_HOG() (HOG features). Added IHASHSUM (hashed
+  0.9.15     Added VL_HOG() (HOG features). Added VL_SVMPEGASOS() and
+             a vastly improved SVM implementation. Added IHASHSUM (hashed
              counting). Improved INTHIST (integral histogram). Added
              VL_CUMMAX(). Improved the implementation of VL_ROC() and
              VL_PR(). Added VL_DET() (Detection Error Trade-off (DET)
