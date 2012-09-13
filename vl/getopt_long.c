@@ -49,7 +49,7 @@ int    optreset ;
  ** This function extract long and short options from the argument
  ** list @a argv of @a argc entries.
  **
- ** A short options sequence is introduced by a singe dash character
+ ** A short options sequence is introduced by a single dash character
  ** @c -. Each short option is described by a single character in the
  ** string @a optstring, possibly followed by a @c : character to
  ** denote a (mandatory) argument of the short option. A short option
