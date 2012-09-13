@@ -363,9 +363,9 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
   /* write preamble */
   fprintf(f,
           "P5\n%d\n%d\n%d\n",
-          im->width,
-          im->height,
-          im->max_value) ;
+          (signed)im->width,
+          (signed)im->height,
+          (signed)im->max_value) ;
 
   /* take care of endianness */
 #if defined(VL_ARCH_LITTLE_ENDIAN)
