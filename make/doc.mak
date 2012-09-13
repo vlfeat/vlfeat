@@ -247,6 +247,7 @@ doc-info :
 	$(call dump-var,png_tgt)
 	$(call dump-var,jpg_tgt)
 	$(call dump-var,man_tgt)
+	$(call dump-var,DOXYGEN)
 	@echo
 
 # --------------------------------------------------------------------
