@@ -1,4 +1,7 @@
-% VL_DEMO  Run all demos
+function vl_demo
+% VL_DEMO Run VLFeat demos
+
+% Author: Andrea Vedaldi
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
@@ -8,10 +11,7 @@
 
 root = vl_root ;
 demo_path = fullfile(root,'toolbox','demo') ;
-test_path = fullfile(root,'toolbox','test') ;
-
 addpath(demo_path) ;
-addpath(test_path) ;
 
 vl_demo_sift_basic ;
 vl_demo_sift_peak ;
@@ -21,20 +21,15 @@ vl_demo_sift_or ;
 vl_demo_sift_match ;
 vl_demo_sift_vs_ubc ;
 
-vl_demo_dsift ;
-
 vl_demo_mser_basic ;
 vl_demo_mser_delta ;
 vl_demo_mser_cmd ;
 
-vl_test_hikmeans ;
-vl_test_ikmeans ;
-vl_test_imintegral ;
-
 vl_demo_aib ;
-
 vl_demo_quickshift ;
 vl_demo_slic ;
+vl_demo_dsift ;
+vl_demo_hog ;
 
 vl_demo_kdtree ;
 vl_demo_kdtree_sift ;
@@ -47,4 +42,3 @@ vl_demo_imdisttf ;
 vl_demo_plots_rank ;
 
 rmpath(demo_path);
-rmpath(test_path);
