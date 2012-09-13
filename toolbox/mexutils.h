@@ -17,6 +17,7 @@ the terms of the BSD license (see the COPYING file).
 #include"mex.h"
 #include<vl/generic.h>
 #include<vl/array.h>
+#include<vl/stringop.h>
 #include<ctype.h>
 #include<string.h>
 #include<stdio.h>
@@ -828,6 +829,37 @@ vlmxNextOption (mxArray const *args[], int nargs,
   if (optarg) *optarg = args [*next] ;
   ++ (*next) ;
   return opt ;
+}
+
+/** @brief Get an emumeration member by name
+ ** @param enumeration the enumeration to decode.
+ ** @param name member name as a MATLAB string array.sb
+ ** @param caseInsensitive if @c true match the string case-insensitive.
+ ** @return the corresponding enumeration member, or @c NULL if any.
+ **/
+
+static VlEnumerator *
+vlmxDecodeEnumeration (mxArray const *name_array,
+                       VlEnumerator const *enumeration,
+                       vl_bool caseInsensitive)
+{
+  char name [1024] ;
+
+  /* check the array is a string */
+  if (! vlmxIsString (name_array, -1)) {
+    vlmxError (vlmxErrInvalidArgument, "The array is not a string.") ;
+  }
+
+  /* retrieve option name */
+  if (mxGetString (name_array, name, sizeof(name))) {
+    vlmxError (vlmxErrInvalidArgument, "The string array is too long.") ;
+  }
+
+  if (caseInsensitive) {
+    return vl_enumeration_get_casei(enumeration, name) ;
+  } else {
+    return vl_enumeration_get(enumeration, name) ;
+  }
 }
 
 /* MEXUTILS_H */
