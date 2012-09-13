@@ -31,6 +31,8 @@ vl_demo_slic ;
 vl_demo_dsift ;
 vl_demo_hog ;
 
+vl_demo_svmpegasos ;
+
 vl_demo_kdtree ;
 vl_demo_kdtree_sift ;
 vl_demo_kdtree_self ;
