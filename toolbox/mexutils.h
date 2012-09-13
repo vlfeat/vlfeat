@@ -538,14 +538,14 @@ vlmxIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
 static int
 vlmxIsString (const mxArray* array, vl_index length)
 {
-  int M = mxGetM (array) ;
-  int N = mxGetN (array) ;
+  mwSize M = mxGetM (array) ;
+  mwSize N = mxGetN (array) ;
 
   return
     mxIsChar(array) &&
     mxGetNumberOfDimensions(array) == 2 &&
     (M == 1 || (M == 0 && N == 0)) &&
-    (length < 0 || N == length) ;
+    (length < 0 || (signed)N == length) ;
 }
 
 
@@ -576,7 +576,7 @@ vlmxCreateArrayFromVlArray (VlArray const * x)
 {
   mwSize dimensions [VL_ARRAY_MAX_NUM_DIMENSIONS] ;
   mxArray * array = NULL ;
-  mxClassID classId = 0 ;
+  mxClassID classId = (mxClassID)0 ;
   vl_uindex d ;
   vl_size numElements = vl_array_get_num_elements(x) ;
   vl_size numDimensions  = vl_array_get_num_dimensions(x) ;
@@ -585,7 +585,7 @@ vlmxCreateArrayFromVlArray (VlArray const * x)
   vl_size typeSize = vl_get_type_size(type) ;
 
   for (d = 0 ; d < numDimensions ; ++d) {
-    dimensions[d] = xdimensions[d] ;
+    dimensions[d] = (mwSize) xdimensions[d] ;
   }
 
   switch (type) {
@@ -776,7 +776,7 @@ vlmxNextOption (mxArray const *args[], int nargs,
                 mxArray const **optarg)
 {
   char name [1024] ;
-  int opt = -1, i, len ;
+  int opt = -1, i;
 
   if (*next >= nargs) {
     return opt ;
@@ -790,8 +790,6 @@ vlmxNextOption (mxArray const *args[], int nargs,
   }
 
   /* retrieve option name */
-  len = mxGetNumberOfElements (args [*next]) ;
-
   if (mxGetString (args [*next], name, sizeof(name))) {
     vlmxError (vlmxErrInvalidOption,
                "The option name is too long (argument number %d)",
