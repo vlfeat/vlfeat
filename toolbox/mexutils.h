@@ -538,8 +538,8 @@ vlmxIsPlainMatrix (mxArray const * array, vl_index M, vl_index N)
 static int
 vlmxIsString (const mxArray* array, vl_index length)
 {
-  mwSize M = mxGetM (array) ;
-  mwSize N = mxGetN (array) ;
+  mwSize M = (mwSize) mxGetM (array) ;
+  mwSize N = (mwSize) mxGetN (array) ;
 
   return
     mxIsChar(array) &&

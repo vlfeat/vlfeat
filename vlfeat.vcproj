@@ -193,6 +193,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\hog.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\hog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\homkermap.c"
 				>
 			</File>
@@ -364,6 +372,14 @@
 				RelativePath=".\vl\stringop.h"
 				>
 			</File>
+			<File
+				RelativePath=".\vl\svmdataset.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\svmdataset.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="toolbox"
@@ -401,6 +417,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\toolbox\misc\vl_cummax.c"
+				>
+			</File>
+			<File
 				RelativePath=".\toolbox\sift\vl_dsift.c"
 				>
 			</File>
@@ -418,6 +438,14 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\kmeans\vl_hikmeanspush.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_hog.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_homkermap.c"
 				>
 			</File>
 			<File
@@ -473,7 +501,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\toolbox\misc\vl_lbp.c"
+				>
+			</File>
+			<File
 				RelativePath=".\toolbox\misc\vl_localmax.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_maketrainingset.c"
 				>
 			</File>
 			<File
@@ -490,6 +526,10 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\geometry\vl_rodr.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_sampleinthist.c"
 				>
 			</File>
 			<File
@@ -510,6 +550,10 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\slic\vl_slic.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\misc\vl_svmpegasos.c"
 				>
 			</File>
 			<File

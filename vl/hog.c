@@ -287,7 +287,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
       vl_index skip = (1 - fabs(cos(angle))) / 2 * self->glyphSize ;
       vl_index i, j ;
       for (i = skip ; i < (signed)self->glyphSize - skip ; ++i) {
-        j = round(slope * i + offset) ;
+        j = vl_round_d(slope * i + offset) ;
         if (! self->transposed) {
           atglyph(i,j,o) = 1 ;
         } else {
@@ -301,7 +301,7 @@ vl_hog_new (VlHogVariant variant, vl_size numOrientations, vl_bool transposed)
       vl_index skip = (1 - sin(angle)) / 2 * self->glyphSize ;
       vl_index i, j ;
       for (j = skip ; j < (signed)self->glyphSize - skip; ++j) {
-        i = round(slope * j + offset) ;
+        i = vl_round_d(slope * j + offset) ;
         if (! self->transposed) {
           atglyph(i,j,o) = 1 ;
         } else {
@@ -674,7 +674,7 @@ vl_hog_put_image (VlHog * self,
       if (self->useBilinearOrientationAssigment) {
         /* min(1.0,...) guards against small overflows causing NaNs */
         float angle0 = acosf(VL_MIN(orientationWeights[0],1.0)) ;
-        orientationWeights[1] = angle0 / (M_PI / self->numOrientations) ;
+        orientationWeights[1] = angle0 / (VL_PI / self->numOrientations) ;
         orientationWeights[0] = 1 - orientationWeights[1] ;
       } else {
         orientationWeights[0] = 1 ;
@@ -946,6 +946,13 @@ vl_hog_extract (VlHog * self, float * features)
 
         double factor1, factor2, factor3, factor4 ;
 
+		double t1 = 0 ;
+		double t2 = 0 ;
+        double t3 = 0 ;
+        double t4 = 0 ;
+
+		float * oiter = features + x + self->hogWidth * y ;
+
         /* each factor is the inverse of the l2 norm of one of the 2x2 blocks surrounding
            cell x,y */
 #if 0
@@ -976,13 +983,6 @@ vl_hog_extract (VlHog * self, float * features)
           factor4 = 1.0 / sqrt(norm5 + norm6 + norm8 + norm9 + 1e-4) ;
         }
 #endif
-
-        double t1 = 0 ;
-        double t2 = 0 ;
-        double t3 = 0 ;
-        double t4 = 0 ;
-
-        float * oiter = features + x + self->hogWidth * y ;
 
         for (k = 0 ; k < self->numOrientations ; ++k) {
           double ha = iter[hogStride * k] ;

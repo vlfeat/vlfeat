@@ -392,22 +392,18 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
 #endif
                                  )
 {
-  vl_tic() ;
   vl_uindex iteration0 ;
-
   double energy = 0;
-
   vl_size i ;
-
   double acc, learningRate, y ;
   double lambda = svm->lambda ;
   vl_size const regularizationPeriod = 10 ;
 
+  vl_tic() ;
 
   if (svm->randomGenerator == NULL && svm->permutation == NULL) {
     svm->randomGenerator = vl_get_rand() ;
   }
-
 
   assert(svm->randomGenerator == NULL || svm->permutation == NULL) ;
   //assert(svm->iterationsSoFar >= 0) ;
@@ -417,7 +413,6 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
    the learning rate is
 
    learningRate = 1 / (lambda * (iteration + iteration0))
-
    */
 
   iteration0 = (vl_uindex) 1.0 / lambda ;

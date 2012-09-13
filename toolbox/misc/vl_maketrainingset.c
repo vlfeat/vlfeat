@@ -65,6 +65,9 @@ mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels, cons
                                 const double gamma, const double period)
 {
   mwSize dims[] = {1 , 1} ;
+  const char* homkermapNames [5] = {"order","kernelType","windowType","gamma","period"} ;
+  const char* names [3] = {"data","labels","map"} ;
+  mxArray *output, *map, *dataOut, *labelsOut, *orderOut, *kernelTypeOut, *windowTypeOut, *gammaOut;
 
   if (kernelType == NULL)
     {
@@ -76,22 +79,18 @@ mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels, cons
       windowType = mxCreateString("rectangular") ;
     }
 
+  output = mxCreateStructArray(1, dims, 3, names) ;
+  map = mxCreateStructArray(1, dims, 5, homkermapNames) ;
 
-  const char* homkermapNames [5] = {"order","kernelType","windowType","gamma","period"} ;
-  const char* names [3] = {"data","labels","map"} ;
+  dataOut = mxCreateSharedDataCopy(data) ;
+  labelsOut = mxCreateSharedDataCopy(labels) ;
 
-  mxArray* output = mxCreateStructArray(1, dims, 3, names) ;
-  mxArray* map = mxCreateStructArray(1, dims, 5, homkermapNames) ;
+  orderOut = mxCreateDoubleScalar(order) ;
 
-  mxArray* dataOut = mxCreateSharedDataCopy(data) ;
-  mxArray* labelsOut = mxCreateSharedDataCopy(labels) ;
+  kernelTypeOut = mxCreateSharedDataCopy(kernelType) ;
+  windowTypeOut = mxCreateSharedDataCopy(windowType) ;
 
-  mxArray * orderOut = mxCreateDoubleScalar(order) ;
-
-  mxArray* kernelTypeOut = mxCreateSharedDataCopy(kernelType) ;
-  mxArray* windowTypeOut = mxCreateSharedDataCopy(windowType) ;
-
-  mxArray * gammaOut = mxCreateDoubleScalar(gamma) ;
+  gammaOut = mxCreateDoubleScalar(gamma) ;
 
   if (period > 0)
     {

@@ -116,33 +116,36 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
                            "energy", "regularizerTerm", "lossPos",
                            "lossNeg", "hardLossPos", "hardLossNeg"} ;
 
-  mxArray* output = mxCreateStructArray(1, dims, 15, names);
+  mxArray *output, *dimension, *iterations, *maxIterations, *epsilon, *lambda ;
+  mxArray *biasMultiplier, *biasLearningRate, *energyFrequency, *elapsedTime ;
 
-  mxArray * dimension = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  output = mxCreateStructArray(1, dims, 15, names);
+
+  dimension = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
   setUintValue(dimension,svm->dimension) ;
 
-  mxArray * iterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  iterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
   setUintValue(iterations,svm->iterations) ;
 
-  mxArray * maxIterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  maxIterations = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
   setUintValue(maxIterations,svm->maxIterations) ;
 
-  mxArray * epsilon = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  epsilon = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(epsilon,svm->epsilon) ;
 
-  mxArray * lambda = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  lambda = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(lambda,svm->lambda) ;
 
-  mxArray * biasMultiplier = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  biasMultiplier = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(biasMultiplier,svm->biasMultiplier) ;
 
-  mxArray * biasLearningRate = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  biasLearningRate = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(biasLearningRate,svm->biasLearningRate) ;
 
-  mxArray * energyFrequency = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
+  energyFrequency = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
   setUintValue(energyFrequency,svm->energyFrequency) ;
 
-  mxArray * elapsedTime = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  elapsedTime = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(elapsedTime,svm->elapsedTime) ;
 
 
@@ -157,24 +160,24 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
   mxSetField(output, 0, "elapsedTime", elapsedTime) ;
 
 
-  if (svm->objective)
-    {
-      mxArray * energy = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  if (svm->objective) {
+      mxArray *energy, *regularizerTerm, *lossPos, *lossNeg, *hardLossPos, *hardLossNeg ;
+      energy = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(energy,svm->objective->energy) ;
 
-      mxArray * regularizerTerm = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+	  regularizerTerm = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(regularizerTerm,svm->objective->regularizer) ;
 
-      mxArray * lossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+	  lossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(lossPos,svm->objective->lossPos) ;
 
-      mxArray * lossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      lossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(lossNeg,svm->objective->lossNeg) ;
 
-      mxArray * hardLossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      hardLossPos = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(hardLossPos,svm->objective->hardLossPos) ;
 
-      mxArray * hardLossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+      hardLossNeg = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
       setDoubleValue(hardLossNeg,svm->objective->hardLossNeg) ;
 
       mxSetField(output, 0, "energy", energy) ;
@@ -313,13 +316,6 @@ mexFunction(int nout, mxArray *out[],
   vl_size permutationSize = 0 ;
 
   DiagnosticsDispatcher* disp ;
-
-  disp = (DiagnosticsDispatcher*) vl_malloc(sizeof(DiagnosticsDispatcher)) ;
-
-  disp->diagnosticsHandle = NULL ;
-  disp->callerRef = NULL ;
-  disp->verbose = 0 ;
-
   VlSvmDatasetInnerProduct innerProduct = NULL ;
   VlSvmDatasetAccumulator accumulator = NULL ;
 
@@ -333,11 +329,17 @@ mexFunction(int nout, mxArray *out[],
   int n = 0 ;
   double period = -1 ;
 
+  VlSvmDataset* dataset ;
+
   vl_bool homkermap = VL_FALSE ;
   void * map = NULL ;
 
-
   VL_USE_MATLAB_ENV ;
+
+  disp = (DiagnosticsDispatcher*) vl_malloc(sizeof(DiagnosticsDispatcher)) ;
+  disp->diagnosticsHandle = NULL ;
+  disp->callerRef = NULL ;
+  disp->verbose = 0 ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
@@ -566,13 +568,11 @@ mexFunction(int nout, mxArray *out[],
     }
   }
 
-
   if (verbose) {
     mexPrintf("vl_pegasos: Lambda = %g\n", svm->lambda) ;
     mexPrintf("vl_pegasos: BiasMultiplier = %g\n", svm->biasMultiplier) ;
     mexPrintf("vl_pegasos: MaxIterations = %d\n", svm->maxIterations) ;
     mexPrintf("vl_pegasos: permutation size = %d\n", permutationSize) ;
-
   }
 
   switch (dataType) {
@@ -584,10 +584,9 @@ mexFunction(int nout, mxArray *out[],
     innerProduct = (VlSvmDatasetInnerProduct)&vl_svmdataset_innerproduct_d ;
     accumulator = (VlSvmDatasetAccumulator)&vl_svmdataset_accumulator_d ;
     break ;
-
   }
 
-  VlSvmDataset* dataset = vl_svmdataset_new(data,dataDimension) ;
+  dataset = vl_svmdataset_new(data,dataDimension) ;
 
   if (homkermap)
     {
@@ -615,31 +614,27 @@ mexFunction(int nout, mxArray *out[],
    * -------------------------------------------------------------- */
 
 
-  if (nout >= 1)
-    {
+  if (nout >= 1) {
+      double * tempBuffer ;
       mwSize dims[2] ;
       dims[0] = svm->dimension ;
       dims[1] = 1 ;
-
       out[OUT_MODEL] = mxCreateNumericArray(2, dims,
                                             mxDOUBLE_CLASS, mxREAL) ;
-
-      double * tempBuffer  = (double*) mxGetData(out[OUT_MODEL]) ;
-
+      tempBuffer  = (double*) mxGetData(out[OUT_MODEL]) ;
       memcpy(tempBuffer,svm->model,svm->dimension * sizeof(double)) ;
     }
 
   if (nout >= 2)
     {
+		double * tempBuffer ;
       mwSize dims[2] ;
       dims[0] = 1 ;
       dims[1] = 1 ;
 
       out[OUT_BIAS] = mxCreateNumericArray(2, dims,
                                            mxDOUBLE_CLASS, mxREAL) ;
-
-      double * tempBuffer  = (double*) mxGetData(out[OUT_BIAS]) ;
-
+      tempBuffer = (double*) mxGetData(out[OUT_BIAS]) ;
       *tempBuffer = svm->bias ;
     }
 

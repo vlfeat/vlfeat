@@ -158,7 +158,6 @@ MEX_FLAGS = -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 libsrc = \
   vl\aib.c \
   vl\array.c \
-  vl\doc\example-module-doc.c \
   vl\dsift.c \
   vl\generic.c \
   vl\getopt_long.c \
