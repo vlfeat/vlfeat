@@ -49,7 +49,6 @@ figure(2)
 %axis off ; axis tight ;
 vl_demo_print('pegasos_energy') ;
 
-keyboard
 
 function energy = diagnostics(svm,energy)
   figure(2) ; 
