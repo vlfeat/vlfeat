@@ -27,8 +27,8 @@ maxNumComparisonsRange = [1 10 50 100 200 300 400] ;
 numTreesRange = [1 2 5 10] ;
 
 % get data (SIFT features)
-im1 = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
-im2 = imread(fullfile(vl_root, 'data', 'b.jpg')) ;
+im1 = imread(fullfile(vl_root, 'data', 'roofs1.jpg')) ;
+im2 = imread(fullfile(vl_root, 'data', 'roofs2.jpg')) ;
 im1 = single(rgb2gray(im1)) ;
 im2 = single(rgb2gray(im2)) ;
 [f1,d1] = vl_sift(im1,'firstoctave',-1,'floatdescriptors','verbose') ;

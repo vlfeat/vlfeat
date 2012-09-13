@@ -1,7 +1,7 @@
 % VL_DEMO_IMDISTTF Demonstrates image distance transform
 
 % load image
-im = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
+im = imread(fullfile(vl_root, 'data', 'roofs1.jpg')) ;
 im = im(100:200,100:200,:) ;
 imSize = [size(im,1) size(im,2)] ;
 

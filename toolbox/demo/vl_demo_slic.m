@@ -9,7 +9,7 @@ figure(1) ; clf ;
 %                                                        Load a figure
 % --------------------------------------------------------------------
 
-im = imread(fullfile(vl_root,'data','a.jpg')) ;
+im = imread(fullfile(vl_root,'data','roofs1.jpg')) ;
 im = im2single(im) ;
 im = im(1:128,end-128+1:end,:) ;
 

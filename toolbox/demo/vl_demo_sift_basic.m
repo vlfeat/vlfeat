@@ -8,7 +8,7 @@ figure(1) ; clf ;
 % --------------------------------------------------------------------
 %                                                        Load a figure
 % --------------------------------------------------------------------
-I = imread(fullfile(vl_root,'data','a.jpg')) ;
+I = imread(fullfile(vl_root,'data','roofs1.jpg')) ;
 
 image(I) ; colormap gray ;
 axis equal ; axis off ; axis tight ;

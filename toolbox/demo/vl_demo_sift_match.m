@@ -9,8 +9,8 @@ figure(1) ; clf ;
 %                                                    Create image pair
 % --------------------------------------------------------------------
 
-Ia = imread(fullfile(vl_root,'data','a.jpg')) ;
-Ib = imread(fullfile(vl_root,'data','b.jpg')) ;
+Ia = imread(fullfile(vl_root,'data','roofs1.jpg')) ;
+Ib = imread(fullfile(vl_root,'data','roofs2.jpg')) ;
 
 % --------------------------------------------------------------------
 %                                           Extract features and match

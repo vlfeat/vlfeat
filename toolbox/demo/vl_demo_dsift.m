@@ -4,7 +4,7 @@ randn('state',0) ;
 rand('state',0) ;
 
 % read a test image
-I = imread(fullfile(vl_root,'data','a.jpg')) ;
+I = imread(fullfile(vl_root,'data','roofs1.jpg')) ;
 I = single(vl_imdown(rgb2gray(I))) ;
 
 % --------------------------------------------------------------------
