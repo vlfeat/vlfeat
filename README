@@ -26,7 +26,11 @@ QUICKSTART WITH MATLAB
   where X.Y.Z is the latest version. Start MATLAB and run the VLFeat
   setup instruction:
 
-  > run VLFEATROOT/toolbox/vl_setup
+  > run VLFEATROOT/toolbox/vl_setup.
+
+  All VLFeat demos can now be run by the command:
+
+  > vl_demo
 
 PERMANENT INSTALLATION, COMPILING, LINKING, COMMAND LINE UTILITIES
   See the instructions at:
