@@ -24,7 +24,7 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.14
+VER = 0.9.15
 ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
@@ -158,10 +158,12 @@ MEX_FLAGS = -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 libsrc = \
   vl\aib.c \
   vl\array.c \
+  vl\doc\example-module-doc.c \
   vl\dsift.c \
   vl\generic.c \
   vl\getopt_long.c \
   vl\hikmeans.c \
+  vl\hog.c \
   vl\homkermap.c \
   vl\host.c \
   vl\ikmeans.c \
@@ -180,7 +182,8 @@ libsrc = \
   vl\rodrigues.c \
   vl\sift.c \
   vl\slic.c \
-  vl\stringop.c
+  vl\stringop.c \
+  vl\svmdataset.c
 
 cmdsrc = \
   src\aib.c \
@@ -196,6 +199,7 @@ cmdsrc = \
   src\test_qsort-def.c \
   src\test_rand.c \
   src\test_stringop.c \
+  src\test_svd2.c \
   src\test_threads.c \
   src\test_vec_comp.c
 
@@ -218,7 +222,9 @@ mexsrc = \
   toolbox\misc\vl_alldist2.c \
   toolbox\misc\vl_binsearch.c \
   toolbox\misc\vl_binsum.c \
+  toolbox\misc\vl_cummax.c \
   toolbox\misc\vl_getpid.c \
+  toolbox\misc\vl_hog.c \
   toolbox\misc\vl_homkermap.c \
   toolbox\misc\vl_ihashfind.c \
   toolbox\misc\vl_ihashsum.c \
@@ -227,9 +233,11 @@ mexsrc = \
   toolbox\misc\vl_kdtreequery.c \
   toolbox\misc\vl_lbp.c \
   toolbox\misc\vl_localmax.c \
+  toolbox\misc\vl_maketrainingset.c \
   toolbox\misc\vl_pegasos.c \
-  toolbox\misc\vl_samplinthist.c \
+  toolbox\misc\vl_sampleinthist.c \
   toolbox\misc\vl_simdctrl.c \
+  toolbox\misc\vl_svmpegasos.c \
   toolbox\misc\vl_twister.c \
   toolbox\misc\vl_version.c \
   toolbox\mser\vl_erfill.c \
