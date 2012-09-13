@@ -137,7 +137,7 @@ mexFunction(int nout, mxArray *out[],
    *                                                           Do work
    * -------------------------------------------------------------- */
 
-  OUT(SEGMENTATION) = mxCreateNumericMatrix(height, width, mxUINT32_CLASS, mxREAL) ;
+  OUT(SEGMENTATION) = mxCreateNumericMatrix((mwSize)height, (mwSize)width, mxUINT32_CLASS, mxREAL) ;
   segmentation = mxGetData(OUT(SEGMENTATION)) ;
 
   vl_slic_segment(segmentation,
