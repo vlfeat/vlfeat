@@ -354,7 +354,7 @@ main(int argc, char **argv)
     }
 
     if (verbose) {
-      printf("mser:   image is %d by %d pixels\n",
+      printf("mser:   image is %" VL_FMT_SIZE " by %" VL_FMT_SIZE " pixels\n",
              pim. width,
              pim. height) ;
     }
@@ -445,7 +445,7 @@ main(int argc, char **argv)
       /* allocate buffer */
       datainv = malloc(vl_pgm_get_npixels (&pim) *
                   vl_pgm_get_bpp       (&pim)) ;
-      for (i = 0; i < vl_pgm_get_npixels (&pim); i++) {
+      for (i = 0; i < (signed)vl_pgm_get_npixels (&pim); i++) {
         datainv[i] = ~data[i]; /* 255 - data[i] */
       }
 
