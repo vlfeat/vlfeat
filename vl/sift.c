@@ -712,7 +712,7 @@ fast_expn (double x)
   if (x > EXPN_MAX) return 0.0 ;
 
   x *= EXPN_SZ / EXPN_MAX ;
-  i = vl_floor_d (x) ;
+  i = (int)vl_floor_d (x) ;
   r = x - i ;
   a = expn_tab [i    ] ;
   b = expn_tab [i + 1] ;
@@ -1441,7 +1441,7 @@ vl_sift_detect (VlSiftFilt * f)
   } /* next keypoint to refine */
 
   /* update keypoint count */
-  f-> nkeys = k - f->keys ;
+  f-> nkeys = (int)(k - f->keys) ;
 }
 
 
@@ -1649,7 +1649,7 @@ vl_sift_calc_keypoint_orientations (VlSiftFilt *f,
 
 #if defined(VL_SIFT_BILINEAR_ORIENTATIONS)
       {
-        int    bin  = vl_floor_d (fbin - 0.5) ;
+        int bin = (int) vl_floor_d (fbin - 0.5) ;
         double rbin = fbin - bin - 0.5 ;
         hist [(bin + nbins) % nbins] += (1 - rbin) * mod * wgt ;
         hist [(bin + 1    ) % nbins] += (    rbin) * mod * wgt ;
@@ -1851,9 +1851,9 @@ vl_sift_calc_raw_descriptor (VlSiftFilt const *f,
 
       /* The sample will be distributed in 8 adjacent bins.
          We start from the ``lower-left'' bin. */
-      int         binx = vl_floor_f (nx - 0.5) ;
-      int         biny = vl_floor_f (ny - 0.5) ;
-      int         bint = vl_floor_f (nt) ;
+      int         binx = (int)vl_floor_f (nx - 0.5) ;
+      int         biny = (int)vl_floor_f (ny - 0.5) ;
+      int         bint = (int)vl_floor_f (nt) ;
       vl_sift_pix rbinx = nx - (binx + 0.5) ;
       vl_sift_pix rbiny = ny - (biny + 0.5) ;
       vl_sift_pix rbint = nt - bint ;
@@ -2048,9 +2048,9 @@ vl_sift_calc_keypoint_descriptor (VlSiftFilt *f,
 
       /* The sample will be distributed in 8 adjacent bins.
          We start from the ``lower-left'' bin. */
-      int         binx = vl_floor_f (nx - 0.5) ;
-      int         biny = vl_floor_f (ny - 0.5) ;
-      int         bint = vl_floor_f (nt) ;
+      int         binx = (int)vl_floor_f (nx - 0.5) ;
+      int         biny = (int)vl_floor_f (ny - 0.5) ;
+      int         bint = (int)vl_floor_f (nt) ;
       vl_sift_pix rbinx = nx - (binx + 0.5) ;
       vl_sift_pix rbiny = ny - (biny + 0.5) ;
       vl_sift_pix rbint = nt - bint ;
@@ -2184,7 +2184,7 @@ vl_sift_keypoint_init (VlSiftFilt const *f,
   double s, phi, xper ;
 
   phi = log2 ((sigma + VL_EPSILON_D) / f->sigma0) ;
-  o   = vl_floor_d (phi -  ((double) f->s_min + 0.5) / f->S) ;
+  o   = (int)vl_floor_d (phi -  ((double) f->s_min + 0.5) / f->S) ;
   o   = VL_MIN (o, f->o_min + f->O - 1) ;
   o   = VL_MAX (o, f->o_min           ) ;
   s   = f->S * (phi - o) ;
