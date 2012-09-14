@@ -262,24 +262,24 @@ vl_svm_compute_diagnostic(VlSvmPegasos *svm,
     {
       pd = innerProduct(data,k,svm->model) ;
       if (svm->biasMultiplier)
-	{
-	  pd += svm->bias*svm->biasMultiplier ;
-	}
+    {
+      pd += svm->bias*svm->biasMultiplier ;
+    }
 
       pd = VL_MAX(1 - labels[k]*pd, 0.0) ;
 
       if (labels[k] < 0)
-	{
-	  svm->objective->lossNeg += pd ;
-	  svm->objective->hardLossNeg += (pd > 0) ;
-	  numNeg++ ;
-	}
+    {
+      svm->objective->lossNeg += pd ;
+      svm->objective->hardLossNeg += (pd > 0) ;
+      numNeg++ ;
+    }
       else
-	{
-	  svm->objective->lossPos += pd ;
-	  svm->objective->hardLossPos += (pd > 0) ;
-	  numPos++ ;
-	}
+    {
+      svm->objective->lossPos += pd ;
+      svm->objective->hardLossPos += (pd > 0) ;
+      numPos++ ;
+    }
     }
 
   svm->objective->lossNeg /= numNeg ;
@@ -429,10 +429,10 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
       /* pick a sample  */
       vl_uindex k ;
       if (svm->permutation == NULL) {
-	k = vl_rand_uindex(svm->randomGenerator, numSamples) ;
+    k = vl_rand_uindex(svm->randomGenerator, numSamples) ;
       } else {
-	k = svm->permutation[svm->iterations % svm->permutationSize] ;
-	assert(k < numSamples) ;
+    k = svm->permutation[svm->iterations % svm->permutationSize] ;
+    assert(k < numSamples) ;
       }
 
 
@@ -443,7 +443,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
 
       /* regularizer step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
       if (svm->iterations % regularizationPeriod == 0) {
-	double eta =  learningRate * regularizationPeriod * lambda ;
+    double eta =  learningRate * regularizationPeriod * lambda ;
 
 
 
@@ -461,26 +461,26 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
       acc = innerProduct(data,k,svm->model) ;
 
       if (svm->biasMultiplier)
-	acc += svm->biasMultiplier * svm->bias ;
+    acc += svm->biasMultiplier * svm->bias ;
 
       if (y * acc < (double) 1.0) {
-	double eta = y * learningRate ;
+    double eta = y * learningRate ;
 
-	acc = 0 ;
+    acc = 0 ;
 
-	accumulator(data,k,svm->model,eta) ;
+    accumulator(data,k,svm->model,eta) ;
 
 
-	if (svm->biasMultiplier)
-	  {
+    if (svm->biasMultiplier)
+      {
             svm->bias += eta * svm->biasLearningRate * svm->biasMultiplier ;
-	  }
+      }
 
       }
 
       if (svm->iterations % svm->energyFrequency == 0)
-	{
-	  svm->elapsedTime += vl_toc() ;
+    {
+      svm->elapsedTime += vl_toc() ;
 #ifdef VALIDATION
             vl_svm_compute_diagnostic(svm,
                                        validation,
@@ -502,8 +502,8 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
             break ;
 
           energy = svm->objective->energy ;
-	  vl_tic() ;
-	}
+      vl_tic() ;
+    }
 
     }
 

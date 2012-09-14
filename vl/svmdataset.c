@@ -4,7 +4,11 @@
  **/
 
 /*
-Copyright Statement
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
+
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
 */
 
 /**
@@ -149,22 +153,22 @@ VL_XCAT(vl_svmdataset_innerproduct_,SFX) (const void* data, const vl_uindex elem
       double *temp = vl_malloc(sizeof(double) * sdata->order) ;
 
       for (i = 0; i < sdata->dimension; i++)
-	{
-	  sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]);
+    {
+      sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]);
 
-	  for (j = 0; j < sdata->order; j++)
-	    {
-	      res += model[i*sdata->order + j]*temp[j] ;
-	    }
-	}
+      for (j = 0; j < sdata->order; j++)
+        {
+          res += model[i*sdata->order + j]*temp[j] ;
+        }
+    }
       vl_free(temp) ;
     }
   else
     {
       for (i = 0; i < sdata->dimension; i++)
-	{
-	  res += model[i]*(double)(tData[element*sdata->dimension + i]) ;
-	}
+    {
+      res += model[i]*(double)(tData[element*sdata->dimension + i]) ;
+    }
     }
 
   return res ;

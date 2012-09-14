@@ -387,7 +387,7 @@ void diagnosticDispatcher(VlSvmPegasos* svm)
       mxArray *lhs[1],*rhs[3] ;
       DiagnosticsDispatcher* dispatcherObject = (DiagnosticsDispatcher*) svm->diagnosticCallerRef ;
 
-	  lhs[0] = NULL ; 
+      lhs[0] = NULL ; 
       rhs[0] = dispatcherObject->diagnosticsHandle ;
       rhs[1] = createInfoStruct(svm) ;
 
@@ -542,45 +542,45 @@ mexFunction(int nout, mxArray *out[],
     switch (opt) {
     case opt_bias_multiplier :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "BIASMULTIPLIER is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "BIASMULTIPLIER is not a plain scalar.") ;
       }
       vl_svmpegasos_set_bias_multiplier(svm, *mxGetPr(optarg)) ;
       break ;
 
     case opt_max_iterations :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "MAXITERATIONS is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "MAXITERATIONS is not a plain scalar.") ;
       }
       if (*mxGetPr(optarg) < 0) {
-	vlmxError(vlmxErrInvalidArgument, "MAXITERATIONS is negative.") ;
+    vlmxError(vlmxErrInvalidArgument, "MAXITERATIONS is negative.") ;
       }
       vl_svmpegasos_set_maxiterations(svm, (vl_size) *mxGetPr(optarg)) ;
       break ;
     case opt_epsilon :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "EPSILON is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "EPSILON is not a plain scalar.") ;
       }
       if (*mxGetPr(optarg) < 0) {
-	vlmxError(vlmxErrInvalidArgument, "EPSILON is negative.") ;
+    vlmxError(vlmxErrInvalidArgument, "EPSILON is negative.") ;
       }
       vl_svmpegasos_set_epsilon(svm, (double) *mxGetPr(optarg)) ;
       break ;
 
     case opt_starting_iteration :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is not a plain scalar.") ;
       }
       if (*mxGetPr(optarg) < 1) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is smaller than 1.") ;
+    vlmxError(vlmxErrInvalidArgument, "STARTINGITERATION is smaller than 1.") ;
       }
       vl_svmpegasos_set_iterations(svm, (vl_size) *mxGetPr(optarg) - 1) ;
       break ;
 
     case opt_starting_model :
       if (!vlmxIsVector(optarg, -1) ||
-	  mxIsComplex(optarg) ||
-	  mxGetClassID(optarg) != mxDOUBLE_CLASS) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not a real vector.") ;
+      mxIsComplex(optarg) ||
+      mxGetClassID(optarg) != mxDOUBLE_CLASS) {
+    vlmxError(vlmxErrInvalidArgument, "STARTINGMODEL is not a real vector.") ;
       }
       inputModel = mxDuplicateArray(optarg) ;
       vl_svmpegasos_set_model(svm,(double*) mxGetData(inputModel)) ;
@@ -588,15 +588,15 @@ mexFunction(int nout, mxArray *out[],
       break ;
     case opt_starting_bias :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "STARTINGBIAS is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "STARTINGBIAS is not a plain scalar.") ;
       }
       vl_svmpegasos_set_bias(svm, (double) *mxGetPr(optarg)) ;
       break ;
     case opt_permutation :
       if (!vlmxIsVector(optarg, -1) ||
-	  mxIsComplex(optarg) ||
-	  mxGetClassID(optarg) != mxUINT32_CLASS) {
-	vlmxError(vlmxErrInvalidArgument, "PERMUTATION is not a UINT32 vector.") ;
+      mxIsComplex(optarg) ||
+      mxGetClassID(optarg) != mxUINT32_CLASS) {
+    vlmxError(vlmxErrInvalidArgument, "PERMUTATION is not a UINT32 vector.") ;
       }
       permutationSize = mxGetNumberOfElements(optarg) ;
       permutation = mxMalloc(sizeof(vl_uint32) * permutationSize) ;
@@ -619,7 +619,7 @@ mexFunction(int nout, mxArray *out[],
 
     case opt_bias_learningrate :
       if (!vlmxIsPlainScalar(optarg)) {
-	vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE is not a plain scalar.") ;
+    vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE is not a plain scalar.") ;
       }
 
       if (mxGetClassID(optarg) != mxDOUBLE_CLASS) {
@@ -725,7 +725,7 @@ double * tempBuffer ;
 
   if (nout >= 2)
     {
-		mwSize dims[2] ;
+        mwSize dims[2] ;
 double * tempBuffer ;
       dims[0] = 1 ;
       dims[1] = 1 ;
