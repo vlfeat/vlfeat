@@ -27,17 +27,17 @@ the terms of the BSD license (see the COPYING file).
 /** @name Image convolution
  ** @{ */
 VL_EXPORT
-void vl_imconvcol_vf (float* dst, int dst_stride,
+void vl_imconvcol_vf (float* dst, vl_size dst_stride,
                       float const* src,
-                      int src_width, int src_height, int src_stride,
-                      float const* filt, int filt_begin, int filt_end,
+                      vl_size src_width, vl_size src_height, vl_size src_stride,
+                      float const* filt, vl_index filt_begin, vl_index filt_end,
                       int step, unsigned int flags) ;
 
 VL_EXPORT
-void vl_imconvcol_vd (double* dst, int dst_stride,
+void vl_imconvcol_vd (double* dst, vl_size dst_stride,
                       double const* src,
-                      int src_width, int src_height, int src_stride,
-                      double const* filt, int filt_begin, int filt_end,
+                      vl_size src_width, vl_size src_height, vl_size src_stride,
+                      double const* filt, vl_index filt_begin, vl_index filt_end,
                       int step, unsigned int flags) ;
 
 VL_EXPORT

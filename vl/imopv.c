@@ -116,17 +116,17 @@ the terms of the BSD license (see the COPYING file).
 
 #if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
-VL_EXPORT
-void VL_XCAT(vl_imconvcol_v, SFX)
-(T* dst, int dst_stride,
+VL_EXPORT void
+VL_XCAT(vl_imconvcol_v, SFX)
+(T* dst, vl_size dst_stride,
  T const* src,
- int src_width, int src_height, int src_stride,
- T const* filt, int filt_begin, int filt_end,
+ vl_size src_width, vl_size src_height, vl_size src_stride,
+ T const* filt, vl_index filt_begin, vl_index filt_end,
  int step, unsigned int flags)
 {
-  int x = 0 ;
-  int y ;
-  int dheight = (src_height - 1) / step + 1 ;
+  vl_index x = 0 ;
+  vl_index y ;
+  vl_index dheight = (src_height - 1) / step + 1 ;
   vl_bool transp = flags & VL_TRANSPOSE ;
   vl_bool zeropad = (flags & VL_PAD_MASK) == VL_PAD_BY_ZERO ;
 
@@ -145,7 +145,7 @@ void VL_XCAT(vl_imconvcol_v, SFX)
   /* let filt point to the last sample of the filter */
   filt += filt_end - filt_begin ;
 
-  while (x < src_width) {
+  while (x < (signed)src_width) {
     /* Calculate dest[x,y] = sum_p image[x,p] filt[y - p]
      * where supp(filt) = [filt_begin, filt_end] = [fb,fe].
      *
@@ -156,9 +156,9 @@ void VL_XCAT(vl_imconvcol_v, SFX)
      * CHUNK_C: completes all samples
      */
     T const *filti ;
-    int stop ;
+    vl_index stop ;
 
-    for (y = 0 ; y < src_height ; y += step) {
+    for (y = 0 ; y < (signed)src_height ; y += step) {
       T acc = 0 ;
       T v = 0, c ;
       T const* srci ;
@@ -180,7 +180,7 @@ void VL_XCAT(vl_imconvcol_v, SFX)
         }
       }
 
-      stop = filt_end - VL_MAX(filt_begin, y - src_height + 1) + 1 ;
+      stop = filt_end - VL_MAX(filt_begin, y - (signed)src_height + 1) + 1 ;
       while (filti > filt - stop) {
         v = *srci ;
         c = *filti-- ;
@@ -681,8 +681,7 @@ VL_XCAT(vl_imintegral_, SFX)
   }
 }
 
+/* endif VL_IMOPV_INSTANTIATING */
 #undef FLT
-
-/* VL_IMOPV_INSTANTIATING */
 #undef VL_IMOPV_INSTANTIATING
 #endif
