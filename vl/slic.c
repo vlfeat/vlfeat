@@ -283,7 +283,7 @@ vl_slic_segment (vl_uint32 * segmentation,
             distance = appearance + factor * spatial ;
             if (minDistance > distance) {
               minDistance = distance ;
-              segmentation[x + y * width] = region ;
+              segmentation[x + y * width] = (vl_uint32)region ;
             }
           }
         }
