@@ -16,7 +16,7 @@ ABOUT
   A copy is also shipped with the library in doc/index.html.
 
 QUICK START WITH MATLAB
-  Download the binary package of VLFeat at
+  Download the latest binary package of VLFeat at
   http://www.vlfeat.org/download/. Unpack the archive using WinZIP
   (Windows), double clicking on the archive (Mac), or using the
   command line (Linux and Mac):
