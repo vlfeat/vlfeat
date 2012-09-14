@@ -344,8 +344,8 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
   self->minExponent = -20 ;
   self->maxExponent = 8 ;
 
-  tableHeight = 2*self->order + 1 ;
-  tableWidth = self->numSubdivisions * (self->maxExponent - self->minExponent + 1) ;
+  tableHeight = (int) (2*self->order + 1) ;
+  tableWidth = (int) (self->numSubdivisions * (self->maxExponent - self->minExponent + 1)) ;
   self->table = vl_malloc (sizeof(double) *
                            (tableHeight * tableWidth + 2*(1+self->order))) ;
   if (! self->table) {
@@ -354,7 +354,7 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
   }
 
   {
-    vl_int exponent ;
+    vl_index exponent ;
     vl_uindex i, j ;
     double * tablep = self->table ;
     double * kappa = self->table + tableHeight * tableWidth ;
@@ -381,7 +381,7 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
 
       for (i = 0 ; i < self->numSubdivisions ;
            ++i, mantissa += self->subdivision) {
-        x = ldexp(mantissa, exponent) ;
+        x = ldexp(mantissa, (int)exponent) ;
         xgamma = pow(x, self->gamma) ;
         Lxgamma = L * xgamma ;
         Llogx = L * log(x) ;
