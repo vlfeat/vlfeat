@@ -713,7 +713,7 @@ void vl_dsift_process (VlDsiftFilter* self, float const* im)
 
       /* quantize angle */
       nt = vl_mod_2pi_f (angle) * (self->geom.numBinT / (2*VL_PI)) ;
-      bint = vl_floor_f (nt) ;
+      bint = (int) vl_floor_f (nt) ;
       rbint = nt - bint ;
 
       /* write it back */
