@@ -155,7 +155,7 @@ vl_rand_seed_by_array (VlRand * self, vl_uint32 const key [], vl_size keySize)
   int i, j, k;
   vl_rand_seed (self, 19650218UL);
   i=1; j=0;
-  k = (N > keySize ? N : keySize);
+  k = (N > keySize ? N : (int)keySize);
   for (; k; k--) {
     mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1664525UL))
       + key[j] + j; /* non linear */
@@ -220,7 +220,7 @@ vl_rand_uint32 (VlRand * self)
   y ^= (y << 15) & 0xefc60000UL;
   y ^= (y >> 18);
 
-  return y;
+  return (vl_uint32)y;
 
 #undef mti
 #undef mt
