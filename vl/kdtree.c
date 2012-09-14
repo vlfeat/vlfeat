@@ -176,7 +176,7 @@ vl_kdtree_build_recursively
     double secondMoment = 0 ;
     double variance = 0 ;
     for (i = dataBegin ; i < dataEnd ; ++ i) {
-      int di = tree -> dataIndex [i] .index ;
+      vl_index di = tree->dataIndex[i].index ;
       double datum ;
       switch(forest->dataType) {
         case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
@@ -199,14 +199,14 @@ vl_kdtree_build_recursively
     if (forest->splitHeapNumNodes < forest->splitHeapSize) {
       VlKDTreeSplitDimension * splitDimension
         = forest->splitHeapArray + forest->splitHeapNumNodes ;
-      splitDimension->dimension = d ;
+      splitDimension->dimension = (unsigned int)d ;
       splitDimension->mean = mean ;
       splitDimension->variance = variance ;
       vl_kdtree_split_heap_push (forest->splitHeapArray, &forest->splitHeapNumNodes) ;
     } else {
       VlKDTreeSplitDimension * splitDimension = forest->splitHeapArray + 0 ;
       if (splitDimension->variance < variance) {
-        splitDimension->dimension = d ;
+        splitDimension->dimension = (unsigned int)d ;
         splitDimension->mean = mean ;
         splitDimension->variance = variance ;
         vl_kdtree_split_heap_update (forest->splitHeapArray, forest->splitHeapNumNodes, 0) ;
@@ -229,7 +229,7 @@ vl_kdtree_build_recursively
 
   /* sort data along largest variance dimension */
   for (i = dataBegin ; i < dataEnd ; ++ i) {
-    int di = tree->dataIndex [i] .index ;
+    vl_index di = tree->dataIndex[i].index ;
     double datum ;
     switch (forest->dataType) {
       case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
@@ -402,7 +402,7 @@ vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
  ** @internal @brief
  **/
 
-VL_EXPORT int
+VL_EXPORT vl_uindex
 vl_kdforest_query_recursively (VlKDForest  * self,
                                VlKDTree * tree,
                                vl_uindex nodeIndex,
