@@ -480,7 +480,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
     for (k = 0 ; k < self->numCenters ; ++k) {
       if (distanceToCenters[k] < bestDistance) {
         bestDistance = distanceToCenters[k] ;
-        assignments[i] = k ;
+        assignments[i] = (vl_uint32)k ;
       }
     }
 
@@ -533,7 +533,7 @@ VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)
     array.permutation = permutations + d * numData ;
     array.data = data + d ;
     array.stride = self->dimension ;
-    for (x = 0 ; x < numData ; ++x) { array.permutation[x] = x ; }
+    for (x = 0 ; x < numData ; ++x) { array.permutation[x] = (vl_uint32)x ; }
     VL_XCAT3(_vl_kmeans_, SFX, _qsort_sort)(&array, numData) ;
   }
 }
