@@ -48,8 +48,8 @@ VL_EXPORT int vl_pgm_extract_data (FILE *f, VlPgmImage const *im, void *data) ;
 VL_EXPORT int vl_pgm_insert (FILE *f,
                              VlPgmImage const *im,
                              void const*data ) ;
-VL_EXPORT int vl_pgm_get_npixels (VlPgmImage const *im) ;
-VL_EXPORT int vl_pgm_get_bpp (VlPgmImage const *im) ;
+VL_EXPORT vl_size vl_pgm_get_npixels (VlPgmImage const *im) ;
+VL_EXPORT vl_size vl_pgm_get_bpp (VlPgmImage const *im) ;
 /** @} */
 
 /** @name Helper functions

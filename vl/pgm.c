@@ -124,8 +124,7 @@ remove_blanks(FILE* f)
  ** @return number of pixels of the image.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT vl_size
 vl_pgm_get_npixels (VlPgmImage const *im)
 {
   return im->width * im->height ;
@@ -142,8 +141,7 @@ vl_pgm_get_npixels (VlPgmImage const *im)
  ** @return number of bytes per pixel.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT vl_size
 vl_pgm_get_bpp (VlPgmImage const *im)
 {
   return (im->max_value >= 256) + 1 ;
@@ -164,17 +162,16 @@ vl_pgm_get_bpp (VlPgmImage const *im)
  ** occurred in decoding the header or meta section of the PGM file.
  **/
 
-VL_EXPORT
-int
+VL_EXPORT int
 vl_pgm_extract_head (FILE* f, VlPgmImage *im)
 {
-  char     magic [2] ;
-  int      c ;
-  int      is_raw ;
-  int      width ;
-  int      height ;
-  int      max_value ;
-  int      sz ;
+  char magic [2] ;
+  int c ;
+  int is_raw ;
+  int width ;
+  int height ;
+  int max_value ;
+  size_t sz ;
   vl_bool  good ;
 
   VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
@@ -275,10 +272,10 @@ VL_EXPORT
 int
 vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 {
-  int bpp       = vl_pgm_get_bpp       (im) ;
-  int data_size = vl_pgm_get_npixels (im) ;
-  int c ;
+  vl_size bpp = vl_pgm_get_bpp(im) ;
+  vl_size data_size = vl_pgm_get_npixels(im) ;
   vl_bool good = 1 ;
+  size_t c ;
 
   VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
 
@@ -303,7 +300,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
     /* adjust endianess */
 #if defined(VL_ARCH_LITTLE_ENDIAN)
     if (bpp == 2) {
-      int i ;
+      vl_uindex i ;
       vl_uint8 *pt = (vl_uint8*) data ;
       for(i = 0 ; i < 2 * data_size ; i += 2) {
         vl_uint8 tmp = pt [i] ;
@@ -318,7 +315,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
      by whitespaces.
   */
   else {
-    int i ;
+    vl_uindex i ;
     int unsigned v ;
     for(good = 1, i = 0 ;
         i < data_size && good ;
@@ -354,9 +351,9 @@ VL_EXPORT
 int
 vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
 {
-  int bpp = vl_pgm_get_bpp (im) ;
-  int data_size = vl_pgm_get_npixels (im) ;
-  int c ;
+  vl_size bpp = vl_pgm_get_bpp (im) ;
+  vl_size data_size = vl_pgm_get_npixels (im) ;
+  size_t c ;
 
   VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
 
@@ -370,7 +367,7 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
   /* take care of endianness */
 #if defined(VL_ARCH_LITTLE_ENDIAN)
   if (bpp == 2) {
-    int i ;
+    vl_uindex i ;
     vl_uint8* temp = vl_malloc (2 * data_size) ;
     memcpy(temp, data, 2 * data_size) ;
     for(i = 0 ; i < 2 * data_size ; i += 2) {
