@@ -485,7 +485,7 @@ main(int argc, char **argv)
     }
 
     if (verbose)
-      printf ("sift: image is %d by %d pixels\n",
+      printf ("sift: image is %" VL_FMT_SIZE " by %" VL_FMT_SIZE " pixels\n",
               pim. width,
               pim. height) ;
 
