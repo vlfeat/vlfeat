@@ -535,7 +535,7 @@ vl_configuration_to_string_copy ()
     length = snprintf(string, length,
                       "VLFeat version %s\n"
                       "    Static config: %s\n"
-                      "    %d CPU(s): %s\n"
+                      "    %" VL_FMT_SIZE " CPU(s): %s\n"
                       "    Debug: %s\n",
                       vl_get_version_string (),
                       staticString,

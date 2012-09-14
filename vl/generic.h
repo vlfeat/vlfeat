@@ -158,10 +158,10 @@ typedef struct _VlState
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
   VlX86CpuInfo cpuInfo ;
 #endif
-  int numCPUs ;
+  vl_size numCPUs ;
 
   vl_bool simdEnabled ;
-  int maxNumThreads ;
+  vl_size maxNumThreads ;
 
 } VlState ;
 
@@ -180,7 +180,7 @@ VL_INLINE void vl_set_simd_enabled (vl_bool x) ;
 VL_INLINE vl_bool vl_get_simd_enabled () ;
 VL_INLINE vl_bool vl_cpu_has_sse3 () ;
 VL_INLINE vl_bool vl_cpu_has_sse2 () ;
-VL_INLINE int vl_get_num_cpus () ;
+VL_INLINE vl_size vl_get_num_cpus () ;
 VL_EXPORT VlRand * vl_get_rand () ;
 
 /** @} */
@@ -361,7 +361,7 @@ vl_cpu_has_sse2 ()
 #endif
 }
 
-VL_INLINE int
+VL_INLINE vl_size
 vl_get_num_cpus ()
 {
   return vl_get_state()->numCPUs ;
