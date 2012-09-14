@@ -17,7 +17,7 @@ the terms of the BSD license (see the COPYING file).
  ** @author Jim Ulery
  **/
 
-static unsigned int
+static unsigned long
 isqrt(unsigned long val) {
   unsigned long temp, g=0, b = 0x8000, bshft = 15;
   do {
@@ -202,7 +202,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_uint8 const* data, int N)
 
         /* lower bound */
         if(dist < lxc) {
-          lxc = lxc + dist - 2*(isqrt(lxc)+1)*(isqrt(dist)+1) ;
+          lxc = (vl_ikm_acc) (lxc + dist - 2*(isqrt(lxc)+1)*(isqrt(dist)+1)) ;
         } else {
           lxc = 0 ;
         }
@@ -211,7 +211,7 @@ vl_ikm_train_elkan (VlIKMFilt* f, vl_uint8 const* data, int N)
         /* upper bound */
         if(c == cx) {
           vl_ikm_acc ux = u_pt[x] ;
-          u_pt[x] = ux + dist + 2 * (isqrt(ux)+1)*(isqrt(dist)+1);
+          u_pt[x] = (vl_ikm_acc) (ux + dist + 2 * (isqrt(ux)+1)*(isqrt(dist)+1)) ;
           r_pt[x] = 1 ;
         }
       }
