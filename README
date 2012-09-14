@@ -15,7 +15,7 @@ ABOUT
   The documentation is available online at http://www.vlfeat.org/index.html.
   A copy is also shipped with the library in doc/index.html.
 
-QUICKSTART WITH MATLAB
+QUICK START WITH MATLAB
   Download the binary package of VLFeat at
   http://www.vlfeat.org/download/. Unpack the archive using WinZIP
   (Windows), double clicking on the archive (Mac), or using the
@@ -26,9 +26,10 @@ QUICKSTART WITH MATLAB
   where X.Y.Z is the latest version. Start MATLAB and run the VLFeat
   setup instruction:
 
-  > run VLFEATROOT/toolbox/vl_setup.
+  > run VLFEATROOT/toolbox/vl_setup
 
-  All VLFeat demos can now be run by the command:
+  where VLFEATROOT is the path to the directory just unpacked. All
+  VLFeat demos can now be run in a row by the command:
 
   > vl_demo
 
