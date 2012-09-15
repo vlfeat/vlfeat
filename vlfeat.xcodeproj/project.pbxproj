@@ -48,6 +48,49 @@
 		2D1EECCC1603E1B100C63DCE /* svmdataset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = svmdataset.c; sourceTree = "<group>"; };
 		2D1EECCD1603E1B100C63DCE /* svmdataset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = svmdataset.h; sourceTree = "<group>"; };
 		2D1EECD21603E85200C63DCE /* libvl.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libvl.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D1EECF116046F1B00C63DCE /* vl_maketrainingset.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_maketrainingset.c; path = toolbox/misc/vl_maketrainingset.c; sourceTree = "<group>"; };
+		2D1EECF216046F1B00C63DCE /* vl_pegasos.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
+		2D1EECF316046F1B00C63DCE /* vl_svmpegasos.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_svmpegasos.c; path = toolbox/misc/vl_svmpegasos.c; sourceTree = "<group>"; };
+		2D1EECF416046F1B00C63DCE /* vl_ihashsum.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ihashsum.c; path = toolbox/misc/vl_ihashsum.c; sourceTree = "<group>"; };
+		2D1EECF516046F1B00C63DCE /* vl_sampleinthist.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_sampleinthist.c; path = toolbox/misc/vl_sampleinthist.c; sourceTree = "<group>"; };
+		2D1EECF616046F1B00C63DCE /* vl_slic.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_slic.c; path = toolbox/slic/vl_slic.c; sourceTree = "<group>"; };
+		2D1EECF716046F1B00C63DCE /* vl_aib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_aib.c; path = toolbox/aib/vl_aib.c; sourceTree = "<group>"; };
+		2D1EECF816046F1B00C63DCE /* vl_hog.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_hog.c; path = toolbox/misc/vl_hog.c; sourceTree = "<group>"; };
+		2D1EECF916046F1B00C63DCE /* vl_ihashfind.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ihashfind.c; path = toolbox/misc/vl_ihashfind.c; sourceTree = "<group>"; };
+		2D1EECFA16046F1B00C63DCE /* vl_kmeans.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_kmeans.c; path = toolbox/kmeans/vl_kmeans.c; sourceTree = "<group>"; };
+		2D1EECFB16046F1C00C63DCE /* vl_sift.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_sift.c; path = toolbox/sift/vl_sift.c; sourceTree = "<group>"; };
+		2D1EECFC16046F1C00C63DCE /* vl_siftdescriptor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_siftdescriptor.c; path = toolbox/sift/vl_siftdescriptor.c; sourceTree = "<group>"; };
+		2D1EECFD16046F1C00C63DCE /* vl_aibhist.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_aibhist.c; path = toolbox/aib/vl_aibhist.c; sourceTree = "<group>"; };
+		2D1EECFE16046F1C00C63DCE /* vl_alldist.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_alldist.c; path = toolbox/misc/vl_alldist.c; sourceTree = "<group>"; };
+		2D1EECFF16046F1C00C63DCE /* vl_alldist2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_alldist2.c; path = toolbox/misc/vl_alldist2.c; sourceTree = "<group>"; };
+		2D1EED0016046F1C00C63DCE /* vl_binsearch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_binsearch.c; path = toolbox/misc/vl_binsearch.c; sourceTree = "<group>"; };
+		2D1EED0116046F1C00C63DCE /* vl_binsum.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_binsum.c; path = toolbox/misc/vl_binsum.c; sourceTree = "<group>"; };
+		2D1EED0216046F1C00C63DCE /* vl_cummax.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_cummax.c; path = toolbox/misc/vl_cummax.c; sourceTree = "<group>"; };
+		2D1EED0316046F1C00C63DCE /* vl_dsift.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
+		2D1EED0416046F1C00C63DCE /* vl_erfill.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_erfill.c; path = toolbox/mser/vl_erfill.c; sourceTree = "<group>"; };
+		2D1EED0516046F1C00C63DCE /* vl_getpid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_getpid.c; path = toolbox/misc/vl_getpid.c; sourceTree = "<group>"; };
+		2D1EED0616046F1C00C63DCE /* vl_hikmeans.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_hikmeans.c; path = toolbox/kmeans/vl_hikmeans.c; sourceTree = "<group>"; };
+		2D1EED0716046F1C00C63DCE /* vl_hikmeanspush.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_hikmeanspush.c; path = toolbox/kmeans/vl_hikmeanspush.c; sourceTree = "<group>"; };
+		2D1EED0916046F1C00C63DCE /* vl_ikmeans.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ikmeans.c; path = toolbox/kmeans/vl_ikmeans.c; sourceTree = "<group>"; };
+		2D1EED0A16046F1C00C63DCE /* vl_ikmeanspush.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ikmeanspush.c; path = toolbox/kmeans/vl_ikmeanspush.c; sourceTree = "<group>"; };
+		2D1EED0B16046F1C00C63DCE /* vl_imdisttf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
+		2D1EED0C16046F1C00C63DCE /* vl_imintegral.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_imintegral.c; path = toolbox/imop/vl_imintegral.c; sourceTree = "<group>"; };
+		2D1EED0D16046F1C00C63DCE /* vl_imsmooth.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_imsmooth.c; path = toolbox/imop/vl_imsmooth.c; sourceTree = "<group>"; };
+		2D1EED0E16046F1C00C63DCE /* vl_imwbackwardmx.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_imwbackwardmx.c; path = toolbox/imop/vl_imwbackwardmx.c; sourceTree = "<group>"; };
+		2D1EED0F16046F1C00C63DCE /* vl_inthist.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_inthist.c; path = toolbox/misc/vl_inthist.c; sourceTree = "<group>"; };
+		2D1EED1016046F1C00C63DCE /* vl_irodr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_irodr.c; path = toolbox/geometry/vl_irodr.c; sourceTree = "<group>"; };
+		2D1EED1116046F1C00C63DCE /* vl_kdtreebuild.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_kdtreebuild.c; path = toolbox/misc/vl_kdtreebuild.c; sourceTree = "<group>"; };
+		2D1EED1216046F1C00C63DCE /* vl_kdtreequery.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_kdtreequery.c; path = toolbox/misc/vl_kdtreequery.c; sourceTree = "<group>"; };
+		2D1EED1316046F1C00C63DCE /* vl_lbp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_lbp.c; path = toolbox/misc/vl_lbp.c; sourceTree = "<group>"; };
+		2D1EED1416046F1C00C63DCE /* vl_localmax.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_localmax.c; path = toolbox/misc/vl_localmax.c; sourceTree = "<group>"; };
+		2D1EED1516046F1C00C63DCE /* vl_mser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_mser.c; path = toolbox/mser/vl_mser.c; sourceTree = "<group>"; };
+		2D1EED1616046F1C00C63DCE /* vl_quickshift.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_quickshift.c; path = toolbox/quickshift/vl_quickshift.c; sourceTree = "<group>"; };
+		2D1EED1716046F1C00C63DCE /* vl_rodr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_rodr.c; path = toolbox/geometry/vl_rodr.c; sourceTree = "<group>"; };
+		2D1EED1816046F1C00C63DCE /* vl_simdctrl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_simdctrl.c; path = toolbox/misc/vl_simdctrl.c; sourceTree = "<group>"; };
+		2D1EED1916046F1C00C63DCE /* vl_tpsumx.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_tpsumx.c; path = toolbox/imop/vl_tpsumx.c; sourceTree = "<group>"; };
+		2D1EED1A16046F1C00C63DCE /* vl_twister.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
+		2D1EED1B16046F1C00C63DCE /* vl_ubcmatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
+		2D1EED1C16046F1C00C63DCE /* vl_version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
 		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
 		2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
 		2D3E1F2C15FE93480035AA1E /* license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = license.html; path = docsrc/license.html; sourceTree = "<group>"; };
@@ -770,15 +813,59 @@
 				2DE765220FF23EE9006347E0 /* kdtree.h */,
 				2D70CC780DDE1135000A23DE /* mexutils.h */,
 				2DB1A290110CE32F00E02BD8 /* samplinthist.tc */,
-				2D86B1080F24CC9B00E625D6 /* vl_aib.c */,
-				2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */,
-				2D13F028100A6E8800C072E8 /* vl_alldist.c */,
-				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
-				2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */,
-				2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */,
+				2D1EECF716046F1B00C63DCE /* vl_aib.c */,
+				2D1EECFD16046F1C00C63DCE /* vl_aibhist.c */,
+				2D1EECFE16046F1C00C63DCE /* vl_alldist.c */,
+				2D1EECFF16046F1C00C63DCE /* vl_alldist2.c */,
+				2D1EED0016046F1C00C63DCE /* vl_binsearch.c */,
+				2D1EED0116046F1C00C63DCE /* vl_binsum.c */,
 				2DA21723141D49350047E7C7 /* vl_binsum.def */,
+				2D1EED0216046F1C00C63DCE /* vl_cummax.c */,
+				2D1EED0316046F1C00C63DCE /* vl_dsift.c */,
+				2D1EED0416046F1C00C63DCE /* vl_erfill.c */,
+				2D1EED0516046F1C00C63DCE /* vl_getpid.c */,
+				2D1EED0616046F1C00C63DCE /* vl_hikmeans.c */,
+				2D1EED0716046F1C00C63DCE /* vl_hikmeanspush.c */,
+				2D1EECF816046F1B00C63DCE /* vl_hog.c */,
+				2DF4565610ADB9010083F316 /* vl_homkermap.c */,
+				2D1EECF916046F1B00C63DCE /* vl_ihashfind.c */,
+				2D1EECF416046F1B00C63DCE /* vl_ihashsum.c */,
+				2D1EED0916046F1C00C63DCE /* vl_ikmeans.c */,
+				2D1EED0A16046F1C00C63DCE /* vl_ikmeanspush.c */,
+				2D1EED0B16046F1C00C63DCE /* vl_imdisttf.c */,
+				2D1EED0C16046F1C00C63DCE /* vl_imintegral.c */,
+				2D1EED0D16046F1C00C63DCE /* vl_imsmooth.c */,
+				2D1EED0E16046F1C00C63DCE /* vl_imwbackwardmx.c */,
+				2D1EED0F16046F1C00C63DCE /* vl_inthist.c */,
+				2D1EED1016046F1C00C63DCE /* vl_irodr.c */,
+				2D1EED1116046F1C00C63DCE /* vl_kdtreebuild.c */,
+				2D1EED1216046F1C00C63DCE /* vl_kdtreequery.c */,
+				2D1EECFA16046F1B00C63DCE /* vl_kmeans.c */,
+				2D1EED1316046F1C00C63DCE /* vl_lbp.c */,
+				2D1EED1416046F1C00C63DCE /* vl_localmax.c */,
+				2D1EECF116046F1B00C63DCE /* vl_maketrainingset.c */,
+				2D1EED1516046F1C00C63DCE /* vl_mser.c */,
+				2D1EECF216046F1B00C63DCE /* vl_pegasos.c */,
+				2D1EED1616046F1C00C63DCE /* vl_quickshift.c */,
+				2D1EED1716046F1C00C63DCE /* vl_rodr.c */,
+				2D1EECF516046F1B00C63DCE /* vl_sampleinthist.c */,
+				2D86B1080F24CC9B00E625D6 /* vl_aib.c */,
+				2D1EECFB16046F1C00C63DCE /* vl_sift.c */,
+				2D86B1090F24CC9B00E625D6 /* vl_aibhist.c */,
+				2D1EECFC16046F1C00C63DCE /* vl_siftdescriptor.c */,
+				2D13F028100A6E8800C072E8 /* vl_alldist.c */,
+				2D1EED1816046F1C00C63DCE /* vl_simdctrl.c */,
+				2D86B10A0F24CC9B00E625D6 /* vl_alldist2.c */,
+				2D1EECF616046F1B00C63DCE /* vl_slic.c */,
+				2D86B10B0F24CC9B00E625D6 /* vl_binsearch.c */,
+				2D1EECF316046F1B00C63DCE /* vl_svmpegasos.c */,
+				2D1EED1916046F1C00C63DCE /* vl_tpsumx.c */,
+				2D86B10C0F24CC9B00E625D6 /* vl_binsum.c */,
+				2D1EED1A16046F1C00C63DCE /* vl_twister.c */,
 				2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */,
+				2D1EED1B16046F1C00C63DCE /* vl_ubcmatch.c */,
 				2D86B10E0F24CC9B00E625D6 /* vl_erfill.c */,
+				2D1EED1C16046F1C00C63DCE /* vl_version.c */,
 				2D86B10F0F24CC9B00E625D6 /* vl_getpid.c */,
 				2D86B1100F24CC9B00E625D6 /* vl_hikmeans.c */,
 				2D86B1110F24CC9B00E625D6 /* vl_hikmeanspush.c */,
