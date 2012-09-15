@@ -21,7 +21,6 @@ extern mxArray *mxCreateSharedDataCopy(const mxArray* pr);
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Create a plain training set struct
- **
  ** @param data   array containing the training data.
  ** @param labels array containing the labels.
  **
@@ -37,7 +36,6 @@ mxArray* createOutputStruct(const mxArray* data, const mxArray* labels)
   const char* names [2] = {"data","labels"} ;
 
   mxArray* output = mxCreateStructArray(1, dims, 2, names) ;
-
   mxArray* dataOut = mxCreateSharedDataCopy(data) ;
   mxArray* labelsOut = mxCreateSharedDataCopy(labels) ;
 
@@ -50,7 +48,6 @@ mxArray* createOutputStruct(const mxArray* data, const mxArray* labels)
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Create a training set struct with an Homogeneous kernel map
- **
  ** @param data   training data.
  ** @param labels labels.
  ** @param order  order of the homogeneous kernel map.
@@ -58,13 +55,14 @@ mxArray* createOutputStruct(const mxArray* data, const mxArray* labels)
  ** @param windowType type of window.
  ** @param gamma  gamma value.
  ** @param period period of the map.
+ ** @return the training set struct.
  **
- ** The function create a  training set struct with data, labels and
- ** an homogeneous kernel map.
- **
+ ** The function create a training set struct with data, labels and an
+ ** homogeneous kernel map.
  **/
 
-mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels, const double order,
+mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels,
+                                const double order,
                                 mxArray* kernelType, mxArray* windowType,
                                 const double gamma, const double period)
 {
@@ -73,15 +71,13 @@ mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels, cons
   const char* names [3] = {"data","labels","map"} ;
   mxArray *output, *map, *dataOut, *labelsOut, *orderOut, *kernelTypeOut, *windowTypeOut, *gammaOut;
 
-  if (kernelType == NULL)
-    {
-      kernelType = mxCreateString("kchi2") ;
-    }
+  if (kernelType == NULL) {
+    kernelType = mxCreateString("kchi2") ;
+  }
 
-  if (windowType == NULL)
-    {
-      windowType = mxCreateString("rectangular") ;
-    }
+  if (windowType == NULL) {
+    windowType = mxCreateString("rectangular") ;
+  }
 
   output = mxCreateStructArray(1, dims, 3, names) ;
   map = mxCreateStructArray(1, dims, 5, homkermapNames) ;
@@ -96,33 +92,31 @@ mxArray* createHomekermapStruct(const mxArray* data, const mxArray* labels, cons
 
   gammaOut = mxCreateDoubleScalar(gamma) ;
 
-  if (period > 0)
-    {
-      mxArray * periodOut = mxCreateDoubleScalar(period) ;
-      mxSetField(map, 0, "period", periodOut) ;
-    }
+  if (period > 0) {
+    mxArray * periodOut = mxCreateDoubleScalar(period) ;
+    mxSetField(map, 0, "period", periodOut) ;
+  }
 
   mxSetField(map, 0, "order", orderOut) ;
   mxSetField(map, 0, "kernelType", kernelTypeOut) ;
   mxSetField(map, 0, "windowType", windowTypeOut) ;
   mxSetField(map, 0, "gamma", gammaOut) ;
 
-
   mxSetField(output, 0, "data", dataOut) ;
   mxSetField(output, 0, "labels", labelsOut) ;
   mxSetField(output, 0, "map", map) ;
-
   return output ;
 }
 
 /* option codes */
 enum {
-  opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS, opt_gamma, opt_period, opt_window,
+  opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS,
+  opt_gamma, opt_period, opt_window,
 } ;
 
 /* options */
 vlmxOption  options [] = {
-  {"homkermap",                   1,   opt_homkermap                 },
+  {"homkermap",         1,   opt_homkermap           },
   {"kl1",               0,   opt_KL1                 },
   {"kchi2",             0,   opt_KCHI2               },
   {"kjs",               0,   opt_KJS                 },
@@ -187,39 +181,37 @@ mexFunction(int nout, mxArray *out[],
     vlmxError(vlmxErrInvalidArgument, "LABELS is not a vector of dimension compatible with DATA.") ;
   }
 
-
-  if (dataClass != mxSINGLE_CLASS && dataClass != mxDOUBLE_CLASS)
+  if (dataClass != mxSINGLE_CLASS && dataClass != mxDOUBLE_CLASS) {
     vlmxError(vlmxErrInvalidArgument,
               "DATA must be either SINGLE or DOUBLE.") ;
-
+  }
 
   if (mxGetClassID(IN(LABELS)) != mxINT8_CLASS) {
     vlmxError(vlmxErrInvalidArgument, "LABELS must be INT8.") ;
   }
 
-
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
     switch (opt) {
     case opt_homkermap:
       homkermap = VL_TRUE ;
-      if (! vlmxIsPlainScalar(optarg))
-        {
-          vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
-        }
+      if (! vlmxIsPlainScalar(optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "N is not a scalar.") ;
+      }
       order = *mxGetPr(optarg) ;
-      if (order < 0)
-        {
-          vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
-        }
+      if (order < 0) {
+        vlmxError(vlmxErrInvalidArgument, "N is negative.") ;
+      }
       break ;
+
     case opt_KINTERS:
     case opt_KL1:
     case opt_KCHI2:
     case opt_KJS:
       kernelType = (mxArray*) in[next-1] ;
       break ;
+
     case opt_period:
-      if (! vlmxIsPlainScalar(optarg)){
+      if (! vlmxIsPlainScalar(optarg)) {
         vlmxError(vlmxErrInvalidArgument, "PERIOD is not a scalar.") ;
       }
       period = *mxGetPr(optarg) ;
@@ -227,6 +219,7 @@ mexFunction(int nout, mxArray *out[],
         vlmxError(vlmxErrInvalidArgument, "PERIOD is not positive.") ;
       }
       break ;
+
     case opt_gamma:
       if (! vlmxIsPlainScalar(optarg)){
         vlmxError(vlmxErrInvalidArgument, "GAMMA is not a scalar.") ;
@@ -236,6 +229,7 @@ mexFunction(int nout, mxArray *out[],
         vlmxError(vlmxErrInvalidArgument, "GAMMA is not positive.") ;
       }
       break ;
+
     case opt_window:
       if (! vlmxIsString(optarg,-1)){
         vlmxError(vlmxErrInvalidArgument, "WINDOW is not a string.") ;
@@ -257,10 +251,12 @@ mexFunction(int nout, mxArray *out[],
   /* -----------------------------------------------------------------
    *                                                            Output
    * -------------------------------------------------------------- */
-  if (homkermap)
-    OUT(TRAINING_DATA) = createHomekermapStruct(IN(DATA), IN(LABELS), (double)order,kernelType, windowType,
-                                      gamma, period) ;
-  else
+  if (homkermap) {
+    OUT(TRAINING_DATA) = createHomekermapStruct(IN(DATA), IN(LABELS),
+                                                (double)order, kernelType,
+                                                windowType,
+                                                gamma, period) ;
+  } else {
     OUT(TRAINING_DATA) = createOutputStruct(IN(DATA), IN(LABELS)) ;
-
+  }
 }

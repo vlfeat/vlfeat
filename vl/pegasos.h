@@ -21,7 +21,6 @@ the terms of the BSD license (see the COPYING file).
  **
  ** This structure keeps some statistics on a specific classifier
  ** learned via Pegasos Svm Solver.
- **
  **/
 typedef struct _VlSvmObjective {
   double energy ;               /**< full energy value. */
@@ -50,23 +49,22 @@ typedef void (*VlSvmDiagnostics) (void *svm) ;
  **/
 typedef struct _VlSvmPegasos {
   double *  model ;             /**< svm model. */
-  double bias ;                 /**< bias element.  */
-  vl_size dimension ;           /**< model length.  */
-  vl_size iterations ;          /**< number of iterations.  */
-  vl_size maxIterations ;       /**< maximum number of iterations.  */
-  double epsilon ;               /**< stopping criterion threshold */
-  double lambda ;                /**< Pegasos parameter.  */
-  double biasMultiplier ;        /**< bias strength multiplier.  */
-  double elapsedTime ;           /**< elapsed time from algorithm start.  */
-  vl_size energyFrequency ;      /**< frequency of computation of svm energy */
-  double  biasLearningRate ;     /**< frequency of bias learning.  */
-  VlSvmObjective*  objective ;   /**<  value and statistics of
-                                    objective function. */
-  VlRand* randomGenerator ;      /**< random generator.  */
-  vl_uint32 * permutation ;      /**< data permutation.  */
-  vl_size permutationSize ;      /**< permutation size.  */
+  double bias ;                 /**< bias element. */
+  vl_size dimension ;           /**< model length. */
+  vl_size iterations ;          /**< number of iterations. */
+  vl_size maxIterations ;       /**< maximum number of iterations. */
+  double epsilon ;              /**< stopping criterion threshold */
+  double lambda ;               /**< Pegasos parameter. */
+  double biasMultiplier ;       /**< bias strength multiplier. */
+  double elapsedTime ;          /**< elapsed time from algorithm start. */
+  vl_size energyFrequency ;     /**< frequency of computation of svm energy */
+  double  biasLearningRate ;    /**< frequency of bias learning.  */
+  VlSvmObjective*  objective ;  /**< value and statistics of the objective function. */
+  VlRand* randomGenerator ;     /**< random generator.  */
+  vl_uint32 * permutation ;     /**< data permutation. */
+  vl_size permutationSize ;     /**< permutation size. */
   VlSvmDiagnostics diagnostic ; /**< diagnostic function. */
-  void * diagnosticCallerRef ;  /**< reference to caller.  */
+  void * diagnosticCallerRef ;  /**< reference to caller. */
 } VlSvmPegasos ;
 
 /** @name Create and destroy
@@ -122,7 +120,7 @@ VL_INLINE VlRand* vl_svmpegasos_get_random_generator  (VlSvmPegasos const *self)
 VL_INLINE vl_uint32* vl_svmpegasos_get_permutation    (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_permutation_size  (VlSvmPegasos const *self) ;
 VL_INLINE VlSvmDiagnostics vl_svmpegasos_get_diagnostic (VlSvmPegasos const *self) ;
-VL_INLINE void* vl_svmpegasos_get_diagnostic_caller_ref  (VlSvmPegasos const *self) ;
+VL_INLINE void* vl_svmpegasos_get_diagnostic_caller_ref (VlSvmPegasos const *self) ;
 /** @} */
 
 /** @name Set parameters
@@ -140,8 +138,9 @@ VL_INLINE void vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double  
 VL_INLINE void vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r) ;
 VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos *self, vl_uint32* p,
                                                   vl_size psize) ;
-VL_INLINE void vl_svmpegasos_set_diagnostic (VlSvmPegasos *self, VlSvmDiagnostics d,
-                                             void * cr) ;
+VL_INLINE void vl_svmpegasos_set_diagnostic      (VlSvmPegasos *self,
+                                                  VlSvmDiagnostics d,
+                                                  void * cr) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -486,7 +485,7 @@ vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r)
 
 VL_INLINE void
 vl_svmpegasos_set_permutation(VlSvmPegasos *self, vl_uint32* p,
-                                   vl_size psize)
+                              vl_size psize)
 {
   self->permutation = p ;
   self->permutationSize = psize ;

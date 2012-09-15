@@ -11,8 +11,8 @@ This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-#ifndef VL_SVM_DATASET_H
-#define VL_SVM_DATASET_H
+#ifndef VL_SVMDATASET_H
+#define VL_SVMDATASET_H
 
 #include "generic.h"
 
@@ -25,24 +25,24 @@ the terms of the BSD license (see the COPYING file).
  ** @destination using the feature map @map
  **/
 typedef void (*VlSvmDatasetFeatureMap)(const void* map, double * destination,
-                                const vl_size stride, const double x) ;
+                                       const vl_size stride, const double x) ;
 
 /** @typedef VlSvmDatasetInnerProduct
  ** @brief Pointer to a function that defines the inner product
  ** between the data point at position @element and the SVM model
  **/
 typedef double (*VlSvmDatasetInnerProduct)(const void* data,
-                                            const vl_uindex element,
-                                            const double* model) ;
+                                           const vl_uindex element,
+                                           const double* model) ;
 
 /** @typedef VlSvmDatasetAccumulator
  ** @brief Pointer to a function that adds to @model the data point at
  ** position @element multiplied by the constant @multiplier
  **/
 typedef void (*VlSvmDatasetAccumulator)(const void* data,
-                                         const vl_uindex element,
-                                         double * model,
-                                         const double multiplier) ;
+                                        const vl_uindex element,
+                                        double * model,
+                                        const double multiplier) ;
 
 
 /* ---------------------------------------------------------------- */
@@ -114,11 +114,11 @@ void vl_svmdataset_accumulator_f(const void* data,
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_INLINE void*   vl_svmdataset_get_data           (VlSvmDataset const *self) ;
-VL_INLINE vl_size vl_svmdataset_get_dimension      (VlSvmDataset const *self) ;
-VL_INLINE void*   vl_svmdataset_get_map            (VlSvmDataset const *self) ;
+VL_INLINE void*   vl_svmdataset_get_data (VlSvmDataset const *self) ;
+VL_INLINE vl_size vl_svmdataset_get_dimension (VlSvmDataset const *self) ;
+VL_INLINE void*   vl_svmdataset_get_map (VlSvmDataset const *self) ;
 VL_INLINE VlSvmDatasetFeatureMap vl_svmdataset_get_map_func (VlSvmDataset const *self) ;
-VL_INLINE vl_size vl_svmdataset_get_order          (VlSvmDataset const *self) ;
+VL_INLINE vl_size vl_svmdataset_get_order (VlSvmDataset const *self) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -184,7 +184,7 @@ vl_svmdataset_get_map_order (VlSvmDataset const *self)
 {
   return self->order ;
 }
-/* VL_SVM_DATASET_H */
+/* VL_SVMDATASET_H */
 #endif
 
 
