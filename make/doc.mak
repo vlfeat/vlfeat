@@ -82,7 +82,7 @@ doc-deep: all $(doc-dir) $(results-dir)
 # Use webdoc.py to generate the website
 #
 
-doc/index.html: \
+doc/index.html doc/mdoc/htmltoc.xml: \
  doc/toolbox-src/mdoc.html \
  doc/man-src/man.xml \
  doc/man-src/man.html \
@@ -96,6 +96,15 @@ doc/index.html: \
 	rsync -arv docsrc/web.css doc
 	rsync -arv docsrc/pygmentize.css doc
 	rsync -arv docsrc/doxygen.css doc
+	rsync -arv doc/toolbox-src/helptoc.xml doc/mdoc/
+
+ifdef MATLAB_PATH
+doc: doc/mdoc/helpsearch/deletable
+endif
+
+# make documentation searchable in MATLAB
+doc/mdoc/helpsearch/deletable: doc/mdoc/htmltoc.xml
+	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "builddocsearchdb('doc/mdoc/') ; exit"
 
 #
 # Use mdoc.py to create the toolbox documentation that will be
@@ -111,6 +120,8 @@ doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
 	          --exclude='.*/vl_test_.*' \
 	          --exclude='.*/vl_demo_.*' \
 	          --exclude='.*/vl_tune_.*' \
+	          --helptoc \
+	          --helptoc-toolbox-name VLFeat \
 	          --verbose
 #
 # Generate C API documentation
