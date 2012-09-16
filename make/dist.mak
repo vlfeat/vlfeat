@@ -210,7 +210,7 @@ post-doc: doc
 	      --exclude=download                                     \
 	      --exclude=cvpr10wiki                                   \
 	      --exclude=man-src                                      \
-	      --exclude=toolbox-src                                  \
+	      --exclude=mdoc.build                                   \
 	      --exclude=.htaccess                                    \
 	      --exclude=favicon.ico                                  \
 	      --delete                                               \

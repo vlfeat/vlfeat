@@ -110,8 +110,8 @@
 
   <dir name="mdoc">
    <page id="mdoc" name="mdoc" title="Matlab API">
-    <include src="doc/toolbox-src/mdoc.html"/>
-    <include src="doc/toolbox-src/mdoc.xml"/>
+    <include src="doc/mdoc.build/mdoc.html"/>
+    <include src="doc/mdoc.build/mdoc.xml"/>
    </page>
   </dir>
 
