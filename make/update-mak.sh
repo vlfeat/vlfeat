@@ -14,7 +14,10 @@ function make
     # sed below removes the trailing '\' from the last entry
     (
         printf '%s \\\n' "$1 ="
-        find "$2" -name '*.c' | tr '/' '\' | while read -r x
+        find "$2" \
+            -name '*.c' \
+            -not -path 'vl/doc/*' \
+            |  tr '/' '\' | while read -r x
         do
             printf '  %s \\\n' "$x"
         done
