@@ -65,6 +65,8 @@ the terms of the BSD license (see the COPYING file).
 /*                                                Image Convolution */
 /* ---------------------------------------------------------------- */
 
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
 /** @fn  vl_imconvcol_vd(double*,int,double const*,int,int,int,double const*,int,int,int,unsigned int)
  ** @brief Convolve image along columns
  **
@@ -113,8 +115,6 @@ the terms of the BSD license (see the COPYING file).
 /** @fn vl_imconvcol_vf(float*,int,float const*,int,int,int,float const*,int,int,int,unsigned int)
  ** @see ::vl_imconvcol_vf()
  **/
-
-#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
 VL_EXPORT void
 VL_XCAT(vl_imconvcol_v, SFX)
@@ -211,9 +211,14 @@ VL_XCAT(vl_imconvcol_v, SFX)
   } /* next x */
 }
 
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
 /* ---------------------------------------------------------------- */
 /*                                         Image distance transform */
 /* ---------------------------------------------------------------- */
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
 /** @fn ::vl_image_distance_transform_d(double const*,vl_size,vl_size,vl_size,vl_size,double*,vl_uindex*,double,double)
  ** @brief Compute the distance transform of an image
@@ -378,10 +383,11 @@ VL_XCAT(vl_image_distance_transform_,SFX)
           inters = (x + x_) / 2.0 + offset ;
         }
 #if (FLT == VL_TYPE_FLOAT)
-        else if (coeff > VL_EPSILON_F) {
+        else if (coeff > VL_EPSILON_F)
 #else
-        else if (coeff > VL_EPSILON_D) {
+        else if (coeff > VL_EPSILON_D)
 #endif
+        {
           inters = ((r - r_) + coeff * (x2 - x2_)) / (x - x_) / (2*coeff) + offset ;
         } else {
           /* If coeff is very small, the parabolas are flat (= lines).
@@ -445,6 +451,8 @@ VL_XCAT(vl_image_distance_transform_,SFX)
 /*                         Image convolution by a triangular kernel */
 /* ---------------------------------------------------------------- */
 
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
 /** @fn vl_imconvcoltri_d(double*,vl_size,double const*,vl_size,vl_size,vl_size,vl_size,vl_size,int unsigned)
  ** @brief Convolve an image along the columns with a triangular kernel
  ** @param dest destination image.
@@ -498,8 +506,6 @@ VL_XCAT(vl_image_distance_transform_,SFX)
  ** @brief Convolve an image along the columns with a triangular kernel
  ** @see ::vl_imconvcoltri_d()
  **/
-
-#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
 
 VL_EXPORT void
 VL_XCAT(vl_imconvcoltri_, SFX)
@@ -585,6 +591,384 @@ VL_XCAT(vl_imconvcoltri_, SFX)
   vl_free (buffer - filterSize) ;
 }
 
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
+/* ---------------------------------------------------------------- */
+/*                                               Gaussian Smoothing */
+/* ---------------------------------------------------------------- */
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
+/** @fn vl_imsmooth_d(double*,vl_size,double const*,vl_size,vl_size,vl_size,double,double)
+ ** @brief Smooth an image with a Gaussian filter
+ ** @param smoothed
+ ** @param smoothedStride
+ ** @param image
+ ** @param width
+ ** @param height
+ ** @param stride
+ ** @param sigmax
+ ** @param sigmay
+ **/
+
+/** @fn vl_imsmooth_f(float*,vl_size,float const*,vl_size,vl_size,vl_size,double,double)
+ ** @brief Smooth an image with a Gaussian filter
+ ** @see ::vl_imsmooth_d
+ **/
+
+static T*
+VL_XCAT(_vl_new_gaussian_fitler_,SFX)(vl_size *size, double sigma)
+{
+  T* filter ;
+  T mass = (T)1.0 ;
+  vl_index i ;
+  vl_size width = vl_ceil_d(sigma*3) ;
+  double factor = -0.5 / (sigma*sigma) ;
+  *size = 2*width+1 ;
+
+  assert(size) ;
+
+  filter = vl_malloc((*size) * sizeof(T)) ;
+  filter[width] = 1.0 ;
+  for (i = 1 ; i <= (signed)width ; ++i) {
+    double g = exp(factor * i) ;
+    mass += g + g ;
+    filter[width-i] = g ;
+    filter[width+i] = g ;
+  }
+  for (i = 0 ; i < (signed)(*size) ; ++i) {filter[i] /= mass ;}
+  return filter ;
+}
+
+VL_EXPORT void
+VL_XCAT(vl_imsmooth_, SFX)
+(T * smoothed, vl_size smoothedStride,
+ T const *image, vl_size width, vl_size height, vl_size stride,
+ double sigmax, double sigmay)
+{
+  T *filterx, *filtery, *buffer ;
+  vl_size sizex, sizey ;
+
+  filterx = VL_XCAT(_vl_new_gaussian_fitler_,SFX)(&sizex,sigmax) ;
+  if (sigmax == sigmay) {
+    filtery = filterx ;
+    sizey = sizex ;
+  } else {
+    filtery = VL_XCAT(_vl_new_gaussian_fitler_,SFX)(&sizey,sigmay) ;
+  }
+  buffer = vl_malloc(width*height*sizeof(T)) ;
+
+  VL_XCAT(vl_imconvcol_v,SFX) (buffer, height,
+                               image, width, height, stride,
+                               filtery,
+                               -((signed)sizey-1)/2, ((signed)sizey-1)/2,
+                               1, VL_PAD_BY_CONTINUITY | VL_TRANSPOSE) ;
+
+  VL_XCAT(vl_imconvcol_v,SFX) (smoothed, smoothedStride,
+                               buffer, height, width, height,
+                               filterx,
+                               -((signed)sizex-1)/2, ((signed)sizex-1)/2,
+                               1, VL_PAD_BY_CONTINUITY | VL_TRANSPOSE) ;
+
+  vl_free(filterx) ;
+  if (sigmax != sigmay) {
+    vl_free(filtery) ;
+  }
+}
+
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
+/* ---------------------------------------------------------------- */
+/*                                                   Image Gradient */
+/* ---------------------------------------------------------------- */
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
+/** @fn vl_imgradient_d(double*,double*,vl_size,vl_size,double*,vl_size,vl_size,vl_size)
+ ** @brief Compute image gradient
+ ** @param xGradient Pointer to amplitude gradient plane
+ ** @param yGradient Pointer to angle gradient plane
+ ** @param gradWidthStride Width of the gradient plane including padding
+ ** @param gradHeightStride Height of the gradient plane including padding
+ ** @param image Pointer to the source image
+ ** @param imageWidth Source image width
+ ** @param imageHeight Source image height
+ ** @param imageStride Width of the image including padding.
+ **
+ ** This functions computes the amplitudes and angles of input image gradient.
+ **
+ ** Gradient is computed simple by gradient kernel \f$ (-1 ~ 1) \f$,
+ ** \f$ (-1 ~ 1)^T \f$ for border pixels and with sobel filter kernel
+ ** \f$ (-0.5 ~ 0 ~ 0.5) \f$, \f$ (-0.5 ~ 0 ~ 0.5)^T \f$ otherwise on the input
+ ** image @a image yielding x-gradient \f$ dx \f$, stored in @a xGradient and
+ ** y-gradient \f$ dy \f$, stored in @a yGradient, respectively.
+ **
+ ** This function also allows to process only part of the input image
+ ** defining the @a imageStride as original image width and @a width as
+ ** width of the sub-image.
+ **
+ ** Also it allows to easily align the output data by definition
+ ** of the @a gradWidthStride and @a gradHeightStride .
+ **/
+
+/** @fn vl_imgradient_f(float*,float*,vl_size,vl_size,float*,vl_size,vl_size,vl_size)
+ ** @brief Compute image gradient
+ ** @see ::vl_imgradient_d
+ **/
+
+VL_EXPORT void
+VL_XCAT(vl_imgradient_, SFX)
+(T * xGradient, T * yGradient,
+ vl_size gradWidthStride, vl_size gradHeightStride,
+ T * image,
+ vl_size imageWidth, vl_size imageHeight,
+ vl_size imageStride)
+{
+  /* Shortcuts */
+  vl_index const xo = 1 ;
+  vl_index const yo = imageStride ;
+  vl_size const w = imageWidth;
+  vl_size const h = imageHeight;
+
+  T *src, *end, *pgrad_x, *pgrad_y;
+  vl_size y;
+
+  src  = image ;
+  pgrad_x = xGradient ;
+  pgrad_y = yGradient ;
+
+  /* first pixel of the first row */
+  *pgrad_x = src[+xo] - src[0] ;
+  pgrad_x += gradWidthStride;
+  *pgrad_y = src[+yo] - src[0] ;
+  pgrad_y += gradWidthStride;
+  src++;
+
+  /* middle pixels of the  first row */
+  end = (src - 1) + w - 1 ;
+  while (src < end) {
+    *pgrad_x = 0.5 * (src[+xo] - src[-xo]) ;
+    pgrad_x += gradWidthStride;
+    *pgrad_y =        src[+yo] - src[0] ;
+    pgrad_y += gradWidthStride;
+    src++;
+  }
+
+  /* last pixel of the first row */
+  *pgrad_x = src[0]   - src[-xo] ;
+  pgrad_x += gradWidthStride;
+  *pgrad_y = src[+yo] - src[0] ;
+  pgrad_y += gradWidthStride;
+  src++;
+
+  xGradient += gradHeightStride;
+  pgrad_x = xGradient;
+  yGradient += gradHeightStride;
+  pgrad_y = yGradient;
+  image += yo;
+  src = image;
+
+  for (y = 1 ; y < h -1 ; ++y) {
+
+    /* first pixel of the middle rows */
+    *pgrad_x =        src[+xo] - src[0] ;
+    pgrad_x += gradWidthStride;
+    *pgrad_y = 0.5 * (src[+yo] - src[-yo]) ;
+    pgrad_y += gradWidthStride;
+    src++;
+
+    /* middle pixels of the middle rows */
+    end = (src - 1) + w - 1 ;
+    while (src < end) {
+      *pgrad_x = 0.5 * (src[+xo] - src[-xo]) ;
+      pgrad_x += gradWidthStride;
+      *pgrad_y = 0.5 * (src[+yo] - src[-yo]) ;
+      pgrad_y += gradWidthStride;
+      src++;
+    }
+
+    /* last pixel of the middle row */
+    *pgrad_x =        src[0]   - src[-xo] ;
+    pgrad_x += gradWidthStride;
+    *pgrad_y = 0.5 * (src[+yo] - src[-yo]) ;
+    pgrad_y += gradWidthStride;
+    src++;
+
+    xGradient += gradHeightStride;
+    pgrad_x = xGradient;
+    yGradient += gradHeightStride;
+    pgrad_y = yGradient;
+    image += yo;
+    src = image;
+  }
+
+  /* first pixel of the last row */
+  *pgrad_x = src[+xo] - src[0] ;
+  pgrad_x += gradWidthStride;
+  *pgrad_y = src[  0] - src[-yo] ;
+  pgrad_y += gradWidthStride;
+  src++;
+
+  /* middle pixels of the last row */
+  end = (src - 1) + w - 1 ;
+  while (src < end) {
+    *pgrad_x = 0.5 * (src[+xo] - src[-xo]) ;
+    pgrad_x += gradWidthStride;
+    *pgrad_y =        src[0]   - src[-yo] ;
+    pgrad_y += gradWidthStride;
+    src++;
+  }
+
+  /* last pixel of the last row */
+  *pgrad_x = src[0]   - src[-xo] ;
+  *pgrad_y = src[0]   - src[-yo] ;
+}
+/* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
+#endif
+
+
+/** @fn vl_imgradient_polar_d(double*,double*,vl_size,vl_size,double const*,vl_size,vl_size,vl_size)
+ ** @brief Compute gradient amplitudes and directions of an image.
+ ** @param amplitudeGradient Pointer to amplitude gradient plane
+ ** @param angleGradient Pointer to angle gradient plane
+ ** @param gradWidthStride Width of the gradient plane including padding
+ ** @param gradHeightStride Height of the gradient plane including padding
+ ** @param src Pointer to the source image
+ ** @param imageWidth Source image width
+ ** @param imageHeight Source image height
+ ** @param imageStride Width of the source image including padding.
+ **
+ ** This functions computes the amplitudes and angles of input image gradient.
+ **
+ ** Gradient is computed simple by gradient kernel \f$ (-1 ~ 1) \f$,
+ ** \f$ (-1 ~ 1)^T \f$ for border pixels and with sobel filter kernel
+ ** \f$ (-0.5 ~ 0 ~ 0.5) \f$, \f$ (-0.5 ~ 0 ~ 0.5)^T \f$ otherwise on the input
+ ** image @a image yielding x-gradient \f$ dx \f$, stored in @a xGradient and
+ ** y-gradient \f$ dy \f$, stored in @a yGradient, respectively.
+ **
+ ** The amplitude of the gradient, stored in plane @a amplitudeGradient,
+ ** is then calculated as \f$ \sqrt(dx^2+dy^2) \f$  and the angle
+ ** of the gradient, stored in @a angleGradient is \f$ atan(\frac{dy}{dx}) \f$
+ ** normalised into interval 0 and @f$ 2\pi @f$.
+ **
+ ** This function also allows to process only part of the input image
+ ** defining the @a imageStride as original image width and @a width as
+ ** width of the sub-image.
+ **
+ ** Also it allows to easily align the output data by definition
+ ** of the @a gradWidthStride and @a gradHeightStride .
+ **/
+
+/** @fn vl_imgradient_polar_f(float*,float*,vl_size,vl_size,float const*,vl_size,vl_size,vl_size)
+ ** @brief Compute gradient amplitudes and directions of an image.
+ ** @see ::vl_imgradient_polar_f
+ **/
+
+#if (FLT == VL_TYPE_FLOAT || FLT == VL_TYPE_DOUBLE)
+
+VL_EXPORT void
+VL_XCAT(vl_imgradient_polar_, SFX)
+(T * gradientModulus, T * gradientAngle,
+ vl_size gradientHorizontalStride, vl_size gradHeightStride,
+ T const* image,
+ vl_size imageWidth, vl_size imageHeight, vl_size imageStride)
+{
+  /* Shortcuts */
+  int const xo    = 1 ;
+  int const yo    = imageStride ;
+  vl_size const w = imageWidth;
+  vl_size const h = imageHeight;
+
+  T const *src, *end;
+  T *pgrad_angl, *pgrad_ampl;
+  T gx, gy ;
+  vl_size y;
+
+#define SAVE_BACK                                                    \
+*pgrad_ampl = vl_fast_sqrt_f (gx*gx + gy*gy) ;                       \
+pgrad_ampl += gradientHorizontalStride ;                             \
+*pgrad_angl = vl_mod_2pi_f   (vl_fast_atan2_f (gy, gx) + 2*VL_PI) ;  \
+pgrad_angl += gradientHorizontalStride ;                             \
+++src ;                                                              \
+
+  src  = image ;
+  pgrad_angl = gradientAngle ;
+  pgrad_ampl = gradientModulus ;
+
+  /* first pixel of the first row */
+  gx = src[+xo] - src[0] ;
+  gy = src[+yo] - src[0] ;
+  SAVE_BACK ;
+
+  /* middle pixels of the  first row */
+  end = (src - 1) + w - 1 ;
+  while (src < end) {
+    gx = 0.5 * (src[+xo] - src[-xo]) ;
+    gy =        src[+yo] - src[0] ;
+    SAVE_BACK ;
+  }
+
+  /* last pixel of the first row */
+  gx = src[0]   - src[-xo] ;
+  gy = src[+yo] - src[0] ;
+  SAVE_BACK ;
+
+  gradientModulus += gradHeightStride;
+  pgrad_ampl = gradientModulus;
+  gradientAngle += gradHeightStride;
+  pgrad_angl = gradientAngle;
+  image += imageStride;
+  src = image;
+
+  for (y = 1 ; y < h -1 ; ++y) {
+
+    /* first pixel of the middle rows */
+    gx =        src[+xo] - src[0] ;
+    gy = 0.5 * (src[+yo] - src[-yo]) ;
+    SAVE_BACK ;
+
+    /* middle pixels of the middle rows */
+    end = (src - 1) + w - 1 ;
+    while (src < end) {
+      gx = 0.5 * (src[+xo] - src[-xo]) ;
+      gy = 0.5 * (src[+yo] - src[-yo]) ;
+      SAVE_BACK ;
+    }
+
+    /* last pixel of the middle row */
+    gx =        src[0]   - src[-xo] ;
+    gy = 0.5 * (src[+yo] - src[-yo]) ;
+    SAVE_BACK ;
+
+    gradientModulus += gradHeightStride;
+    pgrad_ampl = gradientModulus;
+    gradientAngle += gradHeightStride;
+    pgrad_angl = gradientAngle;
+    image += imageStride;
+    src = image;
+  }
+
+  /* first pixel of the last row */
+  gx = src[+xo] - src[0] ;
+  gy = src[  0] - src[-yo] ;
+  SAVE_BACK ;
+
+  /* middle pixels of the last row */
+  end = (src - 1) + w - 1 ;
+  while (src < end) {
+    gx = 0.5 * (src[+xo] - src[-xo]) ;
+    gy =        src[0]   - src[-yo] ;
+    SAVE_BACK ;
+  }
+
+  /* last pixel of the last row */
+  gx = src[0]   - src[-xo] ;
+  gy = src[0]   - src[-yo] ;
+  SAVE_BACK ;
+
+}
 /* VL_TYPE_FLOAT, VL_TYPE_DOUBLE */
 #endif
 

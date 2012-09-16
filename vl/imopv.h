@@ -105,5 +105,60 @@ vl_image_distance_transform_f (float const * image,
 
 /** @} */
 
+/* ---------------------------------------------------------------- */
+/** @name Image smoothing */
+/** @{ */
+
+VL_EXPORT void
+vl_imsmooth_f (float *smoothed, vl_size smoothedStride,
+               float const *image, vl_size width, vl_size height, vl_size stride,
+               double sigmax, double sigmay) ;
+
+VL_EXPORT void
+vl_imsmooth_d (double *smoothed, vl_size smoothedStride,
+               double const *image, vl_size width, vl_size height, vl_size stride,
+               double sigmax, double sigmay) ;
+
+/** @} */
+
+/* ---------------------------------------------------------------- */
+/** @name Image gradients */
+/** @{ */
+VL_EXPORT void
+vl_imgradient_polar_f (float* amplitudeGradient, float* angleGradient,
+                       vl_size gradWidthStride, vl_size gradHeightStride,
+                       float const* image,
+                       vl_size imageWidth, vl_size imageHeight,
+                       vl_size imageStride);
+
+VL_EXPORT void
+vl_imgradient_polar_d (double* amplitudeGradient, double* angleGradient,
+                       vl_size gradWidthStride, vl_size gradHeightStride,
+                       double const* image,
+                       vl_size imageWidth, vl_size imageHeight,
+                       vl_size imageStride);
+
+VL_EXPORT void
+vl_imgradient_f (float* xGradient, float* yGradient,
+                 vl_size gradWidthStride, vl_size gradHeightStride,
+                 float* image,
+                 vl_size imageWidth, vl_size imageHeight, vl_size imageStride);
+
+VL_EXPORT void
+vl_imgradient_d(double* xGradient, double* yGradient,
+                vl_size gradWidthStride, vl_size gradHeightStride,
+                double* image,
+                vl_size imageWidth, vl_size imageHeight, vl_size imageStride);
+
+VL_EXPORT void
+vl_imgradient_polar_f_callback(float const *sourceImage,
+                               int sourceImageWidth, int sourceImageHeight,
+                               float *dstImage,
+                               int dstWidth, int dstHeight,
+                               int octave, int level,
+                               void *params);
+
+/** @} */
+
 /* VL_IMOPV_H */
 #endif
