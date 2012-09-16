@@ -34,6 +34,11 @@
 		2D1EECEE1603E8E900C63DCE /* slic.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D94E6BC148E48440089ADA5 /* slic.c */; };
 		2D1EECEF1603E8E900C63DCE /* stringop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E980CF8C2E40099B03C /* stringop.c */; };
 		2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EECCC1603E1B100C63DCE /* svmdataset.c */; };
+		2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED1D1604992A00C63DCE /* scalespace.c */; };
+		2D1EED201604992B00C63DCE /* scalespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1EED1E1604992A00C63DCE /* scalespace.h */; };
+		2D1EED2C1605008600C63DCE /* covdet2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED2B1605008600C63DCE /* covdet2.c */; };
+		2DB3F05D1605ED2300862CCA /* vl_covdet.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DB3F04F1605DFDB00862CCA /* vl_covdet.c */; };
+		2DB3F06B1605F3A100862CCA /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,6 +96,12 @@
 		2D1EED1A16046F1C00C63DCE /* vl_twister.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_twister.c; path = toolbox/misc/vl_twister.c; sourceTree = "<group>"; };
 		2D1EED1B16046F1C00C63DCE /* vl_ubcmatch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
 		2D1EED1C16046F1C00C63DCE /* vl_version.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
+		2D1EED1D1604992A00C63DCE /* scalespace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scalespace.c; sourceTree = "<group>"; };
+		2D1EED1E1604992A00C63DCE /* scalespace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scalespace.h; sourceTree = "<group>"; };
+		2D1EED211604FE5900C63DCE /* covdet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet.c; sourceTree = "<group>"; };
+		2D1EED221604FE5900C63DCE /* covdet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = covdet.h; sourceTree = "<group>"; };
+		2D1EED2B1605008600C63DCE /* covdet2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet2.c; sourceTree = "<group>"; };
+		2D1EED2D1605009D00C63DCE /* covdet2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = covdet2.h; sourceTree = "<group>"; };
 		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
 		2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
 		2D3E1F2C15FE93480035AA1E /* license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = license.html; path = docsrc/license.html; sourceTree = "<group>"; };
@@ -412,6 +423,9 @@
 		2DB1A290110CE32F00E02BD8 /* samplinthist.tc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = samplinthist.tc; path = toolbox/misc/samplinthist.tc; sourceTree = "<group>"; };
 		2DB1A2A1110D09B200E02BD8 /* vl_quickshift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_quickshift.c; path = toolbox/quickshift/vl_quickshift.c; sourceTree = "<group>"; };
 		2DB1A2A2110D09B200E02BD8 /* vl_version.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_version.c; path = toolbox/misc/vl_version.c; sourceTree = "<group>"; };
+		2DB3F04F1605DFDB00862CCA /* vl_covdet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_covdet.c; path = ../toolbox/sift/vl_covdet.c; sourceTree = "<group>"; };
+		2DB3F0501605DFDB00862CCA /* vl_covdet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_covdet.m; path = toolbox/sift/vl_covdet.m; sourceTree = "<group>"; };
+		2DB3F0591605EC0B00862CCA /* vl_covdet.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = vl_covdet.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DB6ABF214CDB7B500A27D16 /* vl_hog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_hog.c; path = toolbox/misc/vl_hog.c; sourceTree = "<group>"; };
 		2DBD0AA110F78FEB004DBA31 /* qsort-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "qsort-def.h"; sourceTree = "<group>"; };
 		2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test_qsort-def.c"; sourceTree = "<group>"; };
@@ -443,6 +457,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2DB3F0561605EC0B00862CCA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DB3F06B1605F3A100862CCA /* libvl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -461,6 +483,7 @@
 				2D66AAAE13AE03B20060594E /* toolbox-mfiles */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D7AD0870E38C15700783252 /* doc */,
+				2DB3F0591605EC0B00862CCA /* vl_covdet.mexmaci64 */,
 				2D1EECD21603E85200C63DCE /* libvl.dylib */,
 			);
 			indentWidth = 2;
@@ -587,6 +610,7 @@
 				2D66AC6C13AE05BD0060594E /* vl_clicksegment.m */,
 				2D66AC6D13AE05BD0060594E /* vl_colsubset.m */,
 				2D66AC6E13AE05BD0060594E /* vl_compile.m */,
+				2DB3F0501605DFDB00862CCA /* vl_covdet.m */,
 				2D66AC6F13AE05BD0060594E /* vl_ddgaussian.m */,
 				2D66AC8A13AE05BD0060594E /* vl_dgaussian.m */,
 				2D66AC8B13AE05BD0060594E /* vl_dsift.m */,
@@ -743,6 +767,13 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
+				2D1EED2B1605008600C63DCE /* covdet2.c */,
+				2D1EED2D1605009D00C63DCE /* covdet2.h */,
+				2D1EED211604FE5900C63DCE /* covdet.c */,
+				2D1EED221604FE5900C63DCE /* covdet.h */,
+				2DB3F04F1605DFDB00862CCA /* vl_covdet.c */,
+				2D1EED1D1604992A00C63DCE /* scalespace.c */,
+				2D1EED1E1604992A00C63DCE /* scalespace.h */,
 				2DBD0B2110F7AB58004DBA31 /* metaprograms */,
 				2D732E7E0CF8C2E40099B03C /* aib.c */,
 				2D732E7F0CF8C2E40099B03C /* aib.h */,
@@ -947,6 +978,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D1EED201604992B00C63DCE /* scalespace.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DB3F0571605EC0B00862CCA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1015,6 +1054,23 @@
 			productReference = 2D1EECD21603E85200C63DCE /* libvl.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		2DB3F0581605EC0B00862CCA /* vl_covdet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DB3F05A1605EC0B00862CCA /* Build configuration list for PBXNativeTarget "vl_covdet" */;
+			buildPhases = (
+				2DB3F0551605EC0B00862CCA /* Sources */,
+				2DB3F0561605EC0B00862CCA /* Frameworks */,
+				2DB3F0571605EC0B00862CCA /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vl_covdet;
+			productName = vl_covdet;
+			productReference = 2DB3F0591605EC0B00862CCA /* vl_covdet.mexmaci64 */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1039,6 +1095,7 @@
 				2D72E9C90E4765D2005DAA47 /* make doc-api */,
 				2D72EA220E476C05005DAA47 /* make info */,
 				2D1EECD11603E85200C63DCE /* vl */,
+				2DB3F0581605EC0B00862CCA /* vl_covdet */,
 			);
 		};
 /* End PBXProject section */
@@ -1075,6 +1132,16 @@
 				2D1EECEE1603E8E900C63DCE /* slic.c in Sources */,
 				2D1EECEF1603E8E900C63DCE /* stringop.c in Sources */,
 				2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */,
+				2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */,
+				2D1EED2C1605008600C63DCE /* covdet2.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DB3F0551605EC0B00862CCA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DB3F05D1605ED2300862CCA /* vl_covdet.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1140,7 +1207,11 @@
 				DOXYGEN = doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/toolbox",
+					"$(MATLABROOT)/extern/include",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2011A.app;
@@ -1188,7 +1259,11 @@
 				DOXYGEN = doxygen;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(MATLABROOT)/extern/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/toolbox",
+					"$(MATLABROOT)/extern/include",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2011A.app;
@@ -1221,6 +1296,68 @@
 			};
 			name = Release;
 		};
+		2DB3F05B1605EC0B00862CCA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2DB3F05C1605EC0B00862CCA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1240,6 +1377,7 @@
 				2D1EECD51603E85200C63DCE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2D72E9CA0E4765D2005DAA47 /* Build configuration list for PBXLegacyTarget "make doc-api" */ = {
 			isa = XCConfigurationList;
@@ -1264,6 +1402,15 @@
 			buildConfigurations = (
 				2D8E1B7D13720C55009CDE11 /* Debug */,
 				2D8E1B8113720C5E009CDE11 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DB3F05A1605EC0B00862CCA /* Build configuration list for PBXNativeTarget "vl_covdet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DB3F05B1605EC0B00862CCA /* Debug */,
+				2DB3F05C1605EC0B00862CCA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
