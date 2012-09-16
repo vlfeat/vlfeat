@@ -1,11 +1,12 @@
 /** @file vl_svmpegasos.c
  ** @brief vl_svmpegasos MEX definition
- ** @author Andrea Vedaldi
  ** @author Daniele Perrone
+ ** @author Andrea Vedaldi
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2012 Daniele Perrone.
+Copyright (C) 2011-12 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
