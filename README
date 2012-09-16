@@ -1,8 +1,8 @@
                    VLFeat (Vision Library Features)
                             Version 0.9.15
-                           The VLFeat Team
 
 ABOUT
+
   The VLFeat open source library implements popular computer vision
   algorithms including SIFT, MSER, k-means, hierarchical k-means,
   agglomerative information bottleneck, and quick shift. It is written
@@ -12,36 +12,37 @@ ABOUT
 
   VLFeat is distributed under the BSD license (see the COPYING file).
 
-  The documentation is available online at http://www.vlfeat.org/index.html.
-  A copy is also shipped with the library in doc/index.html.
+  The documentation is available online at
+  http://www.vlfeat.org/index.html. A copy of the same is shipped with
+  the library in doc/index.html. See also:
 
-QUICK START WITH MATLAB
-  Download the latest binary package of VLFeat at
-  http://www.vlfeat.org/download/. Unpack the archive using WinZIP
-  (Windows), double clicking on the archive (Mac), or using the
-  command line (Linux and Mac):
-
-  > tar xzf vlfeat-X.Y.Z-bin.tar.gz
-
-  where X.Y.Z is the latest version. Start MATLAB and run the VLFeat
-  setup instruction:
-
-  > run VLFEATROOT/toolbox/vl_setup
-
-  where VLFEATROOT is the path to the directory just unpacked. All
-  VLFeat demos can now be run in a row by the command:
-
-  > vl_demo
-
-PERMANENT INSTALLATION, COMPILING, LINKING, COMMAND LINE UTILITIES
-  See the instructions at:
-
-  * Installing permanently in MATLAB: http://www.vlfeat.org/install-matlab.html
+  * Installing VLFeat permanently in MATLAB: http://www.vlfeat.org/install-matlab.html
   * Using the command line utilities: http://www.vlfeat.org/install-shell.html
   * Linking to your C program: http://www.vlfeat.org/install-c.html
   * Compiling from source: http://www.vlfeat.org/compiling.html
 
+QUICK START WITH MATLAB
+
+  To start using VLFeat as a MATLAB toolbox, download the latest
+  VLFeat binary package from http://www.vlfeat.org/download/. Unpack
+  it, for example by using WinZIP (Windows), by double clicking on the
+  archive (Mac), or by using the command line (Linux and Mac):
+
+  > tar xzf vlfeat-X.Y.Z-bin.tar.gz
+
+  Here X.Y.Z denotes the latest version. Start MATLAB and run the
+  VLFeat setup command:
+
+  > run VLFEATROOT/toolbox/vl_setup
+
+  Here VLFEATROOT is the path to the VLFeat directory created by
+  unpacking the archive. All VLFeat demos can now be run in a row by
+  the command:
+
+  > vl_demo
+
 CHANGES
+
   0.9.15     Added VL_HOG() (HOG features). Added VL_SVMPEGASOS() and
              a vastly improved SVM implementation. Added IHASHSUM (hashed
              counting). Improved INTHIST (integral histogram). Added
@@ -51,8 +52,7 @@ CHANGES
              support for Xcode 4.3, improved support for past and
              future Xcode versions. Completed the migration of the old
              test code in toolbox/test, moving the functionality to
-             the new unit tests toolbox/xtest. Credited authorship to
-             the VLFeat Team.
+             the new unit tests toolbox/xtest.
   0.9.14     Added SLIC superpixels. Added VL_ALPHANUM(). Improved
              Windows binary package and added support for Visual
              Studio 2010. Improved the documentation layout and added
