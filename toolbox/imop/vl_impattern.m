@@ -27,6 +27,9 @@ function im = vl_impattern(varargin)
 %   UniformNoise::
 %     Random i.i.d. noise.
 %
+%   Blobs:
+%     Gaussian blobs of various sizes and skews.
+%
 %   A stock image::
 %     Any of 'box', 'roofs1', 'roofs2', 'river1', 'river2', 'spotted'.
 %
@@ -45,6 +48,7 @@ else
 end
 
 patterns = {'wedge','cone','smoothChecker','threeDotsSquare', ...
+            'blobs', ...
             'box', 'roofs1', 'roofs2', 'river1', 'river2'} ;
 
 % spooling
@@ -54,6 +58,7 @@ switch lower(pattern)
   case 'smoothchecker', im = smoothChecker(varargin) ;
   case 'threedotssquare', im = threeDotSquare(varargin) ;
   case 'uniformnoise', im = uniformNoise(varargin) ;
+  case 'blobs', im = blobs(varargin) ;
   case {'box','roofs1','roofs2','river1','river2','spots'}
     im = stockImage(pattern, varargin) ;
   case 'gallery'
@@ -66,8 +71,16 @@ switch lower(pattern)
       title(patterns{p}) ;
     end
     colormap gray ;
+    return ;
   otherwise
     error('Unknown patter ''%s''.', pattern) ;
+end
+
+if nargout == 0
+  clf ; imagesc(im) ; hold on ;
+  colormap gray ; axis image off ;
+  title(pattern) ;
+  clear im ;
 end
 
 function [u,v,opts,args] = commonOpts(args)
@@ -110,6 +123,27 @@ im(-1/3<u & u<1/3 & -1/3<v & v<1/3) = .50 ;
 im(i,j1) = 0 ;
 im(i,j2) = 0 ;
 im(i,j3) = 0 ;
+
+function im = blobs(args)
+[u,v,opts,args] = commonOpts(args) ;
+im = zeros(size(u)) ;
+num = 5 ;
+square = 2 / num ;
+sigma = square / 2 / 3 ;
+scales = logspace(log10(0.5), log10(1), num) ;
+skews = linspace(1,2,num) ;
+for i=1:num
+  for j=1:num
+    cy = (i-1) * square + square/2 - 1;
+    cx = (j-1) * square + square/2 - 1;
+    A = sigma * diag([scales(i) scales(i)/skews(j)])  * [1 -1 ; 1 1] / sqrt(2)  ;
+    C = inv(A'*A) ;
+    x = u - cx ;
+    y = v - cy ;
+    im = im + exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
+  end
+end
+im = im / max(im(:)) ;
 
 function im = uniformNoise(args)
 opts.size = [128 128] ;
