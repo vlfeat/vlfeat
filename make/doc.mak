@@ -71,7 +71,7 @@ doc: doc-api doc-man doc-web
 doc-man: doc/man-src/man.xml doc/man-src/man.html
 doc-api: doc/api/index.html
 doc-web: doc/index.html
-doc-toolbox: doc/toolbox-src/mdoc.html
+doc-toolbox: doc/mdoc.build/mdoc.html
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
@@ -82,8 +82,8 @@ doc-deep: all $(doc-dir) $(results-dir)
 # Use webdoc.py to generate the website
 #
 
-doc/index.html doc/mdoc/htmltoc.xml: \
- doc/toolbox-src/mdoc.html \
+doc/index.html: \
+ doc/mdoc.build/mdoc.html \
  doc/man-src/man.xml \
  doc/man-src/man.html \
  docsrc/web.xml \
@@ -92,27 +92,28 @@ doc/index.html doc/mdoc/htmltoc.xml: \
  $(img_tgt) $(html_src)
 	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py --outdir=doc \
 	     docsrc/web.xml --verbose
-	rsync -arv docsrc/images doc
-	rsync -arv docsrc/web.css doc
-	rsync -arv docsrc/pygmentize.css doc
-	rsync -arv docsrc/doxygen.css doc
-	rsync -arv doc/toolbox-src/helptoc.xml doc/mdoc/
+	rsync -rv docsrc/images doc/
+	cp -v docsrc/web.css doc/
+	cp -v docsrc/pygmentize.css doc/
+	cp -v docsrc/doxygen.css doc/
+	cp -v doc/mdoc.build/helptoc.xml doc/mdoc/
+	rsync -rv doc/mdoc.build/helpsearch doc/mdoc/
 
 ifdef MATLAB_PATH
-doc: doc/mdoc/helpsearch/deletable
+doc/index.html: doc/mdoc.build/helpsearch/deletable
 endif
 
 # make documentation searchable in MATLAB
-doc/mdoc/helpsearch/deletable: doc/mdoc/htmltoc.xml
-	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "builddocsearchdb('doc/mdoc/') ; exit"
+doc/mdoc.build/helpsearch/deletable: doc/mdoc.build/htmltoc.xml
+	$(MATLAB_EXE) -$(ARCH) -nodisplay -r "builddocsearchdb('doc/mdoc.build/') ; exit"
 
 #
 # Use mdoc.py to create the toolbox documentation that will be
 # embedded in the website.
 #
 
-doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
-	$(PYTHON) docsrc/mdoc.py toolbox doc/toolbox-src \
+doc/mdoc.build/mdoc.html doc/mdoc.build/htmltoc.xml : $(m_src) docsrc/mdoc.py make/doc.mak
+	$(PYTHON) docsrc/mdoc.py toolbox doc/mdoc.build \
 	          --format=web \
 	          --exclude='noprefix/.*' \
                   --exclude='xtune/.*' \
@@ -124,7 +125,9 @@ doc/toolbox-src/mdoc.html : $(m_src) docsrc/mdoc.py make/doc.mak
 	          --helptoc-toolbox-name VLFeat \
 	          --verbose
 #
-# Generate C API documentation
+# Generate C API documentation. Doxygen should run after Webdoc
+# because it replaces in place the file doc/api/index.html constructed
+# by the latter. Running Webdoc after Doxygen will overwrite this file.
 #
 
 doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
