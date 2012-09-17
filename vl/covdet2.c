@@ -179,7 +179,7 @@ v CMP *(pt - yo - xo) )
                                       requiredSize + 2000 * 2 * sizeof(vl_index)) ;
           assert(err == VL_ERR_OK) ;
         }
-        (*extrema) [3 * (numExtrema - 1) + 0] = x ;
+        (*extrema) [2 * (numExtrema - 1) + 0] = x ;
         (*extrema) [2 * (numExtrema - 1) + 1] = y ;
       }
       pt += xo ;
@@ -211,15 +211,103 @@ vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
   vl_size const xo = 1 ;
   vl_size const yo = width ;
   vl_size const zo = width * height ;
-  refined->xi = x ;
-  refined->yi = y ;
-  refined->zi = z ;
-  refined->x = x ;
-  refined->y = y ;
-  refined->z = z ;
-  refined->peakScore = *(map + xo*x + yo*y + zo*z) ;
-  refined->edgeScore = 5.0 ;
-  return VL_TRUE ;
+
+  double Dx=0,Dy=0,Dz=0,Dxx=0,Dyy=0,Dzz=0,Dxy=0,Dxz=0,Dyz=0 ;
+  double A [3*3], b [3] ;
+
+#define at(dx,dy,dz) (*(pt + (dx)*xo + (dy)*yo + (dz)*zo))
+#define Aat(i,j) (A[(i)+(j)*3])
+
+  float const * pt ;
+  vl_index dx = 0 ;
+  vl_index dy = 0 ;
+  vl_index dz = 0 ;
+  vl_index iter ;
+  int err ;
+
+  assert (map) ;
+  assert (1 <= x && x <= (signed)width - 2) ;
+  assert (1 <= y && y <= (signed)height - 2) ;
+  assert (1 <= z && z <= (signed)depth - 2) ;
+
+  for (iter = 0 ; iter < 5 ; ++iter) {
+    x += dx ;
+    y += dy ;
+    pt = map + x*xo + y*yo + z*zo ;
+
+    /* compute the gradient */
+    Dx = 0.5 * (at(+1,0,0) - at(-1,0,0)) ;
+    Dy = 0.5 * (at(0,+1,0) - at(0,-1,0));
+    Dz = 0.5 * (at(0,0,+1) - at(0,0,-1)) ;
+
+    /* compute the Hessian */
+    Dxx = (at(+1,0,0) + at(-1,0,0) - 2.0 * at(0,0,0)) ;
+    Dyy = (at(0,+1,0) + at(0,-1,0) - 2.0 * at(0,0,0)) ;
+    Dzz = (at(0,0,+1) + at(0,0,-1) - 2.0 * at(0,0,0)) ;
+
+    Dxy = 0.25 * (at(+1,+1,0) + at(-1,-1,0) - at(-1,+1,0) - at(+1,-1,0)) ;
+    Dxz = 0.25 * (at(+1,0,+1) + at(-1,0,-1) - at(-1,0,+1) - at(+1,0,-1)) ;
+    Dyz = 0.25 * (at(0,+1,+1) + at(0,-1,-1) - at(0,-1,+1) - at(0,+1,-1)) ;
+
+    /* solve linear system */
+    Aat(0,0) = Dxx ;
+    Aat(1,1) = Dyy ;
+    Aat(2,2) = Dzz ;
+    Aat(0,1) = Aat(1,0) = Dxy ;
+    Aat(0,2) = Aat(2,0) = Dxz ;
+    Aat(1,2) = Aat(2,1) = Dyz ;
+
+    b[0] = - Dx ;
+    b[1] = - Dy ;
+    b[2] = - Dz ;
+
+    err = vl_solve_linear_system_3(b, A, b) ;
+
+    if (err != VL_ERR_OK) {
+      b[0] = 0 ;
+      b[1] = 0 ;
+      b[2] = 0 ;
+      break ;
+    }
+
+    /* Keep going if there is sufficient translation */
+
+    dx = (b[0] > 0.6 && x < (signed)width - 2 ?  1 : 0)
+    + (b[0] < -0.6 && x > 1 ? -1 : 0) ;
+
+    dy = (b[1] > 0.6 && y < (signed)height - 2 ?  1 : 0)
+    + (b[1] < -0.6 && y > 1 ? -1 : 0) ;
+
+    if (dx == 0 && dy == 0) break ;
+  }
+
+  /* check threshold and other conditions */
+  {
+    double peakScore = at(0,0,0)
+    + 0.5 * (Dx * b[0] + Dy * b[1] + Dz * b[2]) ;
+    double alpha = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
+    double edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+
+    refined->xi = x ;
+    refined->yi = y ;
+    refined->zi = z ;
+    refined->x = x + b[0] ;
+    refined->y = y + b[1] ;
+    refined->z = z + b[2] ;
+    refined->peakScore = peakScore ;
+    refined->edgeScore = edgeScore ;
+
+    return
+    err == VL_ERR_OK &&
+    vl_abs_d(b[0]) < 1.5 &&
+    vl_abs_d(b[1]) < 1.5 &&
+    vl_abs_d(b[2]) < 1.5 &&
+    0 <= refined->x && refined->x <= (signed)width - 1 &&
+    0 <= refined->y && refined->y <= (signed)height - 1 &&
+    0 <= refined->z && refined->z <= (signed)depth - 1 ;
+  }
+#undef Aat
+#undef at
 }
 
 /** @brief Refine extrema in 3D function
@@ -242,13 +330,86 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 {
   vl_size const xo = 1 ;
   vl_size const yo = width ;
-  refined->xi = x ;
-  refined->yi = y ;
-  refined->x = x ;
-  refined->y = y ;
-  refined->peakScore = *(map + xo*x + yo*y) ;
-  refined->edgeScore = 5.0 ;
-  return VL_TRUE ;
+
+  double Dx=0,Dy=0,Dxx=0,Dyy=0,Dxy=0;
+  double A [2*2], b [2] ;
+
+#define at(dx,dy) (*(pt + (dx)*xo + (dy)*yo ))
+#define Aat(i,j) (A[(i)+(j)*2])
+
+  float const * pt ;
+  vl_index dx = 0 ;
+  vl_index dy = 0 ;
+  vl_index iter ;
+  int err ;
+
+  assert (map) ;
+  assert (1 <= x && x <= (signed)width - 2) ;
+  assert (1 <= y && y <= (signed)height - 2) ;
+
+  for (iter = 0 ; iter < 5 ; ++iter) {
+    x += dx ;
+    y += dy ;
+    pt = map + x*xo + y*yo  ;
+
+    /* compute the gradient */
+    Dx = 0.5 * (at(+1,0) - at(-1,0)) ;
+    Dy = 0.5 * (at(0,+1) - at(0,-1));
+
+    /* compute the Hessian */
+    Dxx = (at(+1,0) + at(-1,0) - 2.0 * at(0,0)) ;
+    Dyy = (at(0,+1) + at(0,-1) - 2.0 * at(0,0)) ;
+    Dxy = 0.25 * (at(+1,+1) + at(-1,-1) - at(-1,+1) - at(+1,-1)) ;
+
+    /* solve linear system */
+    Aat(0,0) = Dxx ;
+    Aat(1,1) = Dyy ;
+    Aat(0,1) = Aat(1,0) = Dxy ;
+
+    b[0] = - Dx ;
+    b[1] = - Dy ;
+
+    err = vl_solve_linear_system_2(b, A, b) ;
+
+    if (err != VL_ERR_OK) {
+      b[0] = 0 ;
+      b[1] = 0 ;
+      break ;
+    }
+
+    /* Keep going if there is sufficient translation */
+
+    dx = (b[0] > 0.6 && x < (signed)width - 2 ?  1 : 0)
+    + (b[0] < -0.6 && x > 1 ? -1 : 0) ;
+
+    dy = (b[1] > 0.6 && y < (signed)height - 2 ?  1 : 0)
+    + (b[1] < -0.6 && y > 1 ? -1 : 0) ;
+
+    if (dx == 0 && dy == 0) break ;
+  }
+
+  /* check threshold and other conditions */
+  {
+    double peakScore = at(0,0) + 0.5 * (Dx * b[0] + Dy * b[1]) ;
+    double alpha = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
+    double edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+
+    refined->xi = x ;
+    refined->yi = y ;
+    refined->x = x + b[0] ;
+    refined->y = y + b[1] ;
+    refined->peakScore = peakScore ;
+    refined->edgeScore = edgeScore ;
+
+    return
+    err == VL_ERR_OK &&
+    vl_abs_d(b[0]) < 1.5 &&
+    vl_abs_d(b[1]) < 1.5 &&
+    0 <= refined->x && refined->x <= (signed)width - 1 &&
+    0 <= refined->y && refined->y <= (signed)height - 1 ;
+  }
+#undef Aat
+#undef at
 }
 
 /* ---------------------------------------------------------------- */
@@ -281,6 +442,8 @@ vl_covdet_new (VlCovDetMethod method)
   self->frames = NULL ;
   self->numFrames = 0 ;
   self->numFrameBufferSize = 0 ;
+  self->patch = NULL ;
+  self->patchBufferSize = 0 ;
   return self ;
 }
 
@@ -308,6 +471,7 @@ void
 vl_covdet_delete (VlCovDet * self)
 {
   vl_covdet_reset(self) ;
+  if (self->patch) vl_free (self->patch) ;
   vl_free(self) ;
 }
 
@@ -654,8 +818,7 @@ vl_covdet_detect (VlCovDet * self)
           float const * octave =
           vl_scalespace_get_octave(self->css,o,cgeom.octaveFirstSubdivision) ;
           numExtrema = vl_find_local_extrema_3(&extrema, &extremaBufferSize,
-                                               octave,
-                                               width, height, depth,
+                                               octave, width, height, depth,
                                                0.8 * self->peakThreshold);
           for (index = 0 ; index < numExtrema ; ++index) {
             VlCovDetExtremum3 refined ;
@@ -666,7 +829,9 @@ vl_covdet_detect (VlCovDet * self)
                                                    extrema[3*index+1],
                                                    extrema[3*index+2]) ;
             if (ok) {
-              double sigma = self->css->sigma0 * pow(2.0, o + refined.z / cgeom.octaveResolution) ;
+              double sigma = self->css->sigma0 *
+              pow(2.0, o + (refined.z - cgeom.octaveFirstSubdivision)
+                  / cgeom.octaveResolution) ;
               feature.frame.x = refined.x * step ;
               feature.frame.y = refined.y * step ;
               feature.frame.a11 = sigma ;
@@ -698,7 +863,8 @@ vl_covdet_detect (VlCovDet * self)
                                                      extrema[2*index+0],
                                                      extrema[2*index+1]);
               if (ok) {
-                double sigma = self->css->sigma0 * pow(2.0, o + (double)s / cgeom.octaveResolution) ;
+                double sigma = self->css->sigma0 *
+                pow(2.0, o + (double)s / cgeom.octaveResolution) ;
                 feature.frame.x = refined.x * step ;
                 feature.frame.y = refined.y * step ;
                 feature.frame.a11 = sigma ;
@@ -723,6 +889,256 @@ vl_covdet_detect (VlCovDet * self)
   if (levelxy) vl_free(levelxy) ;
 }
 
+/* ---------------------------------------------------------------- */
+/*                                                      Get a patch */
+/* ---------------------------------------------------------------- */
+
+vl_bool
+vl_covdet_extract_patch (VlCovDet * self,
+                         float * patch,
+                         vl_size resolution,
+                         double extent,
+                         double sigma,
+                         VlFrameOrientedEllipse frame)
+{
+
+  vl_index o, s ;
+  double factor ;
+  double sigma_ ;
+  float const * level ;
+  vl_size width, height ;
+  double step ;
+
+  double U [2*2] ;
+  double V [2*2] ;
+  double D [2*2] ;
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T[2] = {frame.x, frame.y} ;
+  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
+
+
+  /* Starting from a pre-smoothed image at scale sigma_
+     because of the mapping A the resulting smoothing in
+     the warped patch is S, where
+
+        sigma_^2 I = A S A',
+
+        S = sigma_^2 inv(A) inv(A)' = sigma_^2 V D^-2 V',
+
+        A = U D V'.
+
+     Thus we rotate A by V to obtain an axis-aligned smoothing:
+
+        A = U*D,
+
+        S = sigma_^2 D^2.
+
+     Then we search the scale-space for the best sigma_ such
+     that the target smoothing is approximated from below:
+
+        max sigma_(o,s) :    simga_(o,s) factor <= sigma,
+        factor = max{abs(D11), abs(D22)}.
+   */
+
+  vl_svd2(D, U, V, A) ;
+  factor = VL_MAX(D[0], D[3]) ;
+  A[0] = U[0] * D[0] ;
+  A[1] = U[1] * D[0] ;
+  A[2] = U[2] * D[3] ;
+  A[3] = U[3] * D[3] ;
+
+  /*
+   Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
+   This can be obtained by scanning octaves from smalles to largest
+   and stopping when no level in the octave satisfies the relation.
+
+   It may be the case that not even the first octave is fine enough.
+   In this case we just use the first one (finest).
+   */
+  for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
+    s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
+    s = VL_MAX(s, geom.octaveFirstSubdivision) ;
+    s = VL_MIN(s, geom.octaveLastSubdivision) ;
+    sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+    if (factor * sigma_ > sigma) {
+      o -- ;
+      break ;
+    }
+  }
+  s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
+  s = VL_MAX(s, geom.octaveFirstSubdivision) ;
+  s = VL_MIN(s, geom.octaveLastSubdivision) ;
+  sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+
+  /*
+   Now the scale space level to be used for this warping has been
+   determined.
+
+   If the patch is partially or completely out of the image boundary,
+   create a padded copy of the required region first.
+   */
+
+  level = vl_scalespace_get_octave(self->gss, o, s) ;
+  width = vl_scalespace_get_octave_width(self->gss, o) ;
+  height = vl_scalespace_get_octave_height(self->gss, o) ;
+  step = pow(2.0, o) ;
+
+  A[0] /= step ;
+  A[1] /= step ;
+  A[2] /= step ;
+  A[3] /= step ;
+  T[0] /= step ;
+  T[1] /= step ;
+
+  {
+    /*
+     Warp the patch domain [x0hat,y0hat,x1hat,y1hat] to the image domain/
+     Obtain a box [x0,y0,x1,y1] enclosing that wrapped box, and then
+     an integer vertexes version [x0i, y0i, x1i, y1i], making room
+     for one pixel at the boundaty to simplify bilinear interpolation
+     later on.
+     */
+    vl_index x0i, y0i, x1i, y1i ;
+    double x0 = +VL_INFINITY_D ;
+    double x1 = -VL_INFINITY_D ;
+    double y0 = +VL_INFINITY_D ;
+    double y1 = -VL_INFINITY_D ;
+    double boxx [4] = {extent, extent, -extent, -extent} ;
+    double boxy [4] = {-extent, extent, extent, -extent} ;
+    int i ;
+    for (i = 0 ; i < 4 ; ++i) {
+      double x = A[0] * boxx[i] + A[2] * boxy[i] + T[0] ;
+      double y = A[1] * boxx[i] + A[3] * boxy[i] + T[1] ;
+      x0 = VL_MIN(x0, x) ;
+      x1 = VL_MAX(x1, x) ;
+      y0 = VL_MIN(y0, y) ;
+      y1 = VL_MAX(y1, y) ;
+    }
+
+    /* Leave one pixel border for bilinear interpolation. */
+    x0i = floor(x0) - 1 ;
+    y0i = floor(y0) - 1 ;
+    x1i = ceil(x1) + 1 ;
+    y1i = ceil(y1) + 1 ;
+
+    /*
+     If the box [x0i,y0i,x1i,y1i] is not fully contained in the
+     image domain, then create a copy of this region by padding
+     the image. The image is extended by continuity.
+     */
+
+    if (x0i < 0 || x1i > (signed)width-1 ||
+        y0i < 0 || y1i > (signed)height-1) {
+      vl_index xi, yi ;
+
+      /* compute the amount of l,r,t,b padding needed to complete the patch */
+      vl_index padx0 = VL_MAX(0, - x0i) ;
+      vl_index pady0 = VL_MAX(0, - y0i) ;
+      vl_index padx1 = VL_MAX(0, x1i - ((signed)width - 1)) ;
+      vl_index pady1 = VL_MAX(0, y1i - ((signed)height - 1)) ;
+
+      /* make enough room for the patch */
+      vl_index patchWidth = x1i - x0i + 1 ;
+      vl_index patchHeight = y1i - y0i + 1 ;
+      vl_size patchBufferSize = patchWidth * patchHeight * sizeof(float) ;
+      if (patchBufferSize > self->patchBufferSize) {
+        int err = _vl_resize_buffer((void**)&self->patch, &self->patchBufferSize, patchBufferSize) ;
+        if (err) return vl_set_last_error(VL_ERR_ALLOC, NULL) ;
+      }
+
+      if (pady0 < patchHeight - pady1) {
+        /* start by filling the central horizontal band */
+        for (yi = y0i + pady0 ; yi < y0i + patchHeight - pady1 ; ++ yi) {
+          float *dst = self->patch + (yi - y0i) * patchWidth ;
+          float const *src = level + yi * width + VL_MIN(VL_MAX(0, x0i),width-1) ;
+          for (xi = x0i ; xi < x0i + padx0 ; ++xi) *dst++ = *src ;
+          for ( ; xi < x0i + patchWidth - padx1 - 2 ; ++xi) *dst++ = *src++ ;
+          for ( ; xi < x0i + patchWidth ; ++xi) *dst++ = *src ;
+        }
+        /* now extend the central band up and down */
+        for (yi = 0 ; yi < pady0 ; ++yi) {
+          memcpy(self->patch + yi * patchWidth,
+                 self->patch + pady0 * patchWidth,
+                 patchWidth * sizeof(float)) ;
+        }
+        for (yi = patchHeight - pady1 ; yi < patchHeight ; ++yi) {
+          memcpy(self->patch + yi * patchWidth,
+                 self->patch + (patchHeight - pady1 - 1) * patchWidth,
+                 patchWidth * sizeof(float)) ;
+        }
+      } else {
+        /* should be handled better! */
+        memset(self->patch, 0, self->patchBufferSize) ;
+      }
+#if 0
+      {
+        char name [200] ;
+        snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f-ext.pgm", 1e10*vl_get_cpu_time()) ;
+        vl_pgm_write_f(name, self->patch, selfPatchWidth, selfPatchHeight) ;
+      }
+#endif
+
+      level = self->patch ;
+      width = patchWidth ;
+      height = patchHeight ;
+      T[0] -= x0i ;
+      T[1] -= y0i ;
+    }
+  }
+
+  /*
+   Resample by using bilinear interpolation.
+   */
+  {
+    float * pt = patch ;
+    double yhat = -extent ;
+    vl_index xi ;
+    vl_index yi ;
+    double stephat = (2*extent) / (2 * resolution + 1) ;
+
+    for (yi = 0 ; yi < 2 * (signed)resolution + 1 ; ++yi) {
+      double xhat = -extent ;
+      double rx = A[2] * yhat + T[0] ;
+      double ry = A[3] * yhat + T[1] ;
+      for (xi = 0 ; xi < 2 * (signed)resolution + 1 ; ++xi) {
+        double x = A[0] * xhat + rx ;
+        double y = A[1] * xhat + ry ;
+        int xi = vl_floor_d(x) ;
+        int yi = vl_floor_d(y) ;
+        double i00 = level[yi * width + xi] ;
+        double i10 = level[yi * width + xi + 1] ;
+        double i01 = level[(yi + 1) * width + xi] ;
+        double i11 = level[(yi + 1) * width + xi + 1] ;
+        double wx = x - xi ;
+        double wy = y - yi ;
+
+        assert(xi >= 0 && xi <= (signed)width - 1) ;
+        assert(yi >= 0 && yi <= (signed)height - 1) ;
+
+        *pt++ =
+        (1.0 - wy) * ((1.0 - wx) * i00 + wx * i10) +
+        wy * ((1.0 - wx) * i01 + wx * i11) ;
+
+        xhat += stephat ;
+      }
+      yhat += stephat ;
+    }
+  }
+#if 0
+    {
+      char name [200] ;
+      snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
+      vl_pgm_write_f(name, patch, patchWidth, patchHeight) ;
+    }
+#endif
+
+  /*
+   Do additional smoothing if needed.
+   */
+
+
+  return VL_ERR_OK ;
+}
 
 /* ---------------------------------------------------------------- */
 /*                                              Detect orientations */

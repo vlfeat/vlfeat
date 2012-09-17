@@ -30,7 +30,8 @@ enum {
   opt_frames,
   opt_descriptor,
   opt_patch_resolution,
-  opt_patch_relative_size,
+  opt_patch_relative_smoothing,
+  opt_patch_relative_extent,
   opt_verbose
 } ;
 
@@ -47,11 +48,12 @@ vlmxOption  options [] = {
 
   {"Frames",               1,   opt_frames                 },
 
-  {"Descritpor",           1,   opt_descriptor             },
-  {"PatchResolution",      1,   opt_patch_resolution       },
-  {"PatchRelativeSize",    1,   opt_patch_relative_size    },
-  {"Verbose",              0,   opt_verbose                },
-  {0,                      0,   0                          }
+  {"Descritpor",            1,   opt_descriptor              },
+  {"PatchResolution",       1,   opt_patch_resolution        },
+  {"PatchRelativeExtent",   1,   opt_patch_relative_extent   },
+  {"PatchRelativeSmoothing",1,   opt_patch_relative_smoothing},
+  {"Verbose",               0,   opt_verbose                 },
+  {0,                       0,   0                           }
 } ;
 
 /** ------------------------------------------------------------------
@@ -146,6 +148,7 @@ mexFunction(int nout, mxArray *out[],
 {
   enum {IN_I = 0, IN_END} ;
   enum {OUT_FRAMES=0, OUT_DESCRIPTORS, OUT_INFO, OUT_END} ;
+  enum {DESC_NONE, DESC_PATCH, DESC_SIFT, DESC_END} ;
 
   int verbose = 0 ;
   int opt ;
@@ -164,6 +167,12 @@ mexFunction(int nout, mxArray *out[],
   vl_size OctaveResolution = 3 ;
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
+
+  int descriptorType = DESC_PATCH ;
+  vl_index patchResolution = -1 ;
+  double patchRelativeExtent = -1 ;
+  double patchRelativeSmoothing = -1 ;
+  float *patch ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -229,9 +238,49 @@ mexFunction(int nout, mxArray *out[],
       }
       break ;
 
+    case opt_patch_relative_smoothing :
+      if (!vlmxIsPlainScalar(optarg) || (patchRelativeSmoothing = *mxGetPr(optarg)) < 0) {
+        vlmxError(vlmxErrInvalidArgument, "PATCHRELATIVESMOOTHING must be a non-negative real.") ;
+      }
+      break ;
+
+    case opt_patch_relative_extent :
+        if (!vlmxIsPlainScalar(optarg) || (patchRelativeExtent = *mxGetPr(optarg)) <= 0) {
+          vlmxError(vlmxErrInvalidArgument, "PATCHRELATIVEEXTENT must be a posiive real.") ;
+        }
+        break ;
+
+      case opt_patch_resolution :
+        if (!vlmxIsPlainScalar(optarg) || (patchResolution = (vl_index)*mxGetPr(optarg)) <= 0) {
+          vlmxError(vlmxErrInvalidArgument, "PATCHRESOLUTION must be a positive integer.") ;
+        }
+        break ;
+
     default :
       abort() ;
     }
+  }
+
+  switch (descriptorType) {
+    case DESC_PATCH :
+      if (patchResolution < 0)  patchResolution = 20 ;
+      if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
+      if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
+      break ;
+
+    case DESC_SIFT :
+      if (patchResolution < 0)  patchResolution = 20 ;
+      if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
+      if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
+      break ;
+
+    case DESC_NONE :
+      break ;
+  }
+
+  if (patchResolution > 0) {
+    vl_size w = 2*patchResolution + 1 ;
+    patch = mxMalloc(sizeof(float) * w * w);
   }
 
   /* -----------------------------------------------------------------
@@ -252,6 +301,10 @@ mexFunction(int nout, mxArray *out[],
     /* fill with frames: eitehr run the detector of poure them in */
     vl_covdet_detect(covdet) ;
 
+    if (verbose) {
+      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+      mexPrintf("vl_covdet: detected %d features\n", numFrames) ;
+    }
 
     /* affine adaptation if needed */
     if (estimateAffineShape) {
@@ -279,9 +332,9 @@ mexFunction(int nout, mxArray *out[],
       pt = mxGetPr(OUT(FRAMES)) ;
 
       for (i = 0 ; i < (signed)numFrames ; ++i) {
-        /* save the transposed frame */
-        *pt++ = feature[i].frame.y ;
-        *pt++ = feature[i].frame.x ;
+        /* save the transposed frame, adjust origin to MATLAB's*/
+        *pt++ = feature[i].frame.y + 1 ;
+        *pt++ = feature[i].frame.x + 1 ;
         *pt++ = feature[i].frame.a22 ;
         *pt++ = feature[i].frame.a12 ;
         *pt++ = feature[i].frame.a21 ;
@@ -290,7 +343,36 @@ mexFunction(int nout, mxArray *out[],
     }
 
     if (nout >= 2) {
-      OUT(DESCRIPTORS) = mxCreateDoubleMatrix(0,0,mxREAL);
+      switch (descriptorType) {
+        case DESC_NONE:
+          OUT(DESCRIPTORS) = mxCreateDoubleMatrix(0,0,mxREAL);
+          break ;
+
+        case DESC_PATCH:
+        {
+          if (verbose) {
+            mexPrintf("vl_covdet: descriptors: type=patch, "
+                      "resolution=%d, extent=%f, smoothing=%f\n",
+                      patchResolution, patchRelativeExtent, patchRelativeSmoothing);
+          }
+          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
+          vl_index i ;
+          vl_size w = 2*patchResolution + 1 ;
+          float * desc ;
+          OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFrames, mxSINGLE_CLASS, mxREAL) ;
+          desc = mxGetData(OUT(DESCRIPTORS)) ;
+          for (i = 0 ; i < (signed)numFrames ; ++i) {
+            vl_covdet_extract_patch(covdet,
+                                    desc,
+                                    patchResolution,
+                                    patchRelativeExtent,
+                                    patchRelativeSmoothing,
+                                    feature[i].frame) ;
+            desc += w*w ;
+          }
+        }
+      }
     }
 
     if (nout >= 3) {

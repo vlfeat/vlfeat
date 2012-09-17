@@ -224,6 +224,9 @@ typedef struct _VlCovDet
   VlCovDetFeature *frames ;
   vl_size numFrames ;
   vl_size numFrameBufferSize ;
+
+  float * patch ;
+  vl_size patchBufferSize ;
 } VlCovDet ;
 
 
@@ -242,7 +245,11 @@ VL_EXPORT void vl_covdet_put_image (VlCovDet * self,
                                     vl_size width, vl_size height) ;
 
 VL_EXPORT void vl_covdet_detect (VlCovDet * self) ;
-VL_EXPORT float * vl_covdet_extract_affine_patch (VlCovDet * self, VlFrameOrientedEllipse frame) ;
+VL_EXPORT vl_bool vl_covdet_extract_patch (VlCovDet * self, float * patch,
+                                           vl_size resolution,
+                                           double extent,
+                                           double sigma,
+                                           VlFrameOrientedEllipse frame) ;
 VL_EXPORT double * vl_covdet_extract_orientations (VlCovDet * self, vl_size *numOrientations,
                                                    VlFrameOrientedEllipse frame) ;
 VL_EXPORT VlFrameOrientedEllipse vl_covdet_extract_affine_shape (VlCovDet * self,
