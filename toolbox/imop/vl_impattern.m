@@ -48,7 +48,7 @@ else
 end
 
 patterns = {'wedge','cone','smoothChecker','threeDotsSquare', ...
-            'blobs', ...
+            'blobs', 'blobs1', ...
             'box', 'roofs1', 'roofs2', 'river1', 'river2'} ;
 
 % spooling
@@ -59,6 +59,7 @@ switch lower(pattern)
   case 'threedotssquare', im = threeDotSquare(varargin) ;
   case 'uniformnoise', im = uniformNoise(varargin) ;
   case 'blobs', im = blobs(varargin) ;
+  case 'blobs1', im = blobs1(varargin) ;
   case {'box','roofs1','roofs2','river1','river2','spots'}
     im = stockImage(pattern, varargin) ;
   case 'gallery'
@@ -137,6 +138,30 @@ for i=1:num
     cy = (i-1) * square + square/2 - 1;
     cx = (j-1) * square + square/2 - 1;
     A = sigma * diag([scales(i) scales(i)/skews(j)])  * [1 -1 ; 1 1] / sqrt(2)  ;
+    C = inv(A'*A) ;
+    x = u - cx ;
+    y = v - cy ;
+    im = im + exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
+  end
+end
+im = im / max(im(:)) ;
+
+function im = blobs1(args)
+[u,v,opts,args] = commonOpts(args) ;
+im = zeros(size(u)) ;
+num = 5 ;
+square = 2 / num ;
+sigma = square / 2 / 3 ;
+rotations = linspace(0,pi,num+1) ;
+rotations(end) = [] ;
+skews = linspace(1,2,num) ;
+for i=1:num
+  for j=1:num
+    cy = (i-1) * square + square/2 - 1;
+    cx = (j-1) * square + square/2 - 1;
+    th = rotations(i) ;
+    R = [cos(th) -sin(th); sin(th) cos(th)] ;
+    A = sigma * diag([1 1/skews(j)]) * R ;
     C = inv(A'*A) ;
     x = u - cx ;
     y = v - cy ;
