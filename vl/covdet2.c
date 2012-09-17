@@ -639,7 +639,7 @@ _vl_det_hessian_response (float * hessian,
   *(out + yo - 1) = *(in + yo - 3);
 
   /* Bottom row without corners */
-  out++;  vl_plotframe([0;0;extent;0]) ;
+  out++;
   memcpy(out, in, (width - 2)*sizeof(float));
 }
 
