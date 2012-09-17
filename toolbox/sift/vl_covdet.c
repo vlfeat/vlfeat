@@ -212,7 +212,7 @@ mexFunction(int nout, mxArray *out[],
 
     case opt_estimate_affine_shape:
       if (!mxIsLogicalScalar(optarg)) {
-        vlmxError(vlmxErrInvalidArgument, "ESTIMATEAFINESHAPE must be a logical scalar value.") ;
+        vlmxError(vlmxErrInvalidArgument, "ESTIMATEAFFINESHAPE must be a logical scalar value.") ;
       } else {
         estimateAffineShape = *mxGetLogicals(optarg) ;
       }
@@ -297,7 +297,6 @@ mexFunction(int nout, mxArray *out[],
     /* process the image */
     vl_covdet_put_image(covdet, image, numRows, numCols) ;
 
-
     /* fill with frames: eitehr run the detector of poure them in */
     vl_covdet_detect(covdet) ;
 
@@ -308,7 +307,15 @@ mexFunction(int nout, mxArray *out[],
 
     /* affine adaptation if needed */
     if (estimateAffineShape) {
-
+      mexPrintf("vl_covdet: estimating affine shape\n") ;
+      vl_index i  ;
+      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+      VlCovDetFeature * feature = vl_covdet_get_features(covdet);
+      for (i = 0 ; i < (signed)numFrames ; ++i) {
+        VlFrameOrientedEllipse adapted ;
+        adapted = vl_covdet_extract_affine_shape(covdet, feature[i].frame) ;
+        feature[i].frame = adapted ;
+      }
     }
 
     /* orientation estimation if needed */
@@ -343,6 +350,7 @@ mexFunction(int nout, mxArray *out[],
     }
 
     if (nout >= 2) {
+      //      descriptorType = DESC_NONE;
       switch (descriptorType) {
         case DESC_NONE:
           OUT(DESCRIPTORS) = mxCreateDoubleMatrix(0,0,mxREAL);
@@ -352,8 +360,9 @@ mexFunction(int nout, mxArray *out[],
         {
           if (verbose) {
             mexPrintf("vl_covdet: descriptors: type=patch, "
-                      "resolution=%d, extent=%f, smoothing=%f\n",
-                      patchResolution, patchRelativeExtent, patchRelativeSmoothing);
+                      "resolution=%d, extent=%g, smoothing=%g\n",
+                      patchResolution, patchRelativeExtent,
+                      patchRelativeSmoothing);
           }
           vl_size numFrames = vl_covdet_get_num_features(covdet) ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);

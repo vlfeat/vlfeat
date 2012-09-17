@@ -444,6 +444,20 @@ vl_covdet_new (VlCovDetMethod method)
   self->numFrameBufferSize = 0 ;
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
+
+  {
+    vl_index const w = VL_COVDET_AA_PATCH_RESOLUTION ;
+    vl_index i,j ;
+    double step = (2.0 * VL_COVDET_AA_PATCH_EXTENT) / (2*w+1) ;
+    double sigma = VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA ;
+    for (j = -w ; j <= w ; ++j) {
+      for (i = -w ; i <= w ; ++i) {
+        double dx = i*step/sigma ;
+        double dy = j*step/sigma ;
+        self->aaMask[(i+w) + (2*w+1)*(j+w)] = exp(-0.5*(dx*dx+dy*dy)) ;
+      }
+    }
+  }
   return self ;
 }
 
@@ -553,9 +567,9 @@ static void
 _vl_det_hessian_response (float * hessian,
                           float const * image,
                           vl_size width, vl_size height,
-                          double sigma)
+                          double step, double sigma)
 {
-  float factor = (float) (sigma * sigma * sigma * sigma) ;
+  float factor = (float) (sigma * sigma * sigma * sigma) / (step*step) ;
   vl_index const xo = 1 ; /* x-stride */
   vl_index const yo = width;  /* y-stride */
   vl_size r, c;
@@ -625,7 +639,7 @@ _vl_det_hessian_response (float * hessian,
   *(out + yo - 1) = *(in + yo - 3);
 
   /* Bottom row without corners */
-  out++;
+  out++;  vl_plotframe([0;0;extent;0]) ;
   memcpy(out, in, (width - 2)*sizeof(float));
 }
 
@@ -652,7 +666,7 @@ _vl_harris_response (float * harris,
                      float * imagexy,
                      float const * image,
                      vl_size width, vl_size height,
-                     double sigma)
+                     double step, double sigma)
 {
 
 
@@ -773,6 +787,7 @@ vl_covdet_detect (VlCovDet * self)
       vl_size width = vl_scalespace_get_octave_width(self->css, o) ;
       vl_size height = vl_scalespace_get_octave_height(self->css, o) ;
       double sigma = vl_scalespace_get_sigma_for_scale(self->css, o, s) ;
+      double step = pow(2.0, o) ;
       switch (self->method) {
         case VL_COVDET_METHOD_DOG:
           _vl_dog_response(clevel, level,
@@ -783,13 +798,14 @@ vl_covdet_detect (VlCovDet * self)
         case VL_COVDET_METHOD_HARRIS_LAPLACE:
         case VL_COVDET_METHOD_MULTISCALE_HARRIS:
           _vl_harris_response(clevel, levelxx, levelyy, levelxy,
-                              level, width, height, sigma) ;
+                              level, width, height,
+                              step, sigma) ;
           break ;
 
         case VL_COVDET_METHOD_HESSIAN:
         case VL_COVDET_METHOD_HESSIAN_LAPLACE:
         case VL_COVDET_METHOD_MULTISCALE_HESSIAN:
-          _vl_det_hessian_response(clevel, level, width, height, sigma) ;
+          _vl_det_hessian_response(clevel, level, width, height, step, sigma) ;
           break ;
 
         default:
@@ -890,7 +906,7 @@ vl_covdet_detect (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-/*                                                      Get a patch */
+/*                                                    Extract patch */
 /* ---------------------------------------------------------------- */
 
 vl_bool
@@ -941,21 +957,23 @@ vl_covdet_extract_patch (VlCovDet * self,
    */
 
   vl_svd2(D, U, V, A) ;
-  factor = VL_MAX(D[0], D[3]) ;
+  factor = 1.0 / VL_MIN(D[0], D[3]) ;
+
+  /*
   A[0] = U[0] * D[0] ;
   A[1] = U[1] * D[0] ;
   A[2] = U[2] * D[3] ;
   A[3] = U[3] * D[3] ;
+   */
 
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
    This can be obtained by scanning octaves from smalles to largest
    and stopping when no level in the octave satisfies the relation.
 
-   It may be the case that not even the first octave is fine enough.
-   In this case we just use the first one (finest).
+   Given the range of octave availables, do the best you can.
    */
-  for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
+  for (o = geom.firstOctave + 1 ; o <= geom.lastOctave - 1; ++o) {
     s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
     s = VL_MAX(s, geom.octaveFirstSubdivision) ;
     s = VL_MIN(s, geom.octaveLastSubdivision) ;
@@ -969,6 +987,8 @@ vl_covdet_extract_patch (VlCovDet * self,
   s = VL_MAX(s, geom.octaveFirstSubdivision) ;
   s = VL_MIN(s, geom.octaveLastSubdivision) ;
   sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+
+  /* VL_PRINTF("%d %d %g %g %g %g\n", o, s, factor, sigma_, factor * sigma_, sigma) ; */
 
   /*
    Now the scale space level to be used for this warping has been
@@ -1092,15 +1112,15 @@ vl_covdet_extract_patch (VlCovDet * self,
   {
     float * pt = patch ;
     double yhat = -extent ;
-    vl_index xi ;
-    vl_index yi ;
+    vl_index xxi ;
+    vl_index yyi ;
     double stephat = (2*extent) / (2 * resolution + 1) ;
 
-    for (yi = 0 ; yi < 2 * (signed)resolution + 1 ; ++yi) {
+    for (yyi = 0 ; yyi < 2 * (signed)resolution + 1 ; ++yyi) {
       double xhat = -extent ;
       double rx = A[2] * yhat + T[0] ;
       double ry = A[3] * yhat + T[1] ;
-      for (xi = 0 ; xi < 2 * (signed)resolution + 1 ; ++xi) {
+      for (xxi = 0 ; xxi < 2 * (signed)resolution + 1 ; ++xxi) {
         double x = A[0] * xhat + rx ;
         double y = A[1] * xhat + ry ;
         int xi = vl_floor_d(x) ;
@@ -1136,20 +1156,159 @@ vl_covdet_extract_patch (VlCovDet * self,
    Do additional smoothing if needed.
    */
 
-
   return VL_ERR_OK ;
 }
 
 /* ---------------------------------------------------------------- */
-/*                                              Detect orientations */
+/*                                             Extract affine shape */
 /* ---------------------------------------------------------------- */
 
+VlFrameOrientedEllipse
+vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
+{
+  vl_index iter = 0 ;
 
+  double U [2*2] ;
+  double V [2*2] ;
+  double D [2*2] ;
+  double M [2*2] ;
+  double P [2*2] ;
+  double P_ [2*2] ;
+  double Q [2*2] ;
+  double factor ;
+  double anisotropy ;
+  double referenceScale ;
+  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
+  VlFrameOrientedEllipse adapted = frame ;
+  vl_size const size = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+
+  while (1) {
+    double lxx = 0, lxy = 0, lyy = 0 ;
+    vl_index k ;
+    int err ;
+
+    /* A = U D V' */
+    vl_svd2(D, U, V, A) ;
+    anisotropy = VL_MAX(D[0]/D[3], D[3]/D[0]) ;
+
+    if (anisotropy > VL_COVDET_AA_MAX_ANISOTROPY) {
+      /* diverged, give up with current solution */
+      return adapted ;
+    }
+
+    /* make sure that the smallest singluar value stays fixed
+       after the first iteration */
+    if (iter == 0) {
+      referenceScale = VL_MIN(D[0], D[3]) ;
+      factor = 1.0 ;
+    } else {
+      factor = referenceScale / VL_MIN(D[0],D[3]) ;
+    }
+
+    A[0] = U[0] * D[0] * factor ;
+    A[1] = U[1] * D[0] * factor ;
+    A[2] = U[2] * D[3] * factor ;
+    A[3] = U[3] * D[3] * factor ;
+
+    adapted.a11 = A[0] ;
+    adapted.a21 = A[1] ;
+    adapted.a12 = A[2] ;
+    adapted.a22 = A[3] ;
+
+    if (++iter >= VL_COVDET_AA_MAX_NUM_ITERATIONS) break ;
+
+    err = vl_covdet_extract_patch(self,
+                                  self->aaPatch,
+                                  VL_COVDET_AA_PATCH_RESOLUTION,
+                                  VL_COVDET_AA_PATCH_EXTENT,
+                                  1.0,
+                                  adapted) ;
+
+    /* compute second moment matrix */
+    vl_imgradient_f (self->aaPatchX, self->aaPatchY, 1, size,
+                     self->aaPatch, size, size, size) ;
+
+    for (k = 0 ; k < (signed)(size*size) ; ++k) {
+      double lx = self->aaPatchX[k] ;
+      double ly = self->aaPatchY[k] ;
+      lxx += lx * lx * self->aaMask[k] ;
+      lyy += ly * ly * self->aaMask[k] ;
+      lxy += lx * ly * self->aaMask[k] ;
+    }
+    M[0] = lxx ;
+    M[1] = lxy ;
+    M[2] = lxy ;
+    M[3] = lyy ;
+
+    if (lxx == 0 || lyy == 0) {
+      adapted = frame ;
+      break ;
+    }
+
+    /* decompose M = P * Q * P' */
+    vl_svd2 (Q, P, P_, M) ;
+
+    /*
+     Setting A <- A * dA results in M to change approximatively as
+
+     M --> dA'  M dA = dA' P Q P dA
+
+     To make this proportional to the identity, we set
+
+     dA ~= P Q^1/2
+
+     we also make it so the smallest singular value of A is unchanged.
+     */
+
+    if (Q[3]/Q[0] < VL_COVDET_AA_CONVERGENCE_THRESHOLD &&
+        Q[0]/Q[3] < VL_COVDET_AA_CONVERGENCE_THRESHOLD) {
+      break ;
+    }
+
+    {
+      double Ap [4] ;
+      double q0 = sqrt(Q[0]) ;
+      double q1 = sqrt(Q[3]) ;
+      Ap[0] = (A[0] * P[0] + A[2] * P[1]) / q0 ;
+      Ap[1] = (A[1] * P[0] + A[3] * P[1]) / q0 ;
+      Ap[2] = (A[0] * P[2] + A[2] * P[3]) / q1 ;
+      Ap[3] = (A[1] * P[2] + A[3] * P[3]) / q1 ;
+      memcpy(A,Ap,4*sizeof(double)) ;
+    }
+
+  } /* next iteration */
+
+  return adapted ;
+}
 
 /* ---------------------------------------------------------------- */
-/*                                                    Extract patch */
+/*                                             Extract orientations */
 /* ---------------------------------------------------------------- */
 
+double * vl_covdet_extract_orientations (VlCovDet * self,
+                                              vl_size * numOrientations,
+                                              VlFrameOrientedEllipse frame)
+{
+  assert(self);
+  assert(numOrientations) ;
+  self->orientations[0] = 1.0 ;
+  *numOrientations = 1 ;
+  return self->orientations ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                                    Extract scales with Laplacian */
+/* ---------------------------------------------------------------- */
+
+double * vl_covdet_extract_laplacian_scales (VlCovDet * self, vl_size * numScales,
+                                             VlFrameOrientedEllipse frame)
+{
+  assert(self) ;
+  assert(numScales) ;
+  self->scales[0] = 1.0 ;
+  *numScales = 1 ;
+}
 
 /* ---------------------------------------------------------------- */
 /*                                     Setter, getter, and all that */

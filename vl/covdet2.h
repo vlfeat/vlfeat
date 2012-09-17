@@ -211,6 +211,18 @@ VL_EXPORT VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] ;
 /** @brief Covariant feature detector
  **/
 
+enum {
+  VL_COVDET_MAX_ORIENTATIONS,
+  VL_COVDET_MAX_LAPLACIAN_SCALES,
+  VL_COVDET_AA_PATCH_RESOLUTION = 20,
+  VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA = 3,
+  VL_COVDET_AA_MAX_NUM_ITERATIONS = 15
+} ;
+
+#define VL_COVDET_AA_MAX_ANISOTROPY 2.5
+#define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.01
+#define VL_COVDET_AA_PATCH_EXTENT (3*VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA)
+
 typedef struct _VlCovDet
 {
   VlScaleSpace *gss ;       /**< Gaussian scale space. */
@@ -227,6 +239,15 @@ typedef struct _VlCovDet
 
   float * patch ;
   vl_size patchBufferSize ;
+
+  double orientations [VL_COVDET_MAX_ORIENTATIONS] ;
+  double scales [VL_COVDET_MAX_LAPLACIAN_SCALES] ;
+
+  float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaPatchX [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaPatchY [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaMask [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+
 } VlCovDet ;
 
 
