@@ -626,5 +626,15 @@ vl_lapack_dlasv2 (double *smin,
                   double g,
                   double h) ;
 
+
+VL_EXPORT int
+vl_solve_linear_system_3 (double * x, double const * A, double const *b) ;
+
+VL_EXPORT int
+vl_solve_linear_system_2 (double * x, double const * A, double const *b) ;
+
+VL_EXPORT int
+vl_gaussian_elimination (double * A, vl_size numRows, vl_size numColumns) ;
+
 /* VL_MATHOP_H */
 #endif

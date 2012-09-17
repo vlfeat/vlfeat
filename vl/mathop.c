@@ -528,7 +528,6 @@ vl_svd2 (double* S, double *U, double *V, double const *M)
   }
 }
 
-
 /** @brief SVD of a 2x2 upper triangular matrix (LAPACK @c dlasv2 equivalent)
  ** @param smin smallest (in modulus) singular value (out).
  ** @param smax largest (in modulus) singuarl value (out).
@@ -671,6 +670,143 @@ vl_lapack_dlasv2 (double *smin,
   *smax = isign(tsign) * (*smax);
   *smin = isign(tsign * sign(f) * sign(h)) * (*smin) ;
 }
+
+
+/** @brief Solve a 3x3 linear system
+ ** @param x result.
+ ** @param A system matrix.
+ ** @param b coefficients.
+ **
+ ** The function computes a solution to @f$ Ax =b @f$ for a 3x3
+ ** matrix.
+ **/
+
+VL_EXPORT int
+vl_solve_linear_system_3 (double * x, double const * A, double const *b)
+{
+  int err ;
+  double M[3*4] ;
+  M[0] = A[0] ;
+  M[1] = A[1] ;
+  M[2] = A[2] ;
+  M[3] = A[3] ;
+  M[4] = A[4] ;
+  M[5] = A[5] ;
+  M[6] = A[6] ;
+  M[7] = A[7] ;
+  M[8] = A[8] ;
+  M[9] = b[0] ;
+  M[10] = b[1] ;
+  M[11] = b[2] ;
+  err = vl_gaussian_elimination(M,3,4) ;
+  x[0] = M[9] ;
+  x[1] = M[10] ;
+  x[2] = M[11] ;
+  return err ;
+}
+
+/** @brief Solve a 2x2 linear system
+ ** @param x result.
+ ** @param A system matrix.
+ ** @param b coefficients.
+ **
+ ** The function computes a solution to @f$ Ax =b @f$ for a 2x2
+ ** matrix.
+ **/
+
+VL_EXPORT int
+vl_solve_linear_system_2 (double * x, double const * A, double const *b)
+{
+  int err ;
+  double M[2*3] ;
+  M[0] = A[0] ;
+  M[1] = A[1] ;
+  M[2] = A[2] ;
+  M[3] = A[3] ;
+  M[4] = b[0];
+  M[5] = b[1] ;
+  err = vl_gaussian_elimination(M,2,3) ;
+  x[0] = M[4] ;
+  x[1] = M[5] ;
+  return err ;
+}
+
+/** @brief Gaussian elimination
+ ** @param M matrix.
+ ** @param numRows number of rows of @c M.
+ ** @param numColumns number of columns of @c M.
+ **
+ ** The function runs Gaussian elimination with pivoting
+ ** on the matrix @a M in place.
+ ** @c numRows must be not larger than @c numColumns.
+ **
+ ** Let @f$ M = [A, b] @f$ to obtain the solution to the linear
+ ** system @f$ Ax=b @f$ (as the last column of @c M after
+ ** elimination).
+ **
+ ** Let @f$ M = [A, I] @f$ to compute the inverse of @c A in
+ ** a similar manner.
+ **/
+
+VL_EXPORT vl_bool
+vl_gaussian_elimination (double * A, vl_size numRows, vl_size numColumns)
+{
+  vl_index i, j, ii, jj ;
+  assert(A) ;
+  assert(numRows <= numColumns) ;
+
+#define Aat(i,j) A[(i) + (j)*numRows]
+
+  /* Gauss elimination */
+  for(j = 0 ; j < (signed)numRows ; ++j) {
+    double maxa = 0 ;
+    double maxabsa = 0 ;
+    vl_index maxi = -1 ;
+    double tmp ;
+
+    /* look for the maximally stable pivot */
+    for (i = j ; i < (signed)numRows ; ++i) {
+      double a = Aat(i,j) ;
+      double absa = vl_abs_d (a) ;
+      if (absa > maxabsa) {
+        maxa = a ;
+        maxabsa = absa ;
+        maxi = i ;
+      }
+    }
+    i = maxi ;
+
+    /* if singular give up */
+    if (maxabsa < 1e-10) return VL_ERR_OVERFLOW ;
+
+    /* swap j-th row with i-th row and normalize j-th row */
+    for(jj = j ; jj < (signed)numColumns ; ++jj) {
+      tmp = Aat(i,jj) ; Aat(i,jj) = Aat(j,jj) ; Aat(j,jj) = tmp ;
+      Aat(j,jj) /= maxa ;
+    }
+
+    /* elimination */
+    for (ii = j+1 ; ii < (signed)numRows ; ++ii) {
+      double x = Aat(ii,j) ;
+      for (jj = j ; jj < (signed)numRows ; ++jj) {
+        Aat(ii,jj) -= x * Aat(j,jj) ;
+      }
+    }
+  }
+
+  /* backward substitution */
+  for (i = numRows - 1 ; i > 0 ; --i) {
+    for (j = numRows ; j < (signed)numColumns ; ++j) {
+      double x = Aat(i,j) ;
+      for (ii = i-1 ; ii >= 0 ; --ii) {
+        Aat(ii,j) -= x * Aat(ii,i) ;
+      }
+    }
+  }
+
+  return VL_ERR_OK ;
+}
+
 
 /* VL_MATHOP_INSTANTIATING */
 #endif
