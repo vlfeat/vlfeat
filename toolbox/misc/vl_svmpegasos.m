@@ -90,7 +90,15 @@
 %     dataset.
 %
 %   DiagnosticFunction:: [empty] 
-%     Specify a function handle to be called every ENERGYFREQ iterations.
+%     Specify a function handle to be called every ENERGYFREQ
+%     iterations.
+%     The function must be of the form:
+%       
+%       function o = diagnostics(svm,x)
+%     
+%     Where in the first iteration x is the variable passed as 
+%     "DiagnosticCallRef", and the consecutive ones x is the
+%     variable o returned in the previous iteration.
 % 
 %   DiagnosticCallRef:: [empty]
 %     Specify a paramater to be passed to the DIAGNOSTICFUNCTION handle.
