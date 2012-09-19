@@ -3,7 +3,7 @@
 <group>
 
 <p>The <b>HOG</b> features are widely use for object detection. HOG
-decomposes an image into small squared cells, computes an hisrogram of
+decomposes an image into small squared cells, computes an histogram of
 oriented gradients in each cell, normalizes the result using a
 block-wise pattern, and return a descriptor for each cell.</p>
 
@@ -13,7 +13,7 @@ an SVM.</p>
 
 <p>This tutorial shows how to use the VLFeat
 function <code>vl_hog</code> to compute HOG features of various kind
-and manipilate them.</p>
+and manipulate them.</p>
 
 <ul>
  <li><a href="%pathto:tut.hog.basic;">Basic HOG computation</a></li>
@@ -25,7 +25,7 @@ and manipilate them.</p>
 <h1 id="tut.hog.basic">Basic HOG computation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>We start by considering an example inputimage:</p>
+<p>We start by considering an example input image:</p>
 
 <div class="figure">
   <image src="%pathto:root;demo/hog_image.jpg"/>
@@ -40,12 +40,13 @@ hog = vl_hog(im, cellSize, 'verbose') ;
 </precode>
 
 <p>The same function can also be used to generate a pictorial
-rendition of the features, although this unavoidably destroyis some of
+rendition of the features, although this unavoidably destroys some of
 the information contained in the feature itself. To this end, use the
 <code>render</code> command:</p>
 
 <precode type='matlab'>
 imhog = vl_hog('render', hog, 'verbose') ;
+clf ; imagesc(imhog) ; colormap gray ;
 </precode>
 
 <p>This should produce the following image:</p>
@@ -69,9 +70,9 @@ ans =
 <p>In this case the feature has 31 dimensions. HOG exists in many
 variants. VLFeat supports two: the UoCTTI variant (used by default)
 and the original Dalal-Triggs variant (with 2&times;2 square HOG
-blocks for normalisation). The main difference is that the UoCTTI
+blocks for normalization). The main difference is that the UoCTTI
 variant computes bot directed and undirected gradients as well as a
-four dimensional texture-energy feautre, but projects the result down
+four dimensional texture-energy feature, but projects the result down
 to 31 dimensions. Dalal-Triggs works instead with undirected gradients
 only and does not do any compression, for a total of 36
 dimension. The Dalal-Triggs variant can be computed as</p>
@@ -107,7 +108,7 @@ perm = vl_hog('permutation') ;
 </precode>
 
 <p>Then these two examples produce identical results (provided that
-the image contains an exact numver of cells:</p>
+the image contains an exact number of cells:</p>
 
 <precode type='matlab'>
 imHog = vl_hog('render', hog) ;
