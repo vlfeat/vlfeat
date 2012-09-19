@@ -157,8 +157,6 @@ DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
 MEX_FLAGS = $(MEX_FLAGS) -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 
--largeArrayDims
-
 libsrc = \
   vl\aib.c \
   vl\array.c \
@@ -344,10 +342,9 @@ info:
 	@echo ** CC          = $(CC)
 	@echo ** CFLAGS      = $(CFLAGS)
 	@echo ** DLL_CFLAGS  = $(DLL_CFLAGS)
-	@echo ** MEX_CFLAGS  = $(MEX_CFLAGS)
+	@echo ** MEX_FLAGS   = $(MEX_FLAGS)
 	@echo ** BUILD_MEX   = "$(BUILD_MEX)"
 	@echo ** MATLABROOT  = $(MATLABROOT)
-	@echo ** MEX_LFLAGS  = $(MEX_LFLAGS)
 	@echo ** MEX         = $(MEX)
 	@echo ** MEXEXT      = $(MEXEXT)
 	@echo ** MEXOPT      = $(MEXOPT)
