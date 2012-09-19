@@ -103,6 +103,7 @@
 		2D1EED2B1605008600C63DCE /* covdet2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet2.c; sourceTree = "<group>"; };
 		2D1EED2D1605009D00C63DCE /* covdet2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = covdet2.h; sourceTree = "<group>"; };
 		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
+		2D29DD661608F12B00E74DF3 /* test_gauss_elimination.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_gauss_elimination.c; sourceTree = "<group>"; };
 		2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
 		2D3E1F2C15FE93480035AA1E /* license.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = license.html; path = docsrc/license.html; sourceTree = "<group>"; };
 		2D3E1F2D15FE93480035AA1E /* plots-rank.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "plots-rank.html"; path = "docsrc/plots-rank.html"; sourceTree = "<group>"; };
@@ -755,6 +756,7 @@
 				2DD9A01F0E5A296700CE1DA1 /* test_host.c */,
 				2D72EB080E48A934005DAA47 /* test_imopv.c */,
 				2D6DD0F4100F5E5E006AE152 /* test_mathop_abs.c */,
+				2D29DD661608F12B00E74DF3 /* test_gauss_elimination.c */,
 				2D732DEC0CF8C2E40099B03C /* test_nan.c */,
 				2DBD0AA410F7A48C004DBA31 /* test_qsort-def.c */,
 				2D732DED0CF8C2E40099B03C /* test_stringop.c */,
