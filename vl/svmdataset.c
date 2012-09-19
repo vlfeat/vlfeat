@@ -30,8 +30,7 @@ abstraction is defined via two type of functions:
 The above type of functions define the two typical operations
 performed by SVM solvers on the training data. Any particular
 application can define its own data representation and implement the
-above functions. This allows the use of the SVM solvers implemented in
-VLFeat.
+above functions. 
 
 For double and float arrays we provide the implementation of the
 aforementioned functions.
