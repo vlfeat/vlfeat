@@ -49,6 +49,7 @@ MATLABROOT = C:\Program Files (x86)\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw32
+MEX_FLAGS =
 
 CC = "$(MSVCROOT)\bin\cl.exe"
 LINK = "$(MSVCROOT)\bin\link.exe"
@@ -66,6 +67,7 @@ MATLABROOT = C:\Program Files\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw64
+MEX_FLAGS = -largeArrayDims
 
 CC = "$(MSVCROOT)\bin\amd64\cl.exe"
 LINK = "$(MSVCROOT)\bin\amd64\link.exe"
@@ -153,7 +155,9 @@ CFLAGS = $(CFLAGS) /D"NDEBUG"
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
 EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
-MEX_FLAGS = -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
+MEX_FLAGS = $(MEX_FLAGS) -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
+
+-largeArrayDims
 
 libsrc = \
   vl\aib.c \
