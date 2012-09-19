@@ -16,7 +16,7 @@ categorization.</p>
 <p>The main advantage of using <code>vl_dsift</code>
 over <code>vl_sift</code> is speed. To see this, load a test image</p>
 <precode type='matlab'>
-I = imread(fullfile(vl_root,'data','a.jpg')) ;
+I = vl_impattern('roofs1') ;
 I = single(vl_imdown(rgb2gray(I))) ;
 </precode>
 
@@ -90,7 +90,7 @@ compute such features.</p>
 exactly this:</p>
 
 <precode type='matlab'>
-im = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
+im = vl_impattern('roofs1') ;
 [frames, descrs]=vl_phow(im2single(im)) ;
 </precode>
 

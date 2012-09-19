@@ -3,7 +3,7 @@ function results = vl_test_hog(varargin)
 vl_test_init ;
 
 function s = setup()
-s.im = im2single(imread(fullfile(vl_root,'data','a.jpg'))) ;
+s.im = im2single(vl_impattern('roofs1')) ;
 [x,y]= meshgrid(linspace(-1,1,128)) ;
 s.round = single(x.^2+y.^2);
 s.imSmall = s.im(1:128,1:128,:) ;

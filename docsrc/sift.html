@@ -1,7 +1,7 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <group>
- 
+
 <p>The <em>Scale-Invariant Feature Transform (SIFT)</em> bundles a
 feature detector and a feature descriptor. The detector extracts from
 an image a number of frames (attributed regions) in a way which is
@@ -19,7 +19,7 @@ robustly. For a more in-depth description of the algorithm, see our
  <li><a href="%pathto:tut.sift.conventions;">Conventions</a></li>
  <li><a href="%pathto:tut.sift.ubc;">Comparison with D. Lowe's SIFT</a></li>
 </ul>
- 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.sift.extract">Extracting frames and descriptors</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -27,13 +27,12 @@ robustly. For a more in-depth description of the algorithm, see our
 <p>Both the detector and descriptor are accessible by
 the <code>vl_sift</code> MATLAB command (there is a similar command
 line utility). Open MATLAB and load a test image</p>
- 
+
 <precode type='matlab'>
-pfx = fullfile(vl_root,'data','a.jpg') ;
-I = imread(pfx) ;
+I = vl_impattern('roofs1') ;
 image(I) ;
 </precode>
- 
+
 <div class="figure">
  <img src="%pathto:root;demo/sift_basic_0.jpg"/>
  <div class="caption">
@@ -52,23 +51,23 @@ some internal thresholds are tuned for this case). The image
 <precode type='matlab'>
 I = single(rgb2gray(I)) ;
 </precode>
- 
+
 <p>We compute the SIFT frames (keypoints) and descriptors by</p>
 
 <precode type='matlab'>
 [f,d] = vl_sift(I) ;
 </precode>
- 
+
 <p>The matrix <code>f</code> has a column for each frame. A frame is a
 disk of center <code>f(1:2)</code>, scale <code>f(3)</code> and
 orientation <code>f(4)</code> . We visualize a random selection of 50
 features by:</p>
- 
+
 <precode type="matlab">
-perm = randperm(size(f,2)) ; 
+perm = randperm(size(f,2)) ;
 sel = perm(1:50) ;
-h1 = vl_plotframe(f(:,sel)) ; 
-h2 = vl_plotframe(f(:,sel)) ; 
+h1 = vl_plotframe(f(:,sel)) ;
+h2 = vl_plotframe(f(:,sel)) ;
 set(h1,'color','k','linewidth',3) ;
 set(h2,'color','y','linewidth',2) ;
 </precode>
@@ -81,9 +80,9 @@ set(h2,'color','y','linewidth',2) ;
 </div>
 
 <p>We can also overlay the descriptors by</p>
- 
+
 <precode type='matlab'>
-h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;  
+h3 = vl_plotsiftdescriptor(d(:,sel),f(:,sel)) ;
 set(h3,'color','g') ;
 </precode>
 
@@ -125,7 +124,7 @@ the closest descriptor in <code>db</code> (as measured by the L2 norm
 of the difference between them). The index of the original match and
 the closest descriptor is stored in each column of
 <code>matches</code> and the distance between the pair is stored in
-<code>scores</code>. 
+<code>scores</code>.
 </p>
 
 <p>
@@ -166,7 +165,7 @@ I = single(255 * I) ;
 </div>
 
 <p>We run the detector with peak threshold <code>peak_thresh</code> by</p>
- 
+
 <precode type='matlab'>
 f = vl_sift(I, 'PeakThresh', peak_thresh) ;
 </precode>
@@ -189,7 +188,7 @@ f = vl_sift(I, 'PeakThresh', peak_thresh) ;
 <p>The <em>edge threshold</em> eliminates peaks of
 the DoG scale space whose curvature is too small (such peaks yield
 badly localized frames). For instance, consider the test image</p>
- 
+
 <precode type='matlab'>
 I = zeros(100,500) ;
 for i=[10 20 30 40 50 60 70 80 90]
@@ -240,7 +239,7 @@ the <code>Frames</code> option.</p>
 <p>For instance, we can compute the descriptor of a SIFT frame
 centered at position <code>(100,100)</code>, of scale <code>10</code>
 and orientation <code>-pi/8</code> by</p>
- 
+
 <precode type='matlab'>
 fc = [100;100;10;-pi/8] ;
 [f,d] = vl_sift(I,'frames',fc) ;
@@ -254,7 +253,7 @@ fc = [100;100;10;-pi/8] ;
 </span>
 </div>
 </div>
- 
+
  <p>Multiple frames <code>fc</code> may be specified as well. In this
   case they are re-ordered by increasing
   scale. The <code>Orientations</code> option instructs the program to
@@ -274,7 +273,7 @@ Custom frame with computed orientations.
 </span>
 </div>
 </div>
- 
+
 <p>Notice that, depending on the local appearance, a keypoint may
 have <em>multiple</em> orientations.  Moreover, a keypoint computed on
 a constant image region (such as a one pixel region) has no
@@ -290,7 +289,7 @@ MATLAB drivers is that the latter assumes that the image origin
 (top-left corner) has coordinate (1,1) as opposed to (0,0). Lowe's
 original implementation uses a different reference system, illustrated
 next:</p>
- 
+
 <div class="figure">
 <img src="%pathto:root;figures/sift-conv-vlfeat.png"/> <br/>
 <img src="%pathto:root;figures/sift-conv.png"/>
@@ -300,7 +299,7 @@ Our conventions (top) compared to Lowe's (bottom).
 </span>
 </div>
 </div>
- 
+
  <p>Our implementation uses the standard image reference system, with
   the <code>y</code> axis pointing downward. The frame
   orientation <code>&theta;</code> and descriptor use the same reference

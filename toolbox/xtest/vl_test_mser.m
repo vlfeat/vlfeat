@@ -3,7 +3,7 @@ function results = vl_test_mser(varargin)
 vl_test_init ;
 
 function s = setup()
-s.im = im2uint8(rgb2gray(imread(fullfile(vl_root,'data','a.jpg')))) ;
+s.im = im2uint8(rgb2gray(vl_impattern('roofs1'))) ;
 
 function test_mser(s)
 [regions,frames] = vl_mser(s.im) ;

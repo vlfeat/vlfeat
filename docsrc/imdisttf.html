@@ -5,10 +5,12 @@
 
 <p>The distance transform of an image <code>image</code> is defined
   as</p>
+
 <pre>
   dt(u,v) = min  image(u',v') + alpha (u'-u-u0)^2 + beta (v'-v'-v0)^2
             u'v'
 </pre>
+
 <p>The most common use of the image distance transform is to propagate
 the response of a feature detector to nearby image locations. This is
 used, for example, in the implementation of certain deformable part
@@ -24,8 +26,9 @@ linear time complexity in the number of image pixels.</p>
 
 <p>Consider the edge map extracted by the MATLAB built-in Canny edge
 detector on one of VLFeat test images:</p>
+
 <precode type="matlab">
-im = imread(fullfile(vl_root, 'data', 'a.jpg')) ;
+im = vl_impattern('roofs1') ;
 im = im(1:100,1:100,:) ;
 imSize = [size(im,1) size(im,2)] ;
 edges = zeros(imSize) + inf;
