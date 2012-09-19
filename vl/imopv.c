@@ -722,7 +722,7 @@ VL_EXPORT void
 VL_XCAT(vl_imgradient_, SFX)
 (T * xGradient, T * yGradient,
  vl_size gradWidthStride, vl_size gradHeightStride,
- T * image,
+ T const * image,
  vl_size imageWidth, vl_size imageHeight,
  vl_size imageStride)
 {
@@ -732,7 +732,8 @@ VL_XCAT(vl_imgradient_, SFX)
   vl_size const w = imageWidth;
   vl_size const h = imageHeight;
 
-  T *src, *end, *pgrad_x, *pgrad_y;
+  T const *src, *end ;
+  T *pgrad_x, *pgrad_y;
   vl_size y;
 
   src  = image ;

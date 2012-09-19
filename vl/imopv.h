@@ -141,13 +141,13 @@ vl_imgradient_polar_d (double* amplitudeGradient, double* angleGradient,
 VL_EXPORT void
 vl_imgradient_f (float* xGradient, float* yGradient,
                  vl_size gradWidthStride, vl_size gradHeightStride,
-                 float* image,
+                 float const *image,
                  vl_size imageWidth, vl_size imageHeight, vl_size imageStride);
 
 VL_EXPORT void
 vl_imgradient_d(double* xGradient, double* yGradient,
                 vl_size gradWidthStride, vl_size gradHeightStride,
-                double* image,
+                double const *image,
                 vl_size imageWidth, vl_size imageHeight, vl_size imageStride);
 
 VL_EXPORT void
