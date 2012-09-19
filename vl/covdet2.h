@@ -212,16 +212,23 @@ VL_EXPORT VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] ;
  **/
 
 enum {
-  VL_COVDET_MAX_ORIENTATIONS,
-  VL_COVDET_MAX_LAPLACIAN_SCALES,
+  VL_COVDET_MAX_NUM_ORIENTATIONS = 4,
+  VL_COVDET_MAX_NUM_LAPLACIAN_SCALES = 4,
   VL_COVDET_AA_PATCH_RESOLUTION = 20,
   VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA = 3,
-  VL_COVDET_AA_MAX_NUM_ITERATIONS = 15
+  VL_COVDET_AA_MAX_NUM_ITERATIONS = 15,
+  VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS = 36
 } ;
 
 #define VL_COVDET_AA_MAX_ANISOTROPY 2.5
-#define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.01
+#define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.001
 #define VL_COVDET_AA_PATCH_EXTENT (3*VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA)
+#define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
+#define VL_COVDET_LAP_NUM_LEVELS 5
+#define VL_COVDET_LAP_PATCH_RESOLUTION 12
+#define VL_COVDET_DEF_REFERENCE_ANGLE (VL_PI/2)
+#define VL_COVDET_DEF_PEAK_THRESHOLD 0.001
+#define VL_COVDET_DEF_EDGE_THRESHOLD 10.0
 
 typedef struct _VlCovDet
 {
@@ -240,13 +247,18 @@ typedef struct _VlCovDet
   float * patch ;
   vl_size patchBufferSize ;
 
-  double orientations [VL_COVDET_MAX_ORIENTATIONS] ;
-  double scales [VL_COVDET_MAX_LAPLACIAN_SCALES] ;
+  vl_bool transposed ;
+  double referenceAngle ;
+  double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
+  double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
 
   float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaPatchX [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaPatchY [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaMask [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+
+  float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
+  float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
 
 } VlCovDet ;
 
@@ -256,6 +268,7 @@ typedef struct _VlCovDet
  **/
 VL_EXPORT VlCovDet * vl_covdet_new (VlCovDetMethod method) ;
 VL_EXPORT void vl_covdet_delete (VlCovDet * self) ;
+VL_EXPORT void vl_covdet_reset (VlCovDet * self) ;
 /** @} */
 
 /** @name Process data
@@ -266,16 +279,29 @@ VL_EXPORT void vl_covdet_put_image (VlCovDet * self,
                                     vl_size width, vl_size height) ;
 
 VL_EXPORT void vl_covdet_detect (VlCovDet * self) ;
-VL_EXPORT vl_bool vl_covdet_extract_patch (VlCovDet * self, float * patch,
-                                           vl_size resolution,
-                                           double extent,
-                                           double sigma,
-                                           VlFrameOrientedEllipse frame) ;
-VL_EXPORT double * vl_covdet_extract_orientations (VlCovDet * self, vl_size *numOrientations,
-                                                   VlFrameOrientedEllipse frame) ;
-VL_EXPORT VlFrameOrientedEllipse vl_covdet_extract_affine_shape (VlCovDet * self,
-                                                                 VlFrameOrientedEllipse frame) ;
-VL_EXPORT void vl_covdet_reset (VlCovDet * self) ;
+VL_EXPORT void vl_covdet_extract_orientations (VlCovDet * self) ;
+VL_EXPORT void vl_covdet_extract_laplacian_scales (VlCovDet * self) ;
+VL_EXPORT void vl_covdet_extract_affine_shape (VlCovDet * self) ;
+
+VL_EXPORT double *
+vl_covdet_extract_orientations_for_frame (VlCovDet * self,
+                                          vl_size *numOrientations,
+                                          VlFrameOrientedEllipse frame) ;
+VL_EXPORT double *
+vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
+                                              vl_size *numScales,
+                                              VlFrameOrientedEllipse frame) ;
+VL_EXPORT int
+vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
+                                          VlFrameOrientedEllipse * adapted,
+                                          VlFrameOrientedEllipse frame) ;
+
+VL_EXPORT vl_bool
+vl_covdet_extract_patch_for_frame (VlCovDet * self, float * patch,
+                                   vl_size resolution,
+                                   double extent,
+                                   double sigma,
+                                   VlFrameOrientedEllipse frame) ;
 /** @} */
 
 /** @name Retrieve data and parameters
@@ -286,6 +312,9 @@ VL_EXPORT void * vl_covdet_get_features (VlCovDet * self) ;
 VL_EXPORT vl_index vl_covdet_get_first_octave (VlCovDet * self) ;
 VL_EXPORT double vl_covdet_get_peak_threshold (VlCovDet * self) ;
 VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet * self) ;
+VL_EXPORT double vl_covdet_get_reference_angle (VlCovDet * self) ;
+VL_EXPORT vl_bool vl_covdet_get_transposed (VlCovDet * self) ;
+
 /** @} */
 
 /** @name Set parameters
@@ -294,6 +323,7 @@ VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet * self) ;
 VL_EXPORT void vl_covdet_set_first_octave (VlCovDet * self, vl_index o) ;
 VL_EXPORT void vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold) ;
 VL_EXPORT void vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold) ;
+VL_EXPORT void vl_covdet_set_transposed (VlCovDet * self, vl_bool t) ;
 /** @} */
 
 /* VL_COVDET_H */

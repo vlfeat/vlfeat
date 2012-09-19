@@ -290,9 +290,9 @@ mexFunction(int nout, mxArray *out[],
     VlCovDet * covdet = vl_covdet_new(method) ;
 
     /* set covdet parameters */
+    vl_covdet_set_transposed(covdet, VL_TRUE) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
-
 
     /* process the image */
     vl_covdet_put_image(covdet, image, numRows, numCols) ;
@@ -307,19 +307,32 @@ mexFunction(int nout, mxArray *out[],
 
     /* affine adaptation if needed */
     if (estimateAffineShape) {
-      mexPrintf("vl_covdet: estimating affine shape\n") ;
-      vl_index i  ;
-      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
-      VlCovDetFeature * feature = vl_covdet_get_features(covdet);
-      for (i = 0 ; i < (signed)numFrames ; ++i) {
-        VlFrameOrientedEllipse adapted ;
-        adapted = vl_covdet_extract_affine_shape(covdet, feature[i].frame) ;
-        feature[i].frame = adapted ;
+      if (verbose) {
+        vl_size numFeaturesBefore = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: estimating affine shape for %d features\n", numFeaturesBefore) ;
+      }
+
+      vl_covdet_extract_affine_shape(covdet) ;
+
+      if (verbose) {
+        vl_size numFeaturesAfter = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: %d features passed affine adaptation\n", numFeaturesAfter) ;
       }
     }
 
     /* orientation estimation if needed */
     if (estimateOrientation) {
+      if (verbose) {
+        vl_size numFeaturesBefore = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: estimating orientations for %d features\n", numFeaturesBefore) ;
+      }
+
+      vl_covdet_extract_orientations(covdet) ;
+
+      if (verbose) {
+        vl_size numFeaturesAfter = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: %d features after estimating orientations\n", numFeaturesAfter) ;
+      }
 
     }
 
@@ -372,7 +385,7 @@ mexFunction(int nout, mxArray *out[],
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFrames, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           for (i = 0 ; i < (signed)numFrames ; ++i) {
-            vl_covdet_extract_patch(covdet,
+            vl_covdet_extract_patch_for_frame(covdet,
                                     desc,
                                     patchResolution,
                                     patchRelativeExtent,

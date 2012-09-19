@@ -49,6 +49,20 @@ _vl_resize_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
   }
 }
 
+/** @brief Enlarge buffer
+ ** @param buffer
+ ** @param bufferSize
+ ** @param targetSize
+ ** @return error code
+ **/
+
+static int
+_vl_enlarge_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
+  if (*bufferSize >= targetSize) return VL_ERR_OK ;
+  return _vl_resize_buffer(buffer,bufferSize,targetSize) ;
+}
+
+
 /** @brief Find extrema in 3D function
  ** @param extrema
  ** @param bufferSize
@@ -221,7 +235,7 @@ vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
   float const * pt ;
   vl_index dx = 0 ;
   vl_index dy = 0 ;
-  vl_index dz = 0 ;
+  /*vl_index dz = 0 ;*/
   vl_index iter ;
   int err ;
 
@@ -437,13 +451,15 @@ vl_covdet_new (VlCovDetMethod method)
   self->method = method ;
   self->octaveResolution = 3 ;
   self->firstOctave = -1 ;
-  self->peakThreshold = 0.0001 ;
-  self->edgeThreshold = 10.0 ;
+  self->peakThreshold = VL_COVDET_DEF_PEAK_THRESHOLD ;
+  self->edgeThreshold = VL_COVDET_DEF_EDGE_THRESHOLD ;
   self->frames = NULL ;
   self->numFrames = 0 ;
   self->numFrameBufferSize = 0 ;
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
+  self->referenceAngle = VL_COVDET_DEF_REFERENCE_ANGLE ;
+  self->transposed = VL_FALSE ;
 
   {
     vl_index const w = VL_COVDET_AA_PATCH_RESOLUTION ;
@@ -455,6 +471,37 @@ vl_covdet_new (VlCovDetMethod method)
         double dx = i*step/sigma ;
         double dy = j*step/sigma ;
         self->aaMask[(i+w) + (2*w+1)*(j+w)] = exp(-0.5*(dx*dx+dy*dy)) ;
+      }
+    }
+  }
+
+  {
+    /*
+     Covers one octave of Laplacian filters, from sigma=1 to sigma=2.
+     The spatial sampling step is 0.5.
+     */
+    vl_index s ;
+    for (s = 0 ; s < VL_COVDET_LAP_NUM_LEVELS ; ++s) {
+      double sStep = 1.0 / (VL_COVDET_LAP_NUM_LEVELS-1) ;
+      double step = 0.5 ;
+      double sigma = pow(2.0, sStep * s) ;
+      double mass = 0 ;
+      vl_index const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
+      vl_index i, j ;
+      for (j = -w ; j <= w ; ++j) {
+        for (i = -w ; i <= w ; ++i) {
+          double dx = i * step / sigma ;
+          double dy = j * step / sigma ;
+          double d2 = dx*dx + dy*dy ;
+          double a = (d2 - 2) * exp(-0.5 * d2) ;
+          mass += fabs(a) ;
+          self->laplacians[s * (2*w+1)*(2*w+1) +
+                           (2*w+1) * j +
+                           i ] = a ;
+        }
+      }
+      for (j = 0 ; j < (2*w+1)*(2*w+1) ; ++j) {
+        self->laplacians[s * (2*w+1)*(2*w+1) + j] /= mass ;
       }
     }
   }
@@ -661,15 +708,55 @@ _vl_det_hessian_response (float * hessian,
 
 static void
 _vl_harris_response (float * harris,
-                     float * imagexx,
-                     float * imageyy,
-                     float * imagexy,
                      float const * image,
                      vl_size width, vl_size height,
-                     double step, double sigma)
+                     double step, double sigma,
+                     double sigmaI, double alpha)
 {
+  float factor = (float) (sigma * sigma) / (step * step) ;
+  vl_index k ;
 
+  float * LxLx ;
+  float * LyLy ;
+  float * LxLy ;
 
+  LxLx = vl_malloc(sizeof(float) * width * height) ;
+  LyLy = vl_malloc(sizeof(float) * width * height) ;
+  LxLy = vl_malloc(sizeof(float) * width * height) ;
+
+  vl_imgradient_f (LxLx, LyLy, width, 1, image, width, height, width) ;
+
+  for (k = 0 ; k < (signed)(width * height) ; ++k) {
+    float dx = LxLx[k] ;
+    float dy = LyLy[k] ;
+    LxLx[k] = dx*dx ;
+    LyLy[k] = dy*dy ;
+    LxLy[k] = dx*dy ;
+  }
+
+  vl_imsmooth_f(LxLx, width, LxLx, width, height, width,
+                sigmaI / step, sigmaI / step) ;
+
+  vl_imsmooth_f(LyLy, width, LyLy, width, height, width,
+                sigmaI / step, sigmaI / step) ;
+
+  vl_imsmooth_f(LxLy, width, LxLy, width, height, width,
+                sigmaI / step, sigmaI / step) ;
+
+  for (k = 0 ; k < (signed)(width * height) ; ++k) {
+    float a = LxLx[k] ;
+    float b = LyLy[k] ;
+    float c = LxLy[k] ;
+
+    float determinant = a * b - c * c ;
+    float trace = a + b ;
+
+    harris[k] = factor * (determinant - alpha * (trace * trace)) ;
+  }
+
+  vl_free(LxLy) ;
+  vl_free(LyLy) ;
+  vl_free(LxLx) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -797,9 +884,10 @@ vl_covdet_detect (VlCovDet * self)
 
         case VL_COVDET_METHOD_HARRIS_LAPLACE:
         case VL_COVDET_METHOD_MULTISCALE_HARRIS:
-          _vl_harris_response(clevel, levelxx, levelyy, levelxy,
+          _vl_harris_response(clevel,
                               level, width, height,
-                              step, sigma) ;
+                              step, sigma,
+                              1.4 * sigma, 0.05) ;
           break ;
 
         case VL_COVDET_METHOD_HESSIAN:
@@ -910,7 +998,7 @@ vl_covdet_detect (VlCovDet * self)
 /* ---------------------------------------------------------------- */
 
 vl_bool
-vl_covdet_extract_patch (VlCovDet * self,
+vl_covdet_extract_patch_for_frame (VlCovDet * self,
                          float * patch,
                          vl_size resolution,
                          double extent,
@@ -1163,8 +1251,10 @@ vl_covdet_extract_patch (VlCovDet * self,
 /*                                             Extract affine shape */
 /* ---------------------------------------------------------------- */
 
-VlFrameOrientedEllipse
-vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
+int
+vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
+                                          VlFrameOrientedEllipse * adapted,
+                                          VlFrameOrientedEllipse frame)
 {
   vl_index iter = 0 ;
 
@@ -1179,9 +1269,10 @@ vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
   double anisotropy ;
   double referenceScale ;
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
-  VlFrameOrientedEllipse adapted = frame ;
   vl_size const size = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
   double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+
+  *adapted = frame ;
 
   while (1) {
     double lxx = 0, lxy = 0, lyy = 0 ;
@@ -1194,7 +1285,7 @@ vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
 
     if (anisotropy > VL_COVDET_AA_MAX_ANISOTROPY) {
       /* diverged, give up with current solution */
-      return adapted ;
+      break ;
     }
 
     /* make sure that the smallest singluar value stays fixed
@@ -1211,19 +1302,19 @@ vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
     A[2] = U[2] * D[3] * factor ;
     A[3] = U[3] * D[3] * factor ;
 
-    adapted.a11 = A[0] ;
-    adapted.a21 = A[1] ;
-    adapted.a12 = A[2] ;
-    adapted.a22 = A[3] ;
+    adapted->a11 = A[0] ;
+    adapted->a21 = A[1] ;
+    adapted->a12 = A[2] ;
+    adapted->a22 = A[3] ;
 
     if (++iter >= VL_COVDET_AA_MAX_NUM_ITERATIONS) break ;
 
-    err = vl_covdet_extract_patch(self,
-                                  self->aaPatch,
-                                  VL_COVDET_AA_PATCH_RESOLUTION,
-                                  VL_COVDET_AA_PATCH_EXTENT,
-                                  1.0,
-                                  adapted) ;
+    err = vl_covdet_extract_patch_for_frame(self,
+                                            self->aaPatch,
+                                            VL_COVDET_AA_PATCH_RESOLUTION,
+                                            VL_COVDET_AA_PATCH_EXTENT,
+                                            1.0,
+                                            *adapted) ;
 
     /* compute second moment matrix */
     vl_imgradient_f (self->aaPatchX, self->aaPatchY, 1, size,
@@ -1242,7 +1333,7 @@ vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
     M[3] = lyy ;
 
     if (lxx == 0 || lyy == 0) {
-      adapted = frame ;
+      *adapted = frame ;
       break ;
     }
 
@@ -1279,33 +1370,250 @@ vl_covdet_extract_affine_shape (VlCovDet * self, VlFrameOrientedEllipse frame)
 
   } /* next iteration */
 
-  return adapted ;
+  /*
+   Shape adaptation does not estimate rotation. This is fixed by default
+   so that a selected axis is not rotated at all (usually this is the
+   vertical axis for upright features). To do so, the frame is rotated
+   as follows.
+   */
+#if 1
+  {
+    double A [2*2] = {adapted->a11, adapted->a21, adapted->a12, adapted->a22} ;
+    double ref [2] ;
+    double ref_ [2] ;
+    double angle ;
+    double angle_ ;
+    double dangle ;
+    double r1, r2 ;
+
+    if (self->transposed) {
+      /* up is the x axis */
+      ref[0] = 1 ;
+      ref[1] = 0 ;
+    } else {
+      /* up is the y axis */
+      ref[0] = 0 ;
+      ref[1] = 1 ;
+    }
+
+    vl_solve_linear_system_2 (ref_, A, ref) ;
+    angle = atan2(ref[1], ref[0]) ;
+    angle_ = atan2(ref_[1], ref_[0]) ;
+    dangle = angle_ - angle ;
+    r1 = cos(dangle) ;
+    r2 = sin(dangle) ;
+    adapted->a11 = + A[0] * r1 + A[2] * r2 ;
+    adapted->a21 = + A[1] * r1 + A[3] * r2 ;
+    adapted->a12 = - A[0] * r2 + A[2] * r1 ;
+    adapted->a22 = - A[1] * r2 + A[3] * r1 ;
+  }
+#endif
+  return VL_ERR_OK ;
+}
+
+void
+vl_covdet_extract_affine_shape (VlCovDet * self)
+{
+  vl_index i, j  ;
+  vl_size numFrames = vl_covdet_get_num_features(self) ;
+  VlCovDetFeature * feature = vl_covdet_get_features(self);
+  for (i = 0 ; i < (signed)numFrames ; ++i) {
+    int status ;
+    VlFrameOrientedEllipse adapted ;
+    status = vl_covdet_extract_affine_shape_for_frame(self, &adapted, feature[i].frame) ;
+    if (status == VL_ERR_OK) {
+      feature[j] = feature[i] ;
+      feature[j].frame = adapted ;
+      ++ j ;
+    }
+  }
+  self->numFrames = j ;
 }
 
 /* ---------------------------------------------------------------- */
 /*                                             Extract orientations */
 /* ---------------------------------------------------------------- */
 
-double * vl_covdet_extract_orientations (VlCovDet * self,
-                                              vl_size * numOrientations,
-                                              VlFrameOrientedEllipse frame)
+double * vl_covdet_extract_orientations_for_frame (VlCovDet * self,
+                                                   vl_size * numOrientations,
+                                                   VlFrameOrientedEllipse frame)
 {
   assert(self);
   assert(numOrientations) ;
-  self->orientations[0] = 1.0 ;
-  *numOrientations = 1 ;
+  int err ;
+  vl_index k, i ;
+  vl_index iter ;
+  vl_size size = 2 * VL_COVDET_AA_PATCH_RESOLUTION + 1  ;
+  vl_size const numBins = VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
+  double hist [VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS] ;
+  double const step = 2 * VL_PI / VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
+  double const inverseStep = 1.0 / step ;
+  double maxValue ;
+  double const fraction = VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE ;
+
+  err = vl_covdet_extract_patch_for_frame(self,
+                                self->aaPatch,
+                                VL_COVDET_AA_PATCH_RESOLUTION,
+                                VL_COVDET_AA_PATCH_EXTENT,
+                                1.0,
+                                frame) ;
+
+  vl_imgradient_polar_f (self->aaPatchX, self->aaPatchY, 1, size,
+                         self->aaPatch, size, size, size) ;
+
+  memset (hist, 0, sizeof(double) * VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS) ;
+
+  /* accumulate histogram */
+  for (k = 0 ; k < (signed)(size*size) ; ++k) {
+    double modulus = self->aaPatchX[k] ;
+    double angle = self->aaPatchY[k] ;
+    double weight = self->aaMask[k] ;
+
+    double x = angle * inverseStep ;
+    vl_index bin = vl_floor_d(x) ;
+    double w2 = x - bin ;
+    double w1 = 1.0 - w2 ;
+
+    hist[(bin + numBins) % numBins] += w1 * (modulus * weight) ;
+    hist[(bin + numBins + 1) % numBins] += w2 * (modulus * weight) ;
+  }
+
+  /* smooth histogram */
+  for (iter = 0; iter < 6; iter ++) {
+    double prev = hist [numBins - 1] ;
+    double first = hist [0] ;
+    vl_index i ;
+    for (i = 0; i < (signed)numBins - 1; ++i) {
+      double curr = (prev + hist[i] + hist[(i + 1) % numBins]) / 3.0 ;
+      prev = hist[i] ;
+      hist[i] = curr ;
+    }
+    hist[i] = (prev + hist[i] + first) / 3.0 ;
+  }
+
+  /* find the histogram maximum */
+  maxValue = 0 ;
+  for (i = 0 ; i < (signed)numBins ; ++i) {
+    maxValue = VL_MAX (maxValue, hist[i]) ;
+  }
+
+  /* find peaks within 80% from max */
+  *numOrientations = 0 ;
+  for(i = 0 ; i < (signed)numBins ; ++i) {
+    double h0 = hist [i] ;
+    double hm = hist [(i - 1 + numBins) % numBins] ;
+    double hp = hist [(i + 1 + numBins) % numBins] ;
+
+    /* is this a peak? */
+    if (h0 > fraction * maxValue && h0 > hm && h0 > hp) {
+      /* quadratic interpolation */
+      double di = - 0.5 * (hp - hm) / (hp + hm - 2 * h0) ;
+      double th = step * (i + di) ;
+      if (self->transposed) {
+        /* the axis to the right is y, measure orientations from this */
+        th = VL_PI/2 - th ;
+      }
+      self->orientations [*numOrientations] = th ;
+      *numOrientations += 1 ;
+      if (*numOrientations >= VL_COVDET_MAX_NUM_ORIENTATIONS) break ;
+    }
+  }
+
   return self->orientations ;
 }
+
+void
+vl_covdet_extract_orientations (VlCovDet * self)
+{
+  vl_index i, j  ;
+  vl_size numFrames = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFrames ; ++i) {
+    vl_size numOrientations ;
+    VlCovDetFeature feature = self->frames[i] ;
+    double const * angles =
+    vl_covdet_extract_orientations_for_frame(self, &numOrientations, feature.frame) ;
+
+    for (j = 0 ; j < (signed)numOrientations ; ++j) {
+      double A [2*2] = {
+        feature.frame.a11,
+        feature.frame.a21,
+        feature.frame.a12,
+        feature.frame.a22} ;
+      double r1 = cos(angles[j]) ;
+      double r2 = sin(angles[j]) ;
+      VlFrameOrientedEllipse * oriented ;
+
+      if (j == 0) {
+        oriented = & self->frames[i].frame ;
+      } else {
+        _vl_covdet_append_feature(self, &feature) ;
+        oriented = & self->frames[self->numFrames -1].frame ;
+      }
+
+      oriented->a11 = + A[0] * r1 + A[2] * r2 ;
+      oriented->a21 = + A[1] * r1 + A[3] * r2 ;
+      oriented->a12 = - A[0] * r2 + A[2] * r1 ;
+      oriented->a22 = - A[1] * r2 + A[3] * r1 ;
+    }
+  }
+}
+
 
 /* ---------------------------------------------------------------- */
 /*                                    Extract scales with Laplacian */
 /* ---------------------------------------------------------------- */
 
-double * vl_covdet_extract_laplacian_scales (VlCovDet * self, vl_size * numScales,
-                                             VlFrameOrientedEllipse frame)
+double * vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
+                                                       vl_size * numScales,
+                                                       VlFrameOrientedEllipse frame)
 {
   assert(self) ;
   assert(numScales) ;
+
+  int err ;
+  vl_index k, i ;
+  vl_index iter ;
+  vl_size size = 2 * VL_COVDET_AA_PATCH_RESOLUTION + 1  ;
+  vl_size const numBins = VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
+  double hist [VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS] ;
+  double const step = 2 * VL_PI / VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
+  double const inverseStep = 1.0 / step ;
+  double maxValue ;
+  double const fraction = VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE ;
+  vl_size const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
+  double scores [VL_COVDET_LAP_NUM_LEVELS] ;
+  float const * pt ;
+
+
+  double alpha = sqrt(2) ;
+  VlFrameOrientedEllipse alphaFrame = frame ;
+  alphaFrame.a11 = alpha * alphaFrame.a11 ;
+  alphaFrame.a21 = alpha * alphaFrame.a21 ;
+  alphaFrame.a12 = alpha * alphaFrame.a12 ;
+  alphaFrame.a22 = alpha * alphaFrame.a22 ;
+
+  err = vl_covdet_extract_patch_for_frame(self,
+                                          self->lapPatch,
+                                          VL_COVDET_LAP_PATCH_RESOLUTION,
+                                          VL_COVDET_LAP_PATCH_EXTENT,
+                                          1.0,
+                                          alphaFrame) ;
+
+
+  pt = self->laplacians ;
+  for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
+    vl_index q ;
+    double score = 0 ;
+    for (q = 0 ; q < (2*w+1) * (2*w+1) ; ++q) {
+      score += (*pt++) * self->lapPatch[q] ;
+    }
+    scores[k] = score ;
+  }
+
+
+
+
+
   self->scales[0] = 1.0 ;
   *numScales = 1 ;
 }
@@ -1404,5 +1712,25 @@ vl_covdet_get_features (VlCovDet * self)
   return self->frames ;
 }
 
+
+/** @brief Get wether images are passed in transposed
+ ** @param self ::VlCovDet object.
+ ** @return whether images are transposed.
+ **/
+vl_bool
+vl_covdet_get_transposed (VlCovDet * self)
+{
+  return self->transposed ;
+}
+
+/** @brief Set the index of the first octave
+ ** @param self ::VlCovDet object.
+ ** @param t whether images are transposed.
+ **/
+void
+vl_covdet_set_transposed (VlCovDet * self, vl_bool t)
+{
+  self->transposed = t ;
+}
 
 
