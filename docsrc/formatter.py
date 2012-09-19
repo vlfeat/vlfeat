@@ -190,7 +190,7 @@ class Formatter:
 
         self.tokens = Lexer(lines)
         self.xmldoc = xml.dom.minidom.Document()
-        self.funcs  = funcs
+        self.funcs = funcs
         self.linktype = linktype
         #print self.tokens
 
@@ -216,9 +216,9 @@ class Formatter:
             func_name = i.group(1)
 
             # lookup function name in dictionary
-            if self.funcs.has_key(func_name):
+            if self.funcs.has_key(func_name.upper()):
                 # retrieve function HTML location
-                func_href = self.funcs[func_name]
+                func_href = self.funcs[func_name.upper()]
 
                 # add text so far
                 xs.append(self.toTextNode(s[last+1:i.start()]))

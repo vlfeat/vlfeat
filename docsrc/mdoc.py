@@ -16,7 +16,6 @@ from wikidoc import wikidoc
 from formatter import Formatter
 from optparse import OptionParser
 
-
 excludeRegexList = []
 format           = 'html'
 verb             = 0
@@ -379,7 +378,7 @@ if __name__ == '__main__':
                 prev.next = m
                 m.prev = prev
             prev = m
-            func = m.funcname
+            func = m.funcname.upper()
             mfiles[func] = m
             linkdict[func] = m.getRef(format)
     if verb:
