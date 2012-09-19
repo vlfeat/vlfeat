@@ -57,7 +57,7 @@
 %     If specified, do not signal null nodes; instead cluster them.
 %
 %   See also: VL_AIBCUT(), VL_AIBHIST(), VL_AIBCUTHIST(),
-%             VL_AIBCUTPUSH(), VL_HELP().
+%   VL_AIBCUTPUSH(), VL_HELP().
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.

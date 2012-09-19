@@ -1,6 +1,6 @@
 function style = vl_plotstyle(index)
 % VL_PLOTSTYLES  Get a plot style
-%   STYLES = VL_PLOTSYLE(INDEX) returns a cell array of PLOT() options
+%   STYLES = VL_PLOTSTYLE(INDEX) returns a cell array of PLOT() options
 %   for the color/line style of index INDEX. The available styles are
 %   defined the ColorOrder and LineStyleOrder properties of the
 %   current axes and cycled first by color and then by line style.
@@ -29,6 +29,8 @@ function style = vl_plotstyle(index)
 %       end
 %
 %     produce visually similar results.
+%
+%   See also: VL_HELP().
 
 % Author: Andrea Vedaldi
 

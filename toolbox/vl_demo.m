@@ -1,5 +1,8 @@
 function vl_demo
 % VL_DEMO Run VLFeat demos
+%   VL_DEMO runs all VLFeat demos in a row, exporting figures for
+%   the documentation. Edit this file to see a list of the vailable
+%   demos, or look into the toolbox/demo directory.
 
 % Author: Andrea Vedaldi
 
