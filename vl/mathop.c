@@ -764,6 +764,20 @@ vl_gaussian_elimination (double * A, vl_size numRows, vl_size numColumns)
     vl_index maxi = -1 ;
     double tmp ;
 
+#if 0
+    {
+      vl_index iii, jjj ;
+      for (iii = 0 ; iii < 2 ; ++iii) {
+        for (jjj = 0 ; jjj < 3 ; ++jjj) {
+          VL_PRINTF("%5.2g ", Aat(iii,jjj)) ;
+
+        }
+        VL_PRINTF("\n") ;
+      }
+      VL_PRINTF("\n") ;
+    }
+#endif
+
     /* look for the maximally stable pivot */
     for (i = j ; i < (signed)numRows ; ++i) {
       double a = Aat(i,j) ;
@@ -785,24 +799,75 @@ vl_gaussian_elimination (double * A, vl_size numRows, vl_size numColumns)
       Aat(j,jj) /= maxa ;
     }
 
+#if 0
+    {
+      vl_index iii, jjj ;
+      VL_PRINTF("after swap %d %d\n", j, i);
+      for (iii = 0 ; iii < 2 ; ++iii) {
+        for (jjj = 0 ; jjj < 3 ; ++jjj) {
+          VL_PRINTF("%5.2g ", Aat(iii,jjj)) ;
+
+        }
+        VL_PRINTF("\n") ;
+      }
+      VL_PRINTF("\n") ;
+    }
+#endif
+
     /* elimination */
     for (ii = j+1 ; ii < (signed)numRows ; ++ii) {
       double x = Aat(ii,j) ;
-      for (jj = j ; jj < (signed)numRows ; ++jj) {
+      for (jj = j ; jj < (signed)numColumns ; ++jj) {
         Aat(ii,jj) -= x * Aat(j,jj) ;
       }
     }
+
+#if 0
+    {
+      VL_PRINTF("after elimination\n");
+
+      vl_index iii, jjj ;
+      for (iii = 0 ; iii < 2 ; ++iii) {
+        for (jjj = 0 ; jjj < 3 ; ++jjj) {
+          VL_PRINTF("%5.2g ", Aat(iii,jjj)) ;
+
+        }
+        VL_PRINTF("\n") ;
+      }
+      VL_PRINTF("\n") ;
+    }
+#endif
+
   }
 
   /* backward substitution */
   for (i = numRows - 1 ; i > 0 ; --i) {
-    for (j = numRows ; j < (signed)numColumns ; ++j) {
-      double x = Aat(i,j) ;
-      for (ii = i-1 ; ii >= 0 ; --ii) {
-        Aat(ii,j) -= x * Aat(ii,i) ;
+    /* substitute in all rows above */
+    for (ii = i - 1 ; ii >= 0 ; --ii) {
+      double x = Aat(ii,i) ;
+      /* j = numRows */
+      for (j = numRows ; j < (signed)numColumns ; ++j) {
+        Aat(ii,j) -= x * Aat(i,j) ;
       }
     }
   }
+
+#if 0
+  {
+    VL_PRINTF("after substitution\n");
+
+    vl_index iii, jjj ;
+    for (iii = 0 ; iii < 2 ; ++iii) {
+      for (jjj = 0 ; jjj < 3 ; ++jjj) {
+        VL_PRINTF("%5.2g ", Aat(iii,jjj)) ;
+
+      }
+      VL_PRINTF("\n") ;
+    }
+    VL_PRINTF("\n") ;
+  }
+#endif
+
 
   return VL_ERR_OK ;
 }
