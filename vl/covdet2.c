@@ -480,31 +480,45 @@ vl_covdet_new (VlCovDetMethod method)
      Covers one octave of Laplacian filters, from sigma=1 to sigma=2.
      The spatial sampling step is 0.5.
      */
-    vl_index s ;
+    vl_index s, k ;
     for (s = 0 ; s < VL_COVDET_LAP_NUM_LEVELS ; ++s) {
-      double sStep = 1.0 / (VL_COVDET_LAP_NUM_LEVELS-1) ;
-      double step = 0.5 ;
-      double sigma = pow(2.0, sStep * s) ;
+      double sigmaLap = pow(2.0, -0.5 + 0.5 * s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+      double const sigmaIm = 1.0 / sqrt(2.0) ;
+      double const sigmaDelta = sqrt(sigmaLap*sigmaLap - sigmaIm*sigmaIm) ;
+      double const step = 0.5 * sigmaIm ;
       double mass = 0 ;
-      vl_index const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
-      vl_index i, j ;
-      for (j = -w ; j <= w ; ++j) {
-        for (i = -w ; i <= w ; ++i) {
-          double dx = i * step / sigma ;
-          double dy = j * step / sigma ;
-          double d2 = dx*dx + dy*dy ;
-          double a = (d2 - 2) * exp(-0.5 * d2) ;
-          mass += fabs(a) ;
-          self->laplacians[s * (2*w+1)*(2*w+1) +
-                           (2*w+1) * j +
-                           i ] = a ;
-        }
+      vl_size const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
+      vl_size const num = 2 * w + 1  ;
+      float * pt = self->laplacians + s * (num * num) ;
+
+      memset(pt, 0, num * num * sizeof(float)) ;
+
+#define at(x,y) pt[(x+w)+(y+w)*(2*w+1)]
+      at(0,0) = - 4.0 ;
+      at(-1,0) = 1.0 ;
+      at(+1,0) = 1.0 ;
+      at(0,1) = 1.0 ;
+      at(0,-1) = 1.0 ;
+#undef at
+
+      vl_imsmooth_f(pt, num,
+                    pt, num, num, num,
+                    sigmaDelta / step, sigmaDelta / step) ;
+
+      for (k = 0 ; k < (signed)(num * num) ; ++k) mass += fabs(pt[k]) ;
+      for (k = 0 ; k < (signed)(num * num) ; ++k) pt[k] /= mass ;
+
+#if 1
+      {
+        char name [200] ;
+        snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%f-lap.pgm", sigmaDelta) ;
+        vl_pgm_write_f(name, pt, num, num) ;
       }
-      for (j = 0 ; j < (2*w+1)*(2*w+1) ; ++j) {
-        self->laplacians[s * (2*w+1)*(2*w+1) + j] /= mass ;
-      }
+#endif
+
     }
   }
+
   return self ;
 }
 
@@ -981,6 +995,14 @@ vl_covdet_detect (VlCovDet * self)
               }
             }
           }
+          switch (self->method) {
+            case VL_COVDET_METHOD_HARRIS_LAPLACE :
+            case VL_COVDET_METHOD_HESSIAN_LAPLACE :
+              vl_covdet_extract_laplacian_scales (self) ;
+              break ;
+            default:
+              break ;
+          }
           break ;
         }
       }
@@ -999,11 +1021,11 @@ vl_covdet_detect (VlCovDet * self)
 
 vl_bool
 vl_covdet_extract_patch_for_frame (VlCovDet * self,
-                         float * patch,
-                         vl_size resolution,
-                         double extent,
-                         double sigma,
-                         VlFrameOrientedEllipse frame)
+                                   float * patch,
+                                   vl_size resolution,
+                                   double extent,
+                                   double sigma,
+                                   VlFrameOrientedEllipse frame)
 {
 
   vl_index o, s ;
@@ -1571,51 +1593,77 @@ double * vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   assert(numScales) ;
 
   int err ;
-  vl_index k, i ;
-  vl_index iter ;
-  vl_size size = 2 * VL_COVDET_AA_PATCH_RESOLUTION + 1  ;
-  vl_size const numBins = VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
-  double hist [VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS] ;
-  double const step = 2 * VL_PI / VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
-  double const inverseStep = 1.0 / step ;
-  double maxValue ;
-  double const fraction = VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE ;
+  double sigmaImage = 1.0 / sqrt(2.0) ;
+  double step = 0.5 / sqrt(2.0) ;
   vl_size const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
-  double scores [VL_COVDET_LAP_NUM_LEVELS] ;
+  vl_size const num = 2*w+1;
+  double extent = step * w ;
+  vl_index k ;
   float const * pt ;
-
-
-  double alpha = sqrt(2) ;
-  VlFrameOrientedEllipse alphaFrame = frame ;
-  alphaFrame.a11 = alpha * alphaFrame.a11 ;
-  alphaFrame.a21 = alpha * alphaFrame.a21 ;
-  alphaFrame.a12 = alpha * alphaFrame.a12 ;
-  alphaFrame.a22 = alpha * alphaFrame.a22 ;
+  double scores [VL_COVDET_LAP_NUM_LEVELS] ;
 
   err = vl_covdet_extract_patch_for_frame(self,
                                           self->lapPatch,
-                                          VL_COVDET_LAP_PATCH_RESOLUTION,
-                                          VL_COVDET_LAP_PATCH_EXTENT,
-                                          1.0,
-                                          alphaFrame) ;
-
+                                          w,
+                                          extent,
+                                          sigmaImage,
+                                          frame) ;
 
   pt = self->laplacians ;
   for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
     vl_index q ;
     double score = 0 ;
-    for (q = 0 ; q < (2*w+1) * (2*w+1) ; ++q) {
+    for (q = 0 ; q < (signed)(num * num) ; ++q) {
       score += (*pt++) * self->lapPatch[q] ;
     }
     scores[k] = score ;
   }
 
+  /* find and interpolate maxima */
+  *numScales = 0 ;
+  for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
+    double a = scores[k-1] ;
+    double b = scores[k] ;
+    double c = scores[k+1] ;
+    if ((b > a && b > c) || (b < a && b < c)) {
+      double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
+      double scale = pow(2.0, (k + dk) / (VL_COVDET_MAX_NUM_LAPLACIAN_SCALES - 1) - 0.5) ;
+      if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
+        self->scales[*numScales++] = scale ;
+      }
+    }
+  }
 
+  return self->scales ;
+}
 
+void
+vl_covdet_extract_laplacian_scales (VlCovDet * self)
+{
+  vl_index i, j  ;
+  vl_size numFrames = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFrames ; ++i) {
+    vl_size numScales ;
+    VlCovDetFeature feature = self->frames[i] ;
+    double const * scales =
+    vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
 
+    for (j = 0 ; j < (signed)numScales ; ++j) {
+      VlFrameOrientedEllipse * scaled ;
 
-  self->scales[0] = 1.0 ;
-  *numScales = 1 ;
+      if (j == 0) {
+        scaled = & self->frames[i].frame ;
+      } else {
+        _vl_covdet_append_feature(self, &feature) ;
+        scaled = & self->frames[self->numFrames -1].frame ;
+      }
+
+      scaled->a11 *= scales[j] ;
+      scaled->a21 *= scales[j] ;
+      scaled->a12 *= scales[j] ;
+      scaled->a22 *= scales[j] ;
+    }
+  }
 }
 
 /* ---------------------------------------------------------------- */
