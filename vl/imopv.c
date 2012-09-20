@@ -623,16 +623,16 @@ VL_XCAT(_vl_new_gaussian_fitler_,SFX)(vl_size *size, double sigma)
   T* filter ;
   T mass = (T)1.0 ;
   vl_index i ;
-  vl_size width = vl_ceil_d(sigma*3) ;
-  double factor = -0.5 / (sigma*sigma) ;
-  *size = 2*width+1 ;
+  vl_size width = vl_ceil_d(sigma * 3.0) ;
+  *size = 2 * width + 1 ;
 
   assert(size) ;
 
   filter = vl_malloc((*size) * sizeof(T)) ;
   filter[width] = 1.0 ;
   for (i = 1 ; i <= (signed)width ; ++i) {
-    double g = exp(factor * i) ;
+    double x = (double)i / sigma ;
+    double g = exp(-0.5 * x * x) ;
     mass += g + g ;
     filter[width-i] = g ;
     filter[width+i] = g ;
@@ -671,6 +671,7 @@ VL_XCAT(vl_imsmooth_, SFX)
                                -((signed)sizex-1)/2, ((signed)sizex-1)/2,
                                1, VL_PAD_BY_CONTINUITY | VL_TRANSPOSE) ;
 
+  vl_free(buffer) ;
   vl_free(filterx) ;
   if (sigmax != sigmay) {
     vl_free(filtery) ;
