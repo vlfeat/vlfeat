@@ -1233,8 +1233,8 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
       for (xxi = 0 ; xxi < 2 * (signed)resolution + 1 ; ++xxi) {
         double x = A[0] * xhat + rx ;
         double y = A[1] * xhat + ry ;
-        int xi = vl_floor_d(x) ;
-        int yi = vl_floor_d(y) ;
+        vl_index xi = vl_floor_d(x) ;
+        vl_index yi = vl_floor_d(y) ;
         double i00 = level[yi * width + xi] ;
         double i10 = level[yi * width + xi + 1] ;
         double i01 = level[(yi + 1) * width + xi] ;
@@ -1436,7 +1436,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
 void
 vl_covdet_extract_affine_shape (VlCovDet * self)
 {
-  vl_index i, j  ;
+  vl_index i, j = 0 ;
   vl_size numFrames = vl_covdet_get_num_features(self) ;
   VlCovDetFeature * feature = vl_covdet_get_features(self);
   for (i = 0 ; i < (signed)numFrames ; ++i) {

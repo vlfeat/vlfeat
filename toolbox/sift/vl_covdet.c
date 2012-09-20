@@ -14,6 +14,7 @@ the terms of the BSD license (see the COPYING file).
 #include <mexutils.h>
 #include <vl/covdet2.h>
 #include <vl/mathop.h>
+#include <vl/sift.h>
 
 #include <math.h>
 #include <assert.h>
@@ -48,12 +49,33 @@ vlmxOption  options [] = {
 
   {"Frames",               1,   opt_frames                 },
 
-  {"Descritpor",            1,   opt_descriptor              },
+  {"Descriptor",            1,   opt_descriptor              },
   {"PatchResolution",       1,   opt_patch_resolution        },
   {"PatchRelativeExtent",   1,   opt_patch_relative_extent   },
   {"PatchRelativeSmoothing",1,   opt_patch_relative_smoothing},
   {"Verbose",               0,   opt_verbose                 },
   {0,                       0,   0                           }
+} ;
+
+
+/** @brief Types of feature frames */
+typedef enum _VlCovDetDescritporType {
+  VL_COVDET_DESC_NONE = 0,
+  VL_COVDET_DESC_PATCH,
+  VL_COVDET_DESC_SIFT,
+  VL_COVDET_DESC_NUM
+} VlCovDetDescriptorType ;
+
+const char* vlCovDetDescriptorNames [VL_COVDET_DESC_NUM] =
+{
+  "None", "Patch", "SIFT"
+} ;
+
+VlEnumerator vlCovDetDescriptorTypes [VL_COVDET_DESC_NUM] =
+{
+  {"None" ,   (vl_index)VL_COVDET_DESC_NONE             },
+  {"Patch",   (vl_index)VL_COVDET_DESC_PATCH            },
+  {"SIFT",    (vl_index)VL_COVDET_DESC_SIFT             }
 } ;
 
 /** ------------------------------------------------------------------
@@ -148,7 +170,6 @@ mexFunction(int nout, mxArray *out[],
 {
   enum {IN_I = 0, IN_END} ;
   enum {OUT_FRAMES=0, OUT_DESCRIPTORS, OUT_INFO, OUT_END} ;
-  enum {DESC_NONE, DESC_PATCH, DESC_SIFT, DESC_END} ;
 
   int verbose = 0 ;
   int opt ;
@@ -168,11 +189,12 @@ mexFunction(int nout, mxArray *out[],
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
 
-  int descriptorType = DESC_PATCH ;
+  int descriptorType = -1 ;
   vl_index patchResolution = -1 ;
   double patchRelativeExtent = -1 ;
   double patchRelativeSmoothing = -1 ;
-  float *patch ;
+  float *patch = NULL ;
+  float *patchXY = NULL ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -209,6 +231,14 @@ mexFunction(int nout, mxArray *out[],
       }
       method = (VlCovDetMethod)pair->value ;
       break;
+
+      case opt_descriptor:
+        pair = vlmxDecodeEnumeration(optarg, vlCovDetDescriptorTypes, VL_TRUE) ;
+        if (pair == NULL) {
+          vlmxError(vlmxErrInvalidArgument, "DESCRIPTOR is not a supported descriptor.") ;
+        }
+        descriptorType = (VlCovDetDescriptorType)pair->value ;
+        break;
 
     case opt_estimate_affine_shape:
       if (!mxIsLogicalScalar(optarg)) {
@@ -261,26 +291,29 @@ mexFunction(int nout, mxArray *out[],
     }
   }
 
+  if (descriptorType < 0) descriptorType = VL_COVDET_DESC_SIFT ;
+
   switch (descriptorType) {
-    case DESC_PATCH :
+    case VL_COVDET_DESC_NONE :
+      break ;
+
+    case VL_COVDET_DESC_PATCH :
       if (patchResolution < 0)  patchResolution = 20 ;
       if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
       if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
       break ;
 
-    case DESC_SIFT :
+    case VL_COVDET_DESC_SIFT :
       if (patchResolution < 0)  patchResolution = 20 ;
       if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
       if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
-      break ;
-
-    case DESC_NONE :
       break ;
   }
 
   if (patchResolution > 0) {
     vl_size w = 2*patchResolution + 1 ;
     patch = mxMalloc(sizeof(float) * w * w);
+    patchXY = mxMalloc(2 * sizeof(float) * w * w);
   }
 
   /* -----------------------------------------------------------------
@@ -336,11 +369,6 @@ mexFunction(int nout, mxArray *out[],
 
     }
 
-    /* compute descriptors if needed */
-    if (0) {
-
-    }
-
     /* store results back */
     {
       vl_index i  ;
@@ -365,11 +393,11 @@ mexFunction(int nout, mxArray *out[],
     if (nout >= 2) {
       //      descriptorType = DESC_NONE;
       switch (descriptorType) {
-        case DESC_NONE:
+        case VL_COVDET_DESC_NONE:
           OUT(DESCRIPTORS) = mxCreateDoubleMatrix(0,0,mxREAL);
           break ;
 
-        case DESC_PATCH:
+        case VL_COVDET_DESC_PATCH:
         {
           if (verbose) {
             mexPrintf("vl_covdet: descriptors: type=patch, "
@@ -393,6 +421,47 @@ mexFunction(int nout, mxArray *out[],
                                     feature[i].frame) ;
             desc += w*w ;
           }
+        }
+        case VL_COVDET_DESC_SIFT:
+        {
+          if (verbose) {
+            mexPrintf("vl_covdet: descriptors: type=sift, "
+                      "resolution=%d, extent=%g, smoothing=%g\n",
+                      patchResolution, patchRelativeExtent,
+                      patchRelativeSmoothing);
+          }
+          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
+          VlSiftFilt * sift = vl_sift_new(16, 16, 1, 3, 0) ;
+          vl_index i ;
+          vl_size dimension = 128 ;
+          vl_size patchSide = 2 * patchResolution + 1 ;
+          float * desc ;
+          OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFrames, mxSINGLE_CLASS, mxREAL) ;
+          desc = mxGetData(OUT(DESCRIPTORS)) ;
+          for (i = 0 ; i < (signed)numFrames ; ++i) {
+            vl_covdet_extract_patch_for_frame(covdet,
+                                              patch,
+                                              patchResolution,
+                                              patchRelativeExtent,
+                                              patchRelativeSmoothing,
+                                              feature[i].frame) ;
+
+            vl_imgradient_polar_f (patchXY, patchXY +1,
+                                   2, 2 * patchSide,
+                                   patch, patchSide, patchSide, patchSide) ;
+
+
+            vl_sift_calc_raw_descriptor (sift,
+                                         patchXY,
+                                         desc,
+                                         (int)patchSide, (int)patchSide,
+                                         (double)patchSide / 2, (double)patchSide / 2,
+                                         (double)patchSide / (3.0 * (4 + 1)),
+                                         0) ;
+            desc += dimension ;
+          }
+          vl_sift_delete(sift) ;
         }
       }
     }
@@ -427,4 +496,7 @@ mexFunction(int nout, mxArray *out[],
     /* cleanup */
     vl_covdet_delete (covdet) ;
   }
+
+    if (patchXY) mxFree(patchXY) ;
+  if (patch) mxFree(patch) ;
 }
