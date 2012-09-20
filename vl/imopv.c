@@ -878,8 +878,8 @@ VL_XCAT(vl_imgradient_polar_, SFX)
  vl_size imageWidth, vl_size imageHeight, vl_size imageStride)
 {
   /* Shortcuts */
-  int const xo    = 1 ;
-  int const yo    = imageStride ;
+  vl_index const xo = 1 ;
+  vl_index const yo = imageStride ;
   vl_size const w = imageWidth;
   vl_size const h = imageHeight;
 
