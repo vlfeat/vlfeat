@@ -179,10 +179,17 @@ im = exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
 
 function im = blobs1(args)
 [u,v,opts,args] = commonOpts(args) ;
+opts.number = 5 ;
+opts.sigma = [] ;
+opts = vl_argparse(opts, args) ;
 im = zeros(size(u)) ;
-num = 5 ;
-square = 2 / num ;
-sigma = square / 2 / 3 ;
+square = 2 / opts.number ;
+num = opts.number ;
+if isempty(opts.sigma)
+  sigma = 1/6 * square ;
+else
+  sigma = opts.sigma * square ;
+end
 rotations = linspace(0,pi,num+1) ;
 rotations(end) = [] ;
 skews = linspace(1,2,num) ;
