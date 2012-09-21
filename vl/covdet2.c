@@ -609,7 +609,7 @@ vl_covdet_put_image (VlCovDet * self,
                                   self->octaveResolution,
                                   octaveFirstSubdivision, octaveLastSubdivision) ;
   }
-  vl_scalespace_init (self->gss, image) ;
+  vl_scalespace_put_image(self->gss, image) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -873,41 +873,38 @@ vl_covdet_detect (VlCovDet * self)
   }
   if (self->method == VL_COVDET_METHOD_HARRIS_LAPLACE ||
       self->method == VL_COVDET_METHOD_MULTISCALE_HARRIS) {
-    vl_size width = vl_scalespace_get_octave_width(self->gss, geom.firstOctave) ;
-    vl_size height = vl_scalespace_get_octave_width(self->gss, geom.firstOctave) ;
-    levelxx = vl_malloc(width*height*sizeof(float)) ;
-    levelyy = vl_malloc(width*height*sizeof(float)) ;
-    levelxy = vl_malloc(width*height*sizeof(float)) ;
+    VlScaleSpaceOctaveGeometry oct = vl_scalespace_get_octave_geometry(self->gss, geom.firstOctave) ;
+    levelxx = vl_malloc(oct.width * oct.height * sizeof(float)) ;
+    levelyy = vl_malloc(oct.width * oct.height * sizeof(float)) ;
+    levelxy = vl_malloc(oct.width * oct.height * sizeof(float)) ;
   }
 
   /* compute cornerness ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   for (o = cgeom.firstOctave ; o <= cgeom.lastOctave ; ++o) {
+    VlScaleSpaceOctaveGeometry oct = vl_scalespace_get_octave_geometry(self->css, o) ;
+
     for (s = cgeom.octaveFirstSubdivision ; s <= cgeom.octaveLastSubdivision ; ++s) {
-      float * level = vl_scalespace_get_octave(self->gss, o, s) ;
-      float * clevel = vl_scalespace_get_octave(self->css, o, s) ;
-      vl_size width = vl_scalespace_get_octave_width(self->css, o) ;
-      vl_size height = vl_scalespace_get_octave_height(self->css, o) ;
-      double sigma = vl_scalespace_get_sigma_for_scale(self->css, o, s) ;
-      double step = pow(2.0, o) ;
+      float * level = vl_scalespace_get_level(self->gss, o, s) ;
+      float * clevel = vl_scalespace_get_level(self->css, o, s) ;
+      double sigma = vl_scalespace_get_level_sigma(self->css, o, s) ;
       switch (self->method) {
         case VL_COVDET_METHOD_DOG:
           _vl_dog_response(clevel, level,
-                           vl_scalespace_get_octave(self->gss, o, s-1),
-                           width, height) ;
+                           vl_scalespace_get_level(self->gss, o, s - 1),
+                           oct.width, oct.height) ;
           break ;
 
         case VL_COVDET_METHOD_HARRIS_LAPLACE:
         case VL_COVDET_METHOD_MULTISCALE_HARRIS:
           _vl_harris_response(clevel,
-                              level, width, height,
-                              step, sigma,
-                              1.4 * sigma, 0.05) ;
+                              level, oct.width, oct.height, oct.step,
+                              sigma, 1.4 * sigma, 0.05) ;
           break ;
 
         case VL_COVDET_METHOD_HESSIAN:
         case VL_COVDET_METHOD_HESSIAN_LAPLACE:
         case VL_COVDET_METHOD_MULTISCALE_HESSIAN:
-          _vl_det_hessian_response(clevel, level, width, height, step, sigma) ;
+          _vl_det_hessian_response(clevel, level, oct.width, oct.height, oct.step, sigma) ;
           break ;
 
         default:
@@ -923,10 +920,11 @@ vl_covdet_detect (VlCovDet * self)
     vl_size numExtrema ;
     vl_size index ;
     for (o = cgeom.firstOctave ; o <= cgeom.lastOctave ; ++o) {
-      vl_size width = vl_scalespace_get_octave_width(self->css, o) ;
-      vl_size height = vl_scalespace_get_octave_height(self->css, o) ;
+      VlScaleSpaceOctaveGeometry octgeom = vl_scalespace_get_octave_geometry(self->css, o) ;
+      double step = octgeom.step ;
+      vl_size width = octgeom.width ;
+      vl_size height = octgeom.height ;
       vl_size depth = cgeom.octaveLastSubdivision - cgeom.octaveFirstSubdivision + 1 ;
-      double step = vl_scalespace_get_octave_sampling_step (self->css, o) ;
 
       switch (self->method) {
         case VL_COVDET_METHOD_DOG:
@@ -934,7 +932,7 @@ vl_covdet_detect (VlCovDet * self)
         {
           /* scale-space extrema */
           float const * octave =
-          vl_scalespace_get_octave(self->css,o,cgeom.octaveFirstSubdivision) ;
+          vl_scalespace_get_level(self->css, o, cgeom.octaveFirstSubdivision) ;
           numExtrema = vl_find_local_extrema_3(&extrema, &extremaBufferSize,
                                                octave, width, height, depth,
                                                0.8 * self->peakThreshold);
@@ -947,7 +945,7 @@ vl_covdet_detect (VlCovDet * self)
                                                    extrema[3*index+1],
                                                    extrema[3*index+2]) ;
             if (ok) {
-              double sigma = self->css->sigma0 *
+              double sigma = cgeom.sigma0 *
               pow(2.0, o + (refined.z - cgeom.octaveFirstSubdivision)
                   / cgeom.octaveResolution) ;
               feature.frame.x = refined.x * step ;
@@ -968,7 +966,7 @@ vl_covdet_detect (VlCovDet * self)
         {
           for (s = cgeom.octaveFirstSubdivision ; s < cgeom.octaveLastSubdivision ; ++s) {
             /* space extrema */
-            float const * level = vl_scalespace_get_octave(self->css,o,s) ;
+            float const * level = vl_scalespace_get_level(self->css,o,s) ;
             numExtrema = vl_find_local_extrema_2(&extrema, &extremaBufferSize,
                                                  level,
                                                  width, height,
@@ -981,7 +979,7 @@ vl_covdet_detect (VlCovDet * self)
                                                      extrema[2*index+0],
                                                      extrema[2*index+1]);
               if (ok) {
-                double sigma = self->css->sigma0 *
+                double sigma = cgeom.sigma0 *
                 pow(2.0, o + (double)s / cgeom.octaveResolution) ;
                 feature.frame.x = refined.x * step ;
                 feature.frame.y = refined.y * step ;
@@ -1041,6 +1039,7 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
   double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
   double T[2] = {frame.x, frame.y} ;
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
+  VlScaleSpaceOctaveGeometry oct ;
 
 
   /* Starting from a pre-smoothed image at scale sigma_
@@ -1108,10 +1107,11 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
    create a padded copy of the required region first.
    */
 
-  level = vl_scalespace_get_octave(self->gss, o, s) ;
-  width = vl_scalespace_get_octave_width(self->gss, o) ;
-  height = vl_scalespace_get_octave_height(self->gss, o) ;
-  step = pow(2.0, o) ;
+  level = vl_scalespace_get_level(self->gss, o, s) ;
+  oct = vl_scalespace_get_octave_geometry(self->gss, o) ;
+  width = oct.width ;
+  height = oct.height ;
+  step = oct.step ;
 
   A[0] /= step ;
   A[1] /= step ;

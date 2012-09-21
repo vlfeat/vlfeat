@@ -95,17 +95,18 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
   }
 
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(ss) ;
+
   numOctaves = geom.lastOctave - geom.firstOctave + 1 ;
   numSubdivisions = geom.octaveLastSubdivision - geom.octaveFirstSubdivision + 1 ;
 
   data_array = mxCreateCellMatrix(1, numOctaves);
   for (o = geom.firstOctave ; o <= geom.lastOctave ; ++o) {
-    vl_size w = vl_scalespace_get_octave_width(ss, o) ;
-    vl_size h = vl_scalespace_get_octave_height(ss, o) ;
-    float const * octave = vl_scalespace_get_octave(ss, o, geom.octaveFirstSubdivision) ;
-    mwSize dims [3] = {w, h, numSubdivisions} ;
+    VlScaleSpaceOctaveGeometry oct = vl_scalespace_get_octave_geometry(ss, o) ;
+    float const * octave = vl_scalespace_get_level(ss, o, geom.octaveFirstSubdivision) ;
+    mwSize dims [3] = {oct.width, oct.height, numSubdivisions} ;
     mxArray * octave_array = mxCreateNumericArray(3, dims, mxSINGLE_CLASS, mxREAL) ;
-    memcpy(mxGetData(octave_array), octave, w*h*numSubdivisions*sizeof(float)) ;
+    memcpy(mxGetData(octave_array),
+           octave, oct.width * oct.height * numSubdivisions * sizeof(float)) ;
     mxSetCell(data_array, o - geom.firstOctave, octave_array) ;
   }
 
@@ -421,6 +422,7 @@ mexFunction(int nout, mxArray *out[],
                                     feature[i].frame) ;
             desc += w*w ;
           }
+          break ;
         }
         case VL_COVDET_DESC_SIFT:
         {
@@ -462,7 +464,10 @@ mexFunction(int nout, mxArray *out[],
             desc += dimension ;
           }
           vl_sift_delete(sift) ;
+          break ;
         }
+        default:
+          assert(0) ; /* descriptor type */
       }
     }
 
