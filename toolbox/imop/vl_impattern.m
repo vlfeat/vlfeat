@@ -28,7 +28,20 @@ function im = vl_impattern(varargin)
 %     Random i.i.d. noise.
 %
 %   Blobs:
-%     Gaussian blobs of various sizes and skews.
+%     Gaussian blobs of various sizes and skews. Use the option-value
+%     pairs 'sigma', 'orientation', and 'anisotropy' to specify the
+%     respective parameters. 'sigma' is the scalar standard deviation
+%     of an isotropic blob (the image domain is the rectangle
+%     [-1,1]^2). 'orientation' is the clockwise rotation (as the Y
+%     axis points downards). 'anisotropy' (>= 1) is the ratio of the
+%     the largest over the smallest axis of the blob (the smallest
+%     axis length is set by 'sigma').
+%
+%   Blobs1:
+%     Gaussian blobs of various skews and orientations.
+%
+%   Blob:
+%     One Gaussian blob.
 %
 %   A stock image::
 %     Any of 'box', 'roofs1', 'roofs2', 'river1', 'river2', 'spotted'.
@@ -48,7 +61,7 @@ else
 end
 
 patterns = {'wedge','cone','smoothChecker','threeDotsSquare', ...
-            'blobs', 'blobs1', ...
+            'blob', 'blobs', 'blobs1', ...
             'box', 'roofs1', 'roofs2', 'river1', 'river2'} ;
 
 % spooling
@@ -58,6 +71,7 @@ switch lower(pattern)
   case 'smoothchecker', im = smoothChecker(varargin) ;
   case 'threedotssquare', im = threeDotSquare(varargin) ;
   case 'uniformnoise', im = uniformNoise(varargin) ;
+  case 'blob', im = blob(varargin) ;
   case 'blobs', im = blobs(varargin) ;
   case 'blobs1', im = blobs1(varargin) ;
   case {'box','roofs1','roofs2','river1','river2','spots'}
@@ -146,6 +160,23 @@ for i=1:num
 end
 im = im / max(im(:)) ;
 
+function im = blob(args)
+[u,v,opts,args] = commonOpts(args) ;
+opts.sigma = 0.15 ;
+opts.anisotropy = .5 ;
+opts.orientation = 2/3 * pi  ;
+opts = vl_argparse(opts, args) ;
+im = zeros(size(u)) ;
+th = opts.orientation ;
+R = [cos(th) -sin(th) ; sin(th) cos(th)] ;
+A = opts.sigma * R * diag([opts.anisotropy 1]) ;
+cx = 0 ;
+cy = 0 ;
+C = inv(A*A') ;
+x = u - cx ;
+y = v - cy ;
+im = exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
+
 function im = blobs1(args)
 [u,v,opts,args] = commonOpts(args) ;
 im = zeros(size(u)) ;
@@ -161,8 +192,8 @@ for i=1:num
     cx = (j-1) * square + square/2 - 1;
     th = rotations(i) ;
     R = [cos(th) -sin(th); sin(th) cos(th)] ;
-    A = sigma * diag([1 1/skews(j)]) * R ;
-    C = inv(A'*A) ;
+    A = sigma * R * diag([1 1/skews(j)]) ;
+    C = inv(A*A') ;
     x = u - cx ;
     y = v - cy ;
     im = im + exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
