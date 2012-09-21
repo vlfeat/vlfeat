@@ -1,10 +1,12 @@
 /** @internal @file covdet.c
+ ** @brief Covariant Detector - MEX
+ ** @author Karel Lenc
  ** @author Andrea Vedaldi
- ** @brief Scale Invariant Feature Transform (SIFT) - MEX
+ ** @author Michal Perdoch
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-12 Karel Lencl, Andrea Vedaldi and Michal Perdoch.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -449,7 +451,7 @@ mexFunction(int nout, mxArray *out[],
       }
     } else {
       mexPrintf("vl_covdet: detector: %s\n",
-                vl_enumeration_get_by_value(vlCovdetMethods, method)) ;
+                vl_enumeration_get_by_value(vlCovdetMethods, method)->name) ;
       vl_covdet_detect(covdet) ;
     }
 
@@ -621,6 +623,6 @@ mexFunction(int nout, mxArray *out[],
     vl_covdet_delete (covdet) ;
   }
 
-    if (patchXY) mxFree(patchXY) ;
+  if (patchXY) mxFree(patchXY) ;
   if (patch) mxFree(patch) ;
 }
