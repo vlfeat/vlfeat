@@ -1018,14 +1018,16 @@ vl_covdet_detect (VlCovDet * self)
 /* ---------------------------------------------------------------- */
 
 vl_bool
-vl_covdet_extract_patch_for_frame (VlCovDet * self,
-                                   float * patch,
-                                   vl_size resolution,
-                                   double extent,
-                                   double sigma,
-                                   VlFrameOrientedEllipse frame)
+vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
+                                          double * sigma1,
+                                          double * sigma2,
+                                          float * patch,
+                                          vl_size resolution,
+                                          double extent,
+                                          double sigma,
+                                          double const * A_,
+                                          double const * T_)
 {
-
   vl_index o, s ;
   double factor ;
   double sigma_ ;
@@ -1036,11 +1038,10 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
   double U [2*2] ;
   double V [2*2] ;
   double D [2*2] ;
-  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
-  double T[2] = {frame.x, frame.y} ;
+  double A [] = {A_[0], A_[1], A_[2], A_[3]} ;
+  double T [] = {T_[0], T_[1]} ;
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
   VlScaleSpaceOctaveGeometry oct ;
-
 
   /* Starting from a pre-smoothed image at scale sigma_
      because of the mapping A the resulting smoothing in
@@ -1056,7 +1057,7 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
 
         A = U*D,
 
-        S = sigma_^2 D^2.
+        S = sigma_^2 D^-2.
 
      Then we search the scale-space for the best sigma_ such
      that the target smoothing is approximated from below:
@@ -1067,14 +1068,7 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
 
   vl_svd2(D, U, V, A) ;
   factor = 1.0 / VL_MIN(D[0], D[3]) ;
-
-  /*
-  A[0] = U[0] * D[0] ;
-  A[1] = U[1] * D[0] ;
-  A[2] = U[2] * D[3] ;
-  A[3] = U[3] * D[3] ;
-   */
-
+  
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
    This can be obtained by scanning octaves from smalles to largest
@@ -1082,22 +1076,26 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
 
    Given the range of octave availables, do the best you can.
    */
-  for (o = geom.firstOctave + 1 ; o <= geom.lastOctave - 1; ++o) {
+  for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
     s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
     s = VL_MAX(s, geom.octaveFirstSubdivision) ;
     s = VL_MIN(s, geom.octaveLastSubdivision) ;
     sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+    /*VL_PRINTF(".. %d D=%g %g; sigma_=%g factor*sigma_=%g\n", o, D[0], D[3], sigma_, factor* sigma_) ;*/
     if (factor * sigma_ > sigma) {
       o -- ;
       break ;
     }
   }
+  o = VL_MIN(o, geom.lastOctave) ;
   s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
   s = VL_MAX(s, geom.octaveFirstSubdivision) ;
   s = VL_MIN(s, geom.octaveLastSubdivision) ;
   sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+  if (sigma1) *sigma1 = sigma_ / D[0] ;
+  if (sigma2) *sigma2 = sigma_ / D[3] ;
 
-  /* VL_PRINTF("%d %d %g %g %g %g\n", o, s, factor, sigma_, factor * sigma_, sigma) ; */
+  /*VL_PRINTF("%d %d %g %g %g %g\n", o, s, factor, sigma_, factor * sigma_, sigma) ;*/
 
   /*
    Now the scale space level to be used for this warping has been
@@ -1204,7 +1202,7 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
       {
         char name [200] ;
         snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f-ext.pgm", 1e10*vl_get_cpu_time()) ;
-        vl_pgm_write_f(name, self->patch, selfPatchWidth, selfPatchHeight) ;
+        vl_pgm_write_f(name, patch, patchWidth, patchWidth) ;
       }
 #endif
 
@@ -1254,19 +1252,29 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
       yhat += stephat ;
     }
   }
-#if 0
+#if 1
     {
       char name [200] ;
       snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
-      vl_pgm_write_f(name, patch, patchWidth, patchHeight) ;
+      vl_pgm_write_f(name, patch, 2*resolution+1, 2*resolution+1) ;
     }
 #endif
-
-  /*
-   Do additional smoothing if needed.
-   */
-
   return VL_ERR_OK ;
+}
+
+
+vl_bool
+vl_covdet_extract_patch_for_frame (VlCovDet * self,
+                                   float * patch,
+                                   vl_size resolution,
+                                   double extent,
+                                   double sigma,
+                                   VlFrameOrientedEllipse frame)
+{
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T[2] = {frame.x, frame.y} ;
+  return vl_covdet_extract_patch_for_frame_helper
+  (self, NULL, NULL, patch, resolution, extent, sigma, A, T) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1287,12 +1295,13 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   double P [2*2] ;
   double P_ [2*2] ;
   double Q [2*2] ;
+  double sigma1, sigma2 ;
   double factor ;
   double anisotropy ;
   double referenceScale ;
-  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
   vl_size const size = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
   double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T [2] = {frame.x, frame.y} ;
 
   *adapted = frame ;
 
@@ -1304,6 +1313,8 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
     /* A = U D V' */
     vl_svd2(D, U, V, A) ;
     anisotropy = VL_MAX(D[0]/D[3], D[3]/D[0]) ;
+
+    /* VL_PRINTF("anisot: %g\n", anisotropy); */
 
     if (anisotropy > VL_COVDET_AA_MAX_ANISOTROPY) {
       /* diverged, give up with current solution */
@@ -1331,12 +1342,23 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
 
     if (++iter >= VL_COVDET_AA_MAX_NUM_ITERATIONS) break ;
 
-    err = vl_covdet_extract_patch_for_frame(self,
-                                            self->aaPatch,
-                                            VL_COVDET_AA_PATCH_RESOLUTION,
-                                            VL_COVDET_AA_PATCH_EXTENT,
-                                            1.0,
-                                            *adapted) ;
+    err = vl_covdet_extract_patch_for_frame_helper(self,
+                                                   &sigma1, &sigma2,
+                                                   self->aaPatch,
+                                                   VL_COVDET_AA_PATCH_RESOLUTION,
+                                                   VL_COVDET_AA_PATCH_EXTENT,
+                                                   1.0,
+                                                   A, T) ;
+    
+    if (1) {
+      double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
+      double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
+      double stephat = (2.0*VL_COVDET_AA_PATCH_EXTENT) / size ;
+      /*VL_PRINTF("%g %g\n", sigma1, sigma2) ;*/
+      vl_imsmooth_f(self->aaPatch, size,
+                    self->aaPatch, size, size, size,
+                    deltaSigma1 / stephat, deltaSigma2 / stephat) ;
+    }
 
     /* compute second moment matrix */
     vl_imgradient_f (self->aaPatchX, self->aaPatchY, 1, size,
@@ -1393,12 +1415,13 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   } /* next iteration */
 
   /*
+   Make upright.
+
    Shape adaptation does not estimate rotation. This is fixed by default
    so that a selected axis is not rotated at all (usually this is the
    vertical axis for upright features). To do so, the frame is rotated
    as follows.
    */
-#if 1
   {
     double A [2*2] = {adapted->a11, adapted->a21, adapted->a12, adapted->a22} ;
     double ref [2] ;
@@ -1429,7 +1452,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
     adapted->a12 = - A[0] * r2 + A[2] * r1 ;
     adapted->a22 = - A[1] * r2 + A[3] * r1 ;
   }
-#endif
+
   return VL_ERR_OK ;
 }
 
