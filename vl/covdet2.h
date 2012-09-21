@@ -279,6 +279,7 @@ VL_EXPORT void vl_covdet_put_image (VlCovDet * self,
                                     vl_size width, vl_size height) ;
 
 VL_EXPORT void vl_covdet_detect (VlCovDet * self) ;
+VL_EXPORT int vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature) ;
 VL_EXPORT void vl_covdet_extract_orientations (VlCovDet * self) ;
 VL_EXPORT void vl_covdet_extract_laplacian_scales (VlCovDet * self) ;
 VL_EXPORT void vl_covdet_extract_affine_shape (VlCovDet * self) ;
@@ -289,7 +290,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                           VlFrameOrientedEllipse frame) ;
 VL_EXPORT double *
 vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
-                                              vl_size *numScales,
+                                              vl_size * numScales,
                                               VlFrameOrientedEllipse frame) ;
 VL_EXPORT int
 vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
@@ -307,13 +308,13 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self, float * patch,
 /** @name Retrieve data and parameters
  ** @{
  **/
-VL_EXPORT vl_size vl_covdet_get_num_features (VlCovDet * self) ;
+VL_EXPORT vl_size vl_covdet_get_num_features (VlCovDet const * self) ;
 VL_EXPORT void * vl_covdet_get_features (VlCovDet * self) ;
-VL_EXPORT vl_index vl_covdet_get_first_octave (VlCovDet * self) ;
-VL_EXPORT double vl_covdet_get_peak_threshold (VlCovDet * self) ;
-VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet * self) ;
-VL_EXPORT double vl_covdet_get_reference_angle (VlCovDet * self) ;
-VL_EXPORT vl_bool vl_covdet_get_transposed (VlCovDet * self) ;
+VL_EXPORT vl_index vl_covdet_get_first_octave (VlCovDet const * self) ;
+VL_EXPORT vl_size vl_covdet_get_octave_resolution (VlCovDet const * self) ;
+VL_EXPORT double vl_covdet_get_peak_threshold (VlCovDet const * self) ;
+VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet const * self) ;
+VL_EXPORT vl_bool vl_covdet_get_transposed (VlCovDet const * self) ;
 
 /** @} */
 
@@ -321,6 +322,7 @@ VL_EXPORT vl_bool vl_covdet_get_transposed (VlCovDet * self) ;
  ** @{
  **/
 VL_EXPORT void vl_covdet_set_first_octave (VlCovDet * self, vl_index o) ;
+VL_EXPORT void vl_covdet_set_octave_resolution (VlCovDet * self, vl_size r) ;
 VL_EXPORT void vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold) ;
 VL_EXPORT void vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold) ;
 VL_EXPORT void vl_covdet_set_transposed (VlCovDet * self, vl_bool t) ;

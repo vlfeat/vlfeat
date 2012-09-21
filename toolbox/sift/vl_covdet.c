@@ -38,16 +38,16 @@ enum {
 
 /* options */
 vlmxOption  options [] = {
-  {"Method",               1,   opt_method                 },
-  {"OctaveResolution",     1,   opt_octave_resolution      },
-  {"DoubleImage",          1,   opt_double_image           },
-  {"PeakThreshold",        1,   opt_peak_threshold         },
-  {"EdgeThreshold",        1,   opt_edge_threshold         },
+  {"Method",                1,   opt_method                  },
+  {"OctaveResolution",      1,   opt_octave_resolution       },
+  {"DoubleImage",           1,   opt_double_image            },
+  {"PeakThreshold",         1,   opt_peak_threshold          },
+  {"EdgeThreshold",         1,   opt_edge_threshold          },
 
-  {"EstimateOrientation",  1,   opt_estimate_orientation   },
-  {"EstimateAffineShape",  1,   opt_estimate_affine_shape  },
+  {"EstimateOrientation",   1,   opt_estimate_orientation    },
+  {"EstimateAffineShape",   1,   opt_estimate_affine_shape   },
 
-  {"Frames",               1,   opt_frames                 },
+  {"Frames",                1,   opt_frames                  },
 
   {"Descriptor",            1,   opt_descriptor              },
   {"PatchResolution",       1,   opt_patch_resolution        },
@@ -186,7 +186,7 @@ mexFunction(int nout, mxArray *out[],
   vl_bool estimateOrientation = VL_FALSE ;
 
   vl_bool doubleImage = VL_TRUE ;
-  vl_size OctaveResolution = 3 ;
+  vl_index octaveResolution = -1 ;
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
 
@@ -196,6 +196,10 @@ mexFunction(int nout, mxArray *out[],
   double patchRelativeSmoothing = -1 ;
   float *patch = NULL ;
   float *patchXY = NULL ;
+
+  double * userFrames = NULL ;
+  vl_size userFrameDimension = 0 ;
+  vl_size numUserFrames = 0 ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -257,6 +261,20 @@ mexFunction(int nout, mxArray *out[],
       }
       break ;
 
+    case opt_double_image:
+      if (!mxIsLogicalScalar(optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "DOUBLEIMAGE must be a logical scalar value.") ;
+      } else {
+        doubleImage = *mxGetLogicals(optarg);
+      }
+      break ;
+
+    case opt_octave_resolution :
+      if (!vlmxIsPlainScalar(optarg) || (octaveResolution = (vl_index)*mxGetPr(optarg)) < 1) {
+        vlmxError(vlmxErrInvalidArgument, "OCTAVERESOLUTION must be an integer not smaller than 1.") ;
+      }
+      break ;
+
     case opt_edge_threshold :
       if (!vlmxIsPlainScalar(optarg) || (edgeThreshold = *mxGetPr(optarg)) < 1) {
         vlmxError(vlmxErrInvalidArgument, "EDGETHRESHOLD must be a real not smaller than 1.") ;
@@ -286,6 +304,26 @@ mexFunction(int nout, mxArray *out[],
           vlmxError(vlmxErrInvalidArgument, "PATCHRESOLUTION must be a positive integer.") ;
         }
         break ;
+
+      case opt_frames:
+        numUserFrames = mxGetN (optarg) ;
+        userFrameDimension = mxGetM (optarg) ;
+        if (!vlmxIsPlainMatrix(optarg,-1,-1)) {
+          vlmxError(vlmxErrInvalidArgument, "FRAMES must be a palin matrix.") ;
+        }
+        switch (userFrameDimension) {
+          case 2:
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+            /* ok */
+            break ;
+          default:
+            vlmxError(vlmxErrInvalidArgument,
+                      "FRAMES of dimensions %d are not recognised",
+                      userFrameDimension); ;
+        }
 
     default :
       abort() ;
@@ -325,6 +363,8 @@ mexFunction(int nout, mxArray *out[],
 
     /* set covdet parameters */
     vl_covdet_set_transposed(covdet, VL_TRUE) ;
+    vl_covdet_set_first_octave(covdet, doubleImage? -1 : 0) ;
+    if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
 
@@ -332,7 +372,86 @@ mexFunction(int nout, mxArray *out[],
     vl_covdet_put_image(covdet, image, numRows, numCols) ;
 
     /* fill with frames: eitehr run the detector of poure them in */
-    vl_covdet_detect(covdet) ;
+    if (numUserFrames > 0) {
+      vl_index k ;
+
+      if (verbose) {
+        mexPrintf("vl_covdet: sourcing %d frames\n", numUserFrames) ;
+      }
+
+      for (k = 0 ; k < numUserFrames ; ++k) {
+        double const * uframe = userFrames + userFrameDimension * k ;
+        VlCovDetFeature feature ;
+        feature.peakScore = VL_INFINITY_F ;
+        feature.edgeScore = 1.0 ;
+        feature.frame.x = uframe[1] - 1 ;
+        feature.frame.y = uframe[0] - 1 ;
+        switch (userFrameDimension) {
+          case 2:
+            feature.frame.a11 = 1.0 ;
+            feature.frame.a21 = 0.0 ;
+            feature.frame.a12 = 0.0 ;
+            feature.frame.a22 = 1.0 ;
+            break ;
+          case 3:
+            feature.frame.a11 = uframe[2] ;
+            feature.frame.a21 = 0.0 ;
+            feature.frame.a12 = 0.0 ;
+            feature.frame.a22 = uframe[2] ;
+            break ;
+          case 4:
+          {
+            double sigma = uframe[2] ;
+            double c = cos(uframe[3]) ;
+            double s = sin(uframe[3]) ;
+            feature.frame.a11 = sigma * c ;
+            feature.frame.a21 = sigma * (-s) ;
+            feature.frame.a12 = sigma * s ;
+            feature.frame.a22 = sigma * c; ;
+            break ;
+          }
+          case 5:
+          {
+            double a11, a21, a12, a22, d2 ;
+            if (uframe[2] < 0) {
+              vlmxError(vlmxErrInvalidArgument, "FRAMES(:,%d) does not have a PSD covariance.", k+1) ;
+            }
+            a11 = sqrt(uframe[2]) ;
+            a21 = uframe[3] / VL_MAX(a11, 1e-10) ;
+            a12 = 0.0 ;
+            d2 = uframe[4] - a21*a21 ;
+            if (d2 < 0) {
+              vlmxError(vlmxErrInvalidArgument, "FRAMES(:,%d) does not have a PSD covariance.", k+1) ;
+            }
+            a22 = sqrt(d2) ;
+            feature.frame.a11 = a22 ;
+            feature.frame.a21 = a12 ;
+            feature.frame.a12 = a21 ;
+            feature.frame.a22 = a11 ;
+            break ;
+          }
+          case 6:
+          {
+            double a11 = uframe[2] ;
+            double a21 = uframe[3] ;
+            double a12 = uframe[4] ;
+            double a22 = uframe[5] ;
+            feature.frame.a11 = a22 ;
+            feature.frame.a21 = a12 ;
+            feature.frame.a12 = a21 ;
+            feature.frame.a22 = a11 ;
+            break ;
+          }
+
+          default:
+            assert(0) ;
+        }
+      }
+    } else {
+      mexPrintf("vl_covdet: detector: %s\n",
+                vl_enumeration_get_by_value(vlCovdetMethods, method)) ;
+      vl_covdet_detect(covdet) ;
+    }
 
     if (verbose) {
       vl_size numFrames = vl_covdet_get_num_features(covdet) ;

@@ -508,7 +508,7 @@ vl_covdet_new (VlCovDetMethod method)
       for (k = 0 ; k < (signed)(num * num) ; ++k) mass += fabs(pt[k]) ;
       for (k = 0 ; k < (signed)(num * num) ; ++k) pt[k] /= mass ;
 
-#if 1
+#if 0
       {
         char name [200] ;
         snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%f-lap.pgm", sigmaDelta) ;
@@ -808,8 +808,8 @@ _vl_dog_response (float * dog,
  ** @param method
  ** @return new covariant detector.
  **/
-static int
-_vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
+int
+vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
 {
   vl_size requiredSize ;
   assert(self) ;
@@ -956,7 +956,7 @@ vl_covdet_detect (VlCovDet * self)
               feature.frame.a22 = sigma ;
               feature.peakScore = refined.peakScore ;
               feature.edgeScore = refined.edgeScore ;
-              _vl_covdet_append_feature(self, &feature) ;
+              vl_covdet_append_feature(self, &feature) ;
             }
           }
           break ;
@@ -989,7 +989,7 @@ vl_covdet_detect (VlCovDet * self)
                 feature.frame.a22 = sigma ;
                 feature.peakScore = refined.peakScore ;
                 feature.edgeScore = refined.edgeScore ;
-                _vl_covdet_append_feature(self, &feature) ;
+                vl_covdet_append_feature(self, &feature) ;
               }
             }
           }
@@ -1568,7 +1568,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
       if (j == 0) {
         oriented = & self->frames[i].frame ;
       } else {
-        _vl_covdet_append_feature(self, &feature) ;
+        vl_covdet_append_feature(self, &feature) ;
         oriented = & self->frames[self->numFrames -1].frame ;
       }
 
@@ -1654,7 +1654,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
       if (j == 0) {
         scaled = & self->frames[i].frame ;
       } else {
-        _vl_covdet_append_feature(self, &feature) ;
+        vl_covdet_append_feature(self, &feature) ;
         scaled = & self->frames[self->numFrames -1].frame ;
       }
 
@@ -1671,12 +1671,33 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
 /* ---------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------- */
+/** @brief Get wether images are passed in transposed
+ ** @param self ::VlCovDet object.
+ ** @return whether images are transposed.
+ **/
+vl_bool
+vl_covdet_get_transposed (VlCovDet const  * self)
+{
+  return self->transposed ;
+}
+
+/** @brief Set the index of the first octave
+ ** @param self ::VlCovDet object.
+ ** @param t whether images are transposed.
+ **/
+void
+vl_covdet_set_transposed (VlCovDet * self, vl_bool t)
+{
+  self->transposed = t ;
+}
+
+/* ---------------------------------------------------------------- */
 /** @brief Get the edge threshold
  ** @param self ::VlCovDet object.
  ** @return the edge threshold.
  **/
 double
-vl_covdet_get_edge_threshold (VlCovDet * self)
+vl_covdet_get_edge_threshold (VlCovDet const * self)
 {
   return self->edgeThreshold ;
 }
@@ -1694,12 +1715,13 @@ vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold)
   self->edgeThreshold = edgeThreshold ;
 }
 
+/* ---------------------------------------------------------------- */
 /** @brief Get the peak threshold
  ** @param self ::VlCovDet object.
  ** @return the peak threshold.
  **/
 double
-vl_covdet_get_peak_threshold (VlCovDet * self)
+vl_covdet_get_peak_threshold (VlCovDet const * self)
 {
   return self->peakThreshold ;
 }
@@ -1723,7 +1745,7 @@ vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold)
  ** @return index of the first octave.
  **/
 vl_index
-vl_covdet_get_first_octave (VlCovDet * self)
+vl_covdet_get_first_octave (VlCovDet const * self)
 {
   return self->firstOctave ;
 }
@@ -1741,15 +1763,40 @@ vl_covdet_set_first_octave (VlCovDet * self, vl_index o)
   vl_covdet_reset(self) ;
 }
 
+/* ---------------------------------------------------------------- */
+/** @brief Get the octave resolution.
+ ** @param self ::VlCovDet object.
+ ** @return octave resolution.
+ **/
+
+vl_size
+vl_covdet_get_octave_resolution (VlCovDet const * self)
+{
+  return self->octaveResolution ;
+}
+
+/** @brief Set the octave resolutuon.
+ ** @param self ::VlCovDet object.
+ ** @param octave resoltuion.
+ **
+ ** Calling this function resets the detector.
+ **/
+void
+vl_covdet_set_octave_resolution (VlCovDet * self, vl_size r)
+{
+  self->octaveResolution = r ;
+  vl_covdet_reset(self) ;
+}
+
+/* ---------------------------------------------------------------- */
 /** @brief Get number of stored frames
  ** @return number of frames stored in the detector.
  **/
 vl_size
-vl_covdet_get_num_features (VlCovDet * self)
+vl_covdet_get_num_features (VlCovDet const * self)
 {
   return self->numFrames ;
 }
-
 
 /** @brief Get the stored frames
  ** @return frames stored in the detector.
@@ -1759,26 +1806,4 @@ vl_covdet_get_features (VlCovDet * self)
 {
   return self->frames ;
 }
-
-
-/** @brief Get wether images are passed in transposed
- ** @param self ::VlCovDet object.
- ** @return whether images are transposed.
- **/
-vl_bool
-vl_covdet_get_transposed (VlCovDet * self)
-{
-  return self->transposed ;
-}
-
-/** @brief Set the index of the first octave
- ** @param self ::VlCovDet object.
- ** @param t whether images are transposed.
- **/
-void
-vl_covdet_set_transposed (VlCovDet * self, vl_bool t)
-{
-  self->transposed = t ;
-}
-
 
