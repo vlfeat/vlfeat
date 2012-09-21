@@ -199,6 +199,8 @@ mexFunction(int nout, mxArray *out[],
   float *patch = NULL ;
   float *patchXY = NULL ;
 
+  double boundaryMargin = 2.0 ;
+
   double * userFrames = NULL ;
   vl_size userFrameDimension = 0 ;
   vl_size numUserFrames = 0 ;
@@ -296,36 +298,36 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_patch_relative_extent :
-        if (!vlmxIsPlainScalar(optarg) || (patchRelativeExtent = *mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument, "PATCHRELATIVEEXTENT must be a posiive real.") ;
-        }
-        break ;
+      if (!vlmxIsPlainScalar(optarg) || (patchRelativeExtent = *mxGetPr(optarg)) <= 0) {
+        vlmxError(vlmxErrInvalidArgument, "PATCHRELATIVEEXTENT must be a posiive real.") ;
+      }
+      break ;
 
-      case opt_patch_resolution :
-        if (!vlmxIsPlainScalar(optarg) || (patchResolution = (vl_index)*mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument, "PATCHRESOLUTION must be a positive integer.") ;
-        }
-        break ;
+    case opt_patch_resolution :
+      if (!vlmxIsPlainScalar(optarg) || (patchResolution = (vl_index)*mxGetPr(optarg)) <= 0) {
+        vlmxError(vlmxErrInvalidArgument, "PATCHRESOLUTION must be a positive integer.") ;
+      }
+      break ;
 
-      case opt_frames:
-        numUserFrames = mxGetN (optarg) ;
-        userFrameDimension = mxGetM (optarg) ;
-        if (!vlmxIsPlainMatrix(optarg,-1,-1)) {
-          vlmxError(vlmxErrInvalidArgument, "FRAMES must be a palin matrix.") ;
-        }
-        switch (userFrameDimension) {
-          case 2:
-          case 3:
-          case 4:
-          case 5:
-          case 6:
+    case opt_frames:
+      numUserFrames = mxGetN (optarg) ;
+      userFrameDimension = mxGetM (optarg) ;
+      if (!vlmxIsPlainMatrix(optarg,-1,-1)) {
+        vlmxError(vlmxErrInvalidArgument, "FRAMES must be a palin matrix.") ;
+      }
+      switch (userFrameDimension) {
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
             /* ok */
-            break ;
-          default:
-            vlmxError(vlmxErrInvalidArgument,
-                      "FRAMES of dimensions %d are not recognised",
-                      userFrameDimension); ;
-        }
+          break ;
+        default:
+          vlmxError(vlmxErrInvalidArgument,
+                    "FRAMES of dimensions %d are not recognised",
+                    userFrameDimension); ;
+      }
 
     default :
       abort() ;
@@ -381,7 +383,7 @@ mexFunction(int nout, mxArray *out[],
         mexPrintf("vl_covdet: sourcing %d frames\n", numUserFrames) ;
       }
 
-      for (k = 0 ; k < numUserFrames ; ++k) {
+      for (k = 0 ; k < (signed)numUserFrames ; ++k) {
         double const * uframe = userFrames + userFrameDimension * k ;
         VlCovDetFeature feature ;
         feature.peakScore = VL_INFINITY_F ;
@@ -452,12 +454,23 @@ mexFunction(int nout, mxArray *out[],
     } else {
       mexPrintf("vl_covdet: detector: %s\n",
                 vl_enumeration_get_by_value(vlCovdetMethods, method)->name) ;
+      mexPrintf("vl_covdet: peak threshold: %g, edge threshold: %g\n",
+                vl_covdet_get_peak_threshold(covdet),
+                vl_covdet_get_edge_threshold(covdet)) ;
       vl_covdet_detect(covdet) ;
-    }
+      if (verbose) {
+        vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: detected %d features\n", numFrames) ;
+      }
 
-    if (verbose) {
-      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
-      mexPrintf("vl_covdet: detected %d features\n", numFrames) ;
+      if (boundaryMargin > 0) {
+        vl_covdet_drop_features_outside (covdet, boundaryMargin) ;
+        if (verbose) {
+          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          mexPrintf("vl_covdet: kept %d inside the bounary margin (%g)\n",
+                    numFrames, boundaryMargin) ;
+        }
+      }
     }
 
     /* affine adaptation if needed */

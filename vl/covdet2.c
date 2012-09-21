@@ -203,7 +203,6 @@ v CMP *(pt - yo - xo) )
   return numExtrema ;
 }
 
-
 /** @brief Refine extrema in 3D function
  ** @param refined refined extrema.
  ** @param map a 3D array representing the map.
@@ -451,14 +450,31 @@ vl_covdet_new (VlCovDetMethod method)
   self->method = method ;
   self->octaveResolution = 3 ;
   self->firstOctave = -1 ;
-  self->peakThreshold = VL_COVDET_DEF_PEAK_THRESHOLD ;
-  self->edgeThreshold = VL_COVDET_DEF_EDGE_THRESHOLD ;
+  switch (self->method) {
+    case VL_COVDET_METHOD_DOG :
+      self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
+      self->edgeThreshold = VL_COVDET_DOG_DEF_EDGE_THRESHOLD ;
+      break ;
+    case VL_COVDET_METHOD_HARRIS_LAPLACE:
+    case VL_COVDET_METHOD_MULTISCALE_HARRIS:
+      self->peakThreshold = VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD ;
+      self->edgeThreshold = VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD ;
+      break ;
+    case VL_COVDET_METHOD_HESSIAN_LAPLACE:
+    case VL_COVDET_METHOD_MULTISCALE_HESSIAN:
+      self->peakThreshold = VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD ;
+      self->edgeThreshold = VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD ;
+      break;
+    default:
+      assert(0) ;
+  }
+
+  self->nonMaximaSuppression = 0.3 ;
   self->frames = NULL ;
   self->numFrames = 0 ;
   self->numFrameBufferSize = 0 ;
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
-  self->referenceAngle = VL_COVDET_DEF_REFERENCE_ANGLE ;
   self->transposed = VL_FALSE ;
 
   {
@@ -944,6 +960,8 @@ vl_covdet_detect (VlCovDet * self)
                                                    extrema[3*index+0],
                                                    extrema[3*index+1],
                                                    extrema[3*index+2]) ;
+            ok &= refined.peakScore > self->peakThreshold ;
+            ok &= refined.edgeScore < self->edgeThreshold ;
             if (ok) {
               double sigma = cgeom.sigma0 *
               pow(2.0, o + (refined.z - cgeom.octaveFirstSubdivision)
@@ -978,6 +996,8 @@ vl_covdet_detect (VlCovDet * self)
                                                      level, width, height,
                                                      extrema[2*index+0],
                                                      extrema[2*index+1]);
+              ok &= refined.peakScore > self->peakThreshold ;
+              ok &= refined.edgeScore < self->edgeThreshold ;
               if (ok) {
                 double sigma = cgeom.sigma0 *
                 pow(2.0, o + (double)s / cgeom.octaveResolution) ;
@@ -1006,6 +1026,43 @@ vl_covdet_detect (VlCovDet * self)
       }
     }
     if (extrema) { vl_free(extrema) ; extrema = 0 ; }
+  }
+
+  if (self->nonMaximaSuppression) {
+    vl_size killed = 0 ;
+    vl_index i, j ;
+    double tol = self->nonMaximaSuppression ;
+    for (i = 0 ; i < (signed)self->numFrames ; ++i) {
+      double x = self->frames[i].frame.x ;
+      double y = self->frames[i].frame.y ;
+      double sigma = self->frames[i].frame.a11 ;
+      double score = self->frames[i].peakScore ;
+
+      for (j = 0 ; j < (signed)self->numFrames ; ++j) {
+        double dx_ = self->frames[j].frame.x - x ;
+        double dy_ = self->frames[j].frame.y - y ;
+        double sigma_ = self->frames[j].frame.a11 ;
+        double score_ = self->frames[j].peakScore ;
+        if (score_ == 0) continue ;
+        if (sigma < (1+tol) * sigma_ &&
+            sigma_ < (1+tol) * sigma &&
+            vl_abs_d(dx_) < tol * sigma &&
+            vl_abs_d(dy_) < tol * sigma &&
+            score > score_) {
+          self->frames[j].peakScore = 0 ;
+          killed ++ ;
+        }
+      }
+    }
+    j = 0 ;
+    for (i = 0 ; i < (signed)self->numFrames ; ++i) {
+      VlCovDetFeature feature = self->frames[i] ;
+      if (self->frames[i].peakScore != 0) {
+        self->frames[j++] = feature ;
+      }
+    }
+    self->numFrames = j ;
+    VL_PRINTF("killed: %d\n",killed) ;
   }
 
   if (levelxx) vl_free(levelxx) ;
@@ -1068,7 +1125,7 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
 
   vl_svd2(D, U, V, A) ;
   factor = 1.0 / VL_MIN(D[0], D[3]) ;
-  
+
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
    This can be obtained by scanning octaves from smalles to largest
@@ -1252,7 +1309,7 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
       yhat += stephat ;
     }
   }
-#if 1
+#if 0
     {
       char name [200] ;
       snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
@@ -1349,7 +1406,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
                                                    VL_COVDET_AA_PATCH_EXTENT,
                                                    1.0,
                                                    A, T) ;
-    
+
     if (1) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
       double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
@@ -1687,6 +1744,53 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
       scaled->a22 *= scales[j] ;
     }
   }
+}
+
+/* ---------------------------------------------------------------- */
+/*                          Check if featurs are contained in image */
+/* ---------------------------------------------------------------- */
+
+vl_bool
+_vl_covdet_check_frame_inside (VlCovDet * self, VlFrameOrientedEllipse frame, double margin)
+{
+  double extent = margin ;
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T[2] = {frame.x, frame.y} ;
+  double x0 = +VL_INFINITY_D ;
+  double x1 = -VL_INFINITY_D ;
+  double y0 = +VL_INFINITY_D ;
+  double y1 = -VL_INFINITY_D ;
+  double boxx [4] = {extent, extent, -extent, -extent} ;
+  double boxy [4] = {-extent, extent, extent, -extent} ;
+  int i ;
+  for (i = 0 ; i < 4 ; ++i) {
+    double x = A[0] * boxx[i] + A[2] * boxy[i] + T[0] ;
+    double y = A[1] * boxx[i] + A[3] * boxy[i] + T[1] ;
+    x0 = VL_MIN(x0, x) ;
+    x1 = VL_MAX(x1, x) ;
+    y0 = VL_MIN(y0, y) ;
+    y1 = VL_MAX(y1, y) ;
+  }
+
+  return
+  0 <= x0 && x1 <= self->gss->geom.width-1 &&
+  0 <= y0 && y1 <= self->gss->geom.height-1 ;
+}
+
+void
+vl_covdet_drop_features_outside (VlCovDet * self, double margin)
+{
+  vl_index i, j = 0 ;
+  vl_size numFrames = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFrames ; ++i) {
+    vl_bool inside =
+    _vl_covdet_check_frame_inside (self, self->frames[i].frame, margin) ;
+    if (inside) {
+      self->frames[j] = self->frames[i] ;
+      ++j ;
+    }
+  }
+  self->numFrames = j ;
 }
 
 /* ---------------------------------------------------------------- */

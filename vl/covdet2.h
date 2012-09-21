@@ -226,9 +226,12 @@ enum {
 #define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
 #define VL_COVDET_LAP_NUM_LEVELS 10
 #define VL_COVDET_LAP_PATCH_RESOLUTION 12
-#define VL_COVDET_DEF_REFERENCE_ANGLE (VL_PI/2)
-#define VL_COVDET_DEF_PEAK_THRESHOLD 0.001
-#define VL_COVDET_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_DOG_DEF_PEAK_THRESHOLD 0.05
+#define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.001
+#define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.001
+#define VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD 10.0
 
 typedef struct _VlCovDet
 {
@@ -240,6 +243,8 @@ typedef struct _VlCovDet
   vl_size octaveResolution ;
   vl_index firstOctave ;
 
+  double nonMaximaSuppression ;
+
   VlCovDetFeature *frames ;
   vl_size numFrames ;
   vl_size numFrameBufferSize ;
@@ -248,7 +253,6 @@ typedef struct _VlCovDet
   vl_size patchBufferSize ;
 
   vl_bool transposed ;
-  double referenceAngle ;
   double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
   double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
 
@@ -303,6 +307,10 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self, float * patch,
                                    double extent,
                                    double sigma,
                                    VlFrameOrientedEllipse frame) ;
+
+VL_EXPORT void
+vl_covdet_drop_features_outside (VlCovDet * self, double margin) ;
+
 /** @} */
 
 /** @name Retrieve data and parameters
