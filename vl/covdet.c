@@ -496,7 +496,7 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_AA_PATCH_RESOLUTION 20
 #define VL_COVDET_AA_MAX_NUM_ITERATIONS 15
 #define VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS 36
-#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 1.1
+#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 1.5
 #define VL_COVDET_AA_MAX_ANISOTROPY 5
 #define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.001
 #define VL_COVDET_AA_ACCURATE_SMOOTHING VL_FALSE
@@ -1587,9 +1587,6 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
                                          1.0,
                                          A, T, D[0], D[3]) ;
     if (err) return err ;
-
-    VL_PRINTF("%g %g\n", sigma1, sigma2) ;
-
 
     if (self->aaAccurateSmoothing) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
