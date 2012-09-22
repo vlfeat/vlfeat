@@ -1900,7 +1900,7 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   double step = 0.5 / sqrt(2.0) ;
   vl_size const resolution = VL_COVDET_LAP_PATCH_RESOLUTION ;
   vl_size const num = 2 * resolution + 1 ;
-  double extent = step * num ;
+  double extent = step * resolution ;
   vl_index k ;
   float const * pt ;
   double scores [VL_COVDET_LAP_NUM_LEVELS] ;
@@ -1936,18 +1936,17 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
       vl_index q ;
       double score = 0 ;
       double sigmaLap = pow(2.0, -0.5 + (double)k / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
- /*     double sigmaLap = sqrt(sigmaLapFilter*sigmaLapFilter + sigmaImage*sigmaImage - 0.5) ;*/
       sigmaLap = sqrt(sigmaLap*sigmaLap - 0.5 + sigmaImage*sigmaImage) ;
 
       for (q = 0 ; q < (signed)(num * num) ; ++q) {
         score += (*pt++) * self->lapPatch[q] ;
       }
       scores[k] = score * sigmaLap * sigmaLap ;
- //     VL_PRINTF("%.4f ", scores[k]) ;
+      VL_PRINTF("%.4f ", scores[k]) ;
   //    VL_PRINTF("%.4f ", sigmaLap) ;
 
     }
-   // VL_PRINTF("\n") ;
+    VL_PRINTF("\n") ;
 
     /* find and interpolate maxima */
     for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
@@ -2002,6 +2001,7 @@ void
 vl_covdet_extract_laplacian_scales (VlCovDet * self)
 {
   vl_index i, j  ;
+  vl_bool dropFeaturesWithoutScale = VL_TRUE ;
   vl_size numFeatures = vl_covdet_get_num_features(self) ;
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numScales ;
@@ -2009,7 +2009,11 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
     double const * scales =
     vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
 
-    VL_PRINTF("scale %f %d\n", scales[0], numScales) ;
+    /*VL_PRINTF("scale %f %d\n", scales[0], numScales) ;*/
+
+    if (numScales == 0 && dropFeaturesWithoutScale) {
+      self->features[i].peakScore = 0 ;
+    }
 
     for (j = 0 ; j < (signed)numScales ; ++j) {
       VlFrameOrientedEllipse * scaled ;
@@ -2026,6 +2030,16 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
       scaled->a12 *= scales[j] ;
       scaled->a22 *= scales[j] ;
     }
+  }
+  if (dropFeaturesWithoutScale) {
+    j = 0 ;
+    for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
+      VlCovDetFeature feature = self->features[i] ;
+      if (feature.peakScore) {
+        self->features[j++] = feature ;
+      }
+    }
+    self->numFeatures = j ;
   }
 }
 
