@@ -77,6 +77,54 @@ _vl_enlarge_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
 #pragma mark Finding local extrema
 /* ---------------------------------------------------------------- */
 
+/* Todo: make this generally available in the library */
+
+typedef struct _VlCovDetExtremum2
+{
+  vl_index xi ;
+  vl_index yi ;
+  float x ;
+  float y ;
+  float peakScore ;
+  float edgeScore ;
+} VlCovDetExtremum2 ;
+
+typedef struct _VlCovDetExtremum3
+{
+  vl_index xi ;
+  vl_index yi ;
+  vl_index zi ;
+  float x ;
+  float y ;
+  float z ;
+  float peakScore ;
+  float edgeScore ;
+} VlCovDetExtremum3 ;
+
+VL_EXPORT vl_size
+vl_find_local_extrema_3 (vl_index ** extrema, vl_size * bufferSize,
+                         float const * map,
+                         vl_size width, vl_size height, vl_size depth,
+                         double threshold) ;
+
+VL_EXPORT vl_size
+vl_find_local_extrema_2 (vl_index ** extrema, vl_size * bufferSize,
+                         float const * map,
+                         vl_size width, vl_size height,
+                         double threshold) ;
+
+VL_EXPORT vl_bool
+vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
+                           float const * map,
+                           vl_size width, vl_size height, vl_size depth,
+                           vl_index x, vl_index y, vl_index z) ;
+
+VL_EXPORT vl_bool
+vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
+                           float const * map,
+                           vl_size width, vl_size height,
+                           vl_index x, vl_index y) ;
+
 /** @brief Find extrema in 3D function
  ** @param extrema
  ** @param bufferSize
@@ -759,7 +807,7 @@ _vl_det_hessian_response (float * hessian,
                           vl_size width, vl_size height,
                           double step, double sigma)
 {
-  float factor = (float) (sigma * sigma * sigma * sigma) / (step*step) ;
+  float factor = (float) pow(sigma/step, 4.0) ;
   vl_index const xo = 1 ; /* x-stride */
   vl_index const yo = width;  /* y-stride */
   vl_size r, c;
@@ -851,7 +899,7 @@ _vl_harris_response (float * harris,
                      double step, double sigma,
                      double sigmaI, double alpha)
 {
-  float factor = (float) (sigma * sigma) / (step * step) ;
+  float factor = (float) pow(sigma/step, 4.0) ;
   vl_index k ;
 
   float * LxLx ;
@@ -862,7 +910,7 @@ _vl_harris_response (float * harris,
   LyLy = vl_malloc(sizeof(float) * width * height) ;
   LxLy = vl_malloc(sizeof(float) * width * height) ;
 
-  vl_imgradient_f (LxLx, LyLy, width, 1, image, width, height, width) ;
+  vl_imgradient_f (LxLx, LyLy, 1, widthcl, image, width, height, width) ;
 
   for (k = 0 ; k < (signed)(width * height) ; ++k) {
     float dx = LxLx[k] ;
@@ -918,7 +966,7 @@ _vl_dog_response (float * dog,
 }
 
 /* ---------------------------------------------------------------- */
-#pragma Detect features
+#pragma mark Detect features
 /* ---------------------------------------------------------------- */
 
 /** @brief Detect scale-space features
@@ -1916,7 +1964,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-/*                          Check if featurs are contained in image */
+#pragma mark Checking that features are inside an image
 /* ---------------------------------------------------------------- */
 
 vl_bool

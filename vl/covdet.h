@@ -124,56 +124,6 @@ vl_get_frame_type (vl_bool affineAdaptation, vl_bool orientation)
 }
 
 /* ---------------------------------------------------------------- */
-/*                                            Local extrema finding */
-/* ---------------------------------------------------------------- */
-
-typedef struct _VlCovDetExtremum2
-{
-  vl_index xi ;
-  vl_index yi ;
-  float x ;
-  float y ;
-  float peakScore ;
-  float edgeScore ;
-} VlCovDetExtremum2 ;
-
-typedef struct _VlCovDetExtremum3
-{
-  vl_index xi ;
-  vl_index yi ;
-  vl_index zi ;
-  float x ;
-  float y ;
-  float z ;
-  float peakScore ;
-  float edgeScore ;
-} VlCovDetExtremum3 ;
-
-VL_EXPORT vl_size
-vl_find_local_extrema_3 (vl_index ** extrema, vl_size * bufferSize,
-                         float const * map,
-                         vl_size width, vl_size height, vl_size depth,
-                         double threshold) ;
-
-VL_EXPORT vl_size
-vl_find_local_extrema_2 (vl_index ** extrema, vl_size * bufferSize,
-                         float const * map,
-                         vl_size width, vl_size height,
-                         double threshold) ;
-
-VL_EXPORT vl_bool
-vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
-                           float const * map,
-                           vl_size width, vl_size height, vl_size depth,
-                           vl_index x, vl_index y, vl_index z) ;
-
-VL_EXPORT vl_bool
-vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
-                           float const * map,
-                           vl_size width, vl_size height,
-                           vl_index x, vl_index y) ;
-
-/* ---------------------------------------------------------------- */
 /*                                       Covariant Feature Detector */
 /* ---------------------------------------------------------------- */
 
