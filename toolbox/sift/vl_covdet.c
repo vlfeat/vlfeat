@@ -367,10 +367,15 @@ mexFunction(int nout, mxArray *out[],
 
     /* set covdet parameters */
     vl_covdet_set_transposed(covdet, VL_TRUE) ;
-    vl_covdet_set_first_octave(covdet, doubleImage? -1 : 0) ;
+    vl_covdet_set_first_octave(covdet, doubleImage ? -1 : 0) ;
     if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
+
+    if (verbose) {
+      VL_PRINTF("vl_covdet: doubling image: %s\n",
+                VL_YESNO(vl_covdet_get_first_octave(covdet) < 0)) ;
+    }
 
     /* process the image */
     vl_covdet_put_image(covdet, image, numRows, numCols) ;

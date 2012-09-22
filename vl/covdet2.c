@@ -1407,7 +1407,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
                                                    1.0,
                                                    A, T) ;
 
-    if (1) {
+    if (0) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
       double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
       double stephat = (2.0*VL_COVDET_AA_PATCH_EXTENT) / size ;
