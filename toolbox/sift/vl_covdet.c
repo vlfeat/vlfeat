@@ -620,8 +620,8 @@ mexFunction(int nout, mxArray *out[],
         "peakScores",
         "edgeScores"
       };
-      mxArray * gss_array = _createArrayFromScaleSpace(covdet->gss) ;
-      mxArray * css_array = _createArrayFromScaleSpace(covdet->css) ;
+      mxArray * gss_array = _createArrayFromScaleSpace(vl_covdet_get_gss(covdet)) ;
+      mxArray * css_array = _createArrayFromScaleSpace(vl_covdet_get_css(covdet)) ;
       mxArray * peak_array = mxCreateNumericMatrix(1,numFrames,mxSINGLE_CLASS,mxREAL) ;
       mxArray * edge_array = mxCreateNumericMatrix(1,numFrames,mxSINGLE_CLASS,mxREAL) ;
       float * peak = mxGetData(peak_array) ;

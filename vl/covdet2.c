@@ -16,10 +16,6 @@
 #include "covdet2.h"
 #include <string.h>
 
-/* ---------------------------------------------------------------- */
-/*                                            Local extrema finding */
-/* ---------------------------------------------------------------- */
-
 /** @brief Reallocate buffer
  ** @param buffer
  ** @param bufferSize
@@ -62,6 +58,9 @@ _vl_enlarge_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
   return _vl_resize_buffer(buffer,bufferSize,targetSize) ;
 }
 
+/* ---------------------------------------------------------------- */
+#pragma mark Finding local extrema
+/* ---------------------------------------------------------------- */
 
 /** @brief Find extrema in 3D function
  ** @param extrema
@@ -426,8 +425,62 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 }
 
 /* ---------------------------------------------------------------- */
-/*                                            Local extrema finding */
+#pragma mark Covarant detector
 /* ---------------------------------------------------------------- */
+
+#define VL_COVDET_MAX_NUM_ORIENTATIONS 4
+#define VL_COVDET_MAX_NUM_LAPLACIAN_SCALES 4
+#define VL_COVDET_AA_PATCH_RESOLUTION 20
+#define VL_COVDET_AA_MAX_NUM_ITERATIONS 15
+#define VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS 36
+#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 1.1
+#define VL_COVDET_AA_MAX_ANISOTROPY 5
+#define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.001
+#define VL_COVDET_AA_ACCURATE_SMOOTHING VL_FALSE
+#define VL_COVDET_AA_PATCH_EXTENT (3*VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA)
+#define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
+#define VL_COVDET_LAP_NUM_LEVELS 10
+#define VL_COVDET_LAP_PATCH_RESOLUTION 12
+#define VL_COVDET_DOG_DEF_PEAK_THRESHOLD 0.05
+#define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.001
+#define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.001
+#define VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD 10.0
+
+/** @brief Covariant feature detector */
+struct _VlCovDet
+{
+  VlScaleSpace *gss ;        /**< Gaussian scale space. */
+  VlScaleSpace *css ;        /**< Cornerness scale space. */
+  VlCovDetMethod method ;    /**< feature extraction method. */
+  double peakThreshold ;     /**< peak threshold. */
+  double edgeThreshold ;     /**< edge threshold. */
+  vl_size octaveResolution ; /**< resolution of each octave. */
+  vl_index firstOctave ;     /**< index of the first octave. */
+  
+  double nonMaximaSuppression ;
+  
+  VlCovDetFeature *frames ;
+  vl_size numFrames ;
+  vl_size numFrameBufferSize ;
+  
+  float * patch ;
+  vl_size patchBufferSize ;
+  
+  vl_bool transposed ;
+  double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
+  double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
+  
+  vl_bool aaAccurateSmoothing ;
+  float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaPatchX [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaPatchY [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  float aaMask [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
+  
+  float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
+  float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
+}  ;
 
 VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] = {
   {"DoG" ,              (vl_index)VL_COVDET_METHOD_DOG              },
@@ -440,9 +493,10 @@ VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] = {
 } ;
 
 /** @brief Create a new object instance
- ** @param method
+ ** @param method method for covariant feature detection.
  ** @return new covariant detector.
  **/
+
 VlCovDet *
 vl_covdet_new (VlCovDetMethod method)
 {
@@ -476,7 +530,8 @@ vl_covdet_new (VlCovDetMethod method)
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
   self->transposed = VL_FALSE ;
-
+  self->aaAccurateSmoothing = VL_COVDET_AA_ACCURATE_SMOOTHING ;
+  
   {
     vl_index const w = VL_COVDET_AA_PATCH_RESOLUTION ;
     vl_index i,j ;
@@ -534,9 +589,16 @@ vl_covdet_new (VlCovDetMethod method)
 
     }
   }
-
   return self ;
 }
+
+
+/** @brief Reset object
+ ** @param self object.
+ **
+ ** This function removes any buffered features and frees other
+ ** internal buffers.
+ **/
 
 void
 vl_covdet_reset (VlCovDet * self)
@@ -556,8 +618,9 @@ vl_covdet_reset (VlCovDet * self)
 }
 
 /** @brief Delete object instance
- ** @param self object to delete.
+ ** @param self object.
  **/
+
 void
 vl_covdet_delete (VlCovDet * self)
 {
@@ -566,15 +629,47 @@ vl_covdet_delete (VlCovDet * self)
   vl_free(self) ;
 }
 
+/** @brief Append a feature to the internal buffer.
+ ** @param self object.
+ ** @param feature a pointer to the feature to append.
+ ** @return status.
+ **
+ ** The feature is copied. The function may fail with @c status
+ ** equal to ::VL_ERR_ALLOC if there is insufficient memory.
+ **/
+
+int
+vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
+{
+  vl_size requiredSize ;
+  assert(self) ;
+  assert(feature) ;
+  self->numFrames ++ ;
+  requiredSize = self->numFrames * sizeof(VlCovDetFeature) ;
+  if (requiredSize > self->numFrameBufferSize) {
+    int err = _vl_resize_buffer((void**)&self->frames, &self->numFrameBufferSize,
+                                (self->numFrames + 1000) * sizeof(VlCovDetFeature)) ;
+    if (err) return err ;
+  }
+  self->frames[self->numFrames - 1] = *feature ;
+  return VL_ERR_OK ;
+}
+
 /* ---------------------------------------------------------------- */
-/*                                     Start processing a new image */
+#pragma mark Process a new image
 /* ---------------------------------------------------------------- */
 
 /** @brief Detect features in an image
- ** @param method
- ** @return new covariant detector.
+ ** @param self object.
+ ** @param image image to process.
+ ** @param width image width.
+ ** @param height image height.
+ ** @return status.
+ **
+ ** The function may fail with ::VL_ERR_ALLOC if memory is insufficient.
  **/
-void
+
+int
 vl_covdet_put_image (VlCovDet * self,
                      float const * image,
                      vl_size width, vl_size height)
@@ -624,20 +719,23 @@ vl_covdet_put_image (VlCovDet * self,
                                   self->firstOctave,
                                   self->octaveResolution,
                                   octaveFirstSubdivision, octaveLastSubdivision) ;
+    if (self->gss == NULL) return VL_ERR_ALLOC ;
   }
   vl_scalespace_put_image(self->gss, image) ;
+  return VL_ERR_OK ;
 }
 
 /* ---------------------------------------------------------------- */
-/*                                           determinant of Hessian */
+#pragma mark Cornerness measures
 /* ---------------------------------------------------------------- */
 
 /** @brief Scaled derminant of the Hessian filter
- ** @param hessian
- ** @param image
- ** @param width
- ** @param height
- ** @param sigma
+ ** @param hessian output image.
+ ** @param image input image.
+ ** @param width image width.
+ ** @param height image height.
+ ** @param step image sampling step (pixel size).
+ ** @param sigma Gaussian smoothing of the input image.
  **/
 
 static void
@@ -720,20 +818,15 @@ _vl_det_hessian_response (float * hessian,
   memcpy(out, in, (width - 2)*sizeof(float));
 }
 
-
-/* ---------------------------------------------------------------- */
-/*                                           Determinant of Hessian */
-/* ---------------------------------------------------------------- */
-
-/** @brief Scaled Harris response
- ** @param harris
- ** @param imagexx
- ** @param imageyy
- ** @param imagexy
- ** @param image
- ** @param width
- ** @param height
- ** @param sigma
+/** @brief Scale-normalised Harris response
+ ** @param harris output image.
+ ** @param image input image.
+ ** @param width image width.
+ ** @param height image height.
+ ** @param step image sampling step (pixel size).
+ ** @param sigma Gaussian smoothing of the input image.
+ ** @param sigmaI integration scale.
+ ** @param alpha factor in the definition of the Harris score.
  **/
 
 static void
@@ -789,19 +882,12 @@ _vl_harris_response (float * harris,
   vl_free(LxLx) ;
 }
 
-/* ---------------------------------------------------------------- */
-/*                                          Difference of Gaussians */
-/* ---------------------------------------------------------------- */
-
-/** @brief Scaled Harris response
- ** @param harris
- ** @param imagexx
- ** @param imageyy
- ** @param imagexy
- ** @param image
- ** @param width
- ** @param height
- ** @param sigma
+/** @brief Difference of Gaussian
+ ** @param dog output image.
+ ** @param level1 input image at the smaller Gaussian scale.
+ ** @param level2 input image at the larger Gaussian scale.
+ ** @param width image width.
+ ** @param height image height.
  **/
 
 static void
@@ -817,29 +903,8 @@ _vl_dog_response (float * dog,
 }
 
 /* ---------------------------------------------------------------- */
-/*                                        Detect scale-space points */
+#pragma Detect features
 /* ---------------------------------------------------------------- */
-
-/** @brief Append a frame to the internal buffer
- ** @param method
- ** @return new covariant detector.
- **/
-int
-vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
-{
-  vl_size requiredSize ;
-  assert(self) ;
-  assert(feature) ;
-  self->numFrames ++ ;
-  requiredSize = self->numFrames * sizeof(VlCovDetFeature) ;
-  if (requiredSize > self->numFrameBufferSize) {
-    int err = _vl_resize_buffer((void**)&self->frames, &self->numFrameBufferSize,
-                                (self->numFrames + 1000) * sizeof(VlCovDetFeature)) ;
-    if (err) return err ;
-  }
-  self->frames[self->numFrames - 1] = *feature ;
-  return VL_ERR_OK ;
-}
 
 /** @brief Detect scale-space features
  ** @param method
@@ -1071,19 +1136,34 @@ vl_covdet_detect (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-/*                                                    Extract patch */
+#pragma mark Extract patches
 /* ---------------------------------------------------------------- */
 
+/** @brief Helper for extracting patches
+ ** @param self object.
+ ** @param sigma1 actual patch smoothing along the first axis (out).
+ ** @param sigma2 actual patch smoothing along the second axis (out).
+ ** @param patch buffer.
+ ** @param resolution patch resolution.
+ ** @param extent patch extent.
+ ** @param sigma desired smoothing in the patch frame.
+ ** @param A linear transfomration from patch to image.
+ ** @param T translation from patch to image.
+ ** @param d1 first singular value @a A.
+ ** @param d2 second singular value of @a A.
+ **/
+
 vl_bool
-vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
-                                          double * sigma1,
-                                          double * sigma2,
-                                          float * patch,
-                                          vl_size resolution,
-                                          double extent,
-                                          double sigma,
-                                          double const * A_,
-                                          double const * T_)
+vl_covdet_extract_patch_helper (VlCovDet * self,
+                                double * sigma1,
+                                double * sigma2,
+                                float * patch,
+                                vl_size resolution,
+                                double extent,
+                                double sigma,
+                                double (A) [4],
+                                double (T) [2],
+                                double d1, double d2)
 {
   vl_index o, s ;
   double factor ;
@@ -1092,11 +1172,6 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
   vl_size width, height ;
   double step ;
 
-  double U [2*2] ;
-  double V [2*2] ;
-  double D [2*2] ;
-  double A [] = {A_[0], A_[1], A_[2], A_[3]} ;
-  double T [] = {T_[0], T_[1]} ;
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
   VlScaleSpaceOctaveGeometry oct ;
 
@@ -1123,8 +1198,6 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
         factor = max{abs(D11), abs(D22)}.
    */
 
-  vl_svd2(D, U, V, A) ;
-  factor = 1.0 / VL_MIN(D[0], D[3]) ;
 
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
@@ -1133,12 +1206,15 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
 
    Given the range of octave availables, do the best you can.
    */
+  
+  factor = 1.0 / VL_MIN(d1, d2) ;
+
   for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
     s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
     s = VL_MAX(s, geom.octaveFirstSubdivision) ;
     s = VL_MIN(s, geom.octaveLastSubdivision) ;
     sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
-    /*VL_PRINTF(".. %d D=%g %g; sigma_=%g factor*sigma_=%g\n", o, D[0], D[3], sigma_, factor* sigma_) ;*/
+    /*VL_PRINTF(".. %d D=%g %g; sigma_=%g factor*sigma_=%g\n", o, d1, d2, sigma_, factor* sigma_) ;*/
     if (factor * sigma_ > sigma) {
       o -- ;
       break ;
@@ -1149,8 +1225,8 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
   s = VL_MAX(s, geom.octaveFirstSubdivision) ;
   s = VL_MIN(s, geom.octaveLastSubdivision) ;
   sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
-  if (sigma1) *sigma1 = sigma_ / D[0] ;
-  if (sigma2) *sigma2 = sigma_ / D[3] ;
+  if (sigma1) *sigma1 = sigma_ / d1 ;
+  if (sigma2) *sigma2 = sigma_ / d2 ;
 
   /*VL_PRINTF("%d %d %g %g %g %g\n", o, s, factor, sigma_, factor * sigma_, sigma) ;*/
 
@@ -1319,6 +1395,25 @@ vl_covdet_extract_patch_for_frame_helper (VlCovDet * self,
   return VL_ERR_OK ;
 }
 
+/** @brief Helper for extracting patches
+ ** @param self object.
+ ** @param patch buffer.
+ ** @param resolution patch resolution.
+ ** @param extent patch extent.
+ ** @param sigma desired smoothing in the patch frame.
+ ** @param frame feature frame.
+ **
+ ** The function considers a patch of extent <code>[-extent,extent]</code>
+ ** on each side, with a side counting <code>2*resolution+1</code> pixels.
+ ** In attempts to extract from the scale space a patch
+ ** baed on the affine warping specified by @a frame in such a way
+ ** that the resulting smoothing of the image is @a sigma (in the
+ ** patch frame).
+ **
+ ** The transformation is specified by the matrices @c A and @c T
+ ** embedded in the feature @a frame. Note that this transformation maps
+ ** pixels from the patch frame to the image frame.
+ **/
 
 vl_bool
 vl_covdet_extract_patch_for_frame (VlCovDet * self,
@@ -1328,10 +1423,14 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
                                    double sigma,
                                    VlFrameOrientedEllipse frame)
 {
-  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double A[2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
   double T[2] = {frame.x, frame.y} ;
-  return vl_covdet_extract_patch_for_frame_helper
-  (self, NULL, NULL, patch, resolution, extent, sigma, A, T) ;
+  double D[4], U[4], V[4] ;
+  
+  vl_svd2(D, U, V, A) ;
+  
+  return vl_covdet_extract_patch_helper
+  (self, NULL, NULL, patch, resolution, extent, sigma, A, T, D[0], D[3]) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1399,15 +1498,15 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
 
     if (++iter >= VL_COVDET_AA_MAX_NUM_ITERATIONS) break ;
 
-    err = vl_covdet_extract_patch_for_frame_helper(self,
-                                                   &sigma1, &sigma2,
-                                                   self->aaPatch,
-                                                   VL_COVDET_AA_PATCH_RESOLUTION,
-                                                   VL_COVDET_AA_PATCH_EXTENT,
-                                                   1.0,
-                                                   A, T) ;
+    err = vl_covdet_extract_patch_helper(self,
+                                         &sigma1, &sigma2,
+                                         self->aaPatch,
+                                         VL_COVDET_AA_PATCH_RESOLUTION,
+                                         VL_COVDET_AA_PATCH_EXTENT,
+                                         1.0,
+                                         A, T, D[0], D[3]) ;
 
-    if (0) {
+    if (self->aaAccurateSmoothing) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
       double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
       double stephat = (2.0*VL_COVDET_AA_PATCH_EXTENT) / size ;
@@ -1794,7 +1893,7 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin)
 }
 
 /* ---------------------------------------------------------------- */
-/*                                     Setter, getter, and all that */
+#pragma mark Setters and getters
 /* ---------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------- */
@@ -1908,11 +2007,35 @@ vl_covdet_get_octave_resolution (VlCovDet const * self)
  **
  ** Calling this function resets the detector.
  **/
+
 void
 vl_covdet_set_octave_resolution (VlCovDet * self, vl_size r)
 {
   self->octaveResolution = r ;
   vl_covdet_reset(self) ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get whether affine adaptation uses accurate smoothing.
+ ** @param self object.
+ ** @return @c true if accurate smoothing is used.
+ **/
+
+vl_bool
+vl_covdet_get_aa_accurate_smoothing (VlCovDet const * self)
+{
+  return self->aaAccurateSmoothing ;
+}
+
+/** @brief Set whether affine adaptation uses accurate smoothing.
+ ** @param self object.
+ ** @param x whether accurate smoothing should be usd.
+ **/
+
+void
+vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x)
+{
+  self->aaAccurateSmoothing = x ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1932,5 +2055,30 @@ void *
 vl_covdet_get_features (VlCovDet * self)
 {
   return self->frames ;
+}
+
+/** @brief Get the Gaussian scale space
+ ** @return Gaussian scale space.
+ **
+ ** A Gaussian scale space exists only after calling ::vl_covdet_put_image.
+ ** Otherwise the function returns @c NULL.
+ **/
+VlScaleSpace *
+vl_covdet_get_gss (VlCovDet const * self)
+{
+  return self->gss ;
+}
+
+/** @brief Get the cornerness measure scale space
+ ** @return cornerness measure scale space.
+ **
+ ** A cornerness measure scale space exists only after calling 
+ ** ::vl_covdet_detect. Otherwise the function returns @c NULL.
+ **/
+
+VlScaleSpace *
+vl_covdet_get_css (VlCovDet const * self)
+{
+  return self->css ;
 }
 

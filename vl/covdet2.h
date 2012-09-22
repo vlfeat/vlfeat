@@ -177,20 +177,15 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 /*                                       Covariant Feature Detector */
 /* ---------------------------------------------------------------- */
 
+/** @brief A detected feature */
 typedef struct _VlCovDetFeature
 {
-  VlFrameOrientedEllipse frame ;
-  float peakScore ;
-  float edgeScore ;
+  VlFrameOrientedEllipse frame ; /**< feature frame. */
+  float peakScore ; /**< peak score. */
+  float edgeScore ; /**< edge score. */
 } VlCovDetFeature ;
 
-/**
- ** @brief Image response functions
- **
- ** Response functions appliable to the input image used for frames
- ** detection.
- **/
-
+/** @brief Covariant feature detection method */
 typedef enum _VlCovDetMethod
 {
   VL_COVDET_METHOD_DOG = 1,
@@ -202,70 +197,10 @@ typedef enum _VlCovDetMethod
   VL_COVDET_METHOD_NUM
 } VlCovDetMethod;
 
-
-/** @brief Mapping between strings and ::VlCovDetMethod values
- **/
-
+/** @brief Mapping between strings and ::VlCovDetMethod values */
 VL_EXPORT VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] ;
 
-/** @brief Covariant feature detector
- **/
-
-enum {
-  VL_COVDET_MAX_NUM_ORIENTATIONS = 4,
-  VL_COVDET_MAX_NUM_LAPLACIAN_SCALES = 4,
-  VL_COVDET_AA_PATCH_RESOLUTION = 20,
-  VL_COVDET_AA_MAX_NUM_ITERATIONS = 15,
-  VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS = 36
-} ;
-
-#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 1.1
-#define VL_COVDET_AA_MAX_ANISOTROPY 5
-#define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.001
-#define VL_COVDET_AA_PATCH_EXTENT (3*VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA)
-#define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
-#define VL_COVDET_LAP_NUM_LEVELS 10
-#define VL_COVDET_LAP_PATCH_RESOLUTION 12
-#define VL_COVDET_DOG_DEF_PEAK_THRESHOLD 0.05
-#define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
-#define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.001
-#define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
-#define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.001
-#define VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD 10.0
-
-typedef struct _VlCovDet
-{
-  VlScaleSpace *gss ;       /**< Gaussian scale space. */
-  VlScaleSpace *css ;       /**< Cornerness scale space. */
-  VlCovDetMethod method ;   /**< feature extraction method. */
-  double peakThreshold ;    /**< peak threshold. */
-  double edgeThreshold ;    /**< edge threshold. */
-  vl_size octaveResolution ;
-  vl_index firstOctave ;
-
-  double nonMaximaSuppression ;
-
-  VlCovDetFeature *frames ;
-  vl_size numFrames ;
-  vl_size numFrameBufferSize ;
-
-  float * patch ;
-  vl_size patchBufferSize ;
-
-  vl_bool transposed ;
-  double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
-  double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
-
-  float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
-  float aaPatchX [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
-  float aaPatchY [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
-  float aaMask [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
-
-  float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
-  float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
-
-} VlCovDet ;
-
+typedef struct _VlCovDet VlCovDet ;
 
 /** @name Create and destroy
  ** @{
@@ -278,7 +213,7 @@ VL_EXPORT void vl_covdet_reset (VlCovDet * self) ;
 /** @name Process data
  ** @{
  **/
-VL_EXPORT void vl_covdet_put_image (VlCovDet * self,
+VL_EXPORT int vl_covdet_put_image (VlCovDet * self,
                                     float const * image,
                                     vl_size width, vl_size height) ;
 
@@ -323,7 +258,9 @@ VL_EXPORT vl_size vl_covdet_get_octave_resolution (VlCovDet const * self) ;
 VL_EXPORT double vl_covdet_get_peak_threshold (VlCovDet const * self) ;
 VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet const * self) ;
 VL_EXPORT vl_bool vl_covdet_get_transposed (VlCovDet const * self) ;
-
+VL_EXPORT VlScaleSpace *  vl_covdet_get_gss (VlCovDet const * self) ;
+VL_EXPORT VlScaleSpace *  vl_covdet_get_css (VlCovDet const * self) ;
+VL_EXPORT vl_bool vl_covdet_get_aa_accurate_smoothing (VlCovDet const * self) ;
 /** @} */
 
 /** @name Set parameters
@@ -334,6 +271,7 @@ VL_EXPORT void vl_covdet_set_octave_resolution (VlCovDet * self, vl_size r) ;
 VL_EXPORT void vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold) ;
 VL_EXPORT void vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold) ;
 VL_EXPORT void vl_covdet_set_transposed (VlCovDet * self, vl_bool t) ;
+VL_EXPORT void vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x) ;
 /** @} */
 
 /* VL_COVDET_H */
