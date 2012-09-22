@@ -13,6 +13,21 @@
  the terms of the BSD license (see the COPYING file).
  */
 
+/**
+ <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page covdet Covariant feature detectors
+@auhtor Karel Lenc
+@author Andrea Vedaldi
+@author Mcihal Perdoch
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref covdet.h implements a number of covariant feature detectors, based
+on three cornerness measures (determinant of the Hessian, trace of the Hessian
+(aka Difference of Gaussians, and Harris). It supprots affine adaptation,
+orientation estimation, as well as Laplacian scale detection.
+ 
+**/
+
 #include "covdet.h"
 #include <string.h>
 
@@ -462,8 +477,8 @@ struct _VlCovDet
   double nonMaximaSuppression ;
   
   VlCovDetFeature *frames ;
-  vl_size numFrames ;
-  vl_size numFrameBufferSize ;
+  vl_size numFeatures ;
+  vl_size numFeatureBufferSize ;
   
   float * patch ;
   vl_size patchBufferSize ;
@@ -525,8 +540,8 @@ vl_covdet_new (VlCovDetMethod method)
 
   self->nonMaximaSuppression = 0.3 ;
   self->frames = NULL ;
-  self->numFrames = 0 ;
-  self->numFrameBufferSize = 0 ;
+  self->numFeatures = 0 ;
+  self->numFeatureBufferSize = 0 ;
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
   self->transposed = VL_FALSE ;
@@ -644,14 +659,14 @@ vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
   vl_size requiredSize ;
   assert(self) ;
   assert(feature) ;
-  self->numFrames ++ ;
-  requiredSize = self->numFrames * sizeof(VlCovDetFeature) ;
-  if (requiredSize > self->numFrameBufferSize) {
-    int err = _vl_resize_buffer((void**)&self->frames, &self->numFrameBufferSize,
-                                (self->numFrames + 1000) * sizeof(VlCovDetFeature)) ;
+  self->numFeatures ++ ;
+  requiredSize = self->numFeatures * sizeof(VlCovDetFeature) ;
+  if (requiredSize > self->numFeatureBufferSize) {
+    int err = _vl_resize_buffer((void**)&self->frames, &self->numFeatureBufferSize,
+                                (self->numFeatures + 1000) * sizeof(VlCovDetFeature)) ;
     if (err) return err ;
   }
-  self->frames[self->numFrames - 1] = *feature ;
+  self->frames[self->numFeatures - 1] = *feature ;
   return VL_ERR_OK ;
 }
 
@@ -925,7 +940,7 @@ vl_covdet_detect (VlCovDet * self)
   vl_index o, s ;
 
   /* clear previous detections if any */
-  self->numFrames = 0 ;
+  self->numFeatures = 0 ;
 
   /* prepare buffers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   cgeom = geom ;
@@ -1097,13 +1112,13 @@ vl_covdet_detect (VlCovDet * self)
     vl_size killed = 0 ;
     vl_index i, j ;
     double tol = self->nonMaximaSuppression ;
-    for (i = 0 ; i < (signed)self->numFrames ; ++i) {
+    for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
       double x = self->frames[i].frame.x ;
       double y = self->frames[i].frame.y ;
       double sigma = self->frames[i].frame.a11 ;
       double score = self->frames[i].peakScore ;
 
-      for (j = 0 ; j < (signed)self->numFrames ; ++j) {
+      for (j = 0 ; j < (signed)self->numFeatures ; ++j) {
         double dx_ = self->frames[j].frame.x - x ;
         double dy_ = self->frames[j].frame.y - y ;
         double sigma_ = self->frames[j].frame.a11 ;
@@ -1120,13 +1135,13 @@ vl_covdet_detect (VlCovDet * self)
       }
     }
     j = 0 ;
-    for (i = 0 ; i < (signed)self->numFrames ; ++i) {
+    for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
       VlCovDetFeature feature = self->frames[i] ;
       if (self->frames[i].peakScore != 0) {
         self->frames[j++] = feature ;
       }
     }
-    self->numFrames = j ;
+    self->numFeatures = j ;
     VL_PRINTF("killed: %d\n",killed) ;
   }
 
@@ -1434,8 +1449,18 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
 }
 
 /* ---------------------------------------------------------------- */
-/*                                             Extract affine shape */
+#pragma mark Affine shape
 /* ---------------------------------------------------------------- */
+
+/** @brief Extract the affine shape for a feature frame
+ ** @param self object.
+ ** @param adapted the shape-adapted frame.
+ ** @param frame the input frame.
+ ** @return ::VL_ERR_OK if affine adaptation is successful.
+ **
+ ** This function may fail if adaptation is unsuccessful or if
+ ** memory is insufficient.
+ **/
 
 int
 vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
@@ -1505,6 +1530,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
                                          VL_COVDET_AA_PATCH_EXTENT,
                                          1.0,
                                          A, T, D[0], D[3]) ;
+    if (err) return err ;
 
     if (self->aaAccurateSmoothing) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
@@ -1612,13 +1638,20 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   return VL_ERR_OK ;
 }
 
+/** @brief Extract the affine shape for the stored features
+ ** @param self object.
+ **
+ ** This function may discard features for which no affine
+ ** shape can reliably be detected.
+ **/
+
 void
 vl_covdet_extract_affine_shape (VlCovDet * self)
 {
   vl_index i, j = 0 ;
-  vl_size numFrames = vl_covdet_get_num_features(self) ;
+  vl_size numFeatures = vl_covdet_get_num_features(self) ;
   VlCovDetFeature * feature = vl_covdet_get_features(self);
-  for (i = 0 ; i < (signed)numFrames ; ++i) {
+  for (i = 0 ; i < (signed)numFeatures ; ++i) {
     int status ;
     VlFrameOrientedEllipse adapted ;
     status = vl_covdet_extract_affine_shape_for_frame(self, &adapted, feature[i].frame) ;
@@ -1628,16 +1661,25 @@ vl_covdet_extract_affine_shape (VlCovDet * self)
       ++ j ;
     }
   }
-  self->numFrames = j ;
+  self->numFeatures = j ;
 }
 
 /* ---------------------------------------------------------------- */
-/*                                             Extract orientations */
+#pragma mark Orientation
 /* ---------------------------------------------------------------- */
 
-double * vl_covdet_extract_orientations_for_frame (VlCovDet * self,
-                                                   vl_size * numOrientations,
-                                                   VlFrameOrientedEllipse frame)
+/** @brief Extract the orientation(s) for a feature frame
+ ** @param self object.
+ ** @param numOrientations the number of detected orientations.
+ ** @return an array of detected orientations.
+ **
+ ** The function returns @c NULL if memory is insufficient.
+ **/
+
+double *
+vl_covdet_extract_orientations_for_frame (VlCovDet * self,
+                                          vl_size * numOrientations,
+                                          VlFrameOrientedEllipse frame)
 {
   assert(self);
   assert(numOrientations) ;
@@ -1658,6 +1700,10 @@ double * vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                 VL_COVDET_AA_PATCH_EXTENT,
                                 1.0,
                                 frame) ;
+  if (err) {
+    *numOrientations = 0 ;
+    return NULL ;
+  }
 
   vl_imgradient_polar_f (self->aaPatchX, self->aaPatchY, 1, size,
                          self->aaPatch, size, size, size) ;
@@ -1723,12 +1769,20 @@ double * vl_covdet_extract_orientations_for_frame (VlCovDet * self,
   return self->orientations ;
 }
 
+/** @brief Extract the orientation(s) for the stored features.
+ ** @param self object.
+ **
+ ** Note that, since more than one orientation can be detected
+ ** for each feature, this function may create copies of them, 
+ ** one for each orientation.
+ **/
+
 void
 vl_covdet_extract_orientations (VlCovDet * self)
 {
   vl_index i, j  ;
-  vl_size numFrames = vl_covdet_get_num_features(self) ;
-  for (i = 0 ; i < (signed)numFrames ; ++i) {
+  vl_size numFeatures = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numOrientations ;
     VlCovDetFeature feature = self->frames[i] ;
     double const * angles =
@@ -1748,7 +1802,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
         oriented = & self->frames[i].frame ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        oriented = & self->frames[self->numFrames -1].frame ;
+        oriented = & self->frames[self->numFeatures -1].frame ;
       }
 
       oriented->a11 = + A[0] * r1 + A[2] * r2 ;
@@ -1759,14 +1813,22 @@ vl_covdet_extract_orientations (VlCovDet * self)
   }
 }
 
-
 /* ---------------------------------------------------------------- */
-/*                                    Extract scales with Laplacian */
+#pragma mark Laplacian scales
 /* ---------------------------------------------------------------- */
 
-double * vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
-                                                       vl_size * numScales,
-                                                       VlFrameOrientedEllipse frame)
+/** @brief Extract the Laplacian scale(s) for a feature frame.
+ ** @param self object.
+ ** @param numScales the number of detected scales.
+ ** @return an array of detected scales.
+ **
+ ** The function returns @c NULL if memory is insufficient.
+ **/
+
+double *
+vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
+                                              vl_size * numScales,
+                                              VlFrameOrientedEllipse frame)
 {
   assert(self) ;
   assert(numScales) ;
@@ -1816,12 +1878,20 @@ double * vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   return self->scales ;
 }
 
+
+/** @brief Extract the Laplacian scales for the stored features
+ ** @param self object.
+ **
+ ** Note that, since more than one orientation can be detected
+ ** for each feature, this function may create copies of them,
+ ** one for each orientation.
+ **/
 void
 vl_covdet_extract_laplacian_scales (VlCovDet * self)
 {
   vl_index i, j  ;
-  vl_size numFrames = vl_covdet_get_num_features(self) ;
-  for (i = 0 ; i < (signed)numFrames ; ++i) {
+  vl_size numFeatures = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numScales ;
     VlCovDetFeature feature = self->frames[i] ;
     double const * scales =
@@ -1834,7 +1904,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
         scaled = & self->frames[i].frame ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        scaled = & self->frames[self->numFrames -1].frame ;
+        scaled = & self->frames[self->numFeatures -1].frame ;
       }
 
       scaled->a11 *= scales[j] ;
@@ -1876,12 +1946,28 @@ _vl_covdet_check_frame_inside (VlCovDet * self, VlFrameOrientedEllipse frame, do
   0 <= y0 && y1 <= self->gss->geom.height-1 ;
 }
 
+/** @brief Drop features (partially) outside the image
+ ** @param self object.
+ ** @param margin geometric marging.
+ **
+ ** The feature extent is defined by @c maring. A bounding box
+ ** in the normalised feature frame containin a circle of radius
+ ** @a maring is created and mapped to the image by 
+ ** the feature frame transformation. Then the feature
+ ** is dropped if the bounding box is not contained in the image.
+ **
+ ** For example, setting @c margin to zero drops a feature only
+ ** if its center is not contained.
+ **
+ ** Typically a valua of @c margin equal to 1 or 2 is used.
+ **/
+
 void
 vl_covdet_drop_features_outside (VlCovDet * self, double margin)
 {
   vl_index i, j = 0 ;
-  vl_size numFrames = vl_covdet_get_num_features(self) ;
-  for (i = 0 ; i < (signed)numFrames ; ++i) {
+  vl_size numFeatures = vl_covdet_get_num_features(self) ;
+  for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_bool inside =
     _vl_covdet_check_frame_inside (self, self->frames[i].frame, margin) ;
     if (inside) {
@@ -1889,7 +1975,7 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin)
       ++j ;
     }
   }
-  self->numFrames = j ;
+  self->numFeatures = j ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -2045,7 +2131,7 @@ vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x)
 vl_size
 vl_covdet_get_num_features (VlCovDet const * self)
 {
-  return self->numFrames ;
+  return self->numFeatures ;
 }
 
 /** @brief Get the stored frames

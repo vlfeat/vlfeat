@@ -464,16 +464,16 @@ mexFunction(int nout, mxArray *out[],
                 vl_covdet_get_edge_threshold(covdet)) ;
       vl_covdet_detect(covdet) ;
       if (verbose) {
-        vl_size numFrames = vl_covdet_get_num_features(covdet) ;
-        mexPrintf("vl_covdet: detected %d features\n", numFrames) ;
+        vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
+        mexPrintf("vl_covdet: detected %d features\n", numFeatures) ;
       }
 
       if (boundaryMargin > 0) {
         vl_covdet_drop_features_outside (covdet, boundaryMargin) ;
         if (verbose) {
-          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
           mexPrintf("vl_covdet: kept %d inside the bounary margin (%g)\n",
-                    numFrames, boundaryMargin) ;
+                    numFeatures, boundaryMargin) ;
         }
       }
     }
@@ -512,14 +512,14 @@ mexFunction(int nout, mxArray *out[],
     /* store results back */
     {
       vl_index i  ;
-      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+      vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
       VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
       double * pt ;
 
-      OUT(FRAMES) = mxCreateDoubleMatrix (6, numFrames, mxREAL) ;
+      OUT(FRAMES) = mxCreateDoubleMatrix (6, numFeatures, mxREAL) ;
       pt = mxGetPr(OUT(FRAMES)) ;
 
-      for (i = 0 ; i < (signed)numFrames ; ++i) {
+      for (i = 0 ; i < (signed)numFeatures ; ++i) {
         /* save the transposed frame, adjust origin to MATLAB's*/
         *pt++ = feature[i].frame.y + 1 ;
         *pt++ = feature[i].frame.x + 1 ;
@@ -545,14 +545,14 @@ mexFunction(int nout, mxArray *out[],
                       patchResolution, patchRelativeExtent,
                       patchRelativeSmoothing);
           }
-          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
           vl_index i ;
           vl_size w = 2*patchResolution + 1 ;
           float * desc ;
-          OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFrames, mxSINGLE_CLASS, mxREAL) ;
+          OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
-          for (i = 0 ; i < (signed)numFrames ; ++i) {
+          for (i = 0 ; i < (signed)numFeatures ; ++i) {
             vl_covdet_extract_patch_for_frame(covdet,
                                     desc,
                                     patchResolution,
@@ -571,16 +571,16 @@ mexFunction(int nout, mxArray *out[],
                       patchResolution, patchRelativeExtent,
                       patchRelativeSmoothing);
           }
-          vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+          vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
           VlSiftFilt * sift = vl_sift_new(16, 16, 1, 3, 0) ;
           vl_index i ;
           vl_size dimension = 128 ;
           vl_size patchSide = 2 * patchResolution + 1 ;
           float * desc ;
-          OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFrames, mxSINGLE_CLASS, mxREAL) ;
+          OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
-          for (i = 0 ; i < (signed)numFrames ; ++i) {
+          for (i = 0 ; i < (signed)numFeatures ; ++i) {
             vl_covdet_extract_patch_for_frame(covdet,
                                               patch,
                                               patchResolution,
@@ -612,7 +612,7 @@ mexFunction(int nout, mxArray *out[],
 
     if (nout >= 3) {
       vl_index i ;
-      vl_size numFrames = vl_covdet_get_num_features(covdet) ;
+      vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
       VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
       const char* names[] = {
         "gss",
@@ -622,11 +622,11 @@ mexFunction(int nout, mxArray *out[],
       };
       mxArray * gss_array = _createArrayFromScaleSpace(vl_covdet_get_gss(covdet)) ;
       mxArray * css_array = _createArrayFromScaleSpace(vl_covdet_get_css(covdet)) ;
-      mxArray * peak_array = mxCreateNumericMatrix(1,numFrames,mxSINGLE_CLASS,mxREAL) ;
-      mxArray * edge_array = mxCreateNumericMatrix(1,numFrames,mxSINGLE_CLASS,mxREAL) ;
+      mxArray * peak_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
+      mxArray * edge_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
       float * peak = mxGetData(peak_array) ;
       float * edge = mxGetData(edge_array) ;
-      for (i = 0 ; i < (signed)numFrames ; ++i) {
+      for (i = 0 ; i < (signed)numFeatures ; ++i) {
         peak[i] = feature[i].peakScore ;
         edge[i] = feature[i].edgeScore ;
       }

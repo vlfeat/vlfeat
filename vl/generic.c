@@ -47,6 +47,7 @@ extraction of code.</em>
   - @ref slic
   - @ref quickshift
   - @ref hog
+  - @ref covdet
 - <b>Support functionalities</b>
   - @ref host.h      "Platform abstraction"
   - @ref generic
