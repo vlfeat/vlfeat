@@ -1142,10 +1142,10 @@ vl_covdet_detect (VlCovDet * self)
         }
       }
     } /* next octave */
-    
+
     if (extrema) { vl_free(extrema) ; extrema = 0 ; }
   }
-  
+
   /* Laplacian scale selection for certain methods */
   switch (self->method) {
     case VL_COVDET_METHOD_HARRIS_LAPLACE :
@@ -1905,94 +1905,70 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   double factor = 1.0 ;
   float const * pt ;
   vl_index k ;
-  int iter ;
+
+  double A[2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T[2] = {frame.x, frame.y} ;
+  double D[4], U[4], V[4] ;
+  double sigma1, sigma2 ;
 
   *numScales = 0 ;
-  for (iter = 0 ; iter < 1 && *numScales == 0 ; ++iter) {
-    double A[2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
-    double T[2] = {frame.x, frame.y} ;
-    double D[4], U[4], V[4] ;
-    double sigma1, sigma2 ;
 
-    vl_svd2(D, U, V, A) ;
+  vl_svd2(D, U, V, A) ;
 
-    err = vl_covdet_extract_patch_helper
-    (self, &sigma1, &sigma2, self->lapPatch, resolution, extent, sigmaImage, A, T, D[0], D[3]) ;
+  err = vl_covdet_extract_patch_helper
+  (self, &sigma1, &sigma2, self->lapPatch, resolution, extent, sigmaImage, A, T, D[0], D[3]) ;
+  if (err) return NULL ;
 
-    /* the actual smoothing after warping is never the target one */
-    if (sigma1 == sigma2) {
-      actualSigmaImage = sigma1 ;
-    } else {
-      /* here we could compensate */
-      actualSigmaImage = sqrt(sigma1*sigma2) ;
+  /* the actual smoothing after warping is never the target one */
+  if (sigma1 == sigma2) {
+    actualSigmaImage = sigma1 ;
+  } else {
+    /* here we could compensate */
+    actualSigmaImage = sqrt(sigma1*sigma2) ;
+  }
+
+  /* now multiply by the bank of Laplacians */
+  pt = self->laplacians ;
+  for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
+    vl_index q ;
+    double score = 0 ;
+    double sigmaLap = pow(2.0, -0.5 + (double)k / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+    sigmaLap = sqrt(sigmaLap*sigmaLap
+                    - sigmaImage*sigmaImage
+                    + actualSigmaImage*actualSigmaImage) ;
+
+    for (q = 0 ; q < (signed)(num * num) ; ++q) {
+      score += (*pt++) * self->lapPatch[q] ;
     }
+    scores[k] = score * sigmaLap * sigmaLap ;
+  }
 
-    //VL_PRINTF("sigmaImage:%f\n",sigmaImage) ;
-
-    /* now multiply by the bank of Laplacians */
-    pt = self->laplacians ;
-    for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
-      vl_index q ;
-      double score = 0 ;
-      double sigmaLap = pow(2.0, -0.5 + (double)k / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+  /* find and interpolate maxima */
+  for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
+    double a = scores[k-1] ;
+    double b = scores[k] ;
+    double c = scores[k+1] ;
+    if ((b > a && b > c) || (b < a && b < c)) {
+      double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
+      double s = k + dk ;
+      double sigmaLap = pow(2.0, -0.5 + s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+      double scale ;
       sigmaLap = sqrt(sigmaLap*sigmaLap
                       - sigmaImage*sigmaImage
                       + actualSigmaImage*actualSigmaImage) ;
-
-      for (q = 0 ; q < (signed)(num * num) ; ++q) {
-        score += (*pt++) * self->lapPatch[q] ;
+      scale = sigmaLap / 1.0 ;
+      /*
+       VL_PRINTF("** k:%d, s:%f, sigmaLapFilter:%f, sigmaLap%f, scale:%f (%f %f %f)\n",
+       k,s,sigmaLapFilter,sigmaLap,scale,a,b,c) ;
+       */
+      if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
+        self->scales[*numScales] = scale * factor ;
+        *numScales += 1 ;
       }
-      scores[k] = score * sigmaLap * sigmaLap ;
-   //   VL_PRINTF("%.4f ", scores[k]) ;
-  //    VL_PRINTF("%.4f ", sigmaLap) ;
-
-    }
-   // VL_PRINTF("\n") ;
-
-    /* find and interpolate maxima */
-    for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
-      double a = scores[k-1] ;
-      double b = scores[k] ;
-      double c = scores[k+1] ;
-      if ((b > a && b > c) || (b < a && b < c)) {
-        double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
-        double s = k + dk ;
-        double sigmaLap = pow(2.0, -0.5 + s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
-        double scale ;
-        sigmaLap = sqrt(sigmaLap*sigmaLap
-                        - sigmaImage*sigmaImage
-                        + actualSigmaImage*actualSigmaImage) ;
-        scale = sigmaLap / 1.0 ;
-    //    VL_PRINTF("** k:%d, s:%f, sigmaLapFilter:%f, sigmaLap%f, scale:%f (%f %f %f)\n",
-     //             k,s,sigmaLapFilter,sigmaLap,scale,a,b,c) ;
-        if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
-          self->scales[*numScales] = scale * factor ;
-          *numScales += 1 ;
-        }
-      }
-    }
-
-#if 0
-    {
-      char name [200] ;
-      snprintf(name, 200, "/Users/vedaldi/Desktop/bla/patch-%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
-      VL_PRINTF("done %s\n",name) ;
-      vl_pgm_write_f(name, self->lapPatch, num, num) ;
-    }
-#endif
-
-    /* now double the frame size and repeat */
-    {
-      double factor = pow(2.0, - 1.0 + 1.0 / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
-      frame.a11 *= factor ;
-      frame.a12 *= factor ;
-      frame.a21 *= factor ;
-      frame.a22 *= factor ;
     }
   }
   return self->scales ;
 }
-
 
 /** @brief Extract the Laplacian scales for the stored features
  ** @param self object.
@@ -2012,8 +1988,6 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
     VlCovDetFeature feature = self->features[i] ;
     double const * scales =
     vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
-
-    /*VL_PRINTF("scale %f %d\n", scales[0], numScales) ;*/
 
     if (numScales == 0 && dropFeaturesWithoutScale) {
       self->features[i].peakScore = 0 ;
@@ -2045,7 +2019,6 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
     }
     self->numFeatures = j ;
   }
-  VL_PRINTF("aaaaa %d\n", self->numFeatures) ;
 }
 
 /* ---------------------------------------------------------------- */
