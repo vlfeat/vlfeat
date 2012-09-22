@@ -1224,8 +1224,8 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
                                 vl_size resolution,
                                 double extent,
                                 double sigma,
-                                double (A) [4],
-                                double (T) [2],
+                                double (A_) [4],
+                                double (T_) [2],
                                 double d1, double d2)
 {
   vl_index o, s ;
@@ -1234,6 +1234,9 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
   float const * level ;
   vl_size width, height ;
   double step ;
+
+  double A [4] = {A_[0], A_[1], A_[2], A_[3]} ;
+  double T [2] = {T_[0], T_[1]} ;
 
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
   VlScaleSpaceOctaveGeometry oct ;
@@ -1528,7 +1531,9 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   double factor ;
   double anisotropy ;
   double referenceScale ;
-  vl_size const size = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
+  vl_size const resolution = VL_COVDET_AA_PATCH_RESOLUTION ;
+  vl_size const side = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
+  double const extent = VL_COVDET_AA_PATCH_EXTENT ;
   double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
   double T [2] = {frame.x, frame.y} ;
 
@@ -1559,10 +1564,13 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
       factor = referenceScale / VL_MIN(D[0],D[3]) ;
     }
 
-    A[0] = U[0] * D[0] * factor ;
-    A[1] = U[1] * D[0] * factor ;
-    A[2] = U[2] * D[3] * factor ;
-    A[3] = U[3] * D[3] * factor ;
+    D[0] *= factor ;
+    D[3] *= factor ;
+
+    A[0] = U[0] * D[0] ;
+    A[1] = U[1] * D[0] ;
+    A[2] = U[2] * D[3] ;
+    A[3] = U[3] * D[3] ;
 
     adapted->a11 = A[0] ;
     adapted->a21 = A[1] ;
@@ -1574,27 +1582,29 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
     err = vl_covdet_extract_patch_helper(self,
                                          &sigma1, &sigma2,
                                          self->aaPatch,
-                                         VL_COVDET_AA_PATCH_RESOLUTION,
-                                         VL_COVDET_AA_PATCH_EXTENT,
+                                         resolution,
+                                         extent,
                                          1.0,
                                          A, T, D[0], D[3]) ;
     if (err) return err ;
 
+    VL_PRINTF("%g %g\n", sigma1, sigma2) ;
+
+
     if (self->aaAccurateSmoothing) {
       double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
       double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
-      double stephat = (2.0*VL_COVDET_AA_PATCH_EXTENT) / size ;
-      /*VL_PRINTF("%g %g\n", sigma1, sigma2) ;*/
-      vl_imsmooth_f(self->aaPatch, size,
-                    self->aaPatch, size, size, size,
+      double stephat = extent / resolution ;
+      vl_imsmooth_f(self->aaPatch, side,
+                    self->aaPatch, side, side, side,
                     deltaSigma1 / stephat, deltaSigma2 / stephat) ;
     }
 
     /* compute second moment matrix */
-    vl_imgradient_f (self->aaPatchX, self->aaPatchY, 1, size,
-                     self->aaPatch, size, size, size) ;
+    vl_imgradient_f (self->aaPatchX, self->aaPatchY, 1, side,
+                     self->aaPatch, side, side, side) ;
 
-    for (k = 0 ; k < (signed)(size*size) ; ++k) {
+    for (k = 0 ; k < (signed)(side*side) ; ++k) {
       double lx = self->aaPatchX[k] ;
       double ly = self->aaPatchY[k] ;
       lxx += lx * lx * self->aaMask[k] ;
@@ -1933,6 +1943,8 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
     vl_index q ;
     double score = 0 ;
     double sigmaLap = pow(2.0, -0.5 + (double)k / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+    /* note that the sqrt argument cannot be negative since by construction
+     sigmaLap >= sigmaImage */
     sigmaLap = sqrt(sigmaLap*sigmaLap
                     - sigmaImage*sigmaImage
                     + actualSigmaImage*actualSigmaImage) ;
