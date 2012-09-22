@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D1BC0F6160DF170009E8DD3 /* covdet.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED211604FE5900C63DCE /* covdet.c */; };
 		2D1EECD61603E8E900C63DCE /* aib.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D732E7E0CF8C2E40099B03C /* aib.c */; };
 		2D1EECD71603E8E900C63DCE /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DFA36D212F1A26D00E808D9 /* array.c */; };
 		2D1EECD81603E8E900C63DCE /* dsift.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DE5B37D0FDC2BE9008CEB1D /* dsift.c */; };
@@ -36,7 +37,6 @@
 		2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EECCC1603E1B100C63DCE /* svmdataset.c */; };
 		2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED1D1604992A00C63DCE /* scalespace.c */; };
 		2D1EED201604992B00C63DCE /* scalespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1EED1E1604992A00C63DCE /* scalespace.h */; };
-		2D1EED2C1605008600C63DCE /* covdet2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED2B1605008600C63DCE /* covdet2.c */; };
 		2DB3F05D1605ED2300862CCA /* vl_covdet.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DB3F04F1605DFDB00862CCA /* vl_covdet.c */; };
 		2DB3F06B1605F3A100862CCA /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 /* End PBXBuildFile section */
@@ -100,8 +100,6 @@
 		2D1EED1E1604992A00C63DCE /* scalespace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scalespace.h; sourceTree = "<group>"; };
 		2D1EED211604FE5900C63DCE /* covdet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet.c; sourceTree = "<group>"; };
 		2D1EED221604FE5900C63DCE /* covdet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = covdet.h; sourceTree = "<group>"; };
-		2D1EED2B1605008600C63DCE /* covdet2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet2.c; sourceTree = "<group>"; };
-		2D1EED2D1605009D00C63DCE /* covdet2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = covdet2.h; sourceTree = "<group>"; };
 		2D27614810FF6B3900D14D9E /* vl_imdisttf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_imdisttf.c; path = toolbox/imop/vl_imdisttf.c; sourceTree = "<group>"; };
 		2D29DD661608F12B00E74DF3 /* test_gauss_elimination.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_gauss_elimination.c; sourceTree = "<group>"; };
 		2D2B3C6B11A19CB9008F9C80 /* vl_pegasos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_pegasos.c; path = toolbox/misc/vl_pegasos.c; sourceTree = "<group>"; };
@@ -769,8 +767,6 @@
 		2D732E7D0CF8C2E40099B03C /* vl */ = {
 			isa = PBXGroup;
 			children = (
-				2D1EED2B1605008600C63DCE /* covdet2.c */,
-				2D1EED2D1605009D00C63DCE /* covdet2.h */,
 				2D1EED211604FE5900C63DCE /* covdet.c */,
 				2D1EED221604FE5900C63DCE /* covdet.h */,
 				2DB3F04F1605DFDB00862CCA /* vl_covdet.c */,
@@ -1135,7 +1131,7 @@
 				2D1EECEF1603E8E900C63DCE /* stringop.c in Sources */,
 				2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */,
 				2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */,
-				2D1EED2C1605008600C63DCE /* covdet2.c in Sources */,
+				2D1BC0F6160DF170009E8DD3 /* covdet.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

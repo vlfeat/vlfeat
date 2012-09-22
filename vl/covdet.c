@@ -13,7 +13,7 @@
  the terms of the BSD license (see the COPYING file).
  */
 
-#include "covdet2.h"
+#include "covdet.h"
 #include <string.h>
 
 /** @brief Reallocate buffer

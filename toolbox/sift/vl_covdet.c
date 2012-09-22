@@ -14,7 +14,7 @@ the terms of the BSD license (see the COPYING file).
 */
 
 #include <mexutils.h>
-#include <vl/covdet2.h>
+#include <vl/covdet.h>
 #include <vl/mathop.h>
 #include <vl/sift.h>
 
