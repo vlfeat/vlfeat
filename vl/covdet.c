@@ -25,7 +25,7 @@
 on three cornerness measures (determinant of the Hessian, trace of the Hessian
 (aka Difference of Gaussians, and Harris). It supprots affine adaptation,
 orientation estimation, as well as Laplacian scale detection.
- 
+
 **/
 
 #include "covdet.h"
@@ -503,7 +503,7 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_AA_PATCH_EXTENT (3*VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA)
 #define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
 #define VL_COVDET_LAP_NUM_LEVELS 10
-#define VL_COVDET_LAP_PATCH_RESOLUTION 12
+#define VL_COVDET_LAP_PATCH_RESOLUTION 16
 #define VL_COVDET_DOG_DEF_PEAK_THRESHOLD 0.05
 #define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
 #define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.001
@@ -521,26 +521,26 @@ struct _VlCovDet
   double edgeThreshold ;     /**< edge threshold. */
   vl_size octaveResolution ; /**< resolution of each octave. */
   vl_index firstOctave ;     /**< index of the first octave. */
-  
+
   double nonMaximaSuppression ;
-  
-  VlCovDetFeature *frames ;
+
+  VlCovDetFeature *features ;
   vl_size numFeatures ;
   vl_size numFeatureBufferSize ;
-  
+
   float * patch ;
   vl_size patchBufferSize ;
-  
+
   vl_bool transposed ;
   double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
   double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
-  
+
   vl_bool aaAccurateSmoothing ;
   float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaPatchX [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaPatchY [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
   float aaMask [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
-  
+
   float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
   float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
 }  ;
@@ -587,14 +587,14 @@ vl_covdet_new (VlCovDetMethod method)
   }
 
   self->nonMaximaSuppression = 0.3 ;
-  self->frames = NULL ;
+  self->features = NULL ;
   self->numFeatures = 0 ;
   self->numFeatureBufferSize = 0 ;
   self->patch = NULL ;
   self->patchBufferSize = 0 ;
   self->transposed = VL_FALSE ;
   self->aaAccurateSmoothing = VL_COVDET_AA_ACCURATE_SMOOTHING ;
-  
+
   {
     vl_index const w = VL_COVDET_AA_PATCH_RESOLUTION ;
     vl_index i,j ;
@@ -616,7 +616,8 @@ vl_covdet_new (VlCovDetMethod method)
      */
     vl_index s, k ;
     for (s = 0 ; s < VL_COVDET_LAP_NUM_LEVELS ; ++s) {
-      double sigmaLap = pow(2.0, -0.5 + 0.5 * s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+      double sigmaLap = pow(2.0, -0.5 +
+                            (double)s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
       double const sigmaIm = 1.0 / sqrt(2.0) ;
       double const sigmaDelta = sqrt(sigmaLap*sigmaLap - sigmaIm*sigmaIm) ;
       double const step = 0.5 * sigmaIm ;
@@ -639,10 +640,10 @@ vl_covdet_new (VlCovDetMethod method)
                     pt, num, num, num,
                     sigmaDelta / step, sigmaDelta / step) ;
 
-      for (k = 0 ; k < (signed)(num * num) ; ++k) mass += fabs(pt[k]) ;
-      for (k = 0 ; k < (signed)(num * num) ; ++k) pt[k] /= mass ;
-
-#if 0
+     // for (k = 0 ; k < (signed)(num * num) ; ++k) mass += fabs(pt[k]) ;
+     // for (k = 0 ; k < (signed)(num * num) ; ++k) pt[k] /= mass ;
+     // for (k = 0 ; k < (signed)(num * num) ; ++k) pt[k] *= mass ;
+#if 1
       {
         char name [200] ;
         snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%f-lap.pgm", sigmaDelta) ;
@@ -666,9 +667,9 @@ vl_covdet_new (VlCovDetMethod method)
 void
 vl_covdet_reset (VlCovDet * self)
 {
-  if (self->frames) {
-    vl_free(self->frames) ;
-    self->frames = NULL ;
+  if (self->features) {
+    vl_free(self->features) ;
+    self->features = NULL ;
   }
   if (self->css) {
     vl_scalespace_delete(self->css) ;
@@ -710,11 +711,11 @@ vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
   self->numFeatures ++ ;
   requiredSize = self->numFeatures * sizeof(VlCovDetFeature) ;
   if (requiredSize > self->numFeatureBufferSize) {
-    int err = _vl_resize_buffer((void**)&self->frames, &self->numFeatureBufferSize,
+    int err = _vl_resize_buffer((void**)&self->features, &self->numFeatureBufferSize,
                                 (self->numFeatures + 1000) * sizeof(VlCovDetFeature)) ;
     if (err) return err ;
   }
-  self->frames[self->numFeatures - 1] = *feature ;
+  self->features[self->numFeatures - 1] = *feature ;
   return VL_ERR_OK ;
 }
 
@@ -910,7 +911,7 @@ _vl_harris_response (float * harris,
   LyLy = vl_malloc(sizeof(float) * width * height) ;
   LxLy = vl_malloc(sizeof(float) * width * height) ;
 
-  vl_imgradient_f (LxLx, LyLy, 1, widthcl, image, width, height, width) ;
+  vl_imgradient_f (LxLx, LyLy, 1, width, image, width, height, width) ;
 
   for (k = 0 ; k < (signed)(width * height) ; ++k) {
     float dx = LxLx[k] ;
@@ -1161,32 +1162,32 @@ vl_covdet_detect (VlCovDet * self)
     vl_index i, j ;
     double tol = self->nonMaximaSuppression ;
     for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
-      double x = self->frames[i].frame.x ;
-      double y = self->frames[i].frame.y ;
-      double sigma = self->frames[i].frame.a11 ;
-      double score = self->frames[i].peakScore ;
+      double x = self->features[i].frame.x ;
+      double y = self->features[i].frame.y ;
+      double sigma = self->features[i].frame.a11 ;
+      double score = self->features[i].peakScore ;
 
       for (j = 0 ; j < (signed)self->numFeatures ; ++j) {
-        double dx_ = self->frames[j].frame.x - x ;
-        double dy_ = self->frames[j].frame.y - y ;
-        double sigma_ = self->frames[j].frame.a11 ;
-        double score_ = self->frames[j].peakScore ;
+        double dx_ = self->features[j].frame.x - x ;
+        double dy_ = self->features[j].frame.y - y ;
+        double sigma_ = self->features[j].frame.a11 ;
+        double score_ = self->features[j].peakScore ;
         if (score_ == 0) continue ;
         if (sigma < (1+tol) * sigma_ &&
             sigma_ < (1+tol) * sigma &&
             vl_abs_d(dx_) < tol * sigma &&
             vl_abs_d(dy_) < tol * sigma &&
             score > score_) {
-          self->frames[j].peakScore = 0 ;
+          self->features[j].peakScore = 0 ;
           killed ++ ;
         }
       }
     }
     j = 0 ;
     for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
-      VlCovDetFeature feature = self->frames[i] ;
-      if (self->frames[i].peakScore != 0) {
-        self->frames[j++] = feature ;
+      VlCovDetFeature feature = self->features[i] ;
+      if (self->features[i].peakScore != 0) {
+        self->features[j++] = feature ;
       }
     }
     self->numFeatures = j ;
@@ -1269,7 +1270,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
    Given the range of octave availables, do the best you can.
    */
-  
+
   factor = 1.0 / VL_MIN(d1, d2) ;
 
   for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
@@ -1489,9 +1490,9 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
   double A[2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
   double T[2] = {frame.x, frame.y} ;
   double D[4], U[4], V[4] ;
-  
+
   vl_svd2(D, U, V, A) ;
-  
+
   return vl_covdet_extract_patch_helper
   (self, NULL, NULL, patch, resolution, extent, sigma, A, T, D[0], D[3]) ;
 }
@@ -1821,7 +1822,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
  ** @param self object.
  **
  ** Note that, since more than one orientation can be detected
- ** for each feature, this function may create copies of them, 
+ ** for each feature, this function may create copies of them,
  ** one for each orientation.
  **/
 
@@ -1832,7 +1833,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
   vl_size numFeatures = vl_covdet_get_num_features(self) ;
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numOrientations ;
-    VlCovDetFeature feature = self->frames[i] ;
+    VlCovDetFeature feature = self->features[i] ;
     double const * angles =
     vl_covdet_extract_orientations_for_frame(self, &numOrientations, feature.frame) ;
 
@@ -1847,10 +1848,10 @@ vl_covdet_extract_orientations (VlCovDet * self)
       VlFrameOrientedEllipse * oriented ;
 
       if (j == 0) {
-        oriented = & self->frames[i].frame ;
+        oriented = & self->features[i].frame ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        oriented = & self->frames[self->numFeatures -1].frame ;
+        oriented = & self->features[self->numFeatures -1].frame ;
       }
 
       oriented->a11 = + A[0] * r1 + A[2] * r2 ;
@@ -1881,48 +1882,111 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   assert(self) ;
   assert(numScales) ;
 
+  /*
+   We try to explore one octave, with the nominal detection scale 1.0
+   (in the patch reference frame) in the middle. Thus the goal is to sample
+   the response of the tr-Laplacian operator at logarithmically
+   spaced scales in 1/sqrt(2), sqrt(2).
+
+   To this end, the patch is warped with a smoothing of at most
+   sigmaImage = 1 / sqrt(2) (beginning of the scale), sampled at
+   roughly twice the Nyquist frequency (so step = 1 / (2*sqrt(2))).
+   This maes it possible to approximate the Laplacian operator at
+   that scale by simple finite differences.
+
+   */
   int err ;
   double sigmaImage = 1.0 / sqrt(2.0) ;
   double step = 0.5 / sqrt(2.0) ;
-  vl_size const w = VL_COVDET_LAP_PATCH_RESOLUTION ;
-  vl_size const num = 2*w+1;
-  double extent = step * w ;
+  vl_size const resolution = VL_COVDET_LAP_PATCH_RESOLUTION ;
+  vl_size const num = 2 * resolution + 1 ;
+  double extent = step * num ;
   vl_index k ;
   float const * pt ;
   double scores [VL_COVDET_LAP_NUM_LEVELS] ;
+  int iter ;
+  double factor ;
 
-  err = vl_covdet_extract_patch_for_frame(self,
-                                          self->lapPatch,
-                                          w,
-                                          extent,
-                                          sigmaImage,
-                                          frame) ;
-
-  pt = self->laplacians ;
-  for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
-    vl_index q ;
-    double score = 0 ;
-    for (q = 0 ; q < (signed)(num * num) ; ++q) {
-      score += (*pt++) * self->lapPatch[q] ;
-    }
-    scores[k] = score ;
-  }
-
-  /* find and interpolate maxima */
+  factor = 1.0 ;
   *numScales = 0 ;
-  for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
-    double a = scores[k-1] ;
-    double b = scores[k] ;
-    double c = scores[k+1] ;
-    if ((b > a && b > c) || (b < a && b < c)) {
-      double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
-      double scale = pow(2.0, (k + dk) / (VL_COVDET_MAX_NUM_LAPLACIAN_SCALES - 1) - 0.5) ;
-      if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
-        self->scales[*numScales++] = scale ;
+  for (iter = 0 ; iter < 2 && *numScales == 0 ; ++iter) {
+    double A[2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+    double T[2] = {frame.x, frame.y} ;
+    double D[4], U[4], V[4] ;
+    double sigma1, sigma2 ;
+
+    vl_svd2(D, U, V, A) ;
+
+    err = vl_covdet_extract_patch_helper
+    (self, &sigma1, &sigma2, self->lapPatch, resolution, extent, 0.5, A, T, D[0], D[3]) ;
+
+    /* the actual smoothing after warping is never the target one */
+    if (sigma1 == sigma2) {
+      sigmaImage = sigma1 ;
+    } else {
+      /* here we could compensate */
+      sigmaImage = sqrt(sigma1*sigma2) ;
+    }
+
+    //VL_PRINTF("sigmaImage:%f\n",sigmaImage) ;
+
+    /* now multiply by the bank of Laplacians */
+    pt = self->laplacians ;
+    for (k = 0 ; k < VL_COVDET_LAP_NUM_LEVELS ; ++k) {
+      vl_index q ;
+      double score = 0 ;
+      double sigmaLap = pow(2.0, -0.5 + (double)k / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+ /*     double sigmaLap = sqrt(sigmaLapFilter*sigmaLapFilter + sigmaImage*sigmaImage - 0.5) ;*/
+      sigmaLap = sqrt(sigmaLap*sigmaLap - 0.5 + sigmaImage*sigmaImage) ;
+
+      for (q = 0 ; q < (signed)(num * num) ; ++q) {
+        score += (*pt++) * self->lapPatch[q] ;
+      }
+      scores[k] = score * sigmaLap * sigmaLap ;
+ //     VL_PRINTF("%.4f ", scores[k]) ;
+  //    VL_PRINTF("%.4f ", sigmaLap) ;
+
+    }
+   // VL_PRINTF("\n") ;
+
+    /* find and interpolate maxima */
+    for (k = 1 ; k < VL_COVDET_LAP_NUM_LEVELS - 1 ; ++k) {
+      double a = scores[k-1] ;
+      double b = scores[k] ;
+      double c = scores[k+1] ;
+      if ((b > a && b > c) || (b < a && b < c)) {
+        double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
+        double s = k + dk ;
+        double sigmaLapFilter = pow(2.0, -0.5 + s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+        double sigmaLap = sqrt(sigmaLapFilter*sigmaLapFilter + sigmaImage*sigmaImage) ;
+        double scale = sigmaLap / 1.0 ;
+    //    VL_PRINTF("** k:%d, s:%f, sigmaLapFilter:%f, sigmaLap%f, scale:%f (%f %f %f)\n",
+     //             k,s,sigmaLapFilter,sigmaLap,scale,a,b,c) ;
+        if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
+          self->scales[*numScales] = scale * factor ;
+          *numScales += 1 ;
+        }
       }
     }
-  }
 
+#if 0
+    {
+      char name [200] ;
+      snprintf(name, 200, "/Users/vedaldi/Desktop/bla/patch-%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
+      VL_PRINTF("done %s\n",name) ;
+      vl_pgm_write_f(name, self->lapPatch, num, num) ;
+    }
+#endif
+
+    /* now double the frame size and repeat */
+    {
+      double factor = pow(2.0, - 1.0 + 1.0 / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
+      frame.a11 *= factor ;
+      frame.a12 *= factor ;
+      frame.a21 *= factor ;
+      frame.a22 *= factor ;
+    }
+  }
   return self->scales ;
 }
 
@@ -1941,18 +2005,20 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
   vl_size numFeatures = vl_covdet_get_num_features(self) ;
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numScales ;
-    VlCovDetFeature feature = self->frames[i] ;
+    VlCovDetFeature feature = self->features[i] ;
     double const * scales =
     vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
+
+    VL_PRINTF("scale %f %d\n", scales[0], numScales) ;
 
     for (j = 0 ; j < (signed)numScales ; ++j) {
       VlFrameOrientedEllipse * scaled ;
 
       if (j == 0) {
-        scaled = & self->frames[i].frame ;
+        scaled = & self->features[i].frame ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        scaled = & self->frames[self->numFeatures -1].frame ;
+        scaled = & self->features[self->numFeatures -1].frame ;
       }
 
       scaled->a11 *= scales[j] ;
@@ -2000,7 +2066,7 @@ _vl_covdet_check_frame_inside (VlCovDet * self, VlFrameOrientedEllipse frame, do
  **
  ** The feature extent is defined by @c maring. A bounding box
  ** in the normalised feature frame containin a circle of radius
- ** @a maring is created and mapped to the image by 
+ ** @a maring is created and mapped to the image by
  ** the feature frame transformation. Then the feature
  ** is dropped if the bounding box is not contained in the image.
  **
@@ -2017,9 +2083,9 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin)
   vl_size numFeatures = vl_covdet_get_num_features(self) ;
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_bool inside =
-    _vl_covdet_check_frame_inside (self, self->frames[i].frame, margin) ;
+    _vl_covdet_check_frame_inside (self, self->features[i].frame, margin) ;
     if (inside) {
-      self->frames[j] = self->frames[i] ;
+      self->features[j] = self->features[i] ;
       ++j ;
     }
   }
@@ -2188,7 +2254,7 @@ vl_covdet_get_num_features (VlCovDet const * self)
 void *
 vl_covdet_get_features (VlCovDet * self)
 {
-  return self->frames ;
+  return self->features ;
 }
 
 /** @brief Get the Gaussian scale space
@@ -2206,7 +2272,7 @@ vl_covdet_get_gss (VlCovDet const * self)
 /** @brief Get the cornerness measure scale space
  ** @return cornerness measure scale space.
  **
- ** A cornerness measure scale space exists only after calling 
+ ** A cornerness measure scale space exists only after calling
  ** ::vl_covdet_detect. Otherwise the function returns @c NULL.
  **/
 
