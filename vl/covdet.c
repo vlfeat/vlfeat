@@ -533,7 +533,7 @@ struct _VlCovDet
   vl_size patchBufferSize ;
 
   vl_bool transposed ;
-  double orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
+  VlCovDetFeatureOrientation orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
   double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
 
   vl_bool aaAccurateSmoothing ;
@@ -1521,6 +1521,8 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
 {
   vl_index iter = 0 ;
 
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T [2] = {frame.x, frame.y} ;
   double U [2*2] ;
   double V [2*2] ;
   double D [2*2] ;
@@ -1536,8 +1538,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   vl_size const resolution = VL_COVDET_AA_PATCH_RESOLUTION ;
   vl_size const side = 2*VL_COVDET_AA_PATCH_RESOLUTION + 1 ;
   double const extent = VL_COVDET_AA_PATCH_EXTENT ;
-  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
-  double T [2] = {frame.x, frame.y} ;
+
 
   *adapted = frame ;
 
@@ -1725,15 +1726,29 @@ vl_covdet_extract_affine_shape (VlCovDet * self)
 #pragma mark Orientation
 /* ---------------------------------------------------------------- */
 
+static int
+_vl_covdet_compare_orientations_descending (void const * a_,
+                                            void const * b_)
+{
+  VlCovDetFeatureOrientation const * a = a_ ;
+  VlCovDetFeatureOrientation const * b = b_ ;
+  if (a->score > b->score) return -1 ;
+  if (a->score < b->score) return +1 ;
+  return 0 ;
+}
+
 /** @brief Extract the orientation(s) for a feature frame
  ** @param self object.
  ** @param numOrientations the number of detected orientations.
- ** @return an array of detected orientations.
+ ** @return an array of detected orientations with their scores.
+ **
+ ** The returned array is a matrix of size @f$ 2 \times n @f$
+ ** where <em>n</em> is the number of detected orientations.
  **
  ** The function returns @c NULL if memory is insufficient.
  **/
 
-double *
+VlCovDetFeatureOrientation *
 vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                           vl_size * numOrientations,
                                           VlFrameOrientedEllipse frame)
@@ -1743,37 +1758,86 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
   int err ;
   vl_index k, i ;
   vl_index iter ;
-  vl_size size = 2 * VL_COVDET_AA_PATCH_RESOLUTION + 1  ;
+
+  double extent = VL_COVDET_AA_PATCH_EXTENT ;
+  vl_size resolution = VL_COVDET_AA_PATCH_RESOLUTION ;
+  vl_size side = 2 * resolution + 1  ;
+
   vl_size const numBins = VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
   double hist [VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS] ;
-  double const step = 2 * VL_PI / VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
-  double const inverseStep = 1.0 / step ;
-  double maxValue ;
-  double const fraction = VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE ;
+  double const binExtent = 2 * VL_PI / VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS ;
+  double const peakRelativeSize = VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE ;
+  double maxPeakValue ;
 
-  err = vl_covdet_extract_patch_for_frame(self,
-                                self->aaPatch,
-                                VL_COVDET_AA_PATCH_RESOLUTION,
-                                VL_COVDET_AA_PATCH_EXTENT,
-                                1.0,
-                                frame) ;
+  double A [2*2] = {frame.a11, frame.a21, frame.a12, frame.a22} ;
+  double T [2] = {frame.x, frame.y} ;
+  double U [2*2] ;
+  double V [2*2] ;
+  double D [2*2] ;
+  double sigma1, sigma2 ;
+  double sigmaD = 1.0 ;
+  double theta0 ;
+
+  /*
+   The goal is to estimate a rotation R(theta) such that the patch given
+   by the transformation A R(theta) has the strongest average
+   gradient pointing right (or down for transposed conventions).
+
+   To compensate for tha anisotropic smoothing due to warping,
+   A is decomposed as A = U D V' and the patch is warped by
+   U D only, meaning that the matrix R_(theta) will be estimated instead,
+   where:
+
+      A R(theta) = U D V' R(theta) = U D R_(theta)
+
+   such that R(theta) = V R(theta). That is an extra rotation of
+   theta0 = atan2(V(2,1),V(1,1)).
+   */
+
+  /* axis aligned anisotropic smoothing for easier compensation */
+  vl_svd2(D, U, V, A) ;
+
+  A[0] = U[0] * D[0] ;
+  A[1] = U[1] * D[0] ;
+  A[2] = U[2] * D[3] ;
+  A[3] = U[3] * D[3] ;
+
+  theta0 = atan2(V[1],V[0]) ;
+
+  err = vl_covdet_extract_patch_helper(self,
+                                       &sigma1, &sigma2,
+                                       self->aaPatch,
+                                       resolution,
+                                       extent,
+                                       sigmaD,
+                                       A, T, D[0], D[3]) ;
+
   if (err) {
     *numOrientations = 0 ;
     return NULL ;
   }
 
-  vl_imgradient_polar_f (self->aaPatchX, self->aaPatchY, 1, size,
-                         self->aaPatch, size, size, size) ;
+  if (1) {
+    double deltaSigma1 = sqrt(VL_MAX(sigmaD*sigmaD - sigma1*sigma1,0)) ;
+    double deltaSigma2 = sqrt(VL_MAX(sigmaD*sigmaD - sigma2*sigma2,0)) ;
+    double stephat = extent / resolution ;
+    vl_imsmooth_f(self->aaPatch, side,
+                  self->aaPatch, side, side, side,
+                  deltaSigma1 / stephat, deltaSigma2 / stephat) ;
+  }
 
-  memset (hist, 0, sizeof(double) * VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS) ;
+  /* histogram of oriented gradients */
+  vl_imgradient_polar_f (self->aaPatchX, self->aaPatchY, 1, side,
+                         self->aaPatch, side, side, side) ;
 
-  /* accumulate histogram */
-  for (k = 0 ; k < (signed)(size*size) ; ++k) {
+  memset (hist, 0, sizeof(double) * numBins) ;
+
+  for (k = 0 ; k < (signed)(side*side) ; ++k) {
     double modulus = self->aaPatchX[k] ;
     double angle = self->aaPatchY[k] ;
     double weight = self->aaMask[k] ;
 
-    double x = angle * inverseStep ;
+    double x = angle / binExtent ;
     vl_index bin = vl_floor_d(x) ;
     double w2 = x - bin ;
     double w1 = 1.0 - w2 ;
@@ -1796,9 +1860,9 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
   }
 
   /* find the histogram maximum */
-  maxValue = 0 ;
+  maxPeakValue = 0 ;
   for (i = 0 ; i < (signed)numBins ; ++i) {
-    maxValue = VL_MAX (maxValue, hist[i]) ;
+    maxPeakValue = VL_MAX (maxPeakValue, hist[i]) ;
   }
 
   /* find peaks within 80% from max */
@@ -1809,19 +1873,28 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
     double hp = hist [(i + 1 + numBins) % numBins] ;
 
     /* is this a peak? */
-    if (h0 > fraction * maxValue && h0 > hm && h0 > hp) {
+    if (h0 > peakRelativeSize * maxPeakValue && h0 > hm && h0 > hp) {
       /* quadratic interpolation */
       double di = - 0.5 * (hp - hm) / (hp + hm - 2 * h0) ;
-      double th = step * (i + di) ;
+      double th = binExtent * (i + di) + theta0 ;
       if (self->transposed) {
         /* the axis to the right is y, measure orientations from this */
-        th = VL_PI/2 - th ;
+        th = VL_PI/2 + th ;
       }
-      self->orientations [*numOrientations] = th ;
+      self->orientations[*numOrientations].angle = th ;
+      self->orientations[*numOrientations].score = h0 ;
       *numOrientations += 1 ;
+      //VL_PRINTF("%d %g\n", *numOrientations, th) ;
+
       if (*numOrientations >= VL_COVDET_MAX_NUM_ORIENTATIONS) break ;
     }
   }
+
+  /* sort the oritentations by decreasing scores */
+  qsort(self->orientations,
+        *numOrientations,
+        sizeof(VlCovDetFeatureOrientation),
+        _vl_covdet_compare_orientations_descending) ;
 
   return self->orientations ;
 }
@@ -1842,7 +1915,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numOrientations ;
     VlCovDetFeature feature = self->features[i] ;
-    double const * angles =
+    VlCovDetFeatureOrientation* orientations =
     vl_covdet_extract_orientations_for_frame(self, &numOrientations, feature.frame) ;
 
     for (j = 0 ; j < (signed)numOrientations ; ++j) {
@@ -1851,8 +1924,8 @@ vl_covdet_extract_orientations (VlCovDet * self)
         feature.frame.a21,
         feature.frame.a12,
         feature.frame.a22} ;
-      double r1 = cos(angles[j]) ;
-      double r2 = sin(angles[j]) ;
+      double r1 = cos(orientations[j].angle) ;
+      double r2 = sin(orientations[j].angle) ;
       VlFrameOrientedEllipse * oriented ;
 
       if (j == 0) {

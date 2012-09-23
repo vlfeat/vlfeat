@@ -135,6 +135,12 @@ typedef struct _VlCovDetFeature
   float edgeScore ; /**< edge score. */
 } VlCovDetFeature ;
 
+typedef struct _VlCovDetFeatureOrientation
+{
+  double angle ;
+  double score ;
+} VlCovDetFeatureOrientation ;
+
 /** @brief Covariant feature detection method */
 typedef enum _VlCovDetMethod
 {
@@ -173,7 +179,7 @@ VL_EXPORT void vl_covdet_extract_orientations (VlCovDet * self) ;
 VL_EXPORT void vl_covdet_extract_laplacian_scales (VlCovDet * self) ;
 VL_EXPORT void vl_covdet_extract_affine_shape (VlCovDet * self) ;
 
-VL_EXPORT double *
+VL_EXPORT VlCovDetFeatureOrientation *
 vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                           vl_size *numOrientations,
                                           VlFrameOrientedEllipse frame) ;
