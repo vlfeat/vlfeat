@@ -18,7 +18,7 @@
 @page covdet Covariant feature detectors
 @auhtor Karel Lenc
 @author Andrea Vedaldi
-@author Mcihal Perdoch
+@author Michal Perdoch
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref covdet.h implements a number of covariant feature detectors, based
@@ -1879,7 +1879,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
       double th = binExtent * (i + di) + theta0 ;
       if (self->transposed) {
         /* the axis to the right is y, measure orientations from this */
-        th = VL_PI/2 + th ;
+        th = th - VL_PI/2 ;
       }
       self->orientations[*numOrientations].angle = th ;
       self->orientations[*numOrientations].score = h0 ;

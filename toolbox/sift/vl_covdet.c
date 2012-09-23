@@ -145,7 +145,7 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
  **/
 
 static void
-transpose_descriptor (float *dst, float const *src)
+flip_descriptor (float *dst, float const *src)
 {
   int const BO = 8 ;  /* number of orientation bins */
   int const BP = 4 ;  /* number of spatial bins     */
@@ -227,6 +227,7 @@ mexFunction(int nout, mxArray *out[],
   numCols = mxGetN(IN(I)) ;
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+
     switch (opt) {
 
     case opt_verbose :
@@ -344,16 +345,19 @@ mexFunction(int nout, mxArray *out[],
 
     case VL_COVDET_DESC_PATCH :
       if (patchResolution < 0)  patchResolution = 20 ;
-      if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
+      if (patchRelativeExtent < 0) patchRelativeExtent = 6 ;
       if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
       break ;
 
     case VL_COVDET_DESC_SIFT :
-      if (patchResolution < 0)  patchResolution = 20 ;
-      if (patchRelativeExtent < 0) patchRelativeExtent = 3 ;
+      /* the patch parameters are selected to match the SIFT descriptor geometry */
+      if (patchResolution < 0)  patchResolution = 15 ;
+      if (patchRelativeExtent < 0) patchRelativeExtent = 7.5 ;
       if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1 ;
       break ;
   }
+
+
 
   if (patchResolution > 0) {
     vl_size w = 2*patchResolution + 1 ;
@@ -392,38 +396,40 @@ mexFunction(int nout, mxArray *out[],
 
       for (k = 0 ; k < (signed)numUserFrames ; ++k) {
         double const * uframe = userFrames + userFrameDimension * k ;
+        double a11, a21, a12, a22 ;
         VlCovDetFeature feature ;
         feature.peakScore = VL_INFINITY_F ;
         feature.edgeScore = 1.0 ;
         feature.frame.x = uframe[1] - 1 ;
         feature.frame.y = uframe[0] - 1 ;
+
         switch (userFrameDimension) {
           case 2:
-            feature.frame.a11 = 1.0 ;
-            feature.frame.a21 = 0.0 ;
-            feature.frame.a12 = 0.0 ;
-            feature.frame.a22 = 1.0 ;
+            a11 = 1.0 ;
+            a21 = 0.0 ;
+            a12 = 0.0 ;
+            a22 = 1.0 ;
             break ;
           case 3:
-            feature.frame.a11 = uframe[2] ;
-            feature.frame.a21 = 0.0 ;
-            feature.frame.a12 = 0.0 ;
-            feature.frame.a22 = uframe[2] ;
+            a11 = uframe[2] ;
+            a21 = 0.0 ;
+            a12 = 0.0 ;
+            a22 = uframe[2] ;
             break ;
           case 4:
           {
             double sigma = uframe[2] ;
             double c = cos(uframe[3]) ;
             double s = sin(uframe[3]) ;
-            feature.frame.a11 = sigma * c ;
-            feature.frame.a21 = sigma * (-s) ;
-            feature.frame.a12 = sigma * s ;
-            feature.frame.a22 = sigma * c; ;
+            a11 = sigma * c ;
+            a21 = sigma * s ;
+            a12 = sigma * (-s) ;
+            a22 = sigma * c ;
             break ;
           }
           case 5:
           {
-            double a11, a21, a12, a22, d2 ;
+            double d2 ;
             if (uframe[2] < 0) {
               vlmxError(vlmxErrInvalidArgument, "FRAMES(:,%d) does not have a PSD covariance.", k+1) ;
             }
@@ -435,27 +441,23 @@ mexFunction(int nout, mxArray *out[],
               vlmxError(vlmxErrInvalidArgument, "FRAMES(:,%d) does not have a PSD covariance.", k+1) ;
             }
             a22 = sqrt(d2) ;
-            feature.frame.a11 = a22 ;
-            feature.frame.a21 = a12 ;
-            feature.frame.a12 = a21 ;
-            feature.frame.a22 = a11 ;
             break ;
           }
           case 6:
           {
-            double a11 = uframe[2] ;
-            double a21 = uframe[3] ;
-            double a12 = uframe[4] ;
-            double a22 = uframe[5] ;
-            feature.frame.a11 = a22 ;
-            feature.frame.a21 = a12 ;
-            feature.frame.a12 = a21 ;
-            feature.frame.a22 = a11 ;
+            a11 = uframe[2] ;
+            a21 = uframe[3] ;
+            a12 = uframe[4] ;
+            a22 = uframe[5] ;
             break ;
           }
           default:
             assert(0) ;
         }
+        feature.frame.a11 = a22 ;
+        feature.frame.a21 = a12 ;
+        feature.frame.a12 = a21 ;
+        feature.frame.a22 = a11 ;
         vl_covdet_append_feature(covdet, &feature) ;
       }
     } else {
@@ -579,9 +581,12 @@ mexFunction(int nout, mxArray *out[],
           vl_index i ;
           vl_size dimension = 128 ;
           vl_size patchSide = 2 * patchResolution + 1 ;
+          double patchStep = (double)patchRelativeExtent / patchResolution ;
+          float tempDesc [128] ;
           float * desc ;
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
+          vl_sift_set_magnif(sift, 3.0) ;
           for (i = 0 ; i < (signed)numFeatures ; ++i) {
             vl_covdet_extract_patch_for_frame(covdet,
                                               patch,
@@ -595,13 +600,26 @@ mexFunction(int nout, mxArray *out[],
                                    patch, patchSide, patchSide, patchSide) ;
 
 
+            /*
+             Note: the patch is transposed, so that x and y are swapped.
+             However, if NBO is not divisible by 4, then the configuration
+             of the SIFT orientations is not symmetric by rotations of pi/2.
+             Hence the only option is to rotate the descriptor further by
+             an angle we need to compute the descriptor rotaed by an additional pi/2
+             angle. In this manner, x concides and y is flipped.
+             */
             vl_sift_calc_raw_descriptor (sift,
                                          patchXY,
-                                         desc,
+                                         tempDesc,
                                          (int)patchSide, (int)patchSide,
-                                         (double)patchSide / 2, (double)patchSide / 2,
-                                         (double)patchSide / (3.0 * (4 + 1)),
-                                         0) ;
+                                         (double)(patchSide-1) / 2, (double)(patchSide-1) / 2,
+                                         (double)patchRelativeExtent / (3.0 * (4 + 1) / 2) /
+                                         patchStep,
+                                         VL_PI / 2) ;
+
+            //VL_PRINTF("%g\n", (double)patchRelativeExtent / (3.0 * (4 + 1) / 2)) ;
+
+            flip_descriptor (desc, tempDesc) ;
             desc += dimension ;
           }
           vl_sift_delete(sift) ;
