@@ -239,7 +239,7 @@ mexFunction(int nout, mxArray *out[],
 
     case opt_frames :
       if (!vlmxIsMatrix(optarg, 4, -1)) {
-        mexErrMsgTxt("'Frames' must be a 4 x N matrix.x") ;
+        mexErrMsgTxt("'Frames' must be a 4 x N matrix.") ;
       }
       ikeys_array = mxDuplicateArray (optarg) ;
       nikeys      = mxGetN (optarg) ;
