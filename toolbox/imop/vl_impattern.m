@@ -28,20 +28,21 @@ function im = vl_impattern(varargin)
 %     Random i.i.d. noise.
 %
 %   Blobs:
-%     Gaussian blobs of various sizes and skews. Use the option-value
-%     pairs 'sigma', 'orientation', and 'anisotropy' to specify the
-%     respective parameters. 'sigma' is the scalar standard deviation
-%     of an isotropic blob (the image domain is the rectangle
+%     Gaussian blobs of various sizes and anisotropies.
+%
+%   Blobs1:
+%     Gaussian blobs of various orientations and anisotropies.
+%
+%   Blob:
+%     One Gaussian blob. Use the option-value pairs 'sigma',
+%     'orientation', and 'anisotropy' to specify the respective
+%     parameters. 'sigma' is the scalar standard deviation of an
+%     isotropic blob (the image domain is the rectangle
 %     [-1,1]^2). 'orientation' is the clockwise rotation (as the Y
 %     axis points downards). 'anisotropy' (>= 1) is the ratio of the
 %     the largest over the smallest axis of the blob (the smallest
-%     axis length is set by 'sigma').
-%
-%   Blobs1:
-%     Gaussian blobs of various skews and orientations.
-%
-%   Blob:
-%     One Gaussian blob.
+%     axis length is set by 'sigma'). Set 'cut' to TRUE to cut half
+%     half of the blob.
 %
 %   A stock image::
 %     Any of 'box', 'roofs1', 'roofs2', 'river1', 'river2', 'spotted'.
@@ -165,17 +166,18 @@ function im = blob(args)
 opts.sigma = 0.15 ;
 opts.anisotropy = .5 ;
 opts.orientation = 2/3 * pi  ;
+opts.cut = false ;
 opts = vl_argparse(opts, args) ;
 im = zeros(size(u)) ;
 th = opts.orientation ;
 R = [cos(th) -sin(th) ; sin(th) cos(th)] ;
 A = opts.sigma * R * diag([opts.anisotropy 1]) ;
-cx = 0 ;
-cy = 0 ;
-C = inv(A*A') ;
-x = u - cx ;
-y = v - cy ;
-im = exp(-0.5 *(x.*x*C(1,1) + y.*y*C(2,2) + 2*x.*y*C(1,2))) ;
+T = [0;0] ;
+[x,y] = vl_waffine(inv(A),-inv(A)*T,u,v) ;
+im = exp(-0.5 *(x.^2 + y.^2)) ;
+if opts.cut
+  im = im .* double(x > 0) ;
+end
 
 function im = blobs1(args)
 [u,v,opts,args] = commonOpts(args) ;
