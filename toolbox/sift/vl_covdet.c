@@ -310,11 +310,12 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_frames:
-      numUserFrames = mxGetN (optarg) ;
-      userFrameDimension = mxGetM (optarg) ;
       if (!vlmxIsPlainMatrix(optarg,-1,-1)) {
         vlmxError(vlmxErrInvalidArgument, "FRAMES must be a palin matrix.") ;
       }
+      numUserFrames = mxGetN (optarg) ;
+      userFrameDimension = mxGetM (optarg) ;
+      userFrames = mxGetPr (optarg) ;
       switch (userFrameDimension) {
         case 2:
         case 3:
@@ -328,6 +329,7 @@ mexFunction(int nout, mxArray *out[],
                     "FRAMES of dimensions %d are not recognised",
                     userFrameDimension); ;
       }
+      break ;
 
     default :
       abort() ;
@@ -451,10 +453,10 @@ mexFunction(int nout, mxArray *out[],
             feature.frame.a22 = a11 ;
             break ;
           }
-
           default:
             assert(0) ;
         }
+        vl_covdet_append_feature(covdet, &feature) ;
       }
     } else {
       mexPrintf("vl_covdet: detector: %s\n",

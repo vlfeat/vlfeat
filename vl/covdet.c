@@ -1239,7 +1239,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
   double A [4] = {A_[0], A_[1], A_[2], A_[3]} ;
   double T [2] = {T_[0], T_[1]} ;
 
-  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->css) ;
+  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->gss) ;
   VlScaleSpaceOctaveGeometry oct ;
 
   /* Starting from a pre-smoothed image at scale sigma_
