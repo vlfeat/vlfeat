@@ -496,7 +496,8 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_AA_PATCH_RESOLUTION 20
 #define VL_COVDET_AA_MAX_NUM_ITERATIONS 15
 #define VL_COVDET_OR_NUM_ORIENTATION_HISTOGAM_BINS 36
-#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 1.5
+#define VL_COVDET_AA_RELATIVE_INTEGRATION_SIGMA 3
+#define VL_COVDET_AA_RELATIVE_DERIVATIVE_SIGMA 1
 #define VL_COVDET_AA_MAX_ANISOTROPY 5
 #define VL_COVDET_AA_CONVERGENCE_THRESHOLD 1.001
 #define VL_COVDET_AA_ACCURATE_SMOOTHING VL_FALSE
@@ -1528,6 +1529,7 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
   double P_ [2*2] ;
   double Q [2*2] ;
   double sigma1, sigma2 ;
+  double sigmaD = VL_COVDET_AA_RELATIVE_DERIVATIVE_SIGMA ;
   double factor ;
   double anisotropy ;
   double referenceScale ;
@@ -1584,13 +1586,13 @@ vl_covdet_extract_affine_shape_for_frame (VlCovDet * self,
                                          self->aaPatch,
                                          resolution,
                                          extent,
-                                         1.0,
+                                         sigmaD,
                                          A, T, D[0], D[3]) ;
     if (err) return err ;
 
-    if (self->aaAccurateSmoothing) {
-      double deltaSigma1 = sqrt(VL_MAX(1.0 - sigma1*sigma1,0)) ;
-      double deltaSigma2 = sqrt(VL_MAX(1.0 - sigma2*sigma2,0)) ;
+    if (self->aaAccurateSmoothing ) {
+      double deltaSigma1 = sqrt(VL_MAX(sigmaD*sigmaD - sigma1*sigma1,0)) ;
+      double deltaSigma2 = sqrt(VL_MAX(sigmaD*sigmaD - sigma2*sigma2,0)) ;
       double stephat = extent / resolution ;
       vl_imsmooth_f(self->aaPatch, side,
                     self->aaPatch, side, side, side,
