@@ -16,6 +16,8 @@ root = vl_root ;
 demo_path = fullfile(root,'toolbox','demo') ;
 addpath(demo_path) ;
 
+vl_demo_covdet ;
+
 vl_demo_sift_basic ;
 vl_demo_sift_peak ;
 vl_demo_sift_edge ;
