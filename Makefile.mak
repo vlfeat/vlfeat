@@ -24,7 +24,7 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.15
+VER = 0.9.16
 ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
@@ -160,6 +160,7 @@ MEX_FLAGS = $(MEX_FLAGS) -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 libsrc = \
   vl\aib.c \
   vl\array.c \
+  vl\covdet.c \
   vl\dsift.c \
   vl\generic.c \
   vl\getopt_long.c \
@@ -181,6 +182,7 @@ libsrc = \
   vl\quickshift.c \
   vl\random.c \
   vl\rodrigues.c \
+  vl\scalespace.c \
   vl\sift.c \
   vl\slic.c \
   vl\stringop.c \
@@ -190,6 +192,7 @@ cmdsrc = \
   src\aib.c \
   src\mser.c \
   src\sift.c \
+  src\test_gauss_elimination.c \
   src\test_getopt_long.c \
   src\test_heap-def.c \
   src\test_host.c \
@@ -244,6 +247,7 @@ mexsrc = \
   toolbox\mser\vl_erfill.c \
   toolbox\mser\vl_mser.c \
   toolbox\quickshift\vl_quickshift.c \
+  toolbox\sift\vl_covdet.c \
   toolbox\sift\vl_dsift.c \
   toolbox\sift\vl_sift.c \
   toolbox\sift\vl_siftdescriptor.c \
