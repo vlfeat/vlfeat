@@ -133,6 +133,8 @@ typedef struct _VlCovDetFeature
   VlFrameOrientedEllipse frame ; /**< feature frame. */
   float peakScore ; /**< peak score. */
   float edgeScore ; /**< edge score. */
+  float orientationScore ; /**< orientation score. */
+  float laplacianScaleScore ; /**< Laplacian scale score. */
 } VlCovDetFeature ;
 
 typedef struct _VlCovDetFeatureOrientation
@@ -140,6 +142,12 @@ typedef struct _VlCovDetFeatureOrientation
   double angle ;
   double score ;
 } VlCovDetFeatureOrientation ;
+
+typedef struct _VlCovDetFeatureLaplacianScale
+{
+  double scale ;
+  double score ;
+} VlCovDetFeatureLaplacianScale ;
 
 /** @brief Covariant feature detection method */
 typedef enum _VlCovDetMethod
@@ -183,7 +191,8 @@ VL_EXPORT VlCovDetFeatureOrientation *
 vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                           vl_size *numOrientations,
                                           VlFrameOrientedEllipse frame) ;
-VL_EXPORT double *
+
+VL_EXPORT VlCovDetFeatureLaplacianScale *
 vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
                                               vl_size * numScales,
                                               VlFrameOrientedEllipse frame) ;

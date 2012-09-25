@@ -74,7 +74,7 @@ _vl_enlarge_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Finding local extrema
+/*                                            Finding local extrema */
 /* ---------------------------------------------------------------- */
 
 /* Todo: make this generally available in the library */
@@ -488,7 +488,7 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Covarant detector
+/*                                                Covarant detector */
 /* ---------------------------------------------------------------- */
 
 #define VL_COVDET_MAX_NUM_ORIENTATIONS 4
@@ -534,7 +534,7 @@ struct _VlCovDet
 
   vl_bool transposed ;
   VlCovDetFeatureOrientation orientations [VL_COVDET_MAX_NUM_ORIENTATIONS] ;
-  double scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
+  VlCovDetFeatureLaplacianScale scales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES] ;
 
   vl_bool aaAccurateSmoothing ;
   float aaPatch [(2*VL_COVDET_AA_PATCH_RESOLUTION+1)*(2*VL_COVDET_AA_PATCH_RESOLUTION+1)] ;
@@ -547,13 +547,13 @@ struct _VlCovDet
 }  ;
 
 VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] = {
-  {"DoG" ,              (vl_index)VL_COVDET_METHOD_DOG              },
-  {"Hessian",           (vl_index)VL_COVDET_METHOD_HESSIAN          },
-  {"HessianLaplace",    (vl_index)VL_COVDET_METHOD_HESSIAN_LAPLACE  },
-  {"HarrisLaplace",     (vl_index)VL_COVDET_METHOD_HARRIS_LAPLACE   },
-  {"MultiscaleHessian", (vl_index)VL_COVDET_METHOD_HESSIAN_LAPLACE  },
-  {"MultiscaleHarris",  (vl_index)VL_COVDET_METHOD_HARRIS_LAPLACE   },
-  {0,                   0                                           }
+  {"DoG" ,              (vl_index)VL_COVDET_METHOD_DOG               },
+  {"Hessian",           (vl_index)VL_COVDET_METHOD_HESSIAN           },
+  {"HessianLaplace",    (vl_index)VL_COVDET_METHOD_HESSIAN_LAPLACE   },
+  {"HarrisLaplace",     (vl_index)VL_COVDET_METHOD_HARRIS_LAPLACE    },
+  {"MultiscaleHessian", (vl_index)VL_COVDET_METHOD_MULTISCALE_HESSIAN},
+  {"MultiscaleHarris",  (vl_index)VL_COVDET_METHOD_MULTISCALE_HARRIS },
+  {0,                   0                                            }
 } ;
 
 /** @brief Create a new object instance
@@ -572,12 +572,12 @@ vl_covdet_new (VlCovDetMethod method)
     case VL_COVDET_METHOD_DOG :
       self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_DOG_DEF_EDGE_THRESHOLD ;
-      break ;
     case VL_COVDET_METHOD_HARRIS_LAPLACE:
     case VL_COVDET_METHOD_MULTISCALE_HARRIS:
       self->peakThreshold = VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD ;
       break ;
+    case VL_COVDET_METHOD_HESSIAN :
     case VL_COVDET_METHOD_HESSIAN_LAPLACE:
     case VL_COVDET_METHOD_MULTISCALE_HESSIAN:
       self->peakThreshold = VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD ;
@@ -710,14 +710,17 @@ vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
   if (requiredSize > self->numFeatureBufferSize) {
     int err = _vl_resize_buffer((void**)&self->features, &self->numFeatureBufferSize,
                                 (self->numFeatures + 1000) * sizeof(VlCovDetFeature)) ;
-    if (err) return err ;
+    if (err) {
+      self->numFeatures -- ;
+      return err ;
+    }
   }
   self->features[self->numFeatures - 1] = *feature ;
   return VL_ERR_OK ;
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Process a new image
+/*                                              Process a new image */
 /* ---------------------------------------------------------------- */
 
 /** @brief Detect features in an image
@@ -787,7 +790,7 @@ vl_covdet_put_image (VlCovDet * self,
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Cornerness measures
+/*                                              Cornerness measures */
 /* ---------------------------------------------------------------- */
 
 /** @brief Scaled derminant of the Hessian filter
@@ -964,7 +967,7 @@ _vl_dog_response (float * dog,
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Detect features
+/*                                                  Detect features */
 /* ---------------------------------------------------------------- */
 
 /** @brief Detect scale-space features
@@ -1081,6 +1084,7 @@ vl_covdet_detect (VlCovDet * self)
           for (index = 0 ; index < numExtrema ; ++index) {
             VlCovDetExtremum3 refined ;
             VlCovDetFeature feature ;
+            memset(&feature, 0, sizeof(feature)) ;
             vl_bool ok = vl_refine_local_extreum_3(&refined,
                                                    octave, width, height, depth,
                                                    extrema[3*index+0],
@@ -1118,6 +1122,7 @@ vl_covdet_detect (VlCovDet * self)
             for (index = 0 ; index < numExtrema ; ++index) {
               VlCovDetExtremum2 refined ;
               VlCovDetFeature feature ;
+              memset(&feature, 0, sizeof(feature)) ;
               vl_bool ok = vl_refine_local_extreum_2(&refined,
                                                      level, width, height,
                                                      extrema[2*index+0],
@@ -1200,7 +1205,7 @@ vl_covdet_detect (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Extract patches
+/*                                                  Extract patches */
 /* ---------------------------------------------------------------- */
 
 /** @brief Helper for extracting patches
@@ -1501,7 +1506,7 @@ vl_covdet_extract_patch_for_frame (VlCovDet * self,
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Affine shape
+/*                                                     Affine shape */
 /* ---------------------------------------------------------------- */
 
 /** @brief Extract the affine shape for a feature frame
@@ -1723,7 +1728,7 @@ vl_covdet_extract_affine_shape (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Orientation
+/*                                                      Orientation */
 /* ---------------------------------------------------------------- */
 
 static int
@@ -1926,25 +1931,26 @@ vl_covdet_extract_orientations (VlCovDet * self)
         feature.frame.a22} ;
       double r1 = cos(orientations[j].angle) ;
       double r2 = sin(orientations[j].angle) ;
-      VlFrameOrientedEllipse * oriented ;
+      VlCovDetFeature * oriented ;
 
       if (j == 0) {
-        oriented = & self->features[i].frame ;
+        oriented = & self->features[i] ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        oriented = & self->features[self->numFeatures -1].frame ;
+        oriented = & self->features[self->numFeatures -1] ;
       }
 
-      oriented->a11 = + A[0] * r1 + A[2] * r2 ;
-      oriented->a21 = + A[1] * r1 + A[3] * r2 ;
-      oriented->a12 = - A[0] * r2 + A[2] * r1 ;
-      oriented->a22 = - A[1] * r2 + A[3] * r1 ;
+      oriented->orientationScore = orientations[j].score ;
+      oriented->frame.a11 = + A[0] * r1 + A[2] * r2 ;
+      oriented->frame.a21 = + A[1] * r1 + A[3] * r2 ;
+      oriented->frame.a12 = - A[0] * r2 + A[2] * r1 ;
+      oriented->frame.a22 = - A[1] * r2 + A[3] * r1 ;
     }
   }
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Laplacian scales
+/*                                                 Laplacian scales */
 /* ---------------------------------------------------------------- */
 
 /** @brief Extract the Laplacian scale(s) for a feature frame.
@@ -1955,7 +1961,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
  ** The function returns @c NULL if memory is insufficient.
  **/
 
-double *
+VlCovDetFeatureLaplacianScale *
 vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
                                               vl_size * numScales,
                                               VlFrameOrientedEllipse frame)
@@ -2046,7 +2052,8 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
        k,s,sigmaLapFilter,sigmaLap,scale,a,b,c) ;
        */
       if (*numScales < VL_COVDET_MAX_NUM_LAPLACIAN_SCALES) {
-        self->scales[*numScales] = scale * factor ;
+        self->scales[*numScales].scale = scale * factor ;
+        self->scales[*numScales].score = b + 0.5 * (c - a) * dk ;
         *numScales += 1 ;
       }
     }
@@ -2070,7 +2077,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numScales ;
     VlCovDetFeature feature = self->features[i] ;
-    double const * scales =
+    VlCovDetFeatureLaplacianScale const * scales =
     vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
 
     if (numScales == 0 && dropFeaturesWithoutScale) {
@@ -2078,19 +2085,20 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
     }
 
     for (j = 0 ; j < (signed)numScales ; ++j) {
-      VlFrameOrientedEllipse * scaled ;
+      VlCovDetFeature * scaled ;
 
       if (j == 0) {
-        scaled = & self->features[i].frame ;
+        scaled = & self->features[i] ;
       } else {
         vl_covdet_append_feature(self, &feature) ;
-        scaled = & self->features[self->numFeatures -1].frame ;
+        scaled = & self->features[self->numFeatures -1] ;
       }
 
-      scaled->a11 *= scales[j] ;
-      scaled->a21 *= scales[j] ;
-      scaled->a12 *= scales[j] ;
-      scaled->a22 *= scales[j] ;
+      scaled->laplacianScaleScore = scales[j].score ;
+      scaled->frame.a11 *= scales[j].scale ;
+      scaled->frame.a21 *= scales[j].scale ;
+      scaled->frame.a12 *= scales[j].scale ;
+      scaled->frame.a22 *= scales[j].scale ;
     }
   }
   if (dropFeaturesWithoutScale) {

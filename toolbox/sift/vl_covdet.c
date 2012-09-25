@@ -638,24 +638,35 @@ mexFunction(int nout, mxArray *out[],
         "gss",
         "css",
         "peakScores",
-        "edgeScores"
+        "edgeScores",
+        "orientationScore",
+        "laplacianScaleScore"
       };
       mxArray * gss_array = _createArrayFromScaleSpace(vl_covdet_get_gss(covdet)) ;
       mxArray * css_array = _createArrayFromScaleSpace(vl_covdet_get_css(covdet)) ;
       mxArray * peak_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
       mxArray * edge_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
+      mxArray * orientation_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
+      mxArray * laplacian_array = mxCreateNumericMatrix(1,numFeatures,mxSINGLE_CLASS,mxREAL) ;
+
       float * peak = mxGetData(peak_array) ;
       float * edge = mxGetData(edge_array) ;
+      float * orientation = mxGetData(orientation_array) ;
+      float * laplacian = mxGetData(laplacian_array) ;
       for (i = 0 ; i < (signed)numFeatures ; ++i) {
         peak[i] = feature[i].peakScore ;
         edge[i] = feature[i].edgeScore ;
+        orientation[i] = feature[i].orientationScore ;
+        laplacian[i] = feature[i].laplacianScaleScore ;
       }
 
-      OUT(INFO) = mxCreateStructMatrix(1, 1, 4, names) ;
+      OUT(INFO) = mxCreateStructMatrix(1, 1, 6, names) ;
       mxSetFieldByNumber(OUT(INFO), 0, 0, gss_array) ;
       mxSetFieldByNumber(OUT(INFO), 0, 1, css_array) ;
       mxSetFieldByNumber(OUT(INFO), 0, 2, peak_array) ;
       mxSetFieldByNumber(OUT(INFO), 0, 3, edge_array) ;
+      mxSetFieldByNumber(OUT(INFO), 0, 4, orientation_array) ;
+      mxSetFieldByNumber(OUT(INFO), 0, 5, laplacian_array) ;
     }
     /* cleanup */
     vl_covdet_delete (covdet) ;
