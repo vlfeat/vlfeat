@@ -1,0 +1,96 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>The covariant </p>
+
+<ul>
+ <li><a href="%pathto:tut.sift.extract;">Extracting frames and descriptors</a></li>
+ <li><a href="%pathto:tut.sift.match;">Basic matching</a></li>
+ <li><a href="%pathto:tut.sift.param;">Detector parameters</a></li>
+ <li><a href="%pathto:tut.sift.custom;">Custom frames</a></li>
+ <li><a href="%pathto:tut.sift.conventions;">Conventions</a></li>
+ <li><a href="%pathto:tut.sift.ubc;">Comparison with D. Lowe's SIFT</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.extract">Extracting frames and descriptors</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>The first example shows how to load an image and compute and
+visualise co-varaint features:</p>
+
+<precode type='matlab'>
+im = vl_impattern('roofs1') ;
+figure(1) ; clf ;
+image(im) ; axis image off ;
+</precode>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_basic_image.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Input image.
+  </span>
+ </div>
+</div>
+
+<precode type='matlab'>
+imgs = im2single(rgb2gray(im)) ;
+frames = vl_covdet(imgs, 'verbose') ;
+</precode>
+
+<pre>
+vl_covdet: doubling image: yes
+vl_covdet: detector: DoG
+vl_covdet: peak threshold: 0.01, edge threshold: 10
+vl_covdet: detected 3518 features
+vl_covdet: kept 3413 inside the bounary margin (2)
+</pre>
+
+<precode type='matlab'>
+hold on ;
+vl_plotframe(frames) ;
+</precode>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_basic_frames.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Input image.
+  </span>
+ </div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.affine">Affine adaptation</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Affine adaptation</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_affine_frame.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Input image.
+  </span>
+ </div>
+</div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.ori">Feature orientation</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Estimating the orientations</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_oriented_frame.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Input image.
+  </span>
+ </div>
+</div>
+
+
+</group>
