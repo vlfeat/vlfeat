@@ -2,15 +2,16 @@
 
 <group>
 
-<p>The covariant </p>
+<p>This tutorial gives an overview of the <code>vl_covdet</code>
+VLFeat command that gives access to a number of co-variant feature
+detectors and corresponding descriptors.</p>
 
 <ul>
- <li><a href="%pathto:tut.sift.extract;">Extracting frames and descriptors</a></li>
- <li><a href="%pathto:tut.sift.match;">Basic matching</a></li>
- <li><a href="%pathto:tut.sift.param;">Detector parameters</a></li>
- <li><a href="%pathto:tut.sift.custom;">Custom frames</a></li>
- <li><a href="%pathto:tut.sift.conventions;">Conventions</a></li>
- <li><a href="%pathto:tut.sift.ubc;">Comparison with D. Lowe's SIFT</a></li>
+ <li><a href="%pathto:tut.covdet.extract;">Extracting frames and descriptors</a></li>
+ <li><a href="%pathto:tut.covdet.affine;">Affine adaptation</a></li>
+ <li><a href="%pathto:tut.covdet.ori;">Feature orientations</a></li>
+ <li><a href="%pathto:tut.covdet.descr;">Computing descriptors</a></li>
+ <li><a href="%pathto:tut.covdet.frames;">Using custom frames</a></li>
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -18,7 +19,8 @@
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>The first example shows how to load an image and compute and
-visualise co-varaint features:</p>
+visualise co-varaint features. Fist, let us load an example image and
+visualize it:</p>
 
 <precode type='matlab'>
 im = vl_impattern('roofs1') ;
@@ -35,10 +37,17 @@ image(im) ; axis image off ;
  </div>
 </div>
 
+<p>The image must be converted to grayscale and single precision. Then
+<code>vl_covdet</code> can be called in order to extract features (by
+default this uses the DoG or SIFT detector).</p>
+
 <precode type='matlab'>
 imgs = im2single(rgb2gray(im)) ;
 frames = vl_covdet(imgs, 'verbose') ;
 </precode>
+
+<p>The <code>verbose</code> option is not necessary, but it produces
+some useful information:</p>
 
 <pre>
 vl_covdet: doubling image: yes
@@ -48,10 +57,15 @@ vl_covdet: detected 3518 features
 vl_covdet: kept 3413 inside the bounary margin (2)
 </pre>
 
+<p>The <code>vl_plotframe</code> command can then be used to plot
+these features</p>
+
 <precode type='matlab'>
 hold on ;
 vl_plotframe(frames) ;
 </precode>
+
+<p>which results in the image</p>
 
 <div class="figure">
  <img src="%pathto:root;demo/covdet_basic_frames.jpg"/>
@@ -62,17 +76,69 @@ vl_plotframe(frames) ;
  </div>
 </div>
 
+<p><code>vl_covdet</code> supports a number of detectors:</p>
+
+<ul>
+<li><em>Difference of Gaussian</em> or <em>trace of Hessian</em>
+or <em>Laplacian</em> use the local extrema trace of the multiscale
+Laplacian operator to detect features in scale and space (as in
+SIFT).</li>
+<li><em>Hessian</em> uses instead the local extrema of the mutliscale
+determinant of Hesisan operator.</li>
+<li><em>Hessian Laplace</em> uses the determinat of Hessian for
+localisation in space, and the Laplacian for localisation in
+scale.</li>
+<li><em>Harris Laplace</em> uses the Harris cornerness measure instead
+of the determiannt of the Hessian.</li>
+<li><em>Hessian Multiscale</em> detects features spatially at mutliple
+scales by using the determinant of Hessian operator, but does not
+attempt to estiamte their scale.</li>
+<li><em>Harris Multiscale</em> is like the previous one, but for the
+Harris cornerness measure.</li>
+</ul>
+
+<p>For example, to use the Hessian-Laplace operator instead of DoG,
+use the code:</p>
+
+<precode type='matlab'>
+frames = vl_covdet(imgs, 'method', names{i}) ;
+</precode>
+
+<p>The following figure shows example of the output of various
+operatros:</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_detectors.jpg"/>
+ <div class="caption">
+  <span class="content">
+    Various detectors
+  </span>
+ </div>
+</div>
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.covdet.affine">Affine adaptation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>Affine adaptation</p>
+<p><em>Affine adaptation</em> is the process of estimating the affine
+shape of an image region in order to construct an affinely co-variant
+feature frame. This is useful to compensate for deformations of the
+image that include slant, at least for small perspective distortion.</p>
+
+<p>To switch on affine adaptation, use
+the <code>EstiamteAffineShape</code> option:</p>
+
+<precode type='matlab'>
+frames = vl_covdet(imgs, 'estimateAffineShape', true, 'verbose') ;
+</precode>
+
+<p>which results in the following detections:</p>
 
 <div class="figure">
- <img src="%pathto:root;demo/covdet_affine_frame.jpg"/>
+ <img src="%pathto:root;demo/covdet_affine_frames.jpg"/>
  <div class="caption">
   <span class="content">
-   Input image.
+   Affinely adapted features.
   </span>
  </div>
 </div>
@@ -81,16 +147,143 @@ vl_plotframe(frames) ;
 <h1 id="tut.covdet.ori">Feature orientation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>Estimating the orientations</p>
+<p>The methods discussed so far are rotationally invariant. This means
+that they work regardless of an image rotation, but they do not allow
+to fix rotation in the feature frame. Instead, features are estimated
+to be upright by default (formally, this means that the affine
+transformation implied by a feature maps the vertical axis to
+itself).</p>
+
+<p>Estimating and removing the effecnt of rotation from a feature
+frame is needed in order to compute rotationally variant descriptors
+like SIFT or the image intensity in such a way that these are
+invariant to image rotations. This can be obtained by specifing
+the <code>EstiamteOrientation</code> option:</p>
+
+<precode type='matlab'>
+frames = vl_covdet(imgs, 'estimateOrientation', true, 'verbose') ;
+</precode>
+
+<p>This results in the following features being detected:</p>
 
 <div class="figure">
- <img src="%pathto:root;demo/covdet_oriented_frame.jpg"/>
+ <img src="%pathto:root;demo/covdet_oriented_frames.jpg"/>
  <div class="caption">
   <span class="content">
-   Input image.
+    Features with orientation detection.
   </span>
  </div>
 </div>
 
+<p>The method used is the same as the one propsed by Lowe []: the
+orientation is given by the dominant gradient direction. Intuitively,
+this means that, in the normalized frame, brighter stuff should appear
+on the right, or there should be a left-to-right dark-to-bright
+pattern.</p>
+
+<p>In practice, this method may result in an ambiguous detection of
+orientations; in this case, up to four different orientations may be
+assigned to the same frame, resulting in a multiplication of them.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.descr">Computing descriptors</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p><code>vl_covdet</code> can also compute descriptors. Two are
+supported so far: SIFT and raw patches (from which any other
+descriptor can be computed). To use this functionality simply add an
+output argument:</p>
+
+<precode type='matlab'>
+[frames, descrs] = vl_covdet(imgs) ;
+</precode>
+
+<p>This will compute SIFT descriptors. In this case each column
+of <code>descrs</code> is a 128-dimensional descriptor (in single
+precision). Alternatively, to compute patches use:</p>
+
+<precode type='matlab'>
+[frames, descrs] = vl_covdet(imgs, 'descriptor', 'patch') ;
+</precode>
+
+<p>In this case each column of <code>descrs</code> is a stacked patch.
+To visualize the first 100 patches, one can use for example:</p>
+
+<precode type='matlab'>
+w = sqrt(size(patches,1)) ;
+vl_imarraysc(reshape(patches(:,1:10*10), w,w,[])) ;
+</precode>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_patches.jpg"/>
+ <img src="%pathto:root;demo/covdet_affine_patches.jpg"/>
+ <div class="caption">
+  <span class="content">
+    Patches extracted with the stadnard detectors (left) and adding
+    affine adaptation (right).
+  </span>
+ </div>
+</div>
+
+<p>There are several parameters affecting the patches associated to
+features.  First, <code>PatchRelatvieExtent</code> can be used to
+control how large a patch is relative to the feature scale. The extent
+is half of the side of the patch square range, measured in the
+normalized feature frame. Since blobs are detected at a normalized
+standard deviation of 1, and assuming that this can be interepreted as
+the size of the blob, setting <code>PatchRelativeExtent</code> to 6
+makes the &ldqo;radius&rdqo; of the patch six times larger than the
+blob used for detection.</p>
+
+<p>A second imporant parameter is <code>PatchRelativeSigma</code>
+which expresses the amount of smoothing applied to the image in the
+normalised frame. By default this is set to 1.0, but can be reduced to
+get &ldqo;sharper&rdqo; patches. Of course, the amount of smoothing is
+bounded below by the resolution of the input image: a smoothing of,
+say, less than half a pixel cannot be recovered due to the limited
+sampling rate of the latter.</p>
+
+<p>The last parameter is <code>PatchResolution</code>. If this is
+equal to <em>w</em>, then the patch has a side of <em>2w+1</em>
+pixels.  (hence the samplign step in the normalised frame is simply
+<code>PatchRelativeExtent</code>/<code>PatchResoluton</code>).
+Extracting higher resolution patches may be needed for largerer extent
+and smaller smoothings. A good setting for this parameter may be
+<code>PatchRelativeExtent</code>/<code>PatchRelativeSigma</code>.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.frames">Custom frames</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Finally, it is possilbe to use <code>vl_covdet</code> to compute
+descriptors on custom feature frames, or to apply affine adaptation
+and/or orientation estimation to the latter.</p>
+
+<p>For example</p>
+
+<precode type='matlab'>
+delta = 30 ;
+xr = delta:delta:size(im,2)-delta+1 ;
+yr = delta:delta:size(im,1)-delta+1 ;
+[x,y] = meshgrid(xr,yr) ;
+frames = [x(:)'; y(:)'] ;
+frames(end+1,:) = delta/2 ;
+
+[frames, patches] = vl_covdet(imgs, ...
+                              'frames', frames, ...
+                              'estimateAffineShape', true, ...
+                              'estimateOrientation', true) ;
+</precode>
+
+<p>computes affinely adapted features on a grid:</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_custom_frames.jpg"/>
+ <div class="caption">
+   <span class="content">
+     Custom frame (on a grid) after affine adaptation.
+   </span>
+ </div>
+</div>
 
 </group>
