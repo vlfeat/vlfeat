@@ -91,12 +91,13 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
   mxArray *data_array = NULL;
   vl_size numOctaves, numSubdivisions ;
   vl_index o ;
+  VlScaleSpaceGeometry geom ;
 
   if (ss == NULL) {
     return mxCreateDoubleMatrix(0,0,mxREAL);
   }
 
-  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(ss) ;
+  geom = vl_scalespace_get_geometry(ss) ;
 
   numOctaves = geom.lastOctave - geom.firstOctave + 1 ;
   numSubdivisions = geom.octaveLastSubdivision - geom.octaveFirstSubdivision + 1 ;
@@ -122,11 +123,11 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
       "sigma0",
       "data" };
     mxArray * array = mxCreateStructMatrix(1, 1, 7, names) ;
-    mxSetFieldByNumber(array, 0, 0, vlmxCreatePlainScalar(geom.firstOctave)) ;
-    mxSetFieldByNumber(array, 0, 1, vlmxCreatePlainScalar(geom.lastOctave)) ;
-    mxSetFieldByNumber(array, 0, 2, vlmxCreatePlainScalar(geom.octaveResolution)) ;
-    mxSetFieldByNumber(array, 0, 3, vlmxCreatePlainScalar(geom.octaveFirstSubdivision)) ;
-    mxSetFieldByNumber(array, 0, 4, vlmxCreatePlainScalar(geom.octaveLastSubdivision)) ;
+    mxSetFieldByNumber(array, 0, 0, vlmxCreatePlainScalar((double)geom.firstOctave)) ;
+    mxSetFieldByNumber(array, 0, 1, vlmxCreatePlainScalar((double)geom.lastOctave)) ;
+    mxSetFieldByNumber(array, 0, 2, vlmxCreatePlainScalar((double)geom.octaveResolution)) ;
+    mxSetFieldByNumber(array, 0, 3, vlmxCreatePlainScalar((double)geom.octaveFirstSubdivision)) ;
+    mxSetFieldByNumber(array, 0, 4, vlmxCreatePlainScalar((double)geom.octaveLastSubdivision)) ;
     mxSetFieldByNumber(array, 0, 5, vlmxCreatePlainScalar(geom.sigma0)) ;
     mxSetFieldByNumber(array, 0, 6, data_array);
     return array ;
@@ -400,8 +401,8 @@ mexFunction(int nout, mxArray *out[],
         VlCovDetFeature feature ;
         feature.peakScore = VL_INFINITY_F ;
         feature.edgeScore = 1.0 ;
-        feature.frame.x = uframe[1] - 1 ;
-        feature.frame.y = uframe[0] - 1 ;
+        feature.frame.x = (float)uframe[1] - 1 ;
+        feature.frame.y = (float)uframe[0] - 1 ;
 
         switch (userFrameDimension) {
           case 2:
@@ -454,10 +455,10 @@ mexFunction(int nout, mxArray *out[],
           default:
             assert(0) ;
         }
-        feature.frame.a11 = a22 ;
-        feature.frame.a21 = a12 ;
-        feature.frame.a12 = a21 ;
-        feature.frame.a22 = a11 ;
+        feature.frame.a11 = (float)a22 ;
+        feature.frame.a21 = (float)a12 ;
+        feature.frame.a12 = (float)a21 ;
+        feature.frame.a22 = (float)a11 ;
         vl_covdet_append_feature(covdet, &feature) ;
       }
     } else {
@@ -543,17 +544,20 @@ mexFunction(int nout, mxArray *out[],
 
         case VL_COVDET_DESC_PATCH:
         {
+		  vl_size numFeatures ;
+		  VlCovDetFeature const * feature ;
+          vl_index i ;
+          vl_size w = 2*patchResolution + 1 ;
+          float * desc ;
+
           if (verbose) {
             mexPrintf("vl_covdet: descriptors: type=patch, "
                       "resolution=%d, extent=%g, smoothing=%g\n",
                       patchResolution, patchRelativeExtent,
                       patchRelativeSmoothing);
           }
-          vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
-          VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
-          vl_index i ;
-          vl_size w = 2*patchResolution + 1 ;
-          float * desc ;
+          numFeatures = vl_covdet_get_num_features(covdet) ;
+          feature = vl_covdet_get_features(covdet);
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           for (i = 0 ; i < (signed)numFeatures ; ++i) {
@@ -569,12 +573,6 @@ mexFunction(int nout, mxArray *out[],
         }
         case VL_COVDET_DESC_SIFT:
         {
-          if (verbose) {
-            mexPrintf("vl_covdet: descriptors: type=sift, "
-                      "resolution=%d, extent=%g, smoothing=%g\n",
-                      patchResolution, patchRelativeExtent,
-                      patchRelativeSmoothing);
-          }
           vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
           VlSiftFilt * sift = vl_sift_new(16, 16, 1, 3, 0) ;
@@ -584,6 +582,12 @@ mexFunction(int nout, mxArray *out[],
           double patchStep = (double)patchRelativeExtent / patchResolution ;
           float tempDesc [128] ;
           float * desc ;
+          if (verbose) {
+            mexPrintf("vl_covdet: descriptors: type=sift, "
+                      "resolution=%d, extent=%g, smoothing=%g\n",
+                      patchResolution, patchRelativeExtent,
+                      patchRelativeSmoothing);
+          }
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           vl_sift_set_magnif(sift, 3.0) ;

@@ -153,6 +153,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\covdet.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\covdet.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\dsift.c"
 				>
 			</File>
@@ -342,6 +350,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\rodrigues.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\scalespace.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\scalespace.h"
 				>
 			</File>
 			<File

@@ -40,6 +40,7 @@ orientation estimation, as well as Laplacian scale detection.
 
 static int
 _vl_resize_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
+  void * newBuffer ;
   if (*buffer == NULL) {
     *buffer = vl_malloc(targetSize) ;
     if (*buffer) {
@@ -50,7 +51,7 @@ _vl_resize_buffer (void ** buffer, vl_size * bufferSize, vl_size targetSize) {
       return VL_ERR_ALLOC ;
     }
   }
-  void * newBuffer = vl_realloc(*buffer, targetSize) ;
+  newBuffer = vl_realloc(*buffer, targetSize) ;
   if (newBuffer) {
     *buffer = newBuffer ;
     *bufferSize = targetSize ;
@@ -750,7 +751,7 @@ vl_covdet_put_image (VlCovDet * self,
   assert (height >= 1) ;
 
   /* (minOctaveSize - 1) 2^lastOctave <= min(width,height) - 1 */
-  lastOctave = vl_floor_d(log2(VL_MIN((double)width-1,(double)height-1) / (minOctaveSize - 1))) ;
+  lastOctave = vl_floor_d(vl_log2_d(VL_MIN((double)width-1,(double)height-1) / (minOctaveSize - 1))) ;
 
   if (self->method == VL_COVDET_METHOD_DOG) {
     octaveFirstSubdivision = -2 ;
@@ -978,8 +979,6 @@ _vl_dog_response (float * dog,
 void
 vl_covdet_detect (VlCovDet * self)
 {
-  assert (self) ;
-  assert (self->gss) ;
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->gss) ;
   VlScaleSpaceGeometry cgeom ;
   vl_bool cssReady = VL_FALSE ;
@@ -987,6 +986,9 @@ vl_covdet_detect (VlCovDet * self)
   float * levelyy = NULL ;
   float * levelxy = NULL ;
   vl_index o, s ;
+
+  assert (self) ;
+  assert (self->gss) ;
 
   /* clear previous detections if any */
   self->numFeatures = 0 ;
@@ -1084,12 +1086,13 @@ vl_covdet_detect (VlCovDet * self)
           for (index = 0 ; index < numExtrema ; ++index) {
             VlCovDetExtremum3 refined ;
             VlCovDetFeature feature ;
+			vl_bool ok ;
             memset(&feature, 0, sizeof(feature)) ;
-            vl_bool ok = vl_refine_local_extreum_3(&refined,
-                                                   octave, width, height, depth,
-                                                   extrema[3*index+0],
-                                                   extrema[3*index+1],
-                                                   extrema[3*index+2]) ;
+            ok = vl_refine_local_extreum_3(&refined,
+				octave, width, height, depth,
+				extrema[3*index+0],
+				extrema[3*index+1],
+				extrema[3*index+2]) ;
             ok &= refined.peakScore > self->peakThreshold ;
             ok &= refined.edgeScore < self->edgeThreshold ;
             if (ok) {
@@ -1122,11 +1125,12 @@ vl_covdet_detect (VlCovDet * self)
             for (index = 0 ; index < numExtrema ; ++index) {
               VlCovDetExtremum2 refined ;
               VlCovDetFeature feature ;
+			  vl_bool ok ;
               memset(&feature, 0, sizeof(feature)) ;
-              vl_bool ok = vl_refine_local_extreum_2(&refined,
-                                                     level, width, height,
-                                                     extrema[2*index+0],
-                                                     extrema[2*index+1]);
+              ok = vl_refine_local_extreum_2(&refined,
+				  level, width, height,
+				  extrema[2*index+0],
+				  extrema[2*index+1]);
               ok &= refined.peakScore > self->peakThreshold ;
               ok &= refined.edgeScore < self->edgeThreshold ;
               if (ok) {
@@ -1282,7 +1286,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
   factor = 1.0 / VL_MIN(d1, d2) ;
 
   for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
-    s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
+    s = vl_floor_d(vl_log2_d(sigma / (factor * geom.sigma0)) - o) ;
     s = VL_MAX(s, geom.octaveFirstSubdivision) ;
     s = VL_MIN(s, geom.octaveLastSubdivision) ;
     sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
@@ -1293,7 +1297,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
     }
   }
   o = VL_MIN(o, geom.lastOctave) ;
-  s = vl_floor_d(log2(sigma / (factor * geom.sigma0)) - o) ;
+  s = vl_floor_d(vl_log2_d(sigma / (factor * geom.sigma0)) - o) ;
   s = VL_MAX(s, geom.octaveFirstSubdivision) ;
   s = VL_MIN(s, geom.octaveLastSubdivision) ;
   sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
@@ -1758,8 +1762,6 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
                                           vl_size * numOrientations,
                                           VlFrameOrientedEllipse frame)
 {
-  assert(self);
-  assert(numOrientations) ;
   int err ;
   vl_index k, i ;
   vl_index iter ;
@@ -1782,6 +1784,9 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
   double sigma1, sigma2 ;
   double sigmaD = 1.0 ;
   double theta0 ;
+
+  assert(self);
+  assert(numOrientations) ;
 
   /*
    The goal is to estimate a rotation R(theta) such that the patch given
@@ -1966,9 +1971,6 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
                                               vl_size * numScales,
                                               VlFrameOrientedEllipse frame)
 {
-  assert(self) ;
-  assert(numScales) ;
-
   /*
    We try to explore one octave, with the nominal detection scale 1.0
    (in the patch reference frame) in the middle. Thus the goal is to sample
@@ -1998,6 +2000,9 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
   double T[2] = {frame.x, frame.y} ;
   double D[4], U[4], V[4] ;
   double sigma1, sigma2 ;
+
+  assert(self) ;
+  assert(numScales) ;
 
   *numScales = 0 ;
 
@@ -2114,7 +2119,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Checking that features are inside an image
+/*                       Checking that features are inside an image */
 /* ---------------------------------------------------------------- */
 
 vl_bool
@@ -2177,7 +2182,7 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin)
 }
 
 /* ---------------------------------------------------------------- */
-#pragma mark Setters and getters
+/*                                              Setters and getters */
 /* ---------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------- */
