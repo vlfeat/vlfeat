@@ -42,6 +42,13 @@ QUICK START WITH MATLAB
   > vl_demo
 
 CHANGES
+  0.9.16     Added VL_COVDET(). This function implements the following
+             detectors: DoG, Hessian, Harris Laplace, Hessian Laplace,
+             Multiscale Hessian, Multiscale Harris. It also implements
+             affine adaptation, estiamtion of feature orientation,
+             computation of descriptors on the affine patches
+             (including raw patches), and sourcing of custom feature
+             frame.
 
   0.9.15     Added VL_HOG() (HOG features). Added VL_SVMPEGASOS() and
              a vastly improved SVM implementation. Added IHASHSUM (hashed

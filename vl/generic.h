@@ -31,7 +31,7 @@ the terms of the BSD license (see the COPYING file).
 #endif
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.15"
+#define VL_VERSION_STRING "0.9.16"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024
