@@ -126,3 +126,21 @@ colormap gray ;
 vl_figaspect(2) ;
 vl_demo_print('covdet_css',.8) ;
 
+
+figure(10) ; clf ;
+subplot(1,2,1) ;
+hist([info.peakScores],10) ;
+xlabel('Peak Score') ;
+ylabel('Occurences') ;
+grid on ;
+
+subplot(1,2,2) ;
+hist([info.edgeScores],10) ;
+xlabel('Edge Score') ;
+ylabel('Occurences') ;
+grid on ;
+
+vl_figaspect(2) ;
+vl_demo_print('covdet_scores',.9) ;
+
+keyboard
