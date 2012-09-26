@@ -16,49 +16,11 @@ the terms of the BSD license (see the COPYING file).
 #ifndef VL_SCALESPACE_H
 #define VL_SCALESPACE_H
 
-#include "pgm.h"
-
-#include <stdio.h>
-#include <math.h>
 #include "generic.h"
 #include "imopv.h"
+#include "mathop.h"
 
-/** ------------------------------------------------------------------
- ** @brief Scale space feature frame
- **
- ** This structure represent a feature frame as extracted by the
- ** ::VlScaleSpace object. It represents a point in space and scale,
- ** including both continuous and approimated integer coordinates
- ** pointing to a discrete sample in the scale space structure.
- **/
-
-typedef struct _VlScaleSpaceFrame
-{
-  vl_index o ;           /**< o coordinate (octave). */
-  vl_index ix ;          /**< Integer unnormalized x coordinate. */
-  vl_index iy ;          /**< Integer unnormalized y coordinate. */
-  vl_index is ;          /**< Integer s coordinate. */
-  float x ;              /**< x coordinate. */
-  float y ;              /**< y coordinate. */
-  float s ;              /**< s coordinate. */
-  float sigma ;          /**< scale. */
-} VlScaleSpaceFrame ;
-
-/** ------------------------------------------------------------------
- ** @brief Scale space processing callback
- **
- ** Scale space callback appliable to separate planes.
- **/
-
-typedef void (VlScaleSpaceCallback) (float const *srcImage,
-                                     vl_size src_width, vl_size src_height,
-                                     float *dstImage,
-                                     vl_size dst_width, vl_size dst_height,
-                                     vl_index octave, vl_index level,
-                                     void *params);
-
-/* ---------------------------------------------------------------- */
-
+/** @brief A set of parameters describing the scale space geometry */
 typedef struct _VlScaleSpaceGeometry
 {
   vl_size width ; /**< Image width */
@@ -79,8 +41,6 @@ typedef struct _VlScaleSpaceOctaveGeometry
   double step ; /**< Sampling step (size of a pixel) */
 } VlScaleSpaceOctaveGeometry ;
 
-/* ---------------------------------------------------------------- */
-
 /** @brief Gaussian scale space */
 typedef struct _VlScaleSpace
 {
@@ -95,7 +55,9 @@ typedef struct _VlScaleSpace
 VL_EXPORT VlScaleSpace *
 vl_scalespace_new (vl_size width, vl_size height,
                    vl_index numOctaves, vl_index firstOctave,
-                   vl_size numLevels, vl_index firstLevel, vl_index lastLevel) ;
+                   vl_size octaveResolution,
+                   vl_index octaveFirstSubdivision,
+                   vl_index octaveLastSubdivision) ;
 
 VL_EXPORT VlScaleSpace *
 vl_scalespace_new_with_geometry (VlScaleSpaceGeometry geom) ;

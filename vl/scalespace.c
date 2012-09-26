@@ -24,7 +24,12 @@ the terms of the BSD license (see the COPYING file).
 @ref scalespace.h implements a scale space, a data structure
 fundamental in the computation of covariant features such as SIFT,
 Hessian-Affine, Harris-Affine, Harris-Laplace, etc.
+ 
+ 
+**/
 
+/* todo: complete
+ 
 - @ref scalespace-overview
 - @ref scalespace-usage
 - @ref scalespace-tech
@@ -47,35 +52,37 @@ a coarser sampling rate).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 A scale space is represented by an instance of the ::VlScaleSpace
-object.
+object. This can be created as follows:
 
 @code
- VlScaleSpace ss = vl_scalespace_new(width, height,
-                                     numOctave, firstOctave,
-                                     numLevel, firstLevel, lastLevel) ;
+VlScaleSpace ss = vl_scalespace_new(width, height,
+                                    numOctaves, firstOctave,
+                                    octaveResolution,
+                                    octaveFirstSubdivision,
+                                    octaveLastSubdivision) ;
 @endcode
+ 
+Here @c width and @c height are the image dimension, @c numOctave
+is the total number of spanned octaves, and @c firstOctave
+is the index of the first octave, @c octaveResolution is the number
+of subdivisions per octave, and @c octaveFirstSubdivision
+and @c octaveLastSubdivision define the range of the octave.
 
-The scale space objec class has a number of functionalities meant to
-help developing feature detectors:
 
-- Local maxima/minima in space and scale can be detected with
- ::vl_scalespace_find_local_extrema() and refined to sub-pixel accuracy
- with ::vl_scalespace_refine_local_extrema(). Local extremas
- are filtered based on the <em>peak threshold</em> and the
- <em>edge threshold</em>.
-
-- An affinely-warped image patch can be extracted from the scale
-  space by using ::vl_scalespace_affinely_normalize_patch().
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection scalespace-tech Scale space
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-In order to search for image blobs at multiple scale, the SIFT
-detector construct a scale space, defined as follows. Let
-@f$I_0(\mathbf{x})@f$ denote an idealized <em>infinite resolution</em>
-image. Consider the  <em>Gaussian kernel</em>
-
+The Gaussian scale space of an image @f$ \ell(x,y) @f$ is defined as
+the three-dimesnional function
+ 
+@f[
+\ell(x,y,\sigma) = (g_\sigma * \ell)(x,y),  \quad \sigma \geq 0.
+@f]
+ 
+where
+ 
 @f[
  g_{\sigma}(\mathbf{x})
  =
@@ -86,6 +93,14 @@ image. Consider the  <em>Gaussian kernel</em>
  \frac{\mathbf{x}^\top\mathbf{x}}{\sigma^2}
  \right)
 @f]
+ 
+
+In order to search for image blobs at multiple scale, the SIFT
+detector construct a scale space, defined as follows. Let
+@f$I_0(\mathbf{x})@f$ denote an idealized <em>infinite resolution</em>
+image. Consider the  <em>Gaussian kernel</em>
+
+
 
 The <b>Gaussian scale space</b> is the collection of smoothed images
 
@@ -369,14 +384,16 @@ err_alloc_self:
 VlScaleSpace *
 vl_scalespace_new (vl_size width, vl_size height,
                    vl_index numOctaves, vl_index firstOctave,
-                   vl_size numLevels, vl_index firstLevel, vl_index lastLevel)
+                   vl_size octaveResolution,
+                   vl_index octaveFirstSubdivision,
+                   vl_index octaveLastSubdivision)
 {
   VlScaleSpaceGeometry geom ;
   vl_size baseWidth, baseHeight, numElements ;
 
-  assert(lastLevel >= firstLevel) ;
-  assert(firstLevel <= 0) ;
-  assert(lastLevel >= (signed)numLevels - 1) ;
+  assert(octaveLastSubdivision >= octaveFirstSubdivision) ;
+  assert(octaveFirstSubdivision <= 0) ;
+  assert(octaveLastSubdivision >= (signed)octaveResolution - 1) ;
 
   /* automatically figure out the number of octaves if needed */
   baseWidth = VL_SHIFT_LEFT(width, -firstOctave) ;
@@ -390,10 +407,10 @@ vl_scalespace_new (vl_size width, vl_size height,
   geom.height = height ;
   geom.firstOctave = firstOctave ;
   geom.lastOctave = numOctaves + firstOctave - 1 ;
-  geom.octaveResolution= numLevels ;
-  geom.octaveFirstSubdivision = firstLevel ;
-  geom.octaveLastSubdivision = lastLevel ;
-  geom.sigma0 = 1.6 * pow(2.0, 1.0 / numLevels) ;
+  geom.octaveResolution= octaveResolution ;
+  geom.octaveFirstSubdivision = octaveFirstSubdivision ;
+  geom.octaveLastSubdivision = octaveLastSubdivision ;
+  geom.sigma0 = 1.6 * pow(2.0, 1.0 / octaveResolution) ;
   geom.sigman = 0.5 ;
 
   return vl_scalespace_new_with_geometry (geom) ;
