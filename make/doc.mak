@@ -112,7 +112,8 @@ doc/mdoc.build/helpsearch/deletable: doc/mdoc.build/htmltoc.xml
 # embedded in the website.
 #
 
-doc/mdoc.build/mdoc.html doc/mdoc.build/htmltoc.xml : $(m_src) docsrc/mdoc.py make/doc.mak
+doc/mdoc.build/mdoc.html doc/mdoc.build/htmltoc.xml: $(m_src) \
+docsrc/mdoc.py make/doc.mak
 	$(PYTHON) docsrc/mdoc.py toolbox doc/mdoc.build \
 	          --format=web \
 	          --exclude='noprefix/.*' \
