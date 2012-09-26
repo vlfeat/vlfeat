@@ -362,7 +362,14 @@ vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
     double peakScore = at(0,0,0)
     + 0.5 * (Dx * b[0] + Dy * b[1] + Dz * b[2]) ;
     double alpha = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
-    double edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+    double edgeScore ;
+
+    if (alpha < 0) {
+      /* not an extremum */
+      edgeScore = VL_INFINITY_D ;
+    } else {
+      edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+    }
 
     refined->xi = x ;
     refined->yi = y ;
@@ -468,7 +475,14 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
   {
     double peakScore = at(0,0) + 0.5 * (Dx * b[0] + Dy * b[1]) ;
     double alpha = (Dxx+Dyy)*(Dxx+Dyy) / (Dxx*Dyy - Dxy*Dxy) ;
-    double edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+    double edgeScore ;
+
+    if (alpha < 0) {
+      /* not an extremum */
+      edgeScore = VL_INFINITY_D ;
+    } else {
+      edgeScore = (0.5*alpha - 1) + sqrt(VL_MAX(0.25*alpha - 1,0)*alpha) ;
+    }
 
     refined->xi = x ;
     refined->yi = y ;
@@ -573,6 +587,7 @@ vl_covdet_new (VlCovDetMethod method)
     case VL_COVDET_METHOD_DOG :
       self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_DOG_DEF_EDGE_THRESHOLD ;
+      break ;
     case VL_COVDET_METHOD_HARRIS_LAPLACE:
     case VL_COVDET_METHOD_MULTISCALE_HARRIS:
       self->peakThreshold = VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD ;
@@ -1086,14 +1101,14 @@ vl_covdet_detect (VlCovDet * self)
           for (index = 0 ; index < numExtrema ; ++index) {
             VlCovDetExtremum3 refined ;
             VlCovDetFeature feature ;
-			vl_bool ok ;
+            vl_bool ok ;
             memset(&feature, 0, sizeof(feature)) ;
             ok = vl_refine_local_extreum_3(&refined,
-				octave, width, height, depth,
-				extrema[3*index+0],
-				extrema[3*index+1],
-				extrema[3*index+2]) ;
-            ok &= refined.peakScore > self->peakThreshold ;
+                                           octave, width, height, depth,
+                                           extrema[3*index+0],
+                                           extrema[3*index+1],
+                                           extrema[3*index+2]) ;
+            ok &= fabs(refined.peakScore) > self->peakThreshold ;
             ok &= refined.edgeScore < self->edgeThreshold ;
             if (ok) {
               double sigma = cgeom.sigma0 *
@@ -1125,13 +1140,13 @@ vl_covdet_detect (VlCovDet * self)
             for (index = 0 ; index < numExtrema ; ++index) {
               VlCovDetExtremum2 refined ;
               VlCovDetFeature feature ;
-			  vl_bool ok ;
+              vl_bool ok ;
               memset(&feature, 0, sizeof(feature)) ;
               ok = vl_refine_local_extreum_2(&refined,
-				  level, width, height,
-				  extrema[2*index+0],
-				  extrema[2*index+1]);
-              ok &= refined.peakScore > self->peakThreshold ;
+                                             level, width, height,
+                                             extrema[2*index+0],
+                                             extrema[2*index+1]);
+              ok &= fabs(refined.peakScore) > self->peakThreshold ;
               ok &= refined.edgeScore < self->edgeThreshold ;
               if (ok) {
                 double sigma = cgeom.sigma0 *
