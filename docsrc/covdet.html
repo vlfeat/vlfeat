@@ -3,24 +3,27 @@
 <group>
 
 <p>This tutorial gives an overview of the <code>vl_covdet</code>
-VLFeat command that gives access to a number of co-variant feature
-detectors and corresponding descriptors.</p>
+VLFeat command implementing a number of co-variant feature detectors
+and corresponding descriptors. For example applications, see also
+the <a href="%pathto:tut.sift">SIFT tutorial</a>.</p>
 
 <ul>
  <li><a href="%pathto:tut.covdet.extract;">Extracting frames and descriptors</a></li>
+ <li><a href="%pathto:tut.covdet.frames;">Understanding feature frames</a></li>
  <li><a href="%pathto:tut.covdet.affine;">Affine adaptation</a></li>
  <li><a href="%pathto:tut.covdet.ori;">Feature orientations</a></li>
  <li><a href="%pathto:tut.covdet.descr;">Computing descriptors</a></li>
- <li><a href="%pathto:tut.covdet.frames;">Using custom frames</a></li>
+ <li><a href="%pathto:tut.covdet.custom;">Using custom frames</a></li>
+ <li><a href="%pathto:tut.covdet.ss;">Getting the scale scale spaces</a></li>
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.covdet.extract">Extracting frames and descriptors</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>The first example shows how to load an image and compute and
-visualise co-varaint features. Fist, let us load an example image and
-visualize it:</p>
+<p>The first example shows how to use <code>vl_covdet</code> to
+compute and visualise co-varaint features. Fist, let us load an
+example image and visualize it:</p>
 
 <precode type='matlab'>
 im = vl_impattern('roofs1') ;
@@ -32,14 +35,14 @@ image(im) ; axis image off ;
  <img src="%pathto:root;demo/covdet_basic_image.jpg"/>
  <div class="caption">
   <span class="content">
-   Input image.
+   An example input image.
   </span>
  </div>
 </div>
 
 <p>The image must be converted to grayscale and single precision. Then
 <code>vl_covdet</code> can be called in order to extract features (by
-default this uses the DoG or SIFT detector).</p>
+default this uses the DoG cornerness measure, similarly to SIFT).</p>
 
 <precode type='matlab'>
 imgs = im2single(rgb2gray(im)) ;
@@ -49,13 +52,13 @@ frames = vl_covdet(imgs, 'verbose') ;
 <p>The <code>verbose</code> option is not necessary, but it produces
 some useful information:</p>
 
-<pre>
+<precode>
 vl_covdet: doubling image: yes
 vl_covdet: detector: DoG
 vl_covdet: peak threshold: 0.01, edge threshold: 10
 vl_covdet: detected 3518 features
 vl_covdet: kept 3413 inside the bounary margin (2)
-</pre>
+</precode>
 
 <p>The <code>vl_plotframe</code> command can then be used to plot
 these features</p>
@@ -71,65 +74,104 @@ vl_plotframe(frames) ;
  <img src="%pathto:root;demo/covdet_basic_frames.jpg"/>
  <div class="caption">
   <span class="content">
-   Input image.
+   The default features detected by <code>vl_covdet</code> use the DoG
+   cornerness measure (like SIFT).
   </span>
  </div>
 </div>
 
-<p><code>vl_covdet</code> supports a number of detectors:</p>
+<p>In addition to the DoG detector, <code>vl_covdet</code> supports a
+number of other ones:</p>
 
 <ul>
-<li><em>Difference of Gaussian</em> or <em>trace of Hessian</em>
-or <em>Laplacian</em> use the local extrema trace of the multiscale
-Laplacian operator to detect features in scale and space (as in
-SIFT).</li>
-<li><em>Hessian</em> uses instead the local extrema of the mutliscale
-determinant of Hesisan operator.</li>
-<li><em>Hessian Laplace</em> uses the determinat of Hessian for
-localisation in space, and the Laplacian for localisation in
-scale.</li>
-<li><em>Harris Laplace</em> uses the Harris cornerness measure instead
-of the determiannt of the Hessian.</li>
+<li>The <em>Difference of Gaussian operator</em> (also knwon
+as <em>trace of the Hessian operator</em> or <em>Laplacian
+operator</em>) uses the local extrema trace of the multiscale Laplacian
+operator to detect features in scale and space (as in SIFT).</li>
+
+<li>The <em>Hessian operator</em> uses the local extrema of the
+mutliscale determinant of Hessisan operator.</li>
+
+<li>The <em>Hessian Laplace</em> detector uses the extrema of the
+multiscale determinat of Hessian operator for localisation in space,
+and the extrema of the multiscale Laplacian operator for localisation
+in scale.</li>
+
+<li><em>Harris Laplace</em> uses the multiscale Harris cornerness
+measure instead of the determiannt of the Hessian for localisaiton in
+space, and is otherwise identical to the previous detector..</li>
+
 <li><em>Hessian Multiscale</em> detects features spatially at mutliple
-scales by using the determinant of Hessian operator, but does not
-attempt to estiamte their scale.</li>
-<li><em>Harris Multiscale</em> is like the previous one, but for the
-Harris cornerness measure.</li>
+scales by using the multiscale determinant of Hessian operator, but
+does not attempt to estiamte their scale.</li>
+
+<li><em>Harris Multiscale</em> is like the previous one, but uses the
+multiscale Harris measure instead.</li>
 </ul>
 
 <p>For example, to use the Hessian-Laplace operator instead of DoG,
 use the code:</p>
 
 <precode type='matlab'>
-frames = vl_covdet(imgs, 'method', names{i}) ;
+frames = vl_covdet(imgs, 'method', 'HarrisLaplace') ;
 </precode>
 
-<p>The following figure shows example of the output of various
-operatros:</p>
+<p>The following figure shows example of the output of these
+detectors:</p>
 
 <div class="figure">
  <img src="%pathto:root;demo/covdet_detectors.jpg"/>
  <div class="caption">
   <span class="content">
-    Various detectors
+    Different detectros can produce a fairly different set of
+    features.
   </span>
  </div>
 </div>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.frames">Understanding feature frames</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>To understand the rest of the tutorial, it is important to
+understand the geometric meaning of a feature <em>frame</em>. Features
+computed by <code>vl_covdet</code> are <em>oriented ellipses</em> and
+are defined by a translation $T$ and linear map $A$ (a $2\times 2$)
+which can be extracted as follows:</p>
+
+<precode>
+ T = frame(1:2) ;
+ A = reshape(frame(3:6),2,2)) ;
+</precode>
+
+<p>The map $(A,T)$ moves pixels from the feature frame (also called
+normalised patch domain) to the image frame. The feature is
+represented as a circle of unit radius centered at the origin in the
+feature reference frame, and this is transformed into an image elippse
+by $(A,T)$.</p>
+
+<p>In term of extent, the normalised patch domain is a square box
+centered at the origin, whereas the image domain uses the standard
+MATLAB convention and starts at (1,1). The Y axis points downard and
+the X axis to the right. These notions are important in the
+computation of normalised patches and descriptors
+(see <a href="%pathto:tut.covdet.descr">later</a>).</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.covdet.affine">Affine adaptation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p><em>Affine adaptation</em> is the process of estimating the affine
-shape of an image region in order to construct an affinely co-variant
-feature frame. This is useful to compensate for deformations of the
-image that include slant, at least for small perspective distortion.</p>
+<p><em>Affine adaptation</em> is the process of estimating the
+&ldqo;affine shape&rdqo; of an image region in order to construct an
+affinely co-variant feature frame. This is useful in order to
+compensate for deformations of the image like slant, arising for
+example for small perspective distortion.</p>
 
 <p>To switch on affine adaptation, use
 the <code>EstiamteAffineShape</code> option:</p>
 
 <precode type='matlab'>
-frames = vl_covdet(imgs, 'estimateAffineShape', true, 'verbose') ;
+frames = vl_covdet(imgs, 'estimateAffineShape', true) ;
 </precode>
 
 <p>which results in the following detections:</p>
@@ -147,24 +189,24 @@ frames = vl_covdet(imgs, 'estimateAffineShape', true, 'verbose') ;
 <h1 id="tut.covdet.ori">Feature orientation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>The methods discussed so far are rotationally invariant. This means
-that they work regardless of an image rotation, but they do not allow
-to fix rotation in the feature frame. Instead, features are estimated
-to be upright by default (formally, this means that the affine
-transformation implied by a feature maps the vertical axis to
+<p>The detection methods discussed so far are rotationally
+invariant. This means that they detect the same circular or ellptical
+regions regardless of an image rotation, but they do not allow to fix
+and normalise rotation in the feature frame. Instead, features are
+estimated to be upright by default (formally, this means that the
+affine transformation $(A,T)$ maps the vertical axis $(0,1)$ to
 itself).</p>
 
-<p>Estimating and removing the effecnt of rotation from a feature
-frame is needed in order to compute rotationally variant descriptors
-like SIFT or the image intensity in such a way that these are
-invariant to image rotations. This can be obtained by specifing
-the <code>EstiamteOrientation</code> option:</p>
+<p>Estimating and removing the effect of rotation from a feature frame
+is needed in order to compute rotationally invariant descriptors. This
+can be obtained by specifing the <code>EstiamteOrientation</code>
+option:</p>
 
 <precode type='matlab'>
 frames = vl_covdet(imgs, 'estimateOrientation', true, 'verbose') ;
 </precode>
 
-<p>This results in the following features being detected:</p>
+<p>which results in the following features being detected:</p>
 
 <div class="figure">
  <img src="%pathto:root;demo/covdet_oriented_frames.jpg"/>
@@ -178,12 +220,13 @@ frames = vl_covdet(imgs, 'estimateOrientation', true, 'verbose') ;
 <p>The method used is the same as the one propsed by Lowe []: the
 orientation is given by the dominant gradient direction. Intuitively,
 this means that, in the normalized frame, brighter stuff should appear
-on the right, or there should be a left-to-right dark-to-bright
+on the right, or that there should be a left-to-right dark-to-bright
 pattern.</p>
 
 <p>In practice, this method may result in an ambiguous detection of
-orientations; in this case, up to four different orientations may be
-assigned to the same frame, resulting in a multiplication of them.</p>
+the orientations; in this case, up to four different orientations may
+be assigned to the same frame, resulting in a multiplication of
+them.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.covdet.descr">Computing descriptors</h1>
@@ -198,9 +241,9 @@ output argument:</p>
 [frames, descrs] = vl_covdet(imgs) ;
 </precode>
 
-<p>This will compute SIFT descriptors. In this case each column
-of <code>descrs</code> is a 128-dimensional descriptor (in single
-precision). Alternatively, to compute patches use:</p>
+<p>This will compute SIFT descriptors for all the features. Each
+column of <code>descrs</code> is a 128-dimensional descriptor vector
+in single precision. Alternatively, to compute patches use:</p>
 
 <precode type='matlab'>
 [frames, descrs] = vl_covdet(imgs, 'descriptor', 'patch') ;
@@ -226,38 +269,41 @@ vl_imarraysc(reshape(patches(:,1:10*10), w,w,[])) ;
 </div>
 
 <p>There are several parameters affecting the patches associated to
-features.  First, <code>PatchRelatvieExtent</code> can be used to
+features. First, <code>PatchRelatvieExtent</code> can be used to
 control how large a patch is relative to the feature scale. The extent
-is half of the side of the patch square range, measured in the
-normalized feature frame. Since blobs are detected at a normalized
-standard deviation of 1, and assuming that this can be interepreted as
-the size of the blob, setting <code>PatchRelativeExtent</code> to 6
-makes the &ldqo;radius&rdqo; of the patch six times larger than the
-blob used for detection.</p>
+is half of the side of the patch domain, a square in
+the <a href="%pathto:tut.covdet.frames;">frame reference
+frame</a>. Since most detectors latch on image structures (e.g. blobs)
+that, in the normalised frame reference, have a size comparable to a
+circle of radius one, setting <code>PatchRelativeExtent</code> to 6
+makes the patch about six times largerer than the size of the corner
+structure. This is approximately the default extent of SIFT feature
+descriptors.</p>
 
 <p>A second imporant parameter is <code>PatchRelativeSigma</code>
 which expresses the amount of smoothing applied to the image in the
-normalised frame. By default this is set to 1.0, but can be reduced to
-get &ldqo;sharper&rdqo; patches. Of course, the amount of smoothing is
-bounded below by the resolution of the input image: a smoothing of,
-say, less than half a pixel cannot be recovered due to the limited
-sampling rate of the latter.</p>
+normalised patch frame. By default this is set to 1.0, but can be
+reduced to get &ldqo;sharper&rdqo; patches. Of course, the amount of
+smoothing is bounded below by the resolution of the input image: a
+smoothing of, say, less than half a pixel cannot be recovered due to
+the limited sampling rate of the latter. Moreover, the patch must be
+sampled finely enough to avoid aliasing (see next).</p>
 
 <p>The last parameter is <code>PatchResolution</code>. If this is
-equal to <em>w</em>, then the patch has a side of <em>2w+1</em>
-pixels.  (hence the samplign step in the normalised frame is simply
+equal to $w$, then the patch has a side of $2w+1$ pixels.  (hence the
+sampling step in the normalised frame is given by
 <code>PatchRelativeExtent</code>/<code>PatchResoluton</code>).
 Extracting higher resolution patches may be needed for largerer extent
 and smaller smoothings. A good setting for this parameter may be
 <code>PatchRelativeExtent</code>/<code>PatchRelativeSigma</code>.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.covdet.frames">Custom frames</h1>
+<h1 id="tut.covdet.custom">Custom frames</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>Finally, it is possilbe to use <code>vl_covdet</code> to compute
 descriptors on custom feature frames, or to apply affine adaptation
-and/or orientation estimation to the latter.</p>
+and/or orientation estimation to these.</p>
 
 <p>For example</p>
 
@@ -275,7 +321,7 @@ frames(end+1,:) = delta/2 ;
                               'estimateOrientation', true) ;
 </precode>
 
-<p>computes affinely adapted features on a grid:</p>
+<p>computes affinely adapted and oriented features on a grid:</p>
 
 <div class="figure">
  <img src="%pathto:root;demo/covdet_custom_frames.jpg"/>
@@ -285,5 +331,67 @@ frames(end+1,:) = delta/2 ;
    </span>
  </div>
 </div>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.covdet.ss">Getting the scale spaces</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p><code>vl_covdet</code> can return additional information about the
+features, including the scale spaces and scores for each detected
+feature. To do so use the syntax:</p>
+
+<precode type='matlab'>
+[frames, descrs, info] = vl_covdet(imgs) ;
+</precode>
+
+<p>This will return a structure info</p>
+
+<precode>
+info =
+
+                    gss: [1x1 struct]
+                    css: [1x1 struct]
+             peakScores: [1x351 single]
+             edgeScores: [1x351 single]
+       orientationScore: [1x351 single]
+    laplacianScaleScore: [1x351 single]
+</precode>
+
+<div>
+\[ test \]
+</div>
+
+<p>The last four fields are the peak, edge, orientation, and Laplacian
+scale scores of the detected features. The first two were discussed
+before, and the last two are the scores associated to a specific
+orientation during orientation assignment and to a specific scale
+during Laplacian scale estimation.</p>
+
+<p>The first two fields are the Gaussian scale space and the
+cornerness measure scale space, which can be plotted by means
+of <code>vl_plotss</code>. The following is the of the Gaussian scale
+space for our example image:</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_gss.jpg"/>
+ <div class="caption">
+   <span class="content">
+     Gaussian scale space.
+   </span>
+ </div>
+</div>
+
+<p>The following is an example of the corresponding cornerness
+measure:</p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/covdet_css.jpg"/>
+ <div class="caption">
+   <span class="content">
+     Cornerness scale space (Difference of Gaussians).
+   </span>
+ </div>
+</div>
+
 
 </group>

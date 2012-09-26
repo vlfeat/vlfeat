@@ -5,7 +5,7 @@
 % --------------------------------------------------------------------
 
 im = vl_impattern('roofs1') ;
-im = im(end-255:end,1:320,:) ;
+im = im(end-128:end,128:320,:) ;
 
 figure(1) ; clf ;
 image(im) ; axis image off ;
@@ -74,21 +74,21 @@ figure(6) ; clf ;
 for i = 1:numel(names)
   frames = vl_covdet(imgs, 'method', names{i}) ;
 
-  vl_tightsubplot(3,2,i, 'margintop',0.025) ;
+  vl_tightsubplot(3,2,i, 'margintop',0.025, 'marginright', 0.01) ;
   imagesc(im) ; axis image off ;
   hold on ;
   vl_plotframe(frames) ;
   title(names{i}) ;
 end
 
-vl_figaspect(2/3) ;
+vl_figaspect(3/4) ;
 vl_demo_print('covdet_detectors',.9) ;
 
 % --------------------------------------------------------------------
 %                                                        Custom frames
 % --------------------------------------------------------------------
 
-delta = 30 ;
+delta = 15 ;
 xr = delta:delta:size(im,2)-delta+1 ;
 yr = delta:delta:size(im,1)-delta+1 ;
 [x,y] = meshgrid(xr,yr) ;
@@ -105,3 +105,24 @@ imagesc(im) ;
 axis image off ; hold on ; colormap gray ;
 vl_plotframe(frames) ;
 vl_demo_print('covdet_custom_frames',.8) ;
+
+% --------------------------------------------------------------------
+%                                                         Scale spaces
+% --------------------------------------------------------------------
+
+[frames, descrs, info] = vl_covdet(imgs) ;
+
+info
+
+figure(8) ; clf ;
+vl_plotss(info.gss) ;
+colormap gray ;
+vl_figaspect(2) ;
+vl_demo_print('covdet_gss',.8) ;
+
+figure(9) ; clf ;
+vl_plotss(info.css) ;
+colormap gray ;
+vl_figaspect(2) ;
+vl_demo_print('covdet_css',.8) ;
+
