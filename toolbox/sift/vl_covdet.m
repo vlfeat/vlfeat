@@ -111,6 +111,16 @@
 %
 %   The function supports the following options:
 %
+%   OctaveResolution:: 3
+%     The number of scale levels sampled per octave when constructing
+%     the scale spaces.
+%
+%   DoubleImage:: true
+%     Whether to double the image before extracting features. This
+%     allows to detect features at a smoothing level of 0.5 and up
+%     rathern than 1.0 and up, resulting in many more small
+%     features being detected.
+%
 %   Verbose::
 %     If specified, it incerases the verbosity level.
 %
