@@ -15,26 +15,26 @@
 %
 %   DoG::
 %     The Difference of Gaussians is an approximate version of the
-%     multiscale trace of Laplacian operator [].
+%     multiscale trace of Laplacian operator [1].
 %
 %   Hessian::
-%     Determinant Hessian operator [].
+%     Determinant Hessian operator [2].
 %
 %   HessianLaplace::
 %     Determinant of Hessian for space localisation, trace of
-%     Laplacian for scale detection [].
+%     Laplacian for scale detection [2].
 %
 %   HarrisLaplace::
 %     Harris cornerness measure for space localisation, trace
-%     of Laplacian for scale detection [].
+%     of Laplacian for scale detection [2].
 %
 %   MultiscaleHessian::
 %     Same as HessianLaplace, but Laplacian scale detection is not
-%     performend (features are simply detected at multiple scales) [].
+%     performend (features are simply detected at multiple scales) [2].
 %
 %   MultiscaleHarris::
 %     Same as HarrisLaplace, but Laplacian scale detection is not
-%     performend (features are simply detected at multiple scales) [].
+%     performend (features are simply detected at multiple scales) [2].
 %
 %   The number of detected features is affected by the
 %   'PeakThreshold', which sets the minimum absolute vale of the
@@ -51,17 +51,17 @@
 %
 %   VL_COVDET(..., 'EstimateAffineShape', true) switches on affine
 %   adaptation, which attempts to estimate the affine co-variant shape
-%   of each feature based on the algorihtm of [].
+%   of each feature based on the algorihtm of [2].
 %
 %   VL_COVDET(..., 'EstimateOrientations', true) switches on the
 %   estimation of the orientation of features (which are therefore not
 %   upright anymore) []. Note that more than one orientation can be
 %   associated to each feature, creating copies of them.
 %
-%   VL_COVDET(..., 'Frames', f) allows to specify user defined
-%   frames. This skips detection, but estimating the affine shape
-%   or the orietnations can still be applied. Moreover, descriptors
-%   for these frames can be computed.
+%   VL_COVDET(..., 'Frames', F) allows to specify user defined frames
+%   F. This skips detection, but estimating the affine shape or the
+%   orietnations can still be applied. Moreover, descriptors for these
+%   frames can be computed.
 %
 %   [F,D] = VL_COVDET(I, ...) computes the SIFT descriptors [1] for
 %   the detected features. Each column of D is the descriptor of the
@@ -125,11 +125,11 @@
 %     If specified, it incerases the verbosity level.
 %
 %   REFERENCES::
-%     [1] D. G. Lowe, Distinctive image features from scale-invariant
-%     keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
+%   [1] D. G. Lowe, Distinctive image features from scale-invariant
+%   keypoints. IJCV, vol. 2, no. 60, pp. 91-110, 2004.
 %
-%     [2] K. Mikolajcyk and C. Schmid, An affine invariant interest
-%     point detector. ICCV, vol. 2350, pp. 128-142, 2002.
+%   [2] K. Mikolajcyk and C. Schmid, An affine invariant interest
+%   point detector. ICCV, vol. 2350, pp. 128-142, 2002.
 %
 %   See also: VL_SIFT(), VL_PLOTFRAME(), VL_PLOTSS(), VL_HELP().
 
