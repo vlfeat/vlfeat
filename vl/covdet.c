@@ -644,7 +644,7 @@ vl_covdet_new (VlCovDetMethod method)
 #if 0
       {
         char name [200] ;
-        snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%f-lap.pgm", sigmaDelta) ;
+        snprintf(name, 200, "/tmp/%f-lap.pgm", sigmaDelta) ;
         vl_pgm_write_f(name, pt, num, num) ;
       }
 #endif
@@ -1200,7 +1200,7 @@ vl_covdet_detect (VlCovDet * self)
       }
     }
     self->numFeatures = j ;
-    VL_PRINTF("killed: %d\n",killed) ;
+   /*  VL_PRINTF("killed: %d\n",killed) ; */
   }
 
   if (levelxx) vl_free(levelxx) ;
@@ -1410,7 +1410,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 #if 0
       {
         char name [200] ;
-        snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f-ext.pgm", 1e10*vl_get_cpu_time()) ;
+        snprintf(name, 200, "/tmp/%20.0f-ext.pgm", 1e10*vl_get_cpu_time()) ;
         vl_pgm_write_f(name, patch, patchWidth, patchWidth) ;
       }
 #endif
@@ -1464,7 +1464,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 #if 0
     {
       char name [200] ;
-      snprintf(name, 200, "/Users/vedaldi/Desktop/bla/%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
+      snprintf(name, 200, "/tmp/%20.0f.pgm", 1e10*vl_get_cpu_time()) ;
       vl_pgm_write_f(name, patch, 2*resolution+1, 2*resolution+1) ;
     }
 #endif
