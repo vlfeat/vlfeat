@@ -477,7 +477,7 @@ mexFunction(int nout, mxArray *out[],
         vl_covdet_drop_features_outside (covdet, boundaryMargin) ;
         if (verbose) {
           vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
-          mexPrintf("vl_covdet: kept %d inside the bounary margin (%g)\n",
+          mexPrintf("vl_covdet: kept %d inside the boundary margin (%g)\n",
                     numFeatures, boundaryMargin) ;
         }
       }
