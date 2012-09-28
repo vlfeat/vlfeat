@@ -605,7 +605,7 @@ vl_covdet_new (VlCovDetMethod method)
       assert(0) ;
   }
 
-  self->nonExtremaSuppression = 0.3 ;
+  self->nonExtremaSuppression = 0.5 ;
   self->features = NULL ;
   self->numFeatures = 0 ;
   self->numFeatureBufferSize = 0 ;
@@ -2059,7 +2059,9 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
     double a = scores[k-1] ;
     double b = scores[k] ;
     double c = scores[k+1] ;
-    if ((b > a && b > c) || (b < a && b < c)) {
+    double t =  VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
+
+    if ((b > a && b > c) || (b < a && b < c) && vl_abs_d(b) >= t) {
       double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
       double s = k + dk ;
       double sigmaLap = pow(2.0, -0.5 + s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
@@ -2350,12 +2352,12 @@ vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x)
 }
 
 /* ---------------------------------------------------------------- */
-/** @brief Get the non-extrema supporession threshold
+/** @brief Get the non-extrema suppression threshold
  ** @param self object.
  ** @return threshold.
  **/
 
-vl_bool
+double
 vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self)
 {
   return self->nonExtremaSuppression ;

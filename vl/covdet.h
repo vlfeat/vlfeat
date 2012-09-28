@@ -227,7 +227,7 @@ VL_EXPORT VlScaleSpace *  vl_covdet_get_gss (VlCovDet const * self) ;
 VL_EXPORT VlScaleSpace *  vl_covdet_get_css (VlCovDet const * self) ;
 VL_EXPORT vl_bool vl_covdet_get_aa_accurate_smoothing (VlCovDet const * self) ;
 VL_EXPORT vl_size const * vl_covdet_get_laplacian_scales_statistics (VlCovDet const * self, vl_size * numScales) ;
-VL_EXPORT vl_bool vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self) ;
+VL_EXPORT double vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self) ;
 VL_EXPORT vl_size vl_covdet_get_num_non_extrema_suppressed (VlCovDet const * self) ;
 
 /** @} */

@@ -479,8 +479,7 @@ mexFunction(int nout, mxArray *out[],
       if (verbose) {
         vl_index i ;
         vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
-        mexPrintf("vl_covdet: detected %d features\n", numFeatures) ;
-        mexPrintf("vl_covdet: % supporessed as non-extrema (threshold: %f)\n",
+        mexPrintf("vl_covdet: %d features suppressed as duplicate (threshold: %g)\n",
                   vl_covdet_get_num_non_extrema_suppressed(covdet),
                   vl_covdet_get_non_extrema_suppression_threshold(covdet)) ;
         switch (method) {
@@ -491,9 +490,9 @@ mexFunction(int nout, mxArray *out[],
             vl_size const * numFeaturesPerScale ;
             numFeaturesPerScale = vl_covdet_get_laplacian_scales_statistics
               (covdet, &numScales) ;
-            mexPrintf("vl_covdet: #features with #lap. scales:") ;
+            mexPrintf("vl_covdet: Laplacian scales:") ;
             for (i = 0 ; i <= (signed)numScales ; ++i) {
-              mexPrintf("%d with %d;", numFeaturesPerScale[i], i) ;
+              mexPrintf("%d with %d scales;", numFeaturesPerScale[i], i) ;
             }
             mexPrintf("\n") ;
           }
@@ -501,6 +500,7 @@ mexFunction(int nout, mxArray *out[],
         default:
           break ;
         }
+        mexPrintf("vl_covdet: detected %d features\n", numFeatures) ;
       }
 
       if (boundaryMargin > 0) {
