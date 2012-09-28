@@ -524,7 +524,7 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
 #define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.000002
 #define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
-#define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.002
+#define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.003
 #define VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD 10.0
 
 /** @brief Covariant feature detector */
@@ -538,7 +538,8 @@ struct _VlCovDet
   vl_size octaveResolution ; /**< resolution of each octave. */
   vl_index firstOctave ;     /**< index of the first octave. */
 
-  double nonMaximaSuppression ;
+  double nonExtremaSuppression ;
+  vl_size numNonExtremaSuppressed ;
 
   VlCovDetFeature *features ;
   vl_size numFeatures ;
@@ -559,6 +560,7 @@ struct _VlCovDet
 
   float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
   float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
+  vl_size numFeaturesWithNumScales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES + 1] ;
 }  ;
 
 VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] = {
@@ -603,7 +605,7 @@ vl_covdet_new (VlCovDetMethod method)
       assert(0) ;
   }
 
-  self->nonMaximaSuppression = 0.3 ;
+  self->nonExtremaSuppression = 0.3 ;
   self->features = NULL ;
   self->numFeatures = 0 ;
   self->numFeatureBufferSize = 0 ;
@@ -1181,10 +1183,10 @@ vl_covdet_detect (VlCovDet * self)
       break ;
   }
 
-  if (self->nonMaximaSuppression) {
-    vl_size killed = 0 ;
+  if (self->nonExtremaSuppression) {
     vl_index i, j ;
-    double tol = self->nonMaximaSuppression ;
+    double tol = self->nonExtremaSuppression ;
+    self->numNonExtremaSuppressed = 0 ;
     for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
       double x = self->features[i].frame.x ;
       double y = self->features[i].frame.y ;
@@ -1201,9 +1203,9 @@ vl_covdet_detect (VlCovDet * self)
             sigma_ < (1+tol) * sigma &&
             vl_abs_d(dx_) < tol * sigma &&
             vl_abs_d(dy_) < tol * sigma &&
-            score > score_) {
+            vl_abs_d(score) > vl_abs_d(score_)) {
           self->features[j].peakScore = 0 ;
-          killed ++ ;
+          self->numNonExtremaSuppressed ++ ;
         }
       }
     }
@@ -1215,7 +1217,6 @@ vl_covdet_detect (VlCovDet * self)
       }
     }
     self->numFeatures = j ;
-   /*  VL_PRINTF("killed: %d\n",killed) ; */
   }
 
   if (levelxx) vl_free(levelxx) ;
@@ -2094,11 +2095,16 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
   vl_index i, j  ;
   vl_bool dropFeaturesWithoutScale = VL_TRUE ;
   vl_size numFeatures = vl_covdet_get_num_features(self) ;
+  memset(self->numFeaturesWithNumScales, 0,
+         sizeof(self->numFeaturesWithNumScales)) ;
+
   for (i = 0 ; i < (signed)numFeatures ; ++i) {
     vl_size numScales ;
     VlCovDetFeature feature = self->features[i] ;
     VlCovDetFeatureLaplacianScale const * scales =
     vl_covdet_extract_laplacian_scales_for_frame(self, &numScales, feature.frame) ;
+
+    self->numFeaturesWithNumScales[numScales] ++ ;
 
     if (numScales == 0 && dropFeaturesWithoutScale) {
       self->features[i].peakScore = 0 ;
@@ -2131,6 +2137,7 @@ vl_covdet_extract_laplacian_scales (VlCovDet * self)
     }
     self->numFeatures = j ;
   }
+
 }
 
 /* ---------------------------------------------------------------- */
@@ -2343,6 +2350,41 @@ vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x)
 }
 
 /* ---------------------------------------------------------------- */
+/** @brief Get the non-extrema supporession threshold
+ ** @param self object.
+ ** @return threshold.
+ **/
+
+vl_bool
+vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self)
+{
+  return self->nonExtremaSuppression ;
+}
+
+/** @brief Set the non-extrema suppression threshod
+ ** @param self object.
+ ** @param x threshold.
+ **/
+
+void
+vl_covdet_set_non_extrema_suppression_threshold (VlCovDet * self, double x)
+{
+  self->nonExtremaSuppression = x ;
+}
+
+/** @brief Get the number of non-extrema suppressed
+ ** @param self object.
+ ** @return number.
+ **/
+
+vl_size
+vl_covdet_get_num_non_extrema_suppressed (VlCovDet const * self)
+{
+  return self->numNonExtremaSuppressed ;
+}
+
+
+/* ---------------------------------------------------------------- */
 /** @brief Get number of stored frames
  ** @return number of frames stored in the detector.
  **/
@@ -2367,6 +2409,7 @@ vl_covdet_get_features (VlCovDet * self)
  ** A Gaussian scale space exists only after calling ::vl_covdet_put_image.
  ** Otherwise the function returns @c NULL.
  **/
+
 VlScaleSpace *
 vl_covdet_get_gss (VlCovDet const * self)
 {
@@ -2386,3 +2429,20 @@ vl_covdet_get_css (VlCovDet const * self)
   return self->css ;
 }
 
+/** @brief Get the number of features found with a certain number of scales
+ ** @param sellf object.
+ ** @param numScales length of the histogram (out).
+ ** @return histogram.
+ **
+ ** Calling this function makes sense only after running a detector
+ ** that uses the Laplacian as a secondary measure for scale
+ ** detection
+ **/
+
+vl_size const *
+vl_covdet_get_laplacian_scales_statistics (VlCovDet const * self,
+                                           vl_size * numScales)
+{
+  *numScales = VL_COVDET_MAX_NUM_LAPLACIAN_SCALES ;
+  return self->numFeaturesWithNumScales ;
+}

@@ -453,6 +453,10 @@ mexFunction(int nout, mxArray *out[],
             break ;
           }
           default:
+            a11 = 0 ;
+            a21 = 0 ;
+            a12 = 0 ;
+            a22 = 0 ;
             assert(0) ;
         }
         feature.frame.a11 = (float)a22 ;
@@ -462,15 +466,41 @@ mexFunction(int nout, mxArray *out[],
         vl_covdet_append_feature(covdet, &feature) ;
       }
     } else {
-      mexPrintf("vl_covdet: detector: %s\n",
-                vl_enumeration_get_by_value(vlCovdetMethods, method)->name) ;
-      mexPrintf("vl_covdet: peak threshold: %g, edge threshold: %g\n",
-                vl_covdet_get_peak_threshold(covdet),
-                vl_covdet_get_edge_threshold(covdet)) ;
-      vl_covdet_detect(covdet) ;
       if (verbose) {
+        mexPrintf("vl_covdet: detector: %s\n",
+                  vl_enumeration_get_by_value(vlCovdetMethods, method)->name) ;
+        mexPrintf("vl_covdet: peak threshold: %g, edge threshold: %g\n",
+                  vl_covdet_get_peak_threshold(covdet),
+                  vl_covdet_get_edge_threshold(covdet)) ;
+      }
+
+      vl_covdet_detect(covdet) ;
+
+      if (verbose) {
+        vl_index i ;
         vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
         mexPrintf("vl_covdet: detected %d features\n", numFeatures) ;
+        mexPrintf("vl_covdet: % supporessed as non-extrema (threshold: %f)\n",
+                  vl_covdet_get_num_non_extrema_suppressed(covdet),
+                  vl_covdet_get_non_extrema_suppression_threshold(covdet)) ;
+        switch (method) {
+        case VL_COVDET_METHOD_HARRIS_LAPLACE:
+        case VL_COVDET_METHOD_HESSIAN_LAPLACE:
+          {
+            vl_size numScales ;
+            vl_size const * numFeaturesPerScale ;
+            numFeaturesPerScale = vl_covdet_get_laplacian_scales_statistics
+              (covdet, &numScales) ;
+            mexPrintf("vl_covdet: #features with #lap. scales:") ;
+            for (i = 0 ; i <= (signed)numScales ; ++i) {
+              mexPrintf("%d with %d;", numFeaturesPerScale[i], i) ;
+            }
+            mexPrintf("\n") ;
+          }
+          break ;
+        default:
+          break ;
+        }
       }
 
       if (boundaryMargin > 0) {
