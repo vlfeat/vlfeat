@@ -14,7 +14,7 @@
  */
 
 /**
- <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page covdet Covariant feature detectors
 @auhtor Karel Lenc
 @author Andrea Vedaldi
@@ -2059,7 +2059,7 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
     double a = scores[k-1] ;
     double b = scores[k] ;
     double c = scores[k+1] ;
-    double t =  VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
+    double t = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
 
     if ((b > a && b > c) || (b < a && b < c) && vl_abs_d(b) >= t) {
       double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
