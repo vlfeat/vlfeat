@@ -206,10 +206,10 @@ if ~exist(conf.modelPath) || conf.clobber
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        w(:,ci) = vl_pegasos(psix(:,selTrain(perm)), ...
-                             int8(y(perm)), lambda, ...
-                             'NumIterations', 50/lambda, ...
-                             'BiasMultiplier', conf.svm.biasMultiplier) ;
+        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm))) ;
+        [w(:,ci) b(ci)] = vl_svmpegasos(data, lambda, ...
+                                        'MaxIterations', 50/lambda, ...
+                                        'BiasMultiplier', conf.svm.biasMultiplier) ;
       end
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...
@@ -220,8 +220,8 @@ if ~exist(conf.modelPath) || conf.clobber
       w = svm.w' ;
   end
 
-  model.b = conf.svm.biasMultiplier * w(end, :) ;
-  model.w = w(1:end-1, :) ;
+  model.b = conf.svm.biasMultiplier * b ;
+  model.w = w ;
 
   save(conf.modelPath, 'model') ;
 else
