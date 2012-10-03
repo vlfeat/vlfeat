@@ -209,6 +209,7 @@ post-doc: doc
 	      --progress                                             \
 	      --exclude=download                                     \
 	      --exclude=cvpr10wiki                                   \
+	      --exclude=benchmarks                                   \
 	      --exclude=man-src                                      \
 	      --exclude=mdoc.build                                   \
 	      --exclude=.htaccess                                    \
