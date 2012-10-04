@@ -142,5 +142,3 @@ grid on ;
 
 vl_figaspect(2) ;
 vl_demo_print('covdet_scores',.9) ;
-
-keyboard
