@@ -1,9 +1,7 @@
 % VL_DEMO_SIFT_CMD Demo: SIFT: test command line utility
 
 pfx = fullfile(vl_root,'results') ;
-if ~ exist(pfx, 'dir')
-  mkdir(pfx) ;
-end
+vl_xmkdir(pfx) ;
 
 p_img = fullfile(vl_root,'data','box.pgm') ;
 p_low = fullfile(vl_root,'data','box.sift') ;
