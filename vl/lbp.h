@@ -11,6 +11,9 @@ This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
+#ifndef VL_LBP_H
+#define VL_LBP_H
+
 #include "generic.h"
 
 /** @brief Type of quantization for LBP features */
@@ -45,3 +48,6 @@ VL_INLINE vl_size vl_lbp_get_dimension(VlLbp * self)
 {
   return self->dimension ;
 }
+
+/* VL_LBP_H */
+#endif
