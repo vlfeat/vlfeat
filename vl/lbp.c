@@ -84,6 +84,7 @@ when the image is column major rather than row major.
 
 #include "lbp.h"
 #include "mathop.h"
+#include "string.h"
 
 /* ---------------------------------------------------------------- */
 /*                                           Initialization helpers */
@@ -202,6 +203,9 @@ vl_lbp_process (VlLbp * self,
 
 #define at(u,v) (*(image + width * (v) + (u)))
 #define to(u,v,w) (*(features + cstride * (w) + cwidth * (v) + (u)))
+
+  /* clear the output buffer */
+  memset(features, 0, sizeof(float)*cdimension*cstride) ;
 
   /* accumulate pixel-level measurements into cells */
   for (y = 1 ; y < (signed)height - 1 ; ++y) {
