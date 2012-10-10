@@ -206,7 +206,7 @@ vl_lbp_process (VlLbp * self,
 
   /* clean the buffer features */
   {
-      memset(features, 0, sizeof(float)*cdimension);
+      memset(features, 0, sizeof(float)*cdimension*cstride);
   }
 
   /* accumulate pixel-level measurements into cells */
