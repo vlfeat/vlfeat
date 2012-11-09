@@ -7,7 +7,7 @@ function vl_assert_almost_equal(x, y, varargin)
     end
   end
   assert(isequal(class(x), class(y)), varargin{:}) ;
-  assert(isequal(size(x),size(y)), varargin{:}) ;
+  assert(isequal(size(x), size(y)), varargin{:}) ;
   if isstruct(x)
     fx = fieldnames(x) ;
     fy = fieldnames(y) ;
