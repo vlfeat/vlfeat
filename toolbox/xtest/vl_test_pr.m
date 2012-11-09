@@ -78,3 +78,17 @@ vl_assert_almost_equal(pr1, [1/2 1/3 1/4 1/5 2/6  1]) ;
 % stable without inf (no conventional point and -inf are NaN)
 vl_assert_almost_equal(rc2, [.5  .5  .5  .5  NaN .5]) ;
 vl_assert_almost_equal(pr2, [1/2 1/3 1/4 1/5 NaN  1]) ;
+
+function test_normalised_pr(s)
+scores = [+1 +2] ;
+labels = [+1 -1] ;
+[rc1,pr1,info] = vl_pr(labels,scores) ;
+[rc2,pr2,info] = vl_pr(labels,scores,'normalizePrior',.5) ;
+vl_assert_almost_equal(pr1, pr2) ;
+vl_assert_almost_equal(rc1, rc2) ;
+
+scores_ = [+1 +2 +2 +2] ;
+labels_ = [+1 -1 -1 -1] ;
+[rc3,pr3,info3] = vl_pr(labels_,scores_) ;
+[rc4,pr4,info4] = vl_pr(labels,scores,'normalizePrior',1/4) ;
+vl_assert_almost_equal(info3, info4) ;

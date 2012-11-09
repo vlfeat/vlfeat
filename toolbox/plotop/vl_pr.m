@@ -16,13 +16,13 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   samples are predicted to be positive and is conventionally set to
 %   the value 1.
 %
-%   Set the zero the lables of samples that should be ignored in the
+%   Set to zero the lables of samples that should be ignored in the
 %   evaluation. Set to -INF the scores of samples which are not
 %   retrieved. If there are samples with -INF score, then the PR curve
 %   may have maximum recall smaller than 1, unless the INCLUDEINF
 %   option is used (see below). The options NUMNEGATIVES and
-%   NUMPOSITIVES can be used to specify additional samples with -INF
-%   score (see below).
+%   NUMPOSITIVES can be used to add additional surrogate samples with
+%   -INF score (see below).
 %
 %   [RECALL, PRECISION, INFO] = VL_PR(...) returns an additional
 %   structure INFO with the following fields:
@@ -89,6 +89,11 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %     score (increasing recall). Samples with -INF scores are assigned
 %     RECALL and PRECISION equal to NaN.
 %
+%   NormalizePrior:: []
+%     If set to a scalar, reweights positive and negative labels so
+%     that the fraction of positive ones is equal to the specified
+%     value. This computes the normalised PR curves of [2]
+%
 %   About the PR curve::
 %     This section uses the same symbols used in the documentation of
 %     the VL_ROC() function. In addition to those quantities, define:
@@ -105,6 +110,8 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   REFERENCES:
 %   [1] C. D. Manning, P. Raghavan, and H. Schutze. An Introduction to
 %   Information Retrieval. Cambridge University Press, 2008.
+%   [2] D. Hoiem, Y. Chodpathumwan, and Q. Dai. Diagnosing error in
+%   object detectors. In Proc. ECCV, 2012.
 %
 %   See also VL_ROC(), VL_HELP().
 
@@ -116,15 +123,27 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
+% TP and FP are the vectors of true positie and false positve label
+% counts for decreasing scores, P and N are the total number of
+% positive and negative labels. Note that if certain options are used
+% some labels may actually not be stored explicitly by LABELS, so P+N
+% can be larger than the number of element of LABELS.
+
 [tp, fp, p, n, perm, varargin] = vl_tpfp(labels, scores, varargin{:}) ;
 opts.stable = false ;
 opts.interpolate = false ;
+opts.normalizePrior = [] ;
 opts = vl_argparse(opts,varargin) ;
 
 % compute precision and recall
 small = 1e-10 ;
 recall = tp / max(p, small) ;
-precision = max(tp, small) ./ max(tp + fp, small) ;
+if isempty(opts.normalizePrior)
+  precision = max(tp, small) ./ max(tp + fp, small) ;
+else
+  a = opts.normalizePrior ;
+  precision = max(tp * a/p, small) ./ max(tp * a/p + fp * (1-a)/n, small) ;
+end
 
 % interpolate precision if needed
 if opts.interpolate
@@ -167,7 +186,12 @@ end
 if nargout == 0
   cla ; hold on ;
   plot(recall,precision,'linewidth',2) ;
-  spline([0 1], [1 1] * p / length(labels), 'r--', 'linewidth', 2) ;
+  if isempty(opts.normalizePrior)
+    randomPrecision = p / (p + n) ;
+  else
+    randomPrecision = opts.normalizePrior ;
+  end
+  spline([0 1], [1 1] * randomPrecision, 'r--', 'linewidth', 2) ;
   axis square ; grid on ;
   xlim([0 1]) ; xlabel('recall') ;
   ylim([0 1]) ; ylabel('precision') ;
