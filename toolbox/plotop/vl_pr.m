@@ -142,7 +142,8 @@ if isempty(opts.normalizePrior)
   precision = max(tp, small) ./ max(tp + fp, small) ;
 else
   a = opts.normalizePrior ;
-  precision = max(tp * a/p, small) ./ max(tp * a/p + fp * (1-a)/n, small) ;
+  precision = max(tp * a/max(p,small), small) ./ ...
+      max(tp * a/max(p,small) + fp * (1-a)/max(n,small), small) ;
 end
 
 % interpolate precision if needed

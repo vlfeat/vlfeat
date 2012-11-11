@@ -82,8 +82,8 @@ vl_assert_almost_equal(pr2, [1/2 1/3 1/4 1/5 NaN  1]) ;
 function test_normalised_pr(s)
 scores = [+1 +2] ;
 labels = [+1 -1] ;
-[rc1,pr1,info] = vl_pr(labels,scores) ;
-[rc2,pr2,info] = vl_pr(labels,scores,'normalizePrior',.5) ;
+[rc1,pr1,info1] = vl_pr(labels,scores) ;
+[rc2,pr2,info2] = vl_pr(labels,scores,'normalizePrior',.5) ;
 vl_assert_almost_equal(pr1, pr2) ;
 vl_assert_almost_equal(rc1, rc2) ;
 
@@ -92,3 +92,17 @@ labels_ = [+1 -1 -1 -1] ;
 [rc3,pr3,info3] = vl_pr(labels_,scores_) ;
 [rc4,pr4,info4] = vl_pr(labels,scores,'normalizePrior',1/4) ;
 vl_assert_almost_equal(info3, info4) ;
+
+function test_normalised_pr_corner_cases(s)
+scores = 1:10 ;
+labels = ones(1,10) ;
+[rc1,pr1,info1] = vl_pr(labels,scores) ;
+vl_assert_almost_equal(rc1, (0:10)/10) ;
+vl_assert_almost_equal(pr1, ones(1,11)) ;
+
+scores = 1:10 ;
+labels = zeros(1,10) ;
+[rc2,pr2,info2] = vl_pr(labels,scores) ;
+vl_assert_almost_equal(rc2, zeros(1,11)) ;
+vl_assert_almost_equal(pr2, ones(1,11)) ;
+
