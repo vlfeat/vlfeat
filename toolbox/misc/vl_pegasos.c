@@ -36,10 +36,11 @@ typedef struct _DiagnosticsDispatcher {
 enum {dimension,
       iterations,
       maxIterations,
+      preconditioner,
       epsilon,
       lambda,
       biasMultiplier,
-      biasLearningRate,
+      biasPreconditioner,
       energyFrequency,
       elapsedTime,
       energy,
@@ -88,7 +89,7 @@ void setUintValue(mxArray* array, vl_uint32 value)
  **  - epsilon: SVM stop criterion.
  **  - lambda: SVM pegasos paramater.
  **  - biasMultiplier: constant multiplying the SVM bias.
- **  - biasLearningRate: learning rate for the SVM bias.
+ **  - biasPreconditioner: pre-conditioner for the SVM bias.
  **  - energyFrequency: rate of SVM energy update.
  **  - elapseTime: elapsed time since the start of the SVM learning.
  **  - energy: SVM energy value.
@@ -106,12 +107,12 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
   const char* names [15] = {
     "dimension", "iterations", "maxIterations",
     "epsilon", "lambda", "biasMultiplier",
-    "biasLearningRate", "energyFrequency", "elapsedTime",
+    "biasPreconditioner", "energyFrequency", "elapsedTime",
     "energy", "regularizerTerm", "lossPos",
     "lossNeg", "hardLossPos", "hardLossNeg"} ;
 
   mxArray *output, *dimension, *iterations, *maxIterations, *epsilon, *lambda ;
-  mxArray *biasMultiplier, *biasLearningRate, *energyFrequency, *elapsedTime ;
+  mxArray *biasMultiplier, *biasPreconditioner, *energyFrequency, *elapsedTime ;
 
   output = mxCreateStructArray(1, dims, 15, names);
 
@@ -133,8 +134,8 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
   biasMultiplier = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
   setDoubleValue(biasMultiplier,svm->biasMultiplier) ;
 
-  biasLearningRate = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
-  setDoubleValue(biasLearningRate,svm->biasLearningRate) ;
+  biasPreconditioner = mxCreateNumericMatrix(1, 1,mxDOUBLE_CLASS, mxREAL) ;
+  setDoubleValue(biasPreconditioner,svm->biasPreconditioner) ;
 
   energyFrequency = mxCreateNumericMatrix(1, 1,mxUINT32_CLASS, mxREAL) ;
   setUintValue(energyFrequency,svm->energyFrequency) ;
@@ -149,7 +150,7 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
   mxSetField(output, 0, "epsilon", epsilon) ;
   mxSetField(output, 0, "lambda", lambda) ;
   mxSetField(output, 0, "biasMultiplier", biasMultiplier) ;
-  mxSetField(output, 0, "biasLearningRate", biasLearningRate) ;
+  mxSetField(output, 0, "biasPreconditioner", biasPreconditioner) ;
   mxSetField(output, 0, "energyFrequency", energyFrequency) ;
   mxSetField(output, 0, "elapsedTime", elapsedTime) ;
 
@@ -191,7 +192,7 @@ mxArray * createInfoStruct(VlSvmPegasos* svm)
  ** @param svm SVM status.
  **
  **  The function is the callbach called by pegasos SVM when the full
- **  energy and the diagnostic informations are computed. Is a Matlab
+ **  energy and the diagnostic informations are computed. If a Matlab
  **  Callback has been given in input, the function calls it passing
  **  the same informations as a matlab struct.
  **
@@ -238,7 +239,7 @@ enum {
   opt_permutation, opt_bias_learningrate, opt_diagnostic,
   opt_energy_freq, opt_diagnostic_caller_ref, opt_block_sparse,
   opt_homkermap, opt_KCHI2, opt_KL1, opt_KJS, opt_KINTERS,
-  opt_gamma, opt_period, opt_window, opt_starting_bias
+  opt_gamma, opt_period, opt_window, opt_starting_bias, opt_bias_preconditioner
 } ;
 
 /* options */
@@ -251,10 +252,10 @@ vlmxOption  options [] = {
   {"StartingModel",     1,   opt_starting_model      },
   {"StartingBias",      1,   opt_starting_bias       },
   {"Permutation",       1,   opt_permutation         },
-  {"BiasLearningRate",  1,   opt_bias_learningrate   },
   {"DiagnosticFunction",1,   opt_diagnostic          },
   {"DiagnosticCallRef", 1,   opt_diagnostic_caller_ref},
   {"EnergyFreq",        1,   opt_energy_freq         },
+  {"BiasPreconditioner",1,   opt_bias_preconditioner },
   {"homkermap",         1,   opt_homkermap           },
   {"kl1",               0,   opt_KL1                 },
   {"kchi2",             0,   opt_KCHI2               },
@@ -275,7 +276,7 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_DATA, IN_LABELS, IN_LAMBDA, IN_END} ;
-  enum {OUT_MODEL = 0, OUT_BIAS, OUT_INFO} ;
+  enum {OUT_MODEL = 0, OUT_BIAS, OUT_INFO, OUT_DIAGNOSTIC_REF} ;
 
   int verbose = 0 ;
   int opt ;
@@ -469,15 +470,16 @@ mexFunction(int nout, mxArray *out[],
       vl_svmpegasos_set_permutation(svm,permutation,permutationSize) ;
       break ;
 
-    case opt_bias_learningrate :
+   case opt_bias_preconditioner :
       if (!vlmxIsPlainScalar(optarg)) {
-        vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE is not a plain scalar.") ;
+	vlmxError(vlmxErrInvalidArgument, "PRECONDITIONER is not a plain scalar.") ;
       }
       if (mxGetClassID(optarg) != mxDOUBLE_CLASS) {
-        vlmxError(vlmxErrInvalidArgument, "BIASLEARNINGRATE must be double.") ;
+	vlmxError(vlmxErrInvalidArgument, "PRECODNITIONER  must be double.") ;
       }
-      vl_svmpegasos_set_bias_learningrate(svm, (double)*mxGetPr(optarg)) ;
+      vl_svmpegasos_set_bias_preconditioner(svm, (double)*mxGetPr(optarg)) ;
       break ;
+
     case opt_diagnostic :
 
       if( !mxIsClass( optarg , "function_handle")) {
@@ -578,6 +580,11 @@ mexFunction(int nout, mxArray *out[],
     vl_svmdataset_set_map(dataset,map,mapFunc,2*n + 1) ;
   }
 
+  if (!disp->callerRef && nout > 3) {
+    vlmxError(vlmxErrInvalidArgument,
+              "Too many output arguments.");
+  }
+
   /* -----------------------------------------------------------------
    *                                                            Do job
    * -------------------------------------------------------------- */
@@ -615,8 +622,12 @@ mexFunction(int nout, mxArray *out[],
     *tempBuffer = svm->bias ;
   }
 
-  if (nout == 3) {
+  if (nout >= 3) {
     out[OUT_INFO] = createInfoStruct(svm) ;
+  }
+
+  if (nout == 4 && disp->callerRef) {
+    out[OUT_DIAGNOSTIC_REF] = disp->callerRef;
   }
 
   if (homkermap) {

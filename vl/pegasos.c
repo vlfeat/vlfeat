@@ -305,7 +305,7 @@ VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
   svm->biasMultiplier = 0 ;
   svm->bias = 0 ;
   svm->elapsedTime = 0 ;
-  svm->biasLearningRate = 1 ;
+  svm->biasPreconditioner = 1 ;
   svm->energyFrequency = 100 ;
   svm->randomGenerator = NULL ;
   svm->permutation = NULL ;
@@ -371,13 +371,12 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
   }
 
   assert(svm->randomGenerator == NULL || svm->permutation == NULL) ;
-  //assert(svm->iterationsSoFar >= 0) ;
+  assert(svm->iterationsSoFar >= 0) ;
 
   /*
     Choose iteration0 to start with small enoguh steps. Recall that
     the learning rate is
 
-    learningRate = 1 / (lambda * (iteration + iteration0))
   */
 
   iteration0 = (vl_uindex) 1.0 / lambda ;
@@ -412,7 +411,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
         svm->model[i] -= eta * svm->model[i] ;
       }
       if (svm->biasMultiplier)
-        svm->bias -= eta * svm->biasLearningRate * svm->bias ;
+        svm->bias -= eta * svm->biasPreconditioner * svm->bias ;
     }
 
     /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -429,7 +428,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
       accumulator(data,k,svm->model,eta) ;
 
       if (svm->biasMultiplier) {
-        svm->bias += eta * svm->biasLearningRate * svm->biasMultiplier ;
+        svm->bias += eta * svm->biasPreconditioner * svm->biasMultiplier ;
       }
     }
 

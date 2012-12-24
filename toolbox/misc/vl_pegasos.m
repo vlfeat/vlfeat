@@ -14,31 +14,31 @@
 %   regularization parameter LAMBDA using the PEGASOS [1]
 %   solver. INFO is a struct containing the input parameters plus
 %   diagnostic informations:
-% 
+%
 %   energy::
 %     SVM energy value.
-% 
+%
 %   iterations::
 %     Number of iterations performed.
-% 
+%
 %   elapseTime::
 %     Elapsed time since the start of the SVM learning.
-% 
+%
 %   regulizerTerm::
 %     Value of the SVM regulizer term.
-% 
+%
 %   lossPos::
 %     Value of loss function only for data points labeled positives.
-% 
+%
 %   lossNeg::
 %     Value of loss function onlt for data points labeled negatives.
-% 
+%
 %   hardLossPos::
 %     Number of mislabeled positive points.
-% 
+%
 %   hardLossNeg::
 %     Number of mislabeled negative points.
-% 
+%
 %   ALGORITHM. PEGASOS is an implementation of stochastic subgradient
 %   descent. At each iteration a data point is selected at random, the
 %   subgradient of the cost function relative to that data point is
@@ -47,19 +47,19 @@
 %   details.
 %
 %   VL_SVMPEGASOS() accepts the following options:
-% 
+%
 %   Epsilon:: [empty]
 %     Specify the SVM stopping criterion threshold. If not
 %     specified VL_SVMPEGASOS will finish when the maximum number
 %     of iterations is reached. The stopping criterion is tested
-%     after each ENERGYFREQ iteration. 
-% 
+%     after each ENERGYFREQ iteration.
+%
 %   MaxIterations:: [10 / LAMBDA]
 %     Sets the maximum number of iterations.
 %
 %   BiasMultiplier:: [0]
 %     Appends to the data X the specified scalar value B. This
-%     approximates the training of a linear SVM with bias.  
+%     approximates the training of a linear SVM with bias.
 %
 %   StartingModel:: [null vector]
 %     Specify the initial value for the weight vector W.
@@ -72,9 +72,10 @@
 %   StartingBias:: [0]
 %     Specify the inital bias value.
 % 
-%   BiasLearningRate:: [1]
-%     Specify the frequency of the bias learning. The default
-%     setting updates the bias at each iteration.
+%   BiasPreconditioner:: [1]
+%     Specify a preconditioner for the bias. This value is
+%     multiplied to the bias subgradient before adding
+%     the latter to the current model estimate.
 % 
 %   Permutation:: [empty]
 %     Specify a permutation PERM to be used to sample the data (this
@@ -89,20 +90,21 @@
 %
 %   DiagnosticFunction:: [empty]
 %     Specify a function handle to be called every ENERGYFREQ iterations.
-% 
+%
 %   DiagnosticCallRef:: [empty]
-%     Specify a paramater to be passed to the DIAGNOSTICFUNCTION handle.
-% 
+%     Specify a paramater to be passed to the DIAGNOSTICFUNCTION
+%     handle. The handle is returned as fourth output of the function.
+%
 %   EnergyFreq:: [100]
 %     Specify how often the SVM energy is computed.
-% 
+%
 %   HOMKERMAP:: [empty]
 %     Specify the use of an Homogeneus Kernel map for the training
 %     data (See [2],[3]). The passed value N is such that a 2*N+1
 %     dimensional approximated kernel map is computed. Each
 %     training data point is expanded online into a vector of
 %     dimension 2*N+1.
-%  
+%
 %   KChi2::
 %     Compute the map for the Chi2 kernel.
 %
@@ -131,7 +133,7 @@
 %     Set the homogeneity degree of the kernel. The standard kernels
 %     are 1-homogeneous, but sometimes smaller values perform better
 %     in applications. See [2] for details.
-% 
+%
 %   Verbose::
 %     Be verbose.
 %
@@ -154,7 +156,7 @@
 %     [1] S. Shalev-Shwartz, Y. Singer, N. Srebro, and
 %     A. Cotter. Pegasos: Primal Estimated sub-GrAdient SOlver for
 %     SVM. MBP, 2010.
-% 
+%
 %     [2] A. Vedaldi and A. Zisserman
 %     `Efficient Additive Kernels via Explicit Feature Maps',
 %     Proc. CVPR, 2010.

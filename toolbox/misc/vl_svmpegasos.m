@@ -11,36 +11,36 @@
 %
 %   The training struct DATA is created using the function
 %   VL_MAKETRAININGSET.
-% 
+%
 %   [W B INFO] = VL_SVMPEGASOS(DATA, LAMBDA) learns a linear SVM W
 %   and a bias B given training struct DATA, and the regularization
 %   parameter LAMBDA using the PEGASOS [1] solver. INFO is a struct
 %   containing the input parameters plus diagnostic informations:
-% 
+%
 %   energy::
 %     SVM energy value.
-% 
+%
 %   iterations::
 %     Number of iterations performed.
-% 
+%
 %   elapseTime::
 %     Elapsed time since the start of the SVM learning.
-% 
+%
 %   regulizerTerm::
 %     Value of the SVM regulizer term.
-% 
+%
 %   lossPos::
 %     Value of loss function only for data points labeled positives.
-% 
+%
 %   lossNeg::
 %     Value of loss function onlt for data points labeled negatives.
-% 
+%
 %   hardLossPos::
 %     Number of mislabeled positive points.
-% 
+%
 %   hardLossNeg::
 %     Number of mislabeled negative points.
-%   
+%
 %   ALGORITHM. PEGASOS is an implementation of stochastic subgradient
 %   descent. At each iteration a data point is selected at random, the
 %   subgradient of the cost function relative to that data point is
@@ -49,19 +49,19 @@
 %   details.
 %
 %   VL_SVMPEGASOS() accepts the following options:
-% 
+%
 %   Epsilon:: [empty]
 %     Specify the SVM stopping criterion threshold. If not
 %     specified VL_SVMPEGASOS will finish when the maximum number
 %     of iterations is reached. The stopping criterion is tested
-%     after each ENERGYFREQ iteration. 
-% 
+%     after each ENERGYFREQ iteration.
+%
 %   MaxIterations:: [10 / LAMBDA]
 %     Sets the maximum number of iterations.
 %
 %   BiasMultiplier:: [0]
 %     Appends to the data X the specified scalar value B. This
-%     approximates the training of a linear SVM with bias.  
+%     approximates the training of a linear SVM with bias.
 %
 %   StartingModel:: [null vector]
 %     Specify the initial value for the weight vector W.
@@ -73,11 +73,12 @@
 %
 %   StartingBias:: [0]
 %     Specify the inital bias value.
-% 
-%   BiasLearningRate:: [1]
-%     Specify the frequency of the bias learning. The default
-%     setting updates the bias at each iteration.
-% 
+%
+%   BiasPreconditioner:: [1]
+%     Specify a preconditioner for the bias. This value is
+%     multiplied to the bias subgradient before adding
+%     the latter to the current model estimate.
+%
 %   Permutation:: [empty]
 %     Specify a permutation PERM to be used to sample the data (this
 %     disables random sampling). Specifically, at the T-th iteration
@@ -89,23 +90,24 @@
 %     the error term. A common application is to balance an unbalanced
 %     dataset.
 %
-%   DiagnosticFunction:: [empty] 
+%   DiagnosticFunction:: [empty]
 %     Specify a function handle to be called every ENERGYFREQ
 %     iterations.
 %     The function must be of the form:
-%       
+%
 %       function o = diagnostics(svm,x)
-%     
-%     Where in the first iteration x is the variable passed as 
+%
+%     Where in the first iteration x is the variable passed as
 %     "DiagnosticCallRef", and the consecutive ones x is the
 %     variable o returned in the previous iteration.
-% 
+%
 %   DiagnosticCallRef:: [empty]
-%     Specify a paramater to be passed to the DIAGNOSTICFUNCTION handle.
-% 
+%     Specify a paramater to be passed to the DIAGNOSTICFUNCTION
+%     handle. The handle is returned as fourth output of the function.
+%
 %   EnergyFreq:: [100]
 %     Specify how often the SVM energy is computed.
-% 
+%
 %   ValidationData::
 %     Specify a validation dataset. The validation dataset must be
 %     created using VL_MAKETRAININGSET. If specified, the energy

@@ -7,7 +7,7 @@
 /*
 Copyright (C) 2012 Daniele Perrone.
 Copyright (C) 2011-12 Andrea Vedaldi.
- 
+
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -60,7 +60,7 @@ typedef struct _VlSvmPegasos {
   double biasMultiplier ;       /**< bias strength multiplier. */
   double elapsedTime ;          /**< elapsed time from algorithm start. */
   vl_size energyFrequency ;     /**< frequency of computation of svm energy */
-  double  biasLearningRate ;    /**< frequency of bias learning.  */
+  double  biasPreconditioner ;  /**< bias learning preconditioner.  */
   VlSvmObjective*  objective ;  /**< value and statistics of the objective function. */
   VlRand* randomGenerator ;     /**< random generator.  */
   vl_uint32 * permutation ;     /**< data permutation. */
@@ -116,7 +116,7 @@ VL_INLINE double  vl_svmpegasos_get_lambda            (VlSvmPegasos const *self)
 VL_INLINE double  vl_svmpegasos_get_bias_multiplier   (VlSvmPegasos const *self) ;
 VL_INLINE double  vl_svmpegasos_get_elapsed_time      (VlSvmPegasos const *self) ;
 VL_INLINE vl_size vl_svmpegasos_get_energy_frequency  (VlSvmPegasos const *self) ;
-VL_INLINE double  vl_svmpegasos_get_bias_learningrate (VlSvmPegasos const *self) ;
+VL_INLINE double  vl_svmpegasos_get_bias_preconditioner (VlSvmPegasos const *self) ;
 VL_INLINE VlSvmObjective* vl_svmpegasos_get_objective (VlSvmPegasos const *self) ;
 VL_INLINE VlRand* vl_svmpegasos_get_random_generator  (VlSvmPegasos const *self) ;
 VL_INLINE vl_uint32* vl_svmpegasos_get_permutation    (VlSvmPegasos const *self) ;
@@ -136,7 +136,7 @@ VL_INLINE void vl_svmpegasos_set_epsilon         (VlSvmPegasos *self, double e) 
 VL_INLINE void vl_svmpegasos_set_lambda          (VlSvmPegasos *self, double l) ;
 VL_INLINE void vl_svmpegasos_set_bias_multiplier (VlSvmPegasos *self, double b) ;
 VL_INLINE void vl_svmpegasos_set_energy_frequency(VlSvmPegasos *self, vl_size e) ;
-VL_INLINE void vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double  blr) ;
+VL_INLINE void vl_svmpegasos_set_bias_preconditioner (VlSvmPegasos *self, double  blr) ;
 VL_INLINE void vl_svmpegasos_set_random_generator(VlSvmPegasos *self, VlRand * r) ;
 VL_INLINE void vl_svmpegasos_set_permutation     (VlSvmPegasos *self, vl_uint32* p,
                                                   vl_size psize) ;
@@ -270,15 +270,15 @@ vl_svmpegasos_get_energy_frequency (VlSvmPegasos const *self)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get bias learning rate.
+ ** @brief Get bias pre-conditioner.
  ** @param self Pegasos Svm Solver.
- ** @return bias learning rate.
+ ** @return bias pre-conditioner.
  **/
 
 VL_INLINE double
-vl_svmpegasos_get_bias_learningrate (VlSvmPegasos const *self)
+vl_svmpegasos_get_bias_preconditioner (VlSvmPegasos const *self)
 {
-  return self->biasLearningRate ;
+  return self->biasPreconditioner ;
 }
 
 /** ------------------------------------------------------------------
@@ -461,9 +461,9 @@ vl_svmpegasos_set_energy_frequency (VlSvmPegasos *self, vl_size e)
  **/
 
 VL_INLINE void
-vl_svmpegasos_set_bias_learningrate (VlSvmPegasos *self, double blr)
+vl_svmpegasos_set_bias_preconditioner (VlSvmPegasos *self, double blr)
 {
-  self->biasLearningRate = blr ;
+  self->biasPreconditioner = blr ;
 }
 
 /** ------------------------------------------------------------------
