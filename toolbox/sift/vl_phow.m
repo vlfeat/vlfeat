@@ -147,7 +147,7 @@ function [frames, descrs] = vl_phow(im, varargin)
     % remove low contrast descriptors
     % note that for color descriptors the V component is
     % thresholded
-    switch opts.color
+    switch lower(opts.color)
       case {'gray', 'opponent'}
         contrast = f{1}(3,:) ;
       case 'rgb'
