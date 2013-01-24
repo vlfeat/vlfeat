@@ -48,7 +48,7 @@
 %     re-orderded.
 %
 %   Orientations::
-%     If specified, compute the orietantions of the frames overriding
+%     If specified, compute the orientations of the frames overriding
 %     the orientation specified by the 'Frames' option.
 %
 %   Verbose::
