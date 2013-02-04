@@ -105,7 +105,7 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
   data_array = mxCreateCellMatrix(1, numOctaves);
   for (o = geom.firstOctave ; o <= geom.lastOctave ; ++o) {
     VlScaleSpaceOctaveGeometry oct = vl_scalespace_get_octave_geometry(ss, o) ;
-    float const * octave = vl_scalespace_get_level(ss, o, geom.octaveFirstSubdivision) ;
+    float const * octave = vl_scalespace_get_level_const(ss, o, geom.octaveFirstSubdivision) ;
     mwSize dims [3] = {oct.width, oct.height, numSubdivisions} ;
     mxArray * octave_array = mxCreateNumericArray(3, dims, mxSINGLE_CLASS, mxREAL) ;
     memcpy(mxGetData(octave_array),
@@ -128,7 +128,7 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
     mxSetFieldByNumber(array, 0, 2, vlmxCreatePlainScalar((double)geom.octaveResolution)) ;
     mxSetFieldByNumber(array, 0, 3, vlmxCreatePlainScalar((double)geom.octaveFirstSubdivision)) ;
     mxSetFieldByNumber(array, 0, 4, vlmxCreatePlainScalar((double)geom.octaveLastSubdivision)) ;
-    mxSetFieldByNumber(array, 0, 5, vlmxCreatePlainScalar(geom.sigma0)) ;
+    mxSetFieldByNumber(array, 0, 5, vlmxCreatePlainScalar(geom.baseScale)) ;
     mxSetFieldByNumber(array, 0, 6, data_array);
     return array ;
   }

@@ -20,7 +20,14 @@ the terms of the BSD license (see the COPYING file).
 #include "imopv.h"
 #include "mathop.h"
 
-/** @brief A set of parameters describing the scale space geometry */
+/* ---------------------------------------------------------------- */
+/*                                             VlScaleSpaceGeometry */
+/* ---------------------------------------------------------------- */
+
+/** @brief Geometry of a scale space
+ **
+ ** There are a few restrictions on the valid geometrties.
+ */
 typedef struct _VlScaleSpaceGeometry
 {
   vl_size width ; /**< Image width */
@@ -30,10 +37,19 @@ typedef struct _VlScaleSpaceGeometry
   vl_size octaveResolution ; /**< Number of octave subdivisions */
   vl_index octaveFirstSubdivision ; /**< Index of the first octave subdivsion */
   vl_index octaveLastSubdivision ; /**< Index of the last octave subdivision */
-  double sigma0 ; /**< Base smoothing (smoothing of octave 0, level 0) */
-  double sigman ; /**< Bominal image smoothing */
+  double baseScale ; /**< Base smoothing (smoothing of octave 0, level 0) */
+  double nominalScale ; /**< Nominal smoothing of the original image */
 } VlScaleSpaceGeometry ;
 
+VL_EXPORT
+vl_bool vl_scalespacegeometry_is_equal (VlScaleSpaceGeometry a,
+                                        VlScaleSpaceGeometry b) ;
+
+/* ---------------------------------------------------------------- */
+/*                                       VlScaleSpaceOctaveGeometry */
+/* ---------------------------------------------------------------- */
+
+/** @brief Geometry of one octave of a scale space */
 typedef struct _VlScaleSpaceOctaveGeometry
 {
   vl_size width ; /**< Width (number of pixels) */
@@ -41,30 +57,21 @@ typedef struct _VlScaleSpaceOctaveGeometry
   double step ; /**< Sampling step (size of a pixel) */
 } VlScaleSpaceOctaveGeometry ;
 
-/** @brief Gaussian scale space */
-typedef struct _VlScaleSpace
-{
-  VlScaleSpaceGeometry geom ; /**< Geometry of the scale space */
-  float **octaves ; /**< Data */
-} VlScaleSpace ;
+/* ---------------------------------------------------------------- */
+/*                                                     VlScaleSpace */
+/* ---------------------------------------------------------------- */
 
+typedef struct _VlScaleSpace VlScaleSpace ;
 
 /** @name Create and destroy
  ** @{
  **/
-VL_EXPORT VlScaleSpace *
-vl_scalespace_new (vl_size width, vl_size height,
-                   vl_index numOctaves, vl_index firstOctave,
-                   vl_size octaveResolution,
-                   vl_index octaveFirstSubdivision,
-                   vl_index octaveLastSubdivision) ;
-
-VL_EXPORT VlScaleSpace *
-vl_scalespace_new_with_geometry (VlScaleSpaceGeometry geom) ;
-
-VL_EXPORT void  vl_scalespace_delete (VlScaleSpace *self) ;
-VL_EXPORT VlScaleSpace *vl_scalespace_clone_structure (VlScaleSpace* src);
-VL_EXPORT VlScaleSpace *vl_scalespace_clone (VlScaleSpace* src);
+VL_EXPORT VlScaleSpaceGeometry vl_scalespace_get_default_geometry(vl_size width, vl_size height) ;
+VL_EXPORT VlScaleSpace * vl_scalespace_new (vl_size width, vl_size height) ;
+VL_EXPORT VlScaleSpace * vl_scalespace_new_with_geometry (VlScaleSpaceGeometry geom) ;
+VL_EXPORT VlScaleSpace * vl_scalespace_new_copy (VlScaleSpace* src);
+VL_EXPORT VlScaleSpace * vl_scalespace_new_shallow_copy (VlScaleSpace* src);
+VL_EXPORT void vl_scalespace_delete (VlScaleSpace *self) ;
 /** @} */
 
 /** @name Process data
@@ -80,7 +87,9 @@ vl_scalespace_put_image (VlScaleSpace *self, float const* image);
 VL_EXPORT VlScaleSpaceGeometry vl_scalespace_get_geometry (VlScaleSpace const * self) ;
 VL_EXPORT VlScaleSpaceOctaveGeometry vl_scalespace_get_octave_geometry (VlScaleSpace const * self, vl_index o) ;
 VL_EXPORT float *
-vl_scalespace_get_level (VlScaleSpace const *self, vl_index o, vl_index s) ;
+vl_scalespace_get_level (VlScaleSpace * self, vl_index o, vl_index s) ;
+VL_EXPORT float const *
+vl_scalespace_get_level_const (VlScaleSpace const * self, vl_index o, vl_index s) ;
 VL_EXPORT double
 vl_scalespace_get_level_sigma (VlScaleSpace const *self, vl_index o, vl_index s) ;
 /** @} */

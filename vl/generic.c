@@ -48,6 +48,7 @@ extraction of code.</em>
   - @ref quickshift
   - @ref hog
   - @ref covdet
+  - @ref scalespace
 - <b>Support functionalities</b>
   - @ref host.h      "Platform abstraction"
   - @ref generic

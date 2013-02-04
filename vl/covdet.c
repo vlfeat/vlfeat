@@ -748,7 +748,8 @@ vl_covdet_append_feature (VlCovDet * self, VlCovDetFeature const * feature)
  ** @param height image height.
  ** @return status.
  **
- ** The function may fail with ::VL_ERR_ALLOC if memory is insufficient.
+ ** @a width and @a height must be at least one pixel. The function
+ ** fails by returing ::VL_ERR_ALLOC if the memory is insufficient.
  **/
 
 int
@@ -760,7 +761,7 @@ vl_covdet_put_image (VlCovDet * self,
   vl_index lastOctave ;
   vl_index octaveFirstSubdivision ;
   vl_index octaveLastSubdivision ;
-  vl_bool gssReady = VL_FALSE ;
+  VlScaleSpaceGeometry geom = vl_scalespace_get_default_geometry(width,height) ;
 
   assert (self) ;
   assert (image) ;
@@ -781,26 +782,20 @@ vl_covdet_put_image (VlCovDet * self,
     octaveLastSubdivision = self->octaveResolution - 1 ;
   }
 
-  if (self->gss) {
-    VlScaleSpaceGeometry geom = vl_scalespace_get_geometry (self->gss);
-    gssReady =
-    geom.width == width &&
-    geom.height == height &&
-    geom.firstOctave == self->firstOctave &&
-    geom.lastOctave == lastOctave &&
-    geom.octaveResolution == self->octaveResolution &&
-    geom.octaveFirstSubdivision == octaveFirstSubdivision &&
-    geom.octaveLastSubdivision == octaveLastSubdivision ;
-  }
+  geom.width = width ;
+  geom.height = height ;
+  geom.firstOctave = self->firstOctave ;
+  geom.lastOctave = lastOctave ;
+  geom.octaveResolution = self->octaveResolution ;
+  geom.octaveFirstSubdivision = octaveFirstSubdivision ;
+  geom.octaveLastSubdivision = octaveLastSubdivision ;
 
-  /* see if the gss must be re-allocated */
-  if (! gssReady) {
+  if (self->gss == NULL ||
+      ! vl_scalespacegeometry_is_equal (geom,
+                                        vl_scalespace_get_geometry(self->gss)))
+  {
     if (self->gss) vl_scalespace_delete(self->gss) ;
-    self->gss = vl_scalespace_new(width, height,
-                                  lastOctave - self->firstOctave + 1,
-                                  self->firstOctave,
-                                  self->octaveResolution,
-                                  octaveFirstSubdivision, octaveLastSubdivision) ;
+    self->gss = vl_scalespace_new_with_geometry(geom) ;
     if (self->gss == NULL) return VL_ERR_ALLOC ;
   }
   vl_scalespace_put_image(self->gss, image) ;
@@ -998,7 +993,6 @@ vl_covdet_detect (VlCovDet * self)
 {
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->gss) ;
   VlScaleSpaceGeometry cgeom ;
-  vl_bool cssReady = VL_FALSE ;
   float * levelxx = NULL ;
   float * levelyy = NULL ;
   float * levelxy = NULL ;
@@ -1015,25 +1009,12 @@ vl_covdet_detect (VlCovDet * self)
   if (self->method == VL_COVDET_METHOD_DOG) {
     cgeom.octaveFirstSubdivision = -1 ;
   }
-  if (self->css) {
-    VlScaleSpaceGeometry cssGeom = vl_scalespace_get_geometry(self->css) ;
-    cssReady =
-    cssGeom.width == cgeom.width &&
-    cssGeom.height == cgeom.height &&
-    cssGeom.firstOctave == cgeom.firstOctave &&
-    cssGeom.lastOctave == cgeom.lastOctave &&
-    cssGeom.octaveResolution == cgeom.octaveResolution &&
-    cssGeom.octaveFirstSubdivision == cgeom.octaveFirstSubdivision &&
-    cssGeom.octaveLastSubdivision == cgeom.octaveLastSubdivision ;
-  }
-  if (! cssReady) {
+  if (!self->css ||
+      !vl_scalespacegeometry_is_equal(cgeom,
+                                      vl_scalespace_get_geometry(self->css)))
+  {
     if (self->css) vl_scalespace_delete(self->css) ;
-    self->css = vl_scalespace_new(cgeom.width, cgeom.height,
-                                  cgeom.lastOctave - cgeom.firstOctave + 1,
-                                  cgeom.firstOctave,
-                                  cgeom.octaveResolution,
-                                  cgeom.octaveFirstSubdivision,
-                                  cgeom.octaveLastSubdivision) ;
+    self->css = vl_scalespace_new_with_geometry(cgeom) ;
   }
   if (self->method == VL_COVDET_METHOD_HARRIS_LAPLACE ||
       self->method == VL_COVDET_METHOD_MULTISCALE_HARRIS) {
@@ -1113,7 +1094,7 @@ vl_covdet_detect (VlCovDet * self)
             ok &= fabs(refined.peakScore) > self->peakThreshold ;
             ok &= refined.edgeScore < self->edgeThreshold ;
             if (ok) {
-              double sigma = cgeom.sigma0 *
+              double sigma = cgeom.baseScale *
               pow(2.0, o + (refined.z - cgeom.octaveFirstSubdivision)
                   / cgeom.octaveResolution) ;
               feature.frame.x = refined.x * step ;
@@ -1151,7 +1132,7 @@ vl_covdet_detect (VlCovDet * self)
               ok &= fabs(refined.peakScore) > self->peakThreshold ;
               ok &= refined.edgeScore < self->edgeThreshold ;
               if (ok) {
-                double sigma = cgeom.sigma0 *
+                double sigma = cgeom.baseScale *
                 pow(2.0, o + (double)s / cgeom.octaveResolution) ;
                 feature.frame.x = refined.x * step ;
                 feature.frame.y = refined.y * step ;
@@ -1302,10 +1283,10 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
   factor = 1.0 / VL_MIN(d1, d2) ;
 
   for (o = geom.firstOctave + 1 ; o <= geom.lastOctave ; ++o) {
-    s = vl_floor_d(vl_log2_d(sigma / (factor * geom.sigma0)) - o) ;
+    s = vl_floor_d(vl_log2_d(sigma / (factor * geom.baseScale)) - o) ;
     s = VL_MAX(s, geom.octaveFirstSubdivision) ;
     s = VL_MIN(s, geom.octaveLastSubdivision) ;
-    sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+    sigma_ = geom.baseScale * pow(2.0, o + (double)s / geom.octaveResolution) ;
     /*VL_PRINTF(".. %d D=%g %g; sigma_=%g factor*sigma_=%g\n", o, d1, d2, sigma_, factor* sigma_) ;*/
     if (factor * sigma_ > sigma) {
       o -- ;
@@ -1313,10 +1294,10 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
     }
   }
   o = VL_MIN(o, geom.lastOctave) ;
-  s = vl_floor_d(vl_log2_d(sigma / (factor * geom.sigma0)) - o) ;
+  s = vl_floor_d(vl_log2_d(sigma / (factor * geom.baseScale)) - o) ;
   s = VL_MAX(s, geom.octaveFirstSubdivision) ;
   s = VL_MIN(s, geom.octaveLastSubdivision) ;
-  sigma_ = geom.sigma0 * pow(2.0, o + (double)s / geom.octaveResolution) ;
+  sigma_ = geom.baseScale * pow(2.0, o + (double)s / geom.octaveResolution) ;
   if (sigma1) *sigma1 = sigma_ / d1 ;
   if (sigma2) *sigma2 = sigma_ / d2 ;
 
@@ -2061,7 +2042,7 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
     double c = scores[k+1] ;
     double t = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
 
-    if ((b > a && b > c) || (b < a && b < c) && vl_abs_d(b) >= t) {
+    if ((((b > a) && (b > c)) || ((b < a) && (b < c))) && (vl_abs_d(b) >= t)) {
       double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
       double s = k + dk ;
       double sigmaLap = pow(2.0, -0.5 + s / (VL_COVDET_LAP_NUM_LEVELS - 1)) ;
@@ -2158,6 +2139,7 @@ _vl_covdet_check_frame_inside (VlCovDet * self, VlFrameOrientedEllipse frame, do
   double y1 = -VL_INFINITY_D ;
   double boxx [4] = {extent, extent, -extent, -extent} ;
   double boxy [4] = {-extent, extent, extent, -extent} ;
+  VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->gss) ;
   int i ;
   for (i = 0 ; i < 4 ; ++i) {
     double x = A[0] * boxx[i] + A[2] * boxy[i] + T[0] ;
@@ -2169,8 +2151,8 @@ _vl_covdet_check_frame_inside (VlCovDet * self, VlFrameOrientedEllipse frame, do
   }
 
   return
-  0 <= x0 && x1 <= self->gss->geom.width-1 &&
-  0 <= y0 && y1 <= self->gss->geom.height-1 ;
+  0 <= x0 && x1 <= geom.width-1 &&
+  0 <= y0 && y1 <= geom.height-1 ;
 }
 
 /** @brief Drop features (partially) outside the image
