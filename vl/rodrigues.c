@@ -1,10 +1,10 @@
-/** @file rodirgues.c
+/** @file rodrigues.c
  ** @brief Rodrigues formulas - Definition
  ** @author Andrea Vedaldi
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -18,12 +18,11 @@ the terms of the BSD license (see the COPYING file).
 #include <math.h>
 
 /** @brief Rodrigues' formula
- **
  ** @param R_pt  3x3 matrix - array of 9 double (in) .
  ** @param dR_pt 9x3 matrix - array of 27 double (in).
- ** @param om_pt 3   vector - array of 3 dobule (out).
+ ** @param om_pt 3 vector - array of 3 dobule (out).
  **/
-VL_EXPORT
+
 void
 vl_rodrigues(double* R_pt, double* dR_pt, const double* om_pt)
 {
@@ -166,7 +165,6 @@ vl_rodrigues(double* R_pt, double* dR_pt, const double* om_pt)
 }
 
 /** @brief Inverse Rodrigues formula
- *
  ** @param om_pt  3    vector - array of 3   dobule (out).
  ** @param dom_pt 3x9  matrix - array of 3x9 dobule (out).
  ** @param R_pt   3x3  matrix - array of 9   double (in).

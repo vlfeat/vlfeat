@@ -28,10 +28,8 @@ representing an image at multiple resolutions
 detect scale invariant features @cite{lindeberg98principles} such as
 SIFT, Hessian-Affine, Harris-Affine, Harris-Laplace, etc.
 
-- @ref scalespace-overview
-  - @ref scalespace-finer
-- @ref scalespace-algorithm
-
+@tableofcontents
+ 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section scalespace-overview Overview
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->

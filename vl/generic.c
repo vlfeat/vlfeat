@@ -4,7 +4,7 @@
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -16,18 +16,15 @@ the terms of the BSD license (see the COPYING file).
 @mainpage VLFeat -- Vision Lab Features Library
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
-@par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
+@par Copyright &copy; 2007-13 Andrea Vedaldi and Brian Fulkerson
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-<em>VLFeat C library contains implementations of common computer
-vision algorithms, with a special focus on visual features for
-matching image regions. Applications include structure from motion and
-object and category detection and recognition.
-
-We strive to make the library free of clutter, portable (VLFeat is
-largely C-89 compatible), and self- documented. Different parts of the
-library are weakly interdependent, simplifying understanding and
-extraction of code.</em>
+The VLFeat C library implements common computer
+vision algorithms, with a special focus on visual features, as used
+in state-of-the-art object recognition and image
+matching applications.
+ 
+VLFeat strives to be clutter-free, simple, portable, and well documented.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section main-contents Contents
