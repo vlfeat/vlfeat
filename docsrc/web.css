@@ -1,4 +1,9 @@
 /* div, p, ul, li, ol, img {border: 1px solid red ;} */
+
+.clearfix {
+    display: inline-block;
+    width: 100%;
+}
 html, body, div, img {
     margin: 0px ;
     padding: 0px ;
@@ -11,22 +16,17 @@ html {
     background-color: #5d564e;
 }
 body {
-    border-bottom: 2px #aaa solid ;
-    border-left:   1px #aaa solid ;
-    border-right:  2px #aaa solid ;
-    margin-left: auto ;
-    margin-right: auto ;
-    margin-bottom: 0.5em ;
-    width: 72em ;
+    min-width: 1024px ;
+    /* max-width: 1296px ; */ /* 1296 preferred */
     background-color: #183a60;
-    font-family: Lucida, Helvetica, sans-serif ;
-    font-size: 14px ;
-    border-color: #454545;
+    font-family: 'Lucida Grande', Arial, Helvetica, sans-serif ;
+    font-size: 13px ;
+    line-height: 22px ;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Trebuchet MS', Helvetica, sans-serif ;
+    /* font-family: 'Lucida Grande', Arial, Helvetica, sans-serif ; */
     font-weight: bold ;
-    color: #183a60;
+    /* color: #183a60 ; */
 }
 a {
     color: #004fdc;
@@ -40,7 +40,6 @@ b {
 }
 pre, code {
     font-family: 'Bitstream Vera Sans Mono', monospace ;
-    /* color: #ff6f00; */
 }
 code {
     color: #BA2121 ;
@@ -51,29 +50,27 @@ code a {
     color: inherit ! important ;
 }
 #pagebody {
-    background-color: white ;
-    padding-bottom: 1px ;
+    background-color: #eee ;
+    display: inline-block;
+    width: 100%;
 }
 #content {
     overflow: hidden ;
-    float: right ;
-    width: 54em ;
-    line-height: 1.4em ;
-    padding-right: 2em ;
-    padding-top: 0.5em ;
-    padding-bottom: 1em ;
+    max-width: 960px ;
+    padding-right: 26px ;
+    padding-left: 26px ;
+    background-color: white ;
 }
 #sidebar {
     float: left ;
-    width: 10em ;
-    padding: 0em ;
+    width: 256px ;
+    padding: 13px ;
+    min-height: 100%
 }
 #sidebar ul {
     margin: 0 ;
     padding: 0 ;
-    margin-left: .5em ;
-    margin-top: 1em ;
-    margin-bottom: 0em ;
+    margin-left: 13px ;
 }
 #sidebar ul ul {
     margin-top: .3em ;
@@ -106,9 +103,9 @@ code a {
     padding: .2em;
 }
 #header {
-    padding-left: 1em ;
-    padding-bottom: 1em ;
-    padding-top: 1em;
+    padding-left: 20px ;
+    padding-bottom: 20px ;
+    padding-top: 20px ;
 }
 #header #cse-search-box {
     float: right ;
@@ -119,9 +116,10 @@ code a {
 #headbanner {
     color: #5a5a5a ;
     background-color: #f6f6f6 ;
-    padding: 0.4em 1em ;
+    padding: 7px 20px ;
     border-bottom: 1px solid #DDD ;
-    font: bold 1.1em 'Trebuchet MS', Helvetica, sans-serif;
+    font-weight: bold ;
+    font-size: 15px ;
 }
 #header h1 {
     margin: 0 ;
@@ -174,6 +172,7 @@ code a {
 #content h4 {font-size:1.1em; margin-bottom: 0.5em;}
 #content h5 {font-size:1.0em; margin-bottom: 0.5em;}
 #content h6 {font-size:1.0em; margin-bottom: 0.5em;}
+/*
 #content p,
 #content blockquote,
 #content div.figure,
@@ -182,6 +181,7 @@ code a {
     padding: 0 ;
     padding-right: 10em ;
 }
+*/
 #content blockquote {
     margin: 1em ;
     font-family: Lucida, Helvetica, sans-serif ;
