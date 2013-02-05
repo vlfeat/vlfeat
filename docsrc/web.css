@@ -17,8 +17,9 @@ html {
 }
 body {
     min-width: 1024px ;
-    /* max-width: 1296px ; */ /* 1296 preferred */
+    max-width: 1296px ;
     background-color: #183a60;
+    margin: auto ;
     font-family: 'Lucida Grande', Arial, Helvetica, sans-serif ;
     font-size: 13px ;
     line-height: 22px ;
@@ -56,14 +57,13 @@ code a {
 }
 #content {
     overflow: hidden ;
-    max-width: 960px ;
     padding-right: 26px ;
     padding-left: 26px ;
     background-color: white ;
 }
 #sidebar {
     float: left ;
-    width: 256px ;
+    width: 236px ;
     padding: 13px ;
     min-height: 100%
 }
