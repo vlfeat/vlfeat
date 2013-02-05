@@ -787,6 +787,7 @@ class DocPageScript(DocNode):
         gen.putString("<script type=")
         if sa.has_key("type"):
             gen.putXMLAttr(expandAttr(sa["type"], pageNode))
+            gen.putString(" ")
         else:
             gen.putString("\"text/javascript\" ")
         if sa.has_key("src"):
