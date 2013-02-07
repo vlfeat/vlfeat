@@ -160,7 +160,7 @@ end
 % --------------------------------------------------------------------
 
 if ~isempty(opts.plot) || nargout == 0
-  if isempty(opts.plot), opts.plot = 'tntp' ; end
+  if isempty(opts.plot), opts.plot = 'fptp' ; end
   cla ; hold on ;
   switch lower(opts.plot)
     case {'truenegatives', 'tn', 'tntp'}
@@ -169,7 +169,7 @@ if ~isempty(opts.plot) || nargout == 0
       spline([0 1], [0 1], 'k--', 'linewidth', 1) ;
       plot(1-info.eer, 1-info.eer, 'k*', 'linewidth', 1) ;
       xlabel('true negative rate') ;
-      ylabel('true positve rate (recall)') ;
+      ylabel('true positive rate (recall)') ;
       loc = 'sw' ;
 
     case {'falsepositives', 'fp', 'fptp'}
@@ -177,8 +177,8 @@ if ~isempty(opts.plot) || nargout == 0
       hrand = spline([0 1], [0 1], 'r--', 'linewidth', 2) ;
       spline([1 0], [0 1], 'k--', 'linewidth', 1) ;
       plot(info.eer, 1-info.eer, 'k*', 'linewidth', 1) ;
-      xlabel('false positve rate') ;
-      ylabel('true positve rate (recall)') ;
+      xlabel('false positive rate') ;
+      ylabel('true positive rate (recall)') ;
       loc = 'se' ;
 
     case {'tptn'}
@@ -186,7 +186,7 @@ if ~isempty(opts.plot) || nargout == 0
       hrand = spline([0 1], [1 0], 'r--', 'linewidth', 2) ;
       spline([0 1], [0 1], 'k--', 'linewidth', 1) ;
       plot(1-info.eer, 1-info.eer, 'k*', 'linewidth', 1) ;
-      xlabel('true positve rate (recall)') ;
+      xlabel('true positive rate (recall)') ;
       ylabel('false positive rate') ;
       loc = 'sw' ;
 
