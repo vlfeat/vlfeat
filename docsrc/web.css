@@ -4,9 +4,10 @@
     display: inline-block;
     width: 100%;
 }
-html, body, div, img {
+html, body, div, img, dl {
     margin: 0px ;
     padding: 0px ;
+    border-style: none ; /* ie again */
 }
 table {
     font: inherit ;
@@ -63,7 +64,7 @@ code a {
 }
 #sidebar {
     float: left ;
-    width: 236px ;
+    width: 208px ;
     padding: 13px ;
     min-height: 100%
 }
@@ -216,19 +217,13 @@ code a {
     margin-left: 2em ;
 }
 #content dt {
-    /*display: block ;
-      float: left ;*/
     font-weight: bold ;
-    width: auto ;
-    margin-right: 1em ;
-    padding: 0 ;
-    text-align: left;
+    text-align: left ;
 }
 #content dd {
     display: block ;
     margin: 0.25em 0 ;
     padding-left: 2em ;
-    padding-right: 10em ;
 }
 #content dd p,
 #content dd ul {
@@ -262,38 +257,44 @@ code a {
     border: 1px solid #DDD ;
     padding: 0.5em ;
 }
-#content table.boxes {
+#content table.onecol td {
     width: 100% ;
-    border-spacing: 0em ;
-    border-collapse: collapse ;
-    margin: 0em ;
+}
+#content table.twocols td {
+    width: 50% ;
+}
+#content table.threecols td {
+    width: 33% ;
+}
+#content table.boxes {
+    min-width: 100% ;
+    border-collapse: separate ;
+    border-spacing: 13px ;
+    margin: -13px ;
     padding: 0em ;
+    box-sizing:border-box ; /* avoids exceeding 100% width */
 }
 #content table.boxes td {
-    width: 50% ;
-    height: 100% ;
     vertical-align: top ;
+    background-color: #f6f6f6 ;
+    border: 1px solid #DDD ;
+    padding: 0.5em ;
 }
-#content table.boxes div.box {
-    height:100% ;
-    min-height:100% ;
+#content .boxes h1 {
+    font-size: 1.2em ;
+    margin: 0px ;
+}
+#content .boxes ul {
+    margin-top: 0.25em ;
+    margin-bottom: 0.5em ;
+}
+#content .boxes p {
+    margin-top: 0.25em ;
+    margin-bottom: 0.5em ;
+    padding: 0px ;
 }
 #content img.image-right {
     float: right ;
-}
-#content div.box h1 {
-    font-size: 1.2em ;
-    /*text-align: center ;*/
-    margin: 0px ;
-}
-#content div.box ul {
-    margin-top: 0.25em ;
-    margin-bottom: 0.5em ;
-}
-#content div.box p {
-    margin-top: 0.25em ;
-    margin-bottom: 0.5em ;
-    padding-right: 1em ;
 }
 #content div.parbox {
     border: 1px dotted #333 ;
