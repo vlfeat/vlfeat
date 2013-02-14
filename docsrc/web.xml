@@ -125,11 +125,24 @@
       MathJax.Hub.Config({
       tex2jax: {
       inlineMath: [ ['$','$'], ['\\(','\\)'] ],
-      processEscapes: true
+      processEscapes: true,
+      },
+      TeX: {
+        Macros: {
+          bx: '\\mathbf{x}',
+          by: '\\mathbf{y}',
+          bz: '\\mathbf{z}',
+          bu: '\\mathbf{u}',
+          bw: '\\mathbf{w}',
+          balpha: '\\boldsymbol{\\alpha}',
+          real: '\\mathbb{R}',
+        },
+        equationNumbers: { autoNumber: 'AMS' }
       }
-      });
+     });
     </pagescript>
-    <pagescript type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"/>
+    <pagescript type="text/javascript"
+                src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"/>
     <div class="doxygen">
      <!-- Doc Here -->
     </div>
