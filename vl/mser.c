@@ -4,27 +4,30 @@
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-/** @file mser.h
-
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page mser Maximally Stable Extremal Regions
 @author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@file mser.h implements the <em>Maximally Stable Extremal
-Regions</em> (MSER) feature detetctor @cite{matas03robust}.
+*Maximally Stable Extremal Regions* (MSER) @cite{matas03robust} is a
+standard local feature detector. MSER extracts as features the
+connected components of the level sets of the (intensity) image. Among
+all such regions, the ones that are locally maximally stable are
+selected. MSERs are affine co-variant, as well as largely co-variant
+to generic diffeomorphic transformations.
 
-- @ref mser-overview
-- @ref mser-definition
-- @ref mser-vol
-- @ref mser-ell
+@ref mser.h implements the MSER feature detector. This version is
+capable of working on images of arbitrary dimensions (e.g. volumes).
+
+@tableofcontents
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section mser-overview Maximally Stable Extremal Regions Overview
@@ -178,7 +181,7 @@ calculations, the pixel coordinate @f$x=(x_1,...,x_n)@f$ use the
 standard index order and ranges.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection mser-algo Algorithm
+@section mser-algo Algorithm
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The algorithm is quite efficient. While some details may be
