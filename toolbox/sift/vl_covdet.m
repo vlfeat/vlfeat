@@ -53,7 +53,7 @@
 %   adaptation, which attempts to estimate the affine co-variant shape
 %   of each feature based on the algorihtm of [2].
 %
-%   VL_COVDET(..., 'EstimateOrientations', true) switches on the
+%   VL_COVDET(..., 'EstimateOrientation', true) switches on the
 %   estimation of the orientation of features (which are therefore not
 %   upright anymore) []. Note that more than one orientation can be
 %   associated to each feature, creating copies of them.
