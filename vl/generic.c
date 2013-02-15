@@ -32,7 +32,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
 @section main-contents Contents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-- *Visual feature detectors and descriptors*
+- **Visual feature detectors and descriptors**
   - @ref sift
   - @ref dsift
   - @ref mser
@@ -42,7 +42,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @ref fisher
   - @ref vlad
 
-- *Clustering and indexing*
+- **Clustering and indexing**
   - @ref kmeans
   - @ref ikmeans.h  "Integer K-means (IKM)"
   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
@@ -50,16 +50,16 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @ref aib
   - @ref kdtree
 
-- *Segmentation*
+- **Segmentation**
   - @ref quickshift
   - @ref slic
 
-- *Statistical methods*
+- **Statistical methods**
   - @ref aib
   - @ref homkermap
   - @ref svm
 
-- *Support functionalities*
+- **Support functionalities**
   - @ref host.h      "Platform abstraction"
   - @ref generic
   - @ref random.h    "Random number generator"
