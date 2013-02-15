@@ -32,26 +32,34 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
 @section main-contents Contents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-- <b>Algorithms</b>
+- *Visual feature detectors and descriptors*
   - @ref sift
   - @ref dsift
   - @ref mser
+  - @ref covdet
+  - @ref scalespace
+  - @ref hog
+  - @ref fisher
+  - @ref vlad
+
+- *Clustering and indexing*
   - @ref kmeans
   - @ref ikmeans.h  "Integer K-means (IKM)"
   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
   - @ref gmm
-  - @ref fisher
-  - @ref vlad
   - @ref aib
   - @ref kdtree
-  - @ref homkermap
-  - @ref pegasos
-  - @ref slic
+
+- *Segmentation*
   - @ref quickshift
-  - @ref hog
-  - @ref covdet
-  - @ref scalespace
-- <b>Support functionalities</b>
+  - @ref slic
+
+- *Statistical methods*
+  - @ref aib
+  - @ref homkermap
+  - @ref svm
+
+- *Support functionalities*
   - @ref host.h      "Platform abstraction"
   - @ref generic
   - @ref random.h    "Random number generator"
@@ -63,11 +71,13 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @ref rodrigues.h "Rodrigues formula"
   - @ref mexutils.h  "MATLAB MEX helper functions"
   - @ref getopt_long.h "Drop-in @c getopt_long replacement"
+
 - @ref design
   - @ref design-objects     "Objects"
   - @ref design-resources   "Memory and resource management"
   - @ref design-threads     "Multi-threading"
   - @ref design-portability "Portability"
+
 - @ref dev
 - @ref main-glossary
 
@@ -84,7 +94,7 @@ the library.
 @section design-resources Memory and resource handling
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Some VLFeat functions return pointers to memory blocks or
+Some VLFeat functions return pointers txo memory blocks or
 objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc, or functions
 whose name contains either the keywords @c new or @c copy,
 transfer the ownership of the memory block or object to the
