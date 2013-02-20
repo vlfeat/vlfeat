@@ -99,7 +99,7 @@ $(OCTAVE_MEX_BINDIR)/%.$(OCTAVE_MEX_SUFFIX) : %.c $(octave-mex-dir)
 	CXXFLAGS="$(OCTAVE_MEX_CXXFLAGS)" \
 	LDFLAGS="$(OCTAVE_MEX_LDFLAGS)" \
 	 $(MKOCTFILE) \
-	       --mex $(OCTAVE_MEX_FLAGS) \
+	       --mex $(OCTAVE_MEX_FLAGS) $(OCTAVE_MEX_LDFLAGS)\
 	       "$(<)" --output "$(@)"
 	@rm -f $(<:.c=.o)
 
