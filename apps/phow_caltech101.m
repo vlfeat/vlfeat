@@ -217,7 +217,8 @@ if ~exist(conf.modelPath) || conf.clobber
                   sprintf(' -s 3 -B %f -c %f', ...
                           conf.svm.biasMultiplier, conf.svm.C), ...
                   'col') ;
-      w = svm.w' ;
+      w = svm.w(:,1:end-1)' ;
+      b =  svm.w(:,end)' ;
   end
 
   model.b = conf.svm.biasMultiplier * b ;
