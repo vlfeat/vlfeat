@@ -39,6 +39,9 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @ref kmeans
   - @ref ikmeans.h  "Integer K-means (IKM)"
   - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
+  - @ref gmm
+  - @ref fisher
+  - @ref vlad
   - @ref aib
   - @ref kdtree
   - @ref homkermap

@@ -1,0 +1,187 @@
+/** @file   vl_vlad.c
+ ** @brief  vl_vlad MEX definition.
+ ** @author Andrea Vedaldi
+ ** @author David Novotny
+ **/
+
+/*
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+All rights reserved.
+
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
+
+#include <vl/vlad.h>
+#include <mexutils.h>
+#include <string.h>
+#include <stdio.h>
+
+enum {
+  opt_verbose,
+  opt_normalize
+} ;
+
+
+vlmxOption  options [] = {
+  {"Verbose",           0,   opt_verbose             },
+  {"Normalize",         0,   opt_normalize           }
+} ;
+
+/* driver */
+void
+mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
+{
+  enum {IN_DATA = 0, IN_MEANS, IN_ASSIGN, IN_END} ;
+  enum {OUT_ENC} ;
+
+  int opt ;
+  int next = IN_END ;
+  mxArray const  *optarg ;
+
+  mxArray const * means_array =      in[IN_MEANS] ;
+  mxArray const * data_array =       in[IN_DATA] ;
+  mxArray const * assign_array =     in[IN_ASSIGN] ;
+
+  vl_size i;
+  vl_size numClusters ;
+  vl_size dimension ;
+  vl_size numData ;
+  vl_bool normalize = VL_FALSE;
+
+  void * means = NULL;
+  void * assignments = NULL;
+  void * data = NULL ;
+  void * enc = NULL;
+
+  int verbosity = 0 ;
+
+  vl_type dataType ;
+  mxClassID classID ;
+  mxClassID classIDparams ;
+
+  VL_USE_MATLAB_ENV ;
+
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
+
+  if (nin < 3) {
+    vlmxError (vlmxErrInvalidArgument,
+               "At least three arguments required.");
+  }
+
+  classID = mxGetClassID (IN(DATA)) ;
+  switch (classID) {
+    case mxSINGLE_CLASS:
+      dataType = VL_TYPE_FLOAT ;
+      break ;
+    case mxDOUBLE_CLASS:
+      dataType = VL_TYPE_DOUBLE ;
+      break ;
+    default:
+      vlmxError (vlmxErrInvalidArgument,
+                 "DATA must be of class SINGLE or DOUBLE") ;
+      abort() ;
+  }
+
+  if( mxGetClassID (IN(MEANS)) != classID ||
+      mxGetClassID (IN(ASSIGN)) != classID ) {
+    vlmxError (vlmxErrInvalidArgument,
+               "MEANS and ASSIGNMENTS must be of same class as DATA.") ;
+  }
+
+  dimension = mxGetM (IN(DATA)) ;
+  numData = mxGetN (IN(DATA)) ;
+  numClusters = mxGetN (IN(MEANS)) ;
+
+
+  if (dimension == 0) {
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+  }
+
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+    char buf [1024] ;
+    switch (opt) {
+      case opt_verbose :
+        ++ verbosity ;
+        break ;
+      case opt_normalize :
+        normalize = VL_TRUE ;
+        break ;
+      default :
+        abort() ;
+        break ;
+    }
+  }
+
+  /* -----------------------------------------------------------------
+   *                                                        Do the job
+   * -------------------------------------------------------------- */
+  
+  data = mxGetPr(data_array);
+  means = mxGetPr(means_array);
+  assignments = mxGetPr(assign_array);
+
+  if (verbosity) {
+    mexPrintf("VLAD encoding ...\n") ;
+  }
+
+  /* -------------------------------------------------------------- */
+  /*                                                       Encoding */
+  /* -------------------------------------------------------------- */
+  FILE * f;
+  switch(dataType) {
+    case VL_TYPE_FLOAT:
+      enc = (void*)vl_malloc(sizeof(float) * dimension * numClusters);
+
+//       f = fopen("/home/dave/vlfeat/data/mex-debug.txt","w");
+//       fprintf(f,"assignments:\n");
+//       for(vl_size i_cl = 0; i_cl < numClusters; i_cl++) {
+//         for(vl_size i_d = 0; i_d < numData; i_d++) {
+//           fprintf(f,"%f ",*((float*)assignments + i_cl*numData + i_d));
+//         }
+//         fprintf(f,"\n");
+//       }
+//       fclose(f);
+
+      break;
+    case VL_TYPE_DOUBLE:
+      enc = (void*)vl_malloc(sizeof(double) * dimension * numClusters);
+
+      /*f = fopen("/home/dave/vlfeat/data/mex-debug.txt","w");
+      fprintf(f,"assignments:\n");
+      for(vl_size i_cl = 0; i_cl < numClusters; i_cl++) {
+        for(vl_size i_d = 0; i_d < numData; i_d++) {
+          fprintf(f,"%f ",*((double*)assignments + i_cl*numData + i_d));
+        }
+        fprintf(f,"\n");
+      }
+      fclose(f);
+*/
+      break;
+    default:
+      abort();
+      break;
+  }
+
+  vl_vlad_encode
+  (dataType,
+   data,
+   means,
+   assignments,
+   enc,
+   dimension,
+   numData,
+   numClusters,
+   normalize);
+
+  OUT(ENC) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
+
+  /* copy encodings */
+  memcpy (mxGetData(OUT(ENC)),
+          enc,
+          vl_get_type_size (dataType) * dimension * numClusters) ;
+
+
+}
