@@ -1,6 +1,6 @@
 /** @file mathop.h
  ** @brief Math operations
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*

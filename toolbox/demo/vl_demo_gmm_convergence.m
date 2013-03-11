@@ -1,11 +1,11 @@
 dimension = 128;
 numData = 10000;
 numClusters = 100;
-numIterations = 10;
+numIterations = 5;
 numIterationsKM = 3;
 
 X = rand(dimension,numData);
-numTrials = 10;
+numTrials = 2;
 
 lls = zeros(numTrials,2);
 
@@ -75,6 +75,7 @@ bar(lls);
 set(gca,'xticklabel',inits);
 xlabel('Initialization type');
 ylabel('LogLikelyhood');
+title('GMM convergence test')
 
 
 

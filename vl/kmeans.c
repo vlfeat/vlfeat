@@ -1,6 +1,6 @@
 /** @file kmeans.c
  ** @brief K-means - Declaration
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*
@@ -14,7 +14,7 @@ the terms of the BSD license (see the COPYING file).
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page kmeans K-means clustering
-@author Andrea Vedaldi
+@author Andrea Vedaldi, David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kmeans.h implements a number of algorithm for k-means quantisation.
@@ -100,7 +100,7 @@ quantize new data points.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kmeans.h supports parallel and serial computation of the point
-to cluster memberships in the case when the ANN algorithm is selected.
+to cluster memberships.
 The parallel approach is implemented using <a href="http://openmp.org">OpenMP</a>.
 
 @section kmeans-tech Technical details
@@ -192,7 +192,7 @@ Another method for faster determination of point to cluster memberships is
 based on KD-Trees. For each point @f$ x_i @f$ the nearest center @f$ c_k @f$
 (which minimizes @f$ d^2(x_i, c_{\pi(i)}) @f$ over @f$ \pi(i) \in \{1, \dots, k\} @f$)
 is picked using randomized best-bin-first KD-Forest
-(see the @ref kdtree page for detailed information on implemented KD-Trees)
+(see the @ref kdtree page for detailed information on implemented KD-Trees).
 
 */
 
@@ -568,7 +568,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
 /* ---------------------------------------------------------------- */
 
 static void
-VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)
+VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
 (VlKMeans * self,
  vl_uint32 * assignments,
  TYPE * distances,
@@ -629,9 +629,9 @@ VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)
     }
     case VlKMeansParallel: {
 
-      vl_size numChunks = 1;
+      vl_int numChunks = 1;
       int chunkSize = 1;
-      vl_size t;
+      vl_int t;
       vl_uindex nIdx;
       VlKDForestNeighbor * neighbors;
       VlKDForestSearcher ** searchers;
@@ -643,7 +643,7 @@ VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)
       neighbors = vl_malloc(sizeof(VlKDForestNeighbor) * numChunks);
       searchers = vl_malloc(sizeof(VlKDForestSearcher*) * numChunks);
 
-      for(nIdx = 0; nIdx < numChunks; nIdx++) {
+      for(nIdx = 0; nIdx < (vl_uindex) numChunks; nIdx++) {
         searchers[nIdx] = vl_kdforest_new_searcher(forest);
       }
 
@@ -655,7 +655,7 @@ VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)
         VlKDForestSearcher * searcher = searchers[t];
         vl_uindex x;
 
-        for(x = t; x < numData; x += numChunks) {
+        for(x = (vl_uindex)t; x < (vl_uindex)numData; x += numChunks) {
           vl_kdforest_query (searcher, neighbors + t, 1, (TYPE const *) (data + x*self->dimension));
 
           if(distances) {
@@ -911,7 +911,7 @@ VL_XCAT(_vl_kmeans_update_center_distances_, SFX)
 }
 
 static double
-VL_XCAT(_vl_kmeans_refine_centers_ANN_, SFX)
+VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)
 (VlKMeans * self,
  TYPE const * data,
  vl_size numData)
@@ -948,7 +948,7 @@ VL_XCAT(_vl_kmeans_refine_centers_ANN_, SFX)
        ++ iteration) {
 
     /* assign data to cluters */
-    VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)(self, assignments, distances, data, numData, iteration) ;
+    VL_XCAT(_vl_kmeans_quantize_ann_, SFX)(self, assignments, distances, data, numData, iteration) ;
 
     /* compute energy */
     energy = 0 ;
@@ -1075,7 +1075,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 {
   vl_size d, iteration, x ;
   vl_uint32 c, j ;
-  vl_bool allDone ;
+  vl_bool allDone = VL_FALSE;
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
   vl_uint32 * assignments = vl_malloc (sizeof(vl_uint32) * numData) ;
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
@@ -1684,7 +1684,7 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
       break ;
     case VlKMeansANN:
       return
-        VL_XCAT(_vl_kmeans_refine_centers_ANN_, SFX)(self, data, numData) ;
+        VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)(self, data, numData) ;
       break ;
     default:
       abort() ;
@@ -1855,7 +1855,7 @@ vl_kmeans_quantize
  **/
 
 VL_EXPORT void
-vl_kmeans_quantize_ANN
+vl_kmeans_quantize_ann
 (VlKMeans * self,
  vl_uint32 * assignments,
  void * distances,
@@ -1865,11 +1865,11 @@ vl_kmeans_quantize_ANN
 {
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
-      _vl_kmeans_quantize_ANN_f
+      _vl_kmeans_quantize_ann_f
       (self, assignments, distances, (float const *)data, numData, iteration) ;
       break ;
     case VL_TYPE_DOUBLE :
-      _vl_kmeans_quantize_ANN_d
+      _vl_kmeans_quantize_ann_d
       (self, assignments, distances, (double const *)data, numData, iteration) ;
       break ;
     default:

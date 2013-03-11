@@ -48,4 +48,10 @@ vl_demo_imdisttf ;
 
 vl_demo_plots_rank ;
 
+vl_demo_gmm_2d_rand;
+vl_demo_gmm_2d_twist;
+vl_demo_gmm_3d;
+
+vl_demo_kmeans_speed;
+
 rmpath(demo_path);

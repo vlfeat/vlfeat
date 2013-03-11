@@ -1,6 +1,5 @@
 /** @file vlad.h
  ** @brief VLAD encoding (@ref vlad)
- ** @author Andrea Vedaldi
  ** @author David Novotny
  **/
 

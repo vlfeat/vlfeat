@@ -1,6 +1,5 @@
 /** @file   vl_vlad.c
  ** @brief  vl_vlad MEX definition.
- ** @author Andrea Vedaldi
  ** @author David Novotny
  **/
 
@@ -43,7 +42,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   mxArray const * data_array =       in[IN_DATA] ;
   mxArray const * assign_array =     in[IN_ASSIGN] ;
 
-  vl_size i;
   vl_size numClusters ;
   vl_size dimension ;
   vl_size numData ;
@@ -58,7 +56,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   vl_type dataType ;
   mxClassID classID ;
-  mxClassID classIDparams ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -101,7 +98,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
-    char buf [1024] ;
     switch (opt) {
       case opt_verbose :
         ++ verbosity ;
@@ -118,7 +114,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   /* -----------------------------------------------------------------
    *                                                        Do the job
    * -------------------------------------------------------------- */
-  
+
   data = mxGetPr(data_array);
   means = mxGetPr(means_array);
   assignments = mxGetPr(assign_array);
@@ -130,35 +126,13 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   /* -------------------------------------------------------------- */
   /*                                                       Encoding */
   /* -------------------------------------------------------------- */
-  FILE * f;
+
   switch(dataType) {
     case VL_TYPE_FLOAT:
       enc = (void*)vl_malloc(sizeof(float) * dimension * numClusters);
-
-//       f = fopen("/home/dave/vlfeat/data/mex-debug.txt","w");
-//       fprintf(f,"assignments:\n");
-//       for(vl_size i_cl = 0; i_cl < numClusters; i_cl++) {
-//         for(vl_size i_d = 0; i_d < numData; i_d++) {
-//           fprintf(f,"%f ",*((float*)assignments + i_cl*numData + i_d));
-//         }
-//         fprintf(f,"\n");
-//       }
-//       fclose(f);
-
       break;
     case VL_TYPE_DOUBLE:
       enc = (void*)vl_malloc(sizeof(double) * dimension * numClusters);
-
-      /*f = fopen("/home/dave/vlfeat/data/mex-debug.txt","w");
-      fprintf(f,"assignments:\n");
-      for(vl_size i_cl = 0; i_cl < numClusters; i_cl++) {
-        for(vl_size i_d = 0; i_d < numData; i_d++) {
-          fprintf(f,"%f ",*((double*)assignments + i_cl*numData + i_d));
-        }
-        fprintf(f,"\n");
-      }
-      fclose(f);
-*/
       break;
     default:
       abort();

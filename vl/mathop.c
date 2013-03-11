@@ -1,6 +1,6 @@
 /** @file mathop.c
  ** @brief Math operations - Definition
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*

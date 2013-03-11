@@ -1,6 +1,6 @@
 /** @file vlad.c
  ** @brief VLAD - Declaration
- ** @author Andrea Vedaldi, David Novotny
+ ** @author David Novotny
  **/
 
 /*
@@ -14,13 +14,52 @@ the terms of the BSD license (see the COPYING file).
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page vlad VLAD encoding
-@author Andrea Vedaldi, David Novotny
+@author David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref vlad.h implements the calculation of VLAD encoding <- TODO
+@ref vlad.h implements the calculation of VLAD encoding @cite{jegou10vlad}.
 
-To get the VLAD vector siply run the function (::vl_vlad_encode)
-with correct parameters.
+To get the VLAD vector siply run the function ::vl_vlad_encode
+with correct parameters. The function can be applied to both
+@c float or @c double data types.
+
+@section vlad-tech Technical details
+
+The VLAD (Vector of Linearly Aggregated Descriptors) encoding is bound
+to estimation of a gaussian mixture model (see @ref gmm.h) or to
+kmeans clustering (see @ref kmeans.h). Using the obtained soft (GMM) or hard (KMeans)
+assignments and means one can encode a bunch of feature vectors with respect to the
+estimated means and assignments.
+
+Having a set of @f$ D @f$ dimensional features
+@f$ x_1 ... x_N @f$,
+a set of assignments
+@f$ q_{1,1} ... q_{N,K}  @f$
+and a set of means
+@f$ \mu_1 ... \mu_K  @f$
+the components @f$ v_{i,j} @f$ of VLAD encoding are defined as:
+@f[
+  v_{j} = \sum_{i=1}^{N} {  q_{i,j} (x_{i} - \mu_{j}) }
+@f]
+
+the <b>VLAD encoding</b> is an concatenation vector @f$ V @f$ of these components.
+Thus the size of this encoding is @f$ D @f$ x @f$ K @f$.
+
+@f[
+  V = [ v_{1} ... v_{K} ]
+@f]
+
+However the size of each cluster could have a negative imapact on the
+appearance of the vector @f$ V @f$ and so, the normalization of each
+aggregate of vectors could be used:
+
+@f[
+  v_{j} = { \sum_{i=1}^{N} {q_{i,j} x_{i}}  \over { \sum_{i=1}^{N} {q_{i,j}} } } - \mu_{j}
+@f]
+
+This normalization is controlled by the last argument of ::vl_vlad_encode.
+
+
 */
 
 #include "vlad.h"

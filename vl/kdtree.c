@@ -1,6 +1,6 @@
 /** @file kdtree.c
  ** @brief KD-tree - Definition
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*
@@ -15,7 +15,7 @@ the terms of the BSD license (see the COPYING file).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page kdtree KD-trees and forests
-@author Andrea Vedaldi
+@author Andrea Vedaldi, David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kdtree.h implements a KD-tree object, a data structure that can

@@ -1,6 +1,6 @@
 /** @file fisher.c
  ** @brief Fisher - Declaration
- ** @author Andrea Vedaldi, David Novotny
+ ** @author David Novotny
  **/
 
 /*
@@ -14,25 +14,25 @@ the terms of the BSD license (see the COPYING file).
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page fisher Fisher encoding
-@author Andrea Vedaldi, David Novotny
+@author David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref fisher.h implements the calculation of fisher vector from the
-set of feature vectors with respect to the provided gaussian mixture model.
+@ref fisher.h implements the calculation of a fisher vector @cite{Perronnin10improvingthe}
+from the set of feature vectors with respect to the provided gaussian mixture model.
 The function can be applied to both @c float or @c double data types.
 The covariance matrices of individual gaussians are assumed to be diagonal.
 
 To get the fisher vector siply run the function (::vl_fisher_encode)
 with correct parameters.
 
-@section gmm-tech Technical details
+@section fisher-tech Technical details
 
-The fisher vector encoding is strongly bound to estimation of a gaussian
+The fisher vector encoding @cite{Perronnin10improvingthe} is strongly bound to estimation of a gaussian
 mixture model (see @ref gmm.h). Using the obtained means, variances and
 weights of individual gaussians, one can encode a set of features with
 respect to the gaussian model using the fisher vector encoding technique.
 
-Having a set of @f$ D @f$ dimensional features @f$ x_i ... x_N @f$,
+Having a set of @f$ D @f$ dimensional features @f$ x_1 ... x_N @f$,
 and a set of gaussian parameters
 @f$ \Sigma_1 ... \Sigma_K  @f$ (= covariance matrices of gaussians),
 @f$ \mu_1 ... \mu_K  @f$ (= means),

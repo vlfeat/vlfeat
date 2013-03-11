@@ -1,6 +1,5 @@
 /** @file   vl_gmm.c
  ** @brief  vl_gmm MEX definition.
- ** @author Andrea Vedaldi
  ** @author David Novotny
  **/
 
@@ -62,7 +61,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int opt ;
   int next = IN_END ;
   mxArray const  *optarg ;
-  
+
   vl_size i;
 
   vl_size numClusters = 10;
@@ -75,7 +74,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_bool meansSet = VL_FALSE;
   vl_bool sigmasSet = VL_FALSE;
   vl_bool weightsSet = VL_FALSE;
-  
+
   double sigmaLowBound = 0.000001;
 
   VlGMMMultithreading multithreading = VlGMMParallel;
@@ -165,7 +164,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     case opt_sigma_low_bound :
       sigmaLowBound = (double) mxGetScalar(optarg) ;
       break ;
-      
+
     case opt_weights : ;
 	  {
       mxClassID classIDweights = mxGetClassID (optarg) ;
@@ -205,7 +204,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
       break;
 	  }
-      
+
     case opt_means : ;
 	  {
       mxClassID classIDmeans = mxGetClassID (optarg) ;
@@ -373,7 +372,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    * -------------------------------------------------------------- */
 
   data = mxGetPr(IN(DATA)) ;
-  
+
   switch(dataType){
   case VL_TYPE_DOUBLE:
         for(i = 0; i < numData*dimension; i++) {
@@ -383,7 +382,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
                    "DATA contains NaNs or Infs.") ;
             }
         }
-      break;  
+      break;
   case VL_TYPE_FLOAT:
         for(i = 0; i < numData*dimension; i++) {
             float datum = *((float*)data + i);
@@ -394,8 +393,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         }
     break;
   default:
-    abort();        
-    break;  
+    abort();
+    break;
   }
 
   gmm = vl_gmm_new (dataType) ;

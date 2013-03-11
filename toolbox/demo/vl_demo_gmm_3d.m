@@ -25,6 +25,7 @@ fprintf('\n ---------- \n KMeans time - %f \n ---------- \n\n',elapsedKMEANS);
 initSigmas = zeros(dimension,numClusters);
 initWeights = zeros(1,numClusters);
 
+figure('Name','GMM');
 subplot(1,2,1);
 hold on
 for i=1:numClusters
@@ -40,6 +41,10 @@ for i=1:numClusters
     end
 end
 axis equal
+xlabel('x');
+ylabel('y');
+zlabel('z');
+title('GMM: KMeans intialization');
 
 %% gmm
 elapsedGMM = tic;
@@ -61,4 +66,10 @@ for i=1:numClusters
     plot3(X(1,idx == i),X(2,idx == i),X(3,idx == i),'.','color',cc(i,:));
 end
 axis equal
+xlabel('x');
+ylabel('y');
+zlabel('z');
+title('GMM: Estimated gaussian mixture');
 return
+
+vl_demo_print('gmm_3d_clusters');

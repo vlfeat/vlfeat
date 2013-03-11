@@ -1,6 +1,5 @@
 /** @file fisher.h
  ** @brief Fisher encoding (@ref fisher)
- ** @author Andrea Vedaldi
  ** @author David Novotny
  **/
 

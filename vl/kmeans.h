@@ -1,6 +1,6 @@
 /** @file kmeans.h
  ** @brief K-means (@ref kmeans)
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*

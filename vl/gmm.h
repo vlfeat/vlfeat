@@ -1,6 +1,6 @@
 /** @file gmm.h
  ** @brief GMM (@ref gmm)
- ** @author Andrea Vedaldi, David Novotny
+ ** @author David Novotny
  **/
 
 /*

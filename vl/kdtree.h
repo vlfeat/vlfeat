@@ -1,6 +1,6 @@
 /** @file kdtree.h
  ** @brief KD-tree (@ref kdtree)
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*
