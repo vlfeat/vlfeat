@@ -371,7 +371,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
   }
 
   assert(svm->randomGenerator == NULL || svm->permutation == NULL) ;
-  assert(svm->iterationsSoFar >= 0) ;
+  assert(svm->iterations >= 0) ;
 
   /*
     Choose iteration0 to start with small enoguh steps. Recall that
