@@ -24,8 +24,8 @@ It supports
 - @e l1 and @e l2 distances;
 - random selection and <code>k-means++</code> @cite{arthur07k-means}
   initialization methods;
-- the basic Lloyd @cite{lloyd82least} and the accelerated Elkan
-  @cite{elkan03using} optimization methods.
+- the basic Lloyd @cite{lloyd82least}, the accelerated Elkan
+  @cite{elkan03using} and ANN optimization methods;
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section kmeans-usage Usage
@@ -87,6 +87,21 @@ quantize new data points.
   @cite{lloyd82least}. However, it uses storage proportional to the
   square of the number of clusters, which makes it unpractical for a
   very large number of clusters.
+
+- <b>ANN</b> @cite{beis97shape} @cite{silpa-anan08optimised} @cite{muja09fast}
+             (::VlKMeansANN). This algorithm is basically the same as Lloyds version,
+  but instead of a naive computation of point-to-cluster memberships
+  it uses best-bin-first randomized @ref kdtree. The KD-Forest queries could
+  be used in a parallel or serial manner (see @ref kmeans-usage-multithreading
+  section).
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-usage-multithreading OpenMP multithreading support
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+@ref kmeans.h supports parallel and serial computation of the point
+to cluster memberships in the case when the ANN algorithm is selected.
+The parallel approach is implemented using <a href="http://openmp.org">OpenMP</a>.
 
 @section kmeans-tech Technical details
 
@@ -169,12 +184,26 @@ to the distance to the currently assigned center and a lower bound to the
 distance to all the other centers. Unless such bounds do not intersect,
 then a point need not to be reassigned. See [3] for details.
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeans-tech-ANN Speeding up by using the ANN KD-Forests
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Another method for faster determination of point to cluster memberships is
+based on KD-Trees. For each point @f$ x_i @f$ the nearest center @f$ c_k @f$
+(which minimizes @f$ d^2(x_i, c_{\pi(i)}) @f$ over @f$ \pi(i) \in \{1, \dots, k\} @f$)
+is picked using randomized best-bin-first KD-Forest
+(see the @ref kdtree page for detailed information on implemented KD-Trees)
+
 */
 
 #include "kmeans.h"
 #include "generic.h"
 #include "mathop.h"
 #include <string.h>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 /* ================================================================ */
 #ifndef VL_KMEANS_INSTANTIATING
@@ -197,6 +226,7 @@ vl_kmeans_reset (VlKMeans * self)
 
   if (self->centers) vl_free(self->centers) ;
   if (self->centerDistances) vl_free(self->centerDistances) ;
+
   self->centers = NULL ;
   self->centerDistances = NULL ;
 }
@@ -224,6 +254,11 @@ vl_kmeans_new (vl_type dataType,
 
   self->centers = NULL ;
   self->centerDistances = NULL ;
+
+  self->multithreading = VlKMeansSerial;
+
+  self->numTrees = 3;
+  self->maxNumComparisons = 100;
 
   vl_kmeans_reset (self) ;
 
@@ -253,6 +288,9 @@ vl_kmeans_new_copy (VlKMeans const * kmeans)
   self->numCenters = kmeans->numCenters ;
   self->centers = NULL ;
   self->centerDistances = NULL ;
+
+  self->numTrees = kmeans->numTrees;
+  self->maxNumComparisons = kmeans->maxNumComparisons;
 
   if (kmeans->centers) {
     vl_size dataSize = vl_get_type_size(self->dataType) * self->dimension * self->numCenters ;
@@ -285,8 +323,7 @@ vl_kmeans_delete (VlKMeans * self)
 }
 
 /* an helper structure */
-typedef struct _VlKMeansSortWrapper
-{
+typedef struct _VlKMeansSortWrapper {
   vl_uint32 * permutation ;
   void const * data ;
   vl_size stride ;
@@ -363,11 +400,13 @@ VL_XCAT(_vl_kmeans_seed_centers_with_rand_data_, SFX)
       if (numCenters - k < numData - i) {
         vl_bool duplicateDetected = VL_FALSE ;
         VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)(distances,
-                                                              dimension,
-                                                              data + dimension * perm[i], 1,
-                                                              (TYPE*)self->centers, k,
-                                                              distFn) ;
-        for (j = 0 ; j < k ; ++j) { duplicateDetected |= (distances[j] == 0) ; }
+            dimension,
+            data + dimension * perm[i], 1,
+            (TYPE*)self->centers, k,
+            distFn) ;
+        for (j = 0 ; j < k ; ++j) {
+          duplicateDetected |= (distances[j] == 0) ;
+        }
         if (duplicateDetected) continue ;
       }
 
@@ -462,31 +501,194 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
  vl_size numData)
 {
   vl_uindex i ;
+  vl_size numChunks = 1;
+  vl_size t;
+  int chunkSize = 1;
+
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
 #else
   VlDoubleVectorComparisonFunction distFn = vl_get_vector_comparison_function_d(self->distance) ;
 #endif
-  TYPE * distanceToCenters = vl_malloc (sizeof(TYPE) * self->numCenters) ;
 
-  for (i = 0 ; i < numData ; ++i) {
-    vl_size k ;
-    TYPE bestDistance = (TYPE) VL_INFINITY_D ;
-    VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)(distanceToCenters,
-                                                          self->dimension,
-                                                          data + self->dimension * i, 1,
-                                                          (TYPE*)self->centers, self->numCenters,
-                                                          distFn) ;
-    for (k = 0 ; k < self->numCenters ; ++k) {
-      if (distanceToCenters[k] < bestDistance) {
-        bestDistance = distanceToCenters[k] ;
-        assignments[i] = (vl_uint32)k ;
-      }
-    }
-
-    if (distances) distances[i] = bestDistance ;
+  switch(self->multithreading) {
+    case(VlKMeansParallel):
+#if defined(_OPENMP)
+      numChunks = vl_get_num_threads();
+#else
+      numChunks = 1;
+#endif
+      break;
+    case(VlKMeansSerial):
+      numChunks = 1;
+      break;
+    default:
+      VL_PRINT("Bad multithreading value.\n");
+      abort();
   }
-  vl_free(distanceToCenters) ;
+
+  TYPE ** distanceToCentersChunks = vl_malloc (sizeof(TYPE*) * numChunks) ;
+  for(t = 0; t < numChunks; t++) {
+    distanceToCentersChunks[t] = vl_malloc (sizeof(TYPE) * self->numCenters) ;
+  }
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(t,i) schedule(static,chunkSize)
+#endif
+  for(t = 0; t < numChunks; t++) {
+    for (i = t ; i < numData ; i += numChunks) {
+      vl_size k ;
+      TYPE * distanceToCenters = distanceToCentersChunks[t] ;
+      TYPE bestDistance = (TYPE) VL_INFINITY_D ;
+
+      VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)(distanceToCenters,
+          self->dimension,
+          data + self->dimension * i, 1,
+          (TYPE*)self->centers, self->numCenters,
+          distFn) ;
+
+      for (k = 0 ; k < self->numCenters ; ++k) {
+        if (distanceToCenters[k] < bestDistance) {
+          bestDistance = distanceToCenters[k] ;
+          assignments[i] = (vl_uint32)k ;
+        }
+      }
+      if (distances) distances[i] = bestDistance ;
+    }
+  }
+
+  for(t = 0; t < numChunks; t++) {
+    vl_free(distanceToCentersChunks[t]);
+  }
+  vl_free(distanceToCentersChunks) ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                                                 ANN quantization */
+/* ---------------------------------------------------------------- */
+
+static void
+VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)
+(VlKMeans * self,
+ vl_uint32 * assignments,
+ TYPE * distances,
+ TYPE const * data,
+ vl_size numData,
+ vl_size iteration)
+{
+#if (FLT == VL_TYPE_FLOAT)
+  VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
+#else
+  VlDoubleVectorComparisonFunction distFn = vl_get_vector_comparison_function_d(self->distance) ;
+#endif
+
+  VlKDForest * forest = vl_kdforest_new(self->dataType,self->dimension,self->numTrees, self->distance);
+
+  vl_kdforest_set_max_num_comparisons(forest,self->maxNumComparisons);
+  vl_kdforest_set_thresholding_method(forest,VL_KDTREE_MEDIAN);
+  vl_kdforest_build(forest,self->numCenters,self->centers);
+
+  switch(self->multithreading) {
+    case VlKMeansSerial: {
+      vl_uindex x;
+      VlKDForestNeighbor * neighbor = vl_malloc(sizeof(VlKDForestNeighbor));
+      VlKDForestSearcher * searcher = vl_kdforest_new_searcher(forest);
+
+      for(x = 0; x < numData; x++) {
+        TYPE const * query = data + x*self->dimension;
+
+        vl_kdforest_query (searcher, neighbor, 1, query);
+
+        if (distances) {
+          if(iteration == 0) {
+            distances[x] = (TYPE) neighbor->distance;
+            assignments[x] = (vl_uint32) neighbor->index ;
+          } else {
+            TYPE prevDist;
+            prevDist = distFn(self->dimension,
+                              data + self->dimension * x,
+                              (TYPE*)self->centers + self->dimension * assignments[x]);
+
+            if(prevDist > (TYPE) neighbor->distance) {
+              distances[x] = (TYPE) neighbor->distance;
+              assignments[x] = (vl_uint32) neighbor->index ;
+            } else {
+              distances[x] = prevDist;
+            }
+          }
+
+        } else {
+          assignments[x] = (vl_uint32) neighbor->index ;
+        }
+      }
+
+      vl_free(neighbor);
+      vl_kdforest_delete(forest);
+
+      break;
+    }
+    case VlKMeansParallel: {
+
+      vl_size numChunks = 1;
+      int chunkSize = 1;
+      vl_size t;
+      vl_uindex nIdx;
+      VlKDForestNeighbor * neighbors;
+      VlKDForestSearcher ** searchers;
+
+#ifdef _OPENMP
+      numChunks = (vl_size)omp_get_max_threads();
+#endif
+
+      neighbors = vl_malloc(sizeof(VlKDForestNeighbor) * numChunks);
+      searchers = vl_malloc(sizeof(VlKDForestSearcher*) * numChunks);
+
+      for(nIdx = 0; nIdx < numChunks; nIdx++) {
+        searchers[nIdx] = vl_kdforest_new_searcher(forest);
+      }
+
+#ifdef _OPENMP
+#pragma omp parallel for private(t) schedule(static,chunkSize)
+#endif
+      for(t = 0 ; t < numChunks ; t++) {
+
+        VlKDForestSearcher * searcher = searchers[t];
+        vl_uindex x;
+
+        for(x = t; x < numData; x += numChunks) {
+          vl_kdforest_query (searcher, neighbors + t, 1, (TYPE const *) (data + x*self->dimension));
+
+          if(distances) {
+            if(iteration == 0) {
+              distances[x] = (TYPE) neighbors[t].distance;
+              assignments[x] = (vl_uint32) neighbors[t].index ;
+            } else {
+              TYPE prevDist = (TYPE) distFn(self->dimension,
+                                            data + self->dimension * x,
+                                            (TYPE*)self->centers + self->dimension *assignments[x]);
+              if (prevDist > (TYPE) neighbors[t].distance) {
+                distances[x] = (TYPE) neighbors[t].distance;
+                assignments[x] = (vl_uint32) neighbors[t].index ;
+              } else {
+                distances[x] = prevDist;
+              }
+            }
+
+          } else {
+            assignments[x] = (vl_uint32) neighbors[t].index ;
+          }
+        }
+      } /* end of parallel region */
+
+      vl_kdforest_delete(forest);
+      vl_free(searchers);
+      vl_free(neighbors);
+
+      break;
+    }
+    default:
+      abort();
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -502,9 +704,9 @@ VL_XCAT3(_vl_kmeans_, SFX, _qsort_cmp)
 (VlKMeansSortWrapper * array, vl_uindex indexA, vl_uindex indexB)
 {
   return
-  ((TYPE*)array->data) [array->permutation[indexA] * array->stride]
-  -
-  ((TYPE*)array->data) [array->permutation[indexB] * array->stride] ;
+    ((TYPE*)array->data) [array->permutation[indexA] * array->stride]
+    -
+    ((TYPE*)array->data) [array->permutation[indexB] * array->stride] ;
 }
 
 VL_INLINE void
@@ -533,7 +735,9 @@ VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)
     array.permutation = permutations + d * numData ;
     array.data = data + d ;
     array.stride = self->dimension ;
-    for (x = 0 ; x < numData ; ++x) { array.permutation[x] = (vl_uint32)x ; }
+    for (x = 0 ; x < numData ; ++x) {
+      array.permutation[x] = (vl_uint32)x ;
+    }
     VL_XCAT3(_vl_kmeans_, SFX, _qsort_sort)(&array, numData) ;
   }
 }
@@ -549,10 +753,10 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
  vl_size numData)
 {
   vl_size c, d, x, iteration ;
-  vl_bool allDone ;
   double previousEnergy = VL_INFINITY_D ;
   double energy ;
   TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
+
   vl_uint32 * assignments = vl_malloc (sizeof(vl_uint32) * numData) ;
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   vl_uint32 * permutations = NULL ;
@@ -568,8 +772,7 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
   }
 
   for (energy = VL_INFINITY_D,
-       iteration = 0,
-       allDone = VL_FALSE ;
+       iteration = 0;
        1 ;
        ++ iteration) {
 
@@ -614,13 +817,17 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
         for (x = 0 ; x < numData ; ++x) {
           TYPE * cpt = (TYPE*)self->centers + assignments[x] * self->dimension ;
           TYPE const * xpt = data + x * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
+          for (d = 0 ; d < self->dimension ; ++d) {
+            cpt[d] += xpt[d] ;
+          }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
           TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
           if (clusterMasses[c] > 0) {
             TYPE mass = clusterMasses[c] ;
-            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] /= mass ;
+            }
           } else {
             vl_uindex x = vl_rand_uindex(rand, numData) ;
             numRestartedCenters ++ ;
@@ -638,7 +845,7 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
             c = assignments[perm[x]] ;
             if (2 * numSeenSoFar[c] < clusterMasses[c]) {
               ((TYPE*)self->centers) [d + c * self->dimension] =
-              data [d + perm[x] * self->dimension] ;
+                data [d + perm[x] * self->dimension] ;
             }
             numSeenSoFar[c] ++ ;
           }
@@ -666,17 +873,19 @@ VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)
     }
   } /* next Lloyd iteration */
 
-  if (permutations) { vl_free(permutations) ; }
-  if (numSeenSoFar) { vl_free(numSeenSoFar) ; }
+  if (permutations) {
+    vl_free(permutations) ;
+  }
+  if (numSeenSoFar) {
+    vl_free(numSeenSoFar) ;
+  }
   vl_free(distances) ;
   vl_free(assignments) ;
   vl_free(clusterMasses) ;
   return energy ;
 }
 
-/* ---------------------------------------------------------------- */
-/*                                                 Elkan refinement */
-/* ---------------------------------------------------------------- */
+
 
 static double
 VL_XCAT(_vl_kmeans_update_center_distances_, SFX)
@@ -694,14 +903,169 @@ VL_XCAT(_vl_kmeans_update_center_distances_, SFX)
                                        self->numCenters) ;
   }
   VL_XCAT(vl_eval_vector_comparison_on_all_pairs_, SFX)(self->centerDistances,
-                                                        self->dimension,
-                                                        self->centers, self->numCenters,
-                                                        NULL, 0,
-                                                        distFn) ;
+      self->dimension,
+      self->centers, self->numCenters,
+      NULL, 0,
+      distFn) ;
   return self->numCenters * (self->numCenters - 1) / 2 ;
 }
 
+static double
+VL_XCAT(_vl_kmeans_refine_centers_ANN_, SFX)
+(VlKMeans * self,
+ TYPE const * data,
+ vl_size numData)
+{
+  vl_size c, d, x, iteration ;
+  double previousEnergy = VL_INFINITY_D ;
+  double energy ;
 
+  vl_uint32 * permutations = NULL ;
+  vl_size * numSeenSoFar = NULL ;
+  VlRand * rand = vl_get_rand () ;
+  vl_size totNumRestartedCenters = 0 ;
+  vl_size numRestartedCenters = 0 ;
+
+  vl_uint32 * assignments = vl_malloc (sizeof(vl_uint32) * numData) ;
+  vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
+  TYPE * distances = vl_malloc (sizeof(TYPE) * numData) ;
+
+  if (self->distance == VlDistanceL1) {
+    permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
+    numSeenSoFar = vl_malloc(sizeof(vl_size) * self->numCenters) ;
+    VL_XCAT(_vl_kmeans_sort_data_helper_, SFX)(self, permutations, data, numData) ;
+  }
+
+#if ! defined(_OPENMP)
+  if(self->multithreading == VlGMMParallel) {
+    VL_PRINT("kmeans: Warning: OpenMP not included, continuing with serial computation.")
+  }
+#endif
+
+  for (energy = VL_INFINITY_D,
+       iteration = 0;
+       1 ;
+       ++ iteration) {
+
+    /* assign data to cluters */
+    VL_XCAT(_vl_kmeans_quantize_ANN_, SFX)(self, assignments, distances, data, numData, iteration) ;
+
+    /* compute energy */
+    energy = 0 ;
+    for (x = 0 ; x < numData ; ++x) energy += distances[x] ;
+    if (self->verbosity) {
+      VL_PRINTF("kmeans: ANN iter %d: energy = %g\n", iteration,
+                energy) ;
+    }
+
+    /* check termination conditions */
+    if (iteration >= self->maxNumIterations) {
+      if (self->verbosity) {
+        VL_PRINTF("kmeans: ANN terminating because maximum number of iterations reached\n") ;
+      }
+      break ;
+    }
+
+    double eps = (previousEnergy - energy)/previousEnergy;
+    if (energy == previousEnergy || eps < 0.00001) {
+      if (self->verbosity) {
+        VL_PRINTF("kmeans: ANN terminating because the algorithm fully converged\n") ;
+      }
+      break ;
+    }
+
+    /* begin next iteration */
+    previousEnergy = energy ;
+
+    /* update clusters */
+    memset(clusterMasses, 0, sizeof(vl_size) * numData) ;
+    for (x = 0 ; x < numData ; ++x) {
+      clusterMasses[assignments[x]] ++ ;
+    }
+
+    numRestartedCenters = 0 ;
+    switch (self->distance) {
+      case VlDistanceL2:
+        memset(self->centers, 0, sizeof(TYPE) * self->dimension * self->numCenters) ;
+        for (x = 0 ; x < numData ; ++x) {
+          TYPE * cpt = (TYPE*)self->centers + assignments[x] * self->dimension ;
+          TYPE const * xpt = data + x * self->dimension ;
+          for (d = 0 ; d < self->dimension ; ++d) {
+            cpt[d] += xpt[d] ;
+          }
+        }
+        for (c = 0 ; c < self->numCenters ; ++c) {
+          TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
+          if (clusterMasses[c] > 0) {
+            TYPE mass = clusterMasses[c] ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] /= mass ;
+            }
+          } else {
+            vl_uindex x = vl_rand_uindex(rand, numData) ;
+            numRestartedCenters ++ ;
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] = data[x * self->dimension + d] ;
+            }
+          }
+        }
+        break ;
+      case VlDistanceL1:
+        for (d = 0 ; d < self->dimension ; ++d) {
+          vl_uint32 * perm = permutations + d * numData ;
+          memset(numSeenSoFar, 0, sizeof(vl_size) * self->numCenters) ;
+          for (x = 0; x < numData ; ++x) {
+            c = assignments[perm[x]] ;
+            if (2 * numSeenSoFar[c] < clusterMasses[c]) {
+              ((TYPE*)self->centers) [d + c * self->dimension] =
+                data [d + perm[x] * self->dimension] ;
+            }
+            numSeenSoFar[c] ++ ;
+          }
+          /* restart the centers as required  */
+          for (c = 0 ; c < self->numCenters ; ++c) {
+            if (clusterMasses[c] == 0) {
+              TYPE * cpt = (TYPE*)self->centers + c * self->dimension ;
+              vl_uindex x = vl_rand_uindex(rand, numData) ;
+              numRestartedCenters ++ ;
+              for (d = 0 ; d < self->dimension ; ++d) {
+                cpt[d] = data[x * self->dimension + d] ;
+              }
+            }
+          }
+        }
+        break ;
+      default:
+        VL_PRINT("bad distance set: %d\n",self->distance);
+        abort();
+    } /* done compute centers */
+
+    totNumRestartedCenters += numRestartedCenters ;
+    if (self->verbosity && numRestartedCenters) {
+      VL_PRINTF("kmeans: ANN iter %d: restarted %d centers\n", iteration,
+                numRestartedCenters) ;
+    }
+
+  }
+
+
+  if (permutations) {
+    vl_free(permutations) ;
+  }
+  if (numSeenSoFar) {
+    vl_free(numSeenSoFar) ;
+  }
+
+  vl_free(distances) ;
+  vl_free(assignments) ;
+  vl_free(clusterMasses) ;
+  return energy ;
+
+}
+
+/* ---------------------------------------------------------------- */
+/*                                                 Elkan refinement */
+/* ---------------------------------------------------------------- */
 
 static double
 VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
@@ -717,10 +1081,13 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   VlRand * rand = vl_get_rand () ;
 
+  vl_size numChunks, t;
+  int chunkSize = 1;
+
 #if (FLT == VL_TYPE_FLOAT)
-    VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
+  VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
 #else
-    VlDoubleVectorComparisonFunction distFn = vl_get_vector_comparison_function_d(self->distance) ;
+  VlDoubleVectorComparisonFunction distFn = vl_get_vector_comparison_function_d(self->distance) ;
 #endif
 
   TYPE * nextCenterDistances = vl_malloc (sizeof(TYPE) * self->numCenters) ;
@@ -743,6 +1110,22 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size totDistanceComputationsToFinalize = 0 ;
   vl_size totNumRestartedCenters = 0 ;
 
+  switch(self->multithreading) {
+    case(VlKMeansParallel):
+#if defined(_OPENMP)
+      numChunks = vl_get_num_threads()*10;
+#else
+      numChunks = 1;
+#endif
+      break;
+    case(VlKMeansSerial):
+      numChunks = 1;
+      break;
+    default:
+      VL_PRINT("Bad multithreading value.\n");
+      abort();
+  }
+
   if (self->distance == VlDistanceL1) {
     permutations = vl_malloc(sizeof(vl_uint32) * numData * self->dimension) ;
     numSeenSoFar = vl_malloc(sizeof(vl_size) * self->numCenters) ;
@@ -760,7 +1143,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 
   /* update distances between centers */
   totDistanceComputationsToInit +=
-  VL_XCAT(_vl_kmeans_update_center_distances_, SFX)(self) ;
+    VL_XCAT(_vl_kmeans_update_center_distances_, SFX)(self) ;
 
   /* assigmen points to the initial centers and initialize bounds */
   memset(pointToCenterLB, 0, sizeof(TYPE) * self->numCenters *  numData) ;
@@ -813,10 +1196,11 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
               energy, totDistanceComputationsToInit) ;
   }
 
-/* #define SANITY*/
+  /* #define SANITY*/
 #ifdef SANITY
   {
-    int xx ; int cc ;
+    int xx ;
+    int cc ;
     TYPE tol = 1e-5 ;
     VL_PRINTF("inconsistencies after initial assignments:\n");
     for (xx = 0 ; xx < numData ; ++xx) {
@@ -828,10 +1212,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
         if (cc == assignments[xx]) {
           TYPE z = pointToClosestCenterUB[xx] ;
           if (z+tol<b) VL_PRINTF("UB %d %d = %f < %f\n",
-                             cc, xx, z, b) ;
+                                   cc, xx, z, b) ;
         }
         if (a>b+tol) VL_PRINTF("LB %d %d = %f  > %f\n",
-                           cc, xx, a, b) ;
+                                 cc, xx, a, b) ;
       }
     }
   }
@@ -864,17 +1248,21 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
         for (x = 0 ; x < numData ; ++x) {
           TYPE * cpt = newCenters + assignments[x] * self->dimension ;
           TYPE const * xpt = data + x * self->dimension ;
-          for (d = 0 ; d < self->dimension ; ++d) { cpt[d] += xpt[d] ; }
+          for (d = 0 ; d < self->dimension ; ++d) {
+            cpt[d] += xpt[d] ;
+          }
         }
         for (c = 0 ; c < self->numCenters ; ++c) {
           TYPE * cpt = newCenters + c * self->dimension ;
           if (clusterMasses[c] > 0) {
             TYPE mass = clusterMasses[c] ;
-            for (d = 0 ; d < self->dimension ; ++d) { cpt[d] /= mass ; }
+            for (d = 0 ; d < self->dimension ; ++d) {
+              cpt[d] /= mass ;
+            }
           } else {
             /* restart the center */
             vl_uindex x = vl_rand_uindex(rand, numData) ;
-			numRestartedCenters ++ ;
+            numRestartedCenters ++ ;
             for (d = 0 ; d < self->dimension ; ++d) {
               cpt[d] = data[x * self->dimension + d] ;
             }
@@ -889,7 +1277,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
             c = assignments[perm[x]] ;
             if (2 * numSeenSoFar[c] < clusterMasses[c]) {
               newCenters [d + c * self->dimension] =
-              data [d + perm[x] * self->dimension] ;
+                data [d + perm[x] * self->dimension] ;
             }
             numSeenSoFar[c] ++ ;
           }
@@ -899,7 +1287,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           if (clusterMasses[c] == 0) {
             TYPE * cpt = newCenters + c * self->dimension ;
             vl_uindex x = vl_rand_uindex(rand, numData) ;
-			numRestartedCenters ++ ;
+            numRestartedCenters ++ ;
             for (d = 0 ; d < self->dimension ; ++d) {
               cpt[d] = data[x * self->dimension + d] ;
             }
@@ -970,7 +1358,12 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
      Update lower bounds on point-to-center distances
      based on the center variation.
      */
-    for (x = 0 ; x < numData ; ++x) {
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(t,x,c) schedule(dynamic,chunkSize)
+#endif
+  for (t = 0; t < numChunks; t++) {
+    for (x = t ; x < numData ; x += numChunks) {
       for (c = 0 ; c < self->numCenters ; ++c) {
         TYPE a = pointToCenterLB[c + x * self->numCenters] ;
         TYPE b = centerToNewCenterDistances[c] ;
@@ -978,22 +1371,24 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           pointToCenterLB[c + x * self->numCenters] = 0 ;
         } else {
           if (self->distance == VlDistanceL1) {
-             pointToCenterLB[c + x * self->numCenters]  = a - b ;
+            pointToCenterLB[c + x * self->numCenters]  = a - b ;
           } else {
 #if (FLT == VL_TYPE_FLOAT)
             TYPE sqrtab =  sqrtf (a * b) ;
 #else
             TYPE sqrtab =  sqrt (a * b) ;
 #endif
-             pointToCenterLB[c + x * self->numCenters]  = a + b - 2.0 * sqrtab ;
+            pointToCenterLB[c + x * self->numCenters]  = a + b - 2.0 * sqrtab ;
           }
         }
       }
     }
+  }
 
-   #ifdef SANITY
+#ifdef SANITY
     {
-      int xx ; int cc ;
+      int xx ;
+      int cc ;
       TYPE tol = 1e-5 ;
       VL_PRINTF("inconsistencies before assignments:\n");
       for (xx = 0 ; xx < numData ; ++xx) {
@@ -1005,10 +1400,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           if (cc == assignments[xx]) {
             TYPE z = pointToClosestCenterUB[xx] ;
             if (z+tol<b) VL_PRINTF("UB %d %d = %f < %f\n",
-                                            cc, xx, z, b) ;
+                                     cc, xx, z, b) ;
           }
           if (a>b+tol) VL_PRINTF("LB %d %d = %f  > %f (assign = %d)\n",
-                                          cc, xx, a, b, assignments[xx]) ;
+                                   cc, xx, a, b, assignments[xx]) ;
         }
       }
     }
@@ -1018,7 +1413,11 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
      Scan the data and to the reassignments. Use the bounds to
      skip as many point-to-center distance calculations as possible.
      */
-    for (allDone = VL_TRUE, x = 0 ; x < numData ; ++x) {
+#if defined(_OPENMP)
+#pragma omp parallel for private(t,c,x,allDone) schedule(dynamic,chunkSize) reduction(+:numDistanceComputationsToRefreshUB,numDistanceComputationsToRefreshLB)
+#endif
+  for(t = 0; t < numChunks; t++) {
+    for (allDone = VL_TRUE, x = t ; x < numData ; x += numChunks) {
       /*
        A point x sticks with its current center assignmets[x]
        the UB to d(x, c[assigmnets[x]]) is not larger than half
@@ -1029,42 +1428,22 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
         continue ;
       }
 
-      for (c = 0 ; c < self->numCenters ; ++c) {
-        vl_uint32 cx = assignments[x] ;
-        TYPE distance ;
+        for (c = 0 ; c < self->numCenters ; ++c) {
+          vl_uint32 cx = assignments[x] ;
+          TYPE distance ;
 
-        /* The point is not reassigned to a given center c
-         if either:
+          /* The point is not reassigned to a given center c
+          if either:
 
-         0 - c is already the assigned center
-         1 - The UB of d(x, c[assignments[x]]) is smaller than half
-             the distance of c[assigments[x]] to c, OR
-         2 - The UB of d(x, c[assignmets[x]]) is smaller than the
-             LB of the distance of x to c.
-         */
-        if (cx == c) {
-          continue ;
-        }
-        if (((self->distance == VlDistanceL1) ? 2.0 : 4.0) *
-            pointToClosestCenterUB[x] <= ((TYPE*)self->centerDistances)
-            [c + cx * self->numCenters]) {
-          continue ;
-        }
-        if (pointToClosestCenterUB[x] <= pointToCenterLB
-            [c + x * self->numCenters]) {
-          continue ;
-        }
-
-        /* If the UB is loose, try recomputing it and test again */
-        if (! pointToClosestCenterUBIsStrict[x]) {
-          distance = distFn(self->dimension,
-                            data + self->dimension * x,
-                            (TYPE*)self->centers + self->dimension * cx) ;
-          pointToClosestCenterUB[x] = distance ;
-          pointToClosestCenterUBIsStrict[x] = VL_TRUE ;
-          pointToCenterLB[cx + x * self->numCenters] = distance ;
-          numDistanceComputationsToRefreshUB += 1 ;
-
+          0 - c is already the assigned center
+          1 - The UB of d(x, c[assignments[x]]) is smaller than half
+              the distance of c[assigments[x]] to c, OR
+          2 - The UB of d(x, c[assignmets[x]]) is smaller than the
+              LB of the distance of x to c.
+          */
+          if (cx == c) {
+            continue ;
+          }
           if (((self->distance == VlDistanceL1) ? 2.0 : 4.0) *
               pointToClosestCenterUB[x] <= ((TYPE*)self->centerDistances)
               [c + cx * self->numCenters]) {
@@ -1074,29 +1453,50 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
               [c + x * self->numCenters]) {
             continue ;
           }
-        }
 
-        /*
-         Now the UB is strict (equal to d(x, assignments[x])), but
-         we still could not exclude that x should be reassigned to
-         c. We therefore compute the distance, update the LB,
-         and check if a reassigmnet must be made
-         */
-        distance = distFn(self->dimension,
+          /* If the UB is loose, try recomputing it and test again */
+          if (! pointToClosestCenterUBIsStrict[x]) {
+            distance = distFn(self->dimension,
+                            data + self->dimension * x,
+                            (TYPE*)self->centers + self->dimension * cx) ;
+            pointToClosestCenterUB[x] = distance ;
+            pointToClosestCenterUBIsStrict[x] = VL_TRUE ;
+            pointToCenterLB[cx + x * self->numCenters] = distance ;
+            numDistanceComputationsToRefreshUB += 1 ;
+
+            if (((self->distance == VlDistanceL1) ? 2.0 : 4.0) *
+                pointToClosestCenterUB[x] <= ((TYPE*)self->centerDistances)
+                [c + cx * self->numCenters]) {
+              continue ;
+            }
+            if (pointToClosestCenterUB[x] <= pointToCenterLB
+                [c + x * self->numCenters]) {
+              continue ;
+            }
+          }
+
+          /*
+          Now the UB is strict (equal to d(x, assignments[x])), but
+          we still could not exclude that x should be reassigned to
+          c. We therefore compute the distance, update the LB,
+          and check if a reassigmnet must be made
+          */
+          distance = distFn(self->dimension,
                           data + x * self->dimension,
                           (TYPE*)self->centers + c *  self->dimension) ;
-        numDistanceComputationsToRefreshLB += 1 ;
-        pointToCenterLB[c + x * self->numCenters] = distance ;
+          numDistanceComputationsToRefreshLB += 1 ;
+          pointToCenterLB[c + x * self->numCenters] = distance ;
 
-        if (distance < pointToClosestCenterUB[x]) {
-          assignments[x] = c ;
-          pointToClosestCenterUB[x] = distance ;
-          allDone = VL_FALSE ;
-          /* the UB strict flag is already set here */
-        }
+          if (distance < pointToClosestCenterUB[x]) {
+            assignments[x] = c ;
+            pointToClosestCenterUB[x] = distance ;
+            allDone = VL_FALSE ;
+            /* the UB strict flag is already set here */
+          }
 
-      } /* assign center */
-    } /* next data point */
+        } /* assign center */
+      } /* next data point */
+    } /* end of parallel region */
 
     totDistanceComputationsToRefreshUB
     += numDistanceComputationsToRefreshUB ;
@@ -1115,7 +1515,8 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 
 #ifdef SANITY
     {
-      int xx ; int cc ;
+      int xx ;
+      int cc ;
       TYPE tol = 1e-5 ;
       VL_PRINTF("inconsistencies after assignments:\n");
       for (xx = 0 ; xx < numData ; ++xx) {
@@ -1127,10 +1528,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           if (cc == assignments[xx]) {
             TYPE z = pointToClosestCenterUB[xx] ;
             if (z+tol<b) VL_PRINTF("UB %d %d = %f < %f\n",
-                               cc, xx, z, b) ;
+                                     cc, xx, z, b) ;
           }
           if (a>b+tol) VL_PRINTF("LB %d %d = %f  > %f (assign = %d)\n",
-                             cc, xx, a, b, assignments[xx]) ;
+                                   cc, xx, a, b, assignments[xx]) ;
         }
       }
     }
@@ -1144,10 +1545,10 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 
     if (self->verbosity) {
       vl_size numDistanceComputations =
-      numDistanceComputationsToRefreshUB +
-      numDistanceComputationsToRefreshLB +
-      numDistanceComputationsToRefreshCenterDistances +
-      numDistanceComputationsToNewCenters ;
+        numDistanceComputationsToRefreshUB +
+        numDistanceComputationsToRefreshLB +
+        numDistanceComputationsToRefreshCenterDistances +
+        numDistanceComputationsToNewCenters ;
       VL_PRINTF("kmeans: Elkan iter %d: energy <= %g, dist. calc. = %d\n",
                 iteration,
                 energy,
@@ -1204,15 +1605,15 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 
   {
     vl_size totDistanceComputations =
-    totDistanceComputationsToInit +
-    totDistanceComputationsToRefreshUB +
-    totDistanceComputationsToRefreshLB +
-    totDistanceComputationsToRefreshCenterDistances +
-    totDistanceComputationsToNewCenters +
-    totDistanceComputationsToFinalize ;
+      totDistanceComputationsToInit +
+      totDistanceComputationsToRefreshUB +
+      totDistanceComputationsToRefreshLB +
+      totDistanceComputationsToRefreshCenterDistances +
+      totDistanceComputationsToNewCenters +
+      totDistanceComputationsToFinalize ;
 
     double saving = (double)totDistanceComputations
-    / (iteration * self->numCenters * numData) ;
+                    / (iteration * self->numCenters * numData) ;
 
     if (self->verbosity) {
       VL_PRINTF("kmeans: Elkan: total dist. calc.: %d (%.2f %% of Lloyd)\n",
@@ -1244,8 +1645,12 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
     }
   }
 
-  if (permutations) { vl_free(permutations) ; }
-  if (numSeenSoFar) { vl_free(numSeenSoFar) ; }
+  if (permutations) {
+    vl_free(permutations) ;
+  }
+  if (numSeenSoFar) {
+    vl_free(numSeenSoFar) ;
+  }
 
   vl_free(distances) ;
   vl_free(assignments) ;
@@ -1271,11 +1676,15 @@ VL_XCAT(_vl_kmeans_refine_centers_, SFX)
   switch (self->algorithm) {
     case VlKMeansLloyd:
       return
-      VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)(self, data, numData) ;
+        VL_XCAT(_vl_kmeans_refine_centers_lloyd_, SFX)(self, data, numData) ;
       break ;
     case VlKMeansElkan:
       return
-      VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)(self, data, numData) ;
+        VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)(self, data, numData) ;
+      break ;
+    case VlKMeansANN:
+      return
+        VL_XCAT(_vl_kmeans_refine_centers_ANN_, SFX)(self, data, numData) ;
       break ;
     default:
       abort() ;
@@ -1437,6 +1846,38 @@ vl_kmeans_quantize
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Quantize data using ANN
+ ** @param self KMeans object.
+ ** @param assignments data to centers assignments.
+ ** @param distances data to closes center distance/
+ ** @param data data to quantize.
+ ** @param numData number of data points.
+ **/
+
+VL_EXPORT void
+vl_kmeans_quantize_ANN
+(VlKMeans * self,
+ vl_uint32 * assignments,
+ void * distances,
+ void const * data,
+ vl_size numData,
+ vl_size iteration)
+{
+  switch (self->dataType) {
+    case VL_TYPE_FLOAT :
+      _vl_kmeans_quantize_ANN_f
+      (self, assignments, distances, (float const *)data, numData, iteration) ;
+      break ;
+    case VL_TYPE_DOUBLE :
+      _vl_kmeans_quantize_ANN_d
+      (self, assignments, distances, (double const *)data, numData, iteration) ;
+      break ;
+    default:
+      abort() ;
+  }
+}
+
+/** ------------------------------------------------------------------
  ** @brief Refine center locations.
  ** @param self KMeans object.
  ** @param data data to quantize.
@@ -1461,12 +1902,12 @@ vl_kmeans_refine_centers
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
       return
-      _vl_kmeans_refine_centers_f
-      (self, (float const *)data, numData) ;
+        _vl_kmeans_refine_centers_f
+        (self, (float const *)data, numData) ;
     case VL_TYPE_DOUBLE :
       return
-      _vl_kmeans_refine_centers_d
-      (self, (double const *)data, numData) ;
+        _vl_kmeans_refine_centers_d
+        (self, (double const *)data, numData) ;
     default:
       abort() ;
   }
@@ -1533,7 +1974,7 @@ vl_kmeans_cluster (VlKMeans * self,
     timeRef = vl_get_cpu_time () ;
     energy = vl_kmeans_refine_centers (self, data, numData) ;
     if (self->verbosity) {
-      VL_PRINTF("kmeans: K-means termineted in %.2f s with energy %g\n",
+      VL_PRINTF("kmeans: K-means terminated in %.2f s with energy %g\n",
                 vl_get_cpu_time() - timeRef, energy) ;
     }
 

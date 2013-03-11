@@ -17,6 +17,7 @@ the terms of the BSD license (see the COPYING file).
 #include "generic.h"
 #include "random.h"
 #include "mathop.h"
+#include "kdtree.h"
 
 /* ---------------------------------------------------------------- */
 
@@ -25,7 +26,7 @@ the terms of the BSD license (see the COPYING file).
 typedef enum _VlKMeansAlgorithm {
   VlKMeansLloyd,       /**< Lloyd algorithm */
   VlKMeansElkan,       /**< Elkan algorithm */
-  VlKMeansANN          /**< Approximate nearest neighbors */
+  VlKMeansANN,          /**< Approximate nearest neighbors */
 } VlKMeansAlgorithm ;
 
 /** @brief K-means initialization algorithms */
@@ -35,6 +36,13 @@ typedef enum _VlKMeansInitialization {
   VlKMeansPlusPlus          /**< Plus plus raondomized selection */
 } VlKMeansInitialization ;
 
+/** @brief K-means multithreading options */
+
+typedef enum _VlKMeansMultithreading {
+  VlKMeansParallel,  /**< Multithreaded ANN */
+  VlKMeansSerial          /**< Singlethreaded ANN */
+} VlKMeansMultithreading;
+
 
 /** ------------------------------------------------------------------
  ** @brief K-means quantizer
@@ -42,16 +50,20 @@ typedef enum _VlKMeansInitialization {
 
 typedef struct _VlKMeans
 {
+
   vl_type dataType ;                   /**< data type */
   vl_size dimension ;                  /**< data dimensionality */
   vl_size numCenters ;                 /**< number of centers   */
+  vl_size numTrees;                    /**< number of trees in forest when using ANN-kmeans */
+  vl_size maxNumComparisons;           /**< maximum number of comparisons when using ANN-kmeans */
 
   VlKMeansInitialization initialization ; /** < Initalization algorithm */
   VlKMeansAlgorithm algorithm ;        /**< Clustring algorithm */
   VlVectorComparisonType distance ;    /**< Distance */
+  VlKMeansMultithreading multithreading;           /**< Multithreaded/Singlethreaded */
   vl_size maxNumIterations ;           /**< Maximum number of refinement iterations */
   vl_size numRepetitions   ;           /**< Number of clustering repetitions */
-  int verbosity ;                      /**< verbosity level */
+  int verbosity ;                     /**< verbosity level */
 
   void * centers ;                     /**< centers */
   void * centerDistances ;             /**< centers inter-distances */
@@ -85,6 +97,13 @@ VL_EXPORT void vl_kmeans_quantize (VlKMeans * self,
                                    void * distances,
                                    void const * data,
                                    vl_size numData) ;
+
+VL_EXPORT void vl_kmeans_quantize_ANN (VlKMeans * self,
+                                   vl_uint32 * assignments,
+                                   void * distances,
+                                   void const * data,
+                                   vl_size numData,
+                                   vl_size iteration );
 /** @} */
 
 /** @name Advanced data processing
@@ -130,6 +149,8 @@ VL_INLINE vl_size vl_kmeans_get_num_centers (VlKMeans const * self) ;
 
 VL_INLINE int vl_kmeans_get_verbosity (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kmeans_get_max_num_iterations (VlKMeans const * self) ;
+VL_INLINE vl_size vl_kmeans_get_max_num_comparisons (VlKMeans const * self) ;
+VL_INLINE vl_size vl_kmeans_get_num_trees (VlKMeans const * self) ;
 VL_INLINE double vl_kmeans_get_energy (VlKMeans const * self) ;
 VL_INLINE void const * vl_kmeans_get_centers (VlKMeans const * self) ;
 /** @} */
@@ -139,9 +160,12 @@ VL_INLINE void const * vl_kmeans_get_centers (VlKMeans const * self) ;
  **/
 VL_INLINE void vl_kmeans_set_algorithm (VlKMeans * self, VlKMeansAlgorithm algorithm) ;
 VL_INLINE void vl_kmeans_set_initialization (VlKMeans * self, VlKMeansInitialization initialization) ;
+VL_INLINE void vl_kmeans_set_multithreading (VlKMeans * self, VlKMeansMultithreading multithreading) ;
 VL_INLINE void vl_kmeans_set_num_repetitions (VlKMeans * self, vl_size numRepetitions) ;
 VL_INLINE void vl_kmeans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations) ;
 VL_INLINE void vl_kmeans_set_verbosity (VlKMeans * self, int verbosity) ;
+VL_INLINE void vl_kmeans_set_max_num_comparisons (VlKMeans * self, vl_size maxNumComparisons) ;
+VL_INLINE void vl_kmeans_set_num_trees (VlKMeans * self, vl_size numTrees) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -329,6 +353,55 @@ vl_kmeans_set_initialization (VlKMeans * self,
                               VlKMeansInitialization initialization)
 {
   self->initialization = initialization ;
+}
+
+VL_INLINE void
+vl_kmeans_set_multithreading (VlKMeans * self,
+                              VlKMeansMultithreading multithreading)
+{
+    self->multithreading = multithreading;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get maximum number of comparisons in ANN-KD-Tree.
+ ** @param self KMeans object instance.
+ ** @return maximum number of comparisons.
+ **/
+
+VL_INLINE vl_size
+vl_kmeans_get_max_num_comparisons (VlKMeans const * self)
+{
+  return self->maxNumComparisons ;
+}
+
+/** @brief Set maximum number of comparisons in ANN-KD-Tree.
+ ** @param self KMeans filter.
+ ** @param maxNumComparisons maximum number of comparisons.
+ **/
+
+VL_INLINE void
+vl_kmeans_set_max_num_comparisons (VlKMeans * self,
+                              vl_size maxNumComparisons)
+{
+    self->maxNumComparisons = maxNumComparisons;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get number of trees in ANN-KD-Tree.
+ ** @param self KMeans object instance.
+ ** @return number of trees.
+ **/
+
+VL_INLINE void
+vl_kmeans_set_num_trees (VlKMeans * self, vl_size numTrees)
+{
+    self->numTrees = numTrees;
+}
+
+VL_INLINE vl_size
+vl_kmeans_get_num_trees (VlKMeans const * self)
+{
+    return self->numTrees;
 }
 
 

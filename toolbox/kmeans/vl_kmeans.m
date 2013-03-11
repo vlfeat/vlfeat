@@ -24,12 +24,33 @@
 %     to initialize the centers.
 %
 %   Algorithm:: [LLOYD]
-%     Use either the standard LLOYD or the accelerated
-%     ELKAN algorithm for optimization.
+%     One of LLOYD, ELKAN, or ANN. LLOYD is the standard Lloyd
+%     algorithm (similar to expectation maximisation). ELKAN is a
+%     faster version of LLOYD using triangular inequalities to cut
+%     down significantly the number of sample-to-center
+%     comparisons. ANN is the same as Lloyd, but uses an approximated
+%     nearest neighbours (ANN) algorithm to accelerate the
+%     sample-to-center comparisons. The latter is particularly
+%     suitable for very large problems.
 %
 %   NumRepetitions:: [1]
 %     Number of time to restart k-means. The solution with minimal
 %     energy is returned.
+%
+%   The following options tune the KD-Tree forest used for ANN
+%   computations in the ANN algorithm (see also VL_KDTREEBUILD()
+%   andVL_KDTREEQUERY()).
+%
+%   NumTrees:: [3]
+%     The number of trees int the randomized KD-Tree forest.
+%
+%   MaxNumComparisons:: [100]
+%     Maximum number of sample-to-center comparisons when searching
+%     for the closest center.
+%
+%   Multithreading:: [PARALLEL]
+%     One of PARALLEL or SERIAL. PARALLEL uses multiple threads to
+%     further accelerate the ANN algorithm.
 %
 %   Example::
 %     VL_KMEANS(X, 10, 'verbose', 'distance', 'l1', 'algorithm',
