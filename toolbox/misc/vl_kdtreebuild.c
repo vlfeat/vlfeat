@@ -23,7 +23,7 @@ the terms of the BSD license (see the COPYING file).
 
 /* option codes */
 enum {
-  opt_verbose, opt_threshold_method, opt_num_trees
+  opt_verbose, opt_threshold_method, opt_num_trees, opt_distance
 } ;
 
 /* options */
@@ -31,6 +31,7 @@ vlmxOption  options [] = {
 {"Verbose",          0,   opt_verbose          },
 {"ThresholdMethod",  1,   opt_threshold_method },
 {"NumTrees",         1,   opt_num_trees        },
+{"Distance",         1,   opt_distance         },
 {0,                  0,   0                    }
 } ;
 
@@ -57,6 +58,7 @@ mexFunction(int nout, mxArray *out[],
   mxClassID dataClass ;
   vl_type dataType ;
   int thresholdingMethod = VL_KDTREE_MEDIAN ;
+  VlVectorComparisonType distance = VlDistanceL2;
   vl_size numTrees = 1 ;
 
   VL_USE_MATLAB_ENV ;
@@ -119,6 +121,26 @@ mexFunction(int nout, mxArray *out[],
       case opt_verbose :
         ++ verbose ;
         break ;
+
+      case opt_distance :
+        if (!vlmxIsString (optarg, -1)) {
+          vlmxError (vlmxErrInvalidArgument,
+                    "DISTANCE must be a string.") ;
+        }
+        if (mxGetString (optarg, buffer, sizeof(buffer))) {
+          vlmxError (vlmxErrInvalidArgument,
+                    "DISTANCE argument too long.") ;
+        }
+        if (vlmxCompareStringsI("l2", buffer) == 0) {
+          distance = VlDistanceL2 ;
+        } else if (vlmxCompareStringsI("l1", buffer) == 0) {
+          distance = VlDistanceL1 ;
+        } else {
+          vlmxError (vlmxErrInvalidArgument,
+                    "Invalid value %s for DISTANCE", buffer) ;
+        }
+        break ;
+
     }
   }
 
@@ -126,7 +148,7 @@ mexFunction(int nout, mxArray *out[],
   numData = mxGetN (IN(DATA)) ;
   dimension = mxGetM (IN(DATA)) ;
 
-  forest = vl_kdforest_new (dataType, dimension, numTrees) ;
+  forest = vl_kdforest_new (dataType, dimension, numTrees, distance) ;
   vl_kdforest_set_thresholding_method (forest, thresholdingMethod) ;
 
   if (verbose) {

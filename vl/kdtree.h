@@ -48,6 +48,8 @@ struct _VlKDTreeDataIndexEntry
   double value ;
 } ;
 
+
+
 /** @brief Thresholding method */
 typedef enum _VlKDTreeThresholdingMethod
 {
@@ -77,6 +79,8 @@ struct _VlKDForestSearchState
   double distanceLowerBound ;
 } ;
 
+struct _VlKDForestSearcher;
+
 /** @brief KDForest object */
 typedef struct _VlKDForest
 {
@@ -89,6 +93,7 @@ typedef struct _VlKDForest
   vl_type dataType ;
   void const * data ;
   vl_size numData ;
+  VlVectorComparisonType distance;
   void (*distanceFunction)(void) ;
 
   /* tree structure */
@@ -100,24 +105,45 @@ typedef struct _VlKDForest
   VlKDTreeSplitDimension splitHeapArray [VL_KDTREE_SPLIT_HEAP_SIZE] ;
   vl_size splitHeapNumNodes ;
   vl_size splitHeapSize ;
+  vl_size maxNumNodes;
 
-  /* querying */
-  VlKDForestSearchState * searchHeapArray ;
-  vl_size searchHeapNumNodes ;
-  vl_uindex searchId ;
-  vl_uindex * searchIdBook ;
-
+  /* query */
   vl_size searchMaxNumComparisons ;
+  vl_size numSearchers;
+  struct _VlKDForestSearcher * headSearcher;   /**< head of the double linked list with searchers */
+
+} VlKDForest ;
+
+/** @brief KDForest searcher object */
+struct _VlKDForestSearcher
+{
+
+  /* maintain a linked list of searchers for later disposal*/
+  struct _VlKDForestSearcher * next;
+  struct _VlKDForestSearcher * previous;
+
+  vl_uindex * searchIdBook ;
+  VlKDForestSearchState * searchHeapArray ;
+  VlKDForest * forest;
+
   vl_size searchNumComparisons;
   vl_size searchNumRecursions ;
   vl_size searchNumSimplifications ;
-} VlKDForest ;
 
-/** @name Creatind and disposing
+  vl_size searchHeapNumNodes ;
+  vl_uindex searchId ;
+
+};
+
+typedef struct _VlKDForestSearcher VlKDForestSearcher ;
+
+/** @name Creating, copying and disposing
  ** @{ */
 VL_EXPORT VlKDForest * vl_kdforest_new (vl_type dataType,
-                                        vl_size dimension, vl_size numTrees) ;
+                                        vl_size dimension, vl_size numTrees, VlVectorComparisonType normType) ;
+VL_EXPORT VlKDForestSearcher * vl_kdforest_new_searcher (VlKDForest * kdforest);
 VL_EXPORT void vl_kdforest_delete (VlKDForest * self) ;
+VL_EXPORT void vl_kdforest_delete_searcher (VlKDForestSearcher * searcher) ;
 /** @} */
 
 /** @name Building and querying
@@ -125,7 +151,7 @@ VL_EXPORT void vl_kdforest_delete (VlKDForest * self) ;
 VL_EXPORT void vl_kdforest_build (VlKDForest * self,
                                   vl_size numData,
                                   void const * data) ;
-VL_EXPORT vl_size vl_kdforest_query (VlKDForest * self,
+VL_EXPORT vl_size vl_kdforest_query (VlKDForestSearcher * searcher,
                                      VlKDForestNeighbor * neighbors,
                                      vl_size numNeighbors,
                                      void const * query) ;
@@ -142,6 +168,8 @@ VL_INLINE void vl_kdforest_set_max_num_comparisons (VlKDForest * self, vl_size n
 VL_INLINE vl_size vl_kdforest_get_max_num_comparisons (VlKDForest * self) ;
 VL_INLINE void vl_kdforest_set_thresholding_method (VlKDForest * self, VlKDTreeThresholdingMethod method) ;
 VL_INLINE VlKDTreeThresholdingMethod vl_kdforest_get_thresholding_method (VlKDForest const * self) ;
+VL_INLINE VlKDForest * vl_kdforest_searcher_get_forest (VlKDForestSearcher const * self) ;
+VL_INLINE VlKDForestSearcher * vl_kdforest_get_searcher (VlKDForest const * self, vl_uindex pos) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -270,6 +298,12 @@ VL_INLINE vl_type
 vl_kdforest_get_data_type (VlKDForest const * self)
 {
   return self->dataType ;
+}
+
+VL_INLINE VlKDForest *
+vl_kdforest_searcher_get_forest (VlKDForestSearcher const * self)
+{
+  return self->forest;
 }
 
 

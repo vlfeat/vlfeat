@@ -65,6 +65,7 @@ mexFunction(int nout, mxArray *out[],
   unsigned int numComparisons = 0 ;
   unsigned int maxNumComparisons = 0 ;
   VlKDForestNeighbor * neighbors ;
+  VlKDForestSearcher * searcher;
   mxClassID dataClass ;
 
   VL_USE_MATLAB_ENV ;
@@ -142,9 +143,11 @@ mexFunction(int nout, mxArray *out[],
     VL_PRINTF ("vl_kdforestquery: max num of comparisons per query: %d\n",
                vl_kdforest_get_max_num_comparisons (forest)) ;
   }
+  
+  searcher = vl_kdforest_new_searcher(forest);
 
   for (qi = 0 ; qi < numQueries ; ++ qi) {
-    numComparisons += vl_kdforest_query (forest, neighbors, numNeighbors,
+    numComparisons += vl_kdforest_query (searcher, neighbors, numNeighbors,
                                          query) ;
     switch (dataClass) {
       case mxSINGLE_CLASS:
@@ -181,6 +184,8 @@ mexFunction(int nout, mxArray *out[],
                ((double) numComparisons) / (numQueries * numNeighbors)) ;
   }
 
+  vl_kdforest_delete_searcher (searcher) ;
   vl_kdforest_delete (forest) ;
   vl_free (neighbors) ;
+  
 }
