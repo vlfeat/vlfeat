@@ -15,8 +15,8 @@ the terms of the BSD license (see the COPYING file).
  
 @section rodrigues Rodrigues formulas
 
-- Use vl_rodrigues() to compute the Rodrigues formula and its derivative.
-- Use vl_irodrigues() to compute the inverse Rodrigues formula and
+- Use ::vl_rodrigues to compute the Rodrigues formula and its derivative.
+- Use ::vl_irodrigues to compute the inverse Rodrigues formula and
   its derivative.
 
 **/
