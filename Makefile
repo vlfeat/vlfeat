@@ -86,8 +86,9 @@ SHELL = /bin/bash
 all:
 
 # Feature selection
-DISABLE_SSE2=no
-DISABLE_THREADS=no
+DISABLE_SSE2=
+DISABLE_THREADS=
+DISABLE_OPENMP=
 
 # --------------------------------------------------------------------
 #                                                       Error Messages
@@ -141,11 +142,13 @@ LIBTOOL ?= libtool
 STD_CLFAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99
 STD_CFLAGS += -Wall -Wextra
+
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-STD_CFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
-STD_CFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
+STD_CFLAGS += $(if $(DISABLE_THREADS), -DVL_DISABLE_THREADS)
+STD_CFLAGS += $(if $(DISABLE_SSE2), -DVL_DISABLE_SSE2)
+STD_CFLAGS += $(if $(DISABLE_OPENMP), -DVL_DISABLE_OPENMP)
 STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
-STD_CFLAGS += $(if $(PROFILE), -g,)
+STD_CFLAGS += $(if $(PROFILE), -g)
 
 STD_LDFLAGS = $(LDFLAGS)
 

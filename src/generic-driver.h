@@ -8,6 +8,7 @@
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -123,15 +124,13 @@ vl_file_meta_open (VlFileMeta * self, char const * basename, char const * mode)
                                   basename) ;
 
   if (q >= sizeof(self->name)) {
-    vl_get_thread_specific_state()->lastError = VL_ERR_OVERFLOW ;
-    return -1 ;
+    return vl_set_last_error (VL_ERR_OVERFLOW, NULL) ;
   }
 
   if (self->active) {
     self->file = fopen (self->name, mode) ;
     if (! self->file) {
-      vl_get_thread_specific_state()->lastError = VL_ERR_IO ;
-      return -1 ;
+      return vl_set_last_error(VL_ERR_IO, NULL) ;
     }
   }
   return 0 ;

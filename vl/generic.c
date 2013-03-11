@@ -4,7 +4,8 @@
  **/
 
 /*
-Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -16,7 +17,8 @@ the terms of the BSD license (see the COPYING file).
 @mainpage VLFeat -- Vision Lab Features Library
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
-@par Copyright &copy; 2007-13 Andrea Vedaldi and Brian Fulkerson
+@par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
+@par Copyright &copy; 2013 Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The VLFeat C library implements common computer
@@ -473,6 +475,7 @@ elapsed time.
 **/
 
 #include "generic.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -481,7 +484,9 @@ elapsed time.
 
 #if defined(VL_OS_WIN)
 #include <Windows.h>
-#elif defined(_POSIX_THREADS)
+#endif
+
+#if ! defined(VL_DISABLE_THREADS) && defined(VL_THREADS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -489,26 +494,97 @@ elapsed time.
 #include <unistd.h>
 #endif
 
-/** ------------------------------------------------------------------
- ** @brief Get version string
- ** @return library version string
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+
+/* ---------------------------------------------------------------- */
+/*                                         Global and thread states */
+/* ---------------------------------------------------------------- */
+
+/* Thread state */
+typedef struct _VlThreadState
+{
+  /* errors */
+  int lastError ;
+  char lastErrorMessage [VL_ERR_MSG_LEN] ;
+
+  /* random number generator */
+  VlRand rand ;
+
+  /* time */
+#if defined(VL_OS_WIN)
+  LARGE_INTEGER ticFreq ;
+  LARGE_INTEGER ticMark ;
+#else
+  clock_t ticMark ;
+#endif
+} VlThreadState ;
+
+/* Gobal state */
+typedef struct _VlState
+{
+  /* The thread state uses either a mutex (POSIX)
+    or a critical section (Win) */
+#if defined(VL_DISABLE_THREADS)
+  VlThreadState * threadState ;
+#else
+#if defined(VL_THREADS_POSIX)
+  pthread_key_t threadKey ;
+  pthread_mutex_t mutex ;
+  pthread_t mutexOwner ;
+  pthread_cond_t mutexCondition ;
+  size_t mutexCount ;
+#elif defined(VL_THREADS_WIN)
+  DWORD tlsIndex ;
+  CRITICAL_SECTION mutex ;
+#endif
+#endif /* VL_DISABLE_THREADS */
+
+  /* Configurable functions */
+  int   (*printf_func)  (char const * format, ...) ;
+  void *(*malloc_func)  (size_t) ;
+  void *(*realloc_func) (void*,size_t) ;
+  void *(*calloc_func)  (size_t, size_t) ;
+  void  (*free_func)    (void*) ;
+
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  VlX86CpuInfo cpuInfo ;
+#endif
+  vl_size numCPUs ;
+  vl_bool simdEnabled ;
+  vl_size numThreads ;
+} VlState ;
+
+/* Global state instance */
+VlState _vl_state ;
+
+/* ----------------------------------------------------------------- */
+VL_INLINE VlState * vl_get_state () ;
+VL_INLINE VlThreadState * vl_get_thread_specific_state () ;
+void vl_lock_state () ;
+void vl_unlock_state () ;
+VlThreadState * vl_thread_specific_state_new () ;
+void vl_thread_specific_state_delete (VlThreadState * self) ;
+
+/** @brief Get VLFeat version string
+ ** @return the library version string.
  **/
 
-VL_EXPORT char const *
+char const *
 vl_get_version_string ()
 {
   return VL_VERSION_STRING ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Human readable library configuration
- ** @return a new string with the library configuration.
+/** @brief Get VLFeat configuration string.
+ ** @return a new configuration string.
  **
- ** The function returns a new string with a human readable
- ** rendition of the library configuration.
+ ** The function returns a new string containing a human readable
+ ** description of the library configuration.
  **/
 
-VL_EXPORT char *
+char *
 vl_configuration_to_string_copy ()
 {
   char * string = 0 ;
@@ -535,10 +611,16 @@ vl_configuration_to_string_copy ()
                       "VLFeat version %s\n"
                       "    Static config: %s\n"
                       "    %" VL_FMT_SIZE " CPU(s): %s\n"
+#if defined(_OPENMP)
+                      "    Threads (OpenMP): %" VL_FMT_SIZE " of %" VL_FMT_SIZE "\n"
+#endif
                       "    Debug: %s\n",
                       vl_get_version_string (),
                       staticString,
                       vl_get_num_cpus(), cpuString,
+#if defined(_OPENMP)
+                      vl_get_num_threads(), vl_get_max_num_threads(),
+#endif
                       VL_YESNO(debug)) ;
     length += 1 ;
   }
@@ -555,12 +637,7 @@ do_nothing_printf (char const* format VL_UNUSED, ...)
   return 0 ;
 }
 
-/** --------------------------------------------------------------- */
-
-VlState _vl_state ;
-
-/** ------------------------------------------------------------------
- ** @internal @brief Lock VLFeat state
+/** @internal@brief Lock VLFeat state
  **
  ** The function locks VLFeat global state mutex.
  **
@@ -571,8 +648,7 @@ VlState _vl_state ;
  ** @sa ::vl_unlock_state
  **/
 
-VL_EXPORT void
-vl_lock_state ()
+void vl_lock_state ()
 {
 #if ! defined(VL_DISABLE_THREADS)
 #if   defined(VL_THREADS_POSIX)
@@ -596,15 +672,14 @@ vl_lock_state ()
 #endif
 }
 
-/** ------------------------------------------------------------------
- ** @internal @brief Unlock VLFeat state
+/** @internal@brief Unlock VLFeat state
  **
  ** The function unlocks VLFeat global state mutex.
  **
  ** @sa ::vl_lock_state
  **/
 
-VL_EXPORT void
+void
 vl_unlock_state ()
 {
 #if ! defined(VL_DISABLE_THREADS)
@@ -622,78 +697,68 @@ vl_unlock_state ()
 #endif
 }
 
-/** @internal @fn ::vl_get_state()
- ** @brief Return VLFeat global state
+/** @internal@brief Return VLFeat global state
  **
  ** The function returns a pointer to VLFeat global state.
  **
  ** @return pointer to the global state structure.
  **/
 
-/** @internal @fn ::vl_get_thread_specific_state()
- ** @brief Get VLFeat thread state
+VL_INLINE VlState *
+vl_get_state ()
+{
+  return &_vl_state ;
+}
+
+/** @internal@brief Get VLFeat thread state
+ ** @return pointer to the thread state structure.
  **
  ** The function returns a pointer to VLFeat thread state.
- **
- ** @return pointer to the thread state structure.
  **/
 
-/** @fn ::vl_malloc(size_t)
- ** @brief Call customizable @c malloc function
- ** @param n number of bytes to allocate.
- **
- ** The function calls the user customizable @c malloc.
- **
- ** @return result of @c malloc
+VL_INLINE VlThreadState *
+vl_get_thread_specific_state ()
+{
+#ifdef VL_DISABLE_THREADS
+  return vl_get_state()->threadState ;
+#else
+  VlState * state ;
+  VlThreadState * threadState ;
+
+  vl_lock_state() ;
+  state = vl_get_state() ;
+
+#if defined(VL_THREADS_POSIX)
+  threadState = (VlThreadState *) pthread_getspecific(state->threadKey) ;
+#elif defined(VL_THREADS_WIN)
+  threadState = (VlThreadState *) TlsGetValue(state->tlsIndex) ;
+#endif
+
+  if (! threadState) {
+    threadState = vl_thread_specific_state_new () ;
+  }
+
+#if defined(VL_THREADS_POSIX)
+  pthread_setspecific(state->threadKey, threadState) ;
+#elif defined(VL_THREADS_WIN)
+  TlsSetValue(state->tlsIndex, threadState) ;
+#endif
+
+  vl_unlock_state() ;
+  return threadState ;
+#endif
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get the number of CPU cores of the host
+ ** @return number of CPU cores.
  **/
 
-/** @fn ::vl_realloc(void*,size_t)
- ** @brief Call customizable @c resize function
- **
- ** @param ptr buffer to reallocate.
- ** @param n   number of bytes to allocate.
- **
- ** The function calls the user-customizable @c realloc.
- **
- ** @return result of the user-customizable @c realloc.
- **/
-
-/** @fn ::vl_calloc(size_t,size_t)
- ** @brief Call customizable @c calloc function
- **
- ** @param n    size of each element in byte.
- ** @param size size of the array to allocate (number of elements).
- **
- ** The function calls the user-customizable @c calloc.
- **
- ** @return result of the user-customizable @c calloc.
- **/
-
-/** @fn ::vl_free(void*)
- ** @brief Call customizable @c free function
- **
- ** @param ptr buffer to free.
- **
- ** The function calls the user customizable @c free.
- **/
-
-/** @fn ::vl_get_last_error()
- ** @brief Get VLFeat last error code
- **
- ** The function returns the code of the last error generated
- ** by VLFeat.
- **
- ** @return laste error code.
- **/
-
-/** @internal @fn ::vl_get_last_error_message()
- ** @brief Get VLFeat last error message
- **
- ** The function returns the message of the last
- ** error generated by VLFeat.
- **
- ** @return last error message.
- **/
+vl_size
+vl_get_num_cpus ()
+{
+  return vl_get_state()->numCPUs ;
+}
 
 /** @fn ::vl_set_simd_enabled(vl_bool)
  ** @brief Toggle usage of SIMD instructions
@@ -706,23 +771,113 @@ vl_unlock_state ()
  ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
  **/
 
-/** @fn ::vl_get_simd_enabled()
- ** @brief Are SIMD instructons enabled?
+void
+vl_set_simd_enabled (vl_bool x)
+{
+  vl_get_state()->simdEnabled = x ;
+}
+
+/** @brief Are SIMD instructons enabled?
  ** @return @c true is SIMD instructions are enabled.
  **/
 
-/** @fn ::vl_cpu_has_sse3()
- ** @brief Check for SSE3 instruction set
+vl_bool
+vl_get_simd_enabled ()
+{
+  return vl_get_state()->simdEnabled ;
+}
+
+/** @brief Check for SSE3 instruction set
  ** @return @c true if SSE3 is present.
  **/
 
-/** @fn ::vl_cpu_has_sse2()
- ** @brief Check for SSE2 instruction set
+vl_bool
+vl_cpu_has_sse3 ()
+{
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  return vl_get_state()->cpuInfo.hasSSE3 ;
+#else
+  return VL_FALSE ;
+#endif
+}
+
+/** @brief Check for SSE2 instruction set
  ** @return @c true if SSE2 is present.
  **/
 
-/** ------------------------------------------------------------------
- ** @internal @brief Set last VLFeat error
+vl_bool
+vl_cpu_has_sse2 ()
+{
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  return vl_get_state()->cpuInfo.hasSSE2 ;
+#else
+  return VL_FALSE ;
+#endif
+}
+
+/* ---------------------------------------------------------------- */
+
+/** @brief Get number of threads used for parallel computations
+ ** @return number of threads.
+ **
+ ** This function returns the default number of threads used for
+ ** parallel operations. This is ususally the number of threads
+ ** that are used by parallel sections in the library, and is
+ ** controlled by ::vl_set_num_threads. Normally, it defaults to the number
+ ** of cores of the host. However, some objects and
+ ** functions allow overriding this default value on a case-by-case basis.
+ **/
+
+vl_size
+vl_get_num_threads()
+{
+  return vl_get_state()->numThreads ;
+}
+
+/** @brief Get the maximum number of threads for parallel computations
+ ** @return number of threads.
+ **
+ ** This function returns the maximum number of threads that can be used
+ ** for parallel computations. Normally, it equals the number of cores
+ ** in the host.
+ **/
+
+vl_size
+vl_get_max_num_threads()
+{
+#if defined(_OPENMP)
+  return (vl_size) omp_get_max_threads() ;
+#else
+  return 1 ;
+#endif
+}
+
+/** @brief Set the number of threads to be used in parallel computations
+ ** @param numThreads number of threads to use.
+ ** @return actual number of threads set.
+ **
+ ** This function sets the number of threads for parallel computations
+ ** to @a numThreads (see ::vl_get_num_threads). It is clamped to the
+ ** range from 1 to ::vl_get_max_num_threads.
+ **/
+
+vl_size
+vl_set_num_threads(vl_size numThreads)
+{
+  vl_size num = VL_MIN(numThreads, vl_get_max_num_threads()) ;
+  num = VL_MAX(1, num) ;
+#if defined(_OPENMP)
+  omp_set_num_threads((int)num) ;
+#endif
+  return num ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Set last VLFeat error
+ ** @param error error code.
+ ** @param errorMessage error message format string.
+ ** @param ... format string arguments.
+ ** @return error code.
  **
  ** The function sets the code and optionally the error message
  ** of the last encountered error. @a errorMessage is the message
@@ -732,17 +887,12 @@ vl_unlock_state ()
  **
  ** Passing @c NULL as @a errorMessage
  ** sets the error message to the empty string.
- **
- ** @param error error code.
- ** @param errorMessage error message format string.
- ** @param ... format string arguments.
- ** @return error code.
  **/
 
-VL_EXPORT int
+int
 vl_set_last_error (int error, char const * errorMessage, ...)
 {
-  VlThreadSpecificState * state = vl_get_thread_specific_state() ;
+  VlThreadState * state = vl_get_thread_specific_state() ;
   va_list args;
   va_start(args, errorMessage) ;
   if (errorMessage) {
@@ -761,15 +911,36 @@ vl_set_last_error (int error, char const * errorMessage, ...)
   return error ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Set memory allocation functions
+/** @brief Get the code of the last error
+ ** @return error code.
+ ** @sa ::vl_get_last_error_message.
+ **/
+
+int
+vl_get_last_error () {
+  return vl_get_thread_specific_state()->lastError ;
+}
+
+/** @brief Get the last error message
+ ** @return pointer to the error message.
+ ** @sa ::vl_get_last_error.
+ **/
+
+char const *
+vl_get_last_error_message ()
+{
+  return vl_get_thread_specific_state()->lastErrorMessage ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Set memory allocation functions
  ** @param malloc_func  pointer to @c malloc.
  ** @param realloc_func pointer to @c realloc.
  ** @param calloc_func  pointer to @c calloc.
  ** @param free_func    pointer to @c free.
  **/
 
-VL_EXPORT void
+void
 vl_set_alloc_func (void *(*malloc_func)  (size_t),
                    void *(*realloc_func) (void*, size_t),
                    void *(*calloc_func)  (size_t, size_t),
@@ -785,24 +956,98 @@ vl_set_alloc_func (void *(*malloc_func)  (size_t),
   vl_unlock_state () ;
 }
 
-VL_EXPORT void
+/** @brief Allocate a memory block
+ ** @param n size in bytes of the new block.
+ ** @return pointer to the allocated block.
+ **
+ ** This function allocates a memory block of the specified size.
+ ** The synopsis is the same as the POSIX @c malloc function.
+ **/
+
+void *
+vl_malloc (size_t n)
+{
+  return (vl_get_state()->malloc_func)(n) ;
+}
+
+/** @brief Reallocate a memory block
+ ** @param ptr pointer to a memory block previously allocated.
+ ** @param n size in bytes of the new block.
+ ** @return pointer to the new block.
+ **
+ ** This function reallocates a memory block to change its size.
+ ** The synopsis is the same as the POSIX @c realloc function.
+ **/
+
+void *
+vl_realloc (void* ptr, size_t n)
+{
+  return (vl_get_state()->realloc_func)(ptr, n) ;
+}
+
+/** @brief Free and clear a memory block
+ ** @param n number of items to allocate.
+ ** @param size size in bytes of an item.
+ ** @return pointer to the new block.
+ **
+ ** This function allocates and clears a memory block.
+ ** The synopsis is the same as the POSIX @c calloc function.
+ **/
+
+void *
+vl_calloc (size_t n, size_t size)
+{
+  return (vl_get_state()->calloc_func)(n, size) ;
+}
+
+/** @brief Free a memory block
+ ** @param ptr pointer to the memory block.
+ **
+ ** This function frees a memory block allocated by ::vl_malloc,
+ ** ::vl_calloc, or ::vl_realloc. The synopsis is the same as the POSIX
+ ** @c malloc function.
+ **/
+
+void
+vl_free (void *ptr)
+{
+  (vl_get_state()->free_func)(ptr) ;
+}
+
+/* ---------------------------------------------------------------- */
+
+/** @brief Set the printf function
+ ** @param printf_func pointer to a @c printf implementation.
+ ** Set @c print_func to NULL to disable printf.
+ **/
+
+void
 vl_set_printf_func (printf_func_t printf_func)
 {
   vl_get_state()->printf_func = printf_func ? printf_func : do_nothing_printf ;
 }
 
+/** @brief Get the printf function
+ ** @return printf_func pointer to the @c printf implementation.
+ ** @sa ::vl_set_printf_func.
+ **/
 
-/** ------------------------------------------------------------------
- ** @brief Get processor time
- ** @return processor time.
+printf_func_t
+vl_get_printf_func () {
+  return vl_get_state()->printf_func ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get processor time
+ ** @return processor time in seconds.
  ** @sa ::vl_tic, ::vl_toc
  **/
 
-VL_EXPORT double
+double
 vl_get_cpu_time ()
 {
   #ifdef VL_OS_WIN
-  VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
+  VlThreadState * threadState = vl_get_thread_specific_state() ;
   LARGE_INTEGER mark ;
   QueryPerformanceCounter (&mark) ;
   return (double)mark.QuadPart / (double)threadState->ticFreq.QuadPart ;
@@ -811,16 +1056,16 @@ vl_get_cpu_time ()
 #endif
 }
 
-/** ------------------------------------------------------------------
- ** @brief Reset processor time reference
- ** The function resets VLFeat TIC/TOC time reference.
+/** @brief Reset processor time reference
+ ** The function resets VLFeat TIC/TOC time reference. There is one
+ ** such reference per thread.
  ** @sa ::vl_get_cpu_time, ::vl_toc.
  **/
 
-VL_EXPORT void
+void
 vl_tic ()
 {
-  VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
+  VlThreadState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
   QueryPerformanceCounter (&threadState->ticMark) ;
 #else
@@ -828,8 +1073,8 @@ vl_tic ()
 #endif
 }
 
-/** ------------------------------------------------------------------
- ** @brief Get elapsed time since tic
+/** @brief Get elapsed time since tic
+ ** @return elapsed time in seconds.
  **
  ** The function
  ** returns the processor time elapsed since ::vl_tic was called last.
@@ -840,14 +1085,12 @@ vl_tic ()
  ** @remark On UNIX, this function uses the @c clock() system call.
  ** On Windows, it uses the @c QueryPerformanceCounter() system call,
  ** which is more accurate than @c clock() on this platform.
- **
- ** @return elapsed time in seconds.
  **/
 
-VL_EXPORT double
+double
 vl_toc ()
 {
-  VlThreadSpecificState * threadState = vl_get_thread_specific_state() ;
+  VlThreadState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
   LARGE_INTEGER tocMark ;
   QueryPerformanceCounter(&tocMark) ;
@@ -858,12 +1101,13 @@ vl_toc ()
 #endif
 }
 
-/** ------------------------------------------------------------------
- ** @brief Get the random number generator for this thread
+/* ---------------------------------------------------------------- */
+/** @brief Get the default random number generator.
  ** @return random number generator.
  **
- ** The function returns a pointer to the random number genrator
- ** for this thread.
+ ** The function returns a pointer to the default
+ ** random number genrator.
+ ** There is one such generator per thread.
  **/
 
 VL_EXPORT VlRand *
@@ -872,18 +1116,22 @@ vl_get_rand ()
   return &vl_get_thread_specific_state()->rand ;
 }
 
-/* -------------------------------------------------------------------
- *                       Library construction and destruction routines
- *  --------------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+/*                    Library construction and destruction routines */
+/*  --------------------------------------------------------------- */
 
-VL_EXPORT VlThreadSpecificState *
+/** @internal@brief Construct a new thread state object
+ ** @return new state structure.
+ **/
+
+VlThreadState *
 vl_thread_specific_state_new ()
 {
-  VlThreadSpecificState * self ;
+  VlThreadState * self ;
 #if defined(DEBUG)
   printf("VLFeat thread constructor called\n") ;
 #endif
-  self = malloc(sizeof(VlThreadSpecificState)) ;
+  self = malloc(sizeof(VlThreadState)) ;
   self->lastError = 0 ;
   self->lastErrorMessage[0] = 0 ;
 #if defined(VL_OS_WIN)
@@ -897,22 +1145,32 @@ vl_thread_specific_state_new ()
   return self ;
 }
 
-VL_EXPORT void
-vl_thread_specific_state_delete (VlThreadSpecificState * self)
+/** @internal@brief Delete a thread state structure
+ ** @param self thread state object.
+ **/
+
+void
+vl_thread_specific_state_delete (VlThreadState * self)
 {
 #if defined(DEBUG)
   printf("VLFeat thread destructor called\n") ;
 #endif
   free (self) ;
 }
+/* ---------------------------------------------------------------- */
+/*                                        DLL entry and exit points */
+/* ---------------------------------------------------------------- */
+/* A constructor and a destructor must be called to initalize or dispose of VLFeat
+ * state when the DLL is loaded or unloaded. This is obtained
+ * in different ways depending on the operating system.
+ */
 
 #if (defined(VL_OS_LINUX) || defined(VL_OS_MACOSX)) && defined(VL_COMPILER_GNUC)
-
 static void vl_constructor () __attribute__ ((constructor)) ;
 static void vl_destructor () __attribute__ ((destructor))  ;
+#endif
 
-#elif defined(VL_OS_WIN)
-
+#if defined(VL_OS_WIN)
 static void vl_constructor () ;
 static void vl_destructor () ;
 
@@ -922,7 +1180,7 @@ BOOL WINAPI DllMain(
     LPVOID lpReserved )  // reserved
 {
   VlState * state ;
-  VlThreadSpecificState * threadState ;
+  VlThreadState * threadState ;
   switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
       /* Initialize once for each new process */
@@ -937,7 +1195,7 @@ BOOL WINAPI DllMain(
       /* Do thread-specific cleanup */
 #if ! defined(VL_DISABLE_THREADS) && defined(VL_THREADS_WIN)
       state = vl_get_state() ;
-      threadState = (VlThreadSpecificState*) TlsGetValue(state->tlsIndex) ;
+      threadState = (VlThreadState*) TlsGetValue(state->tlsIndex) ;
       if (threadState) {
         vl_thread_specific_state_delete (threadState) ;
       }
@@ -951,10 +1209,13 @@ BOOL WINAPI DllMain(
     }
     return TRUE ; /* Successful DLL_PROCESS_ATTACH */
 }
+#endif /* VL_OS_WIN */
 
-#endif
+/* ---------------------------------------------------------------- */
+/*                               Library constructor and destructor */
+/* ---------------------------------------------------------------- */
 
-/** @internal @brief Initialize VLFeat */
+/** @internal @brief Initialize VLFeat state */
 static void
 vl_constructor ()
 {
@@ -969,7 +1230,7 @@ vl_constructor ()
 #if defined(DEBUG)
   printf("VLFeat DEBUG: constructing thread specific state.\n") ;
 #endif
-#if   defined(VL_THREADS_POSIX)
+#if defined(VL_THREADS_POSIX)
   {
     typedef void (*destructorType)(void * );
     pthread_key_create (&state->threadKey,
@@ -983,7 +1244,8 @@ vl_constructor ()
   state->tlsIndex = TlsAlloc () ;
 #endif
 #else
-  /* threading support disabled */
+
+/* threading support disabled */
 #if defined(DEBUG)
   printf("VLFeat DEBUG: constructing the generic thread state instance (threading support disabled).\n") ;
 #endif
@@ -996,10 +1258,12 @@ vl_constructor ()
   state->free_func    = free ;
   state->printf_func  = printf ;
 
+  /* on x86 platforms read the CPUID register */
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
   _vl_x86cpu_info_init (&state->cpuInfo) ;
 #endif
 
+  /* get the number of CPUs */
 #if defined(VL_OS_WIN)
   {
     SYSTEM_INFO info;
@@ -1012,7 +1276,14 @@ vl_constructor ()
   state->numCPUs = 1 ;
 #endif
   state->simdEnabled = VL_TRUE ;
-  state->maxNumThreads = 1 ;
+
+  /* get the number of (OpenMP) threads used by the library */
+#if defined(_OPENMP)
+  state->numThreads = omp_get_max_threads() ;
+#else
+  state->numThreads = 1 ;
+#endif
+
 #if defined(DEBUG)
   printf("VLFeat DEBUG: constructor ends.\n") ;
 #endif
@@ -1041,7 +1312,7 @@ vl_destructor ()
        is unloaded, this thread should also be the last one
        using the library, so this is fine.
      */
-    VlThreadSpecificState * threadState =
+    VlThreadState * threadState =
        pthread_getspecific(state->threadKey) ;
     if (threadState) {
       vl_thread_specific_state_delete (threadState) ;
@@ -1059,7 +1330,7 @@ vl_destructor ()
        is unloaded, this thread should also be the last one
        using the library, so this is fine.
      */
-    VlThreadSpecificState * threadState =
+    VlThreadState * threadState =
        TlsGetValue(state->tlsIndex) ;
     if (threadState) {
       vl_thread_specific_state_delete (threadState) ;
@@ -1080,3 +1351,8 @@ vl_destructor ()
   printf("VLFeat DEBUG: destructor ends.\n") ;
 #endif
 }
+
+
+
+
+

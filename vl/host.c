@@ -336,7 +336,14 @@ it supports POSIX threads.
  ** @brief Defined if multi-threading support is disabled
  **
  ** Define this symbol during compilation of the library and linking
- ** to anogher project to disable VLFeat multi-threading support.
+ ** to another project to disable VLFeat multi-threading support.
+ **/
+
+/** @def VL_DISABLE_OPENMP
+ ** @brief Defined if OpenMP support is disabled
+ **
+ ** Define this symbol during compilation of the library and linking
+ ** to another project to disable VLFeat OpenMP support.
  **/
 
 /** @def VL_THREADS_WIN
@@ -492,6 +499,9 @@ vl_static_configuration_to_string_copy ()
 #endif
 #ifndef VL_DISABLE_SSE2
   ", SSE2"
+#endif
+#if defined(_OPENMP)
+  ", OpenMP"
 #endif
   ;
 

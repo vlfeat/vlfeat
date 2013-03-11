@@ -138,11 +138,11 @@ CFLAGS = /nologo /TC /MD \
          /D"_CRT_SECURE_NO_DEPRECATE" \
          /D"__LITTLE_ENDIAN__" \
          /I. \
-         /W1 /Zp8 /Ox
+         /W1 /Zp8 /Ox /openmp
 
 LFLAGS = $(LFLAGS) /NOLOGO \
          /INCREMENTAL:NO \
-         /MANIFEST
+         /MANIFEST /openmp
 
 !if "$(DEBUG)" != "no"
 !message === DEBUGGING ON

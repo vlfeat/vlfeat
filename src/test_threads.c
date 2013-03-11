@@ -5,6 +5,7 @@
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -15,6 +16,14 @@ the terms of the BSD license (see the COPYING file).
 #include <vl/random.h>
 
 #include <stdio.h>
+
+#if defined(VL_THREADS_POSIX)
+#include <pthread.h>
+#endif
+
+#if defined(VL_THREADS_WIN)
+#include <Windows.h>
+#endif
 
 #if defined(VL_THREADS_POSIX)
 

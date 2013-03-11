@@ -23,8 +23,11 @@ DLL_NAME = vl
 DLL_CFLAGS  = $(STD_CFLAGS)
 DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
+DLL_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
+
 
 DLL_LDFLAGS += -lm
+DLL_LDFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
 BINDIR = bin/$(ARCH)
 
@@ -89,15 +92,18 @@ $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 	       "$(<)" -MF "$(@)"
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
-	$(call C,LIBTOOL) -dynamic                                   \
+	$(call C,CC) -m64                                            \
+                    -dynamiclib                                      \
+                    -undefined suppress                              \
                     -flat_namespace                                  \
                     -install_name @loader_path/lib$(DLL_NAME).dylib  \
 	            -compatibility_version $(VER)                    \
                     -current_version $(VER)                          \
-                    -syslibroot $(SDKROOT)                           \
-		    -macosx_version_min $(MACOSX_DEPLOYMENT_TARGET)  \
-	            -o $@ -undefined suppress $^                     \
-	            $(DLL_LDFLAGS)
+                    -isysroot $(SDKROOT)                             \
+		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET) \
+	            $(DLL_LDFLAGS)                                   \
+                    $^                                               \
+                    -o $@
 
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
