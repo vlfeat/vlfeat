@@ -1,0 +1,139 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>The ongoing lines describe how to use estimate a <b>Gaussian mixture model</b>
+using the VlFeat implementation of <b>Expectation Maximization</b> algorithm.
+</p>
+
+<ul>
+ <li><a href="%pathto:tut.gmm.introduction;">GMM basics</a></li>
+ <li><a href="%pathto:tut.gmm.cov;">Speed optimization</a></li>
+ <li><a href="%pathto:tut.gmm.initialization;">Types of initializations of GMMs</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.gmm.introduction">Expectation maximization</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>EM algorithm attempts to model a dataset as a mixture of K multivariate
+gaussian distributions.</p>
+
+<p>Consider a dataset containing 1000 randomly sampled points in 2-D.</p>
+
+<precode type='matlab'>
+N         = 1000 ;
+dimension = 2 ;
+data = rand(dimension,N) ;
+</precode>
+
+<p>If one wants to estimate a gaussian mixture of this dataset, 
+the following commands could be invoked:</p>
+
+<precode type='matlab'>
+numClusters = 30 ;
+[means, sigmas, weights] = vl_gmm(data, numClusters);
+</precode>
+
+<p>In the <code>means</code>, <code>sigmas</code> and <code>weights</code>  
+variables are stored means, sigmas and weights of estimated gaussians,
+which form the mixture. One of the possible outcomes of this algorithm is
+presented in following figure:
+</p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/gmm_2d_rand.jpg"/>
+  <div class="caption">Simple gmm mixture run on a small random 2D dataset.</div>
+</div>
+
+<p>
+The visualization was done using the vl_plotframe method.
+</p>
+
+<precode type='matlab'>
+figure
+hold on
+plot(data(1,:),data(2,:),'r.');
+for i=1:numClusters
+    vl_plotframe([means(:,i)' sigmas(1,i) 0 sigmas(2,i)]);
+end
+</precode>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h3 id="tut.gmm.cov">Covariance optimization</h3>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>
+Note that the ellipses are axis alligned. This is an outcome of the
+optimization method, where (for the sake of speed) all the computations
+are done only with <b>diagonals</b> of covariance matrices.
+</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.gmm.initialization">GMM Initialization</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>The most simple way how to initiate the GMM algorithm is
+to pick <code>numClusters</code> random subset of data points,
+as initial means of individual gaussians, the covariance of the whole dataset
+as initial covariance matrices and equal weights which sum to one as
+initial weight of each gaussian. This random method is implicitly set
+when running <code>vl_gmm</code> function. However user can specify the
+<b>Custom</b> initialization method.</p>
+
+<p>The <b>Custom</b> initialization method is used when a user wants
+to specify its own initialization of the algorithm. When
+the <code>'Initialization'</code> option is set to <code>'Custom'</code>
+also the options <code>'InitMeans'</code>, <code>'InitSigmas'</code> and
+<code>'InitWeights'</code> have to be set. This initialization approach
+is frequently used with KMeans algorithm. KMeans is used
+to obtain initial means, covariances and weights of gaussians. After
+this an EM algorithm takes place. We show the workflow in the following
+piece of code:</p>
+
+<precode>
+%% data init
+numClusters = 30;
+numData = 1000;
+dimension = 2;
+data = rand(dimension,numData);
+
+%% kmeans initialization
+[initMeans, assignments] = vl_kmeans(data, numClusters, ...
+    'algorithm','lloyd', ...
+    'MaxNumIterations',5);
+
+initSigmas = zeros(dimension,numClusters);
+initWeights = zeros(1,numClusters);
+
+%% find initial means, sigmas and weights
+for i=1:numClusters
+    data_k = data(:,assignments==i);
+    initWeights(i) = size(data_k,2) / numClusters;
+    
+    if size(data_k,1) == 0 || size(data_k,2) == 0
+        initSigmas(:,i) = diag(cov(data'));
+    else
+        initSigmas(:,i) = diag(cov(data_k'));
+    end
+end
+
+%% gmm estimation
+[means,sigmas,weights,ll,posteriors] = vl_gmm(data, numClusters, ...
+    'initialization','custom', ...
+    'InitMeans',initMeans, ...
+    'InitSigmas',initSigmas, ...
+    'InitWeights',initWeights);
+</precode>
+
+<p>The demo scripts vl_demo_gmm_2d and vl_demo_gmm_3d also produce
+cute colorized figures such as these: </p>
+
+<div class="figure">
+  <image src="%pathto:root;demo/gmm_2d_shell.jpg"/>
+  <div class="caption">The figure shows how the estimated gaussian mixture looks like with and without the kmeans initialization.</div>
+</div>
+
+</group>
+
