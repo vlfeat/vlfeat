@@ -17,6 +17,9 @@ the terms of the BSD license (see the COPYING file).
 #include "generic.h"
 #include <math.h>
 
+/** @brief Euler constant*/
+#define VL_E 2.718281828459045
+
 /** @brief Logarithm of 2 (math constant)*/
 #define VL_LOG_OF_2 0.693147180559945
 
@@ -554,6 +557,16 @@ typedef float (*VlFloatVectorComparisonFunction)(vl_size dimension, float const 
  **/
 typedef double (*VlDoubleVectorComparisonFunction)(vl_size dimension, double const * X, double const * Y) ;
 
+/** @typedef VlFloatVector3ComparisonFunction
+ ** @brief Pointer to a function to compare 3 vectors of doubles
+ **/
+typedef float (*VlFloatVector3ComparisonFunction)(vl_size dimension, float const * X, float const * Y, float const * Z) ;
+
+/** @typedef VlDoubleVector3ComparisonFunction
+ ** @brief Pointer to a function to compare 3 vectors of doubles
+ **/
+typedef double (*VlDoubleVector3ComparisonFunction)(vl_size dimension, double const * X, double const * Y, double const * Z) ;
+
 /** @brief Vector comparison types */
 enum _VlVectorComparisonType {
   VlDistanceL1,        /**< l1 distance (squared intersection metric) */
@@ -561,6 +574,7 @@ enum _VlVectorComparisonType {
   VlDistanceChi2,      /**< squared Chi2 distance */
   VlDistanceHellinger, /**< squared Hellinger's distance */
   VlDistanceJS,        /**< squared Jensen-Shannon distance */
+  VlDistanceMahal,     /**< squared mahalanobis distance */
   VlKernelL1,          /**< intersection kernel */
   VlKernelL2,          /**< l2 kernel */
   VlKernelChi2,        /**< Chi2 kernel */
@@ -583,6 +597,7 @@ vl_get_vector_comparison_type_name (int type)
     case VlDistanceL1   : return "l1" ;
     case VlDistanceL2   : return "l2" ;
     case VlDistanceChi2 : return "chi2" ;
+    case VlDistanceMahal  : return "mahalanobis" ;
     case VlKernelL1     : return "kl1" ;
     case VlKernelL2     : return "kl2" ;
     case VlKernelChi2   : return "kchi2" ;
@@ -595,6 +610,13 @@ vl_get_vector_comparison_function_f (VlVectorComparisonType type) ;
 
 VL_EXPORT VlDoubleVectorComparisonFunction
 vl_get_vector_comparison_function_d (VlVectorComparisonType type) ;
+
+VL_EXPORT VlFloatVector3ComparisonFunction
+vl_get_vector_3_comparison_function_f (VlVectorComparisonType type) ;
+
+VL_EXPORT VlDoubleVector3ComparisonFunction
+vl_get_vector_3_comparison_function_d (VlVectorComparisonType type) ;
+
 
 VL_EXPORT void
 vl_eval_vector_comparison_on_all_pairs_f (float * result, vl_size dimension,

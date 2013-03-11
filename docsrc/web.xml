@@ -166,6 +166,7 @@
    <page id="tut.sift" name="sift" title="SIFT"> <include src="sift.html"/></page>
    <page id="tut.dsift" name="dsift" title="DSIFT/PHOW"> <include src="dsift.html"/></page>
    <page id="tut.mser" name="mser" title="MSER"> <include src="mser.html"/></page>
+   <page id="tut.gmm" name="gmm" title="GMM">  <include src="gmm.html"/></page>
    <page id="tut.kmeans" name="kmeans" title="KMeans">  <include src="kmeans.html"/></page>
    <page id="tut.ikm" name="ikm" title="IKM">  <include src="ikm.html"/></page>
    <page id="tut.hikm" name="hikm" title="HIKM"> <include src="hikm.html"/></page>

@@ -118,6 +118,65 @@ VL_XCAT(_vl_distance_l2_sse2_, SFX)
 }
 
 VL_EXPORT T
+VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
+(vl_size dimension, T const * X, T const * MU, T const * S)
+{
+  T const * X_end = X + dimension ;
+  T const * X_vec_end = X_end - VSIZE + 1 ;
+  T acc ;
+  VTYPE vacc = VSTZ() ;
+  vl_bool dataAligned = VALIGNED(X) & VALIGNED(MU) & VALIGNED(S);
+
+  if (dataAligned) {
+    while (X < X_vec_end) {
+
+      VTYPE a = *(VTYPE*)X ;
+      VTYPE b = *(VTYPE*)MU ;
+      VTYPE c = *(VTYPE*)S ;
+
+      VTYPE delta = VSUB(a, b) ;
+      VTYPE delta2 = VMUL(delta, delta) ;
+      VTYPE delta2div = VDIV(delta2,c);
+
+      vacc = VADD(vacc, delta2div) ;
+
+      X  += VSIZE ;
+      MU += VSIZE ;
+      S  += VSIZE ;
+    }
+  } else {
+    while (X < X_vec_end) {
+
+      VTYPE a = VLDU(X) ;
+      VTYPE b = VLDU(MU) ;
+      VTYPE c = VLDU(S) ;
+
+      VTYPE delta = VSUB(a, b) ;
+      VTYPE delta2 = VMUL(delta, delta) ;
+      VTYPE delta2div = VDIV(delta2,c);
+
+      vacc = VADD(vacc, delta2div) ;
+
+      X  += VSIZE ;
+      MU += VSIZE ;
+      S  += VSIZE ;
+    }
+  }
+
+  acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
+
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *MU++ ;
+    T c = *S++ ;
+    T delta = a - b ;
+    acc += (delta * delta) / c;
+  }
+
+  return acc ;
+}
+
+VL_EXPORT T
 VL_XCAT(_vl_distance_l1_sse2_, SFX)
 (vl_size dimension, T const * X, T const * Y)
 {
@@ -354,6 +413,109 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
   }
   return ((T)2) * acc ;
 }
+//
+VL_EXPORT void
+VL_XCAT(_vl_weighted_sigma_sse2_, SFX)
+(vl_size dimension, T * S, T const * X, T const * Y, T const * W)
+{
+  T const * X_end = X + dimension ;
+  T const * X_vec_end = X_end - VSIZE + 1 ;
+
+  vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) & VALIGNED(S);
+
+  VTYPE w = VLD1 (W) ;
+
+  if (dataAligned) {
+    while (X < X_vec_end) {
+      VTYPE a = *(VTYPE*)X ;
+      VTYPE b = *(VTYPE*)Y ;
+      VTYPE s = *(VTYPE*)S ;
+
+      VTYPE delta = VSUB(a, b) ;
+      VTYPE delta2 = VMUL(delta, delta) ;
+      VTYPE delta2w = VMUL(delta2, w) ;
+      VTYPE sigmaStore = VADD(s,delta2w);
+
+      *(VTYPE *)S = sigmaStore;
+
+      X += VSIZE ;
+      Y += VSIZE ;
+      S += VSIZE ;
+    }
+  } else {
+    while (X < X_vec_end) {
+      VTYPE a = VLDU(X) ;
+      VTYPE b = VLDU(Y) ;
+      VTYPE s = VLDU(S) ;
+
+      VTYPE delta = VSUB(a, b) ;
+      VTYPE delta2 = VMUL(delta, delta) ;
+      VTYPE delta2w = VMUL(delta2, w) ;
+      VTYPE sigmaStore = VADD(s,delta2w);
+
+      VST2U(S,sigmaStore);
+
+      X += VSIZE ;
+      Y += VSIZE ;
+      S += VSIZE ;
+    }
+  }
+
+
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *Y++ ;
+    T delta = a - b ;
+    *S += ((delta * delta)*(*W)) ;
+    S++;
+  }
+}
+
+VL_EXPORT void
+VL_XCAT(_vl_weighted_mean_sse2_, SFX)
+(vl_size dimension, T * MU, T const * X, T const * W)
+{
+  T const * X_end = X + dimension ;
+  T const * X_vec_end = X_end - VSIZE + 1 ;
+
+  vl_bool dataAligned = VALIGNED(X) & VALIGNED(MU);
+  VTYPE w = VLD1 (W) ;
+
+  if (dataAligned) {
+    while (X < X_vec_end) {
+      VTYPE a = *(VTYPE*)X ;
+      VTYPE mu = *(VTYPE*)MU ;
+
+      VTYPE aw = VMUL(a, w) ;
+      VTYPE meanStore = VADD(aw, mu);
+
+      *(VTYPE *)MU = meanStore;
+
+      X += VSIZE ;
+      MU += VSIZE ;
+    }
+  } else {
+    while (X < X_vec_end) {
+      VTYPE a  = VLDU(X) ;
+      VTYPE mu = VLDU(MU) ;
+
+      VTYPE aw = VMUL(a, w) ;
+      VTYPE meanStore = VADD(aw, mu);
+
+      VST2U(MU,meanStore);
+
+      X += VSIZE ;
+      MU += VSIZE ;
+    }
+  }
+
+  while (X < X_end) {
+    T a = *X++ ;
+    *MU += a * (*W) ;
+    MU++;
+  }
+}
+
 
 /* VL_MATHOP_SSE2_INSTANTIATING */
 #endif

@@ -190,8 +190,10 @@ the terms of the BSD license (see the COPYING file).
 #undef COMPARISONFUNCTION_TYPE
 #if (FLT == VL_TYPE_FLOAT)
 #  define COMPARISONFUNCTION_TYPE VlFloatVectorComparisonFunction
+#  define COMPARISONFUNCTION3_TYPE VlFloatVector3ComparisonFunction
 #else
 #  define COMPARISONFUNCTION_TYPE VlDoubleVectorComparisonFunction
+#  define COMPARISONFUNCTION3_TYPE VlDoubleVector3ComparisonFunction
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -357,6 +359,19 @@ VL_XCAT(_vl_kernel_js_, SFX)
   return (T)0.5 * acc ;
 }
 
+VL_EXPORT T
+VL_XCAT(_vl_distance_mahalanobis_sq_, SFX)
+(vl_size dimension, T const * X, T const * MU, T const * S)
+{
+  T const * X_end = X + dimension ;
+  T acc = 0.0 ;
+  while (X < X_end) {
+    T d = *X++ - *MU++ ;
+    acc += d * d / (*S++) ;
+  }
+  return acc ;
+}
+
 /* ---------------------------------------------------------------- */
 
 VL_EXPORT COMPARISONFUNCTION_TYPE
@@ -364,16 +379,16 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
 {
   COMPARISONFUNCTION_TYPE function = 0 ;
   switch (type) {
-    case VlDistanceL2        : function = VL_XCAT(_vl_distance_l2_,        SFX) ; break ;
-    case VlDistanceL1        : function = VL_XCAT(_vl_distance_l1_,        SFX) ; break ;
-    case VlDistanceChi2      : function = VL_XCAT(_vl_distance_chi2_,      SFX) ; break ;
-    case VlDistanceHellinger : function = VL_XCAT(_vl_distance_hellinger_, SFX) ; break ;
-    case VlDistanceJS        : function = VL_XCAT(_vl_distance_js_,        SFX) ; break ;
-    case VlKernelL2          : function = VL_XCAT(_vl_kernel_l2_,          SFX) ; break ;
-    case VlKernelL1          : function = VL_XCAT(_vl_kernel_l1_,          SFX) ; break ;
-    case VlKernelChi2        : function = VL_XCAT(_vl_kernel_chi2_,        SFX) ; break ;
-    case VlKernelHellinger   : function = VL_XCAT(_vl_kernel_hellinger_,   SFX) ; break ;
-    case VlKernelJS          : function = VL_XCAT(_vl_kernel_js_,          SFX) ; break ;
+    case VlDistanceL2        : function = VL_XCAT(_vl_distance_l2_,             SFX) ; break ;
+    case VlDistanceL1        : function = VL_XCAT(_vl_distance_l1_,             SFX) ; break ;
+    case VlDistanceChi2      : function = VL_XCAT(_vl_distance_chi2_,           SFX) ; break ;
+    case VlDistanceHellinger : function = VL_XCAT(_vl_distance_hellinger_,      SFX) ; break ;
+    case VlDistanceJS        : function = VL_XCAT(_vl_distance_js_,             SFX) ; break ;
+    case VlKernelL2          : function = VL_XCAT(_vl_kernel_l2_,               SFX) ; break ;
+    case VlKernelL1          : function = VL_XCAT(_vl_kernel_l1_,               SFX) ; break ;
+    case VlKernelChi2        : function = VL_XCAT(_vl_kernel_chi2_,             SFX) ; break ;
+    case VlKernelHellinger   : function = VL_XCAT(_vl_kernel_hellinger_,        SFX) ; break ;
+    case VlKernelJS          : function = VL_XCAT(_vl_kernel_js_,               SFX) ; break ;
     default: abort() ;
   }
 
@@ -381,12 +396,36 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {
-      case VlDistanceL2   : function = VL_XCAT(_vl_distance_l2_sse2_,   SFX) ; break ;
-      case VlDistanceL1   : function = VL_XCAT(_vl_distance_l1_sse2_,   SFX) ; break ;
-      case VlDistanceChi2 : function = VL_XCAT(_vl_distance_chi2_sse2_, SFX) ; break ;
-      case VlKernelL2     : function = VL_XCAT(_vl_kernel_l2_sse2_,     SFX) ; break ;
-      case VlKernelL1     : function = VL_XCAT(_vl_kernel_l1_sse2_,     SFX) ; break ;
-      case VlKernelChi2   : function = VL_XCAT(_vl_kernel_chi2_sse2_,   SFX) ; break ;
+      case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_sse2_,             SFX) ; break ;
+      case VlDistanceL1    : function = VL_XCAT(_vl_distance_l1_sse2_,             SFX) ; break ;
+      case VlDistanceChi2  : function = VL_XCAT(_vl_distance_chi2_sse2_,           SFX) ; break ;
+      case VlKernelL2      : function = VL_XCAT(_vl_kernel_l2_sse2_,               SFX) ; break ;
+      case VlKernelL1      : function = VL_XCAT(_vl_kernel_l1_sse2_,               SFX) ; break ;
+      case VlKernelChi2    : function = VL_XCAT(_vl_kernel_chi2_sse2_,             SFX) ; break ;
+      default: break ;
+    }
+  }
+#endif
+
+  return function ;
+}
+
+/* ---------------------------------------------------------------- */
+
+VL_EXPORT COMPARISONFUNCTION3_TYPE
+VL_XCAT(vl_get_vector_3_comparison_function_, SFX)(VlVectorComparisonType type)
+{
+  COMPARISONFUNCTION3_TYPE function = 0 ;
+  switch (type) {
+    case VlDistanceMahal     : function = VL_XCAT(_vl_distance_mahalanobis_sq_, SFX) ; break ;
+    default: abort() ;
+  }
+
+#ifndef VL_DISABLE_SSE2
+  /* if a SSE2 implementation is available, use it */
+  if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
+    switch (type) {
+      case VlDistanceMahal : function = VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX) ; break ;
       default: break ;
     }
   }
