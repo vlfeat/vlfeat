@@ -5,6 +5,7 @@
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi and David Novotny.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -14,185 +15,318 @@ the terms of the BSD license (see the COPYING file).
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page kmeans K-means clustering
-@author Andrea Vedaldi, David Novotny
+@author Andrea Vedaldi
+@author David Novotny
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref kmeans.h implements a number of algorithm for k-means quantisation.
-It supports
+@ref kmeans.h implements a number of algorithm for **K-means
+quantization**: Lloyd @cite{lloyd82least}, an accelerated version by
+Elkan @cite{elkan03using}, and a large scale algorithm based on
+Approximate Nearest Neighbors (ANN). All algorithms support @c float
+or @c double data and can use the $l^1$ or the $l^2$ distance for
+clustering. Furthermore, all algorithms can take advantage of multiple
+CPU cores.
 
-- data of type @c float or @c double;
-- @e l1 and @e l2 distances;
-- random selection and <code>k-means++</code> @cite{arthur07k-means}
-  initialization methods;
-- the basic Lloyd @cite{lloyd82least}, the accelerated Elkan
-  @cite{elkan03using} and ANN optimization methods;
+Please see @subpage kmeans-fundamentals for a technical description of
+K-means and of the algorithms implemented here.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section kmeans-usage Usage
+@section kmeans-starting Getting started
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-To use @ref kmeans.h to learn clusters from some training data,
-instantiate a ::VlKMeans object, set the configuration parameters,
-initialise the cluster centers, and run the trainig code.  For
-instance, to learn @c numCenters clusters from @c numData vectors of
-dimension @c dimension and storage type @c float using L2 distance and
-at most 100 Lloyd iterations of the Lloyd algorithm use:
+The goal of K-means is to partition a dataset into $K$
+&ldquo;compact&rdquo; clusters. The following example demonstrates
+using @ref kmeans.h in the C programming language to partition @c
+numData @c float vectors into compute @c numCenters clusters using
+Lloyd's algorithm:
 
 @code
 #include <vl/kmeans.h>
+double energy ;
+double * centers ;
 
-VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
-VlVectorComparisonType distance = VlDistanceL2 ;
-KMeans * kmeans = vl_kmeans_new (algorithm, distance, VL_TYPE_FLOAT) ;
+// Use float data and the L2 distance for clustering
+KMeans * kmeans = vl_kmeans_new (VLDistanceL2, VL_TYPE_FLOAT) ;
+
+// Use Lloyd algorithm
+vl_kmeans_set_algorithm (kmeans, VlKMeansLloyd) ;
+
+// Initialize the cluster centers by randomly sampling the data
 vl_kmeans_seed_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
+
+// Run at most 100 iterations of cluster refinement using Lloyd algorithm
 vl_kmeans_set_max_num_iterations (kmeans, 100) ;
 vl_kmeans_refine_centers (kmeans, data, numData) ;
+
+// Obtain the energy of the solution
+energy = vl_kmeans_get_energy(kmeans) ;
+
+// Obtain the cluster centers
+centers = vl_kmeans_get_centers(kmeans) ;
 @endcode
 
-Use ::vl_kmeans_get_energy to get the solution energy (or an upper
-bound for the Elkan algorithm) and ::vl_kmeans_get_centers to obtain
-the @c numCluster cluster centers. Use ::vl_kmeans_quantize to
-quantize new data points.
+Once the centers have been obtained, new data points can be assigned
+to clusters by using the ::vl_kmeans_quantize function:
 
+@code
+vl_uint32 * assignments = vl_malloc(sizeof(vl_uint32) * numData) ;
+float * distances = vl_malloc(sizeof(float) * numData) ;
+vl_kmeans_quantize(kmeans, assignments, distances, data, numData) ;
+@endcode
+
+Alternatively, one can directly assign new pointers to the closest
+centers, without bothering with a ::VlKMeans object.
+
+There are several considerations that may impact the performance of
+KMeans. First, since K-means is usually based local optimization
+algorithm, the **initialization method** is important. The following
+initialization methods are supported:
+
+Method         | Function                                | Description
+---------------|-----------------------------------------|-----------------------------------------------
+Random samples | ::vl_kmeans_seed_centers_with_rand_data | Random data points
+K-means++      | ::vl_kmeans_seed_centers_plus_plus      | Random selection biased towards diversity
+Custom         | ::vl_kmeans_set_centers                 | Choose centers (useful to run quantization only)
+
+See @ref kmeans-init for further details. The initialization methods
+use a randomized selection of the data points; the random number
+generator seed is controlled by ::vl_rand_seed.
+
+The second important choice is the **optimization algorithm**. The
+following optimization algorithms are supported:
+
+Algorithm   | Symbol           | See               | Description
+------------|------------------|-------------------|-----------------------------------------------
+Lloyd       | ::VlKMeansLloyd  | @ref kmeans-lloyd | Alternate EM-style optimization
+Elkan       | ::VlKMeansElkan  | @ref kmeans-elkan | A speedup using triangular inequalities
+ANN         | ::VlKMeansANN    | @ref kmeans-ann   | A speedup using approximated nearest neighbors
+
+See the relative sections for further details. These algorithm are
+iterative, and stop when either a **maximum number of iterations**
+(::vl_kmeans_set_max_num_iterations) is reached, or when the energy
+changes sufficiently slowly in one iteration (::vl_kmeans).
+
+Parallel computation...
+*/
+
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-usage-init Initialization algorithms
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-@ref kmeans.h supports the following cluster initialization algorithms:
-
-- <b>Random data points</b> (::vl_kmeans_seed_centers_with_rand_data)
-  initialize the centers from a random selection of the training data.
-- <b>k-means++</b> (::vl_kmeans_seed_centers_plus_plus) initialize the
-  centers from a random selection of the training data while
-  attempting to obtain a good coverage of the dataset. This is the
-  strategy from @cite{arthur07k-means}.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-usage-optimizers Optimization algorithms
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-@ref kmeans.h supports the following optimization algorithms:
-
-- <b>Lloyd</b> @cite{lloyd82least} (::VlKMeansLloyd). This is the
-  standard k-means algorithm, alternating the estimation of the
-  point-to-cluster memebrship and of the cluster centers (means in the
-  Euclidean case). Estimating membership requires computing the
-  distance of each point to all cluster centers, which can be
-  extremely slow.
-
-- <b>Elkan</b> @cite{elkan03using} (::VlKMeansElkan). This is a
-  variation of @cite{lloyd82least} that uses the triangular inequality
-  to avoid many distance calculations when assigning points to
-  clusters and is typically much faster than
-  @cite{lloyd82least}. However, it uses storage proportional to the
-  square of the number of clusters, which makes it unpractical for a
-  very large number of clusters.
-
-- <b>ANN</b> @cite{beis97shape} @cite{silpa-anan08optimised} @cite{muja09fast}
-             (::VlKMeansANN). This algorithm is basically the same as Lloyds version,
-  but instead of a naive computation of point-to-cluster memberships
-  it uses best-bin-first randomized @ref kdtree. The KD-Forest queries could
-  be used in a parallel or serial manner (see @ref kmeans-usage-multithreading
-  section).
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-usage-multithreading OpenMP multithreading support
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-@ref kmeans.h supports parallel and serial computation of the point
-to cluster memberships.
-The parallel approach is implemented using <a href="http://openmp.org">OpenMP</a>.
-
-@section kmeans-tech Technical details
-
-Given data points @f$ x_1, \dots, x_n \in \mathbb{R}^d @f$, k-means
-searches for @f$ k @f$ vectors @f$ c_1, \dots, c_n \in \mathbb{R}^d @f$
-(cluster centers) and a function @f$ \pi : \{1, \dots, n\}
-\rightarrow \{1, \dots, k\} @f$ (cluster memberships)
-that minimize the objective:
-
-@f[
-  E(c_1,\dots,c_n,\pi) = \sum_{i=1}^n d^2(x_i, c_{\pi(i)})
-@f]
-
-A simple procedure due to Lloyd @cite{lloyd82least}
-to locally optimize this objective
-alternates estimating the cluster centers and the membeship function.
-Specifically, given the membership function @f$ \pi @f$,
-the objective can be minimized independently for eac @f$ c_k @f$
-by minimizing
-
-@f[
-  \sum_{i : \pi(i) = k} d^2(x_i, c_k)
-@f]
-
-For the Euclidean distance, the minimizer is simply the mean of the points
-assigned to that cluster. For other distances, the minimizer is
-a generalized average. For instance, for the @f$ l^1 @f$ distance,
-this is the median. Assuming that computing the average is linear
-in the number of points and the data dimension,
-this step requires @f$ O(nd) @f$ operations.
-
-Similarly, given the centers @f$ c_1, \dots, c_k @f$, the objective
-can be optimized independently for the membership @f$ \pi(i) @f$ of
-each point @f$ x_i @f$ by minimizing @f$ d^2(x_i, c_{\pi(i)}) @f$
-over @f$ \pi(i) \in \{1, \dots, k\} @f$. Assuming that computing
-a distance is @f$ O(d) @f$, this step requires @f$ O(ndk) @f$ operations
-and dominates the other.
-
-The algorithm usually starts by initializing the centers from a
-random selection of the data point.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-tech-kmeanspp Initialization by k-means++
+@page kmeans-fundamentals K-means fundamentals
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@cite{arthur07k-means} proposes a randomized initialization
-of the centers which improves
-upon random selection. The first center @f$ c_1 @f$ is selected at random
-from the data points @f$ x_1, \dots, x_n @f$ and
-the distance from this center to all points @f$ d^2(x_i, c_1) @f$ is
-computed. Then the second center @f$ c_2 @f$ is selected at random
-from the data points with probability proportional to the distance, and
-the procedure is repeated using the minimum distance to the centers
-collected so far.
+Given $n$ points $\bx_1,\dots,\bx_n \in \real^d$, the goal of K-means
+is find $K$ `centers` $\bc_1,\dots,\bc_m \in \real^d$ and
+`assignments` $q_1,\dots,q_n \in \{1,\dots,K\}$ of the points to the
+centers such that the sum of distances
+
+\[
+ E(\bc_1,\dots,\bc_k,q_1,\dots,q_n)
+ = \sum_{i=1}^n \|\bx_i - \bc_{q_i} \|_p^p
+\]
+
+is minimized. $K$-means is obtained for the case $p=2$ ($l^2$ norm),
+because in this case the optimal centers are the means of the input
+vectors assigned to them. Here the generalization $p=1$ ($l^1$ norm)
+will also be considered.
+
+Up to normalization, the K-means objective $E$ is also the average
+reconstruction error if the original points are approximated with the
+cluster centers. Thus K-means is used not only to group the input
+points into cluster, but also to `quantize` their values.
+
+K-means is widely used in computer vision, for example in the
+construction of vocabularies of visual features (visual words). In
+these applications the number $n$ of points to cluster and/or the
+number $K$ of clusters is often large. Unfortunately, minimizing the
+objective $E$ is in general a difficult combinatorial problem, so
+locally optimal or approximated solutions are sought instead.
+
+The basic K-means algorithm alternate between re-estimating the
+centers and the assignments (@ref kmeans-lloyd). Combined with a good
+initialization strategy (@ref kmeans-init) and, potentially, by
+re-running the optimization from a number of randomized starting
+states, this algorithm may attain satisfactory solutions in practice.
+
+However, despite its simplicity, Lloyd's algorithm is often too slow.
+A good replacement is Elkan's algorithm (@ref kmeans-elkan), which
+uses the triangular inequality to cut down significantly the cost of
+Lloyd's algorithm. Since this algorithm is otherwise equivalent, it
+should often be preferred.
+
+For very large problems (millions of point to clusters and hundreds,
+thousands, or more clusters to find), even Elkan's algorithm is not
+sufficiently fast. In these cases, one can resort to a variant of
+Lloyd's algorithm that uses an approximated nearest neighbors routine
+(@ref kmeans-ann).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-tech-elkan Speeding up by using the triangular inequality
+@section kmeans-init Initialization methods
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-[3] proposes to use the triangular inequality to avoid most
-distances calculations when computing point-to-cluster membership
-and the cluster centers did not change much from the previous iteration.
+All the $K$-means algorithms considered here find locally optimal
+solutions; as such the way they are initialized is important. @ref
+kmeans.h supports the following initialization algorithms:
 
-This uses two key ideas:
+@par Random data samples
 
-- If a point @f$ x_i @f$ is very close to its current
-  center @f$  c_{\pi(i)} @f$ and this center is very far from another
-  center @f$ c @f$, then the point cannot be assigned to @f$ c @f$.
-  Specifically, if @f$ d(x_i, c_{\pi(i)}) \leq d(c_{\pi(i)}, c) / 2 @f$,
-  then also @f$ d(x_i, c_{\pi(i)}) \leq d(x_i, c) @f$.
+The simplest initialization method is to sample $K$ points at random
+from the input data and use them as initial values for the cluster
+centers.
 
-- If a center @f$ c @f$ is updated to @f$ \hat c @f$, then the variation
-  of the distance of the center to any point can be bounded by
-  @f$ d(x, c) - d(c, \hat c) \leq d(x, \hat c) \leq d(x,c) + d(c, \hat c) @f$.
+@par K-means++
 
-The first idea is used by keeping track of the inter-center distances and
-exlcuding reassigments to centers too far away from the current assigned
-center. The second idea is used by keeping for each point an upper bound
-to the distance to the currently assigned center and a lower bound to the
-distance to all the other centers. Unless such bounds do not intersect,
-then a point need not to be reassigned. See [3] for details.
+@cite{arthur07k-means} proposes a randomized initialization of the
+centers which improves upon random selection. The first center $\bc_1$
+is selected at random from the data points $\bx_1, \dots, \bx_n $ and
+the distance from this center to all points $\|\bx_i - \bc_1\|_p^p$ is
+computed. Then the second center $\bc_2$ is selected at random from
+the data points with probability proportional to the distance. The
+procedure is repeated to obtain the other centers by using the minimum
+distance to the centers collected so far.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection kmeans-tech-ANN Speeding up by using the ANN KD-Forests
+@section kmeans-lloyd Lloyd's algorithm
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Another method for faster determination of point to cluster memberships is
-based on KD-Trees. For each point @f$ x_i @f$ the nearest center @f$ c_k @f$
-(which minimizes @f$ d^2(x_i, c_{\pi(i)}) @f$ over @f$ \pi(i) \in \{1, \dots, k\} @f$)
-is picked using randomized best-bin-first KD-Forest
-(see the @ref kdtree page for detailed information on implemented KD-Trees).
+The most common K-means method is Lloyd's algorithm
+@cite{lloyd82least}. This algorithm is based on the observation that,
+while jointly optimizing clusters and assignment is difficult,
+optimizing one given the other is easy. Lloyd's algorithm alternates
+the steps:
+
+1. **Recompute assignments.** Each point $\bx_i$ is reassigned to the
+   center $\bc_{q_j}$ closer to it. This requires finding for each
+   point the closest among $K$ other points, which is potentially
+   slow.
+2. **Recompute means.** Each center $\bc_q$ is updated to minimize its
+   average distances to the points assigned to it. It is easy to show
+   that the best center is the mean or median of the points,
+   respectively if the $l^2$ or $l^1$ norm is considered.
+
+A naive implementation of the assignment step requires $O(dnK)$
+operations, where $d$ is the dimensionality of the data, $n$ the
+number of data points, and $K$ the number of centers. Updating the
+centers is much cheaper: $O(dn)$ operations suffice to compute the $K$
+means and a slightly higher cost is required for the medians. Clearly,
+the bottleneck is the assignment computation, and this is what the
+other K-means algorithm try to improve.
+
+During the iterations, it can happen that a cluster becomes empty. In
+this case, K-means automatically **&ldquo;restarts&rdquo; the
+cluster** center by selecting a training point at random.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section kmeans-elkan Elkan's algorithm
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Elkan's algorithm @cite{elkan03using} is a variation of Lloyd
+alternate optimization algorithm (@ref kmeans-lloyd) that uses the
+triangular inequality to avoid many distance calculations when
+assigning points to clusters. While much faster than Lloyd, Elkan's
+method uses storage proportional to the umber of clusters by data
+points, which makes it unpractical for a very large number of
+clusters.
+
+The idea of this algorithm is that, if a center update does not move
+them much, then most of the point-to-center computations can be
+avoided when the point-to-center assignments are recomputed. To detect
+which distances need evaluation, the triangular inequality is used to
+lower and upper bound distances after a center update.
+
+Elkan algorithms uses two key observations. First, one has
+
+\[
+\|\bx_i - \bc_{q_i}\|_p \leq \|\bc - \bc_{q_i}\|_p / 2
+\quad\Rightarrow\quad
+\|\bx_i - \bc_{q_i}\|_p \leq \|\bx_i - \bc\|_p.
+\]
+
+Thus if the distance between $\bx_i$ and its current center
+$\bc_{q_i}$ is less than half the distance of the center $\bc_{q_i}$
+to another center $\bc$, then $\bc$ can be skipped when the new
+assignment for $\bx_i$ is searched. Checking this requires keeping
+track of all the inter-center distances, but centers are typically a
+small fraction of the training data, so overall this can be a
+significant saving. In particular, if this condition is satisfied for
+all the centers $\bc \not= \bc_{q_i}$, the point $\bx_i$ can be
+skipped completely. Furthermore, the condition can be tested also
+based on an upper bound $UB_i$ of $\|\bx_i - \bc_{q_i}\|_p$.
+
+Second, if a center $\bc$ is updated to $\hat{\bc}$, then the new
+distance from $\bx$ to $\hat{\bc}$ is bounded from below and above by
+
+\[
+\|\bx - \bc\|_p - \|bc - \hat\bc\|_p
+\leq
+\|\bx - \hat{\bc}\|_p
+\leq
+\|\bx - \hat{\bc}\|_p + \|\bc + \hat{\bc}\|_p.
+\]
+
+This allows to maintain an upper bound on the distance of $\bx_i$ to
+its current center $\bc_{q_i}$ and a lower bound to any other center
+$\bc$:
+
+@f{align*}
+  UB_i      & \leftarrow UB_i + \|\bc_{q_i} - \hat{\bc}_{q_i} \|_p \\
+  LB_i(\bc) & \leftarrow LB_i(\bc) - \|\bc -\hat \bc\|_p.
+@f}
+
+Thus the K-means algorithm becomes:
+
+1.  **Initialization.** Compute $LB_i(\bc) = \|\bx_i -\hat \bc\|_p$ for
+    all points and centers.  Find the current assignments $q_i$ and
+    bounds $UB_i$ by finding the closest centers to each point: $UB_i =
+    \min_{\bc} LB_i(\bc)$.
+2.  **Recompute means.**
+    1. Recompute all the centers based on the new means; call the updated
+       version $\hat{\bc}$.
+    2. Update all the bounds based on the distance $\|\bc - \hat\bc\|_p$
+       as explained above.
+    3. Set $\bc \leftarrow \hat\bc$ for all the centers and go to the next
+       iteration.
+3.  **Recompute assignments.**
+    1. Skip any point $\bx_i$ such that $UB_i \leq \frac{1}{2} \|\bc_{q_i} - \bc\|_p$
+       for all centers $\bc \not= \bc_{q_i}$.
+    2. For each remaining point $\bx_i$ and center $\bc \not= \bc_{q_i}$:
+       1. Skip $\bc$ if
+          \[
+           UB_i \leq \frac{1}{2} \| \bc_{q_i} - \bc \|
+           \quad\text{or}\quad
+           UB_i \leq LB_i(\bc).
+           \]
+          The first condition reflects the first observation above; the
+          second uses the bounds to decide if $\bc$ can be closer than the
+          current center $\bc_{q_i}$ to the point $\bx_i$. If the center
+          cannot be skipped, continue as follows.
+       3. Skip $\bc$ if the condition above is satisfied after making the
+          upper bound tight:
+          \[
+          UB_i = LB_i(\bc_{q_i}) = \| \bx_i - \bc_{q_i} \|_p.
+          \]
+          Note that the latter calculation can be done only once for $\bx_i$.
+          If the center cannot be skipped still, continue as follows.
+       4. Tighten the lower bound too:
+          \[
+          LB_i(\bc) = \| \bx_i - \bc \|_p.
+          \]
+          At this point both $UB_i$ and $LB_i(\bc)$ are tight. If $LB_i <
+          UB_i$, then the point $\bx_i$ should be reassigned to
+          $\bc$. Update $q_i$ to the index of center $\bc$ and reset $UB_i
+          = LB_i(\bc)$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section kmeans-ann ANN algorithm
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The ANN K-means algorithm @cite{beis97shape}
+@cite{silpa-anan08optimised} @cite{muja09fast} is a variant of Lloyd's
+algorithm (@ref kmeans-lloyd) that instead of the naive distance
+computations uses a best-bin-first randomized KD-tree algorithm to
+approximately (and quickly) to find the closest cluster center to each
+point. The KD-tree implementation is based on @ref kdtree.
 
 */
 
@@ -201,7 +335,7 @@ is picked using randomized best-bin-first KD-Forest
 #include "mathop.h"
 #include <string.h>
 
-#ifdef _OPENMP
+#if defined(_OPENMP) && ! defined(VL_DISABLE_OPENMP)
 #include <omp.h>
 #endif
 
@@ -1817,10 +1951,10 @@ vl_kmeans_seed_centers_plus_plus
 /** ------------------------------------------------------------------
  ** @brief Quantize data
  ** @param self KMeans object.
- ** @param assignments data to centers assignments.
- ** @param distances data to closes center distance/
+ ** @param assignments data to closest center assignments (output).
+ ** @param distances data to closest center distance (output).
  ** @param data data to quantize.
- ** @param numData number of data points.
+ ** @param numData number of data points to quantize.
  **/
 
 VL_EXPORT void

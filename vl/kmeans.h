@@ -26,7 +26,7 @@ the terms of the BSD license (see the COPYING file).
 typedef enum _VlKMeansAlgorithm {
   VlKMeansLloyd,       /**< Lloyd algorithm */
   VlKMeansElkan,       /**< Elkan algorithm */
-  VlKMeansANN,          /**< Approximate nearest neighbors */
+  VlKMeansANN          /**< Approximate nearest neighbors */
 } VlKMeansAlgorithm ;
 
 /** @brief K-means initialization algorithms */
@@ -40,7 +40,7 @@ typedef enum _VlKMeansInitialization {
 
 typedef enum _VlKMeansMultithreading {
   VlKMeansParallel,  /**< Multithreaded ANN */
-  VlKMeansSerial          /**< Singlethreaded ANN */
+  VlKMeansSerial     /**< Singlethreaded ANN */
 } VlKMeansMultithreading;
 
 
@@ -51,24 +51,24 @@ typedef enum _VlKMeansMultithreading {
 typedef struct _VlKMeans
 {
 
-  vl_type dataType ;                   /**< data type */
-  vl_size dimension ;                  /**< data dimensionality */
-  vl_size numCenters ;                 /**< number of centers   */
-  vl_size numTrees;                    /**< number of trees in forest when using ANN-kmeans */
-  vl_size maxNumComparisons;           /**< maximum number of comparisons when using ANN-kmeans */
+  vl_type dataType ;                      /**< data type */
+  vl_size dimension ;                     /**< data dimensionality */
+  vl_size numCenters ;                    /**< number of centers   */
+  vl_size numTrees ;                      /**< number of trees in forest when using ANN-kmeans */
+  vl_size maxNumComparisons ;             /**< maximum number of comparisons when using ANN-kmeans */
 
-  VlKMeansInitialization initialization ; /** < Initalization algorithm */
-  VlKMeansAlgorithm algorithm ;        /**< Clustring algorithm */
-  VlVectorComparisonType distance ;    /**< Distance */
-  VlKMeansMultithreading multithreading;           /**< Multithreaded/Singlethreaded */
-  vl_size maxNumIterations ;           /**< Maximum number of refinement iterations */
-  vl_size numRepetitions   ;           /**< Number of clustering repetitions */
-  int verbosity ;                     /**< verbosity level */
+  VlKMeansInitialization initialization ; /**< initalization algorithm */
+  VlKMeansAlgorithm algorithm ;           /**< clustring algorithm */
+  VlVectorComparisonType distance ;       /**< distance */
+  VlKMeansMultithreading multithreading;  /**< multithreaded or singlethreaded */
+  vl_size maxNumIterations ;              /**< maximum number of refinement iterations */
+  vl_size numRepetitions ;                /**< number of clustering repetitions */
+  int verbosity ;                         /**< verbosity level */
 
-  void * centers ;                     /**< centers */
-  void * centerDistances ;             /**< centers inter-distances */
+  void * centers ;                        /**< centers */
+  void * centerDistances ;                /**< centers inter-distances */
 
-  double energy ;                      /**< current solution energy */
+  double energy ;                         /**< current solution energy */
   VlFloatVectorComparisonFunction floatVectorComparisonFn ;
   VlDoubleVectorComparisonFunction doubleVectorComparisonFn ;
 } VlKMeans ;

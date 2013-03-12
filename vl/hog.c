@@ -386,24 +386,24 @@ vl_hog_get_permutation (VlHog const * self)
 }
 
 /* ---------------------------------------------------------------- */
-/** @brief Set wether to use bilinear interpolation assignments
+/** @brief Turn bilinear interpolation of assignments on or off
  ** @param self HOG object.
- ** @param @c true if orientations should be assigned with bilinear interpolation.
- **/
-
-vl_bool
-vl_hog_get_use_bilinear_orientation_assignments (VlHog const * self) {
-  return self->useBilinearOrientationAssigment ;
-}
-
-/** @brief Get wether bilinear interpolation assignments are used
- ** @param self HOG object.
- ** @return @c true if orientations are be assigned with bilinear interpolation.
+ ** @param x @c true if orientations should be assigned with bilinear interpolation.
  **/
 
 void
 vl_hog_set_use_bilinear_orientation_assignments (VlHog * self, vl_bool x) {
   self->useBilinearOrientationAssigment = x ;
+}
+
+/** @brief Tell whether assignments use bilinear interpolation or not
+ ** @param self HOG object.
+ ** @return @c true if orientations are be assigned with bilinear interpolation.
+ **/
+
+vl_bool
+vl_hog_get_use_bilinear_orientation_assignments (VlHog const * self) {
+  return self->useBilinearOrientationAssigment ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -730,18 +730,17 @@ vl_hog_put_image (VlHog * self,
 /* ---------------------------------------------------------------- */
 /** @brief Process features starting from a field in polar notation
  ** @param self HOG object.
- ** @param modulus modulus of the vectors at each image location.
- ** @param angle angle of the vectors at each image location.
- ** @param directed wrap the angle at 2pi (directed) or pi (undirected).
+ ** @param modulus image gradient modulus.
+ ** @param angle image gradient angle.
+ ** @param directed wrap the gradient angles at 2pi (directed) or pi (undirected).
  ** @param width image width.
  ** @param height image height.
- ** @param numChannels number of image channles.
  ** @param cellSize size of a HOG cell.
  **
  ** The function behaves like ::vl_hog_put_image, but foregoes the internal
- ** computation of the gradient field allowing the user to specify
- ** their own. Angles are measure clockwise (y axis pointing downwards)
- ** starting from the x axis (pointing right).
+ ** computation of the gradient field, allowing the user to specify
+ ** their own. Angles are measure clockwise, the y axis pointing downwards,
+ ** starting from the x axis (pointing to the right).
  **/
 
 void vl_hog_put_polar_field (VlHog * self,
@@ -844,7 +843,6 @@ void vl_hog_put_polar_field (VlHog * self,
     } /* next x */
   } /* next y */
 }
-
 
 /* ---------------------------------------------------------------- */
 /** @brief Extract HOG features

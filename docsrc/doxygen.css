@@ -130,8 +130,8 @@
 #content .doxygen pre.fragment {
   border: 1px solid #C4CFE5;
   background-color: #FBFCFD;
-  padding: 4px 6px;
-  margin: 4px 8px 4px 2px;
+  padding: 6px 6px;
+  margin: 0px 8px 0px 2px;
   overflow: auto;
   word-wrap: break-word;
   font-size: 9pt;
@@ -141,7 +141,7 @@
 }
 #content .doxygen div.fragment {
   padding: 4px;
-  margin: 4px;
+  margin: 4px 0px 4px 0px ;
   background-color: #FBFCFD;
   border: 1px solid #C4CFE5;
 }
@@ -149,7 +149,7 @@
   font-family: monospace, fixed;
   font-size: 13px;
   min-height: 13px;
-  line-height: 1.0;
+  line-height: 1.5 ;
   text-wrap: unrestricted;
   white-space: -moz-pre-wrap;
   /* Moz */
@@ -231,8 +231,8 @@
 }
 #content .doxygen div.contents {
   margin-top: 10px;
-  margin-left: 12px;
-  margin-right: 8px;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 #content .doxygen td.indexkey {
   background-color: #EBEFF6;
@@ -875,10 +875,10 @@
   padding: 14px 25px;
   background-color: #F4F6FA;
   border: 1px solid #D8DFEE;
-  border-radius: 7px 7px 7px 7px;
+  border-radius: 3px 3px 3px 3px;
   float: right;
   height: auto;
-  margin: 0 20px 10px 10px;
+  margin: 0px 0px 10px 10px;
   width: 200px;
 }
 #content .doxygen div.toc li {
