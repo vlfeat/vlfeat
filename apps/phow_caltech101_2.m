@@ -46,17 +46,19 @@ function phow_caltech101
 % AUTORIGHTS
 
 conf.calDir = 'data/caltech-101' ;
-conf.dataDir = 'data/' ;
+conf.dataDir = 'data2/' ;
 conf.autoDownloadData = true ;
 conf.numTrain = 15 ;
 conf.numTest = 15 ;
 conf.numClasses = 102 ;
 conf.numWords = 600 ;
-conf.numSpatialX = [2 4] ;
-conf.numSpatialY = [2 4] ;
-conf.quantizer = 'kdtree' ;
+conf.encoder = 'gmm' ;
 conf.svm.C = 10 ;
+
 conf.svm.solver = 'pegasos' ;
+%conf.svm.solver = 'liblinear' ;
+%conf.svm.solver = 'dca' ;
+
 conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 3} ;
 conf.clobber = false ;
@@ -66,15 +68,13 @@ conf.randSeed = 1 ;
 
 if conf.tinyProblem
   conf.prefix = 'tiny' ;
-  conf.numClasses = 5 ;
-  conf.numSpatialX = 2 ;
-  conf.numSpatialY = 2 ;
+  conf.numClasses = 12 ;
   conf.numWords = 300 ;
   conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 5} ;
 end
 
 conf.vocabPath = fullfile(conf.dataDir, [conf.prefix '-vocab.mat']) ;
-conf.histPath = fullfile(conf.dataDir, [conf.prefix '-hists.mat']) ;
+conf.fishPath = fullfile(conf.dataDir, [conf.prefix '-fishers.mat']) ;
 conf.modelPath = fullfile(conf.dataDir, [conf.prefix '-model.mat']) ;
 conf.resultPath = fullfile(conf.dataDir, [conf.prefix '-result']) ;
 
@@ -127,9 +127,6 @@ imageClass = cat(2, imageClass{:}) ;
 
 model.classes = classes ;
 model.phowOpts = conf.phowOpts ;
-model.numSpatialX = conf.numSpatialX ;
-model.numSpatialY = conf.numSpatialY ;
-model.quantizer = conf.quantizer ;
 model.vocab = [] ;
 model.w = [] ;
 model.b = [] ;
@@ -155,7 +152,49 @@ if ~exist(conf.vocabPath) || conf.clobber
   descrs = single(descrs) ;
 
   % Quantize the descriptors to get the visual words
-  vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
+  %vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
+  
+  init_mean = vl_kmeans(descrs, conf.numWords, ...
+      'verbose', 'MaxNumComparisons', ceil(conf.numWords/10), ...
+      'MaxNumIterations', 20, 'NumTrees',3, 'algorithm', ...
+      'ann', 'Initialization', 'plusplus');
+  
+  fprintf('Computing initial variances and coefficients...\n');
+  
+  % compute hard assignments
+  kd_tree = vl_kdtreebuild(init_mean, 'numTrees', 3) ;
+  assign = vl_kdtreequery(kd_tree, init_mean, descrs);
+  
+  % mixing coefficients
+  init_weights = single(vl_binsum(zeros(conf.numWords, 1), 1, double(assign)));
+  init_weights = init_weights / sum(init_weights);
+  
+  % variances
+  init_var = zeros(size(descrs, 1), conf.numWords, 'single');
+  
+  for i = 1:conf.numWords
+      descrs_cluster = descrs(:, assign == i);
+      init_var(:, i) = var(descrs_cluster, 0, 2);
+  end
+  
+  fprintf('Learning GMM model: Number of descriptors: %d; Number of visual words: %d\n',size(descrs,2),conf.numWords)
+  
+  tic
+  [means,sigmas,weights] = vl_gmm(descrs, conf.numWords, ...
+      'initialization','custom', ...
+      'InitMeans',init_mean, ...
+      'InitSigmas',init_var, ...
+      'InitWeights',init_weights, ...
+      'verbose', ...
+      'multithreading', 'parallel', ...
+      'MaxNumIterations', 30);
+  gmmTime = toc;
+  fprintf('gmm time: %f\n',gmmTime);
+  
+  vocab.means = means;
+  vocab.sigmas = sigmas;
+  vocab.weights = weights;
+  
   save(conf.vocabPath, 'vocab') ;
 else
   load(conf.vocabPath) ;
@@ -163,37 +202,32 @@ end
 
 model.vocab = vocab ;
 
-if strcmp(model.quantizer, 'kdtree')
-  model.kdtree = vl_kdtreebuild(vocab) ;
-end
-
 % --------------------------------------------------------------------
-%                                           Compute spatial histograms
+%                                              Compute Fisher encoding
 % --------------------------------------------------------------------
 
-if ~exist(conf.histPath) || conf.clobber
-  hists = {} ;
+if ~exist(conf.fishPath) || conf.clobber
+  codes = {} ;
   parfor ii = 1:length(images)
   % for ii = 1:length(images)
     fprintf('Processing %s (%.2f %%)\n', images{ii}, 100 * ii / length(images)) ;
     im = imread(fullfile(conf.calDir, images{ii})) ;
-    hists{ii} = getImageDescriptor(model, im);
+    codes{ii} = getImageDescriptor(model, im);
   end
 
-  hists = cat(2, hists{:}) ;
-  save(conf.histPath, 'hists') ;
+  codes = cat(2, codes{:}) ;
+  save(conf.fishPath, 'codes') ;
 else
-  load(conf.histPath) ;
+  load(conf.fishPath) ;
 end
 
+
 % --------------------------------------------------------------------
-%                                                  Compute feature map
+%                                        Compute hellinger feature map
 % --------------------------------------------------------------------
 
-psix = vl_homkermap(hists, 1, 'kchi2', 'gamma', .5) ;
-
-size(hists)
-size(psix)
+%codes = sign(codes).*sqrt(abs(codes));
+codes = vl_homkermap(codes, 1, 'kchi2', 'gamma', .5) ;
 
 % --------------------------------------------------------------------
 %                                                            Train SVM
@@ -209,14 +243,14 @@ if ~exist(conf.modelPath) || conf.clobber
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm)));
+        data = vl_maketrainingset(codes(:,selTrain(perm)), int8(y(perm)));
         [w(:,ci) b(ci)] = vl_svmpegasos(data, lambda, ...
                                         'MaxIterations', 50/lambda, ...
                                         'BiasMultiplier', conf.svm.biasMultiplier) ;
       end
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...
-                  sparse(double(psix(:,selTrain))),  ...
+                  sparse(double(codes(:,selTrain))),  ...
                   sprintf(' -s 3 -B %f -c %f', ...
                           conf.svm.biasMultiplier, conf.svm.C), ...
                   'col') ;
@@ -237,7 +271,7 @@ end
 % --------------------------------------------------------------------
 
 % Estimate the class of the test images
-scores = model.w' * psix + model.b' * ones(1,size(psix,2)) ;
+scores = model.w' * codes + model.b' * ones(1,size(codes,2)) ;
 [drop, imageEstClass] = max(scores, [], 1) ;
 
 % Compute the confusion matrix
@@ -266,39 +300,21 @@ im = im2single(im) ;
 if size(im,1) > 480, im = imresize(im, [480 NaN]) ; end
 
 % -------------------------------------------------------------------------
-function hist = getImageDescriptor(model, im)
+function enc = getImageDescriptor(model, im)
 % -------------------------------------------------------------------------
 
 im = standarizeImage(im) ;
-width = size(im,2) ;
-height = size(im,1) ;
-numWords = size(model.vocab, 2) ;
 
 % get PHOW features
-[frames, descrs] = vl_phow(im, model.phowOpts{:}) ;
+[drop, descrs] = vl_phow(im, model.phowOpts{:}) ;
+
 % quantize appearance
-switch model.quantizer
-  case 'vq'
-    [drop, binsa] = min(vl_alldist(model.vocab, single(descrs)), [], 1) ;
-  case 'kdtree'
-    binsa = double(vl_kdtreequery(model.kdtree, model.vocab, ...
-                                  single(descrs), ...
-                                  'MaxComparisons', 15)) ;
-end
+enc = vl_fisher(single(descrs),model.vocab.means,model.vocab.sigmas,model.vocab.weights);
 
-for i = 1:length(model.numSpatialX)
-  binsx = vl_binsearch(linspace(1,width,model.numSpatialX(i)+1), frames(1,:)) ;
-  binsy = vl_binsearch(linspace(1,height,model.numSpatialY(i)+1), frames(2,:)) ;
+%normalize hist
+enc/sum(abs(enc));
 
-  % combined quantization
-  bins = sub2ind([model.numSpatialY(i), model.numSpatialX(i), numWords], ...
-                 binsy,binsx,binsa) ;
-  hist = zeros(model.numSpatialY(i) * model.numSpatialX(i) * numWords, 1) ;
-  hist = vl_binsum(hist, ones(size(bins)), bins) ;
-  hists{i} = single(hist / sum(hist)) ;
-end
-hist = cat(1,hists{:}) ;
-hist = hist / sum(hist) ;
+
 
 % -------------------------------------------------------------------------
 function [className, score] = classify(model, im)

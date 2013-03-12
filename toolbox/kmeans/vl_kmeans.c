@@ -306,6 +306,12 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("kmeans: num. centers = %d\n", numCenters) ;
     mexPrintf("kmeans: max num. comparisons = %d\n", maxNumComparisons) ;
     mexPrintf("kmeans: num. trees = %d\n", numTrees) ;
+    if(multithreading == VlKMeansParallel){
+        mexPrintf("kmeans: multithreading = parallel\n", numTrees) ;
+    } else {
+        mexPrintf("kmeans: multithreading = serial\n", numTrees) ;
+    }
+    
     mexPrintf("\n") ;
   }
 

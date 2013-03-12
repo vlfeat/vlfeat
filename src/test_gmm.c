@@ -162,8 +162,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
 //  saveResults(dataFileData,dataFileResults,gmm,(void*) data, Ndata);
 
-  gettimeofday(&tim, NULL);
-  double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
 
   if(computeFisher) {
     vl_fisher_encode
@@ -179,10 +177,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      VlFisherParallel
     );
   }
-
-  gettimeofday(&tim, NULL);
-  double t2=tim.tv_sec+(tim.tv_usec/1000000.0);
-  printf("Vlfeat fisher wall time: %.6lf seconds\n", t2-t1);
 
 //  VL_PRINT("fisher:\n");
 //  for(cIdx = 0; cIdx < clusterNum; cIdx++) {
