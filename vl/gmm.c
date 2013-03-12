@@ -15,17 +15,20 @@ the terms of the BSD license (see the COPYING file).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page gmm Gaussian mixture model estimation
 @author David Novotny
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h implements expectaton maximization algorithm for estimation
-of a gaussian mixture model.
+@ref gmm.h implements expectaton maximization algorithm (@cite{Dempster77maximumlikelihood})
+for estimation of a gaussian mixture model of input data. The code supports
+@c float or @c double data types, is parallelized and
+offers several numerical stability protections so it
+could be run on large datasets.
 
-- data of type @c float or @c double;
-- random selection, kmeans and custom initialization methods;
-- uses the EM @cite{Dempster77maximumlikelihood} algorithm for estimating gaussians with diagonal covariance matrices
+For detailed information on GMMs and the Expecation Maximization algorithm,
+feel free to see the @subpage gmm-tech section.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section gmm-usage Usage
+@section gmm-starting Getting started
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 To use @ref gmm.h to learn clusters from some training data,
@@ -35,55 +38,120 @@ soft assignments from @c numData vectors of dimension @c dimension
 and storage type @c float using at most 100 EM iterations use:
 
 @code
+float * means ;
+float * sigmas ;
+float * weights ;
+float * posteriors ;
 
-VlGMMMultithreading multithreading = VlGMMParallel;
-VlGMMInitialization initialization = VlGMMRand;
+double loglikelyhood ;
 
+
+// create a new instance of a GMM object, compute with float storage type
 gmm = vl_gmm_new (VL_TYPE_FLOAT) ;
+
+// set the maximum number of EM iterations to 100
 vl_gmm_set_max_num_iterations (gmm, 100) ;
 
+// set the initialization to random selection
 vl_gmm_set_initialization	(gmm,VlGMMRand);
+
+// set parallelized computation
 vl_gmm_set_multithreading (gmm,VlGMMParallel);
 
+
+// ---- obtain the mixture ----
 vl_gmm_cluster ( gmm, data, dimension, numData, numClusters);
+
+
+// get means of estimated gaussians
+means = vl_gmm_get_means(gmm);
+
+// get covariance matrices of estimated gaussians
+sigmas = vl_gmm_get_sigmas(gmm);
+
+// get weights of estimated gaussians
+weights = vl_gmm_get_weights(gmm);
+
+// get loglikelyhood of the estimated mixture
+loglikelyhood = vl_gmm_get_loglikelyhood(gmm) ;
+
+// get soft assignments of data points to each cluster
+posteriors = vl_gmm_get_posteriors(gmm) ;
 
 @endcode
 
-Use ::vl_gmm_get_loglikelyhood to get the loglikelyhood of estimated
-mixture, ::vl_gmm_get_means and ::vl_gmm_get_sigmas to obtain
+@note Due to the increased speed of computations, the covariance matrices of estimated gaussians are forced to be diagonal.
+
+Here we use ::vl_gmm_get_loglikelyhood to get the final
+loglikelyhood of estimated mixture,
+::vl_gmm_get_means and ::vl_gmm_get_sigmas to obtain
 means and diagonals of covariance matrices of estimated gaussians.
 ::vl_gmm_get_posteriors is used to get probabilities of point
 correspondences to each of the gaussians (= soft assignments).
 
+There are several initialization methods which affect the
+convergence speed and quality (= achieved loglikelyhood)
+of the estimated mixture. These methods are selected by
+setting the right parameter to ::vl_gmm_set_initialization
+function. In the following table are shown implemented initialization
+methods and their corresponding parameters to ::vl_gmm_set_initialization
+function.
+
+Method                | VlGMMInitialization parameter           | Description
+----------------------|-----------------------------------------|-----------------------------------------------
+Random initialization | ::VlGMMRand                             | Random initialization of mixture parameters
+KMeans                | ::VlGMMKMeans                           | Initialization of mixture parameters using ::VlKMeans
+Custom                | ::VlGMMCustom                           | User specification of initial mixture parameters
+
+Note that in the case of ::VlGMMKMeans initialization, the user
+has also to specify the customized ::VlKMeans object, which will
+be later used for the initialization (please see @ref kmeans page
+to see how to correctly set up the object).
+
+When a user wants to use the ::VlGMMCustom method, the initial means,
+sigmas and weights have to be specified using the ::vl_gmm_set_means,
+::vl_gmm_set_sigmas and ::vl_gmm_set_weights methods
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection gmm-usage-init Initialization algorithms
+@subsection gmm-starting-multithreading OpenMP multithreading support
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h supports the following cluster initialization algorithms:
+@ref gmm.h supports parallel and serial implementation of the
+GMM estimation. To enable/disable the parallel EM algorithm computation
+use ::vl_gmm_set_multithreading function.
+All the parallel sections of the algorithm are implemented using
+<a href="http://openmp.org">OpenMP</a>.
 
-- <b>Random data points</b> (::vl_gmm_rand_init_mixture)
-  initialize the means from a random selection of the training data.
-  The sigmas are initialized as the overall data covariance, weights
-  of the gaussians are set equal and sum to one.
-- <b>Custom initialization</b> (::vl_gmm_custom_init_mixture)
-  initialize the means, weights and variances according to the user input
-  using funtions ::vl_gmm_set_means, ::vl_gmm_set_weights and
-  ::vl_gmm_set_sigmas.
-- <b>KMeans initialization</b> (::vl_gmm_kmeans_init_mixture)
-  the means, covariances and weights are initialized as covariances, centers
-  and relative masses of clusters obtained using the KMeans algorithm.
-  A user has to specify a customized ::VlKMeans object using
-  function ::vl_gmm_set_kmeans_init_object.
-  If no ::VlKMeans object is specified at the start, a default object
-  is used.
+By default the ::vl_gmm_cluster function is using the maximum amount
+of availible threads. To disable multithreading, run the
+::vl_gmm_set_multithreading function with ::VlGMMSerial parameter.
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection gmm-starting-sse SSE instructions
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The implemented algorithm also uses the SSE2 instructions as
+an optimization.
+
+*/
+
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page gmm-tech GMM fundamentals
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+For fitting a probabilistic model, consisting of a mixture
+of several gaussians on a given dataset, the expectation
+maximization @cite{Dempster77maximumlikelihood}
+ algorithm (EM) is one of the most widely used methods.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection gmm-usage-em EM algorithm
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h implements expectation maximization algorithm @cite{Dempster77maximumlikelihood}
-consisting of two steps which are repeated until convergence:
+@ref The EM algorithm consists of two succesive steps which
+cyclically repeated until convergence:
 
 - <b>Expectation</b>. Estimates probabilities of memberships of each
 point to each of the clusters using current parameters (means,
@@ -94,16 +162,8 @@ computed in the E step, means, covariances and weights
 of individual gaussians are computed such that the lower bound
 of the loglikelyhood of the data is maximized in the next iteration.
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection gmm-usage-multithreading OpenMP multithreading support
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h supports parallel and serial implementation of the
-GMM estimation. To enable/disable the parallel EM algorithm computation
-use ::vl_gmm_set_multithreading function.
-All the parallel sections of the algorithm are implemented using <a href="http://openmp.org">OpenMP</a>.
-
-@section gmm-tech Technical details
+@section gmm-tech-details Technical details
 
 A gaussian mixture model is a representation of data points
 @f$ x_1, \dots, x_n \in \mathbb{R}^d @f$, as a mixture of
@@ -181,7 +241,36 @@ bound of the data log likelyhood thus giving these explicit formulas:
  \pi_k = { \sum_{i=1}^n { q_{i,k} } \over { \sum_{i=1}^n \sum_{k=1}^K q_{i,k} } }
 @f]
 
-@note Both E and M steps are parallelized and use sse2 instructions.
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection gmm-tech-init Initialization algorithms
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Since the EM algorithm is a stochastic method, which converges to
+one of the local minima of the criterion function, the speed of convergence
+and also the quality of the achieved local minimum is highly dependent on
+the initial configuration of the gaussians in the mixture.
+
+@ref gmm.h supports the following cluster initialization algorithms:
+
+- <b>Random data points</b> (::vl_gmm_rand_init_mixture)
+  initializes the means from a random selection of the training data.
+  The sigmas are initialized as the overall data covariance, weights
+  of the gaussians are set equal and sum to one. This approach is the
+  fastest, simplest and also the most likely to end in a bad local
+  minimum.
+
+- <b>Custom initialization</b> (::vl_gmm_custom_init_mixture)
+  initialize the means, weights and variances according to the user input
+  using funtions ::vl_gmm_set_means, ::vl_gmm_set_weights and
+  ::vl_gmm_set_sigmas.
+
+- <b>KMeans initialization</b> (::vl_gmm_kmeans_init_mixture)
+  the means, covariances and weights are initialized as covariances, centers
+  and relative masses of clusters obtained using the KMeans algorithm.
+  A user has to specify a customized ::VlKMeans object using
+  function ::vl_gmm_set_kmeans_init_object.
+  If no ::VlKMeans object is specified at the start, a default object
+  is used.
 
 **/
 
@@ -222,6 +311,8 @@ vl_gmm_new (vl_type dataType)
   self->numData = 0;
   self->dimension = 0;
   self->initialization = VlGMMRand;
+
+  self->multithreading = VlGMMParallel;
 
   self->verbosity = 0 ;
   self->maxNumIterations = 50;

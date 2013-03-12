@@ -325,7 +325,7 @@ The ANN K-means algorithm @cite{beis97shape}
 @cite{silpa-anan08optimised} @cite{muja09fast} is a variant of Lloyd's
 algorithm (@ref kmeans-lloyd) that instead of the naive distance
 computations uses a best-bin-first randomized KD-tree algorithm to
-approximately (and quickly) to find the closest cluster center to each
+approximately (and quickly) find the closest cluster center to each
 point. The KD-tree implementation is based on @ref kdtree.
 
 */

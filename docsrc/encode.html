@@ -7,7 +7,130 @@
 <b>VLAD</b> encodings.
 </p>
 
-TODO
+<p>
+The encoding methods are generally used for quantizing a set of vectors 
+with respect to a vocabulary model (obtained using Gaussian mixture estimation, 
+KMeans clustering, ...).
+</p>
+
+<ul>
+ <li><a href="%pathto:tut.encoding.fisher;">Fisher encoding</a></li>
+ <li><a href="%pathto:tut.encoding.vlad;">VLAD encoding</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.encoding.fisher">Fisher encoding</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>
+The Fisher encoding is best used with a particular estimated gaussian mixture model.
+Using the obtained means, sigmas and variances one can compute a 
+fisher vector. First we initialize random data and train the GMM model 
+(please see the <a href="%pathto:root;overview/gmm.html">GMM</a> tutorial page
+to find info on GMM usage).
+</p>
+
+<precode>
+N         = 5000 ;
+dimension = 2 ;
+dataLearn = rand(dimension,N) ;
+
+numClusters = 30 ;
+[means, sigmas, weights] = vl_gmm(dataLearn, numClusters);
+</precode>
+
+Next we initialize another random set of vectors,
+which should be encoded with respect to the model,
+we have just estimated.
+
+<precode>
+Nencode = 1000;
+dataEncode = rand(dimension,Nencode);
+</precode>
+
+The fisher encoding <code>enc</code> of this new set can be easily obtained by pluging
+the <code>vl_gmm</code> outputs to the
+<code>vl_fisher</code> function:
+
+<precode>
+enc = vl_fisher(dataEncode, means, sigmas, weights);
+</precode>
+
+The <code>enc</code> is our final fisher vector.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.encoding.vlad">VLAD encoding</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>
+The <b>V</b>ector of <b>L</b>inearly <b>A</b>gregated <b>D</b>escriptors
+encodes the features in a slightly different way. Simillar to 
+the Fisher encoding, the VLAD encoding collaborates with
+a clustering technique. In the case of VLAD, this method is 
+KMeans clustering.
+</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h3 id="tut.encoding.vlad.kmeans">KMeans + VLAD</h3>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>
+Let's first, as we did in the Fisher section,
+make a random dataset <code>dataLearn</code> and cluster
+it using KMeans (<a href="%pathto:root;overview/kmeans.html">KMeans</a> tutorial).
+Also we will need the dataset we want to encode, so we create one.
+</p>
+
+<precode>
+N         = 5000 ;
+dimension = 2 ;
+dataLearn = rand(dimension,N) ;
+
+numClusters = 30 ;
+centers = vl_kmeans(dataLearn, numClusters);
+
+Nencode = 1000;
+dataEncode = rand(dimension,Nencode);
+</precode>
+
+<p>
+The <code>vl_vlad</code> function accepts centers of clusters,
+data we want to encode and also assignments (which are "hard" in the case of KMeans)  
+of each vector to a cluster. The assignments could be obtained by the
+vl_kdtree_query function, which quickly finds the nearest cluster center
+(stored in <code>centers</code>) for each <code>dataEncode</code> vector.
+Note that before running queries to KD-Tree it must be built
+using the <code>vl_kdtreebuild</code> function.
+</p>
+
+<precode>
+kd_tree = vl_kdtreebuild(centers) ;
+assign = vl_kdtreequery(kd_tree, centers, dataEncode) ;
+</precode>
+
+<p>
+Now we have in the <code>assign</code> variable indices of nearest centers
+to each <code>dataEncode</code> vector. The next step is 
+converting assign vector to the right format, which
+is accepted by <code>vl_vlad</code>.
+</p>
+
+<precode>
+assignments = zeros(Nencode,numClusters);
+assignments(:,assign) = 1;
+</precode>
+
+<p>
+After this, we are ready to proceed to calculate
+ the final VLAD vector <code>enc</code>.
+</p>
+
+<precode>
+enc = vl_vlad(dataEncode,centers,assignments);
+</precode>
 
 </group>
+
+
+
 
