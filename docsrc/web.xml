@@ -129,12 +129,14 @@
       },
       TeX: {
         Macros: {
+          balpha: '\\boldsymbol{\\alpha}',
+          bc: '\\mathbf{c}',
+          bq: '\\mathbf{q}',
+          bu: '\\mathbf{u}',
+          bw: '\\mathbf{w}',
           bx: '\\mathbf{x}',
           by: '\\mathbf{y}',
           bz: '\\mathbf{z}',
-          bu: '\\mathbf{u}',
-          bw: '\\mathbf{w}',
-          balpha: '\\boldsymbol{\\alpha}',
           real: '\\mathbb{R}',
         },
         equationNumbers: { autoNumber: 'AMS' }
