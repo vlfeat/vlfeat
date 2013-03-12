@@ -84,10 +84,10 @@ algorithm, the **initialization method** is important. The following
 initialization methods are supported:
 
 Method         | Function                                | Description
----------------|-----------------------------------------|------------------------------
+---------------|-----------------------------------------|-----------------------------------------------
 Random samples | ::vl_kmeans_seed_centers_with_rand_data | Random data points
 K-means++      | ::vl_kmeans_seed_centers_plus_plus      | Random selection biased towards diversity
-Custom         | ::vl_kmeans_set_centers                 | Choose centers (useful to run quantization oly)
+Custom         | ::vl_kmeans_set_centers                 | Choose centers (useful to run quantization only)
 
 See @ref kmeans-init for further details. The initialization methods
 use a randomized selection of the data points; the random number
@@ -97,10 +97,9 @@ The second important choice is the **optimization algorithm**. The
 following optimization algorithms are supported:
 
 Algorithm   | Symbol           | See               | Description
-------------|------------------|-------------------|----------------------------------------
+------------|------------------|-------------------|-----------------------------------------------
 Lloyd       | ::VlKMeansLloyd  | @ref kmeans-lloyd | Alternate EM-style optimization
-Elka
-n       | ::VlKMeansElkan  | @ref kmeans-elkan | A speedup using triangular inequalities
+Elkan       | ::VlKMeansElkan  | @ref kmeans-elkan | A speedup using triangular inequalities
 ANN         | ::VlKMeansANN    | @ref kmeans-ann   | A speedup using approximated nearest neighbors
 
 See the relative sections for further details. These algorithm are
@@ -108,9 +107,7 @@ iterative, and stop when either a **maximum number of iterations**
 (::vl_kmeans_set_max_num_iterations) is reached, or when the energy
 changes sufficiently slowly in one iteration (::vl_kmeans).
 
-
 Parallel computation...
-
 */
 
 /**
