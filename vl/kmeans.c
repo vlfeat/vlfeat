@@ -636,8 +636,9 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
 {
   vl_uindex i ;
   vl_size numChunks = 1;
-  vl_size t;
+  vl_int t;
   int chunkSize = 1;
+  TYPE ** distanceToCentersChunks;
 
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
@@ -661,7 +662,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
       abort();
   }
 
-  TYPE ** distanceToCentersChunks = vl_malloc (sizeof(TYPE*) * numChunks) ;
+  distanceToCentersChunks = vl_malloc (sizeof(TYPE*) * numChunks) ;
   for(t = 0; t < numChunks; t++) {
     distanceToCentersChunks[t] = vl_malloc (sizeof(TYPE) * self->numCenters) ;
   }
@@ -670,7 +671,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
 #pragma omp parallel for private(t,i) schedule(static,chunkSize)
 #endif
   for(t = 0; t < numChunks; t++) {
-    for (i = t ; i < numData ; i += numChunks) {
+    for (i = (vl_size)t ; i < numData ; i += numChunks) {
       vl_size k ;
       TYPE * distanceToCenters = distanceToCentersChunks[t] ;
       TYPE bestDistance = (TYPE) VL_INFINITY_D ;
@@ -1080,6 +1081,8 @@ VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)
        iteration = 0;
        1 ;
        ++ iteration) {
+	
+	double eps;
 
     /* assign data to cluters */
     VL_XCAT(_vl_kmeans_quantize_ann_, SFX)(self, assignments, distances, data, numData, iteration) ;
@@ -1100,7 +1103,7 @@ VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)
       break ;
     }
 
-    double eps = (previousEnergy - energy)/previousEnergy;
+    eps = (previousEnergy - energy)/previousEnergy;
     if (energy == previousEnergy || eps < 0.00001) {
       if (self->verbosity) {
         VL_PRINTF("kmeans: ANN terminating because the algorithm fully converged\n") ;
@@ -1215,7 +1218,8 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   VlRand * rand = vl_get_rand () ;
 
-  vl_size numChunks, t;
+  vl_size numChunks;
+  vl_int t;
   int chunkSize = 1;
 
 #if (FLT == VL_TYPE_FLOAT)

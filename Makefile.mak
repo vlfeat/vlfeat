@@ -45,7 +45,7 @@ WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
 !if "$(ARCH)" == "win32"
 !message === COMPILING FOR 32-BIT
 
-MATLABROOT = C:\Program Files (x86)\MATLAB\R2009b
+MATLABROOT = C:\Program Files\MATLAB\R2012a
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw32
@@ -63,7 +63,7 @@ LFLAGS = /MACHINE:X86 \
 !elseif "$(ARCH)" == "win64"
 !message === COMPILING FOR 64-BIT
 
-MATLABROOT = C:\Program Files\MATLAB\R2009b
+MATLABROOT = C:\Program Files\MATLAB\R2012a
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw64
@@ -142,7 +142,7 @@ CFLAGS = /nologo /TC /MD \
 
 LFLAGS = $(LFLAGS) /NOLOGO \
          /INCREMENTAL:NO \
-         /MANIFEST /openmp
+         /MANIFEST
 
 !if "$(DEBUG)" != "no"
 !message === DEBUGGING ON
@@ -162,8 +162,10 @@ libsrc = \
   vl\array.c \
   vl\covdet.c \
   vl\dsift.c \
+  vl\fisher.c \
   vl\generic.c \
   vl\getopt_long.c \
+  vl\gmm.c \
   vl\hikmeans.c \
   vl\hog.c \
   vl\homkermap.c \
@@ -186,7 +188,8 @@ libsrc = \
   vl\sift.c \
   vl\slic.c \
   vl\stringop.c \
-  vl\svmdataset.c
+  vl\svmdataset.c \
+  vl\vlad.c
 
 cmdsrc = \
   src\aib.c \
@@ -194,9 +197,11 @@ cmdsrc = \
   src\sift.c \
   src\test_gauss_elimination.c \
   src\test_getopt_long.c \
+  src\test_gmm.c \
   src\test_heap-def.c \
   src\test_host.c \
   src\test_imopv.c \
+  src\test_kmeans.c \
   src\test_mathop.c \
   src\test_mathop_abs.c \
   src\test_nan.c \
@@ -210,8 +215,10 @@ cmdsrc = \
 mexsrc = \
   toolbox\aib\vl_aib.c \
   toolbox\aib\vl_aibhist.c \
+  toolbox\fisher\vl_fisher.c \
   toolbox\geometry\vl_irodr.c \
   toolbox\geometry\vl_rodr.c \
+  toolbox\gmm\vl_gmm.c \
   toolbox\imop\vl_imdisttf.c \
   toolbox\imop\vl_imintegral.c \
   toolbox\imop\vl_imsmooth.c \
@@ -252,36 +259,43 @@ mexsrc = \
   toolbox\sift\vl_sift.c \
   toolbox\sift\vl_siftdescriptor.c \
   toolbox\sift\vl_ubcmatch.c \
-  toolbox\slic\vl_slic.c
+  toolbox\slic\vl_slic.c \
+  toolbox\vlad\vl_vlad.c 
 
 !if "$(ARCH)" == "win32"
 libobj = $(libsrc:vl\=bin\win32\objs\)
 cmdexe = $(cmdsrc:src\=bin\win32\)
 mexdll = $(mexsrc:.c=.mexw32)
+mexdll = $(mexdll:toolbox\fisher=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\imop=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\geometry=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\gmm=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\kmeans=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\misc=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\aib=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\quickshift=toolbox\mex\mexw32)
 mexdll = $(mexdll:toolbox\slic=toolbox\mex\mexw32)
+mexdll = $(mexdll:toolbox\vlad=toolbox\mex\mexw32)
 mexpdb = $(mexdll:.dll=.pdb)
 
 !elseif "$(ARCH)" == "win64"
 libobj = $(libsrc:vl\=bin\win64\objs\)
 cmdexe = $(cmdsrc:src\=bin\win64\)
 mexdll = $(mexsrc:.c=.mexw64)
+mexdll = $(mexdll:toolbox\fisher=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\sift=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\mser=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\imop=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\geometry=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\gmm=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\kmeans=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\misc=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\aib=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\quickshift=toolbox\mex\mexw64)
 mexdll = $(mexdll:toolbox\slic=toolbox\mex\mexw64)
+mexdll = $(mexdll:toolbox\vlad=toolbox\mex\mexw64)
 mexpdb = $(mexdll:.mexw64=.pdb)
 !endif
 
@@ -441,6 +455,9 @@ startmatlab:
 {toolbox\imop}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
+{toolbox\gmm}.c{$(mexdir)}.$(MEXEXT):
+	$(BUILD_MEX)
+	
 {toolbox\geometry}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
@@ -457,6 +474,12 @@ startmatlab:
 	$(BUILD_MEX)
 
 {toolbox\slic}.c{$(mexdir)}.$(MEXEXT):
+	$(BUILD_MEX)
+	
+{toolbox\vlad}.c{$(mexdir)}.$(MEXEXT):
+	$(BUILD_MEX)
+
+{toolbox\fisher}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
 # vl.dll => mexw{32,64}\vl.dll

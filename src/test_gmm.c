@@ -55,6 +55,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   TYPE * data = vl_malloc(sizeof(TYPE)*numData*dimension);
   TYPE * enc = vl_malloc(sizeof(TYPE)*2*dimension*numClusters);
+  TYPE * assign;
 
   vl_rand_init (&rand) ;
   vl_rand_seed (&rand, 50000) ;
@@ -195,7 +196,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     }
   }
 
-  TYPE * assign = vl_malloc(numData*numClusters*sizeof(TYPE));
+  assign = vl_malloc(numData*numClusters*sizeof(TYPE));
   for(dataIdx = 0; dataIdx < numData; dataIdx++) {
     for(cIdx = 0; cIdx < numClusters; cIdx++) {
       assign[cIdx*numData+dataIdx] = (TYPE)vl_rand_real3(&rand);

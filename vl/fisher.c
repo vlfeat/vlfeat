@@ -88,7 +88,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
   vl_size numChunks = 1;
   int chunkSize = 1;
-  vl_size t;
+  vl_int t;
   TYPE halfDimLog2Pi = (dimension/2.0)*log(2.0*VL_PI);
 
 #if (FLT == VL_TYPE_FLOAT)
@@ -134,7 +134,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #pragma omp parallel for private(t,i_cl,dim) schedule(static,chunkSize)
 #endif
   for(t=0; t < numChunks; t++) {
-    for (i_cl = t ; i_cl < numClusters ; i_cl += numChunks) {
+    for (i_cl = (vl_size)t ; i_cl < numClusters ; i_cl += numChunks) {
 
       TYPE logSigma = 0;
       logWeights[i_cl] = log(weights[i_cl]);
