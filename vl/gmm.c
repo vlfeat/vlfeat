@@ -278,7 +278,9 @@ the initial configuration of the gaussians in the mixture.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #ifdef __SSE2__
   #include "mathop_sse2.h"
@@ -950,7 +952,6 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
           chunkMeans[t][self->dimension * i_cl + dim] += data[self->dimension * i_d + dim] * posteriors[i_cl * numData + i_d];
         }
 #endif
-
       }
     }
   } /* end of parallel region */
