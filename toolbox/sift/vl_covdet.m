@@ -72,23 +72,33 @@
 %   SIFT on a larger measurement reagion, increase the value of
 %   PatchRelativeExtent.
 %
-%   [F,D] = VL_COVDET(I, 'descriptor', 'patch') can be used to extract
-%   raw patches instead of SIFT descriptors. In this case, each column
-%   of D is a stacked square image patch. The following parameters
-%   can be used to control the produced patches:
+%   [F,D] = VL_COVDET(I, 'descriptor', DESCRIPTOR) allows using one
+%   following descriptors instead
 %
-%   PatchResolution:: 15
+%   Liop::
+%     The Local Intensity Order Pattern descriptor. See VL_LIOP()
+%     for parameter definitions (all listed parameters can be used 
+%     as input to VL_COVDET())
+%
+%   Patch::
+%     Can be used to extract raw patches. In this case, each column
+%     of D is a stacked square image patch. 
+%
+%   The following parameters can be used to control the produced 
+%   descriptors:
+%
+%   PatchResolution:: Sift [15], Liop [20], Patch [20]
 %     The size of the patch R in pixel. Specifically, the patch is a
 %     square of side 2*R+1 pixels.
 %
-%   PatchRelativeExtent:: 7.5
+%   PatchRelativeExtent:: Sift [7.5], Liop [10], Patch [6]
 %     The extent E of the patch in the feature frame. A feature F
 %     define a mapping from the feature reference frame to the image
 %     reference frame as an affine transformation A,T (see
 %     VL_PLOTFRAME()). The patch is a square [-E, E]^2 in this frame
 %     (transform this square by A,T to find the extent in the image).
 %
-%   PatchRelativeSigma: 1.0
+%   PatchRelativeSmoothing: Sift [1], Liop [1], Patch [1.2]
 %     The smoothing SIGMA of the patch in the patch frame. The
 %     computed patch can be thought as being obtained by first
 %     warping the image (as a continous signal) by A,T, then
