@@ -30,7 +30,7 @@ abstraction is defined via two type of functions:
 The above type of functions define the two typical operations
 performed by SVM solvers on the training data. Any particular
 application can define its own data representation and implement the
-above functions. 
+above functions.
 
 For double and float arrays we provide the implementation of the
 aforementioned functions.
@@ -70,7 +70,7 @@ VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension)
   dataset->dimension = dimension ;
   dataset->map = NULL ;
   dataset->mapFunc = NULL ;
-  dataset->order = 1 ;
+  dataset->mapDim = 1 ;
   return dataset ;
 }
 
@@ -79,19 +79,19 @@ VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension)
  ** @param data SVM dataset Structure
  ** @param map pointer to Feature Map Object
  ** @param mapFunc function that perform the feature map
- ** @param order order of the map
+ ** @param mapDim the map dimensionality
  **
  ** The function sets a feature map to the SVM dataset @data. The
- ** dimension of the extended data points is /f$2*order + 1/f$.
+ ** dimension of the extended data points is usually /f$2*n + 1/f$.
  **/
 
 VL_EXPORT
 void vl_svmdataset_set_map (VlSvmDataset * data, void * map,
-                            VlSvmDatasetFeatureMap mapFunc, vl_size order)
+                            VlSvmDatasetFeatureMap mapFunc, vl_size mapDim)
 {
   data->map  = map ;
   data->mapFunc = mapFunc ;
-  data->order = order ;
+  data->mapDim = mapDim ;
 }
 
 /** -------------------------------------------------------------------
@@ -149,12 +149,12 @@ VL_XCAT(vl_svmdataset_innerproduct_,SFX) (const void* data, const vl_uindex elem
   tData  = (T*) sdata->data ;
 
   if (sdata->mapFunc) {
-    double *temp = vl_malloc(sizeof(double) * sdata->order) ;
+    double *temp = vl_malloc(sizeof(double) * sdata->mapDim) ;
     for (i = 0; i < sdata->dimension; i++) {
       sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]);
 
-      for (j = 0; j < sdata->order; j++) {
-        res += model[i*sdata->order + j]*temp[j] ;
+      for (j = 0; j < sdata->mapDim; j++) {
+        res += model[i*sdata->mapDim + j]*temp[j] ;
       }
     }
     vl_free(temp) ;
@@ -194,11 +194,11 @@ VL_XCAT(vl_svmdataset_accumulator_,SFX)(const void* data,
   tData  = (T*) sdata->data ;
 
   if (sdata->mapFunc) {
-    double * temp = vl_malloc(sizeof(double)*sdata->order) ;
+    double * temp = vl_malloc(sizeof(double)*sdata->mapDim) ;
     for (i = 0; i < sdata->dimension; i++) {
       sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]) ;
-      for (j = 0; j < sdata->order; j++){
-        model[i*sdata->order + j] += multiplier * temp[j] ;
+      for (j = 0; j < sdata->mapDim; j++){
+        model[i*sdata->mapDim + j] += multiplier * temp[j] ;
       }
     }
     vl_free(temp) ;
@@ -208,6 +208,53 @@ VL_XCAT(vl_svmdataset_accumulator_,SFX)(const void* data,
     }
   }
 }
+
+
+/** @fn vl_svmdataset_lengthsquare_d (const void*, const vl_uindex)
+ ** @param data Pointer to the training data.
+ ** @param element Index of data point.
+ **
+ ** The function performs the inner product of the @a element
+ ** data point with itselft, thus it retuns the square of the vector's length.
+ **
+ ** @see @ref svmdataset-overview
+ **/
+
+/** @fn  vl_svmdataset_lengthsquare_f (const void*, const vl_uindex)
+ ** @see ::vl_svmdataset_lengthsquare_d
+ **/
+
+VL_EXPORT double
+VL_XCAT(vl_svmdataset_lengthsquare_,SFX) (const void* data, const vl_uindex element)
+{
+  vl_size i, j ;
+  T* tData ;
+  double res = 0 ;
+  VlSvmDataset* sdata = (VlSvmDataset*) data ;
+
+  tData  = (T*) sdata->data ;
+
+
+  if (sdata->mapFunc) {
+
+    double *temp = vl_malloc(sizeof(double) * sdata->mapDim) ;
+    for (i = 0; i < sdata->dimension; i++) {
+      sdata->mapFunc(sdata->map,temp,1,tData[element*sdata->dimension + i]);
+
+      for (j = 0; j < sdata->mapDim; j++) {
+        res += temp[j]*temp[j] ;
+      }
+    }
+    vl_free(temp) ;
+  } else {
+    for (i = 0; i < sdata->dimension; i++) {
+      res += (double) (tData[element*sdata->dimension + i]) * (double) (tData[element*sdata->dimension + i]) ;
+    }
+  }
+
+  return res ;
+}
+
 
 /* VL_SVMDATASET_INSTANTIATING */
 #undef FLT

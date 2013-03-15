@@ -45,6 +45,13 @@ typedef void (*VlSvmDatasetAccumulator)(const void* data,
                                         const double multiplier) ;
 
 
+/** @typedef VlSvmDatasetLengthSquare
+ ** @brief Pointer to a function that defines the inner product
+ ** of the data point with it self
+ **/
+typedef double (*VlSvmDatasetLengthSquare)(const void* data,
+                                           const vl_uindex element) ;
+
 /* ---------------------------------------------------------------- */
 /*                                                                  */
 /* ---------------------------------------------------------------- */
@@ -60,7 +67,7 @@ typedef struct _VlSvmDataset {
   vl_size dimension ;           /**< data point dimension */
   void* map ;                   /**< feature Map */
   VlSvmDatasetFeatureMap mapFunc ; /**< function that defines the feature map*/
-  vl_size order ;                  /**< order of expansion of the feture map */
+  vl_size mapDim ;                  /**< the feature map dimensionality (usually 2*n+1) */
 } VlSvmDataset ;
 
 /** @name Create and destroy
@@ -78,7 +85,7 @@ void vl_svmdataset_delete (VlSvmDataset * dataset) ;
  **/
 VL_EXPORT
 void vl_svmdataset_set_map (VlSvmDataset * data, void * map,
-                            VlSvmDatasetFeatureMap mapFunc, vl_size order) ;
+                            VlSvmDatasetFeatureMap mapFunc, vl_size mapDim) ;
 /** @} */
 
 /* ---------------------------------------------------------------- */
@@ -109,6 +116,17 @@ void vl_svmdataset_accumulator_f(const void* data,
                                  const vl_uindex element,
                                  double * model,
                                  const double multiplier) ;
+
+// ADDED!
+
+VL_EXPORT
+double vl_svmdataset_lengthsquare_d (const void* data, const vl_uindex element);
+
+
+VL_EXPORT
+double vl_svmdataset_lengthsquare_f (const void* data, const vl_uindex element);
+
+
 /** @} */
 
 /** @name Retrieve data and parameters
@@ -118,7 +136,7 @@ VL_INLINE void*   vl_svmdataset_get_data (VlSvmDataset const *self) ;
 VL_INLINE vl_size vl_svmdataset_get_dimension (VlSvmDataset const *self) ;
 VL_INLINE void*   vl_svmdataset_get_map (VlSvmDataset const *self) ;
 VL_INLINE VlSvmDatasetFeatureMap vl_svmdataset_get_map_func (VlSvmDataset const *self) ;
-VL_INLINE vl_size vl_svmdataset_get_order (VlSvmDataset const *self) ;
+VL_INLINE vl_size vl_svmdataset_get_mapDim (VlSvmDataset const *self) ;
 /** @} */
 
 /* -------------------------------------------------------------------
@@ -174,15 +192,15 @@ vl_svmdataset_get_map_func (VlSvmDataset const *self)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get Feature Map Order.
+ ** @brief Get Feature Map Dimensionality.
  ** @param self Svm Dataset.
- ** @return feature map order.
+ ** @return feature map dimensionality.
  **/
 
 VL_INLINE vl_size
-vl_svmdataset_get_map_order (VlSvmDataset const *self)
+vl_svmdataset_get_mapDim (VlSvmDataset const *self)
 {
-  return self->order ;
+  return self->mapDim ;
 }
 /* VL_SVMDATASET_H */
 #endif

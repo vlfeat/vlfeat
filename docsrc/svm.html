@@ -1,0 +1,185 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p><b>VLFeat</b> includes fast SVM solvers, SGC <a href="#ref1">[1]</a> and (S)DCA <a href="#ref2">[2]</a>,
+both implemented in <code>vl_svmtrain</code>.
+The function also implements features, like Homogeneous kernel
+map expansion and SVM online statistics. (S)DCA can also be used with
+different loss functions.
+</p> 
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.svm">Support vector machine</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+
+<p>A simple example on how to use <code>vl_svmtrain</code> is presented below. Let's first load and plot the training data </p>
+<precode type='matlab'>
+% Load training data X and their labels y
+load('vl_demo_svm_data.mat');
+
+Xp = X(:,y==1);
+Xn = X(:,y==-1);
+
+figure
+plot(Xn(1,:),Xn(2,:),'*r')
+hold on
+plot(Xp(1,:),Xp(2,:),'*b')
+axis equal ;
+</precode>
+<p>Now we have a plot of the tutorial training data:</p>
+<div class="figure">
+ <img src="%pathto:root;demo/svm_training.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Training Data.
+  </span>
+ </div>
+</div>
+
+<p>Now we will set the learning parameters:</p>
+
+<precode type='matlab'>
+lambda = 0.01 ; % Regularization parameter
+maxIter = 30 ; % Maximum number of iterations
+</precode>
+
+
+
+<p>Learning a linear classifier can be easily done with the following 2
+lines of code:</p>
+
+<precode type='matlab'>
+dataset = vl_maketrainingset(X, int8(y)) ;
+[w b info] = vl_svmtrain(dataset, lambda, 'DCA',...
+                           'MaxIterations', maxIter) 
+</precode>
+
+<p>where we first create a struct containing the training data
+using  <code>vl_maketrainingset</code> and then we call the the SVM
+solver for (S)DCA. The output model is plotted over the training
+data in the following figure. </p>
+
+<div class="figure">
+ <img src="%pathto:root;demo/svm_training_result.jpg"/>
+ <div class="caption">
+  <span class="content">
+   Learned model.
+  </span>
+ </div>
+</div>
+
+<p> The output <code>info</code> is a struct containing some
+  statistic on the learned SVM: </p>
+
+
+<precode type='matlab'>
+info = 
+
+              model: [2x1 double]
+               bias: 0.0553
+          dimension: 2
+         iterations: 30
+      maxIterations: 30
+            epsilon: 0
+             lambda: 0.0100
+     biasMultiplier: 1
+        elapsedTime: 0
+             energy: 0.2106
+    regularizerTerm: 0.0774
+            lossPos: 0.0708
+            lossNeg: 0.0624
+        hardLossPos: 0.1520
+        hardLossNeg: 0.1287
+         energyDual: 0.2099
+         dualityGap: 7.5467e-04
+</precode>
+
+<p>It is also possible to  use under some
+  assumptions <a href="#ref3">[3]</a> an homogeneous kernel map expanded online inside the
+  solver. This can be done with the following command:  </p>
+
+<precode type='matlab'>
+dataset = vl_maketrainingset(X, int8(y).'homkermap',2,'KChi2') ;
+</precode>
+
+<p>The above code creates a training set without applying any
+  homogeneous kernel map to the data. When the solver is called  it will expand each data point with a Chi Squared kernel
+  of period 2.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.svm.diagn">Diagnostics</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>VLFeat allows to get statistics during the training process. It is
+  sufficient to pass a function handle to the solver. The function
+  will be then called every <code>energyFrequency</code> time.</p>
+
+<p>(S)DCA diagnostics provides the duality gap value (the difference between primal and dual energy),
+  which is the upper bound of the primal task sub-optimality.</p>
+
+<precode type='matlab'>
+% Diagnostic function
+function diagnostics(svm)
+  energy = [energy [svm.energy ; svm.energyDual ; svm.dualityGap ] ] ;
+end
+
+% Training the SVM
+energy = [] ;
+dataset = vl_maketrainingset(X, int8(y)) ;
+[w b info] = vl_svmtrain(dataset, lambda, 'DCA',...
+                           'MaxIterations',maxIter,...
+                           'DiagnosticFunction',@diagnostics,,...
+                           'EnergyFreq',1)
+</precode>
+
+<p>The energy value for the past iterations are kept in the
+  matrix <code>energy</code>. Now we can plot the energy values from the learning process. </p>
+
+<precode type='matlab'>
+
+figure 
+hold on
+plot(energy(1,:),'--b') ;
+plot(energy(2,:),'-.g') ;
+plot(energy(3,:),'r') ;
+legend('Primal energy','Dual energy','Duality gap')
+xlabel('Diagnostics iteration')
+ylabel('Energy')
+
+
+</precode>
+
+<div class="figure">
+ <img src="%pathto:root;demo/svm_energy.jpg"/>
+ <div class="caption">
+  <span class="content">
+   SVM energy values plot.
+  </span>
+ </div>
+</div>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.svm.references">References</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<ul>
+
+<li id="ref1">[1] Y. Singer and N. Srebro. <em>Pegasos: Primal
+  estimated sub-gradient solver for SVM</em>. In Proc. ICML,
+  2007.
+</li>
+
+<li id="ref2">[2]
+S. Shalev-Shwartz and T. Zhang. <em>{Stochastic Dual Coordinate Ascent Methods for Regularized Loss Minimization</em>. 2013.
+</li>
+
+<li id="ref3">[3] A. Vedaldi and A. Zisserman. <em>Efficient additive
+    kernels via explicit feature maps</em>. In PAMI, 2011. 
+</li>
+
+</ul>
+
+</group>

@@ -1,25 +1,27 @@
-/** @file pegasos.c
- ** @brief PEGASOS - Definition
+/** @file svm_sgd.c
+ ** @brief SGD SVM Solver - Definition
  ** @author Daniele Perrone
  ** @author Andrea Vedaldi
  **/
 
 /*
 Copyright (C) 2012 Daniele Perrone.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
+
 /**
 <!-- ------------------------------------------------------------- -->
-@page pegasos PEGASOS SVM solver
+@page pegasos SGD SVM solver
 @author Daniele Perrone
 @author Andrea Vedaldi
 <!-- ------------------------------------------------------------- -->
 
-@ref pegasos.h provides a basic implementation of the PEGASOS
+@ref svm_sgd.h provides a basic implementation of the SGD (Stochastic Gradient Descent) solver called PEGASOS.
 @cite{shalev-shwartz07pegasos} linear SVM solver.
 
 - @ref pegasos-overview "Overview"
@@ -32,7 +34,7 @@ the terms of the BSD license (see the COPYING file).
 @section pegasos-overview Overview
 <!-- ------------------------------------------------------------ --->
 
-PEGASOS solves the <em>linear</em> SxVM learning problem
+PEGASOS SGD solves the <em>linear</em> SxVM learning problem
 
 @f[
  \min_{w} \frac{\lambda}{2} \|w\|^2 + \frac{1}{m} \sum_{i=1}^n
@@ -59,8 +61,8 @@ i01-loss of the decision function:
  \ell(w;(x,y)) \geq \frac{1}{2}(1 - y F(x)).
 @f]
 
-PEGASOS is accessed by calling ::vl_svmpegasos_train or
- ::vl_svmpegasos_train_validation_data.
+PEGASOS is accessed by calling ::vl_svm_sgd_train or
+ ::vl_svm_sgd_train_validation_data.
 
 <!-- ------------------------------------------------------------ --->
 @subsection pegasos-algorithm Algorithm
@@ -172,23 +174,23 @@ or the memory is limited.
 
 */
 
-/** @fn vl_svmpegasos_train (VlSvmPegasos*,void*,vl_size,VlSvmDatasetInnerProduct,VlSvmDatasetAccumulator,vl_int8 const*)
+/** @fn vl_svm_sgd_train (VlSvm*,void*,vl_size,VlSvmDatasetInnerProduct,VlSvmDatasetAccumulator,vl_int8 const*)
  ** @param svm (in & out) svm status.
- ** @param data training vectors.
+ ** @param dataset training vectors.
  ** @param numSamples number of training data vectors.
  ** @param innerProduct function defining the innerProduct between the model and a data point.
  ** @param accumulator function definint the sum between the model and a data point.
  ** @param labels labels of the training vectors.
  **
  ** The function runs PEGASOS on the specified data. The structure svm
- ** should be initialized using @ref vl_svmpegasos_new. The vector @a
+ ** should be initialized using @ref vl_svm_new. The vector @a
  ** svm->model must have the dimension equal to @a svm->dimension. if a
  ** bias is used,  @a svm->biasMultiplier must be non-zero, and the
  ** output value will be saved in @a svm->bias.
  **
  ** The function runs PEGASOS for iterations <em>t</em> in the
  ** interval [@a svm->iterations, @a svm->maxIterations]. If the
- ** intial status is initializied using @ref vl_svmpegasos_new
+ ** intial status is initializied using @ref vl_svm_new
  ** svm->iterations is equal to zero.
  **
  ** PEGASOS select the next point for computing the gradient at
@@ -203,7 +205,7 @@ or the memory is limited.
  ** See the @ref pegasos-overview overview for details.
  **/
 
-/** @fn vl_svmpegasos_train_validation_data (VlSvmPegasos*,void*,vl_size,VlSvmDatasetInnerProduct,VlSvmDatasetAccumulator,vl_int8 const *,void *,vl_size,vl_int8 const *)
+/** @fn vl_svm_sgd_train_validation_data (VlSvm*,void*,vl_size,VlSvmDatasetInnerProduct,VlSvmDatasetAccumulator,vl_int8 const *,void *,vl_size,vl_int8 const *)
  ** @param svm (in & out) svm status.
  ** @param data training vectors.
  ** @param numSamples number of training data vectors.
@@ -214,148 +216,46 @@ or the memory is limited.
  ** @param validationNumSamples number of validation data vectors.
  ** @param validationLabels labels of the validation data.
  **
- ** The function is the same algorithm of @ref vl_svmpegasos_train, but
+ ** The function is the same algorithm of @ref vl_svm_sgd_train, but
  ** computes the objective function statistics on a validation
  ** dataset, instead of using the training dataset also for this purpose.
  **
- ** @see ::vl_svmpegasos_train
+ ** @see ::vl_svm_sgd_train
  **/
 
-#ifndef VL_PEGASOS_INSTANTIATING
+#ifndef VL_SGD_INSTANTIATING
 
-#include "pegasos.h"
+#include "svm_sgd.h"
 #include "mathop.h"
 #include <math.h>
 
-void
-vl_svm_compute_diagnostic(VlSvmPegasos *svm,
-                          void * data,
-                          vl_size numSamples,
-                          vl_int8 const * labels,
-                          VlSvmDatasetInnerProduct innerProduct)
-{
-  vl_size i, k ;
-  vl_size numPos = 0 ;
-  vl_size numNeg = 0 ;
-  double pd ;
-  svm->objective->regularizer = 0.0 ;
 
-  for (i = 0; i < svm->dimension; i++) {
-    svm->objective->regularizer += svm->model[i] * svm->model[i] ;
-  }
-
-  svm->objective->regularizer *= svm->lambda * 0.5 ;
-
-  svm->objective->lossPos = 0 ;
-  svm->objective->lossNeg = 0 ;
-  svm->objective->hardLossPos = 0 ;
-  svm->objective->hardLossNeg = 0 ;
-
-  for (k = 0; k < numSamples; k++) {
-    pd = innerProduct(data,k,svm->model) ;
-    if (svm->biasMultiplier) {
-      pd += svm->bias*svm->biasMultiplier ;
-    }
-    pd = VL_MAX(1 - labels[k]*pd, 0.0) ;
-
-    if (labels[k] < 0) {
-      svm->objective->lossNeg += pd ;
-      svm->objective->hardLossNeg += (pd > 0) ;
-      numNeg++ ;
-    } else {
-      svm->objective->lossPos += pd ;
-      svm->objective->hardLossPos += (pd > 0) ;
-      numPos++ ;
-    }
-  }
-
-  svm->objective->lossPos /= numPos ;
-  svm->objective->lossNeg /= numNeg ;
-  svm->objective->hardLossPos /= numPos ;
-  svm->objective->hardLossNeg /= numNeg ;
-  svm->objective->energy = svm->objective->regularizer + svm->objective->lossPos + svm->objective->lossNeg ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Create a new @ref VlSvmPegasos structure
- ** @param dimension svm model dimension.
- ** @param lambda pegasos regularization parameter.
- **
- ** This function allocates and returns a new @ref VlSvmPegasos structure.
- **
- ** @return the new @ref VlSvmPegasos structure.
- ** @sa ::vl_svmpegasos_delete
- **/
-
-VL_EXPORT
-VlSvmPegasos* vl_svmpegasos_new (vl_size dimension,
-                                 double lambda)
-{
-  VlSvmPegasos  * svm = (VlSvmPegasos*) vl_malloc(sizeof(VlSvmPegasos)) ;
-
-  assert(lambda > 0.0) ;
-
-  svm->model = (double*) vl_calloc(dimension, sizeof(double)) ;
-  svm->dimension = dimension ;
-  svm->objective = (VlSvmObjective*) vl_malloc(sizeof(VlSvmObjective)) ;
-  svm->iterations = 0 ;
-  svm->maxIterations = (vl_size) 10 / (lambda + 1) ;
-  svm->lambda = lambda ;
-  svm->epsilon = -1 ;
-  svm->biasMultiplier = 0 ;
-  svm->bias = 0 ;
-  svm->elapsedTime = 0 ;
-  svm->biasPreconditioner = 1 ;
-  svm->energyFrequency = 100 ;
-  svm->randomGenerator = NULL ;
-  svm->permutation = NULL ;
-  svm->diagnosticCallerRef = NULL ;
-  svm->diagnostic = NULL ;
-
-  return svm ;
-}
-
-/** -------------------------------------------------------------------
- ** @brief Delete a @ref VlSvmPegasos structure
- ** @param @ref VlSvmPegasos structure.
- **
- ** The function frees the resources allocated by
- ** ::vl_svmpegasos_new().
- **/
-
-VL_EXPORT
-void vl_svmpegasos_delete (VlSvmPegasos * svm, vl_bool freeModel)
-{
-  if (svm->model && freeModel) vl_free(svm->model) ;
-  if (svm->objective) vl_free(svm->objective) ;
-  vl_free(svm) ;
-}
 
 #define SFX _validation_data
 #define VALIDATION
-#define VL_PEGASOS_INSTANTIATING
-#include "pegasos.c"
+#define VL_SGD_INSTANTIATING
+#include "svm_sgd.c"
 
 #define SFX
-#define VL_PEGASOS_INSTANTIATING
-#include "pegasos.c"
+#define VL_SGD_INSTANTIATING
+#include "svm_sgd.c"
 
-/* VL_PEGASOS_INSTANTIATING */
+/* VL_SGD_INSTANTIATING */
 #else
 
 VL_EXPORT void
-VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
-                                 void * data,
-                                 vl_size numSamples,
-                                 VlSvmDatasetInnerProduct innerProduct,
-                                 VlSvmDatasetAccumulator accumulator,
-                                 vl_int8 const * labels
+VL_XCAT(vl_svm_sgd_train,SFX)(VlSvm * svm,
+                              void * dataset,
+                              vl_size numSamples,
+                              VlSvmDatasetInnerProduct innerProduct,
+                              VlSvmDatasetAccumulator accumulator,
+                              vl_int8 const * labels
 #ifdef VALIDATION
-                                 ,void * validation,
-                                 vl_size validationNumSamples,
-                                 vl_int8 const * validationLabels
+                              ,void * validation,
+                              vl_size validationNumSamples,
+                              vl_int8 const * validationLabels
 #endif
-                                 )
+                              )
 {
   vl_uindex iteration0 ;
   double energy = 0;
@@ -369,14 +269,11 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
   if (svm->randomGenerator == NULL && svm->permutation == NULL) {
     svm->randomGenerator = vl_get_rand() ;
   }
-
   assert(svm->randomGenerator == NULL || svm->permutation == NULL) ;
-  assert(svm->iterations >= 0) ;
 
   /*
     Choose iteration0 to start with small enoguh steps. Recall that
     the learning rate is
-
   */
 
   iteration0 = (vl_uindex) 1.0 / lambda ;
@@ -415,7 +312,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
     }
 
     /* loss step ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-    acc = innerProduct(data,k,svm->model) ;
+    acc = innerProduct(dataset,k,svm->model) ;
 
     if (svm->biasMultiplier) {
       acc += svm->biasMultiplier * svm->bias ;
@@ -425,7 +322,7 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
       double eta = y * learningRate ;
 
       acc = 0 ;
-      accumulator(data,k,svm->model,eta) ;
+      accumulator(dataset,k,svm->model,eta) ;
 
       if (svm->biasMultiplier) {
         svm->bias += eta * svm->biasPreconditioner * svm->biasMultiplier ;
@@ -439,18 +336,23 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
                                 validation,
                                 validationNumSamples,
                                 validationLabels,
-                                innerProduct) ;
+                                innerProduct,
+                                &vl_L1_loss,
+                                NULL) ;
 #else
       vl_svm_compute_diagnostic(svm,
-                                data,
+                                dataset,
                                 numSamples,
                                 labels,
-                                innerProduct) ;
+                                innerProduct,
+                                &vl_L1_loss,
+                                NULL) ;
 #endif
       if (svm->diagnostic) {
         svm->diagnostic(svm) ;
       }
 
+//TODO! find a better stopping condition
       if(svm->epsilon > 0 &&
          vl_abs_d(energy - svm->objective->energy) < svm->epsilon) {
         break ;
@@ -465,5 +367,5 @@ VL_XCAT(vl_svmpegasos_train,SFX)(VlSvmPegasos * svm,
 /* VL_SVMDATASET_INSTANTIATING */
 #undef SFX
 #undef VALIDATION
-#undef VL_PEGASOS_INSTANTIATING
+#undef VL_SGD_INSTANTIATING
 #endif
