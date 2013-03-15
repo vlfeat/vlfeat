@@ -56,13 +56,16 @@ conf.numSpatialX = [2 4] ;
 conf.numSpatialY = [2 4] ;
 conf.quantizer = 'kdtree' ;
 conf.svm.C = 10 ;
-conf.svm.solver = 'pegasos' ;
+conf.svm.solver = 'sdca' ;
 conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 3} ;
 conf.clobber = false ;
 conf.tinyProblem = true ;
 conf.prefix = 'baseline' ;
 conf.randSeed = 1 ;
+
+totalEnergy = 0; % !new
+totalLoss = 0; % !new
 
 if conf.tinyProblem
   conf.prefix = 'tiny' ;
@@ -201,19 +204,38 @@ size(psix)
 
 if ~exist(conf.modelPath) || conf.clobber
   switch conf.svm.solver
-    case 'pegasos'
+    case 'sgd'
       lambda = 1 / (conf.svm.C *  length(selTrain)) ;
       w = [] ;
-      % for ci = 1:length(classes)
       parfor ci = 1:length(classes)
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm)));
-        [w(:,ci) b(ci)] = vl_svmpegasos(data, lambda, ...
+
+        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm))) ;
+        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, ...
                                         'MaxIterations', 50/lambda, ...
-                                        'BiasMultiplier', conf.svm.biasMultiplier) ;
+                                        'BiasMultiplier', conf.svm.biasMultiplier);
+        totalEnergy = totalEnergy + info.energy;
+        totalLoss = totalLoss + info.lossPos + info.lossNeg;
       end
+    case 'sdca'
+      lambda = 1 / (conf.svm.C *  length(selTrain)) ;
+      w = [] ;
+      parfor ci = 1:length(classes)
+        perm = randperm(length(selTrain)) ;
+        fprintf('Training model for class %s\n', classes{ci}) ;
+        y = 2 * (imageClass(selTrain) == ci) - 1 ;
+        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm))) ;
+        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, 'DCA',...
+                                        'MaxIterations', 5/lambda, ...
+                                        'BiasMultiplier', conf.svm.biasMultiplier,...
+                                        'Epsilon',0.00,...
+                                        'OnlineSetting',logical(1));
+        %info
+        totalEnergy = totalEnergy + info.energy; % !new
+        totalLoss = totalLoss + info.lossPos + info.lossNeg; % !new
+      end% % !new-->
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...
                   sparse(double(psix(:,selTrain))),  ...
@@ -257,6 +279,10 @@ title(sprintf('Confusion matrix (%.2f %% accuracy)', ...
               100 * mean(diag(confus)/conf.numTest) )) ;
 print('-depsc2', [conf.resultPath '.ps']) ;
 save([conf.resultPath '.mat'], 'confus', 'conf') ;
+
+
+totalEnergy % !new
+totalLoss % !new
 
 % -------------------------------------------------------------------------
 function im = standarizeImage(im)
