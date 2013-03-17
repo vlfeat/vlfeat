@@ -701,11 +701,11 @@ or the memory is limited.
 
 VL_EXPORT
 void vl_int_array_random_permute(vl_int *A, vl_size size, VlRand *random) {
-  vl_int ai;
-  for (vl_int i = size - 1; i > 0; i--) {
+  vl_int ai, i, j;
+  for (i = size - 1; i > 0; i--) {
 
   //random integer, 0 ≤ j ≤ i
-  vl_int j = (vl_int) vl_rand_uindex (random, i+1);
+    j = (vl_int) vl_rand_uindex (random, i+1);
     ai = A[i];
     A[i] = A[j];
     A[j] = ai;
@@ -744,9 +744,12 @@ VL_XCAT(vl_svm_dca_train,SFX) (VlSvm * svm,
 #endif
 				) {
 
-  /*  Start timer */
-  vl_tic() ;
 
+  double * xi_squares;
+  vl_int * A;
+  vl_size i,p;
+  vl_bool inc, doBreak;
+  double inner, delta, multiplier;
 
   /* Init and seed VLFeat random generator */
   VlRand rand;
@@ -754,16 +757,19 @@ VL_XCAT(vl_svm_dca_train,SFX) (VlSvm * svm,
   vl_rand_seed (&rand, clock()) ;
 
 
+  /*  Start timer */
+  vl_tic() ;
+
 
 
   /* Init  A = {0,...,l-1}, alpha = {0,0,...,0};
    Precompute Q_ii */
   svm->alpha = (double*) vl_calloc(numSamples, sizeof(double));
-  double * xi_squares = (double*) vl_calloc(numSamples, sizeof(double));
-  vl_int * A = (vl_int*) vl_calloc(numSamples, sizeof(vl_int));
+  xi_squares = (double*) vl_calloc(numSamples, sizeof(double));
+  A = (vl_int*) vl_calloc(numSamples, sizeof(vl_int));
 
 
-  for (vl_size i=0; i < numSamples; i++) {
+  for (i=0; i < numSamples; i++) {
     A[i] = i;
 
     // compute the length square a of data vector (inner product with itself)
@@ -778,27 +784,27 @@ VL_XCAT(vl_svm_dca_train,SFX) (VlSvm * svm,
   }
 
   /* Outer iterations */
-  vl_bool inc = 1;
+  inc = 1;
   if(svm->onlineSetting) inc = 0; // online setting increments in inner cycle, not in outer cycle
-  vl_bool doBreak = 0;
+  doBreak = 0;
   for( ; !doBreak && svm->iterations < svm->maxIterations; svm->iterations+=inc) {
 
     if(svm->randomPermutation) vl_int_array_random_permute(A,numSamples,&rand);
 
 
-    for (vl_size p=0; p < numSamples; p++) {
+    for (p=0; p < numSamples; p++) {
       vl_int i = A[p];
 
-      double inner = innerProduct(dataset,i,svm->model);
+      inner = innerProduct(dataset,i,svm->model);
       inner += svm->bias * svm->biasMultiplier;
-      double delta = deltaAlpha(labels[i], inner, svm, xi_squares[i], svm->alpha[i], numSamples);
+      delta = deltaAlpha(labels[i], inner, svm, xi_squares[i], svm->alpha[i], numSamples);
 
       if(delta!=0) {
         /* update alpha */
         svm->alpha[i] += delta;
 
         /* update model */
-        double multiplier = delta/(numSamples*svm->lambda);
+        multiplier = delta/(numSamples*svm->lambda);
         accumulator(dataset,i,svm->model,multiplier);
         svm->bias += multiplier * svm->biasMultiplier;
       }

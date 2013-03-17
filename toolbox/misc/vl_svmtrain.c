@@ -71,6 +71,9 @@ mxArray * createInfoStruct(VlSvm* svm)
   mxArray *output, *dimension, *iterations, *maxIterations, *epsilon ;
   mxArray *lambda, *biasMultiplier ;
   mxArray *biasPreconditioner, *energyFrequency, *elapsedTime ;
+  mwSize mdims[2] ;
+  double * tempBuffer ;
+
 
   if (svm->type == VL_SVM_SGD) {
 
@@ -120,8 +123,6 @@ mxArray * createInfoStruct(VlSvm* svm)
 
 
   /*--MODEL--*/
-  mwSize mdims[2] ;
-  double * tempBuffer ;
   mdims[0] = svm->dimension ;
   mdims[1] = 1 ;
   model = mxCreateNumericArray(2, mdims, mxDOUBLE_CLASS, mxREAL) ;
@@ -449,11 +450,56 @@ mexFunction(int nout, mxArray *out[],
 {
 
 
-  VL_USE_MATLAB_ENV ;
 
   enum {IN_DATA, IN_LAMBDA, IN_END} ;
   enum {OUT_MODEL = 0, OUT_BIAS, OUT_INFO} ;
 
+
+	void * data ;
+	vl_size dataDimension,numSamples ;
+	vl_type dataType ;
+	vl_int8 * labels ;
+	VlSvmDataset * dataset;
+	vl_int mapDim;
+  double lambda;
+  VlSvm* svm;
+  vl_bool freeModel;
+
+  void * validationData;
+  vl_size validationDataDimension ;
+  vl_type validationDataType ;
+  vl_size validationNumSamples ;
+  vl_int8 * validationLabels  ;
+  int validationMapDim ;
+  VlSvmDataset* validationDataset ;
+
+
+  VlSvmDatasetInnerProduct innerProduct ;
+  VlSvmDatasetAccumulator accumulator ;
+
+  VlSvmLossFunction lossFunction;
+  VlSvmLossConjugateFunction lossConjugateFunction;
+  VlSvmDeltaAlpha deltaAlpha;
+  VlSvmDatasetLengthSquare lengthSquare;
+
+  vl_int opt, next;
+
+  mxArray const *optarg ;
+
+  vl_uint32* matlabPermutation ;
+  vl_uint32 * permutation ;
+  vl_size permutationSize ;
+
+  char * last_sgd_param ;
+  char * last_dca_param ;
+
+  vl_uindex k ;
+
+  VL_USE_MATLAB_ENV ;
+
+
+last_sgd_param = NULL;
+last_dca_param = NULL;
 
 	/* Check number of input and output parameters */
 
@@ -467,62 +513,38 @@ mexFunction(int nout, mxArray *out[],
 
 
 	/* Read minimal input */
-	void * data = NULL ;
-	vl_size dataDimension ;
-	vl_type dataType ;
-	vl_size numSamples = 0 ;
-	vl_int8 * labels = NULL ;
 
 	getTrainingData(IN(DATA),&data,&dataDimension,&dataType,&numSamples,&labels) ;
-  VlSvmDataset * dataset = vl_svmdataset_new(data,dataDimension) ;
+  dataset = vl_svmdataset_new(data,dataDimension) ;
 
-  int mapDim = 1 ;
+  mapDim = 1 ;
   setMap(IN(DATA),dataset,&mapDim) ;
 
   if (! vlmxIsPlainScalar(IN(LAMBDA))) {
         vlmxError(vlmxErrInvalidArgument, "LAMBDA is not a plain scalar.") ;
   }
-  double lambda =  *mxGetPr(IN(LAMBDA));
+  lambda =  *mxGetPr(IN(LAMBDA));
   if (lambda<= 0) {
         vlmxError(vlmxErrInvalidArgument, "LAMBDA must be a positive value.") ;
   }
 
   /* prepare SVM object */
-	VlSvm* svm = vl_svm_new(mapDim*dataDimension,lambda,VL_SVM_SGD);
-  vl_bool freeModel = VL_TRUE;
+	svm = vl_svm_new(mapDim*dataDimension,lambda,VL_SVM_SGD);
+  freeModel = VL_TRUE;
 
 
-  /* Validation Data */
-  void * validationData = NULL ;
-  vl_size validationDataDimension ;
-  vl_type validationDataType ;
-  vl_size validationNumSamples = 0 ;
-  vl_int8 * validationLabels = NULL ;
-  int validationMapDim = 0 ;
-  VlSvmDataset* validationDataset = NULL ;
+  innerProduct = NULL ;
+  accumulator = NULL ;
+  lossFunction = (VlSvmLossFunction)&vl_L1_loss ;
+  lossConjugateFunction = (VlSvmLossFunction)&vl_L1_lossConjugate ;
+  deltaAlpha = (VlSvmDeltaAlpha)&vl_L1_deltaAlpha ;
 
+  lengthSquare = NULL ;
 
+  validationDataset = NULL ;
 
-  VlSvmDatasetInnerProduct innerProduct = NULL ;
-  VlSvmDatasetAccumulator accumulator = NULL ;
-  VlSvmLossFunction lossFunction = (VlSvmLossFunction)&vl_L1_loss ;
-  VlSvmLossConjugateFunction lossConjugateFunction = (VlSvmLossFunction)&vl_L1_lossConjugate ;
-  VlSvmDeltaAlpha deltaAlpha = (VlSvmDeltaAlpha)&vl_L1_deltaAlpha ;
+  next = IN_END ;
 
-  VlSvmDatasetLengthSquare lengthSquare = NULL ;
-
-
-  int opt ;
-  int next = IN_END ;
-  mxArray const *optarg ;
-
-  vl_uint32* matlabPermutation ;
-  vl_uint32 * permutation  = NULL ;
-  vl_size permutationSize = 0 ;
-
-  /* for "parameters vs. svm type" checking */
-  char * last_sgd_param = NULL;
-  char * last_dca_param = NULL;
 
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
@@ -646,7 +668,6 @@ mexFunction(int nout, mxArray *out[],
         matlabPermutation = mxGetData(optarg) ;
 
         /* adjust (and check) indexing */
-        vl_uindex k ;
         for (k = 0 ; k < permutationSize ; ++k) {
           permutation[k] = matlabPermutation[k] - 1 ;
           if (permutation[k] >= numSamples) {

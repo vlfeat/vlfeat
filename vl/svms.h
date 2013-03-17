@@ -201,6 +201,7 @@ vl_svm_compute_diagnostic(VlSvm *svm,
                           )
 {
   vl_size i, k ;
+  double inner, loss;
 
   svm->objective->regularizer = svm->bias * svm->bias;
   for (i = 0; i < svm->dimension; i++) {
@@ -219,9 +220,9 @@ vl_svm_compute_diagnostic(VlSvm *svm,
 
   for (k = 0; k < numSamples; k++) {
 
-    double inner = innerProduct(dataset,k,svm->model) ;
+    inner = innerProduct(dataset,k,svm->model) ;
     inner += svm->bias * svm->biasMultiplier;
-    double loss = lossFunction(labels[k],inner) ;
+    loss = lossFunction(labels[k],inner) ;
 
     if (labels[k] < 0) {
       svm->objective->lossNeg += loss ;

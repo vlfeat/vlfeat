@@ -215,12 +215,22 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
 
-
-  VL_USE_MATLAB_ENV ;
-
-
   enum {IN_DATA, IN_MODEL, IN_BIAS, IN_BIAS_MULTIPLIER} ;
   enum {OUT_LABELS} ;
+
+  vl_size dataDimension,numSamples,i;
+	vl_type dataType ;
+  void * data;
+  VlSvmDataset * dataset;
+  vl_int mapDim;
+  double * model;
+  double bias, biasMultiplier, score;
+  VlSvmDatasetInnerProduct innerProduct;
+  vl_int8 * labels;
+  vl_int8 tempBuffer;
+  mwSize dims[2];
+
+  VL_USE_MATLAB_ENV ;
 
 
 	/* Check number of input and output parameters */
@@ -239,16 +249,14 @@ mexFunction(int nout, mxArray *out[],
 
 	/* Load data */
 
-	void * data = NULL ;
-	vl_size dataDimension ;
-	vl_type dataType ;
-	vl_size numSamples = 0 ;
+	data = NULL ;
+	numSamples = 0 ;
 
 	getTestingData(IN(DATA),&data,&dataDimension,&dataType,&numSamples) ;
 
-  VlSvmDataset * dataset = vl_svmdataset_new(data,dataDimension) ;
+  dataset = vl_svmdataset_new(data,dataDimension) ;
 
-  int mapDim = 1 ;
+  mapDim = 1 ;
   setMap(IN(DATA),dataset,&mapDim) ;
 
 
@@ -260,15 +268,14 @@ mexFunction(int nout, mxArray *out[],
               "MODEL dimension does not correspond to DATA dimension (w.r.t. possible feature mapping).") ;
   }
 
-  double * model = (double*) mxGetData(IN(MODEL));
-  double bias;
+  model = (double*) mxGetData(IN(MODEL));
+
   if (nin < 3) {
     bias = 0;
   } else {
     bias = (double) *mxGetPr(IN(BIAS)) ;
   }
 
-  double biasMultiplier;
   if (nin<4) {
     biasMultiplier = 1;
   } else {
@@ -276,7 +283,7 @@ mexFunction(int nout, mxArray *out[],
   }
 
 
-  VlSvmDatasetInnerProduct innerProduct = NULL ;
+  innerProduct = NULL ;
 
   switch (dataType) {
   case VL_TYPE_FLOAT :
@@ -288,12 +295,10 @@ mexFunction(int nout, mxArray *out[],
   }
 
 
-  vl_int8 * labels = vl_calloc(numSamples, sizeof(vl_int8)) ;
-
+  labels = vl_calloc(numSamples, sizeof(vl_int8)) ;
 
   /* Evaluate */
-  double score;
-  for (vl_size i=0; i<numSamples; i++) {
+  for (i=0; i<numSamples; i++) {
     score =innerProduct(dataset,i,model) + biasMultiplier*bias;
     if (score>0) {
       labels[i] = 1;
@@ -303,8 +308,7 @@ mexFunction(int nout, mxArray *out[],
   }
 
 
-  mwSize dims[2] ;
-  double * tempBuffer ;
+
   dims[0] = numSamples ;
   dims[1] = 1 ;
 
