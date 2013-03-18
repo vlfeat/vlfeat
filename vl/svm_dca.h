@@ -16,7 +16,7 @@ the terms of the BSD license (see the COPYING file).
 #ifndef VL_SVM_DCA_H
 #define VL_SVM_DCA_H
 
-#include "svms.h"
+#include "svm.h"
 
 
 /** @name Training Fuctions

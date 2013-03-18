@@ -207,7 +207,7 @@ or the memory is limited.
 
 /** @fn vl_svm_sgd_train_validation_data (VlSvm*,void*,vl_size,VlSvmDatasetInnerProduct,VlSvmDatasetAccumulator,vl_int8 const *,void *,vl_size,vl_int8 const *)
  ** @param svm (in & out) svm status.
- ** @param data training vectors.
+ ** @param dataset training vectors.
  ** @param numSamples number of training data vectors.
  ** @param innerProduct function defining the innerProduct between the  model and a data point.
  ** @param accumulator function definint the sum between the model and a data point.

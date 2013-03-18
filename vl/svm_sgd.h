@@ -17,7 +17,7 @@ the terms of the BSD license (see the COPYING file).
 #ifndef VL_SGD_H
 #define VL_SGD_H
 
-#include "svms.h"
+#include "svm.h"
 
 
 /** @name Training Fuctions
@@ -33,14 +33,14 @@ void vl_svm_sgd_train (VlSvm * svm,
 
 VL_EXPORT
 void vl_svm_sgd_train_validation_data (VlSvm * svm,
-                                          void * dataset,
-                                          vl_size numSamples,
-                                          VlSvmDatasetInnerProduct innerProduct,
-                                          VlSvmDatasetAccumulator accumulator,
-                                          vl_int8 const * labels,
-                                          void * validation,
-                                          vl_size validationNumSamples,
-                                          vl_int8 const * validationLabels) ;
+                          void * dataset,
+                          vl_size numSamples,
+                          VlSvmDatasetInnerProduct innerProduct,
+                          VlSvmDatasetAccumulator accumulator,
+                          vl_int8 const * labels,
+                          void * validation,
+                          vl_size validationNumSamples,
+                          vl_int8 const * validationLabels) ;
 /** @} */
 
 /** @name Retrieve data and parameters
