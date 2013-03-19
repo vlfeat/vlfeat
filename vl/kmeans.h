@@ -355,6 +355,11 @@ vl_kmeans_set_initialization (VlKMeans * self,
   self->initialization = initialization ;
 }
 
+/** @brief Set K-means multithreading option
+ ** @param self KMeans object.
+ ** @param multithreading multithreading option.
+ **/
+
 VL_INLINE void
 vl_kmeans_set_multithreading (VlKMeans * self,
                               VlKMeansMultithreading multithreading)

@@ -116,13 +116,13 @@ is accepted by <code>vl_vlad</code>.
 </p>
 
 <precode>
-assignments = zeros(Nencode,numClusters);
-assignments(:,assign) = 1;
+assignments = zeros(numClusters,Nencode);
+assignments(sub2ind(size(assignments),assign,1:length(assign))) = 1;
 </precode>
 
 <p>
 After this, we are ready to proceed to calculate
- the final VLAD vector <code>enc</code>.
+the final VLAD vector <code>enc</code>.
 </p>
 
 <precode>

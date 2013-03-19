@@ -19,6 +19,10 @@ the terms of the BSD license (see the COPYING file).
 #undef  VSFX
 #undef  VTYPE
 
+#undef  VSIZEavx
+#undef  VSFXavx
+#undef  VTYPEavx
+
 #if (FLT == VL_TYPE_FLOAT)
 #  define T      float
 #  define SFX    f
@@ -33,6 +37,39 @@ the terms of the BSD license (see the COPYING file).
 #  define SFX    i32
 #endif
 
+#ifdef __AVX__
+
+#if (FLT == VL_TYPE_FLOAT)
+#  define VSIZEavx  8
+#  define VSFXavx   s
+#  define VTYPEavx  __m256
+#elif (FLT == VL_TYPE_DOUBLE)
+#  define VSIZEavx  4
+#  define VSFXavx   d
+#  define VTYPEavx  __m256d
+#endif
+
+#define VALIGNED(x) (! (((vl_uintptr)(x)) & 0xF))
+#define VALIGNEDavx(x) (! (((vl_uintptr)(x)) & 0x1F))
+
+#define VMAXavx  VL_XCAT(_mm256_max_p,     VSFX)
+#define VMULavx  VL_XCAT(_mm256_mul_p,     VSFX)
+#define VDIVavx  VL_XCAT(_mm256_div_p,     VSFX)
+#define VADDavx  VL_XCAT(_mm256_add_p,     VSFX)
+#define VSUBavx  VL_XCAT(_mm256_sub_p,     VSFX)
+#define VSTZavx  VL_XCAT(_mm256_setzero_p, VSFX)
+#define VLD1avx  VL_XCAT(_mm256_load1_p,   VSFX)
+#define VLDUavx  VL_XCAT(_mm256_loadu_p,   VSFX)
+#define VST1avx  VL_XCAT(_mm256_store_s,   VSFX)
+#define VSET1avx VL_XCAT(_mm256_set_s,     VSFX)
+#define VSHUavx  VL_XCAT(_mm256_shuffle_p, VSFX)
+#define VNEQavx  VL_XCAT(_mm256_cmpneq_p,  VSFX)
+#define VANDavx  VL_XCAT(_mm256_and_p,     VSFX)
+#define VANDNavx VL_XCAT(_mm256_andnot_p,  VSFX)
+#define VST2avx  VL_XCAT(_mm256_store_p,   VSFX)
+#define VST2Uavx VL_XCAT(_mm256_storeu_p,  VSFX)
+
+#endif
 #ifdef  __SSE2__
 
 #if (FLT == VL_TYPE_FLOAT)
@@ -66,3 +103,4 @@ the terms of the BSD license (see the COPYING file).
 
 /* __SSE2__ */
 #endif
+

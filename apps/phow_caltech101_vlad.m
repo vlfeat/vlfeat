@@ -45,8 +45,8 @@ function phow_caltech101
 
 % AUTORIGHTS
 
-conf.calDir = 'data/caltech-101' ;
-conf.dataDir = 'data2/' ;
+conf.calDir = './data/caltech-101' ;
+conf.dataDir = 'data-vlad/' ;
 conf.autoDownloadData = true ;
 conf.numTrain = 15 ;
 conf.numTest = 15 ;
@@ -68,13 +68,13 @@ conf.randSeed = 1 ;
 
 if conf.tinyProblem
   conf.prefix = 'tiny' ;
-  conf.numClasses = 12 ;
+  conf.numClasses = 15 ;
   conf.numWords = 300 ;
   conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 5} ;
 end
 
 conf.vocabPath = fullfile(conf.dataDir, [conf.prefix '-vocab.mat']) ;
-conf.fishPath = fullfile(conf.dataDir, [conf.prefix '-fishers.mat']) ;
+conf.vladPath = fullfile(conf.dataDir, [conf.prefix '-vlads.mat']) ;
 conf.modelPath = fullfile(conf.dataDir, [conf.prefix '-model.mat']) ;
 conf.resultPath = fullfile(conf.dataDir, [conf.prefix '-result']) ;
 
@@ -154,46 +154,16 @@ if ~exist(conf.vocabPath) || conf.clobber
   % Quantize the descriptors to get the visual words
   %vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
   
-  init_mean = vl_kmeans(descrs, conf.numWords, ...
-      'verbose', 'MaxNumComparisons', ceil(conf.numWords/10), ...
-      'MaxNumIterations', 20, 'NumTrees',3, 'algorithm', ...
-      'ann', 'Initialization', 'plusplus');
+  means = vl_kmeans(descrs, conf.numWords, ...
+      'verbose', 'MaxNumComparisons', 0, ...
+      'MaxNumIterations', 40, 'NumTrees',3, 'algorithm', ...
+      'elkan', 'Initialization', 'plusplus');
   
   fprintf('Computing initial variances and coefficients...\n');
   
-  % compute hard assignments
-  kd_tree = vl_kdtreebuild(init_mean, 'numTrees', 3) ;
-  assign = vl_kdtreequery(kd_tree, init_mean, descrs);
   
-  % mixing coefficients
-  init_weights = single(vl_binsum(zeros(conf.numWords, 1), 1, double(assign)));
-  init_weights = init_weights / sum(init_weights);
-  
-  % variances
-  init_var = zeros(size(descrs, 1), conf.numWords, 'single');
-  
-  for i = 1:conf.numWords
-      descrs_cluster = descrs(:, assign == i);
-      init_var(:, i) = var(descrs_cluster, 0, 2);
-  end
-  
-  fprintf('Learning GMM model: Number of descriptors: %d; Number of visual words: %d\n',size(descrs,2),conf.numWords)
-  
-  tic
-  [means,sigmas,weights] = vl_gmm(descrs, conf.numWords, ...
-      'initialization','custom', ...
-      'InitMeans',init_mean, ...
-      'InitSigmas',init_var, ...
-      'InitWeights',init_weights, ...
-      'verbose', ...
-      'multithreading', 'parallel', ...
-      'MaxNumIterations', 30);
-  gmmTime = toc;
-  fprintf('gmm time: %f\n',gmmTime);
   
   vocab.means = means;
-  vocab.sigmas = sigmas;
-  vocab.weights = weights;
   
   save(conf.vocabPath, 'vocab') ;
 else
@@ -203,10 +173,10 @@ end
 model.vocab = vocab ;
 
 % --------------------------------------------------------------------
-%                                              Compute Fisher encoding
+%                                                Compute VLAD encoding
 % --------------------------------------------------------------------
 
-if ~exist(conf.fishPath) || conf.clobber
+if ~exist(conf.vladPath) || conf.clobber
   codes = {} ;
   parfor ii = 1:length(images)
   % for ii = 1:length(images)
@@ -216,9 +186,9 @@ if ~exist(conf.fishPath) || conf.clobber
   end
 
   codes = cat(2, codes{:}) ;
-  save(conf.fishPath, 'codes') ;
+  save(conf.vladPath, 'codes') ;
 else
-  load(conf.fishPath) ;
+  load(conf.vladPath) ;
 end
 
 
@@ -226,8 +196,8 @@ end
 %                                        Compute hellinger feature map
 % --------------------------------------------------------------------
 
-%codes = sign(codes).*sqrt(abs(codes));
-codes = vl_homkermap(codes, 1, 'kchi2', 'gamma', .5) ;
+codes = sign(codes).*sqrt(abs(codes));
+%codes = vl_homkermap(codes, 1, 'kchi2', 'gamma', .5) ;
 
 % --------------------------------------------------------------------
 %                                                            Train SVM
@@ -308,11 +278,17 @@ im = standarizeImage(im) ;
 % get PHOW features
 [drop, descrs] = vl_phow(im, model.phowOpts{:}) ;
 
-% quantize appearance
-enc = vl_fisher(single(descrs),model.vocab.means,model.vocab.sigmas,model.vocab.weights);
+% compute hard assignments
+kd_tree = vl_kdtreebuild(model.vocab.means, 'numTrees', 3) ;
+assign = vl_kdtreequery(kd_tree, single(model.vocab.means), single(descrs));
+assignments = zeros(size(model.vocab.means,2),size(descrs,2),'single');
 
-%normalize hist
-enc/sum(abs(enc));
+assignments(sub2ind(size(assignments),single(assign),1:length(assign))) = 1;
+
+% quantize appearance
+enc = vl_vlad(single(descrs),model.vocab.means,assignments,'normalize');
+enc = enc(:);
+
 
 
 

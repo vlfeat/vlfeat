@@ -107,7 +107,19 @@ iterative, and stop when either a **maximum number of iterations**
 (::vl_kmeans_set_max_num_iterations) is reached, or when the energy
 changes sufficiently slowly in one iteration (::vl_kmeans).
 
-Parallel computation...
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection kmeanss-starting-multithreading OpenMP multithreading support
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+All the three algorithms, support multithreaded computations.
+If a user wants to run the code in serial mode,
+the ::vl_kmeans_set_multithreading function could be utilized.
+If OpenMP is not installed in the system, the library automatically
+turns the multithreading off.
+
+For further information on OpenMP
+please see the <a href="http://openmp.org">official site</a>.
+
 */
 
 /**
@@ -327,6 +339,33 @@ algorithm (@ref kmeans-lloyd) that instead of the naive distance
 computations uses a best-bin-first randomized KD-tree algorithm to
 approximately (and quickly) find the closest cluster center to each
 point. The KD-tree implementation is based on @ref kdtree.
+
+The algorithm is basically the same as Lloyds, the only difference is
+during the quantization step (assigning the nearest center for each point),
+where the ANN KD-Tree is used.
+
+During each quantization step, a kd-tree randomized forest is built
+over the currently estimated cluster centers. Then all the data points
+are queried, which leads to finding the approximate nearest cluster
+center for each data point. The approximation can however lead to finding
+the solution with higher energy in the next iteration. To protect
+against this behaviour, the distance from previously assigned
+center is compared to the distance from currently found
+approximate nearest center. If the new distance is lower,
+the reassignment occurs, otherwise the point stays assigned
+to the old cluster center.
+
+When using KD-Trees the complexity of the assignment
+step is theoretically lowered to @f$ \O (d n log(K)) @f$. However,
+due to the curse of dimensionality,
+the exact nearest neighbor search becomes basically a linear search.
+That is why the ANN KD-Tree is used. To obtain a sufficient speedup
+the maximum number of distance comparisons in ANN KD-Tree
+has to be lowered quite dramatically. VlFeat experiments show that
+lowering the number of comparisons to one quarter of the
+number of cluster centers gives the same results as
+Elkans algorithm in terms of speed, when clustering
+128 dimensional data (e.g. SIFT descriptors).
 
 */
 
@@ -663,14 +702,14 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
   }
 
   distanceToCentersChunks = vl_malloc (sizeof(TYPE*) * numChunks) ;
-  for(t = 0; t < numChunks; t++) {
+  for(t = 0; t < (vl_int)numChunks; t++) {
     distanceToCentersChunks[t] = vl_malloc (sizeof(TYPE) * self->numCenters) ;
   }
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,i) schedule(static,chunkSize)
 #endif
-  for(t = 0; t < numChunks; t++) {
+  for(t = 0; t < (vl_int)numChunks; t++) {
     for (i = (vl_size)t ; i < numData ; i += numChunks) {
       vl_size k ;
       TYPE * distanceToCenters = distanceToCentersChunks[t] ;
@@ -692,7 +731,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
     }
   }
 
-  for(t = 0; t < numChunks; t++) {
+  for(t = 0; t < (vl_int)numChunks; t++) {
     vl_free(distanceToCentersChunks[t]);
   }
   vl_free(distanceToCentersChunks) ;
@@ -1081,7 +1120,7 @@ VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)
        iteration = 0;
        1 ;
        ++ iteration) {
-	
+
 	double eps;
 
     /* assign data to cluters */
@@ -1500,7 +1539,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,x,c) schedule(dynamic,chunkSize)
 #endif
-  for (t = 0; t < numChunks; t++) {
+  for (t = 0; t < (vl_int) numChunks; t++) {
     for (x = t ; x < numData ; x += numChunks) {
       for (c = 0 ; c < self->numCenters ; ++c) {
         TYPE a = pointToCenterLB[c + x * self->numCenters] ;
@@ -1554,7 +1593,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,c,x,allDone) schedule(dynamic,chunkSize) reduction(+:numDistanceComputationsToRefreshUB,numDistanceComputationsToRefreshLB)
 #endif
-  for(t = 0; t < numChunks; t++) {
+  for(t = 0; t < (vl_int) numChunks; t++) {
     for (allDone = VL_TRUE, x = t ; x < numData ; x += numChunks) {
       /*
        A point x sticks with its current center assignmets[x]

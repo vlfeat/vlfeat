@@ -5,10 +5,10 @@
 %   clusters are also located in columns of the MEANS matrix.
 %   Assignments are soft or hard assignments organized in the matrix,
 %   such that:
-%   [ p(c1|x1), p(c2|x1), ... p(cK|x1);
-%     p(c1|x2), p(c2|x2), ... p(cK|x2);
+%   [ p(x1|c1), p(x2|c1), ... p(xN|c1);
+%     p(x1|c2), p(x2|c2), ... p(xN|c2);
 %     ...
-%     p(c1|xN), p(c2|xN), ... p(cK|xN)] = POSTERIORS
+%     p(x1|cK), p(x2|cK), ... p(xN|cK) ] = POSTERIORS
 %
 %   To express a hard assignment, insert a 1(assigned) or zero to
 %   the corresponding place in the ASSIGN matrix

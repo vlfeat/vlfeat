@@ -145,6 +145,9 @@ For fitting a probabilistic model, consisting of a mixture
 of several gaussians on a given dataset, the expectation
 maximization @cite{Dempster77maximumlikelihood}
  algorithm (EM) is one of the most widely used methods.
+The applications vary from the construction of vocabularies of
+visual words to speech recognition or medical image
+processing.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection gmm-usage-em EM algorithm
@@ -207,8 +210,8 @@ The E step estimates the posteriors @f$ q_{i,k} @f$ using the
 bayesan rule in the following equation:
 
 @f[
- q_{i,k} = { { {\pi_k} {{(2 \pi)}^{K \over 2}} {{| \Sigma_k |}^{1 \over 2}} exp( {-{1 \over 2}} {(x_i - \mu_k)^T} {{ \Sigma_k }^{-1}} {(x_i - \mu_k)} ) } \over
-              { \sum_{l=1}^{K} { {\pi_l} {(2 \pi)}^{K \over 2} | \Sigma_l |^{1 \over 2} exp( {-{1 \over 2}} {(x_i - \mu_l)^T} {{ \Sigma_l }^{-1}} {(x_i - \mu_l)} ) } } }
+ q_{i,k} = { { {\pi_k} {{(2 \pi)}^{-{K \over 2}}} {{| \Sigma_k |}^{-{1 \over 2}}} exp( {-{1 \over 2}} {(x_i - \mu_k)^T} {{ \Sigma_k }^{-1}} {(x_i - \mu_k)} ) } \over
+              { \sum_{l=1}^{K} { {\pi_l} {(2 \pi)}^{-{K \over 2}} | \Sigma_l |^{-{1 \over 2}} exp( {-{1 \over 2}} {(x_i - \mu_l)^T} {{ \Sigma_l }^{-1}} {(x_i - \mu_l)} ) } } }
 @f]
 
 Since the exponent of the multivariate gaussian distribution could become
@@ -1028,6 +1031,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
 
   TYPE * logSigmas;
   TYPE * logWeights;
+  TYPE * invSigmas;
 
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahal) ;
@@ -1036,6 +1040,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
 #endif
 
   logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
+  invSigmas = vl_malloc(sizeof(TYPE) * numClusters * self->dimension);
   logWeights = vl_malloc(numClusters * sizeof(TYPE));
 
   /* parallel computation consts*/
@@ -1070,6 +1075,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
       logWeights[i_cl] = log(weights[i_cl]);
       for(dim = 0; dim < self->dimension; dim++) {
         logSigma += log(sigmas[i_cl*self->dimension + dim]);
+        invSigmas[i_cl*self->dimension + dim] = 1/sigmas[i_cl*self->dimension + dim];
       }
       logSigmas[i_cl] = logSigma;
     }
@@ -1090,7 +1096,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
         posteriors[i_cl * numData + i_d] -= 0.5 * distFn (self->dimension,
                                             data + i_d * self->dimension,
                                             means + i_cl * self->dimension,
-                                            sigmas + i_cl * self->dimension);
+                                            invSigmas + i_cl * self->dimension);
         if(posteriors[i_cl * numData + i_d] > maxPosterior) {
           maxPosterior = posteriors[i_cl * numData + i_d];
         }
@@ -1112,6 +1118,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
 
   vl_free(logSigmas);
   vl_free(logWeights);
+  vl_free(invSigmas);
 
   return LL;
 }

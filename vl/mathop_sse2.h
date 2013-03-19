@@ -39,6 +39,10 @@ the terms of the BSD license (see the COPYING file).
 #include "float.th"
 
 VL_EXPORT T
+VL_XCAT(_vl_dot_sse2_, SFX)
+(vl_size dimension, T const * X, T const * Y) ;
+
+VL_EXPORT T
 VL_XCAT(_vl_distance_l2_sse2_, SFX)
 (vl_size dimension, T const * X, T const * Y) ;
 
@@ -64,6 +68,10 @@ VL_XCAT(_vl_kernel_chi2_sse2_, SFX)
 
 VL_EXPORT T
 VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
+(vl_size dimension, T const * X, T const * MU, T const * S);
+
+VL_EXPORT T
+VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX)
 (vl_size dimension, T const * X, T const * MU, T const * S);
 
 VL_EXPORT void

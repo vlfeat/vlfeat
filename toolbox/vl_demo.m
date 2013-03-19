@@ -52,6 +52,6 @@ vl_demo_gmm_2d_rand;
 vl_demo_gmm_2d_twist;
 vl_demo_gmm_3d;
 
-vl_demo_kmeans_speed;
+vl_demo_kmeans_ann_speed;
 
 rmpath(demo_path);

@@ -85,7 +85,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_size numRepetitions = 1 ;
   double LL ;
   int verbosity = 0 ;
-  int initialization = INIT_RAND ;
+  VlGMMInitialization initialization = VlGMMRand ;
 
   vl_type dataType ;
   mxClassID classID ;
@@ -405,7 +405,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_gmm_set_initialization (gmm, initialization) ;
   vl_gmm_set_sigma_lower_bound (gmm, sigmaLowBound) ;
 
-  if(sigmasSet || meansSet)
+  if(sigmasSet || meansSet || weightsSet)
   {
     if(vl_gmm_get_initialization(gmm) != VlGMMCustom)
     {

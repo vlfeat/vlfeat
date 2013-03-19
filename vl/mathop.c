@@ -425,7 +425,11 @@ VL_XCAT(vl_get_vector_3_comparison_function_, SFX)(VlVectorComparisonType type)
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {
+      #ifdef __AVX__
+      case VlDistanceMahal : function = VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX) ; break ;
+      #else
       case VlDistanceMahal : function = VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX) ; break ;
+      #endif
       default: break ;
     }
   }

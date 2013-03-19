@@ -46,6 +46,8 @@ are defined as:
   v_k = {1 \over {N \sqrt{2 \pi_k}}} \sum_{i=1}^{N} { q_{i,k} [ (x_i - \mu_k)^T \Sigma^{-1} (x_i - \mu_k) - 1 ] }
 @f]
 
+Where @f$ q_{i,k} @f$ is a soft assignment of data point @f$ x_i @f$ to cluster @f$ k @f$.
+
 The fisher vector of size @f$ 2KD @f$, which encodes
 the set of features is:
 @f[
@@ -99,8 +101,6 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
   logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
   logWeights = vl_malloc(sizeof(TYPE) * numClusters);
-//  uk = vl_malloc(dimension*sizeof(TYPE));
-//  vk = vl_malloc(dimension*sizeof(TYPE));
   invSigma = vl_malloc(dimension*sizeof(TYPE)*numClusters);
   sqrtInvSigma = vl_malloc(dimension*sizeof(TYPE)*numClusters);
   posteriors = vl_malloc(numData*numClusters*sizeof(TYPE));
@@ -133,7 +133,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,i_cl,dim) schedule(static,chunkSize)
 #endif
-  for(t=0; t < numChunks; t++) {
+  for(t=0; t < (vl_int)numChunks; t++) {
     for (i_cl = (vl_size)t ; i_cl < numClusters ; i_cl += numChunks) {
 
       TYPE logSigma = 0;
@@ -153,7 +153,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,i_cl,i_d) schedule(static,chunkSize)
 #endif
-  for(t=0; t < numChunks; t++) {
+  for(t=0; t < (vl_int)numChunks; t++) {
     for (i_d = t ; i_d < numData ; i_d += numChunks) {
       TYPE clusterPosteriorsSum = 0;
       TYPE maxPosterior = (TYPE)(-VL_INFINITY_D);
@@ -165,7 +165,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
         posteriors[i_cl * numData + i_d] -= 0.5 * distFn (dimension,
                                             data + i_d * dimension,
                                             means + i_cl * dimension,
-                                            sigmas + i_cl * dimension);
+                                            invSigma + i_cl * dimension);
         if(posteriors[i_cl * numData + i_d] > maxPosterior) {
           maxPosterior = posteriors[i_cl * numData + i_d];
         }
@@ -186,7 +186,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #if defined(_OPENMP)
 #pragma omp parallel for private(t,i_cl,i_d, dim) schedule(static,chunkSize)
 #endif
-  for(t=0; t < numChunks; t++) {
+  for(t=0; t < (vl_int)numChunks; t++) {
     for(i_cl = t; i_cl < numClusters; i_cl += numChunks) {
       TYPE uprefix;
       TYPE vprefix;

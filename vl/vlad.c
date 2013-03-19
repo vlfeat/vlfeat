@@ -37,7 +37,7 @@ a set of assignments
 @f$ q_{1,1} ... q_{N,K}  @f$
 and a set of means
 @f$ \mu_1 ... \mu_K  @f$
-the components @f$ v_{i,j} @f$ of VLAD encoding are defined as:
+the components @f$ v_{j} @f$ of VLAD encoding are defined as:
 @f[
   v_{j} = \sum_{i=1}^{N} {  q_{i,j} (x_{i} - \mu_{j}) }
 @f]

@@ -9,6 +9,7 @@
 #include <vl/fisher.h>
 #include <vl/vlad.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 //#define TYPE double
 //#define VL_F_TYPE VL_TYPE_DOUBLE
@@ -29,10 +30,10 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   double sigmaLowerBound = 0.000001;
 
-  vl_size numData = 16000;
-  vl_size dimension = 5;
-  vl_size numClusters = 5;
-  vl_size maxiter = 10;
+  vl_size numData = 10000;
+  vl_size dimension = 128;
+  vl_size numClusters = 500;
+  vl_size maxiter = 9;
   vl_size maxrep = 1;
 
   vl_size maxiterKM = 5;
@@ -46,7 +47,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   } Init ;
 
   vl_bool computeFisher = VL_TRUE;
-  vl_bool computeVlad = VL_TRUE;
+  vl_bool computeVlad = VL_FALSE;
 
   Init init = Rand;
 
@@ -129,7 +130,14 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_gmm_set_multithreading (gmm,multithreading);
   vl_gmm_set_sigma_lower_bound (gmm,sigmaLowerBound);
 
+  struct timeval t1,t2;
+  gettimeofday(&t1, NULL);
+
   vl_gmm_cluster	(	gmm, data, dimension, numData, numClusters);
+
+  gettimeofday(&t2, NULL);
+
+  VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);
 
 //    VL_PRINT("posterior:\n");
 //    for(cIdx = 0; cIdx < clusterNum; cIdx++){
@@ -139,30 +147,46 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 //        VL_PRINT("\n");
 //    }
 
-  VL_PRINT("mean:\n");
-  for(cIdx = 0; cIdx < numClusters; cIdx++) {
+//  VL_PRINT("mean:\n");
+//  for(cIdx = 0; cIdx < numClusters; cIdx++) {
+//    for(d = 0; d < dimension; d++) {
+//      VL_PRINT("%f ",((TYPE*)gmm->means)[cIdx*dimension+d]);
+//    }
+//    VL_PRINT("\n");
+//  }
+//
+//  VL_PRINT("sigma:\n");
+//  for(cIdx = 0; cIdx < numClusters; cIdx++) {
+//    for(d = 0; d < dimension; d++) {
+//      VL_PRINT("%f ",((TYPE*)gmm->sigmas)[cIdx*dimension+d]);
+//    }
+//    VL_PRINT("\n");
+//  }
+//
+//  VL_PRINT("w:\n");
+//  for(cIdx = 0; cIdx < numClusters; cIdx++) {
+//    VL_PRINT("%f ",((TYPE*)gmm->weights)[cIdx]);
+//    VL_PRINT("\n");
+//  }
+
+  saveResults(dataFileData,dataFileResults,gmm,(void*) data, numData);
+
+//  VL_PRINT("fisher:\n");
+//  for(cIdx = 0; cIdx < clusterNum; cIdx++) {
+//    for(d = 0; d < dimension*2; d++) {
+//      VL_PRINT("%f ",enc[cIdx*dimension*2+d]);
+//    }
+//    VL_PRINT("\n");
+//  }
+
+  vl_free(data);
+  numData = 2000;
+  data = vl_malloc(numData*dimension*sizeof(TYPE));
+  for(dataIdx = 0; dataIdx < numData; dataIdx++) {
     for(d = 0; d < dimension; d++) {
-      VL_PRINT("%f ",((TYPE*)gmm->means)[cIdx*dimension+d]);
+      data[dataIdx*dimension+d] = (TYPE)vl_rand_real3(&rand);
     }
-    VL_PRINT("\n");
   }
-
-  VL_PRINT("sigma:\n");
-  for(cIdx = 0; cIdx < numClusters; cIdx++) {
-    for(d = 0; d < dimension; d++) {
-      VL_PRINT("%f ",((TYPE*)gmm->sigmas)[cIdx*dimension+d]);
-    }
-    VL_PRINT("\n");
-  }
-
-  VL_PRINT("w:\n");
-  for(cIdx = 0; cIdx < numClusters; cIdx++) {
-    VL_PRINT("%f ",((TYPE*)gmm->weights)[cIdx]);
-    VL_PRINT("\n");
-  }
-
-//  saveResults(dataFileData,dataFileResults,gmm,(void*) data, Ndata);
-
 
   if(computeFisher) {
     vl_fisher_encode
@@ -177,23 +201,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      numClusters,
      VlFisherParallel
     );
-  }
-
-//  VL_PRINT("fisher:\n");
-//  for(cIdx = 0; cIdx < clusterNum; cIdx++) {
-//    for(d = 0; d < dimension*2; d++) {
-//      VL_PRINT("%f ",enc[cIdx*dimension*2+d]);
-//    }
-//    VL_PRINT("\n");
-//  }
-
-  vl_free(data);
-  data = vl_malloc(numData*dimension*sizeof(TYPE));
-  numData = 2000;
-  for(dataIdx = 0; dataIdx < numData; dataIdx++) {
-    for(d = 0; d < dimension; d++) {
-      data[dataIdx*dimension+d] = (TYPE)vl_rand_real3(&rand);
-    }
   }
 
   assign = vl_malloc(numData*numClusters*sizeof(TYPE));

@@ -2,7 +2,7 @@
 numClusters = 50;
 numData = 500; %size of one cluster
 dimension = 3;
-mixtureDist = 20;
+mixtureDist = 15;
 cc=hsv(numClusters);
 X = [];
 for i=1:numClusters

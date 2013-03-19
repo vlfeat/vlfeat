@@ -1,6 +1,6 @@
 /** @file mathop_sse2.c
  ** @brief mathop for SSE2 - Definition
- ** @author Andrea Vedaldi
+ ** @author Andrea Vedaldi, David Novotny
  **/
 
 /*
@@ -23,7 +23,12 @@ the terms of the BSD license (see the COPYING file).
 #include "generic.h"
 #include "mathop.h"
 #include "mathop_sse2.h"
+#ifdef __AVX__
+#include <immintrin.h>
+#else
 #include <emmintrin.h>
+#endif
+
 
 #undef FLT
 #define FLT VL_TYPE_DOUBLE
@@ -70,6 +75,70 @@ VL_XCAT(_vl_vhsum_sse2_, SFX)(VTYPE x)
   }
 #endif
   VST1(&acc, x);
+  return acc ;
+}
+
+#ifdef __AVX__
+
+VL_INLINE T
+VL_XCAT(_vl_vhsum_avx_, SFX)(VTYPEavx x)
+{
+  T acc ;
+#if (VSIZEavx == 8)
+  {
+    VTYPEavx hsum = _mm256_hadd_ps(x, x);
+    hsum = _mm256_add_ps(hsum, _mm256_permute2f128_ps(hsum, hsum, 0x1));
+    _mm_store_ss(&acc, _mm_hadd_ps( _mm256_castps256_ps128(hsum), _mm256_castps256_ps128(hsum) ) );
+  }
+#else
+  {
+    VTYPEavx hsum = _mm256_add_pd(x, _mm256_permute2f128_pd(x, x, 0x1));
+    _mm_store_sd(&acc, _mm_hadd_pd( _mm256_castpd256_pd128(hsum), _mm256_castpd256_pd128(hsum) ) );
+  }
+#endif
+  return acc ;
+}
+
+#endif
+
+VL_EXPORT T
+VL_XCAT(_vl_dot_sse2_, SFX)
+(vl_size dimension, T const * X, T const * Y)
+{
+  T const * X_end = X + dimension ;
+  T const * X_vec_end = X_end - VSIZE + 1 ;
+  T acc ;
+  VTYPE vacc = VSTZ() ;
+  vl_bool dataAligned = VALIGNED(X) & VALIGNED(Y) ;
+
+  if (dataAligned) {
+    while (X < X_vec_end) {
+      VTYPE a = *(VTYPE*)X ;
+      VTYPE b = *(VTYPE*)Y ;
+      VTYPE d = VMUL(a, b) ;
+      vacc = VADD(vacc, d) ;
+      X += VSIZE ;
+      Y += VSIZE ;
+    }
+  } else {
+    while (X < X_vec_end) {
+      VTYPE a = VLDU(X) ;
+      VTYPE b = VLDU(Y) ;
+      VTYPE d = VMUL(a, b) ;
+      vacc = VADD(vacc, d) ;
+      X += VSIZE ;
+      Y += VSIZE ;
+    }
+  }
+
+  acc = VL_XCAT(_vl_vhsum_sse2_, SFX)(vacc) ;
+
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *Y++ ;
+    acc += a * b ;
+  }
+
   return acc ;
 }
 
@@ -129,14 +198,13 @@ VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
 
   if (dataAligned) {
     while (X < X_vec_end) {
-
       VTYPE a = *(VTYPE*)X ;
       VTYPE b = *(VTYPE*)MU ;
       VTYPE c = *(VTYPE*)S ;
 
       VTYPE delta = VSUB(a, b) ;
       VTYPE delta2 = VMUL(delta, delta) ;
-      VTYPE delta2div = VDIV(delta2,c);
+      VTYPE delta2div = VMUL(delta2,c);
 
       vacc = VADD(vacc, delta2div) ;
 
@@ -153,7 +221,7 @@ VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
 
       VTYPE delta = VSUB(a, b) ;
       VTYPE delta2 = VMUL(delta, delta) ;
-      VTYPE delta2div = VDIV(delta2,c);
+      VTYPE delta2div = VMUL(delta2,c);
 
       vacc = VADD(vacc, delta2div) ;
 
@@ -170,11 +238,73 @@ VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
     T b = *MU++ ;
     T c = *S++ ;
     T delta = a - b ;
-    acc += (delta * delta) / c;
+    acc += (delta * delta) * c;
   }
 
   return acc ;
 }
+
+#ifdef __AVX__
+
+VL_EXPORT T
+VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX)
+(vl_size dimension, T const * X, T const * MU, T const * S)
+{
+  T const * X_end = X + dimension ;
+  T const * X_vec_end = X_end - VSIZE + 1 ;
+  T acc ;
+  VTYPEavx vacc = VSTZavx() ;
+  vl_bool dataAligned = VALIGNEDavx(X) & VALIGNEDavx(MU) & VALIGNEDavx(S);
+
+  if (dataAligned) {
+    while (X < X_vec_end) {
+      VTYPEavx a = *(VTYPEavx*)X ;
+      VTYPEavx b = *(VTYPEavx*)MU ;
+      VTYPEavx c = *(VTYPEavx*)S ;
+
+      VTYPEavx delta = VSUBavx(a, b) ;
+      VTYPEavx delta2 = VMULavx(delta, delta) ;
+      VTYPEavx delta2div = VMULavx(delta2,c);
+
+      vacc = VADDavx(vacc, delta2div) ;
+
+      X  += VSIZEavx ;
+      MU += VSIZEavx ;
+      S  += VSIZEavx ;
+    }
+  } else {
+    while (X < X_vec_end) {
+
+      VTYPEavx a = VLDUavx(X) ;
+      VTYPEavx b = VLDUavx(MU) ;
+      VTYPEavx c = VLDUavx(S) ;
+
+      VTYPEavx delta = VSUBavx(a, b) ;
+      VTYPEavx delta2 = VMULavx(delta, delta) ;
+      VTYPEavx delta2div = VMULavx(delta2,c);
+
+      vacc = VADDavx(vacc, delta2div) ;
+
+      X  += VSIZEavx ;
+      MU += VSIZEavx ;
+      S  += VSIZEavx ;
+    }
+  }
+
+  acc = VL_XCAT(_vl_vhsum_avx_, SFX)(vacc) ;
+
+  while (X < X_end) {
+    T a = *X++ ;
+    T b = *MU++ ;
+    T c = *S++ ;
+    T delta = a - b ;
+    acc += (delta * delta) * c;
+  }
+
+  return acc ;
+}
+
+#endif
 
 VL_EXPORT T
 VL_XCAT(_vl_distance_l1_sse2_, SFX)
