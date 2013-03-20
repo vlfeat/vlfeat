@@ -396,7 +396,11 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {
+      #ifdef __AVX__
+      case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_avx_,             SFX) ; break ;
+      #else
       case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_sse2_,             SFX) ; break ;
+      #endif
       case VlDistanceL1    : function = VL_XCAT(_vl_distance_l1_sse2_,             SFX) ; break ;
       case VlDistanceChi2  : function = VL_XCAT(_vl_distance_chi2_sse2_,           SFX) ; break ;
       case VlKernelL2      : function = VL_XCAT(_vl_kernel_l2_sse2_,               SFX) ; break ;

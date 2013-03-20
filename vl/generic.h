@@ -145,6 +145,7 @@ vl_set_alloc_func (void *(*malloc_func)  (size_t),
 VL_EXPORT void *vl_malloc  (size_t n) ;
 VL_EXPORT void *vl_realloc (void *ptr, size_t n) ;
 VL_EXPORT void *vl_calloc  (size_t n, size_t size) ;
+VL_EXPORT void *vl_memalign  (size_t n, size_t size) ;
 VL_EXPORT void  vl_free    (void* ptr) ;
 /** @} */
 

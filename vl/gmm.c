@@ -932,7 +932,21 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
         clusterPosteriorSums[t][i_cl] += posteriors[i_cl * numData + i_d];
         posteriorSum += posteriors[i_cl * numData + i_d];
 
-#ifdef __SSE2__
+#ifdef __AVX__
+        VL_XCAT(_vl_weighted_mean_avx_, SFX)
+        (self->dimension,
+         chunkMeans[t] + i_cl * self->dimension,
+         data + i_d * self->dimension,
+         posteriors + i_cl*numData + i_d);
+
+        VL_XCAT(_vl_weighted_sigma_avx_, SFX)
+        (self->dimension,
+         chunkSigmas[t] + i_cl * self->dimension ,
+         data + i_d * self->dimension,
+         oldMeans + i_cl * self->dimension,
+         posteriors + i_cl*numData + i_d);
+#else
+  #ifdef __SSE2__
         VL_XCAT(_vl_weighted_mean_sse2_, SFX)
         (self->dimension,
          chunkMeans[t] + i_cl * self->dimension,
@@ -945,7 +959,7 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
          data + i_d * self->dimension,
          oldMeans + i_cl * self->dimension,
          posteriors + i_cl*numData + i_d);
-#else
+  #else
         for (dim = 0 ; dim < self->dimension ; ++dim) {
           TYPE diff = data[i_d * self->dimension + dim] - oldMeans[i_cl*self->dimension + dim];
           chunkSigmas[t][i_cl * self->dimension + dim] += posteriors[i_cl*numData + i_d] * diff*diff;
@@ -954,6 +968,7 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
         for (dim = 0 ; dim < self->dimension ; ++dim) {
           chunkMeans[t][self->dimension * i_cl + dim] += data[self->dimension * i_d + dim] * posteriors[i_cl * numData + i_d];
         }
+  #endif
 #endif
       }
     }

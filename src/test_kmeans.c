@@ -7,14 +7,15 @@
 #include <vl/kmeans.h>
 #include <vl/host.h>
 #include <vl/kdtree.h>
+//#include <sys/time.h>
 
 
 int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 {
   VlRand rand ;
 
-  vl_size numData = 10000;
-  vl_size dimension = 128;
+  vl_size numData = 100000;
+  vl_size dimension = 256;
   vl_size numCenters = 400;
   vl_size maxiter = 10;
   vl_size maxComp = 100;
@@ -26,8 +27,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_size dataIdx, d;
 
   //VlKMeansAlgorithm algorithm = VlKMeansANN ;
-  //VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
-  VlKMeansAlgorithm algorithm = VlKMeansElkan ;
+  VlKMeansAlgorithm algorithm = VlKMeansLloyd ;
+  //VlKMeansAlgorithm algorithm = VlKMeansElkan ;
   VlVectorComparisonType distance = VlDistanceL2 ;
   VlKMeans * kmeans = vl_kmeans_new (VL_TYPE_DOUBLE,distance) ;
 
@@ -51,7 +52,14 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_kmeans_set_algorithm (kmeans, algorithm);
   vl_kmeans_set_multithreading (kmeans,VlKMeansParallel);
 
+  //struct timeval t1,t2;
+  //gettimeofday(&t1, NULL);
+
   vl_kmeans_cluster(kmeans,data,dimension,numData,numCenters);
+
+  //gettimeofday(&t2, NULL);
+
+  //VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);
 
   vl_kmeans_delete(kmeans);
   vl_free(data);

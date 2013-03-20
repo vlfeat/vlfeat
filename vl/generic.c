@@ -25,7 +25,7 @@ The VLFeat C library implements common computer
 vision algorithms, with a special focus on visual features, as used
 in state-of-the-art object recognition and image
 matching applications.
- 
+
 VLFeat strives to be clutter-free, simple, portable, and well documented.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -981,7 +981,9 @@ void *
 vl_malloc (size_t n)
 {
   return (vl_get_state()->malloc_func)(n) ;
+  //return (memalign)(32,n) ;
 }
+
 
 /** @brief Reallocate a memory block
  ** @param ptr pointer to a memory block previously allocated.

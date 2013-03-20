@@ -9,7 +9,7 @@
 #include <vl/fisher.h>
 #include <vl/vlad.h>
 #include <stdio.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 
 //#define TYPE double
 //#define VL_F_TYPE VL_TYPE_DOUBLE
@@ -30,8 +30,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   double sigmaLowerBound = 0.000001;
 
-  vl_size numData = 10000;
-  vl_size dimension = 128;
+  vl_size numData = 100000;
+  vl_size dimension = 3;
   vl_size numClusters = 500;
   vl_size maxiter = 9;
   vl_size maxrep = 1;
@@ -51,15 +51,15 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   Init init = Rand;
 
-  char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
-  char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
+  //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
+  //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
 
   TYPE * data = vl_malloc(sizeof(TYPE)*numData*dimension);
   TYPE * enc = vl_malloc(sizeof(TYPE)*2*dimension*numClusters);
   TYPE * assign;
 
   vl_rand_init (&rand) ;
-  vl_rand_seed (&rand, 50000) ;
+  vl_rand_seed (&rand, 49000) ;
 
   for(dataIdx = 0; dataIdx < numData; dataIdx++) {
     for(d = 0; d < dimension; d++) {
@@ -130,14 +130,13 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_gmm_set_multithreading (gmm,multithreading);
   vl_gmm_set_sigma_lower_bound (gmm,sigmaLowerBound);
 
-  struct timeval t1,t2;
-  gettimeofday(&t1, NULL);
+  //struct timeval t1,t2;
+  //gettimeofday(&t1, NULL);
 
   vl_gmm_cluster	(	gmm, data, dimension, numData, numClusters);
 
-  gettimeofday(&t2, NULL);
-
-  VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);
+  //gettimeofday(&t2, NULL);
+  //VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);
 
 //    VL_PRINT("posterior:\n");
 //    for(cIdx = 0; cIdx < clusterNum; cIdx++){
@@ -169,7 +168,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 //    VL_PRINT("\n");
 //  }
 
-  saveResults(dataFileData,dataFileResults,gmm,(void*) data, numData);
+  //saveResults(dataFileData,dataFileResults,gmm,(void*) data, numData);
 
 //  VL_PRINT("fisher:\n");
 //  for(cIdx = 0; cIdx < clusterNum; cIdx++) {

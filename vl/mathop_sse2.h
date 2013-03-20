@@ -70,14 +70,6 @@ VL_EXPORT T
 VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
 (vl_size dimension, T const * X, T const * MU, T const * S);
 
-VL_EXPORT T
-VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX)
-(vl_size dimension, T const * X, T const * MU, T const * S);
-
-VL_EXPORT void
-VL_XCAT(_vl_test_sse2_, SFX)
-(vl_size dimension, T * X, T * Y);
-
 VL_EXPORT void
 VL_XCAT(_vl_weighted_sigma_sse2_, SFX)
 (vl_size dimension, T * S, T const * X, T const * Y, T const * W);
@@ -85,7 +77,26 @@ VL_XCAT(_vl_weighted_sigma_sse2_, SFX)
 VL_EXPORT void
 VL_XCAT(_vl_weighted_mean_sse2_, SFX)
 (vl_size dimension, T * MU, T const * X, T const * W);
-;
+
+#ifdef VL_ENABLE_AVX
+
+VL_EXPORT T
+VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX)
+(vl_size dimension, T const * X, T const * MU, T const * S);
+
+VL_EXPORT T
+VL_XCAT(_vl_distance_l2_avx_, SFX)
+(vl_size dimension, T const * X, T const * Y);
+
+VL_EXPORT void
+VL_XCAT(_vl_weighted_sigma_avx_, SFX)
+(vl_size dimension, T * S, T const * X, T const * Y, T const * W);
+
+VL_EXPORT void
+VL_XCAT(_vl_weighted_mean_avx_, SFX)
+(vl_size dimension, T * MU, T const * X, T const * W);
+
+#endif
 
 /* ! VL_DISABLE_SSE2 */
 #endif
