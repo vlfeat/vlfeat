@@ -192,7 +192,7 @@
    <page id="tut.kdtree"  name="kdtree" title="kd-tree">  <include src="kdtree.html"/></page>
    <page id="tut.imdisttf" name="imdisttf" title="Distance transf.">  <include src="imdisttf.html"/></page>
    <page id="tut.utils" name="utils" title="Utils"> <include src="utils.html"/></page>
-   <page id="tut.svm" name="svm" title="Support Vector Machine"> <include src="svm.html"/></page>
+   <page id="tut.svm" name="svm" title="SVM"> <include src="svm.html"/></page>
    <page id="tut.plots-rank" name="plots-rank" title="Plots: rank"> <include src="plots-rank.html"/></page>
   </page>
  </dir>

@@ -996,7 +996,7 @@ double vl_L1_lossConjugate (vl_int8 label, double alpha) {
 
 VL_INLINE
 double vl_L2_lossConjugate (vl_int8 label, double alpha) {
-  return (label-alpha/4)*alpha;
+  return (label+alpha/4)*alpha;
 }
 
 VL_INLINE

@@ -16,7 +16,7 @@ the terms of the BSD license (see the COPYING file).
 */
 
 #include <mexutils.h>
-#include <vl/svms.h>
+#include <vl/svm.h>
 
 #include <vl/svm_sgd.h>
 #include <vl/svm_dca.h>
@@ -497,7 +497,6 @@ mexFunction(int nout, mxArray *out[],
 
   VL_USE_MATLAB_ENV ;
 
-
 last_sgd_param = NULL;
 last_dca_param = NULL;
 
@@ -536,7 +535,7 @@ last_dca_param = NULL;
   innerProduct = NULL ;
   accumulator = NULL ;
   lossFunction = (VlSvmLossFunction)&vl_L1_loss ;
-  lossConjugateFunction = (VlSvmLossFunction)&vl_L1_lossConjugate ;
+  lossConjugateFunction = (VlSvmLossConjugateFunction)&vl_L1_lossConjugate ;
   deltaAlpha = (VlSvmDeltaAlpha)&vl_L1_deltaAlpha ;
 
   lengthSquare = NULL ;
@@ -706,7 +705,7 @@ last_dca_param = NULL;
         last_dca_param = "LOSS";
         if (*mxGetPr(optarg) == 2) {
           lossFunction = (VlSvmLossFunction)&vl_L2_loss ;
-          lossConjugateFunction = (VlSvmLossFunction)&vl_L2_lossConjugate ;
+          lossConjugateFunction = (VlSvmLossConjugateFunction)&vl_L2_lossConjugate ;
           deltaAlpha = (VlSvmDeltaAlpha) &vl_L2_deltaAlpha ;
 
         }

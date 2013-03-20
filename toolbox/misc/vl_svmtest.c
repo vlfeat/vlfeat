@@ -12,7 +12,7 @@ the terms of the BSD license (see the COPYING file).
 */
 
 #include <mexutils.h>
-#include <vl/svms.h>
+#include <vl/svm.h>
 
 #include <vl/svm_sgd.h>
 #include <vl/svm_dca.h>

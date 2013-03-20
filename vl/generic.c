@@ -50,9 +50,12 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @ref aib
   - @ref kdtree
 
+
 - **Segmentation**
-  - @ref quickshift
+  - @ref homkermap
+  - @ref svm
   - @ref slic
+  - @ref quickshift
 
 - **Statistical methods**
   - @ref aib

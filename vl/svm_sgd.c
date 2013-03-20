@@ -13,7 +13,8 @@ This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// old documentation
 /**
 <!-- ------------------------------------------------------------- -->
 @page pegasos SGD SVM solver
@@ -222,6 +223,9 @@ or the memory is limited.
  **
  ** @see ::vl_svm_sgd_train
  **/
+
+ #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 
 #ifndef VL_SGD_INSTANTIATING
 
