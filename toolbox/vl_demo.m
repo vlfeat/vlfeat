@@ -36,13 +36,15 @@ vl_demo_slic ;
 vl_demo_dsift ;
 vl_demo_hog ;
 
-vl_demo_svmpegasos ;
+vl_demo_svm ;
 
 vl_demo_kdtree ;
 vl_demo_kdtree_sift ;
 vl_demo_kdtree_self ;
 vl_demo_kdtree_forest ;
 vl_demo_kdtree_ann ;
+
+vl_demo_kmeans_2d ;
 
 vl_demo_imdisttf ;
 
