@@ -232,8 +232,8 @@ them.</p>
 <h1 id="tut.covdet.descr">Computing descriptors</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p><code>vl_covdet</code> can also compute descriptors. Two are
-supported so far: SIFT and raw patches (from which any other
+<p><code>vl_covdet</code> can also compute descriptors. Three are
+supported so far: SIFT, LIOP and raw patches (from which any other
 descriptor can be computed). To use this functionality simply add an
 output argument:</p>
 
@@ -244,6 +244,15 @@ output argument:</p>
 <p>This will compute SIFT descriptors for all the features. Each
 column of <code>descrs</code> is a 128-dimensional descriptor vector
 in single precision. Alternatively, to compute patches use:</p>
+
+<precode type='matlab'>
+[frames, descrs] = vl_covdet(imgs, 'descriptor', 'liop') ;
+</precode>
+
+<p> Using default settings, each column will be a 144-dimensional
+descriptor vector in single precision. If you wish to change the
+settings, use arguments described in <a href="%pathto:tut.liop">LIOP tutorial</a> 
+</p>
 
 <precode type='matlab'>
 [frames, descrs] = vl_covdet(imgs, 'descriptor', 'patch') ;

@@ -16,10 +16,6 @@
   <!-- Stylesheets -->
   <link href="%pathto:root;web.css" rel="stylesheet" type="text/css"/>
   <link href="%pathto:root;pygmentize.css" rel="stylesheet" type="text/css"/>
-  <style>
-    /* fixes a conflict between Pygmentize and MathJax */
-    .MathJax .mo, .MathJax .mi {color: inherit ! important}
-  </style>
   <title>VLFeat - %path;</title>
   %pagestyle;
 
@@ -67,9 +63,10 @@
    <div id="content">
     %content;
    </div>
+   <div class="clear">&nbsp;</div>
   </div> <!-- pagebody -->
   <div id="footer">
-   &copy; 2007-13 The authors of VLFeat
+   &copy; 2007-12 The VLFeat Authors
   </div> <!-- footer -->
  </body>
  <!-- Body ends -->
@@ -182,6 +179,7 @@
    <page id="tut.hog" name="hog" title="HOG"> <include src="hog.html"/></page>
    <page id="tut.sift" name="sift" title="SIFT"> <include src="sift.html"/></page>
    <page id="tut.dsift" name="dsift" title="DSIFT/PHOW"> <include src="dsift.html"/></page>
+   <page id="tut.liop" name="liop" title="LIOP"> <include src="liop.html"/></page>
    <page id="tut.mser" name="mser" title="MSER"> <include src="mser.html"/></page>
    <page id="tut.gmm" name="gmm" title="GMM">  <include src="gmm.html"/></page>
    <page id="tut.kmeans" name="kmeans" title="KMeans">  <include src="kmeans.html"/></page>

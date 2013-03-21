@@ -38,7 +38,7 @@ MSVCROOT = C:\Program Files\Microsoft Visual Studio 10.0\VC
 !endif
 
 !if "$(WINSDKROOT)" == ""
-WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v6.0A
+WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v7.0A
 !endif
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
@@ -83,6 +83,7 @@ LFLAGS = /MACHINE:X64 \
 !else
 !error ARCH = $(ARCH) is an unknown architecture.
 !endif
+
 
 # --------------------------------------------------------------------
 #                                                                Flags
@@ -158,23 +159,19 @@ EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
 MEX_FLAGS = $(MEX_FLAGS) -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
-  vl\aib.c \
-  vl\array.c \
-  vl\covdet.c \
-  vl\dsift.c \
-  vl\fisher.c \
   vl\imopv.c \
   vl\generic.c \
   vl\mathop.c \
   vl\rodrigues.c \
   vl\getopt_long.c \
-  vl\gmm.c \
   vl\hog.c \
+  vl\gmm.c \
   vl\homkermap.c \
   vl\slic.c \
   vl\kdtree.c \
   vl\scalespace.c \
   vl\dsift.c \
+  vl\liop.c \
   vl\svm_sgd.c \
   vl\lbp.c \
   vl\array.c \
@@ -183,6 +180,7 @@ libsrc = \
   vl\covdet.c \
   vl\kmeans.c \
   vl\stringop.c \
+  vl\fisher.c \
   vl\mathop_sse2.c \
   vl\imopv_sse2.c \
   vl\host.c \
@@ -193,24 +191,16 @@ libsrc = \
   vl\svmdataset.c \
   vl\random.c \
   vl\sift.c \
-  vl\slic.c \
-  vl\stringop.c \
-  vl\svmdataset.c \
+  vl\ikmeans.c \
   vl\vlad.c
-  vl\ikmeans.c
 
 cmdsrc = \
   src\test_vec_comp.c \
   src\test_qsort-def.c \
   src\test_imopv.c \
   src\test_getopt_long.c \
-  src\test_gmm.c \
-  src\test_heap-def.c \
   src\test_host.c \
-  src\test_imopv.c \
-  src\test_kmeans.c \
-  src\test_mathop.c \
-  src\test_host.c \
+  src\test_liop.c \
   src\test_heap-def.c \
   src\test_svd2.c \
   src\aib.c \
@@ -222,15 +212,34 @@ cmdsrc = \
   src\mser.c \
   src\test_threads.c \
   src\test_stringop.c \
+  src\test_kmeans.c \
+  src\test_gmm.c \
+  src\sift.c
+
+cmdsrc = \
+  src\test_vec_comp.c \
+  src\test_qsort-def.c \
+  src\test_imopv.c \
+  src\test_getopt_long.c \
+  src\test_host.c \
+  src\test_liop.c \
+  src\test_heap-def.c \
+  src\test_svd2.c \
+  src\aib.c \
+  src\test_mathop_abs.c \
+  src\test_mathop.c \
+  src\test_nan.c \
+  src\test_gauss_elimination.c \
+  src\test_rand.c \
+  src\mser.c \
+  src\test_threads.c \
+  src\test_stringop.c \
+  src\test_kmeans.c \
+  src\test_gmm.c \
   src\sift.c
 
 mexsrc = \
   toolbox\aib\vl_aibhist.c \
-  toolbox\fisher\vl_fisher.c \
-  toolbox\geometry\vl_irodr.c \
-  toolbox\geometry\vl_rodr.c \
-  toolbox\gmm\vl_gmm.c \
-  toolbox\imop\vl_imdisttf.c \
   toolbox\aib\vl_aib.c \
   toolbox\slic\vl_slic.c \
   toolbox\kmeans\vl_hikmeanspush.c \
@@ -270,14 +279,15 @@ mexsrc = \
   toolbox\misc\vl_simdctrl.c \
   toolbox\misc\vl_ihashsum.c \
   toolbox\misc\vl_svmtrain.c \
+  toolbox\gmm\vl_gmm.c \
+  toolbox\fisher\vl_fisher.c \
   toolbox\sift\vl_sift.c \
+  toolbox\sift\vl_liop.c \
   toolbox\sift\vl_siftdescriptor.c \
-  toolbox\sift\vl_ubcmatch.c \
-  toolbox\slic\vl_slic.c \
-  toolbox\vlad\vl_vlad.c 
   toolbox\sift\vl_dsift.c \
   toolbox\sift\vl_covdet.c \
-  toolbox\sift\vl_ubcmatch.c
+  toolbox\sift\vl_ubcmatch.c \
+  toolbox\vlad\vl_vlad.c
 
 !if "$(ARCH)" == "win32"
 libobj = $(libsrc:vl\=bin\win32\objs\)

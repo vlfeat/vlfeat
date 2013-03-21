@@ -1,0 +1,97 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<group>
+
+<p>This tutorial gives an overview of the <code>vl_liop</code>
+VLFeat command implementing a Local Intensity Order Pattern (LIOP)
+feature descriptor. The function computes descriptor as proposed in
+<a href="%pathto:tut.liop.references;">[1]</a></p>
+
+<p>The LIOP computation is described in <a href="%pathto:root;api/liop-fundamentals.html">
+API fundamental page for LIOP</a> </p>
+
+<ul>
+ <li><a href="%pathto:tut.liop.computation;">LIOP descriptor computation</a></li>
+ <li><a href="%pathto:tut.liop.implementation;">Additional settings</a></li>
+ <li><a href="%pathto:tut.liop.references;">References</a></li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.liop.computation">LIOP descriptor computation</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>The liop descriptor can be computed from a patch. The patch has to be
+a square matrix of an odd side length.</p>
+
+<precode type='matlab'>
+[descr] = vl_covdet(patch) ;
+</precode>
+
+<p>You can add <code>verbose</code> if you wish to see the parametr and 
+descriptor details</p>
+
+<precode type='matlab'>
+[descr] = vl_covdet(patch,'verbose') ;
+</precode>
+
+<p>This will use default parameters which are:</p>
+
+<ul>
+	<li>Number of neighburs [4]	</li>
+	<li>Number of bins [6]	</li>
+	<li>Radius (between a point and its neighbours) [6]	</li>
+	<li>Weighting threshold [5]	</li>
+</ul>
+
+<p>Please note that the patch side length <b>a</b> has to be 
+long enough with respect to the radius <b>r</b> between a point 
+and its neighbours. The image below explains which pixels of the patch 
+are taken for descriptor computation.
+</p>
+
+ <div class="figure">
+ <img src="%pathto:root;images/liop-patch-layout.png"/>
+ <div class="caption">
+   <span class="content">
+     Descriptor computation from a patch 
+   </span>
+ </div>
+</div>
+
+<p>Only points belonging to the area of the inner circle will be used 
+for descriptor computation as sample points. The points from the outer area
+will contribute only as neighbouring points. 
+</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.liop.computation">Additional settings</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>You can easily change all parameters listed above.</p>
+
+<precode type='matlab'>
+[descr] = vl_covdet(patch,'neighbours',3,'OPTION',value) ;
+</precode>
+
+<p>The options are:</p>
+
+<ul>
+	<li><code>Neighbours</code> set the number of neighburs</li>
+	<li><code>'Bins'</code> set the number of bins</li>
+	<li><code>'Radius'</code> set the distance between a point and its neighbours</li>
+	<li><code>'WeightThreshold'</code> set the threshold of how big must be 
+	the difference between neighbours intensities to increase weight of the 
+	particular permutation</li>
+</ul>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.liop.references">References</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<ul>
+  <li>[1] Z. Wang, B. Fan and F. Wu. <em>Local Intensity
+  Order Pattern for Feature Description.</em> In ICCV, 2011 
+  </li>
+</ul>
+
+</group>
