@@ -1,7 +1,4 @@
-% VL_SVMTRAIN is an SVM Solver, offering both Stochastic Gradient Descent Method
-%   and (Stachastic) Dual Coordinate Ascent Method
-%
-%
+% VL_SVMTRAIN Train a Support Vector Machine
 %   [W B INFO] = VL_SVMTRAIN(DATA , LAMBDA [, OPTS]) learns Support Vector Machine with model W
 %   and bias B given training struct DATA and the regularization parameter
 %   LAMBDA. Structure INFO provides diagnostic information.

@@ -1,3 +1,6 @@
+% VL_PEGASOS [deprecated]
+% VL_PEGASOS is deprecated. Please use VL_SVMTRAIN() instead.
+
 function [w b info] = vl_pegasos(X,Y,LAMBDA, varargin)
 
 % Verbose not supported

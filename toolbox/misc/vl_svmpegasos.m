@@ -1,4 +1,9 @@
-function [w b info] = vl_pegasos(DATA,LAMBDA, varargin)
+% VL_SVMPEGASOS [deprecated]
+% VL_SVMPEGASOS is deprecated. Please use VL_SVMTRAIN() instead.
+
+
+
+function [w b info] = vl_svmpegasos(DATA,LAMBDA, varargin)
 
 % Verbose not supported
 if (sum(strcmpi('Verbose',varargin)))
