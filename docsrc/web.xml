@@ -131,6 +131,8 @@
         Macros: {
           balpha: '\\boldsymbol{\\alpha}',
           bc: '\\mathbf{c}',
+          be: '\\mathbf{e}',
+          bg: '\\mathbf{g}',
           bq: '\\mathbf{q}',
           bu: '\\mathbf{u}',
           bw: '\\mathbf{w}',

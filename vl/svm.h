@@ -462,9 +462,9 @@ In its most basic form, the SDCA algorithm can be summarised as follows:
   - Pick a dual variable $q$ uniformly at random in $1, \dots, n$.
   - Maximise the dual with respect to this variable:
     \[
-      \Delta\balpha_q = \max_{\Delta\balpha_q} D(\balpha_t + \Delta\balpha_q e_q ).
+      \Delta\alpha_q = \max_{\Delta\alpha_q} D(\balpha_t + \Delta\alpha_q \be_q ).
     \]
-  - Update $\alpha_{q,t+1} = \alpha_{q,t} + \Delta\balpha_q e_q $.
+  - Update $\alpha_{q,t+1} = \alpha_{q,t} + \Delta\alpha_q \be_q $.
 
 In VLFeat, we partially use the nomenclature from @cite{shwartz13a-dual} and @cite{Hsieh-2008-DCD}.
 
@@ -472,11 +472,11 @@ In VLFeat, we partially use the nomenclature from @cite{shwartz13a-dual} and @ci
 
 The updated dual objective can be expanded as:
 \[
-D(\balpha_t + e_q \Delta\balpha_q) =
+D(\balpha_t + \be_q \Delta\alpha_q) =
 \text{const.}
 - \frac{1}{2\lambda n^2} \bx_q^\top \bx_q
-- \frac{1}{n} \frac{X\balpha_t}{\lambda n} \bx_q^\top \Delta\balpha_q
-- \frac{1}{n} \ell_q(- \alpha_q - \Delta\balpha_q)
+- \frac{1}{n} \frac{X\balpha_t}{\lambda n} \bx_q^\top \be_q \Delta\alpha_q
+- \frac{1}{n} \ell_q(- \alpha_q - \Delta\alpha_q)
 \]
 Maximising this quantity in the scalar variable $\Delta\balpha$ is usually a
 simple and cheap affair. It is convenient to store and incrementally
@@ -484,7 +484,7 @@ update the model $\bw_t$ after the optimal step $\Delta\balpha$ has been
 determined:
 \[
  \bw_t = \frac{X \balpha_t}{\lambda n},
- \quad \bw_{t+1} = \bw_t + \frac{1}{\lambda n }\bx_q \Delta\balpha_q.
+ \quad \bw_{t+1} = \bw_t + \frac{1}{\lambda n }\bx_q \be_q \Delta\alpha_q.
 \]
 
 For example, consider the hinge loss $\ell_q(z) = \max\{0, 1- y_qz \},
@@ -501,7 +501,7 @@ y_q u, & -1 \leq y_q u \leq 0, \\
 Plugging in and ignoring the domain bounds, the update can be obtained
 by setting the derivate w.r.t $\Delta\balpha_q$ equal to zero, obtaining
 \[
- \tilde {\Delta \balpha_q }= \frac{y_q - f}{k/(\lambda n)},
+ \tilde {\Delta \alpha_q }= \frac{y_q - f}{k/(\lambda n)},
 \quad f = \frac{\bx_q^\top X\balpha_t}{\lambda n} = \bx_q^\top \bw_t,
 \quad k = \bx_q^\top \bx_q.
 \]
@@ -509,7 +509,7 @@ Note that $f{}$ is simply the current score associated by the SVM to
 sample $\bx_q$. Accounting for the fact that it must be $-1 \leq - y_q
 \alpha_q \leq 0$, or $0 \leq y_q \alpha_q \leq 1$, one obtains the update
 \[
- \Delta\balpha_q =  y_q \max\{0, \min\{1, \tilde {\Delta\balpha_q }+ y_q \alpha_q\}\} - \alpha_q.
+ \Delta\alpha_q =  y_q \max\{0, \min\{1, \tilde {\Delta\alpha_q }+ y_q \alpha_q\}\} - \alpha_q.
 \]
 
 @section svm-sdca-features Implementation features
@@ -576,7 +576,7 @@ straightforward to describe:
   - Sample one index $i$ in $1,\dots,n$ uniformly at random.
   - Compute a subgradient $\bg_t$ of $E_i(\bw)$ at $\bw_t$.
   - Compute the learning rate $\eta_t$.
-  - Update $\bw_{t+1} = \bw_t - \eta_t \bg_t$.
+  - Update $\bw_{t+1} = \bw_t - \eta_t \b{g}_t$.
 
 Provided that the learning rate $\eta_t$ is choosen correctly, this
 simple algorithm is guaranteed to converge to the minimizer $\bw^*$ of
@@ -659,7 +659,7 @@ optimizer. At the <em>t</em>-th iteration the algorithm:
   @f$ (this is the SVM objective function restricted to the
   minibatch).
 - Compute an intermediate weight vector @f$ w_{t+1/2} @f$ by doing a
-  step @f$ w_{t+1/2} = w_t - \alpha_t \nalba_t @f$ with learning rate
+  step @f$ w_{t+1/2} = w_t - \alpha_t \nabla_t @f$ with learning rate
   @f$ \alpha_t = 1/(\eta t) @f$ along the subgradient. Note that the
   learning rate is inversely proportional to the iteration numeber.
 - Back projects the weight vector @f$ w_{t+1/2} @f$ on the
