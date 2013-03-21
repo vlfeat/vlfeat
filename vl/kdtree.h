@@ -157,6 +157,18 @@ VL_EXPORT vl_size vl_kdforest_query (VlKDForestSearcher * searcher,
                                      void const * query) ;
 /** @} */
 
+/** @name MATLAB interface
+ ** @{ */
+VL_EXPORT vl_size
+vl_kdforest_query_points (VlKDForest * forest,
+                          vl_uint32 * index,
+                          void * distance,
+                          void const * queries,
+                          vl_size numQueries,
+                          vl_size numNeighbors,
+                          vl_bool multithreading);
+/** @} */
+
 /** @name Retrieving and setting parameters
  ** @{ */
 VL_INLINE vl_size vl_kdforest_get_depth_of_tree (VlKDForest const * self, vl_uindex treeIndex) ;

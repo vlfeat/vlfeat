@@ -90,6 +90,7 @@ using the vl_kdforest_delete_searcher method.
 #include "random.h"
 #include "mathop.h"
 #include <stdlib.h>
+#include <omp.h>
 
 #define VL_HEAP_prefix     vl_kdforest_search_heap
 #define VL_HEAP_type       VlKDForestSearchState
@@ -814,6 +815,98 @@ vl_kdforest_query (VlKDForestSearcher * searcher,
   return searcher->searchNumComparisons ;
 }
 
+/** ------------------------------------------------------------------
+ ** @brief Run parallel queries - function for MATLAB interface
+ ** @param forest KDTree forest object instance.
+ ** @param index assignments of points.
+ ** @param distance distances of query points.
+ ** @param numQueries number of query points.
+ ** @param numNeighbors number of nearest neighbors to be found for each data point
+ ** @param dimension dimensionality of the data
+ ** @param multithreading TRUE if multithreaded approach should be used
 
+ **/
 
+VL_EXPORT vl_size
+vl_kdforest_query_points (VlKDForest * forest,
+                          vl_uint32 * index,
+                          void * distance,
+                          void const * queries,
+                          vl_size numQueries,
+                          vl_size numNeighbors,
+                          vl_bool multithreading)
+{
+  vl_int numChunks ;
+  int chunkSize = 1;
+  vl_int t;
+  VlKDForestSearcher ** searchers;
+  VlKDForestNeighbor * neighbors;
+  vl_size numComparisons = 0;
+  vl_type dataType;
+  vl_size dimension;
 
+  dataType = vl_kdforest_get_data_type(forest);
+  dimension = vl_kdforest_get_data_dimension(forest);
+
+#ifdef _OPENMP
+  if(multithreading == VL_TRUE) {
+    numChunks = (vl_size)omp_get_max_threads();
+  } else {
+    numChunks = 1;
+  }
+#else
+  numChunks = 1;
+  VL_PRINT("Warning: OpenMP not included, continuing with serial computation.\n");
+#endif
+
+  searchers = vl_malloc(sizeof(VlKDForestSearcher*) * numChunks);
+  neighbors = vl_malloc(sizeof(VlKDForestNeighbor) * numChunks * numNeighbors);
+
+  for(t = 0; t < (vl_int) numChunks; t++) {
+    searchers[t] = vl_kdforest_new_searcher(forest);
+  }
+
+#ifdef _OPENMP
+#pragma omp parallel for private(t) schedule(static,chunkSize) reduction(+:numComparisons)
+#endif
+  for(t = 0 ; t < numChunks ; t++) {
+    VlKDForestSearcher * searcher = searchers[t];
+    vl_uindex qi;
+    for(qi = (vl_uindex)t; qi < (vl_uindex)numQueries; qi += numChunks) {
+      switch (dataType) {
+        case VL_TYPE_FLOAT: {
+          vl_size ni;
+          numComparisons += vl_kdforest_query (searcher, neighbors + t*numNeighbors, numNeighbors, (float const *) (queries) + qi * dimension);
+          for (ni = 0 ; ni < numNeighbors ; ++ni) {
+            index[qi*numNeighbors + ni] = neighbors[t*numNeighbors + ni].index + 1 ;
+            if(distance){
+              *((float*)distance + qi*numNeighbors + ni) = neighbors[t*numNeighbors + ni].distance ;
+            }
+          }
+          break ;
+        }
+        case VL_TYPE_DOUBLE: {
+          vl_size ni;
+          numComparisons += vl_kdforest_query (searcher, neighbors + t*numNeighbors, numNeighbors, (double const *) (queries) + qi * dimension);
+          for (ni = 0 ; ni < numNeighbors ; ++ni) {
+            index[qi*numNeighbors + ni] = neighbors[t*numNeighbors + ni].index + 1 ;
+            if(distance){
+              *((double*)distance + qi*numNeighbors + ni) = neighbors[t*numNeighbors + ni].distance ;
+            }
+          }
+          break ;
+        }
+        default:
+          abort() ;
+      }
+    }
+  } /* end of parallel region */
+
+  for(t = 0; t < (vl_int) numChunks; t++) {
+    vl_kdforest_delete_searcher(searchers[t]);
+  }
+
+  vl_free(neighbors);
+
+  return numComparisons;
+}
