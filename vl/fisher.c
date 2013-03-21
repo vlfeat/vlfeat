@@ -197,45 +197,19 @@ VL_XCAT(_vl_fisher_encode_, SFX)
       uprefix = 1/(numData*sqrt(weights[i_cl]));
       vprefix = 1/(numData*sqrt(2*weights[i_cl]));
 
-//      memset(uk,0,dimension*sizeof(TYPE));
-//      memset(vk,0,dimension*sizeof(TYPE));
-
       for(i_d = 0; i_d < numData; i_d++) {
         for(dim = 0; dim < dimension; dim++) {
           TYPE diff = (data[i_d*dimension + dim]-means[i_cl*dimension + dim]);
 
           *(uk + dim) += posteriors[i_cl*numData+i_d] * sqrtInvSigma[i_cl*dimension + dim] * diff;
           *(vk + dim) += posteriors[i_cl*numData+i_d] * (invSigma[i_cl*dimension + dim] * diff * diff - 1);
-
-          //uk[dim] += posteriors[i_cl*numData+i_d] * sqrtInvSigma[dim] * diff;
-          //vk[dim] += posteriors[i_cl*numData+i_d] * (invSigma[dim] * diff * diff - 1);
         }
       }
 
       for(dim = 0; dim < dimension; dim++) {
         *(uk + dim) = *(uk + dim) * uprefix;
         *(vk + dim) = *(vk + dim) * vprefix;
-//        uk[dim] = uk[dim] * uprefix;
-//        vk[dim] = vk[dim] * vprefix;
       }
-
-  //    VL_PRINT("uk:\n");
-  //    for(dim = 0; dim < dimension; dim++) {
-  //      VL_PRINT("%f ",uk[dim]);
-  //    }
-  //    VL_PRINT("\n");
-  //
-  //    VL_PRINT("vk:\n");
-  //    for(dim = 0; dim < dimension; dim++) {
-  //      VL_PRINT("%f ",vk[dim]);
-  //    }
-  //    VL_PRINT("\n");
-
-//      for(dim = 0; dim < dimension; dim++) {
-//        //VL_PRINT("%d\n",i_cl*dimension*2 + dimension + dim);
-//        enc[i_cl*dimension*2 + dim] = uk[dim];
-//        enc[i_cl*dimension*2 + dimension + dim] = vk[dim];
-//      }
     }
   } /* end of parallel region */
 

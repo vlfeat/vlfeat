@@ -70,6 +70,3 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 title('GMM: Estimated gaussian mixture');
-return
-
-vl_demo_print('gmm_3d_clusters');
