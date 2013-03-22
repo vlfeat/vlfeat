@@ -399,8 +399,8 @@ mexFunction(int nout, mxArray *out[],
 
     case VL_COVDET_DESC_LIOP :
       if (patchResolution < 0)  patchResolution = 20 ;
-      if (patchRelativeExtent < 0) patchRelativeExtent = 10 ;
-      if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 1.2 ;
+      if (patchRelativeExtent < 0) patchRelativeExtent = 4 ;
+      if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 0.5 ;
   }
 
 
