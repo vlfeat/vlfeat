@@ -111,7 +111,7 @@ Each point is represented by its neighbours. Specifically,
 The neighbouring points are sampled in the same manner as shown on the
 image below ($C$ is the patch center). Sampling order is always anticlokwise.
 
-@image html liop-neigbours-sampling.png "Sampling order of neighbouring points"
+@image html liop-neighbours-sampling.png "Sampling order of neighbouring points"
 
 Intensity values of these neighbouring points are computed by linear
 interpolation.
@@ -120,8 +120,10 @@ We sort the neighbours according their intensities and take the indexes
 that points from the sorted array into the unsorted one. Then the
 permutation index is computed.
 
-$[ I( N_{1}) \; I( N_{2} ) \; I(N_{3}) \; I( N_{4}) ] =
-[ 86 \; 217 \; 152 \; 101]\rightarrow ( 1 \; 4 \; 3 \; 2 )\rightarrow 6$
+@f[
+[ I( N_{1}) \; I( N_{2} ) \; I(N_{3}) \; I( N_{4}) ] =
+[ 86 \; 217 \; 152 \; 101]\rightarrow ( 1 \; 4 \; 3 \; 2 )\rightarrow 6 
+@f]
 
 The permutation index is computed so that it fits the table below.
 
@@ -150,7 +152,9 @@ The bigger difference is between intensities of all neighbours of
 a particular point, the bigger weight is assigned. (In the following
 equation the $Th$ stands for @c weightThreshold.)
 
-$w = \sum \limits_{i,j} sgn( | I( N_{i} )- I( N_{j} )| - Th) + 1$
+@f[ 
+w = \sum \limits_{i,j} sgn( | I( N_{i} )- I( N_{j} )| - Th) + 1
+@f]
 
 If $w > 0$ the particular element is increased by w, by 1 otherwise.
 
@@ -168,7 +172,9 @@ factorial(@numberOfNeighbours) elements represents the second bin ect.
 
 The final step is normalization of the descriptor $\phi$.
 
-$\frac{\phi}{\|\phi\|}\times255$
+@f[ 
+\frac{\phi}{\|\phi\|}\times255
+@f]
 
 */
 

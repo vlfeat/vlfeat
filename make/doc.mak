@@ -206,7 +206,7 @@ doc/figures/%-raw.tex : docsrc/figures/%.fig
 doc/figures/%-raw.ps doc/figures/%-raw.tex: docsrc/figures/%.svg
 	$(call C,INKSCAPE) --export-ps=doc/figures/$(*)-raw.ps --export-latex $<
 	$(call C,MV) doc/figures/$(*)-raw.ps_tex doc/figures/$(*)-raw.tex
-	$(call C,SED) -e 's/$(*)-raw.ps/doc\/figures\/$(*)-raw.ps/g' -i .bak 'doc/figures/$(*)-raw.tex'
+	$(call C,SED) -e 's/$(*)-raw.ps/doc\/figures\/$(*)-raw.ps/g' -i.bak 'doc/figures/$(*)-raw.tex'
 
 doc/figures/%-raw.ps : docsrc/figures/%.fig
 	$(call C,FIG2DEV) -L pstex $< $@
