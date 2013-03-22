@@ -46,7 +46,7 @@ function phow_caltech101
 % AUTORIGHTS
 
 conf.calDir = 'data/caltech-101' ;
-conf.dataDir = 'data-spa/' ;
+conf.dataDir = 'data/' ;
 conf.autoDownloadData = true ;
 conf.numTrain = 15 ;
 conf.numTest = 15 ;
@@ -56,16 +56,17 @@ conf.numSpatialX = [2 4] ;
 conf.numSpatialY = [2 4] ;
 conf.quantizer = 'kdtree' ;
 conf.svm.C = 10 ;
+
 conf.svm.solver = 'sdca' ;
+%conf.svm.solver = 'sgd' ;
+%conf.svm.solver = 'liblinear' ;
+
 conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 3} ;
 conf.clobber = false ;
 conf.tinyProblem = true ;
 conf.prefix = 'baseline' ;
 conf.randSeed = 1 ;
-
-totalEnergy = 0; % !new
-totalLoss = 0; % !new
 
 if conf.tinyProblem
   conf.prefix = 'tiny' ;
@@ -158,7 +159,7 @@ if ~exist(conf.vocabPath) || conf.clobber
   descrs = single(descrs) ;
 
   % Quantize the descriptors to get the visual words
-  vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan') ;
+  vocab = vl_kmeans(descrs, conf.numWords, 'verbose', 'algorithm', 'elkan', 'MaxNumIterations', 50) ;
   save(conf.vocabPath, 'vocab') ;
 else
   load(conf.vocabPath) ;
@@ -195,9 +196,6 @@ end
 
 psix = vl_homkermap(hists, 1, 'kchi2', 'gamma', .5) ;
 
-size(hists)
-size(psix)
-
 % --------------------------------------------------------------------
 %                                                            Train SVM
 % --------------------------------------------------------------------
@@ -216,8 +214,6 @@ if ~exist(conf.modelPath) || conf.clobber
         [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, ...
                                         'MaxIterations', 50/lambda, ...
                                         'BiasMultiplier', conf.svm.biasMultiplier);
-        totalEnergy = totalEnergy + info.energy;
-        totalLoss = totalLoss + info.lossPos + info.lossNeg;
       end
     case 'sdca'
       lambda = 1 / (conf.svm.C *  length(selTrain)) ;
@@ -232,10 +228,7 @@ if ~exist(conf.modelPath) || conf.clobber
                                         'BiasMultiplier', conf.svm.biasMultiplier,...
                                         'Epsilon',0.00,...
                                         'OnlineSetting',logical(1));
-        %info
-        totalEnergy = totalEnergy + info.energy; % !new
-        totalLoss = totalLoss + info.lossPos + info.lossNeg; % !new
-      end% % !new-->
+      end
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...
                   sparse(double(psix(:,selTrain))),  ...
@@ -279,10 +272,6 @@ title(sprintf('Confusion matrix (%.2f %% accuracy)', ...
               100 * mean(diag(confus)/conf.numTest) )) ;
 print('-depsc2', [conf.resultPath '.ps']) ;
 save([conf.resultPath '.mat'], 'confus', 'conf') ;
-
-
-totalEnergy % !new
-totalLoss % !new
 
 % -------------------------------------------------------------------------
 function im = standarizeImage(im)

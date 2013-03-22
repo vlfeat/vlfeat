@@ -281,7 +281,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       if (mxGetM(optarg) != dimension)
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS has to have the same dimension (nb of rows) as input DATA") ;
+                  "INITSIGMAS has to have the same dimension (nb of rows) as input X") ;
       }
 
       if (mxGetN(optarg) != numClusters)

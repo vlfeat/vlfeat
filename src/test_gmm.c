@@ -221,7 +221,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      dimension,
      numData,
      numClusters,
-     VL_FALSE);
+     VL_FALSE,
+     VL_TRUE);
   }
 
   vl_gmm_delete(gmm);

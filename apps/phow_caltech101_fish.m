@@ -55,9 +55,9 @@ conf.numWords = 600 ;
 conf.encoder = 'gmm' ;
 conf.svm.C = 10 ;
 
-conf.svm.solver = 'pegasos' ;
+conf.svm.solver = 'sgd' ;
 %conf.svm.solver = 'liblinear' ;
-%conf.svm.solver = 'dca' ;
+%conf.svm.solver = 'sdca' ;
 
 conf.svm.biasMultiplier = 1 ;
 conf.phowOpts = {'Step', 3} ;
@@ -68,7 +68,7 @@ conf.randSeed = 1 ;
 
 if conf.tinyProblem
   conf.prefix = 'tiny' ;
-  conf.numClasses = 15 ;
+  conf.numClasses = 5 ;
   conf.numWords = 300 ;
   conf.phowOpts = {'Verbose', 2, 'Sizes', 7, 'Step', 5} ;
 end
@@ -224,7 +224,6 @@ end
 % --------------------------------------------------------------------
 
 codes = sign(codes).*sqrt(abs(codes));
-%codes = vl_homkermap(codes, 1, 'kchi2', 'gamma', .5) ;
 
 % --------------------------------------------------------------------
 %                                                            Train SVM
@@ -232,18 +231,32 @@ codes = sign(codes).*sqrt(abs(codes));
 
 if ~exist(conf.modelPath) || conf.clobber
   switch conf.svm.solver
-    case 'pegasos'
+    case 'sgd'
       lambda = 1 / (conf.svm.C *  length(selTrain)) ;
       w = [] ;
-      % for ci = 1:length(classes)
       parfor ci = 1:length(classes)
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        data = vl_maketrainingset(codes(:,selTrain(perm)), int8(y(perm)));
-        [w(:,ci) b(ci)] = vl_svmpegasos(data, lambda, ...
+
+        data = vl_maketrainingset(codes(:,selTrain(perm)), int8(y(perm))) ;
+        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, ...
                                         'MaxIterations', 50/lambda, ...
-                                        'BiasMultiplier', conf.svm.biasMultiplier) ;
+                                        'BiasMultiplier', conf.svm.biasMultiplier);
+      end
+    case 'sdca'
+      lambda = 1 / (conf.svm.C *  length(selTrain)) ;
+      w = [] ;
+      parfor ci = 1:length(classes)
+        perm = randperm(length(selTrain)) ;
+        fprintf('Training model for class %s\n', classes{ci}) ;
+        y = 2 * (imageClass(selTrain) == ci) - 1 ;
+        data = vl_maketrainingset(codes(:,selTrain(perm)), int8(y(perm))) ;
+        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, 'DCA',...
+                                        'MaxIterations', 5/lambda, ...
+                                        'BiasMultiplier', conf.svm.biasMultiplier,...
+                                        'Epsilon',0.00,...
+                                        'OnlineSetting',logical(1));
       end
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...

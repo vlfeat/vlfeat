@@ -18,13 +18,15 @@ the terms of the BSD license (see the COPYING file).
 
 enum {
   opt_verbose,
-  opt_normalize
+  opt_normalize,
+  opt_multithreading
 } ;
 
 
 vlmxOption  options [] = {
   {"Verbose",           0,   opt_verbose             },
-  {"Normalize",         0,   opt_normalize           }
+  {"Normalize",         0,   opt_normalize           },
+  {"Multithreading",    0,   opt_multithreading      }
 } ;
 
 /* driver */
@@ -46,6 +48,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_size dimension ;
   vl_size numData ;
   vl_bool normalize = VL_FALSE;
+  VlVLADMultithreading multithreading = VlVLADParallel;
 
   void * means = NULL;
   void * assignments = NULL;
@@ -98,6 +101,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+    char buf [1024] ;
     switch (opt) {
       case opt_verbose :
         ++ verbosity ;
@@ -105,10 +109,37 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       case opt_normalize :
         normalize = VL_TRUE ;
         break ;
-      default :
-        abort() ;
-        break ;
+    case opt_multithreading :
+      if (!vlmxIsString (optarg, -1))
+      {
+        vlmxError (vlmxErrInvalidArgument,
+                   "MULTITHREADING must be a string.") ;
+      }
+      if (mxGetString (optarg, buf, sizeof(buf)))
+      {
+        vlmxError (vlmxErrInvalidArgument,
+                   "MULTITHREADING argument too long.") ;
+      }
+
+      if (vlmxCompareStringsI("serial", buf) == 0)
+      {
+        multithreading = VlVLADSerial ;
+      }
+      else if (vlmxCompareStringsI("parallel", buf) == 0)
+      {
+        multithreading = VlVLADParallel ;
+      }
+      else
+      {
+        vlmxError (vlmxErrInvalidArgument,
+                   "Invalid value %s for MULTITHREADING.", buf) ;
+      }
+      break ;
+    default :
+      abort() ;
+      break ;
     }
+
   }
 
   /* -----------------------------------------------------------------
@@ -148,7 +179,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
    dimension,
    numData,
    numClusters,
-   normalize);
+   normalize,
+   multithreading);
 
   OUT(ENC) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
 

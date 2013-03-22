@@ -67,6 +67,9 @@ This normalization is controlled by the last argument of ::vl_vlad_encode.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(_OPENMP)
+  #include <omp.h>
+#endif
 
 #ifndef VL_VLAD_INSTANTIATING
 
@@ -83,50 +86,76 @@ VL_XCAT(_vl_vlad_encode_, SFX)
  vl_size dimension,
  vl_size numData,
  vl_size numClusters,
- vl_bool normalize)
+ vl_bool normalize,
+ VlVLADMultithreading multithreading)
 {
   vl_size dim;
   vl_size i_cl, i_d;
+  vl_int t;
+  vl_int numChunks;
+  int chunkSize = 1;
   TYPE * clusterMasses;
+
+  switch(multithreading) {
+    case VlVLADParallel:
+#if defined(_OPENMP)
+      numChunks = (vl_int)vl_get_num_threads();
+#else
+      numChunks = 1;
+#endif
+      break;
+    case VlVLADSerial:
+      numChunks = 1;
+      break;
+    default:
+      VL_PRINT("Bad multithreading value!\n");
+      abort();
+  }
 
   clusterMasses = vl_malloc(numClusters*sizeof(TYPE));
   memset(clusterMasses,0,numClusters*sizeof(TYPE));
 
-  for(i_cl = 0; i_cl < numClusters; i_cl++) {
-    for(i_d = 0; i_d < numData; i_d++) {
-      clusterMasses[i_cl] += assignments[i_d*numClusters+i_cl];
+  #if defined(_OPENMP)
+  #pragma omp parallel for private(t,i_d,i_cl) schedule(static,chunkSize)
+  #endif
+  for(t = 0; t < numChunks; t++){
+    for(i_cl = t; i_cl < numClusters; i_cl += numChunks) {
+      for(i_d = 0; i_d < numData; i_d++) {
+        clusterMasses[i_cl] += assignments[i_d*numClusters+i_cl];
+      }
     }
-  }
+  } /* end of parallel section */
 
   memset(enc,0,sizeof(TYPE) * dimension * numClusters);
 
-  for(i_cl = 0; i_cl < numClusters; i_cl++) {
-    for(i_d = 0; i_d < numData; i_d++) {
-      if(assignments[i_d*numClusters + i_cl] != 0) {
-        for(dim = 0; dim < dimension; dim++) {
-//          TYPE diff = assignments[i_cl*numData + i_d] *
-//                      data [i_d  * dimension + dim] -
-//                      means[i_cl * dimension + dim];
-//          enc[i_cl*dimension + dim] += diff;
-          enc[i_cl*dimension + dim] += assignments[i_d*numClusters + i_cl] *
-                                       data [i_d  * dimension + dim];
+  #if defined(_OPENMP)
+  #pragma omp parallel for private(t,i_d,i_cl,dim) schedule(static,chunkSize)
+  #endif
+  for(t = 0; t < numChunks; t++){
+    for(i_cl = t; i_cl < numClusters; i_cl += numChunks) {
+      for(i_d = 0; i_d < numData; i_d++) {
+        if(assignments[i_d*numClusters + i_cl] != 0) {
+          for(dim = 0; dim < dimension; dim++) {
+            enc[i_cl*dimension + dim] += assignments[i_d*numClusters + i_cl] *
+                                         data [i_d  * dimension + dim];
+          }
         }
       }
-    }
 
-    if(clusterMasses[i_cl]!=0){
-      if (normalize) {
-        for(dim = 0; dim < dimension; dim++) {
-          enc[i_cl*dimension + dim] /= clusterMasses[i_cl];
-          enc[i_cl*dimension + dim] -= means[i_cl*dimension+dim];
-        }
-      } else {
-        for(dim = 0; dim < dimension; dim++) {
-          enc[i_cl*dimension + dim] -= clusterMasses[i_cl] * means[i_cl*dimension+dim];
+      if(clusterMasses[i_cl]!=0){
+        if (normalize) {
+          for(dim = 0; dim < dimension; dim++) {
+            enc[i_cl*dimension + dim] /= clusterMasses[i_cl];
+            enc[i_cl*dimension + dim] -= means[i_cl*dimension+dim];
+          }
+        } else {
+          for(dim = 0; dim < dimension; dim++) {
+            enc[i_cl*dimension + dim] -= clusterMasses[i_cl] * means[i_cl*dimension+dim];
+          }
         }
       }
     }
-  }
+  } /* end of parallel section */
 }
 
 /* VL_FISHER_INSTANTIATING */
@@ -158,6 +187,8 @@ VL_XCAT(_vl_vlad_encode_, SFX)
  ** @param dimension dimensionality of the data
  ** @param numData number of data vectors
  ** @param numClusters number of gaussians in the mixture
+ ** @param normalize set whetter you want to normalize the size of each cluster before encoding
+ ** @param multithreading ::VL_TRUE to switch multithreading computation on
  **
  ** The format of assignments is
  ** [ p(c1|x1), p(c1|x2), ... p(c1|xN),
@@ -181,7 +212,8 @@ vl_vlad_encode
  vl_size dimension,
  vl_size numData,
  vl_size numClusters,
- vl_bool normalize)
+ vl_bool normalize,
+ VlVLADMultithreading multithreading)
 {
   switch(dataType) {
     case VL_TYPE_FLOAT:
@@ -193,7 +225,8 @@ vl_vlad_encode
        dimension,
        numData,
        numClusters,
-       normalize);
+       normalize,
+       multithreading);
       break;
     case VL_TYPE_DOUBLE:
       _vl_vlad_encode_d
@@ -204,7 +237,8 @@ vl_vlad_encode
        dimension,
        numData,
        numClusters,
-       normalize);
+       normalize,
+       multithreading);
       break;
     default:
       abort();

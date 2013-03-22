@@ -16,6 +16,14 @@ the terms of the BSD license (see the COPYING file).
 
 #include "generic.h"
 
+/** @brief Fisher multithreading setup */
+
+typedef enum _VlVLADMultithreading
+{
+  VlVLADParallel,    /**< Compute using one thread */
+  VlVLADSerial       /**< Turn multithreading on */
+} VlVLADMultithreading ;
+
 VL_EXPORT void
 vl_vlad_encode
 (vl_type dataType,
@@ -26,7 +34,7 @@ vl_vlad_encode
  vl_size dimension,
  vl_size numData,
  vl_size numClusters,
- vl_bool normalize);
-
+ vl_bool normalize,
+ VlVLADMultithreading multithreading);
 
 #endif
