@@ -72,6 +72,9 @@ addpath(fullfile(root,'toolbox','quickshift')) ;
 addpath(fullfile(root,'toolbox','sift'      )) ;
 addpath(fullfile(root,'toolbox','special'   )) ;
 addpath(fullfile(root,'toolbox','slic'      )) ;
+addpath(fullfile(root,'toolbox','gmm'       )) ;
+addpath(fullfile(root,'toolbox','vlad'      )) ;
+addpath(fullfile(root,'toolbox','fisher'    )) ;
 addpath(fullfile(root,'toolbox',bindir      )) ;
 
 if noprefix
