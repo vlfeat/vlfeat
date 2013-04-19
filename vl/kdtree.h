@@ -18,6 +18,7 @@ the terms of the BSD license (see the COPYING file).
 #include "mathop.h"
 
 #define VL_KDTREE_SPLIT_HEAP_SIZE 5
+#define VL_KDTREE_VARIANCE_SAMPLES 1000
 
 typedef struct _VlKDTreeNode VlKDTreeNode ;
 typedef struct _VlKDTreeSplitDimension VlKDTreeSplitDimension ;

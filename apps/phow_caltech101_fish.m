@@ -320,10 +320,10 @@ im = standarizeImage(im) ;
 
 % get PHOW features
 [drop, descrs] = vl_phow(im, model.phowOpts{:}) ;
-
+size(descrs)
 % quantize appearance
 enc = vl_fisher(single(descrs),model.vocab.means,model.vocab.sigmas,model.vocab.weights);
-
+size(enc)
 %normalize hist
 enc = enc/sum(abs(enc));
 
