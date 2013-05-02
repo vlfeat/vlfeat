@@ -1,4 +1,4 @@
-# Mac OS Finder Poop
+# Mac OS X Finder
 .DS_Store
 
 # MEX files
@@ -9,7 +9,7 @@
 *.mexa64
 *.mex
 
-# Python complied files
+# Python
 *.pyc
 
 # Other generated files and directories
