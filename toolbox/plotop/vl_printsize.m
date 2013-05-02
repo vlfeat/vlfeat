@@ -1,36 +1,68 @@
 function vl_printsize(varargin)
-% VL_PRINTSIZE  Set the print size of a figure
-%   VL_PRINTSIZE(R) sets the PaperPosition property of the current
-%   figure so that the width of the figure is the fraction R of a
-%   'uslsetter' page. It also sets the PaperSize property to tightly
-%   match the figure size. In this way, printing to any format crops
-%   the figure similar to what printing to EPS would do.
+% VL_PRINTSIZE  Set the printing size of a figure
+%   VL_PRINTSIZE(R) adjusts the PaperPosition property of the current
+%   figure to make the figure paper width equal to R times the width
+%   of a 'uslsetter' page, while preserving the aspect ratio of the
+%   figure. Then, it sets the PaperSize property to match tightly the
+%   size of the figure.
 %
-%   VL_PRINTSIZE(FIG,R) opearates on the specified figure FIG.
-%
-%   This command is useful to resize a figure before printing it so
-%   that elements are scaled appropriately to match the desired figure
-%   size in print. The function accepts the following optional
-%   arguments:
+%   VL_PRINTSIZE(FIG,R) operates on the specified figure FIG. The
+%   function accepts the following optional arguments:
 %
 %   Aspect:: []
-%     Change the figure aspect ratio (widht/height) to the specified
+%     Change the figure aspect ratio (width/height) to the specified
 %     value.
 %
-%   Reference:: 'vertical'
-%     If set to 'horizontal' the ratio R is the widht of the figure
-%     over the width of the page. If 'vertical', the ratio R is the
-%     height of the figure over the height of the page.
+%   Reference:: 'horizontal'
+%     If set to 'horizontal', VL_PRINTSIZE(R) makes the width of the
+%     figure equal to a fraction R of the width of the page. If set to
+%     'vertical', the height is used instead.
 %
-%   PaperType:: 'letter'
-%     Set the type (size) of the reference paperReference. Any of the
-%     paper types supported by MATLAB can be used (see PRINT())).
+%   PaperType:: 'usletter'
+%     Set the type of the reference page to the specified type. Any of
+%     the paper types supported by MATLAB can be used (see
+%     PRINT()).
+%
+%   Margin:: 0
+%     If greater than zero, VL_PRINTSIZE(R) leaves the specified
+%     margin around the figure rather than fitting the paper size
+%     tightly around it. The margin is expressed as a fraction of the
+%     figure paper width (or height if Reference is set to
+%     'vertical').
+%
+%   PRINTING FIGURES IN MATLAB
+%
+%   The standard procedure to include a MATLAB figure in a publication
+%   consists in printing the figure to an EPS or PDF file (by using
+%   the PRINT() function) and then rescaling it to the desired size in
+%   the publication. PDF printing has the additional inconvenience
+%   that large white margins are generated, and requires cropping the
+%   figure too.
+%
+%   Unfortunately, rescalign a figure in this manner has the usually
+%   unwanted effect of rescaling elements of the graphics such as font
+%   sizes and line thicknesses. For example, a font which is 12pt in
+%   the original MATLAB figure may become too large or too small after
+%   rescaling.
+%
+%   The `proper' way of printing a figure is to specify its desired
+%   size on paper before calling the PRINT() function. VL_PRINTSIZE()
+%   helps doing so.
+%
+%   Margins are an additional nuances. When printing to certain
+%   formats such as PDF, MATLAB prints in fact entire page (e.g. a
+%   whole US Letter sheet), resulting in wide white margin all around
+%   the figure. VL_PRINTSIZE() alleviates this problem by setting the
+%   paper size to match the figure size tightly. This does not
+%   eliminate margins completely, especially if the figure has
+%   multiple subplots, but it is certainly a large improvement.
 %
 %   See also: VL_HELP().
 
 % Author: Andrea Vedaldi
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 Andrea Vedaldi.
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under
@@ -47,64 +79,46 @@ end
 sizeRatio = varargin{1} ;
 varargin(1) = [] ;
 
-aspectRatio = NaN ;
-reference = 'horizontal' ;
-paperType = 'usletter' ;
-margin = 0 ;
+opts.aspectRatio = NaN ;
+opts.reference = 'horizontal' ;
+opts.paperType = 'usletter' ;
+opts.margin = 0 ;
+opts = vl_argparse(opts, varargin) ;
 
-for ai=1:2:length(varargin)
-  opt = lower(varargin{ai}) ;
-  arg = varargin{ai+1} ;
-  switch lower(opt)
-    case 'aspect'
-      aspectRatio = arg ;
-    case 'reference'
-      switch lower(arg)
-        case 'horizontal'
-          reference = 'horizontal' ;
-        case 'vertical'
-          reference = 'vertical' ;
-        otherwise
-          error('Invalid value ''%s'' for option ''%s''.', arg, opt) ;
-      end
-    case 'papertype'
-      paperType = opt ;
-    case 'margin'
-      margin = arg ;
-    otherwise
-      error('Unknown option ''%s''.', opt) ;
-  end
+opts.reference = lower(opts.reference) ;
+if ~ismember(opts.reference, {'horizontal', 'vertical'})
+  error('Invalid value ''%s'' for the REFERENCE option', opts.reference) ;
 end
 
 % set the paper size to the reference type
-set(fig, 'PaperType', paperType) ;
+set(fig, 'PaperType', opts.paperType) ;
 paperSize = get(fig, 'PaperSize') ;
 
 % get the current figure position to compute the current aspect ratio
 position = get(fig, 'PaperPosition') ;
 
 % if not specified, compute current aspect ratio
-if isnan(aspectRatio)
-  aspectRatio = position(3) / position(4) ;
+if isnan(opts.aspectRatio)
+  opts.aspectRatio = position(3) / position(4) ;
 end
 
 % resize the figure
-switch reference
+switch opts.reference
   case 'horizontal'
     s = paperSize(1) / position(3) * sizeRatio ;
   case 'vertical'
     s = paperSize(2) / position(4) * sizeRatio ;
 end
-position(3:4) = position(3) * s * [1 1/aspectRatio] ;
+position(3:4) = position(3) * s * [1 1/opts.aspectRatio] ;
 
 % add margin
-switch reference
+switch opts.reference
   case 'horizontal'
-    position(1) = position(3) * margin ;
-    position(2) = position(3) * margin ;
+    position(1) = position(3) * opts.margin ;
+    position(2) = position(3) * opts.margin ;
   case 'vertical'
-    position(1) = position(4) * margin ;
-    position(2) = position(4) * margin ;
+    position(1) = position(4) * opts.margin ;
+    position(2) = position(4) * opts.margin ;
 end
 
 set(fig, 'PaperPosition', position, ...
