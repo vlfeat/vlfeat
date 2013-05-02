@@ -18,6 +18,7 @@ function results = vl_test(suite, test)
 % Author: Andrea Vedaldi
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 Andrea Vedaldi.
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under
@@ -28,7 +29,7 @@ clear functions ;
 testRoot = fileparts(mfilename('fullpath')) ;
 
 if nargin == 0
-  files = dir(fullfile(testRoot, 'vl_test_*m')) ;
+  files = dir(fullfile(testRoot, 'vl_test_*.m')) ;
 elseif nargin == 1
   files.name = fullfile(['vl_test_' suite '.m']) ;
 end
@@ -54,7 +55,6 @@ if nargin < 2
               results(i).exception.message) ;
     end
   end
-
 else
   feval(str2func(sprintf('vl_test_%s', suite)), test) ;
 end

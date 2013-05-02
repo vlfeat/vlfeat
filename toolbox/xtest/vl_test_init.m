@@ -1,25 +1,27 @@
-% VL_TEST_INIT  Intialize test file
-%   This is a VLFeat internal function used to initialize
-%   a file containing tests.
+% VL_TEST_INIT  Intialize unit test file
+%   This is a VLFeat internal function used to initialize an .m file
+%   containing a unit test.
 %
 %   See also: VL_TEST(), VL_HELP().
 
 % Author:: Andrea Vedaldi
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 Andrea Vedaldi.
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
-% obtain path to caller m-file
+% Obtain the path to the m-file that called VL_TEST_INIT()
 stack = dbstack(1) ;
 mfilePath = stack(1).file ;
 mfileName = stack(1).name ;
 fid = fopen(mfilePath, 'r') ;
 
-% Parse source code to get subfunction names. It could use
-% which('-subfun', stack(1).name) instead, but it is undocumented.
+% Parse the source code of the caller to get the names of its
+% subfunctions. One could use which('-subfun', stack(1).name) here,
+% but this feature is undocumented.
 
 setupFunc = [] ;
 teardownFunc = [] ;
