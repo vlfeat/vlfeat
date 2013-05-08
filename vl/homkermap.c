@@ -5,6 +5,7 @@
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -16,34 +17,72 @@ the terms of the BSD license (see the COPYING file).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @page homkermap Homogeneous kernel map
 @author Andrea Vedaldi
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-@ref homkermap.h implements the homogeneous kernel maps
-introduced in @cite{vedaldi10efficient},@cite{vedaldi11efficient}.
-Such maps are efficient linear representations of popular kernels
-such as the intersection, @f$ \chij^2 @f$, and Jensen-Shannon ones.
-
-- @ref homkermap-overview
-  - @ref homkermap-overview-negative
-  - @ref homkermap-overview-homogeneity
-  - @ref homkermap-overview-window
-- @ref homkermap-usage
-- @ref homkermap-tech
+@ref homkermap.h implements the homogeneous kernel maps introduced in
+@cite{vedaldi10efficient},@cite{vedaldi12efficient}.  Such maps are
+efficient linear representations of popular kernels such as the
+intersection, $\chi^2$, and Jensen-Shannon ones.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-@section homkermap-overview Overview
+@section homkermap-starting Getting started
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+The homogeneous kernel map is implemented as an object of type
+::VlHomogeneousKernelMap. To use thois object, first create an
+instance by using ::vl_homogeneouskernelmap_new, then use
+::vl_homogeneouskernelmap_evaluate_d or
+::vl_homogeneouskernelmap_evaluate_f (depdening on whether the data is
+@c double or @c float) to compute the feature map $ \Psi(x)
+$. When done, dispose of the object by calling
+::vl_homogeneouskernelmap_delete.
+
+@code
+double gamma = 1.0 ;
+int order = 1 ;
+double period = -1 ; // use default
+double psi [3] ;
+vl_size psiStride = 1 ;
+double x = 0.5 ;
+VlHomogeneousKernelMap * hom = vl_homogeneouskernelmap_new(
+  VlHomogeneousKernelChi2, gamma, order, period,
+  VlHomogeneousKernelMapWindowRectangular) ;
+vl_homogeneouskernelmap_evaluate_d(hom, psi, psiStride, x) ;
+vl_homogeneouskernelmap_delete(x) ;
+@endcode
+
+The constructor ::vl_homogeneouskernelmap_new takes the kernel type @c
+kernel (see ::VlHomogeneousKernelType), the homogeneity order @c gamma
+(use one for the standard $1$-homogeneous kernels), the approximation
+order @c order (usually order one is enough), the period @a period
+(use a negative value to use the default period), and a window type @c
+window (use ::VlHomogeneousKernelMapWindowRectangular if unsure). The
+approximation order trades off the quality and dimensionality of the
+approximation. The resulting feature map $ \Psi(x) $, computed by
+::vl_homogeneouskernelmap_evaluate_d or
+::vl_homogeneouskernelmap_evaluate_f , is <code>2*order+1</code>
+dimensional.
+
+The code pre-computes the map $ \Psi(x) $ for efficient
+evaluation. The table spans values of $ x $ in the range
+$[2^{-20}, 2^{8}) $. In particular, values smaller than $
+2^{-20} $ are treated as zeroes (which results in a null feature).
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section homkermap-fundamentals Fundamentals
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 The <em>homogeneous kernel map</em> is a finite dimensional linear
-approximation of homgeneous kernels, including the intersection,
-@f$ \chi^2 @f$, and Jensen-Shannon kernels. These kernels
- are ffrequently used in computer vision applications because they
-are particular suitable for data in the format of histograms, which
- encompasses many visual descriptors used.
+approximation of homogeneous kernels, including the intersection,
+$\chi^2$, and Jensen-Shannon kernels. These kernels are frequently
+used in computer vision applications because they are particular
+suited to data in the format of histograms, which includes many common
+visual descriptors.
 
-Let @f$ x,y \in \mathbb{R}_+ @f$ be non-negative scalars and let @f$
-k(x,y) \in \mathbb{R} @f$ be an homogeneous kernel such as the
-@f$ \chi^2 @f$ and or the intersection ones:
+Let $x,y \in \mathbb{R}_+$ be non-negative scalars and let $k(x,y) \in
+\mathbb{R}$ be an homogeneous kernel such as the $\chi^2$ and or the
+intersection ones:
 
 @f[
   k_{\mathrm{inters}}(x,y) = \min\{x, y\},
@@ -51,22 +90,22 @@ k(x,y) \in \mathbb{R} @f$ be an homogeneous kernel such as the
   k_{\chi^2}(x,y) = 2 \frac{(x - y)^2}{x+y}.
 @f]
 
-For vectorial data @f$ \mathbf{x},\mathbf{y} \in \mathbb{R}_+^d @f$, the
-homogeneous kernels in an <em>additive
-combination</em> @f$ K(\mathbf{x},\mathbf{y}) = \sum_{i=1}^d k(x_i,y_i) @f$.
+For vectorial data $ \mathbf{x},\mathbf{y} \in \mathbb{R}_+^d $, the
+homogeneous kernels is defined as an <em>additive combination</em> of
+scalar kernels $K(\mathbf{x},\mathbf{y}) = \sum_{i=1}^d k(x_i,y_i)$.
 
-The <em>homogeneous kernel map</em> of order @f$ n @f$ is a vectorial
-function @f$ \Psi(x) \in \mathbb{R}^{2n+1} @f$ such that, for any
-choice of @f$ x, y \in \mathbb{R}_+ @f$, one has
+The <em>homogeneous kernel map</em> of order $n$ is a vector function
+$\Psi(x) \in \mathbb{R}^{2n+1}$ such that, for any choice of $x, y \in
+\mathbb{R}_+$, the following approximation holds:
 
 @f[
   k(x,y) \approx \langle \Psi(x), \Psi(y) \rangle.
 @f]
 
 Given the feature map for the scalar case, the corresponding feature
- map @f$ \Psi(\mathbf{x}) @f$ for the vectorial case is obtained
- by stacking @f$ [\Psi(x_1), \dots, \Psi(x_n)] @f$.
-Note that the combined feature @f$ \Psi(\mathbf{x}) @f$ has dimension @f$ d(2n+1) @f$.
+map $\Psi(\mathbf{x})$ for the vectorial case is obtained by stacking
+$[\Psi(x_1), \dots, \Psi(x_n)]$.  Note that the stacked feature
+$\Psi(\mathbf{x})$ has dimension $d(2n+1)$.
 
 Using linear analysis tools (e.g. a linear support vector machine)
 on top of dataset that has been encoded by the homogeneous kernel map
@@ -77,38 +116,39 @@ on the corresponding non-linear kernel.
 @subsection homkermap-overview-negative Extension to the negative reals
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-Any positive (semi-)definite kernel @f$ k(x,y) @f$ defined on the
-non-negative reals @f$ x,y \in \mathbb{R}_+ @f$ can be extended to the
-entiere real line by using the definition:
+Any positive (semi-)definite kernel $k(x,y)$ defined on the
+non-negative reals $x,y \in \mathbb{R}_+$ can be extended to the
+entire real line by using the definition:
 
 @f[
-  k_\pm(x,y) = \operatorname{sign}(x) \operatorname{sign}(y) k(|x|,|y|).
+k_\pm(x,y) = \operatorname{sign}(x) \operatorname{sign}(y) k(|x|,|y|).
 @f]
 
-The homogeneous kernel map implements this extension by defining @f$
-\Psi_\pm(x) = \operatorname{sign}(x) \Psi(|x|) @f$. Note that other
+The homogeneous kernel map implements this extension by defining
+$\Psi_\pm(x) = \operatorname{sign}(x) \Psi(|x|)$. Note that other
 extensions are possible, such as
 
 @f[
-  k_\pm(x,y) = H(xy) \operatorname{sign}(y) k(|x|,|y|)
+k_\pm(x,y) = H(xy) \operatorname{sign}(y) k(|x|,|y|)
 @f]
 
-where @f$ H @f$ is the Heavyside function, but may require higher
+where $H$ is the Heaviside function, but may result in higher
 dimensional feature maps.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-@subsection homkermap-overview-homogeneity Homogeneity order
+@subsection homkermap-overview-homogeneity Homogeneity degree
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-Any (1-)homogeneous kernel @f$ k_1(x,y) @f$ can be extended to a so
-called gamma-homgeneous kernel @f$ k_\gamma(x,y) @f$ by the definition
+Any (1-)homogeneous kernel $k_1(x,y)$ can be extended to a so called
+$\gamma$-homgeneous kernel $k_\gamma(x,y)$ by the definition
 
 @f[
   k_\gamma(x,y) = (xy)^{\frac{\gamma}{2}} \frac{k_1(x,y)}{\sqrt{xy}}
 @f]
 
-Smaller value of @f$ \gamma @f$ enhance the kernel non-linearity and
-are sometimes beneficial in applications (see [1,2] for details).
+Smaller values of $\gamma$ enhance the kernel non-linearity and are
+sometimes beneficial in applications (see
+@cite{vedaldi10efficient},@cite{vedaldi12efficient} for details).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 @subsection homkermap-overview-window Windowing and period
@@ -116,15 +156,15 @@ are sometimes beneficial in applications (see [1,2] for details).
 
 This section discusses aspects of the homogeneous kernel map which are
 more technical and may be skipped. The homogeneous kernel map
-approximation is based on periodicizing the kernel; given the kernel
+approximation is based on periodizing the kernel; given the kernel
 signature
 
 @f[
-    \Kappa(\lambda) = k(e^{\frac{\lambda}{2}}, e^{-\frac{\lambda}{2}})
+    \mathcal{K}(\lambda) = k(e^{\frac{\lambda}{2}}, e^{-\frac{\lambda}{2}})
 @f]
 
-the homogeneous kerne map is a feature map for the windowed and
-periodicized kernel whose signature is given by
+the homogeneous kernel map is a feature map for the windowed and
+periodized kernel whose signature is given by
 
 @f[
    \hat{\mathcal{K}}(\lambda)
@@ -132,79 +172,65 @@ periodicized kernel whose signature is given by
    \sum_{i=-\infty}^{+\infty} \mathcal{K}(\lambda + k \Lambda) W(\lambda + k \Lambda)
 @f]
 
-where @f$ W(\lambda) @f$ is a windowing function and @f$ \Lambda @f$
-is the period. This implementation of the homogeneous kernel map
-supports the use of a <em>uniform window</em> (@f$ W(\lambda) = 1 @f$)
-or of a <em>rectangular window</em> (@f$ W(\lambda) =
-\operatorname{rect}(\lambda/\Lambda) @f$). Note that @f$ \lambda =
-\log(y/x) @f$ is equal to the logarithmic ratio of the arguments of
-the kernel. Empirically, the rectangular window seems to have a slight
+where $W(\lambda)$ is a windowing function and $\Lambda$ is the
+period. This implementation of the homogeneous kernel map supports the
+use of a <em>uniform window</em> ($ W(\lambda) = 1 $) or of a
+<em>rectangular window</em> ($ W(\lambda) =
+\operatorname{rect}(\lambda/\Lambda) $). Note that $ \lambda =
+\log(y/x) $ is equal to the logarithmic ratio of the arguments of the
+kernel. Empirically, the rectangular window seems to have a slight
 edge in applications.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-@section homkermap-usage Usage
+@section homkermap-details Implementation details
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-The homogeneous kernel map is implemented as an object of type
-::VlHomogeneousKernelMap. To use thois object, first create an
-instance by ::vl_homogeneouskernelmap_new, then use
-::vl_homogeneouskernelmap_evaluate_d or
-::vl_homogeneouskernelmap_evaluate_f (depdening on whether the data is
-@c double or @c float) to compute the feature map @f$ \Psi(x)
-@f$. When done, dispose of the object by calling
-::vl_homogeneouskernelmap_delete.
+This implementation uses the expressions given in
+@cite{vedaldi10efficient},@cite{vedaldi11efficient} to compute in
+closed form the maps $\Psi(x)$ for the supported kernel types. For
+efficiency reasons, it precomputes $\Psi(x)$ for a large range of
+values of the argument when the homogeneous kernel map object is
+created.
 
-The constructor ::vl_homogeneouskernelmap_new requires the kernel type
-@c kernel (see ::VlHomogeneousKernelType), the homogeneity order @c
-gamma (use one for the standard kernels), the approximation order @c
-order (usually order one is enough), the period @a period (use a
-negative value to use the default period), and a window type @c window
-(use ::VlHomogeneousKernelMapWindowRectangular if unsure). The
-approximation order trades off the quality and dimensionality of the
-approximation. The resulting feature map @f$ \Psi(x) @f$, computed by
-::vl_homogeneouskernelmap_evaluate_d or
-::vl_homogeneouskernelmap_evaluate_f , is <code>2*order+1</code>
-dimensional.
-
-The code pre-computes the map @f$ \Psi(x) @f$ for efficient
-evaluation. The table spans values of @f$ x @f$ in the range
-@f$[2^{-20}, 2^{8}) @f$. In particular, values smaller than @f$
-2^{-20} @f$ are treated as zeroes (which result in a null feature).
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-@section homkermap-tech Technical details
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-The code uses the expressions given in @cite{vedaldi10efficient},@cite{vedaldi11efficient}
-to compute in closed form the maps @f$ \Psi(x) @f$ for the suppoerted kernel types.  For
-efficiency reasons, it tabulates @f$ \Psi(x) @f$ when the homogeneous
-kernel map object is created.
-
-The interal table stores @f$ \Psi(x) \in \mathbb{R}^{2n+1} @f$ for
-@f$ x \geq 0 @f$ by sampling this variable. In particular, @c x is
-decomposed as
+The internal table stores $\Psi(x) \in \mathbb{R}^{2n+1}$ by sampling
+$x\geq 0$. This uses the internal decomposition of IEEE floating point
+representations (@c float and @c double) in mantissa and exponent:
 <pre>
   x = mantissa * (2**exponent),
   minExponent <= exponent <= maxExponent,
   1 <= matnissa < 2.
 </pre>
-Each octave is further subdivided in @c numSubdivisions sublevels.
+Each octave is further sampled in @c numSubdivisions sublevels.
 
-When the map @f$ \Psi(x) @f$ is evaluated, @c x is decomposed back
-into exponent and mantissa, and the result is computed by bilinear
-interpolation from the appropriate table entries.
+When the map $\Psi(x)$ is evaluated, @c x is decomposed again into
+exponent and mantissa to index the table. The output is obtained by
+bilinear interpolation from the appropriate table entries.
 
-*/
+**/
 
+/* ---------------------------------------------------------------- */
 #ifndef VL_HOMKERMAP_INSTANTIATING
+/* ---------------------------------------------------------------- */
 
 #include "homkermap.h"
 #include "mathop.h"
-
 #include <math.h>
 
-/** ------------------------------------------------------------------
- ** @brief Sample the kernel specturm
+struct _VlHomogeneousKernelMap
+{
+  VlHomogeneousKernelType kernelType ;
+  double gamma ;
+  VlHomogeneousKernelMapWindowType windowType ;
+  vl_size order ;
+  double period ;
+  vl_size numSubdivisions ;
+  double subdivision  ;
+  vl_index minExponent ;
+  vl_index maxExponent ;
+  double * table ;
+} ;
+
+/** @internal @brief Sample the kernel specturm
  ** @param self homogeneous kernel map.
  ** @param omega sampling frequency.
  ** @return the spectrum sampled at @a omega.
@@ -235,8 +261,7 @@ VL_INLINE double sinc(double x)
   return sin(x) / x ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Sample the smoothed kernel spectrum
+/** @internal @brief Sample the smoothed kernel spectrum
  ** @param self homogeneous kernel map.
  ** @param omega sampling frequency.
  ** @return the spectrum sampled at @a omega after smoothing.
@@ -271,8 +296,11 @@ vl_homogeneouskernelmap_get_smooth_spectrum (VlHomogeneousKernelMap const * self
   return kappa_hat ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Create a new homgeneous kernel map
+/* ---------------------------------------------------------------- */
+/*                                     Constructors and destructors */
+/* ---------------------------------------------------------------- */
+
+/** @brief Create a new homgeneous kernel map
  ** @param kernelType type of homogeneous kernel.
  ** @param gamma kernel homogeneity degree.
  ** @param order approximation order.
@@ -282,7 +310,7 @@ vl_homogeneouskernelmap_get_smooth_spectrum (VlHomogeneousKernelMap const * self
  **
  ** The function intializes a new homogeneous kernel map for the
  ** specified kernel type, homogeneity degree, approximation order,
- ** period, and truncation window. See @ref homkermap-overview for
+ ** period, and truncation window. See @ref homkermap-fundamentals for
  ** details.
  **
  ** The homogeneity degree @c gamma must be positive (the standard
@@ -398,13 +426,12 @@ vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
   return self ;
 }
 
-/** ------------------------------------------------------------------
- ** @brief Delete a map object
- ** @param self map object.
+/** @brief Delete an object instance.
+ ** @param self object.
  ** The function deletes the specified map object.
  **/
 
-VL_EXPORT void
+void
 vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self)
 {
   vl_free(self->table) ;
@@ -412,8 +439,63 @@ vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self)
   vl_free(self) ;
 }
 
-/** ------------------------------------------------------------------
- ** @fn ::vl_homogeneouskernelmap_evaluate_d(VlHomogeneousKernelMap const*,double*,vl_size,double)
+/* ---------------------------------------------------------------- */
+/*                                     Retrieve data and parameters */
+/* ---------------------------------------------------------------- */
+
+/** @brief Get the map order.
+ ** @param self object.
+ ** @return the map order.
+ **/
+
+vl_size
+vl_homogeneouskernelmap_get_order (VlHomogeneousKernelMap const * self)
+{
+  assert(self) ;
+  return self->order ;
+}
+
+/** @brief Get the map dimension.
+ ** @param self object.
+ ** @return the map dimension (2 @c order  +1).
+ **/
+
+vl_size
+vl_homogeneouskernelmap_get_dimension (VlHomogeneousKernelMap const * self)
+{
+  assert(self) ;
+  return 2 * self->order + 1 ;
+}
+
+/** @brief Get the kernel type.
+ ** @param self object.
+ ** @return kernel type.
+ **/
+
+VlHomogeneousKernelType
+vl_homogeneouskernelmap_get_kernel_type (VlHomogeneousKernelMap const * self)
+{
+  assert(self) ;
+  return self->kernelType ;
+}
+
+/** @brief Get the window type.
+ ** @param self object.
+ ** @return window type.
+ **/
+
+VlHomogeneousKernelMapWindowType
+vl_homogeneouskernelmap_get_window_type (VlHomogeneousKernelMap const * self)
+{
+  assert(self) ;
+  return self->windowType ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                                                     Process data */
+/* ---------------------------------------------------------------- */
+
+/** @fn ::vl_homogeneouskernelmap_evaluate_d(VlHomogeneousKernelMap const*,double*,vl_size,double)
  ** @brief Evaluate map
  ** @param self map object.
  ** @param destination output buffer.
@@ -425,17 +507,8 @@ vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self)
  ** @a destination[0], @a destination[stride], @a destination[2*stride], ....
  **/
 
-/** ------------------------------------------------------------------
- ** @fn ::vl_homogeneouskernelmap_evaluate_f(VlHomogeneousKernelMap const*,float*,vl_size,double)
- ** @brief Evaluate map
- ** @param self map object.
- ** @param destination output buffer.
- ** @param stride stride of the output buffer.
- ** @param x value to expand.
- **
- ** The function evaluates the feature map on @a x and stores the
- ** resulting <code>2*order+1</code> dimensional vector to
- ** @a destination[0], @a destination[stride], @a destination[2*stride], ....
+/** @fn ::vl_homogeneouskernelmap_evaluate_f(VlHomogeneousKernelMap const*,float*,vl_size,double)
+ ** @copydetails ::vl_homogeneouskernelmap_evaluate_d(VlHomogeneousKernelMap const*,double*,vl_size,double)
  **/
 
 #define FLT VL_TYPE_FLOAT
@@ -446,11 +519,16 @@ vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self)
 #define VL_HOMKERMAP_INSTANTIATING
 #include "homkermap.c"
 
-#else
+/* VL_HOMKERMAP_INSTANTIATING */
+#endif
+
+/* ---------------------------------------------------------------- */
+#ifdef VL_HOMKERMAP_INSTANTIATING
+/* ---------------------------------------------------------------- */
 
 #include "float.th"
 
-VL_EXPORT void
+void
 VL_XCAT(vl_homogeneouskernelmap_evaluate_,SFX)
 (VlHomogeneousKernelMap const * self,
  T * destination,
@@ -498,4 +576,5 @@ VL_XCAT(vl_homogeneouskernelmap_evaluate_,SFX)
 
 #undef FLT
 #undef VL_HOMKERMAP_INSTANTIATING
-#endif /* VL_HOMKERMAP_INSTANTIATING */
+/* VL_HOMKERMAP_INSTANTIATING */
+#endif

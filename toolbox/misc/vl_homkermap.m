@@ -9,18 +9,11 @@
 %
 %   The function accepts the following options:
 %
-%   KChi2::
-%     Compute the map for the Chi2 kernel.
-%
-%   KINTERS::
-%     Compute the map for the intersection kernel.
-%
-%   KL1::
-%     Same as KINTERS, but deprecated as the name is not fully
-%     accurate.
-%
-%   KJS::
-%     Compute the map for the JS (Jensen-Shannon) kernel.
+%   Kernel:: KCHI2
+%     One of KCHI2 (Chi2 kernel), KINTERS (intersection kernel), KJS
+%     (Jenen-Shannon kernel). The 'Kernel' option name can be omitted,
+%     i.e. VL_HOMKERMAP(..., 'kernel', 'kchi2') has the same effect of
+%     VL_HOMKERMAP(..., 'kchi2').
 %
 %   Period:: [automatically tuned]
 %     Set the period of the kernel specturm. The approximation is

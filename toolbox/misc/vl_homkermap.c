@@ -21,6 +21,7 @@ enum {
   opt_KL1,
   opt_KJS,
   opt_KINTERS,
+  opt_kernel,
   opt_gamma,
   opt_period,
   opt_window
@@ -31,6 +32,7 @@ vlmxOption options [] = {
   {"kchi2",        0,   opt_KCHI2         },
   {"kjs",          0,   opt_KJS           },
   {"kinters",      0,   opt_KINTERS       },
+  {"kernel",       1,   opt_kernel        },
   {"gamma",        1,   opt_gamma         },
   {"period",       1,   opt_period        },
   {"window",       1,   opt_window        },
@@ -105,6 +107,11 @@ mexFunction(int nout, mxArray *out[],
         break ;
       case opt_KJS:
         kernelType = VlHomogeneousKernelJS ;
+        break ;
+      case opt_kernel:
+        /* make the kernel option argument to be the next option, and
+         hence processed by the code above */
+        next-- ;
         break ;
       case opt_period:
         if (! vlmxIsPlainScalar(optarg)){

@@ -31,31 +31,28 @@ typedef enum {
   VlHomogeneousKernelMapWindowRectangular = 1, /**< rectangular window */
 } VlHomogeneousKernelMapWindowType ;
 
-/** @brief Homogeneous kernel map */
-typedef struct _VlHomogeneousKernelMap
-{
-  VlHomogeneousKernelType kernelType ;
-  double gamma ;
-  VlHomogeneousKernelMapWindowType windowType ;
-  vl_size order ;
-  double period ;
-  vl_size numSubdivisions ;
-  double subdivision  ;
-  vl_index minExponent ;
-  vl_index maxExponent ;
-  double * table ;
-} VlHomogeneousKernelMap ;
+#ifndef __DOXYGEN__
+struct _VlHomogeneousKernelMap ;
+typedef struct _VlHomogeneousKernelMap VlHomogeneousKernelMap ;
+#else
+/** @brief Homogeneous kernel map object */
+typedef OPAQUE VlHomogeneousKernelMap ;
+#endif
 
+/** @name Create and destroy
+ ** @{ */
 VL_EXPORT VlHomogeneousKernelMap *
 vl_homogeneouskernelmap_new (VlHomogeneousKernelType kernelType,
                              double gamma,
                              vl_size order,
                              double period,
                              VlHomogeneousKernelMapWindowType windowType) ;
-
 VL_EXPORT void
 vl_homogeneouskernelmap_delete (VlHomogeneousKernelMap * self) ;
+/** @} */
 
+/** @name Process data
+ ** @{ */
 VL_EXPORT void
 vl_homogeneouskernelmap_evaluate_d (VlHomogeneousKernelMap const * self,
                                     double * destination,
@@ -67,5 +64,23 @@ vl_homogeneouskernelmap_evaluate_f (VlHomogeneousKernelMap const * self,
                                     float * destination,
                                     vl_size stride,
                                     double x) ;
+/** @} */
+
+
+/** @name Retrieve data and parameters
+ ** @{ */
+VL_EXPORT vl_size
+vl_homogeneouskernelmap_get_order (VlHomogeneousKernelMap const * self) ;
+
+VL_EXPORT vl_size
+vl_homogeneouskernelmap_get_dimension (VlHomogeneousKernelMap const * self) ;
+
+VL_EXPORT VlHomogeneousKernelType
+vl_homogeneouskernelmap_get_kernel_type (VlHomogeneousKernelMap const * self) ;
+
+VL_EXPORT VlHomogeneousKernelMapWindowType
+vl_homogeneouskernelmap_get_window_type (VlHomogeneousKernelMap const * self) ;
+/** @} */
+
 /* VL_HOMKERMAP_H */
 #endif
