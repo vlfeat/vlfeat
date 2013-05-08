@@ -65,7 +65,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
 - **Support functionalities**
   - @ref host.h      "Platform abstraction"
   - @ref generic
-  - @ref random.h    "Random number generator"
+  - @ref random
   - @ref mathop.h    "Math operations"
   - @ref heap-def.h  "Generic heap object (priority queue)"
   - @ref stringop.h  "String operations"

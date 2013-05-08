@@ -5,46 +5,65 @@
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-/** @file random.h
+/**
+<!-- ------------------------------------------------------------- -->
+@page random Random number generator
+@author Andrea Vedaldi
+@tableofcontents
+<!-- ------------------------------------------------------------- -->
 
- This module implements the popular Mersenne Twister algorithm (MATLAB
- random generator from version 7.4).
+The module @ref random.h implements random number generation in
+VLFeat.  The generator is based on the popular Mersenne Twister
+algorithm @cite{matsumoto98mersenne} (which is the same as MATLAB
+random generator from MATLAB version 7.4 onwards).
 
- @section random-overview Overview
+<!-- ------------------------------------------------------------- -->
+@section random-starting Getting started
+<!-- ------------------------------------------------------------- -->
 
- A random number generator can be initalized by
+In VLFeat, a random number generator is implemented by an object of
+type ::VLRand. The simplest way to obtain such an object is to get the
+default random generator by
 
- @code
- VlRand rand ;
- vl_rand_init (&rand) ;
- @endcode
+@code
+VlRand * rand = vl_get_rand() ;
+vl_int32 signedRandomInteger = vl_rand_int31(rand) ;
+@code
 
- ::VlRand is a simple structure holding the state of the
- random number generator. The generator can be seeded by
- ::vl_rand_seed and ::vl_rand_seed_by_array. For intsance:
+Note that there is one such generator per thread (see
+::vl_get_rand). If more control is desired, a new ::VlRand object can
+be easily created.  The object is lightweight, designed to be
+allocated on the stack:
 
- @code
- vl_rand_seed (&rand, clock()) ;
- @endcode
+@code
+VlRand rand ;
+vl_rand_init (&rand) ;
+@endcode
 
- The generator can be used to obtain random quantities of
- various types:
+The generator can be seeded by ::vl_rand_seed and ::vl_rand_seed_by_array.
+For instance:
 
- - ::vl_rand_int31, ::vl_rand_uint32 for 32-bit random integers;
- - ::vl_rand_real1 for a double in [0,1];
- - ::vl_rand_real2 for a double in [0,1);
- - ::vl_rand_real3 for a double in (0,1);
- - ::vl_rand_res53 for a double in [0,1) with high resolution.
+@code
+vl_rand_seed (&rand, clock()) ;
+@endcode
 
- There is no need to explicitly destroy a ::VlRand instance.
+The generator can be used to obtain random quantities of
+various types:
 
- [1] http://en.wikipedia.org/wiki/Mersenne_twister
+- ::vl_rand_int31, ::vl_rand_uint32 for 32-bit random integers;
+- ::vl_rand_real1 for a double in [0,1];
+- ::vl_rand_real2 for a double in [0,1);
+- ::vl_rand_real3 for a double in (0,1);
+- ::vl_rand_res53 for a double in [0,1) with high resolution.
+
+There is no need to explicitly destroy a ::VlRand instance.
 
 **/
 
@@ -109,7 +128,7 @@ email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
  ** @param self number generator.
  **/
 
-VL_EXPORT void
+void
 vl_rand_init (VlRand * self)
 {
   memset (self->mt, 0, sizeof(self->mt[0]) * N) ;
@@ -121,7 +140,7 @@ vl_rand_init (VlRand * self)
  ** @param s seed.
  **/
 
-VL_EXPORT void
+void
 vl_rand_seed (VlRand * self, vl_uint32 s)
 {
 #define mti self->mti
@@ -147,7 +166,7 @@ vl_rand_seed (VlRand * self, vl_uint32 s)
  ** @param keySize  length of the array.
  **/
 
-VL_EXPORT void
+void
 vl_rand_seed_by_array (VlRand * self, vl_uint32 const key [], vl_size keySize)
 {
 #define mti self->mti
@@ -177,12 +196,32 @@ vl_rand_seed_by_array (VlRand * self, vl_uint32 const key [], vl_size keySize)
 #undef mt
 }
 
+/** @brief Randomly permute and array of indexes.
+ ** @param self random number generator.
+ ** @param array array of indexes.
+ ** @param size number of element in the array.
+ **
+ ** The function uses *Algorithm P*, also known as *Knuth shuffle*.
+ **/
+
+void
+vl_rand_permute_indexes (VlRand *self, vl_index *array, vl_size size)
+{
+  vl_index i, j, tmp;
+  for (i = size - 1 ; i > 0; i--) {
+    /* Pick a random index j in the range 0, i + 1 and swap it with i */
+    j = (vl_int) vl_rand_uindex (self, i + 1) ;
+    tmp = array[i] ; array[i] = array[j] ; array[j] = tmp ;
+  }
+}
+
+
 /** @brief Generate a random UINT32
  ** @param self random number generator.
  ** @return a random number in [0, 0xffffffff].
  **/
 
-VL_EXPORT vl_uint32
+vl_uint32
 vl_rand_uint32 (VlRand * self)
 {
   unsigned long y;

@@ -1,6 +1,7 @@
 /** @file random.h
- ** @brief Random number generator
+ ** @brief Random number generator (@ref random)
  ** @author Andrea Vedaldi
+ ** @see @ref random
  **/
 
 /*
@@ -45,6 +46,8 @@ VL_INLINE double    vl_rand_real3  (VlRand * self) ;
 VL_INLINE double    vl_rand_res53  (VlRand * self) ;
 VL_INLINE vl_uindex vl_rand_uindex (VlRand * self, vl_uindex range) ;
 /** @} */
+
+VL_EXPORT void vl_rand_permute_indexes (VlRand * self, vl_index* array, vl_size size) ;
 
 /* ---------------------------------------------------------------- */
 
