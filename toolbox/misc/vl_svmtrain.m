@@ -1,131 +1,118 @@
 % VL_SVMTRAIN Train a Support Vector Machine
-%   [W B INFO] = VL_SVMTRAIN(DATA , LAMBDA [, OPTS]) learns Support Vector Machine with model W
-%   and bias B given training struct DATA and the regularization parameter
-%   LAMBDA. Structure INFO provides diagnostic information.
-%   The algorithm finds a minimizer W of the objective function
+%   [W B] = VL_SVMTRAIN(X, Y, LAMBDA) trains a linear Support Vector
+%   Machine (SVM) from the data vectors X and the labels Y. X is a D
+%   by N matrix, with one column for example and D feature dimensions
+%   (SINGLE or DOUBLE). Y is a DOUBLE vector with N elements with a
+%   binary (-1 or +1) label for each training point. To a first order
+%   approximation, the function computes a weight vector W and offset
+%   B such that the score W'*X(:,i)+B has the same sign of LABELS(i)
+%   for all i.
 %
-%     LAMBDA/2 |W|^2 + 1/N SUM_i LOSS(W, X(:,i), Y(i))
+%   VL_SVMTRAIN(DATASET, LABELS, LAMBDA) takes as input a DATASET
+%   structure, which allows more sophisticated input formats to be
+%   supported (see VL_SVMMAKEDATASET()).
 %
-%   where LOSS(W,X,Y) is the used loss function and N is
-%   the number of training vectors in X.
-%   For more details see the VLFeat documentation for Support Vector Machines.
+%   [W, B, INFO] = VL_SVMTRAIN(...) additionally returns a structure
+%   INFO with the following fields:
 %
-%   
-%   By default, VL_SVMTRAIN uses the SGD method with L1 hinge loss function
-%   to train the SVM. By setting appropriate parameter, (S)DCA with selected
-%   loss function can be used instead.
-%
-%
-%   INFO is a struct containing diagnostic information:
-%
-%   iterations::
+%   iteration::
 %     Number of iterations performed.
-%     
-%   maxIterations::
-%     The maximum number of iterations to be performed.
-%     
+%
+%   epoch::
+%     Number of iterations over number of training data points.
+%
 %   elapsedTime::
-%     Elapsed time since the start of the SVM learning.
-%     
-%   energy::
-%     SVM energy value.
-%     
-%   regularizerTerm::
-%     Value of the SVM regulizer term.
+%     Time elapsed since the start of training.
 %
-%   lossPos::
-%     Value of loss function only for positively labeled data points.
-%     
-%   lossNeg::
-%     Value of loss function only for nagatively labeled data points.
-%     
-%   hardLossPos::
-%     Number of mislabeled positive points.
-%     
-%   hardLossNeg::
-%     Number of mislabeled negative points.
+%   objective::
+%     SVM objective value.
 %
-%   
+%   regularizer::
+%     Regularizer value.
 %
-%   VL_SVMCDDUAL() accepts the following options:
+%   loss::
+%     Loss value.
 %
-%   Epsilon:: [0]
+%   scoreVariation:: [SGD only]
+%     Mean square root of the difference between the last two
+%     values of the SVM scores for each point.
+%
+%   dualObjective:: [SDCA only]
+%     Dual objective value.
+%
+%   dualLoss:: [SDCA only]
+%     Dual loss value::
+%
+%   dualityGap:: [SDCA only]
+%     Difference between the objective and the dual objective.
+%
+%   VL_SVMTRAIN() accepts the following options:
+%
+%   Epsilon:: 1e-3
 %     Tolerance for the stopping criterion.
 %
-%   MaxIterations:: [1000]
-%     Sets the maximum number of iterations.
+%   MaxNumIterations:: 10/LAMBDA
+%     Maximum number of iterations.
 %
-%   BiasMultiplier:: [1]
-%     Appends to the data X the specified scalar value B for learning with bias.
+%   BiasMultiplier:: 1
+%     Value of the constant B0 used as bias term (see below).
 %
-%   DiagnosticFunction:: [empty]
-%     Specifies a function handle to be called every DIAGNOSTICFREQ
-%     iterations.
-%     The function must be of the form:
+%   BiasLearningRate:: 0.5
+%     Learning rate for the bias (SGD solver only).
 %
-%       function o = diagnostics(svm) ,
+%   DiagnosticFunction:: []
+%     Diagnostic function callback. The callback takes the INFO
+%     structure as only argument. To trace energies and plot graphs,
+%     the callback can update a global variable or, preferably, be
+%     defined as a nested function and update a local variable in the
+%     parent function.
 %
-%   EnergyFreq:: [100]
-%     Specifies how often the energy is computed and the stopping condition checked.
+%   DiagnosticFrequency:: Number of data points
+%     After how many iteration the diagnostic is run. This step check
+%     for convergence, and is done rarely, typically after each epoch
+%     (pass over the data). It also calls the DiangosticFunction,
+%     if any is specified.
 %
-%   ValidationData::
-%     Specify a validation dataset. The validation dataset must be
-%     created using VL_MAKETRAININGSET. If specified, the energy
-%     value and all the diagnostic informations are computed on the
-%     validation dataset, otherwise the training dataset is used.
+%   Loss:: HINGE
+%     Loss function. One of HINGE, HINGE2, L1, L2, LOGISTIC.
 %
+%   Solver:: SGD
+%     One of SGD (stochastic gradient descent [1]) or SDCA (stochastic
+%     dual coordinate ascent [2,3]).
 %
-%   DCA:: [0]
-%     Set to 1 for the (S)DCA solver, 0 for SGD.
+%   StartingModel:: null vector
+%     Specifies the initial value for the weight vector W (SGD only).
 %
+%   StartingBias:: 0
+%     Specifies the initial value of the bias term (SGD only).
 %
+%   FORMULATION
 %
-%   For (S)DCA, the following specific options may be set:
+%   VL_SVMTRAIN() minimizes the objective function of the form:
 %
-%   Loss:: [1]
-%     Specifies the loss function (L1 hinge loss or L2 hinge loss).
+%     LAMBDA/2 |W|^2 + 1/N SUM_i LOSS(W' X(:,i), Y(i))
 %
-%   RandomPermutation:: [1]
-%     Use Random Permutation of Sub-problems.
+%   where LOSS(W,X,Y) is the loss (hinge by default). The bias is
+%   incorporated by extending each data point X with a feature of
+%   constant value B0, such that the objective becomes
 %
-%   OnlineSetting:: [0]
-%     Use Online Setting.
+%    LAMBDA/2 (|W|^2 + WB^2) 1/N SUM_i LOSS(W' X(:,i) + WB B0, Y(i))
 %
-%
-%   For SGD, the following specific options may be set:
-%
-%   StartingModel:: [null vector]
-%     Specifies the initial value for the weight vector W.
-%
-%   StartingBias:: [0]
-%     Specifies the inital bias value.
-%
-%   StartingIteration:: [1]
-%     Specify the iteration number to start from. The only effect
-%     is to change the step size, as this is inversely proportional
-%     to the iteration number.
-%
-%   Permutation:: [empty]
-%     Specify a permutation PERM to be used to sample the data (this
-%     disables random sampling). Specifically, at the T-th iteration
-%     the algorithm takes a step w.r.t. the PERM[T']-th data point,
-%     where T' is T modulo the number of data samples
-%     (i.e. MOD(T'-1,NUMSAMPLES)+1). PERM needs not to be
-%     bijective. This allows specifying certain data points more or
-%     less frequently, implicitly increasing their relative weight in
-%     the error term. A common application is to balance an unbalanced
-%     dataset.
-%
-%   BiasPreconditioner:: [1]
-%     Specify a preconditioner for the bias. This value is
-%     multiplied to the bias subgradient before adding
-%     the latter to the current model estimate.
-%
-%
+%   Note that this causes the learned bias B = WB B0 to shrinks
+%   towards the origin.
 %
 %   REFERENCES::
-%   [1] Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya Keerthi, and S. Sundararajan. 2008. A dual coordinate descent method for large-scale linear SVM. In Proceedings of the 25th international conference on Machine learning (ICML '08). ACM, New York, NY, USA, 408-415. 
-%   http://ntu.csie.org/~cjlin/papers/cddual.pdf
+%
+%   [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro. Pegasos: Primal
+%       estimated sub-GrAdient SOlver for SVM. In Proc. ICML, 2007.
+%
+%   [2] Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya
+%       Keerthi, and S. Sundararajan. 2008. A dual coordinate descent
+%       method for large-scale linear SVM. Proc. ICML, 2008.
+%
+%   [3] S. Shalev-Shwartz and T. Zhang. Stochastic Dual Coordinate
+%       Ascent Methods for Regularized Loss Minimization. In
+%       Proc. NIPS, 2012.
 %
 %   See also: VL_MAKETRAININGSET(), VL_HELP().
 

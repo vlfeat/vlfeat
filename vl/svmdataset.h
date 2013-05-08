@@ -1,10 +1,12 @@
 /** @file svmdataset.h
  ** @brief SVM Dataset
  ** @author Daniele Perrone
+ ** @author Andrea Vedaldi
  **/
 
 /*
 Copyright (C) 2012 Daniele Perrone.
+Copyright (C) 2013 Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -15,193 +17,65 @@ the terms of the BSD license (see the COPYING file).
 #define VL_SVMDATASET_H
 
 #include "generic.h"
+#include "homkermap.h"
 
-/* ---------------------------------------------------------------- */
-/*                                                                  */
-/* ---------------------------------------------------------------- */
+struct VlSvm_ ;
 
-/** @typedef VlSvmDatasetFeatureMap
- ** @brief Pointer to a function that maps the value in @x to
- ** @destination using the feature map @map
- **/
-typedef void (*VlSvmDatasetFeatureMap)(const void* map, double * destination,
-                                       const vl_size stride, const double x) ;
-
-/** @typedef VlSvmDatasetInnerProduct
- ** @brief Pointer to a function that defines the inner product
- ** between the data point at position @element and the SVM model
- **/
-typedef double (*VlSvmDatasetInnerProduct)(const void* data,
-                                           const vl_uindex element,
-                                           const double* model) ;
-
-/** @typedef VlSvmDatasetAccumulator
- ** @brief Pointer to a function that adds to @model the data point at
- ** position @element multiplied by the constant @multiplier
- **/
-typedef void (*VlSvmDatasetAccumulator)(const void* data,
-                                        const vl_uindex element,
-                                        double * model,
-                                        const double multiplier) ;
-
-
-/** @typedef VlSvmDatasetLengthSquare
- ** @brief Pointer to a function that defines the inner product
- ** of the data point with it self
- **/
-typedef double (*VlSvmDatasetLengthSquare)(const void* data,
-                                           const vl_uindex element) ;
-
-/* ---------------------------------------------------------------- */
-/*                                                                  */
-/* ---------------------------------------------------------------- */
-
-/** @brief Svm Dataset
+/** @typedef VlSvmDataset
+ ** @brief SVM dataset object
  **
- ** This structure is a wrapper for a generic SVM dataset. It should
- ** be provided with a set of functions of type
- ** @ref VlSvmDatasetInnerProduct and @ref VlSvmDatasetAccumulator
+ ** This objects contain a training set to be used in combination with
+ ** the SVM solver object ::VlSvm. Its main purpose is to implement
+ ** the two basic operations inner product (::VlSvmInnerProductFunction)
+ ** and accumulation (::VlSvmAccumulateFunction).
+ **
+ ** See @ref svm and @ref svm-advanced for further information.
  **/
-typedef struct _VlSvmDataset {
-  void * data ;                 /**< pointer to data */
-  vl_size dimension ;           /**< data point dimension */
-  void* map ;                   /**< feature Map */
-  VlSvmDatasetFeatureMap mapFunc ; /**< function that defines the feature map*/
-  vl_size mapDim ;                  /**< the feature map dimensionality (usually 2*n+1) */
-} VlSvmDataset ;
+
+#ifndef __DOXYGEN__
+struct VlSvmDataset_ ;
+typedef struct VlSvmDataset_ VlSvmDataset ;
+#else
+typedef OPAQUE VlSvmDataset ;
+#endif
+
+/** @name SVM callbacks
+ ** @{ */
+typedef void (*VlSvmDiagnosticFunction) (struct VlSvm_ *svm, void *data) ;
+typedef double (*VlSvmLossFunction) (double inner, double label) ;
+typedef double (*VlSvmDcaUpdateFunction) (double alpha, double inner, double norm2, double label) ;
+typedef double (*VlSvmInnerProductFunction)(const void *data, vl_uindex element, double *model) ;
+typedef void (*VlSvmAccumulateFunction) (const void *data, vl_uindex element, double *model, double multiplier) ;
+/* typedef double (*VlSvmSquareNormFunction) (const void *data, vl_uindex element) ; */
+/** @} */
 
 /** @name Create and destroy
  ** @{
  **/
-VL_EXPORT
-VlSvmDataset* vl_svmdataset_new (void * data, vl_size dimension) ;
-
-VL_EXPORT
-void vl_svmdataset_delete (VlSvmDataset * dataset) ;
+VL_EXPORT VlSvmDataset* vl_svmdataset_new (vl_type dataType, void *data, vl_size dimension, vl_size numData) ;
+VL_EXPORT void vl_svmdataset_delete (VlSvmDataset * dataset) ;
 /** @} */
 
-/** @name Set map
+/** @name Set parameters
  ** @{
  **/
-VL_EXPORT
-void vl_svmdataset_set_map (VlSvmDataset * data, void * map,
-                            VlSvmDatasetFeatureMap mapFunc, vl_size mapDim) ;
+VL_EXPORT void vl_svmdataset_set_homogeneous_kernel_map (VlSvmDataset * self,
+                                                         VlHomogeneousKernelMap * hom) ;
 /** @} */
 
-/* ---------------------------------------------------------------- */
-/*    Standard Atomic Functions                                     */
-/* ---------------------------------------------------------------- */
-
-/** @name Standard dataset functions
+/** @name Get data and parameters
  ** @{
  **/
-VL_EXPORT
-double vl_svmdataset_innerproduct_d(const void* data,
-                                    const vl_uindex element,
-                                    const double* model) ;
-
-VL_EXPORT
-void vl_svmdataset_accumulator_d(const void* data,
-                                 const vl_uindex element,
-                                 double * model,
-                                 const double multiplier) ;
-
-VL_EXPORT
-double vl_svmdataset_innerproduct_f(const void* data,
-                                    const vl_uindex element,
-                                    const double* model) ;
-
-VL_EXPORT
-void vl_svmdataset_accumulator_f(const void* data,
-                                 const vl_uindex element,
-                                 double * model,
-                                 const double multiplier) ;
-
-// ADDED!
-
-VL_EXPORT
-double vl_svmdataset_lengthsquare_d (const void* data, const vl_uindex element);
-
-
-VL_EXPORT
-double vl_svmdataset_lengthsquare_f (const void* data, const vl_uindex element);
-
-
+VL_EXPORT void* vl_svmdataset_get_data (VlSvmDataset const *self) ;
+VL_EXPORT vl_size vl_svmdataset_get_num_data (VlSvmDataset const *self) ;
+VL_EXPORT vl_size vl_svmdataset_get_dimension (VlSvmDataset const *self) ;
+VL_EXPORT void* vl_svmdataset_get_map (VlSvmDataset const *self) ;
+VL_EXPORT vl_size vl_svmdataset_get_mapDim (VlSvmDataset const *self) ;
+VL_EXPORT VlSvmAccumulateFunction vl_svmdataset_get_accumulate_function (VlSvmDataset const *self) ;
+VL_EXPORT VlSvmInnerProductFunction vl_svmdataset_get_inner_product_function (VlSvmDataset const * self) ;
+VL_EXPORT VlHomogeneousKernelMap * vl_svmdataset_get_homogeneous_kernel_map (VlSvmDataset const * self) ;
 /** @} */
 
-/** @name Retrieve data and parameters
- ** @{
- **/
-VL_INLINE void*   vl_svmdataset_get_data (VlSvmDataset const *self) ;
-VL_INLINE vl_size vl_svmdataset_get_dimension (VlSvmDataset const *self) ;
-VL_INLINE void*   vl_svmdataset_get_map (VlSvmDataset const *self) ;
-VL_INLINE VlSvmDatasetFeatureMap vl_svmdataset_get_map_func (VlSvmDataset const *self) ;
-VL_INLINE vl_size vl_svmdataset_get_mapDim (VlSvmDataset const *self) ;
-/** @} */
-
-/* -------------------------------------------------------------------
- *                                     Inline functions implementation
- * ---------------------------------------------------------------- */
-
-/** ------------------------------------------------------------------
- ** @brief Get Data.
- ** @param self Svm Dataset.
- ** @return data pointer.
- **/
-
-VL_INLINE void*
-vl_svmdataset_get_data (VlSvmDataset const *self)
-{
-  return self->data ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Get Data Dimension.
- ** @param self Svm Dataset.
- ** @return data dimension.
- **/
-
-VL_INLINE vl_size
-vl_svmdataset_get_dimension (VlSvmDataset const *self)
-{
-  return self->dimension ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Get Feature Map Object.
- ** @param self Svm Dataset.
- ** @return feature map.
- **/
-
-VL_INLINE void*
-vl_svmdataset_get_map (VlSvmDataset const *self)
-{
-  return self->map ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Get Feature Map Function.
- ** @param self Svm Dataset.
- ** @return feature map function.
- **/
-
-VL_INLINE VlSvmDatasetFeatureMap
-vl_svmdataset_get_map_func (VlSvmDataset const *self)
-{
-  return self->mapFunc ;
-}
-
-/** ------------------------------------------------------------------
- ** @brief Get Feature Map Dimensionality.
- ** @param self Svm Dataset.
- ** @return feature map dimensionality.
- **/
-
-VL_INLINE vl_size
-vl_svmdataset_get_mapDim (VlSvmDataset const *self)
-{
-  return self->mapDim ;
-}
 /* VL_SVMDATASET_H */
 #endif
 
