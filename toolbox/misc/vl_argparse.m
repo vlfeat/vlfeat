@@ -48,6 +48,9 @@ end
 
 for ai = 1:2:length(args)
   paramName = args{ai} ;
+  if ~ischar(paramName)
+    error('The name of the parameter number %d is not a string.', (ai-1)/2+1) ;
+  end
   value = args{ai+1} ;
   if isfield(conf,paramName)
     conf.(paramName) = value ;
