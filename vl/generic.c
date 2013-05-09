@@ -14,7 +14,7 @@ the terms of the BSD license (see the COPYING file).
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@mainpage VLFeat -- Vision Lab Features Library
+@mainpage Vision Lab Features Library (VLFeat)
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
 @par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
@@ -33,59 +33,58 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 - **Visual feature detectors and descriptors**
-  - @ref sift
-  - @ref dsift
-  - @ref mser
-  - @ref covdet
-  - @ref scalespace
-  - @ref hog
-  - @ref fisher
-  - @ref vlad
+  - @subpage sift
+  - @subpage dsift
+  - @subpage mser
+  - @subpage covdet
+  - @subpage scalespace
+  - @subpage hog
+  - @subpage fisher
+  - @subpage vlad
 
 - **Clustering and indexing**
-  - @ref kmeans
-  - @ref ikmeans.h  "Integer K-means (IKM)"
-  - @ref hikmeans.h "Hierarchical Integer K-means (HIKM)"
-  - @ref gmm
-  - @ref aib
-  - @ref kdtree
-
+  - @subpage kmeans
+  - @subpage ikmeans.h  "Integer K-means (IKM)"
+  - @subpage hikmeans.h "Hierarchical Integer K-means (HIKM)"
+  - @subpage gmm
+  - @subpage aib
+  - @subpage kdtree
 
 - **Segmentation**
-  - @ref homkermap
-  - @ref svm
-  - @ref slic
-  - @ref quickshift
+  - @subpage homkermap
+  - @subpage svm
+  - @subpage slic
+  - @subpage quickshift
 
 - **Statistical methods**
-  - @ref aib
-  - @ref homkermap
-  - @ref svm
+  - @subpage aib
+  - @subpage homkermap
+  - @subpage svm
 
 - **Support functionalities**
-  - @ref host.h      "Platform abstraction"
-  - @ref generic
-  - @ref random
-  - @ref mathop.h    "Math operations"
-  - @ref heap-def.h  "Generic heap object (priority queue)"
-  - @ref stringop.h  "String operations"
-  - @ref imopv.h     "Image operations"
-  - @ref pgm.h       "PGM reading and writing"
-  - @ref rodrigues.h "Rodrigues formula"
-  - @ref mexutils.h  "MATLAB MEX helper functions"
-  - @ref getopt_long.h "Drop-in @c getopt_long replacement"
+  - @subpage host.h      "Platform abstraction"
+  - @subpage generic
+  - @subpage random
+  - @subpage mathop.h    "Math operations"
+  - @subpage heap-def.h  "Generic heap object (priority queue)"
+  - @subpage stringop.h  "String operations"
+  - @subpage imopv.h     "Image operations"
+  - @subpage pgm.h       "PGM reading and writing"
+  - @subpage rodrigues.h "Rodrigues formula"
+  - @subpage mexutils.h  "MATLAB MEX helper functions"
+  - @subpage getopt_long.h "Drop-in @c getopt_long replacement"
 
-- @ref design
-  - @ref design-objects     "Objects"
-  - @ref design-resources   "Memory and resource management"
-  - @ref design-threads     "Multi-threading"
-  - @ref design-portability "Portability"
+- @subpage design
+- @subpage dev
+- @subpage main-glossary
 
-- @ref dev
-- @ref main-glossary
+**/
 
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page design VLFeat design concepts
+@author Andrea Vedaldi
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat is designed to be portable and simple to integrate with high
@@ -97,22 +96,24 @@ the library.
 @section design-resources Memory and resource handling
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Some VLFeat functions return pointers txo memory blocks or
-objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc, or functions
-whose name contains either the keywords @c new or @c copy,
-transfer the ownership of the memory block or object to the
-caller. The caller must dispose explicitly of all the resources he
-owns (by calling ::vl_free for a memory block, or the appropriate
-destructor for an object).
+Some VLFeat functions return pointers to memory blocks or
+objects. Only ::vl_malloc, ::vl_calloc, ::vl_realloc and functions
+whose name contains either the keywords @c new or @c copy transfer the
+ownership of the memory block or object to the caller. The caller must
+dispose explicitly of all the resources it owns (by calling ::vl_free
+for a memory block, or the appropriate deletion function for an
+object).
 
 The memory allocation functions can be customized by
 ::vl_set_alloc_func (which sets the implementations of ::vl_malloc,
 ::vl_realloc, ::vl_calloc and ::vl_free). Remapping the memory
 allocation functions can be done only if there are no currently
-allocated VLFeat memory blocks or objects. The memory allocation
-functions are common to all threads.
+allocated VLFeat memory blocks or objects -- thus typically at the
+very beginning of a program. The memory allocation functions are a
+global property, shared by all threads.
 
-VLFeat uses three rules that simplify handling exceptions:
+VLFeat uses three rules that simplify handling exceptions when used in
+combination which certain environment such as MATLAB.
 
 - The library allocates local memory only through the reprogrammable
   ::vl_malloc, ::vl_calloc, and ::vl_realloc functions.
@@ -127,35 +128,85 @@ VLFeat uses three rules that simplify handling exceptions:
   local object created by the caller and uses the standard C memory
   allocation functions.
 
-In this way, the VLFeat local state can be reset at any time simply
-by disposing of all the memory allocated so far. The latter can be
-done easily by mapping the memory allocation functions to
-implementations that track the memory blocks allocated, and simply
+In this way, the VLFeat local state can be reset at any time simply by
+disposing of all the memory allocated by the library so far. The
+latter can be done easily by mapping the memory allocation functions
+to implementations that track the memory blocks allocated, and then
 disposing of all such blocks. Since the global state does not
 reference any local object nor uses the remapped memory functions, it
-is unaffected by such an operation; conversely, since no VLFeat
-object references anything but memory, this guarantees that all
-allocated resources are properly disposed (no leaks). This is used
-extensively in the design of MATLAB MEX files (see @ref
+is unaffected by such an operation; conversely, since no VLFeat object
+references anything but memory, this guarantees that all allocated
+resources are properly disposed (avoiding leaking resource). This is
+used extensively in the design of MATLAB MEX files (see @ref
 design-matlab).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section design-objects Objects
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Many VLFeat algorithms are availale in the form of
-&ldquo;objects&rdquo;. Notice that the C language, used by VLFeat,
-does not support objects explicitly. Here an object indicates an
-opaque data structure along with a number of functions (methods)
-operationg on it.
+Many VLFeat algorithms are availale in the form of *objects*. The C
+language, used by VLFeat, does not support objects explicitly. Here an
+object is intended a C structure along with a number of functions (the
+object member functions or methods) operationg on it. Ideally, the
+object data structure is kept opaque to the user, for example by
+defining it in the @c .c implementation files which are not accessible
+to the library user.
 
-Object names are captilaised and start with the <code>Vl</code>
-prefix (for example ::VlSiftFilt). Object methods are lowercase and
+Object names are capitalized and start with the <code>Vl</code> prefix
+(for example @c VlExampleObject). Object methods are lowercase and
 start with the <code>vl_<object_name>_</code> suffix
-(e.g. ::vl_sift_new). Object methods typraically include a constructor
-(e.g. ::vl_sift_new), a destructor (::vl_sift_delete), some getter
-methods (::vl_sift_get_octave_index), and some setter methods
-(::vl_sift_set_magnif).
+(e.g. @c vl_example_object_new).
+
+<!-- ------------------------------------------------------------  -->
+@subsection design-objects-lifecycle Object lifecycle
+<!-- ------------------------------------------------------------  -->
+
+Conceptually, an object undergoes four phases during its lifecylce:
+allocation, initialization, finalization, and deallocation:
+
+- **Allocation.** The memory to hold the object structure is allocated.
+  This is usually done by calling a memory allocation function such as
+  ::vl_calloc to reserve an object of the required size @c
+  sizeof(VlExampleObject). Alternatively, the object can simply by
+  allocated on the stack by declaring a local variable of type
+  VlExampleObject.
+- **Initialization.** The object is initialized by assigning a value to
+  its data members and potentially allocating a number of resources,
+  including other objects or memory buffers. Initialization is
+  done by methods containing the @c init keyword, e.g.  @c
+  vl_example_object_init. Several such methods may be provided.
+- **Finalization.** Initialization is undone by finalization, whose main
+  purpose is to release any resource allocated and still owned by the
+  object. Finalization is done by the @c vl_example_object_finalize
+  method.
+- **Deallocation.** The memory holding the object structure is
+  disposed of, for example by calling ::vl_free or automatically when
+  the corresponding local variable is popped from the stack.
+
+In practice, most VlFeat object are supposed to be created on the
+heap. To this end, allocation/initialization and
+finalization/deallocation are combined into two operations:
+
+- **Creating a new object.** This allocates a new object on the heap
+  and initializes it, combining allocation and initialization in a
+  single operation. It is done by methods containing the @c new keyword,
+  e.g. @c vl_example_object_new.
+- **Deleting an object.** This disposes of an object created by a @c
+  new method, combining finalization and deallocation, for example
+  @c vl_example_object_delete.
+
+<!-- ------------------------------------------------------------  -->
+@subsection design-objects-getters-setters Getters and setters
+<!-- ------------------------------------------------------------  -->
+
+Most objects contain a number of methods to get (getters) and set
+(setters) properties. These should contain the @c get and @c set
+keywords in their name, for example
+
+@code
+double x = vl_example_object_get_property () ;
+vl_example_object_set_property(x) ;
+@endcode
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section design-threads Multi-threading
@@ -299,19 +350,44 @@ user, as it is used only internally.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page dev Developing the library
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
+This page contains information useful to the developer of VLFeat.
+ 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section dev-doc Coding style
+@section dev-style Copyright
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+A short copyright notice is added at the beginnign of each file. For
+example:
+ 
+<pre>
+Copyright (C) 2013 Milan Sulc
+Copyright (C) 2012 Daniele Perrone.
+Copyright (C) 2011-13 Andrea Vedaldi.
+All rights reserved.
+ 
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+</pre>
+
+The copyright of each file is assigned to the authors of the file.
+Every author making a substantial contribution to a file should
+note its copyright by adding a line to the copyright list with the year
+of the modification. Year ranges are acceptable. Lines are never
+deleted, only appended, or potentially modified to list
+more years.
+ 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section dev-style Coding style
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 <ul>
 
-<li><b>Develop a sensibility for good-looking code.</b> The coding
-style should be as uniform as possible throughoug the library. The
-style is specified by this set of rules. However, the quality of the
-code can only be guaranteed by a reasonable application of the rules
-and combined with one's eye for good code.</li>
+<li><b>Look at existing code before you start.</b> The general rule
+is: try to match the style of the existing code as much as
+possible.</li>
 
 <li><b>No whitespaces at the end of lines.</b> Whitespaces introduce
 invisible changes in the code that are however picked up by control
@@ -328,9 +404,9 @@ indicate the array with each of the @c numDimensions dimensions.</li>
 <li><b>Short variable names.</b> For indexes in short for loops it is
 fine to use short index names such as @c i, @c j, and @c k. For example:
 
-@code
+<pre>
 for (i = 0 ; i < numEntries ; ++i) values[i] ++ ;
-@endcode
+</pre>
 
 is considered acceptable.</li>
 
@@ -344,16 +420,41 @@ The VLFeat C library code contains its own in documentation <a
 href='http://www.stack.nl/~dimitri/doxygen/'>Doxygen</a> format. The
 documentation consists in generic pages, such as the @ref index
 "index" and the page you are reading, and documentations for each
-specifid library module, usually corresponding to a certain heaader
-file.
+library module, usually corresponding to a certain header file.
 
+- **Inline comments.** Inline Doxygen comments are discouraged except
+  in the documentation of data members of structures. They start with
+  a capital letter and end with a dot. For example:
+  @code
+  struct VlExampleStructure {
+    int aMember ; /\*\*< A useful data member. 
+  }
+  @endcode
+ 
+- **Brief comments.** Brief Doxygen comments starts by a capital
+  and end with a period. The documentation of all functions start
+  with a brief comment.
+ 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection devl-doc-modules Documenting the library modules
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 A library module groups a number of data types and functions that
-implement a certain functionaltiy of VLFeat. Consider a module called
-<em>Example Module</em>. Then one would typically have:
+implement a certain functionaltiy of VLFeat. The documentation of a
+library module is generally organized as follows:
+
+1. A page introducing the module and including a getting started
+   section (3.g. @ref svm-starting) containing a short tutorial to
+   quickly familiarize the user with the module (e.g. @ref svm).
+2. One or more pages of detailed technical background discussing the
+   algorithms implemented. These sections are used not just as part of
+   the C API, but also as documentation for other APIs such as MATLAB
+   (e.g. @ref svm-fundamentals).
+3. One or more pages with the structure and function documentation
+   (e.g. @ref svm.h).
+
+More in detail, consider a module called <em>Example Module</em>. Then one would
+typically have:
 
 <ul>
 <li>A header or declaration file @c example-module.h. Such a file has an
@@ -380,8 +481,27 @@ brief comment.
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection devl-doc-functions Documenting the library functions
+@subsection devl-doc-functions Documenting functions
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection devl-doc-structures Documenting structures
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection devl-doc-structures Documenting objects
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+As seen in @ref design-objects, VLFeat treats certain structures with
+an object-like semantics. Usually, a module defines exactly one such
+objects. In this case, the object member functions should be grouped
+(by using Doxygen grouping functionality) as
+
+- **Construct and destroy** for the @c vl_object_new, @c
+    vl_object_delete and similar member functions.
+- **Set parameters** for setter functions.
+- **Retrieve parameters and data** for getter functions.
+- **Process data** for functions processing data.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection devl-doc-bib Bibliographic references

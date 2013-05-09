@@ -24,12 +24,12 @@ the terms of the BSD license (see the COPYING file).
 #include <assert.h>
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.16"
+#define VL_VERSION_STRING "0.9.17"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024
 
-/** @name Type identidifers for atomic data types
+/** @name Type identifiers for atomic data types
  ** @{ */
 
 #define VL_TYPE_FLOAT   1     /**< @c float type */
@@ -97,12 +97,8 @@ vl_get_type_size (vl_type type)
   }
   return dataSize ;
 }
-
 /** @} */
 
-
-
-/** @internal @brief VLFeat global state */
 
 VL_EXPORT char const * vl_get_version_string () ;
 VL_EXPORT char * vl_configuration_to_string_copy () ;
@@ -115,12 +111,9 @@ VL_EXPORT vl_size vl_get_num_threads () ;
 VL_EXPORT vl_size vl_get_max_num_threads () ;
 VL_EXPORT VlRand * vl_get_rand () ;
 
-/** @} */
-
 /** ------------------------------------------------------------------
  ** @name Error handling
  ** @{ */
-
 #define VL_ERR_OK       0  /**< No error */
 #define VL_ERR_OVERFLOW 1  /**< Buffer overflow error */
 #define VL_ERR_ALLOC    2  /**< Resource allocation error */
@@ -175,14 +168,14 @@ VL_EXPORT printf_func_t vl_get_printf_func () ;
  ** @name Common operations
  ** @{ */
 
-/** @brief Min operation
+/** @brief Compute the minimum between two values
  ** @param x value
  ** @param y value
  ** @return the minimum of @a x and @a y.
  **/
 #define VL_MIN(x,y) (((x)<(y))?(x):(y))
 
-/** @brief Max operation
+/** @brief Compute the maximum between two values
  ** @param x value.
  ** @param y value.
  ** @return the maximum of @a x and @a y.
@@ -190,13 +183,11 @@ VL_EXPORT printf_func_t vl_get_printf_func () ;
 #define VL_MAX(x,y) (((x)>(y))?(x):(y))
 
 /** @brief Signed left shift operation
- **
- ** The macro is equivalent to the builtin @c << operator, but it
- ** supports negative shifts too.
- **
  ** @param x value.
  ** @param n number of shift positions.
  ** @return @c x << n .
+ ** The macro is equivalent to the builtin @c << operator, but it
+ ** supports negative shifts too.
  **/
 #define VL_SHIFT_LEFT(x,n) (((n)>=0)?((x)<<(n)):((x)>>-(n)))
 /* @} */
