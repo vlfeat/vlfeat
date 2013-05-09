@@ -9,11 +9,11 @@
 %   WEIGHTS cointains individual weights of estimated gaussians in a 
 %   NUMCLUSTERS long one row vector.
 %
-%   [MEANS, SIGMAS, WEIGHTS, LL] = VL_GMM(...) returns the loglikelyhood 
+%   [MEANS, SIGMAS, WEIGHTS, LL] = VL_GMM(...) returns the loglikelihood 
 %   (LL) of the solution as well.
 %
 %   [MEANS, SIGMAS, WEIGHTS, LL, POSTERIORS] = VL_GMM(...) returns the 
-%   loglikelyhood of the solution and posterior probabilities of the 
+%   loglikelihood of the solution and posterior probabilities of the 
 %   correspondeces of individual data points to specific clusters. 
 %   POSTERIORS matrix has NUMCLUSTERS rows and NUMDATA columns.
 %   Each column contains the set of posteriors of a data point to a
@@ -49,7 +49,7 @@
 %
 %   NumRepetitions:: [1]
 %     Number of times to restart EM. The solution with maximal
-%     loglikelyhood is returned.
+%     loglikelihood is returned.
 %
 %   SigmaBound:: [10e-6]
 %     Set the lower bound on sigma diagonals. Suitable when data contains

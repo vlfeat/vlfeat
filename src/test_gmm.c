@@ -141,7 +141,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 //    VL_PRINT("posterior:\n");
 //    for(cIdx = 0; cIdx < clusterNum; cIdx++){
 //        for(dataIdx = 0; dataIdx < Ndata; dataIdx++){
-//            VL_PRINT("%f ",((float*)gmm->posteriors)[cIdx*Ndata+dataIdx]);
+//            VL_PRINT("%f ",((float*)posteriors)[cIdx*Ndata+dataIdx]);
 //        }
 //        VL_PRINT("\n");
 //    }
@@ -149,7 +149,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 //  VL_PRINT("mean:\n");
 //  for(cIdx = 0; cIdx < numClusters; cIdx++) {
 //    for(d = 0; d < dimension; d++) {
-//      VL_PRINT("%f ",((TYPE*)gmm->means)[cIdx*dimension+d]);
+//      VL_PRINT("%f ",((TYPE*)means)[cIdx*dimension+d]);
 //    }
 //    VL_PRINT("\n");
 //  }
@@ -157,14 +157,14 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 //  VL_PRINT("sigma:\n");
 //  for(cIdx = 0; cIdx < numClusters; cIdx++) {
 //    for(d = 0; d < dimension; d++) {
-//      VL_PRINT("%f ",((TYPE*)gmm->sigmas)[cIdx*dimension+d]);
+//      VL_PRINT("%f ",((TYPE*)sigmas)[cIdx*dimension+d]);
 //    }
 //    VL_PRINT("\n");
 //  }
 //
 //  VL_PRINT("w:\n");
 //  for(cIdx = 0; cIdx < numClusters; cIdx++) {
-//    VL_PRINT("%f ",((TYPE*)gmm->weights)[cIdx]);
+//    VL_PRINT("%f ",((TYPE*)weights)[cIdx]);
 //    VL_PRINT("\n");
 //  }
 
@@ -191,9 +191,9 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     vl_fisher_encode
     (VL_F_TYPE,
      data,
-     gmm->means,
-     gmm->sigmas,
-     gmm->weights,
+     vl_gmm_get_means(gmm),
+     vl_gmm_get_sigmas(gmm),
+     vl_gmm_get_weights(gmm),
      enc,
      dimension,
      numData,
@@ -215,7 +215,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     vl_vlad_encode
     (VL_F_TYPE,
      data,
-     gmm->means,
+     vl_gmm_get_means(gmm),
      assign,
      enc,
      dimension,
@@ -243,16 +243,24 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
 
   vl_size d, cIdx;
   vl_uindex i_d;
+  
+  vl_size dimension = vl_gmm_get_dimension(gmm) ;
+  vl_size numClusters = vl_gmm_get_num_clusters(gmm) ;
+  vl_type dataType = vl_gmm_get_data_type(gmm) ;
+  double const * sigmas = vl_gmm_get_sigmas(gmm) ;
+  double const * means = vl_gmm_get_means(gmm) ;
+  double const * weights = vl_gmm_get_weights(gmm) ;
+  double const * posteriors = vl_gmm_get_posteriors(gmm) ;
 
   ofp = fopen(dataFileData, mode);
   for(i_d = 0; i_d < numData; i_d++) {
-    if(gmm->dataType == VL_TYPE_DOUBLE) {
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((double*)data)[i_d * gmm->dimension + d]);
+    if(vl_gmm_get_data_type(gmm) == VL_TYPE_DOUBLE) {
+      for(d = 0; d < vl_gmm_get_dimension(gmm) ; d++) {
+        fprintf(ofp, "%f ", ((double*)data)[i_d * vl_gmm_get_dimension(gmm) + d]);
       }
     } else {
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((float*) data)[i_d * gmm->dimension + d]);
+      for(d = 0; d < vl_gmm_get_dimension(gmm); d++) {
+        fprintf(ofp, "%f ", ((float*) data)[i_d * vl_gmm_get_dimension(gmm) + d]);
       }
     }
     fprintf(ofp, "\n");
@@ -260,29 +268,29 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
   fclose (ofp);
 
   ofp = fopen(dataFileResults, mode);
-  for(cIdx = 0; cIdx < gmm->numClusters; cIdx++) {
-    if(gmm->dataType == VL_TYPE_DOUBLE) {
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((double*)gmm->means)[cIdx*gmm->dimension+d]);
+  for(cIdx = 0; cIdx < numClusters; cIdx++) {
+    if(dataType == VL_TYPE_DOUBLE) {
+      for(d = 0; d < vl_gmm_get_dimension(gmm); d++) {
+        fprintf(ofp, "%f ", ((double*)means)[cIdx*dimension+d]);
       }
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((double*)gmm->sigmas)[cIdx*gmm->dimension+d]);
+      for(d = 0; d < dimension; d++) {
+        fprintf(ofp, "%f ", ((double*)sigmas)[cIdx*dimension+d]);
       }
-      fprintf(ofp, "%f ", ((double*)gmm->weights)[cIdx]);
-      for(i_d = 0; i_d < gmm->numData; i_d++) {
-        fprintf(ofp, "%f ", ((double*)gmm->posteriors)[cIdx*gmm->numData + i_d]);
+      fprintf(ofp, "%f ", ((double*)weights)[cIdx]);
+      for(i_d = 0; i_d < numData; i_d++) {
+        fprintf(ofp, "%f ", ((double*)posteriors)[cIdx*numData + i_d]);
       }
       fprintf(ofp, "\n");
     } else {
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((float*)gmm->means)[cIdx*gmm->dimension+d]);
+      for(d = 0; d < dimension; d++) {
+        fprintf(ofp, "%f ", ((float*)means)[cIdx*dimension+d]);
       }
-      for(d = 0; d < gmm->dimension; d++) {
-        fprintf(ofp, "%f ", ((float*)gmm->sigmas)[cIdx*gmm->dimension+d]);
+      for(d = 0; d < dimension; d++) {
+        fprintf(ofp, "%f ", ((float*)sigmas)[cIdx*dimension+d]);
       }
-      fprintf(ofp, "%f ", ((float*)gmm->weights)[cIdx]);
-      for(i_d = 0; i_d < gmm->numData; i_d++) {
-        fprintf(ofp, "%f ", ((float*)gmm->posteriors)[cIdx*gmm->numData + i_d]);
+      fprintf(ofp, "%f ", ((float*)weights)[cIdx]);
+      for(i_d = 0; i_d < numData; i_d++) {
+        fprintf(ofp, "%f ", ((float*)posteriors)[cIdx*numData + i_d]);
 
       }
       fprintf(ofp, "\n");

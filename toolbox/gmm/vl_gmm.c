@@ -453,15 +453,15 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       abort() ;
     }
 
-    mexPrintf("gmm: initialization = %s\n", initializationName) ;
-    mexPrintf("gmm: multithreading = %s\n", multithreadingName) ;
-    mexPrintf("gmm: maxNumIterations = %d\n", vl_gmm_get_max_num_iterations(gmm)) ;
-    mexPrintf("gmm: numRepetitions = %d\n", vl_gmm_get_num_repetitions(gmm)) ;
-    mexPrintf("gmm: dataType = %s\n", vl_get_type_name(vl_gmm_get_data_type(gmm))) ;
-    mexPrintf("gmm: dataDimension = %d\n", dimension) ;
-    mexPrintf("gmm: num. data points = %d\n", numData) ;
-    mexPrintf("gmm: num. centers = %d\n", numClusters) ;
-    mexPrintf("gmm: lower bound on sigma = %f\n", vl_gmm_get_sigma_lower_bound(gmm)) ;
+    mexPrintf("vl_gmm: initialization = %s\n", initializationName) ;
+    mexPrintf("vl_gmm: multithreading = %s\n", multithreadingName) ;
+    mexPrintf("vl_gmm: maxNumIterations = %d\n", vl_gmm_get_max_num_iterations(gmm)) ;
+    mexPrintf("vl_gmm: numRepetitions = %d\n", vl_gmm_get_num_repetitions(gmm)) ;
+    mexPrintf("vl_gmm: dataType = %s\n", vl_get_type_name(vl_gmm_get_data_type(gmm))) ;
+    mexPrintf("vl_gmm: dataDimension = %d\n", dimension) ;
+    mexPrintf("vl_gmm: num. data points = %d\n", numData) ;
+    mexPrintf("vl_gmm: num. centers = %d\n", numClusters) ;
+    mexPrintf("vl_gmm: lower bound on sigma = %f\n", vl_gmm_get_sigma_lower_bound(gmm)) ;
     mexPrintf("\n") ;
   }
 
@@ -489,7 +489,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vl_gmm_get_weights (gmm),
           vl_get_type_size (dataType) * vl_gmm_get_num_clusters(gmm)) ;
 
-  /* optionally return loglikelyhood */
+  /* optionally return loglikelihood */
   if (nout > 3)
   {
     OUT(LL) = vlmxCreatePlainScalar (LL) ;
