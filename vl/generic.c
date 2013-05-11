@@ -953,7 +953,7 @@ vl_cpu_has_sse2 ()
 
 /* ---------------------------------------------------------------- */
 
-/** @brief Get number of threads used for parallel computations
+/** @brief Get the number of threads available for parallel computations
  ** @return number of threads.
  **
  ** This function returns the default number of threads used for
@@ -970,25 +970,25 @@ vl_get_num_threads()
   return vl_get_state()->numThreads ;
 }
 
-/** @brief Get the maximum number of threads for parallel computations
+/** @brief Get the maximum number of threads that the machine supports
  ** @return number of threads.
  **
  ** This function returns the maximum number of threads that can be used
- ** for parallel computations. Normally, it equals the number of cores
- ** in the host.
+ ** for parallel computations. Normally, it equals the number of processor
+ ** cores of the host.
  **/
 
 vl_size
 vl_get_max_num_threads()
 {
 #if defined(_OPENMP)
-  return (vl_size) omp_get_max_threads() ;
+  return (vl_size) omp_get_num_procs() ;
 #else
   return 1 ;
 #endif
 }
 
-/** @brief Set the number of threads to be used in parallel computations
+/** @brief Set the number of threads available for parallel computations
  ** @param numThreads number of threads to use.
  ** @return actual number of threads set.
  **
@@ -1005,6 +1005,7 @@ vl_set_num_threads(vl_size numThreads)
 #if defined(_OPENMP)
   omp_set_num_threads((int)num) ;
 #endif
+  vl_get_state()->numThreads = num ;
   return num ;
 }
 

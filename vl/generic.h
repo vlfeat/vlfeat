@@ -109,6 +109,7 @@ VL_EXPORT vl_bool vl_cpu_has_sse2 () ;
 VL_EXPORT vl_size vl_get_num_cpus () ;
 VL_EXPORT vl_size vl_get_num_threads () ;
 VL_EXPORT vl_size vl_get_max_num_threads () ;
+VL_EXPORT vl_size vl_set_num_threads (vl_size n) ;
 VL_EXPORT VlRand * vl_get_rand () ;
 
 /** ------------------------------------------------------------------
