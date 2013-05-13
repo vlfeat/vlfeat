@@ -35,11 +35,29 @@ typedef OPAQUE VlSvm ;
 #endif
 
 /** @brief Type of SVM solver */
-typedef enum 
+typedef enum
 {
-  VlSvmSolverSgd = 1, /**< SGD algorithm (@ref svm-sgd). */
-  VlSvmSolverSdca     /**< SDCA algorithm (@ref svm-sdca). */
+  VlSvmSolverNone = 0, /**< No solver (used to evaluate an SVM). */
+  VlSvmSolverSgd = 1,  /**< SGD algorithm (@ref svm-sgd). */
+  VlSvmSolverSdca      /**< SDCA algorithm (@ref svm-sdca). */
 } VlSvmSolverType ;
+
+/** @brief Type of SVM loss
+ **
+ ** Default SVM loss types. The loss can be set by using ::vl_svm_set_loss.
+ ** Note that custom losses can be used too by using ::vl_svm_set_loss_function,
+ ** ::vl_svm_set_loss_derivative_function, etc.
+ **
+ ** @sa svm-loss-functions
+ **/
+typedef enum
+{
+  VlSvmLossHinge = 0,   /**< Standard hinge loss. */
+  VlSvmLossHinge2 = 1,  /**< Hinge loss squared. */
+  VlSvmLossL1,          /**< L1 loss. */
+  VlSvmLossL2,          /**< L2 loss. */
+  VlSvmLossLogistic     /**< Logistic loss. */
+} VlSvmLossType ;
 
 /** @brief Solver status */
 typedef enum
@@ -66,7 +84,7 @@ typedef struct VlSvmStatistics_ {
   double dualLoss ;             /**< Dual loss value. */
   double dualityGap ;           /**< Duality gap = objective - dualObjective. */
   double scoresVariation ;      /**< Variance of the score updates. */
-  double elapsedTime ;          /**< Time elapsed from the start of training. */  
+  double elapsedTime ;          /**< Time elapsed from the start of training. */
 } VlSvmStatistics ;
 
 /** @name Create and destroy
@@ -99,6 +117,7 @@ VL_EXPORT VlSvmStatistics const * vl_svm_get_statistics (VlSvm const *self) ;
 VL_EXPORT double const * vl_svm_get_model (VlSvm const *self) ;
 VL_EXPORT double vl_svm_get_bias (VlSvm const *self) ;
 VL_EXPORT vl_size vl_svm_get_dimension (VlSvm *self) ;
+VL_EXPORT vl_size vl_svm_get_num_data (VlSvm *self) ;
 VL_EXPORT double vl_svm_get_epsilon (VlSvm const *self) ;
 VL_EXPORT double vl_svm_get_bias_learning_rate (VlSvm const *self) ;
 VL_EXPORT vl_size vl_svm_get_max_num_iterations (VlSvm const *self) ;
@@ -107,6 +126,7 @@ VL_EXPORT VlSvmSolverType vl_svm_get_solver (VlSvm const *self) ;
 VL_EXPORT double vl_svm_get_bias_multiplier (VlSvm const *self) ;
 VL_EXPORT double vl_svm_get_lambda (VlSvm const *self) ;
 VL_EXPORT vl_size vl_svm_get_iteration_number (VlSvm const *self) ;
+VL_EXPORT double const * vl_svm_get_scores (VlSvm const *self) ;
 /** @} */
 
 /** @name Set parameters
@@ -126,6 +146,7 @@ VL_EXPORT void vl_svm_set_loss_derivative_function (VlSvm *self, VlSvmLossFuncti
 VL_EXPORT void vl_svm_set_conjugate_loss_function (VlSvm *self, VlSvmLossFunction f) ;
 VL_EXPORT void vl_svm_set_dca_update_function (VlSvm *self, VlSvmDcaUpdateFunction f) ;
 VL_EXPORT void vl_svm_set_data_functions (VlSvm *self, VlSvmInnerProductFunction inner, VlSvmAccumulateFunction acc) ;
+VL_EXPORT void vl_svm_set_loss (VlSvm *self, VlSvmLossType loss) ;
 /** @} */
 
 /** @name Process data
@@ -148,6 +169,18 @@ VL_EXPORT double vl_svm_hinge2_loss (double label, double inner) ;
 VL_EXPORT double vl_svm_hinge2_loss_derivative (double label, double inner) ;
 VL_EXPORT double vl_svm_hinge2_conjugate_loss (double label, double alpha) ;
 VL_EXPORT double vl_svm_hinge2_dca_update (double inner, double norm2, double label, double alpha) ;
+
+/* square l1 */
+VL_EXPORT double vl_svm_l1_loss (double label, double inner) ;
+VL_EXPORT double vl_svm_l1_loss_derivative (double label, double inner) ;
+VL_EXPORT double vl_svm_l1_conjugate_loss (double label, double alpha) ;
+VL_EXPORT double vl_svm_l1_dca_update (double inner, double norm2, double label, double alpha) ;
+
+/* square l2 */
+VL_EXPORT double vl_svm_l2_loss (double label, double inner) ;
+VL_EXPORT double vl_svm_l2_loss_derivative (double label, double inner) ;
+VL_EXPORT double vl_svm_l2_conjugate_loss (double label, double alpha) ;
+VL_EXPORT double vl_svm_l2_dca_update (double inner, double norm2, double label, double alpha) ;
 /** } */
 
 /* VL_SVM_H */

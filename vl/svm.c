@@ -9,9 +9,9 @@
 Copyright (C) 2013 Milan Sulc.
 Copyright (C) 2012 Daniele Perrone.
 Copyright (C) 2011-13 Andrea Vedaldi.
- 
+
 All rights reserved.
- 
+
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
@@ -41,10 +41,10 @@ loss.
 Information on SVMs and the corresponding optimization algorithms as
 implemented by VLFeat are given in:
 
-- @ref svm-fundamentals - Linear SVMs and their learning.
-- @ref svm-advanced - Loss functions, dual objective, and other details.
-- @ref svm-sgd - The SGD algorithm.
-- @ref svm-sdca - The SDCA algorithm.
+- @subpage svm-fundamentals - Linear SVMs and their learning.
+- @subpage svm-advanced - Loss functions, dual objective, and other details.
+- @subpage svm-sgd - The SGD algorithm.
+- @subpage svm-sdca - The SDCA algorithm.
 
 <!-- ------------------------------------------------------------- -->
 @section svm-starting Getting started
@@ -71,7 +71,7 @@ int main()
   double lambda = 0.01;
   double * const model ;
   double bias ;
- 
+
   VlSvm * svm = vl_svm_new(VlSvmSolverSgd,
                            x, dimension, numData,
                            y,
@@ -85,25 +85,25 @@ int main()
          model[0],
          model[1],
          bias);
- 
+
   vl_svm_delete(svm) ;
   return 0;
 }
 @endcode
- 
+
 This code leanrs a binary linear SVM using the SGD algorithm on
 four two-dimensional points using 0.01 as regularization parameter.
 
 ::VlSvmSolverSdca can be specified in place ov ::VlSvmSolverSdca
 in orer to use the SDCA algorithm instead.
- 
+
 Convergence and other diagnostic information can be obtained after
 training by using the ::vl_svm_get_statistics function. Algorithms
 regularly check for convergence (usally after each pass over the data).
 The ::vl_svm_set_diagnostic_function can be used to specify a callback
 to be invoked when diagnostic is run. This can be used, for example,
 to dump information on the screen as the algorithm progresses.
- 
+
 Convergence is reached after a maximum number of iteratiosn
 (::vl_svm_set_max_num_iterations) or after a given criterion falls
 below a threshodl (::vl_svm_set_epsilon). The meaning of these
@@ -113,12 +113,12 @@ may depend on the specific algorithm (see @ref svm for further details).
 inner product and accumulation operation on the data (see @ref svm-advanced).
 This is used to abstract form the data type and support almost anything
 by speciying just two functions (::vl_svm_set_data_functions).
- 
+
 A simple interface to this advanced functionality is provided by the
 ::VlSvmDataset object. This supports natively @c float and @c double
 data types, as well as applying on the fly the homogeneous kernel map
 (@ref homkermap). This is exemplified in @ref svmdataset-starting.
- 
+
 */
 
 /**
@@ -171,7 +171,7 @@ parameter $\lambda$ yields the *regularized loss objective*
 
 @f{equation}{
 \boxed{\displaystyle
-E(\bw) =  \frac{\lambda}{2} \left\| \bw \right\|^2 
+E(\bw) =  \frac{\lambda}{2} \left\| \bw \right\|^2
 + \frac{1}{n} \sum_{i=1}^n \max\{0, 1 - y_i \langle \bw,\bx\rangle\}.
 \label{e:svm-primal-hinge}
 }
@@ -438,14 +438,9 @@ y_i u, & -1 \leq y_i u \leq 0, \\
 <td>$\max\{0, 1-y_i z\}^2$</td>
 <td>\[\ell_i^*(u) =
 \begin{cases}
-\frac{u^2}{4} + y_i u, & y_i u \leq 0, \\
+y_i u + \frac{u^2}{4}, & y_i u \leq 0, \\
 +\infty, & \text{otherwise} \\
 \end{cases}\]</td>
-</tr>
-<tr>
-<td>Square or l2</td>
-<td>$(y_i - z)^2$</td>
-<td>\[\ell_i^*(u)=yu - \frac{u^2}{4}\]</td>
 </tr>
 <tr>
 <td>Linear or l1</td>
@@ -457,6 +452,11 @@ y_i u, & -1 \leq y_i u \leq 1, \\
 \end{cases}\]</td>
 </tr>
 <tr>
+<tr>
+<td>Square or l2</td>
+<td>$(y_i - z)^2$</td>
+<td>\[\ell_i^*(u)=y_iu + \frac{u^2}{4}\]</td>
+</tr>
 <td>Insensitive l1</td>
 <td>$\max\{0, |y_i - z| - \epsilon\}$.</td>
 <td></td>
@@ -511,7 +511,7 @@ duality):
 D(\balpha^*) = P(\bw^*) = P(\bw(\balpha^*)),
 \quad \bw^* = \bw(\balpha^*).
 \]
- 
+
 <!-- ------------------------------------------------------------- -->
 @section svm-C Parametrization in C
 <!-- ------------------------------------------------------------- -->
@@ -568,7 +568,7 @@ In its most basic form, the *SDCA algorithm* can be summarized as follows:
   - Update $\balpha_{t+1} = \balpha_{t} + \be_q \Delta\alpha_q$.
 
 In VLFeat, we partially use the nomenclature from @cite{shwartz13a-dual} and @cite{hsieh08a-dual}.
- 
+
 <!-- ------------------------------------------------------------- -->
 @section svm-sdca-dual-max Dual coordinate maximization
 <!-- ------------------------------------------------------------- -->
@@ -756,18 +756,18 @@ so that $b = B \bw_b$ As noted, the bias multiplier should be
 relatively large in order to avoid shrinking the bias towards zero,
 but small to make the optimization stable. In particular, setting $B$
 to zero learns an unbiased SVM (::vl_svm_set_bias_multiplier).
- 
+
 To counter instability caused by a large bias multiplier, the learning
 rate of the bias is slowed down by multiplying the overall learning
 rate $\eta_t$ by a bias-specific rate coefficient
 (::vl_svm_set_bias_learning_rate).
- 
+
 As a rule of thumb, if the data vectors $\bx$ are $l^2$ normalized (as
 they typically should for optimal performance), then a reasonable bias
 multiplier is in the range 1 to 10 and a reasonable bias learning rate
 is somewhere in the range of the inverse of that (in this manner the
 two parts of the extended feature vector $(\bx, B)$ are balanced).
- 
+
 <!-- ------------------------------------------------------------- -->
 @section svm-sgd-starting-iteration Adjusting the learning rate
 <!-- ------------------------------------------------------------- -->
@@ -824,16 +824,16 @@ for $\bu_t$
 \bu_{t+1} = \bu_{t} - \frac{\eta_t}{f_{t+1}} \bg_t.
 \]
 but this step can be skipped whenever $\bg_t$ is equal to zero.
- 
+
 When the bias component has a different learning rate, this scheme
 must be adjusted slightly by adding a separated factor for the bias,
 but it is otherwise identical.
 
- 
+
 **/
 
 /*
- 
+
 <!-- ------------------------------------------------------------ --->
 @section svm-pegasos PEGASOS
 <!-- ------------------------------------------------------------ --->
@@ -923,20 +923,20 @@ or the memory is limited.
 
 struct VlSvm_ {
   VlSvmSolverType solver ;      /**< SVM solver type. */
-  
+
   vl_size dimension ;           /**< Model dimension. */
   double * model ;              /**< Model ($\bw$ vector). */
   double bias ;                 /**< Bias. */
   double biasMultiplier ;       /**< Bias feature multiplier. */
-  
+
   /* valid during a run */
   double lambda ;               /**< Regularizer multiplier. */
   void const * data ;
   vl_size numData ;
   double const * labels ;
-  
+
   VlSvmDataset * ownDataset ;   /**< Optional owned dataset. */
-  
+
   VlSvmDiagnosticFunction diagnosticFn ;
   void * diagnosticFnData ;
   vl_size diagnosticFrequency ; /**< Frequency of diagnostic. */
@@ -947,15 +947,18 @@ struct VlSvm_ {
   VlSvmDcaUpdateFunction dcaUpdateFn ;
   VlSvmInnerProductFunction innerProductFn ;
   VlSvmAccumulateFunction accumulateFn ;
-  
+
   vl_size iteration ;           /**< Current iterations number. */
   vl_size maxNumIterations ;    /**< Maximum number of iterations. */
   double epsilon ;              /**< Stopping threshold. */
+
+  /* Book keeping */
   VlSvmStatistics statistics ;  /**< Statistcs. */
-    
+  double * scores ;
+
   /* SGD specific */
   double  biasLearningRate ;    /**< Bias learning rate. */
-  
+
   /* SDCA specific */
   double * alpha ;              /**< Dual variables. */
 } ;
@@ -968,7 +971,7 @@ struct VlSvm_ {
  ** @param dimension dimension of the SVM model.
  ** @param numData number of training samples.
  ** @param labels training labels.
- ** @param lambda regularizer parameter. 
+ ** @param lambda regularizer parameter.
  ** @return the new object.
  **
  ** @a data has one column per sample, in @c double format.
@@ -1048,41 +1051,41 @@ vl_svm_new_with_abstract_data (VlSvmSolverType solver,
   assert(dimension >= 1) ;
   assert(numData >= 1) ;
   assert(labels) ;
-  
+
   self->solver = solver ;
-  
+
   self->dimension = dimension ;
   self->model = 0 ;
   self->bias = 0 ;
   self->biasMultiplier = 1.0 ;
-  
+
   self->lambda = lambda ;
   self->data = data ;
   self->numData = numData ;
   self->labels = labels ;
-  
+
   self->diagnosticFrequency = numData ;
   self->diagnosticFn = 0 ;
   self->diagnosticFnData = 0 ;
-  
+
   self->lossFn = vl_svm_hinge_loss ;
   self->conjugateLossFn = vl_svm_hinge_conjugate_loss ;
   self->lossDerivativeFn = vl_svm_hinge_loss_derivative ;
   self->dcaUpdateFn = vl_svm_hinge_dca_update ;
-    
+
   self->innerProductFn = 0 ;
   self->accumulateFn = 0 ;
-  
+
   self->iteration = 0 ;
   self->maxNumIterations = VL_MAX((double)numData, vl_ceil_f(10.0 / lambda)) ;
   self->epsilon = 1e-2 ;
-  
+
   /* SGD */
   self->biasLearningRate = 0.01 ;
-  
+
   /* SDCA */
   self->alpha = 0 ;
-  
+
   /* allocations */
   self->model = vl_calloc(dimension, sizeof(double)) ;
   if (self->model == NULL) goto err_alloc ;
@@ -1092,9 +1095,16 @@ vl_svm_new_with_abstract_data (VlSvmSolverType solver,
     if (self->alpha == NULL) goto err_alloc ;
   }
 
+  self->scores = vl_calloc(numData, sizeof(double)) ;
+  if (self->scores == NULL) goto err_alloc ;
+
   return self ;
-  
+
 err_alloc:
+  if (self->scores) {
+    vl_free (self->scores) ;
+    self->scores = 0 ;
+  }
   if (self->model) {
     vl_free (self->model) ;
     self->model = 0 ;
@@ -1338,6 +1348,19 @@ vl_size vl_svm_get_dimension (VlSvm *self)
   return self->dimension ;
 }
 
+/** @brief Get the number of data samples.
+ ** @param self object.
+ ** @return model number of data samples
+ **
+ ** This is the dimensionality of the weight vector $\bw$.
+ **/
+
+vl_size vl_svm_get_num_data (VlSvm *self)
+{
+  assert(self) ;
+  return self->numData ;
+}
+
 /** @brief Get the SVM model.
  ** @param self object.
  ** @return model.
@@ -1354,7 +1377,7 @@ double const * vl_svm_get_model (VlSvm const *self)
 /** @brief Set the SVM model.
  ** @param self object.
  ** @param model model.
- ** 
+ **
  ** The function *copies* the content of the vector @a model to the
  ** internal model buffer. This operation can be used for warm start
  ** with the SGD algorithm, but has undefined effect with the SDCA algorithm.
@@ -1389,7 +1412,8 @@ void vl_svm_set_bias (VlSvm *self, double b)
  ** @param self object.
  ** @return bias $b$.
  **
- ** The bias multiplier is applied before returning the bias value.
+ ** The value of the bias returned already include the effect of
+ ** bias mutliplier.
  **/
 
 double vl_svm_get_bias (VlSvm const *self)
@@ -1408,6 +1432,21 @@ VlSvmStatistics const * vl_svm_get_statistics (VlSvm const *self)
   assert(self) ;
   return &self->statistics ;
 }
+
+/** @brief Get the scores of the data points.
+ ** @param self object.
+ ** @return vector of scores.
+ **
+ ** After training or during the diagnostic callback,
+ ** this function can be used to retrieve the scores
+ ** of the points, i.e. $\langle \bx_i, \bw \rangle + b$.
+ **/
+
+double const * vl_svm_get_scores (VlSvm const *self)
+{
+  return self->scores ;
+}
+
 
 /* ---------------------------------------------------------------- */
 /*                                                        Callbacks */
@@ -1455,6 +1494,77 @@ void vl_svm_set_data_functions (VlSvm *self, VlSvmInnerProductFunction inner, Vl
   assert(acc) ;
   self->innerProductFn = inner ;
   self->accumulateFn = acc ;
+}
+
+/** @brief Set the loss function callback.
+ ** @param self object.
+ ** @param f loss function callback.
+ **
+ ** Note that setting up a loss requires specifying more than just one
+ ** callback. See @ref svm-loss-functions for details.
+ **/
+
+void vl_svm_set_loss_function (VlSvm *self, VlSvmLossFunction f)
+{
+  assert(self) ;
+  self->lossFn = f ;
+}
+
+/** @brief Set the loss derivative function callback.
+ ** @copydetails vl_svm_set_loss_function.
+ **/
+
+void vl_svm_set_loss_derivative_function (VlSvm *self, VlSvmLossFunction f)
+{
+  assert(self) ;
+  self->lossDerivativeFn = f ;
+}
+
+/** @brief Set the conjugate loss function callback.
+ ** @copydetails vl_svm_set_loss_function.
+ **/
+
+void vl_svm_set_conjugate_loss_function (VlSvm *self, VlSvmLossFunction f)
+{
+  assert(self) ;
+  self->conjugateLossFn = f ;
+}
+
+/** @brief Set the DCA update function callback.
+ ** @copydetails vl_svm_set_loss_function.
+ **/
+
+void vl_svm_set_dca_update_function (VlSvm *self, VlSvmDcaUpdateFunction f)
+{
+  assert(self) ;
+  self->dcaUpdateFn = f ;
+}
+
+/** @brief Set the loss function to one of the default types.
+ ** @param self object.
+ ** @param loss type of loss function.
+ ** @sa @ref svm-loss-functions.
+ **/
+
+void
+vl_svm_set_loss (VlSvm *self, VlSvmLossType loss)
+{
+#define SETLOSS(x,y) \
+case VlSvmLoss ## x: \
+  vl_svm_set_loss_function(self, vl_svm_ ## y ## _loss) ; \
+  vl_svm_set_loss_derivative_function(self, vl_svm_ ## y ## _loss_derivative) ; \
+  vl_svm_set_conjugate_loss_function(self, vl_svm_ ## y ## _conjugate_loss) ; \
+  vl_svm_set_dca_update_function(self, vl_svm_ ## y ## _dca_update) ; \
+  break;
+
+  switch (loss) {
+      SETLOSS(Hinge, hinge) ;
+      SETLOSS(Hinge2, hinge2) ;
+      SETLOSS(L1, l1) ;
+      SETLOSS(L2, l2) ;
+    default:
+      assert(0) ;
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -1537,8 +1647,8 @@ vl_svm_hinge2_loss (double inner,double label)
 double
 vl_svm_hinge2_loss_derivative (double inner, double label)
 {
-  if (label * inner > 0) {
-    return - 2 * inner * label  ;
+  if (label * inner < 1.0) {
+    return 2 * (inner - label) ;
   } else {
     return 0 ;
   }
@@ -1560,7 +1670,7 @@ vl_svm_hinge2_conjugate_loss (double alpha, double label) {
 double
 vl_svm_hinge2_dca_update (double alpha, double inner, double norm2, double label) {
   double palpha = (label - inner - 0.5*alpha) / (norm2 + 0.5) + alpha ;
-  return label * VL_MAX(0, VL_MIN(1, label * palpha)) - alpha ;
+  return label * VL_MAX(0, label * palpha) - alpha ;
 }
 
 /** @brief SVM l1 loss
@@ -1587,8 +1697,8 @@ vl_svm_l1_loss_derivative (double inner, double label)
  ** @copydetails vl_svm_hinge_conjugate_loss */
 double
 vl_svm_l1_conjugate_loss (double alpha, double label) {
-  if (label * alpha <= 0) {
-    return (label + alpha/4) * alpha ;
+  if (vl_abs_d(alpha) <= 1) {
+    return label*alpha ;
   } else {
     return - VL_INFINITY_D ;
   }
@@ -1598,8 +1708,43 @@ vl_svm_l1_conjugate_loss (double alpha, double label) {
  ** @copydetails VlSvmDcaUpdateFunction */
 double
 vl_svm_l1_dca_update (double alpha, double inner, double norm2, double label) {
-  double palpha = (label - inner - 0.5*alpha) / (norm2 + 0.5) + alpha ;
-  return label * VL_MAX(0, VL_MIN(1, label * palpha)) - alpha ;
+  if (vl_abs_d(alpha) <= 1) {
+    double palpha = (label - inner) / norm2 + alpha ;
+    return VL_MAX(-1.0, VL_MIN(1.0, palpha)) - alpha ;
+  } else {
+    return - VL_INFINITY_D ;
+  }
+}
+
+/** @brief SVM l2 loss
+ ** @copydetails VlSvmLossFunction */
+double
+vl_svm_l2_loss (double inner,double label)
+{
+  double z = label - inner ;
+  return z*z ;
+}
+
+/** @brief SVM square l2 loss derivative
+ ** @copydetails VlSvmLossFunction */
+double
+vl_svm_l2_loss_derivative (double inner, double label)
+{
+  return - 2 * (label - inner) ;
+}
+
+/** @brief SVM square l2 loss conjugate
+ ** @copydetails vl_svm_hinge_conjugate_loss */
+double
+vl_svm_l2_conjugate_loss (double alpha, double label) {
+  return (label + alpha/4) * alpha ;
+}
+
+/** @brief SVM square l2 loss DCA update
+ ** @copydetails VlSvmDcaUpdateFunction */
+double
+vl_svm_l2_dca_update (double alpha, double inner, double norm2, double label) {
+  return (label - inner - 0.5*alpha) / (norm2 + 0.5) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1612,32 +1757,55 @@ void _vl_svm_update_statistics (VlSvm *self)
 {
   vl_size i, k ;
   double inner ;
-  
+
   memset(&self->statistics, 0, sizeof(VlSvmStatistics)) ;
-  
+
   self->statistics.regularizer = self->bias * self->bias ;
   for (i = 0; i < self->dimension; i++) {
     self->statistics.regularizer += self->model[i] * self->model[i] ;
   }
   self->statistics.regularizer *= self->lambda * 0.5 ;
-  
+
   for (k = 0; k < self->numData ; k++) {
     inner = self->innerProductFn(self->data, k, self->model) ;
     inner += self->bias * self->biasMultiplier ;
+    self->scores[k] = inner ;
     self->statistics.loss += self->lossFn(inner, self->labels[k]) ;
     if (self->solver == VlSvmSolverSdca) {
       self->statistics.dualLoss -= self->conjugateLossFn(- self->alpha[k], self->labels[k]) ;
     }
   }
-  
+
   self->statistics.loss /= self->numData ;
   self->statistics.objective = self->statistics.regularizer + self->statistics.loss ;
-  
+
   if (self->solver == VlSvmSolverSdca) {
     self->statistics.dualLoss /= self->numData ;
     self->statistics.dualObjective = - self->statistics.regularizer + self->statistics.dualLoss ;
     self->statistics.dualityGap = self->statistics.objective - self->statistics.dualObjective ;
   }
+}
+
+/* ---------------------------------------------------------------- */
+/*                                       Evaluate rather than solve */
+/* ---------------------------------------------------------------- */
+
+void _vl_svm_evaluate (VlSvm *self)
+{
+  double startTime = vl_get_cpu_time () ;
+
+  _vl_svm_update_statistics (self) ;
+
+  self->statistics.elapsedTime = vl_get_cpu_time() - startTime ;
+  self->statistics.iteration = 0 ;
+  self->statistics.epoch = 0 ;
+  self->statistics.status = VlSvmStatusConverged ;
+
+  if (self->diagnosticFn) {
+    self->diagnosticFn(self, self->diagnosticFnData) ;
+  }
+
+  if (self->statistics.status != VlSvmStatusTraining) ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1653,10 +1821,10 @@ void _vl_svm_sdca_train (VlSvm *self)
 
   double startTime = vl_get_cpu_time () ;
   VlRand * rand = vl_get_rand() ;
-  
+
   norm2 = (double*) vl_calloc(self->numData, sizeof(double));
   permutation = vl_calloc(self->numData, sizeof(vl_index)) ;
-  
+
   {
     double * buffer = vl_calloc(self->dimension, sizeof(double)) ;
     for (i = 0 ; i < (unsigned)self->numData; i++) {
@@ -1665,26 +1833,26 @@ void _vl_svm_sdca_train (VlSvm *self)
       memset(buffer, 0, self->dimension * sizeof(double)) ;
       self->accumulateFn (self->data, i, buffer, 1) ;
       n2 = self->innerProductFn (self->data, i, buffer) ;
-      n2 += self->biasMultiplier * self->biasMultiplier ; 
+      n2 += self->biasMultiplier * self->biasMultiplier ;
       norm2[i] = n2 / (self->lambda * self->numData) ;
     }
     vl_free(buffer) ;
   }
-  
+
   for (t = 0 ; 1 ; ++t) {
 
     if (t % self->numData == 0) {
-      /* once a new epoch is reached (all data have been visited), 
+      /* once a new epoch is reached (all data have been visited),
        change permutation */
       vl_rand_permute_indexes(rand, permutation, self->numData) ;
     }
-    
+
     /* pick a sample and compute update */
     i = permutation[t % self->numData] ;
     inner = self->innerProductFn(self->data, i, self->model) ;
     inner += self->bias * self->biasMultiplier ;
     delta = self->dcaUpdateFn(self->alpha[i], inner, norm2[i], self->labels[i]) ;
-    
+
     /* apply update */
     if (delta != 0) {
       self->alpha[i] += delta ;
@@ -1692,7 +1860,7 @@ void _vl_svm_sdca_train (VlSvm *self)
       self->accumulateFn(self->data,i,self->model,multiplier) ;
       self->bias += self->biasMultiplier * multiplier;
     }
-   
+
     /* call diagnostic occasionally */
     if ((t + 1) % self->diagnosticFrequency == 0 || t + 1 == self->maxNumIterations) {
       _vl_svm_update_statistics (self) ;
@@ -1707,11 +1875,11 @@ void _vl_svm_sdca_train (VlSvm *self)
       else if (t + 1 == self->maxNumIterations) {
         self->statistics.status = VlSvmStatusMaxNumIterationsReached ;
       }
-      
+
       if (self->diagnosticFn) {
         self->diagnosticFn(self, self->diagnosticFnData) ;
       }
-      
+
       if (self->statistics.status != VlSvmStatusTraining) {
         break ;
       }
@@ -1737,49 +1905,49 @@ void _vl_svm_sgd_train (VlSvm *self)
   double biasFactor = 1.0 ; /* to allow slower bias learning rate */
   vl_index t0 = VL_MAX(2, vl_ceil_d(1.0 / self->lambda)) ;
   //t0=2 ;
-  
+
   double startTime = vl_get_cpu_time () ;
   VlRand * rand = vl_get_rand() ;
-  
+
   permutation = vl_calloc(self->numData, sizeof(vl_index)) ;
   scores = vl_calloc(self->numData * 2, sizeof(double)) ;
   previousScores = scores + self->numData ;
-  
+
   for (i = 0 ; i < (unsigned)self->numData; i++) {
     permutation [i] = i ;
     previousScores [i] = - VL_INFINITY_D ;
   }
-  
+
   /*
    We store the w vector as the product fw (factor * model).
    We also use a different factor for the bias: biasFactor * biasMultiplier
    to enable a slower learning rate for the bias.
-   
+
    Given this representation, it is easy to carry the two key operations:
-   
+
    * Inner product: <fw,x> = f <w,x>
-   
+
    * Model update: fp wp = fw - rate * lambda * w - rate * g
                          = f(1 - rate * lambda) w - rate * g
-   
+
      Thus the update equations are:
 
                    fp = f(1 - rate * lambda), and
                    wp = w + rate / fp * g ;
-   
+
    * Realization of the scaling factor. Before the statistics function
      is called, or training finishes, the factor (and biasFactor)
      are explicitly applied to the model and the bias.
   */
-  
+
   for (t = 0 ; 1 ; ++t) {
-    
+
     if (t % self->numData == 0) {
       /* once a new epoch is reached (all data have been visited),
        change permutation */
       vl_rand_permute_indexes(rand, permutation, self->numData) ;
     }
-    
+
     /* pick a sample and compute update */
     i = permutation[t % self->numData] ;
     inner = factor * self->innerProductFn(self->data, i, self->model) ;
@@ -1787,13 +1955,13 @@ void _vl_svm_sgd_train (VlSvm *self)
     gradient = self->lossDerivativeFn(inner, self->labels[i]) ;
     previousScores[i] = scores[i] ;
     scores[i] = inner ;
-     
+
     /* apply update */
     rate = 1.0 /  (self->lambda * (t + t0)) ;
     biasRate = rate * self->biasLearningRate ;
     factor *= (1.0 - self->lambda * rate) ;
     biasFactor *= (1.0 - self->lambda * biasRate) ;
-    
+
     /* debug: realize the scaling factor all the times */
     /*
     for (k = 0 ; k < self->dimension ; ++k) self->model[k] *= factor ;
@@ -1801,7 +1969,7 @@ void _vl_svm_sgd_train (VlSvm *self)
     factor = 1.0 ;
     biasFactor = 1.0 ;
     */
-    
+
     if (gradient != 0) {
       self->accumulateFn(self->data, i, self->model, - gradient * rate / factor) ;
       self->bias += self->biasMultiplier * (- gradient * biasRate / biasFactor) ;
@@ -1817,7 +1985,7 @@ void _vl_svm_sgd_train (VlSvm *self)
       biasFactor = 1.0 ;
 
       _vl_svm_update_statistics (self) ;
-      
+
       for (k = 0 ; k < self->numData ; ++k) {
         double delta = scores[k] - previousScores[k] ;
         self->statistics.scoresVariation += delta * delta ;
@@ -1827,7 +1995,7 @@ void _vl_svm_sgd_train (VlSvm *self)
       self->statistics.elapsedTime = vl_get_cpu_time() - startTime ;
       self->statistics.iteration = t ;
       self->statistics.epoch = t / self->numData ;
-      
+
       self->statistics.status = VlSvmStatusTraining ;
       if (self->statistics.scoresVariation < self->epsilon) {
         self->statistics.status = VlSvmStatusConverged ;
@@ -1835,17 +2003,17 @@ void _vl_svm_sgd_train (VlSvm *self)
       else if (t + 1 == self->maxNumIterations) {
         self->statistics.status = VlSvmStatusMaxNumIterationsReached ;
       }
-      
+
       if (self->diagnosticFn) {
         self->diagnosticFn(self, self->diagnosticFnData) ;
       }
-      
+
       if (self->statistics.status != VlSvmStatusTraining) {
         break ;
       }
     }
   } /* next iteration */
-  
+
   vl_free (scores) ;
   vl_free (permutation) ;
 }
@@ -1872,5 +2040,10 @@ void vl_svm_train (VlSvm * self)
     case VlSvmSolverSgd:
       _vl_svm_sgd_train(self) ;
       break ;
+    case VlSvmSolverNone:
+      _vl_svm_evaluate(self) ;
+      break ;
+    default:
+      assert(0) ;
   }
 }

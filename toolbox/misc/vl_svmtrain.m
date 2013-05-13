@@ -1,4 +1,4 @@
-% VL_SVMTRAIN Train a Support Vector Machine
+%VL_SVMTRAIN Train a Support Vector Machine
 %   [W B] = VL_SVMTRAIN(X, Y, LAMBDA) trains a linear Support Vector
 %   Machine (SVM) from the data vectors X and the labels Y. X is a D
 %   by N matrix, with one column for example and D feature dimensions
@@ -10,7 +10,7 @@
 %
 %   VL_SVMTRAIN(DATASET, LABELS, LAMBDA) takes as input a DATASET
 %   structure, which allows more sophisticated input formats to be
-%   supported (see VL_SVMMAKEDATASET()).
+%   supported (see VL_SVMDATASET()).
 %
 %   [W, B, INFO] = VL_SVMTRAIN(...) additionally returns a structure
 %   INFO with the following fields:
@@ -46,7 +46,22 @@
 %   dualityGap:: [SDCA only]
 %     Difference between the objective and the dual objective.
 %
+%   [W, B, INFO, SCORES] = VL_SVMTRAIN(X, Y, LABMDA) returns a row
+%   vector of the SVM score for each training point. This can be used
+%   in combination with the options SOLVER, MODEL, and BIAS to
+%   evaluate an existing SVM on new data points. Furthermore INFO will
+%   contain the corresponding SVM loss, regularizer, and objective
+%   function value. If this information is not of interest, it is
+%   possible to pass a null vector Y instead of the actual labels as
+%   well as a null regularizer.
+%
 %   VL_SVMTRAIN() accepts the following options:
+%
+%   Verbose::
+%     Specify one or multiple times to increase the verbosity level.
+%     Given only once, produces messages at the beginning and end of
+%     the learning. Verbosity of at least 2 prints information at
+%     every diagnostic step.
 %
 %   Epsilon:: 1e-3
 %     Tolerance for the stopping criterion.
@@ -77,13 +92,15 @@
 %     Loss function. One of HINGE, HINGE2, L1, L2, LOGISTIC.
 %
 %   Solver:: SGD
-%     One of SGD (stochastic gradient descent [1]) or SDCA (stochastic
-%     dual coordinate ascent [2,3]).
+%     One of SGD (stochastic gradient descent [1]), SDCA (stochastic
+%     dual coordinate ascent [2,3]), or NONE (no training). The
+%     last option can be used in combination with the options MODEL
+%     and BIAS to evaluate an existing SVM.
 %
-%   StartingModel:: null vector
+%   Model:: null vector
 %     Specifies the initial value for the weight vector W (SGD only).
 %
-%   StartingBias:: 0
+%   Bias:: 0
 %     Specifies the initial value of the bias term (SGD only).
 %
 %   FORMULATION
@@ -101,6 +118,22 @@
 %   Note that this causes the learned bias B = WB B0 to shrinks
 %   towards the origin.
 %
+%   Example::
+%     Learn a linear SVM from data X and labels Y using 0.1
+%     as regularization coefficient:
+%
+%       [w, b] = vl_svmtrain(x, y, 0.1) ;
+%
+%     The SVM can be evaluated on new data XTEST with:
+%
+%       scores = w'*xtest + b ;
+%
+%     Alternatively, VL_SVMTRAIN() can be used fro evaluation too:
+%
+%       [~,~,~, scores] = vl_svmtrain(xtest,y,0,'model',w,'bias,'b) ;
+%
+%     The latter form is particularly useful when X is a DATASET structure.
+%
 %   REFERENCES::
 %
 %   [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro. Pegasos: Primal
@@ -114,6 +147,6 @@
 %       Ascent Methods for Regularized Loss Minimization. In
 %       Proc. NIPS, 2012.
 %
-%   See also: VL_MAKETRAININGSET(), VL_HELP().
+%   See also: VL_SVMDATASET(), VL_HELP().
 
 % AUTHORIGHTS
