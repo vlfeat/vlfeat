@@ -252,6 +252,11 @@ vl_abs_d (double x)
 #endif
 }
 
+/** @brief Base-2 logaritghm
+ ** @param x argument.
+ ** @return @c log(x).
+ **/
+
 VL_INLINE double
 vl_log2_d (double x)
 {
@@ -264,6 +269,7 @@ vl_log2_d (double x)
 #endif
 }
 
+/** @copydoc vl_log2_d */
 VL_INLINE float
 vl_log2_f (float x)
 {
@@ -273,6 +279,64 @@ vl_log2_f (float x)
   return logf(x) / 0.6931472F ;
 #else
   return log2(x) ;
+#endif
+}
+
+/** @brief Check whether a floating point value is NaN
+ ** @param x argument.
+ ** @return true if @a x is NaN.
+ **/
+VL_INLINE vl_bool
+vl_is_nan_f (float x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_isnan (x) ;
+#elif VL_COMPILER_MSC
+  return _isnan(x) ;
+#else
+  return isnan(x) ;
+#endif
+}
+
+/** @copydoc vl_is_nan_f */
+VL_INLINE vl_bool
+vl_is_nan_d (double x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_isnan (x) ;
+#elif VL_COMPILER_MSC
+  return _isnan(x) ;
+#else
+  return isnan(x) ;
+#endif
+}
+
+/** @brief Check whether a floating point value is infinity
+ ** @param x argument.
+ ** @return true if @a x is infinity.
+ **/
+VL_INLINE vl_bool
+vl_is_inf_f (float x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_isinf (x) ;
+#elif VL_COMPILER_MSC
+  return _isinf(x) ;
+#else
+  return isinf(x) ;
+#endif
+}
+
+/** @copydoc vl_is_inf_f */
+VL_INLINE vl_bool
+vl_is_inf_d (double x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_isinf (x) ;
+#elif VL_COMPILER_MSC
+  return _isinf(x) ;
+#else
+  return isinf(x) ;
 #endif
 }
 
