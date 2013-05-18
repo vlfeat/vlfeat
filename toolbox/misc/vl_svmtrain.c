@@ -582,7 +582,7 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
       mexPrintf("\tbias multiplier: %g\n", vl_svm_get_bias_multiplier(svm)) ;
       switch (vl_svm_get_solver(svm)) {
         case VlSvmSolverNone:
-          mexPrintf("\tsolver: none (evaluation only)\n") ;
+          mexPrintf("\tsolver: none (evaluation mode)\n") ;
           break ;
         case VlSvmSolverSgd:
           mexPrintf("\tsolver: sgd\n") ;

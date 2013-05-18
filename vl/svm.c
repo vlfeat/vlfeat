@@ -452,11 +452,11 @@ y_i u, & -1 \leq y_i u \leq 1, \\
 \end{cases}\]</td>
 </tr>
 <tr>
-<tr>
 <td>Square or l2</td>
 <td>$(y_i - z)^2$</td>
 <td>\[\ell_i^*(u)=y_iu + \frac{u^2}{4}\]</td>
 </tr>
+<tr>
 <td>Insensitive l1</td>
 <td>$\max\{0, |y_i - z| - \epsilon\}$.</td>
 <td></td>
@@ -789,7 +789,7 @@ Starting from a given model $\bw$ is easy in SGD as the optimization
 runs in the primal. However, the starting iteration index $t$ should
 also be advanced for a warm start, as otherwise the initial setting of
 $\bw$ is rapidly forgot (::vl_svm_set_model, ::vl_svm_set_bias,
-::vl_svm_set_iteration).
+::vl_svm_set_iteration_number).
 
 <!-- ------------------------------------------------------------- -->
 @section svm-sgd-details Implementation details
@@ -1447,7 +1447,6 @@ double const * vl_svm_get_scores (VlSvm const *self)
   return self->scores ;
 }
 
-
 /* ---------------------------------------------------------------- */
 /*                                                        Callbacks */
 /* ---------------------------------------------------------------- */
@@ -1562,6 +1561,7 @@ case VlSvmLoss ## x: \
       SETLOSS(Hinge2, hinge2) ;
       SETLOSS(L1, l1) ;
       SETLOSS(L2, l2) ;
+      SETLOSS(Logistic, logistic) ;
     default:
       assert(0) ;
   }
@@ -1586,8 +1586,8 @@ case VlSvmLoss ## x: \
  ** @param label label $y$ of the sample.
  ** @param inner inner product $\bw^\top \bx$ of the sample with the SVM model.
  ** @param norm2 normalization factor $\|\bx\|^2/\lambda n$.
- ** @param alpha current value of the dual variable.
- ** @return incremental update $\Delta\alpha$ of the dual variable.
+ ** @param u current value of the dual variable.
+ ** @return incremental update $\Delta\u$ of the dual variable.
  **/
 
 /** @brief SVM hinge loss
@@ -1611,17 +1611,17 @@ vl_svm_hinge_loss_derivative (double inner, double label)
 }
 
 /** @brief SVM hinge loss conjugate
- ** @param alpha dual variable.
+ ** @param u dual variable.
  ** @param label label value.
  ** @return conjugate loss.
  **/
 double
-vl_svm_hinge_conjugate_loss (double alpha, double label) {
-  double z = label * alpha ;
+vl_svm_hinge_conjugate_loss (double u, double label) {
+  double z = label * u ;
   if (-1 <= z && z <= 0) {
-    return label * alpha ;
+    return label * u ;
   } else {
-    return - VL_INFINITY_D ;
+    return VL_INFINITY_D ;
   }
 }
 
@@ -1657,11 +1657,11 @@ vl_svm_hinge2_loss_derivative (double inner, double label)
 /** @brief SVM square hinge loss conjugate
  ** @copydetails vl_svm_hinge_conjugate_loss */
 double
-vl_svm_hinge2_conjugate_loss (double alpha, double label) {
-  if (label * alpha <= 0) {
-    return (label + alpha/4) * alpha ;
+vl_svm_hinge2_conjugate_loss (double u, double label) {
+  if (label * u <= 0) {
+    return (label + u/4) * u ;
   } else {
-    return - VL_INFINITY_D ;
+    return VL_INFINITY_D ;
   }
 }
 
@@ -1681,7 +1681,7 @@ vl_svm_l1_loss (double inner,double label)
   return vl_abs_d(label - inner) ;
 }
 
-/** @brief SVM square l1 loss derivative
+/** @brief SVM l1 loss derivative
  ** @copydetails VlSvmLossFunction */
 double
 vl_svm_l1_loss_derivative (double inner, double label)
@@ -1693,18 +1693,18 @@ vl_svm_l1_loss_derivative (double inner, double label)
   }
 }
 
-/** @brief SVM square l1 loss conjugate
+/** @brief SVM l1 loss conjugate
  ** @copydetails vl_svm_hinge_conjugate_loss */
 double
-vl_svm_l1_conjugate_loss (double alpha, double label) {
-  if (vl_abs_d(alpha) <= 1) {
-    return label*alpha ;
+vl_svm_l1_conjugate_loss (double u, double label) {
+  if (vl_abs_d(u) <= 1) {
+    return label*u ;
   } else {
-    return - VL_INFINITY_D ;
+    return VL_INFINITY_D ;
   }
 }
 
-/** @brief SVM square l1 loss DCA update
+/** @brief SVM l1 loss DCA update
  ** @copydetails VlSvmDcaUpdateFunction */
 double
 vl_svm_l1_dca_update (double alpha, double inner, double norm2, double label) {
@@ -1712,7 +1712,7 @@ vl_svm_l1_dca_update (double alpha, double inner, double norm2, double label) {
     double palpha = (label - inner) / norm2 + alpha ;
     return VL_MAX(-1.0, VL_MIN(1.0, palpha)) - alpha ;
   } else {
-    return - VL_INFINITY_D ;
+    return VL_INFINITY_D ;
   }
 }
 
@@ -1725,7 +1725,7 @@ vl_svm_l2_loss (double inner,double label)
   return z*z ;
 }
 
-/** @brief SVM square l2 loss derivative
+/** @brief SVM l2 loss derivative
  ** @copydetails VlSvmLossFunction */
 double
 vl_svm_l2_loss_derivative (double inner, double label)
@@ -1733,18 +1733,126 @@ vl_svm_l2_loss_derivative (double inner, double label)
   return - 2 * (label - inner) ;
 }
 
-/** @brief SVM square l2 loss conjugate
+/** @brief SVM l2 loss conjugate
  ** @copydetails vl_svm_hinge_conjugate_loss */
 double
-vl_svm_l2_conjugate_loss (double alpha, double label) {
-  return (label + alpha/4) * alpha ;
+vl_svm_l2_conjugate_loss (double u, double label) {
+  return (label + u/4) * u ;
 }
 
-/** @brief SVM square l2 loss DCA update
+/** @brief SVM l2 loss DCA update
  ** @copydetails VlSvmDcaUpdateFunction */
 double
 vl_svm_l2_dca_update (double alpha, double inner, double norm2, double label) {
   return (label - inner - 0.5*alpha) / (norm2 + 0.5) ;
+}
+
+/** @brief SVM l2 loss
+ ** @copydetails VlSvmLossFunction */
+double
+vl_svm_logistic_loss (double inner,double label)
+{
+  double z = label * inner ;
+  if (z >= 0) {
+    return log(1.0 + exp(-z)) ;
+  } else {
+    return -z + log(exp(z) + 1.0) ;
+  }
+}
+
+/** @brief SVM l2 loss derivative
+ ** @copydetails VlSvmLossFunction */
+double
+vl_svm_logistic_loss_derivative (double inner, double label)
+{
+  double z = label * inner ;
+  double t = 1 / (1 + exp(-z)) ; /* this is stable for z << 0 too */
+  return label * (t - 1) ; /*  = -label exp(-z) / (1 + exp(-z)) */
+}
+
+VL_INLINE double xlogx(double x)
+{
+  if (x <= 1e-10) return 0 ;
+  return x*log(x) ;
+}
+
+/** @brief SVM l2 loss conjugate
+ ** @copydetails vl_svm_hinge_conjugate_loss */
+double
+vl_svm_logistic_conjugate_loss (double u, double label) {
+  double z = label * u ;
+  if (-1 <= z && z <= 0) {
+    return xlogx(-z) + xlogx(1+z) ;
+  } else {
+    return VL_INFINITY_D ;
+  }
+}
+
+/** @brief SVM l2 loss DCA update
+ ** @copydetails VlSvmDcaUpdateFunction */
+double
+vl_svm_logistic_dca_update (double alpha, double inner, double norm2, double label) {
+  /*
+   The goal is to solve the problem
+
+   min_delta A/2 delta^2 + B delta + l*(-alpha - delta|y),  -1 <= - y (alpha+delta) <= 0
+
+   where A = norm2, B = inner, and y = label. To simplify the notation, we set
+
+     f(beta) = beta * log(beta) + (1 - beta) * log(1 - beta)
+
+   where beta = y(alpha + delta) such that
+
+     l*(-alpha - delta |y) = f(beta).
+
+   Hence 0 <= beta <= 1, delta = + y beta - alpha. Substituting
+
+     min_beta A/2 beta^2 + y (B - A alpha) beta + f(beta) + const
+
+   The Newton step is then given by
+
+     beta = beta - (A beta + y(B - A alpha) + df) / (A + ddf).
+
+   However, the function is singluar for beta=0 and beta=1 (infinite
+   first and second order derivatives). Since the function is monotonic
+   (second derivarive always strictly greater than zero) and smooth,
+   we canuse bisection to find the zero crossing of the first derivative.
+   Once one is sufficiently close to the optimum, a one or two Newton
+   steps are sufficien to land on it with excellent accuracy.
+   */
+
+  double  df, ddf, der, dder ;
+  vl_index t ;
+
+  /* bisection */
+  double beta1 = 0 ;
+  double beta2 = 1 ;
+  double beta = 0.5 ;
+
+  for (t = 0 ; t < 5 ; ++t) {
+    df = log(beta) - log(1-beta) ;
+    der = norm2 * beta + label * (inner - norm2*alpha) + df ;
+    if (der >= 0) {
+      beta2 = beta ;
+    } else {
+      beta1 = beta ;
+    }
+    beta = 0.5 * (beta1 + beta2) ;
+  }
+
+#if 1
+  /* a final Newton step, but not too close to the singularities */
+  for (t = 0 ; (t < 2) & (beta > VL_EPSILON_D) & (beta < 1-VL_EPSILON_D) ; ++t) {
+    df = log(beta) - log(1-beta) ;
+    ddf = 1 / (beta * (1-beta)) ;
+    der = norm2 * beta + label * (inner - norm2*alpha) + df ;
+    dder = norm2 + ddf ;
+    beta -= der / dder ;
+    beta = VL_MAX(0, VL_MIN(1, beta)) ;
+  }
+#endif
+
+  return label * beta - alpha ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1804,8 +1912,6 @@ void _vl_svm_evaluate (VlSvm *self)
   if (self->diagnosticFn) {
     self->diagnosticFn(self, self->diagnosticFnData) ;
   }
-
-  if (self->statistics.status != VlSvmStatusTraining) ;
 }
 
 /* ---------------------------------------------------------------- */
