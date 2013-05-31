@@ -546,7 +546,7 @@ VL_XCAT(vl_homogeneouskernelmap_evaluate_,SFX)
   if (mantissa == 0 ||
       exponent <= self->minExponent ||
       exponent >= self->maxExponent) {
-    for (j = 0 ; j <= self->order ; ++j) {
+    for (j = 0 ; j < 2*self->order+1 ; ++j) {
       *destination = (T) 0.0 ;
       destination += stride ;
     }
