@@ -175,6 +175,8 @@ VlSvmDataset * parseDataset(const mxArray * dataset_array)
         mxGetString(field, buffer, sizeof(buffer) / sizeof(char)) ;
         if (vl_string_casei_cmp("kl1", buffer) == 0) {
           kernelType = VlHomogeneousKernelIntersection ;
+        } else if (vl_string_casei_cmp("kchi2", buffer) == 0) {
+          kernelType = VlHomogeneousKernelChi2 ;
         } else if (vl_string_casei_cmp("kjs", buffer) == 0) {
           kernelType = VlHomogeneousKernelJS ;
         } else if (vl_string_casei_cmp("kinters", buffer) == 0) {
