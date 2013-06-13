@@ -82,7 +82,7 @@ new_array_from_kdforest (VlKDForest const * forest)
     "splitDimension",
     "splitThreshold",
     "lowerBound" ,
-    "upperBound" 
+    "upperBound"
   } ;
   mxArray * forest_array ;
   mxArray * trees_array ;
@@ -92,7 +92,7 @@ new_array_from_kdforest (VlKDForest const * forest)
   trees_array = mxCreateStructArray (2, treeDims,
                                      sizeof(treeFieldNames) / sizeof(treeFieldNames[0]),
                                      treeFieldNames) ;
-  
+
   /*
     FOREST.NUMDIMENSIONS
     FOREST.NUMDATA
@@ -105,13 +105,13 @@ new_array_from_kdforest (VlKDForest const * forest)
 
   switch(forest->distance){
       case VlDistanceL1:
-          mxSetField (forest_array, 0, "distance", vlmxCreatePlainScalar ((double)0)) ;
-      break;
+        mxSetField (forest_array, 0, "distance", mxCreateString("l1"));
+        break;
       case VlDistanceL2:
-          mxSetField (forest_array, 0, "distance", vlmxCreatePlainScalar ((double)1)) ;
-      break;
+        mxSetField (forest_array, 0, "distance", mxCreateString("l2")) ;
+        break;
       default:
-          abort();
+        abort();
   }
 
   for (ti = 0 ; ti < forest->numTrees ; ++ ti) {
@@ -143,8 +143,7 @@ new_array_from_kdforest (VlKDForest const * forest)
       double * splitThreshold = mxGetData (splitThreshold_array) ;
       double * lowerBound = mxGetData (lowerBound_array) ;
       double * upperBound = mxGetData (upperBound_array) ;
-      
-     
+
       for (ni = 0 ; ni < tree -> numUsedNodes ; ++ ni) {
         VlKDTreeNode const * node = tree -> nodes + ni ;
         int a = node->upperChild ;
@@ -205,7 +204,7 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
   mxArray const * splitThreshold_array ;
   mxArray const * lowerBound_array;
   mxArray const * upperBound_array;
-  
+
 
   vl_int32 const * lowerChild ;
   vl_int32 const * upperChild ;
@@ -216,7 +215,6 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
 
   vl_uindex ti ;
   int unsigned dimension ;
-  double distanceReceived;
   VlVectorComparisonType distance;
   vl_size numData ;
   vl_size numUsedNodes ;
@@ -232,19 +230,22 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
     FOREST.DATA
     FOREST.TREES
    */
-  
+
   distance_array = mxGetField (forest_array, 0, "distance") ;
-  if(distance_array && vlmxIsPlainScalar (distance_array)){
-      distanceReceived = mxGetScalar (distance_array);
-      if(distanceReceived < -0.5 || distanceReceived > 1.5){
-          vlmxError(vlmxErrInconsistentData,
-             "FOREST.DISTANCE must be 0 for L1 distance or 1 for L2 distance.") ;
-      }
-  } else {
+  if(distance_array && vlmxIsString (distance_array, -1)){
+    if (vlmxCompareToStringI(distance_array, "l1") == 0) {
+      distance = VlDistanceL1 ;
+    } else if (vlmxCompareToStringI(distance_array, "l2") == 0) {
+      distance = VlDistanceL2 ;
+    } else {
       vlmxError(vlmxErrInconsistentData,
-             "FOREST.DISTANCE must be 0 for L1 distance or 1 for L2 distance.") ;
+                "FOREST.DISTANCE must be either 'l1' or 'l2'.") ;
+    }
+  } else {
+    vlmxError(vlmxErrInconsistentData,
+              "FOREST.DISTANCE must be a string.") ;
   }
-  
+
   if (! mxIsStruct (forest_array) ||
       mxGetNumberOfElements (forest_array) != 1) {
     vlmxError (vlmxErrInconsistentData,
@@ -290,18 +291,7 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
       vlmxError(vlmxErrInvalidArgument,
                "DATA must be either SINGLE or DOUBLE.") ;
   }
-  
-  switch((int)distanceReceived){
-      case 0:
-          distance = VlDistanceL1;
-          break;
-      case 1:
-          distance = VlDistanceL2;
-          break;
-      default:
-          abort();
-  }
-      
+
   forest = vl_kdforest_new (dataType, dimension, numTrees, distance) ;
   forest->numData = numData ;
   forest->trees = vl_malloc (sizeof(VlKDTree*) * numTrees) ;
@@ -426,7 +416,6 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
         tree->nodes[ni].upperBound = upperBound[ni] ;
       }
     }
-    
 
     {
       vl_uindex di ;
@@ -441,19 +430,14 @@ new_kdforest_from_array (mxArray const * forest_array, mxArray const * data_arra
       restore_parent_recursively (tree, 0, &numNodesToVisit) ;
       if (numNodesToVisit != 0) {
         vlmxError (vlmxErrInconsistentData,
-                  "TREE has an inconsitsent tree structure.") ;
+                   "TREE has an inconsitsent tree structure.") ;
       }
     }
 
     forest->trees[ti] = tree ;
   }
-  
+
   forest->maxNumNodes = maxNumNodes;
-  
-   /*shArray sizeof(VlKDForestSearchState) * maxNumNodes*/
-   /*siBook sizeof(vl_uint32) * numData*/
-   //forest->searchHeapArray = vl_malloc (sizeof(VlKDForestSearchState) * maxNumNodes); 
-   //forest->searchIdBook = vl_malloc (sizeof(vl_uindex)*numData); 
-    
+
   return forest ;
 }
