@@ -56,7 +56,7 @@ for k=1:2:length(varargin)
     case 'maxv'
       maxv = arg ;
     otherwise
-      error(sprintf('Unknown option ''%s''', opt)) ;
+      error(sprintf('Unknown option ''%s''.', opt)) ;
   end
 end
 
@@ -69,16 +69,33 @@ if(size(d,1) ~= NBP*NBP*NBO)
 end
 
 if nargin > 1
-  if (~isempty(f) & size(f,1) < 2 | size(f,1) > 4)
-    error('F should be a 2xK, 3xK, 4xK matrix or the empty matrix');
+  if (~isempty(f) & (size(f,1) < 2 | size(f,1) > 6))
+    error('F must be either empty of have from 2 to six rows.');
   end
 
   if size(f,1) == 2
-    f = [f; 10 * ones(1, size(f,2)) ; 0 * zeros(1, size(f,2))] ;
+    % translation only
+    f(3:6,:) = deal([10 0 0 10]') ;
+    %f = [f; 10 * ones(1, size(f,2)) ; 0 * zeros(1, size(f,2))] ;
   end
 
   if size(f,1) == 3
-    f = [f; 0 * zeros(1, size(f,2))] ;
+    % translation and scale
+    f(3:6,:) = [1 0 0 1]' * f(3,:) ;
+    %f = [f; 0 * zeros(1, size(f,2))] ;
+  end
+
+  if size(f,1) == 4
+    c = cos(f(4,:)) ;
+    s = sin(f(4,:)) ;
+    f(3:6,:) = bsxfun(@times, f(3,:), [c ; s ; -s ; c]) ;
+  end
+
+  if size(f,1) == 5
+    assert(false) ;
+    c = cos(f(4,:)) ;
+    s = sin(f(4,:)) ;
+    f(3:6,:) = bsxfun(@times, f(3,:), [c ; s ; -s ; c]) ;
   end
 
   if(~isempty(f) & size(f,2) ~= size(d,2))
@@ -102,18 +119,12 @@ xall=[] ;
 yall=[] ;
 
 for k=1:K
-  SBP = magnif * f(3,k) ;
-  th=f(4,k) ;
-  c=cos(th) ;
-  s=sin(th) ;
-
   [x,y] = render_descr(d(:,k), NBP, NBO, maxv) ;
-  xall = [xall SBP*(c*x-s*y)+f(1,k)] ;
-  yall = [yall SBP*(s*x+c*y)+f(2,k)] ;
+  xall = [xall magnif*f(3,k)*x + magnif*f(5,k)*y + f(1,k)] ;
+  yall = [yall magnif*f(4,k)*x + magnif*f(6,k)*y + f(2,k)] ;
 end
 
 h=line(xall,yall) ;
-
 
 % --------------------------------------------------------------------
 function [x,y] = render_descr(d, BP, BO, maxv)
