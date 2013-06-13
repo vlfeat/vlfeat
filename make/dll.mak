@@ -25,9 +25,7 @@ DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
 DLL_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
-
 DLL_LDFLAGS += -lm
-DLL_LDFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
 BINDIR = bin/$(ARCH)
 
@@ -102,12 +100,16 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
                     -isysroot $(SDKROOT)                             \
 		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET) \
 	            $(DLL_LDFLAGS)                                   \
+	            $(if $(DISABLE_OPENMP),,-fopenmp)                \
                     $^                                               \
                     -o $@
 
-
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
-	$(call C,CC) $(DLL_CFLAGS) -shared $(^) -o $(@) $(DLL_LDFLAGS)
+	$(call C,CC) -shared    \
+	    $(^)                \
+	    $(DLL_LDFLAGS)	\
+	    $(if $(DISABLE_OPENMP),,-fopenmp) \
+	    -o $(@)
 
 dll-clean:
 	rm -f $(dll_dep) $(dll_obj)

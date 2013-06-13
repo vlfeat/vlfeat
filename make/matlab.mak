@@ -111,8 +111,30 @@ mex-all: $(mex_dll) $(mex_tgt)
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
-$(mex_dll) : $(dll_tgt) $(mex-dir)
-	cp -v "$(<)" "$(@)"
+$(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
+	$(call C,CC) -m64								\
+                    -dynamiclib								\
+                    -undefined suppress							\
+                    -flat_namespace							\
+                    -install_name @loader_path/lib$(DLL_NAME).dylib			\
+	            -compatibility_version $(VER)					\
+                    -current_version $(VER)						\
+                    -isysroot $(SDKROOT)						\
+		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
+	            $(DLL_LDFLAGS)							\
+		    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
+                    $^									\
+                    -o $@
+
+$(MEX_BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
+	$(call C,CC) -shared								\
+	    $(^)									\
+            $(DLL_LDFLAGS)								\
+            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)		\
+	    -o $(@)
+
+#$(mex_dll) : $(dll_tgt) $(mex-dir)
+#	cp -v "$(<)" "$(@)"
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC) \
@@ -189,25 +211,25 @@ $(eval $(call gendir, matlab-noprefix, toolbox/noprefix))
 matlab-noprefix: $(matlab-noprefix-dir) $(m_lnk)
 
 toolbox/noprefix/%.m : vl_%.m
-	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;                   \
-	echo "function varargout = $*(varargin)" > "$@" ;            \
-	cat "$<" | sed -n -e '/^function/b' -e '/^%.*$$/p'           \
-             -e '/^%.*$$/b' -e q >> "$@" ;                           \
+	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;              \
+	echo "function varargout = $*(varargin)" > "$@" ;       \
+	cat "$<" | sed -n -e '/^function/b' -e '/^%.*$$/p'      \
+             -e '/^%.*$$/b' -e q >> "$@" ;                      \
 	echo "[varargout{1:nargout}] = vl_$*(varargin{:});" >> "$@" ;
 
 matlab-test:
-	@echo "Testing Matlab toolbox" ; \
-	cd toolbox ; \
-	RESULT=$$(\
-	$(MATLAB_EXE) -$(ARCH) -nodesktop -r \
-	"vl_setup('xtest','verbose') ; vl_test ; exit") ; \
-	echo "$$RESULT" ; \
-	if test -n "$$(echo \"$$RESULT\" | grep \"failed\")" ; \
-	then \
-	  echo "Matlab toolbox test encountered an error!" ; \
-	  exit 1 ; \
-	else \
-	  echo "Matlab toolbox test completed successfully!" ; \
+	@echo "Testing Matlab toolbox" ;			\
+	cd toolbox ;						\
+	RESULT=$$(						\
+	$(MATLAB_EXE) -$(ARCH) -nodesktop -r			\
+	"vl_setup('xtest','verbose') ; vl_test ; exit") ;	\
+	echo "$$RESULT" ;					\
+	if test -n "$$(echo \"$$RESULT\" | grep \"failed\")" ;	\
+	then							\
+	  echo "Matlab toolbox test encountered an error!" ;	\
+	  exit 1 ;						\
+	else							\
+	  echo "Matlab toolbox test completed successfully!" ;	\
 	fi
 
 matlab-info:
