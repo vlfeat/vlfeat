@@ -5,38 +5,47 @@ function h = vl_plotframe(frames,varargin)
 %  frame is a vector of D=2,3,..,6 real numbers, depending on its
 %  class. VL_PLOTFRAME() supports the following classes:
 %
-%   * POINTS
-%     + FRAME(1:2)   coordinates
+%  Point::
+%    FRAME(1:2) are the x,y coordinates of the point
 %
-%   * CIRCLES
-%     + FRAME(1:2)   center
-%     + FRAME(3)     radius
+%  Circle::
+%    FRAME(1:2) are the x,y coordinates of the center. FRAME(3)
+%    is the circle radius..
 %
-%   * ORIENTED CIRCLES
-%     + FRAME(1:2)   center
-%     + FRAME(3)     radius
-%     + FRAME(4)     orientation
+%  Oriented circle::
+%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3) is the
+%    radius. FRAME(4) is the orientation, expressed as a ppsitive
+%    rotation (note that images use a left-handed system with the Y
+%    axis pointing downwards).
 %
-%   * ELLIPSES
-%     + FRAME(1:2)   center
-%     + FRAME(3:5)   S11, S12, S22 such that ELLIPSE = {x: x' inv(S) x = 1}.
+%  Ellipse::
+%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3:5) are
+%    the element S11, S12, S22 of a 2x2 covariance matrix S (a positive
+%    semidefinite matrix) defining the ellipse shape. The ellipse
+%    is the set of points {x + T: x' inv(S) x = 1}, where T is the center.
 %
-%   * ORIENTED ELLIPSES
-%     + FRAME(1:2)   center
-%     + FRAME(3:6)   stacking of A such that ELLIPSE = {A x : |x| = 1}
+%  Oriented ellipse::
+%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3:6) is
+%    the column-wise stacking of a 2x2 matrix A defining the ellipse
+%    shape and orientation. The ellipse is obtaine by transforming
+%    a unit circle by A as the set of points {A x + T : |x| = 1}, where
+%    T is the center.
 %
-%  H = VL_PLOTFRAME(...) returns the handle of the graphical object
+%  All frames can be thought of as an affine transformation of the unit circle.
+%  For unoriented frames, the affine transformation is selected so that
+%  the positive Y direction (downwards, graviy vector) is preserved.
+%
+%  H = VL_PLOTFRAME(...) returns the handle H of the graphical object
 %  representing the frames.
 %
-%  VL_PLOTFRAME(FRAMES) where FRAMES is a matrix whose column are
-%  FRAME vectors plots all frames simultaneously. Using this call is
-%  much faster than calling VL_PLOTFRAME() for each frame.
+%  VL_PLOTFRAME(FRAMES) for a matrix of FRAMES plots multiple frames.
+%  Using this call is much faster than calling VL_PLOTFRAME() for each frame.
 %
 %  VL_PLOTFRAME(FRAMES,...) passes any extra argument to the
 %  underlying plot function. The first optional argument can be a line
 %  specification string such as the one used by PLOT().
 %
-%  See also: VL_HELP().
+%  See also: VL_FRAME2OELL(), VL_HELP().
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
@@ -72,7 +81,7 @@ if zero_dimensional
 end
 
 % reduce all other cases to ellipses/oriented ellipses
-frames    = frame2oell(frames) ;
+frames = vl_frame2oell(frames) ;
 do_arrows = (D==4 || D==6) ;
 
 % --------------------------------------------------------------------
@@ -97,7 +106,6 @@ end
 Xp = [cos(thr) ; sin(thr) ;] ;
 
 for k=1:K
-
   % frame center
 	xc = frames(1,k) ;
 	yc = frames(2,k) ;
@@ -115,10 +123,9 @@ for k=1:K
 	ally((k-1)*(np+1) + (1:np)) = X(2,:) ;
 
   if do_arrows
-    allxf((k-1)*3 + (1:2)) = xc + [0 A(1,1)] ;
-    allyf((k-1)*3 + (1:2)) = yc + [0 A(2,1)] ;
+    allxf((k-1)*3 + (1:2)) = xc + [0 A(1,2)] ;
+    allyf((k-1)*3 + (1:2)) = yc + [0 A(2,2)] ;
   end
-
 end
 
 if do_arrows
@@ -133,62 +140,4 @@ else
 end
 
 
-% --------------------------------------------------------------------
-function eframes = frame2oell(frames)
-% FRAMES2OELL  Convert generic frame to oriented ellipse
-%   EFRAMES = FRAME2OELL(FRAMES) converts the frames FRAMES to
-%   oriented ellipses EFRAMES. This is useful because many tasks are
-%   almost equivalent for all kind of regions and are immediately
-%   reduced to the most general case.
 
-% Determine the kind of frames
-[D,K] = size(frames) ;
-switch D
-  case 2, kind = 'point' ;
-  case 3, kind = 'disk' ;
-  case 4, kind = 'odisk' ;
-  case 5, kind = 'ellipse' ;
-  case 6, kind = 'oellipse' ;
-  otherwise
-    error(['FRAMES format is unknown']) ;
-end
-eframes = zeros(6,K) ;
-
-% Convert frames to oriented ellipses
-switch kind
-  case 'point'
-    eframes(1:2,:) = frames(1:2,:) ;
-
-  case 'disk'
-    eframes(1:2,:) = frames(1:2,:) ;
-    eframes(3,:)   = frames(3,:) ;
-    eframes(6,:)   = frames(3,:) ;
-
-  case 'odisk'
-    r = frames(3,:) ;
-    c = r.*cos(frames(4,:)) ;
-    s = r.*sin(frames(4,:)) ;
-
-    eframes(1:2,:) = frames(1:2,:) ;
-    eframes(3:6,:) = [c ; s ; -s ; c] ;
-
-  case 'ellipse'
-    eframes(1:2,:) = frames(1:2,:) ;
-    eframes(3:6,:) = mapFromS(frames(3:5,:)) ;
-
-  case 'oellipse'
-    eframes = frames ;
-end
-
-% --------------------------------------------------------------------
-function A = mapFromS(S)
-% --------------------------------------------------------------------
-% Returns the (stacking of the) 2x2 matrix A that maps the unit circle
-% into the ellipses satisfying the equation x' inv(S) x = 1. Here S
-% is a stacked covariance matrix, with elements S11, S12 and S22.
-
-tmp = sqrt(S(3,:)) + eps ;
-A(1,:) = sqrt(S(1,:).*S(3,:) - S(2,:).^2) ./ tmp ;
-A(2,:) = zeros(1,length(tmp));
-A(3,:) = S(2,:) ./ tmp ;
-A(4,:) = tmp ;
