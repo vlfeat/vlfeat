@@ -322,39 +322,41 @@ Thus the K-means algorithm becomes:
 @section kmeans-ann ANN algorithm
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-The ANN K-means algorithm @cite{beis97shape}
-@cite{silpa-anan08optimised} @cite{muja09fast} is a variant of Lloyd's
-algorithm (@ref kmeans-lloyd) that instead of the naive distance
-computations uses a best-bin-first randomized KD-tree algorithm to
-approximately (and quickly) find the closest cluster center to each
-point. The KD-tree implementation is based on @ref kdtree.
+The *Approximate Nearest Neighbor* (ANN) K-means algorithm
+@cite{beis97shape} @cite{silpa-anan08optimised} @cite{muja09fast} is a
+variant of Lloyd's algorithm (@ref kmeans-lloyd) uses a best-bin-first
+randomized KD-tree algorithm to approximately (and quickly) find the
+closest cluster center to each point. The KD-tree implementation is
+based on @ref kdtree.
 
-The algorithm is basically the same as Lloyds, the only difference is
-during the quantization step (assigning the nearest center for each point),
-where the ANN KD-Tree is used.
+The algorithm can be summarized as follows:
 
-During each quantization step, a kd-tree randomized forest is built
-over the currently estimated cluster centers. Then all the data points
-are queried, which leads to finding the approximate nearest cluster
-center for each data point. The approximation can however lead to finding
-the solution with higher energy in the next iteration. To protect
-against this behaviour, the distance from previously assigned
-center is compared to the distance from currently found
-approximate nearest center. If the new distance is lower,
-the reassignment occurs, otherwise the point stays assigned
-to the old cluster center.
+1. **Quantization.** Each point $\bx_i$ is reassigned to the center
+   $\bc_{q_j}$ closer to it. This starts by indexing the $K$ centers
+   by a KD-tree and then using the latter to quickly find the closest
+   center for every training point. The search is approximated to
+   further improve speed. This opens up the possibility that a data
+   point may receive an assignment that is *worse* than the current
+   one. This is avoided by checking that the new assignment estimated
+   by using ANN is an improvement; otherwise the old assignment is
+   kept.
+2. **Center estimation.** Each center $\bc_q$ is updated to minimize
+   its average distances to the points assigned to it. It is easy to
+   show that the best center is the mean or median of the points,
+   respectively if the $l^2$ or $l^1$ norm is considered.
 
-When using KD-Trees the complexity of the assignment
-step is theoretically lowered to @f$ \O (d n log(K)) @f$. However,
-due to the curse of dimensionality,
-the exact nearest neighbor search becomes basically a linear search.
-That is why the ANN KD-Tree is used. To obtain a sufficient speedup
-the maximum number of distance comparisons in ANN KD-Tree
-has to be lowered quite dramatically. VlFeat experiments show that
-lowering the number of comparisons to one quarter of the
-number of cluster centers gives the same results as
-Elkans algorithm in terms of speed, when clustering
-128 dimensional data (e.g. SIFT descriptors).
+The key is to trade-off carefully the speedup obtained by using the
+ANN algorithm and the loss in accuracy when retrieving neighbors.  Due
+to the curse of dimensionality, KD-trees become less effective for
+higher dimensional data, so that the search cost, which in the best
+case is logarithmic with this data structure, may become effectively
+linear. This is somehow mitigated by the fact that new a new KD-tree
+is computed at each iteration, reducing the likelihood that points may
+get stuck with sub-optimal assignments.
+
+Experiments with the quantization of 128-dimensional SIFT features
+show that the ANN algorithm may use one quarter of the comparisons of
+Elkan's while retaining a similar solution accuracy.
 
 */
 
