@@ -24,12 +24,12 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.16
-ARCH = win32
+VER = 0.9.17
+ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
-MSVSVER = 100
-MSVCROOT = $(VCInstallDir)
+MSVSVER =
+MSVCROOT = $(VCINSTALLDIR)
 WINSDKROOT = $(WindowsSdkDir)
 GIT = git
 
@@ -40,6 +40,8 @@ MSVCROOT = C:\Program Files\Microsoft Visual Studio 10.0\VC
 !if "$(WINSDKROOT)" == ""
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v7.0A
 !endif
+
+!include make/nmake_helper.mak
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
 !if "$(ARCH)" == "win32"
