@@ -235,7 +235,7 @@ VlSvmDataset * parseDataset(const mxArray * dataset_array)
 mxArray * makeInfoStruct (VlSvm* svm)
 {
   VlSvmStatistics const * s = vl_svm_get_statistics(svm) ;
-  mxArray * info ;
+  mxArray * info = 0 ;
 
   switch (vl_svm_get_solver(svm)) {
     case VlSvmSolverSdca:
@@ -296,6 +296,9 @@ mxArray * makeInfoStruct (VlSvm* svm)
       info = createScalarStructArray(fields) ;
       break ;
     }
+
+  default:
+    assert(0) ;
   }
   return info ;
 }
