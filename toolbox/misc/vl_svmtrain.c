@@ -1,13 +1,13 @@
 /** @file vl_svmtrain.c
  ** @brief vl_svmtrain MEX definition
- ** @author Milan Sulc
  ** @author Daniele Perrone
+ ** @author Milan Sulc
  ** @author Andrea Vedaldi
  **/
 
 /*
-Copyright (C) 2013 Milan Sulc
 Copyright (C) 2012 Daniele Perrone.
+Copyright (C) 2013 Milan Sulc
 Copyright (C) 2011-13 Andrea Vedaldi.
 All rights reserved.
 

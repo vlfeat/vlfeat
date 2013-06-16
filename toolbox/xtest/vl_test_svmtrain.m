@@ -132,7 +132,7 @@ function test_homkermap(s)
   for solver = {'sgd', 'sdca'}
     for conv = {@single,@double}
       conv = conv{1} ;
-      dataset = vl_svmdataset(conv(s.x), 'homkermap', struct()) ;
+      dataset = vl_svmdataset(conv(s.x), 'homkermap', struct('order',1)) ;
       vl_twister('state',0) ;
       [w_ b_] = vl_svmtrain(dataset, s.y, s.lambda) ;
 

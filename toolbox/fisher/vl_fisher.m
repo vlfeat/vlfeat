@@ -9,10 +9,10 @@
 %
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
-%
-% Authors: Andrea Vedaldi, David Novotny
-%
-% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+
+% Authors: David Novotny, Andrea Vedaldi
+
+% Copyright (C) 2013 David Novotny and Andrea Vedaldi
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under

@@ -39,7 +39,7 @@ for dataType = dataTypes
                                               'MaxNumIterations', 10, ...
                                               'Algorithm', 'Elkan', ...
                                               'Distance', distance) ;
-                                          
+
     vl_twister('state',0) ;
     [centers__, assignments__, en__] = vl_kmeans(X, 10, ...
                                               'NumRepetitions', 1, ...
@@ -48,15 +48,15 @@ for dataType = dataTypes
                                               'Distance', distance, ...
                                               'NumTrees', 3, ...
                                               'MaxNumComparisons',0) ;
-                                          
+
     vl_assert_almost_equal(centers, centers_, 1e-5) ;
     vl_assert_almost_equal(assignments, assignments_, 1e-5) ;
     vl_assert_almost_equal(en, en_, 1e-5) ;
-    
+
     vl_assert_almost_equal(centers, centers__, 1e-5) ;
     vl_assert_almost_equal(assignments, assignments__, 1e-5) ;
     vl_assert_almost_equal(en, en__, 1e-5) ;
-    
+
     vl_assert_almost_equal(centers_, centers__, 1e-5) ;
     vl_assert_almost_equal(assignments_, assignments__, 1e-5) ;
     vl_assert_almost_equal(en_, en__, 1e-5) ;
