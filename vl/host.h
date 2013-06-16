@@ -21,6 +21,7 @@ the terms of the BSD license (see the COPYING file).
 #if defined(__DOXYGEN__)
 #define VL_DISABLE_THREADS
 #define VL_DISABLE_SSE2
+#define VL_DISABLE_OPENMP
 #endif
 
 /** @} */

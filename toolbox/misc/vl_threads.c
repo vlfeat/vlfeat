@@ -14,35 +14,33 @@
 #include "mexutils.h"
 
 void
-mexFunction(int nout, mxArray *out[],
+mexFunction(int nout VL_UNUSED, mxArray *out[],
             int nin, const mxArray *in[])
 {
   enum {IN_NUM = 0} ;
-  enum {OUT_NUM = 0, OUT_MAXNUM} ;
-  vl_size numThreads, maxNumThreads ;
+  enum {OUT_NUM = 0} ;
+  vl_size numThreads ;
     
-  if (nout > 2) {
-    vlmxError(vlmxErrInvalidArgument, "More than two output arguments requested.") ;
-  }
+  numThreads = vl_get_max_threads() ;
   
-  numThreads = vl_get_num_threads() ;
-  maxNumThreads = vl_get_max_num_threads() ;
-  
-  OUT(NUM) = vlmxCreatePlainScalar (numThreads) ;
-  OUT(MAXNUM) = vlmxCreatePlainScalar (maxNumThreads) ;
-  
-  if (nin == 0) {
-    return ;
+  if (nout > 1) {
+    vlmxError(vlmxErrInvalidArgument, "More than one ouptut argumnets requested.") ;
   }
   if (nin > 1) {
     vlmxError(vlmxErrInvalidArgument, "More than one input argument specified.") ;
   }
+
+
+  OUT(NUM) = vlmxCreatePlainScalar (numThreads) ;
+  
+  if (nin == 0) {
+    return ;
+  }
+
   if (!vlmxIsScalar(IN(NUM))) {
     vlmxError(vlmxErrInvalidArgument, "NUM is not a scalar.") ;
   }
   
-  numThreads = mxGetScalar(IN(NUM)) ;
-  numThreads = VL_MAX(numThreads, 0) ;
-  numThreads = VL_MIN(numThreads, maxNumThreads) ;
+  numThreads = (vl_size) mxGetScalar(IN(NUM)) ;
   vl_set_num_threads (numThreads) ;
 }

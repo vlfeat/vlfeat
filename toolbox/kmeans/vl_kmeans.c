@@ -41,7 +41,6 @@ vlmxOption  options [] = {
   {"NumRepetitions",    1,   opt_num_repetitions,    },
   {"Initialization",    1,   opt_initialization      },
   {"Initialisation",    1,   opt_initialization      }, /* UK spelling */
-  {"Multithreading",    1,   opt_multithreading      },
   {"NumTrees",          1,   opt_num_trees           },
   {"MaxNumComparisons", 1,   opt_num_comparisons     },
   {0,                   0,   0                       }
@@ -74,7 +73,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int initialization = INIT_PLUSPLUS ;
   vl_size maxNumComparisons = 100 ;
   vl_size numTrees = 3;
-  VlKMeansMultithreading multithreading = VlKMeansParallel;
 
   vl_type dataType ;
   mxClassID classID ;
@@ -237,26 +235,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
             maxNumComparisons = (vl_size) mxGetScalar (optarg) ;
          break;
 
-      case opt_multithreading :
-        if (!vlmxIsString (optarg, -1)) {
-          vlmxError (vlmxErrInvalidArgument,
-                    "MULTITHREADING must be a string.") ;
-        }
-        if (mxGetString (optarg, buf, sizeof(buf))) {
-          vlmxError (vlmxErrInvalidArgument,
-                    "MULTITHREADING argument too long.") ;
-        }
-        if (vlmxCompareStringsI("parallel", buf) == 0) {
-          multithreading = VlKMeansParallel ;
-        } else if (vlmxCompareStringsI("serial", buf) == 0) {
-          multithreading = VlKMeansSerial ;
-        } else {
-          vlmxError (vlmxErrInvalidArgument,
-                    "Invalid value %s for MULTITHREADING", buf) ;
-        }
-        break ;
-
-
       default :
         abort() ;
         break ;
@@ -276,7 +254,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_kmeans_set_algorithm (kmeans, algorithm) ;
   vl_kmeans_set_initialization (kmeans, initialization) ;
   vl_kmeans_set_max_num_iterations (kmeans, maxNumIterations) ;
-  vl_kmeans_set_multithreading (kmeans,multithreading);
   vl_kmeans_set_max_num_comparisons (kmeans, maxNumComparisons) ;
   vl_kmeans_set_num_trees (kmeans, numTrees);
 
@@ -305,13 +282,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("kmeans: num. data points = %d\n", numData) ;
     mexPrintf("kmeans: num. centers = %d\n", numCenters) ;
     mexPrintf("kmeans: max num. comparisons = %d\n", maxNumComparisons) ;
-    mexPrintf("kmeans: num. trees = %d\n", numTrees) ;
-    if(multithreading == VlKMeansParallel){
-        mexPrintf("kmeans: multithreading = parallel\n", numTrees) ;
-    } else {
-        mexPrintf("kmeans: multithreading = serial\n", numTrees) ;
-    }
-    
+    mexPrintf("kmeans: num. trees = %d\n", numTrees) ;    
     mexPrintf("\n") ;
   }
 

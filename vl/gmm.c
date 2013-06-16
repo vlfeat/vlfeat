@@ -299,8 +299,9 @@ the initial configuration of the gaussians in the mixture.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #endif
 
 #ifdef __SSE2__
@@ -882,7 +883,6 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
 
     VlKMeans * kmeansInit = vl_kmeans_new(self->dataType,VlDistanceL2);
 
-    vl_kmeans_set_multithreading (kmeansInit, self->multithreading);
     vl_kmeans_set_initialization(kmeansInit, initialization);
     vl_kmeans_set_max_num_iterations (kmeansInit, niter) ;
     vl_kmeans_set_max_num_comparisons (kmeansInit, ncomparisons) ;
@@ -1199,7 +1199,7 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   switch(self->multithreading) {
     case(VlGMMParallel):
 #if defined(_OPENMP)
-      numChunks = (vl_int)vl_get_num_threads();
+      numChunks = (vl_int)vl_get_max_threads();
 #else
       numChunks = 1;
 #endif
@@ -1379,7 +1379,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   switch(self->multithreading) {
     case(VlGMMParallel):
 #ifdef _OPENMP
-      numChunks = (vl_int)vl_get_num_threads();
+      numChunks = (vl_int)vl_get_max_threads();
 #else
       numChunks = 1;
 #endif

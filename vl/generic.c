@@ -207,42 +207,10 @@ keywords in their name, for example
 double x = vl_example_object_get_property () ;
 vl_example_object_set_property(x) ;
 @endcode
+**/
 
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section design-threads Multi-threading
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-VLFeat can be used with multiple threads by treating appropriately
-different kinds of operations:
-
-- <b>Local operations (reentrancy).</b> Most VLFeat operations are
-  reentrant, in the sense that they operate on local data. It is safe
-  to execute such operations concurrently from multiple threads as
-  long as each thread operates on an independent sets of objects or
-  memory blocks.  By contrast, operating on the same object or memory
-  block from multiple threads requires proper synchronization by the
-  user.
-
-- <b>Task-specific operations.</b> A few operations are intrinsically
-  non-reentrant but thread-specific. These include: retrieving the
-  last error by ::vl_get_last_error and obtaining the thread-specific
-  random number generator by ::vl_get_rand. VLFeat makes such
-  operations thread-safe by operating on task-specific data.
-
-- <b>Global operations.</b> A small number of operations are
-  non-reentrant <em>and</em> affect all threads simultaneously. These
-  are restricted to changing certain global configuration parameters,
-  such as the memory allocation functions by
-  ::vl_set_alloc_func. These operations are <em>not</em> thread safe
-  and should be executed before multiple threads are started.
-
-Some VLFeat algorithms are randomised. Each thread has his own random
-number generator (an instance of ::VlRand) accessed by
-::vl_get_rand. To make calculations reproducible the random number
-generator must be seeded appropriately in each thread. Notice also
-that using the same VLFeat object from multiple threads (with
-appropriate synchronization) will cause multiple random number
-generators to be intermixed.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section design-portability Portability features
@@ -610,6 +578,91 @@ elapsed time.
 
 **/
 
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page threads Threading
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+VLFeat supports for threaded computations can be used to take advantage
+of multi-core architectures. Threading support includes:
+
+- Supporting using VLFeat functions and objects from multiple threads
+  simultaneously. This is discussed in @ref threads-multiple.
+- Using multiple cores to accelerate computations. This is
+  discussed in @ref threads-parallel.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section threads-multiple Using VLFeat from multiple threads
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+VLFeat can be used from multiple threads simultaneously if proper
+rules are followed.
+
+- <b>A VLFeat object instance is accessed only from one thread at any
+  given time.</b> Functions operating on objects (member functions)
+  are conditionally thread safe: the same function may be called
+  simultaneously from multiple threads provided that it operates on
+  different, independent objects. However, modifying the same object
+  from multiple threads (using the same or different member functions)
+  is possible only from one thread at any given time, and should
+  therefore be synchronized. Certain VLFeat objects may contain
+  features specific to simplify multi-threaded operations
+  (e.g. ::VlKDForest).
+- <b>Thread-safe global functions are used.</b> These include
+  thread-specific operations such as retrieving the last error by
+  ::vl_get_last_error and obtaining the thread-specific random number
+  generator instance by ::vl_get_rand. In these cases, the functions
+  operate on thread-specific data that VLFeat creates and
+  maintains. Note in particular that each thread has an independent
+  default random number generator (as returned by
+  ::vl_get_rand). VLFeat objects that involve using random numbers
+  will typically use the random number generator of the thread
+  currently accessing the object (although an object-specific
+  generator can be often be specified instead).
+- <b>Any other global function is considered non-thread safe and is
+  accessed exclusively by one thread at a time.</b> A small number of
+  operations are non-reentrant <em>and</em> affect all threads
+  simultaneously. These are restricted to changing certain global
+  configuration parameters, such as the memory allocation functions by
+  ::vl_set_alloc_func. These operations are <em>not</em> thread safe
+  and are preferably executed before multiple threads start to operate
+  with the library.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section threads-parallel Parallel computations
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+VLFeat uses OpenMP to implement parallel computations. VLFeat avoids
+changing OpenMP global state, such as the desired number of
+computational threads, as this may affect the rest of the application
+(e.g. MATLAB) in undesriable ways. Instead, it duplicates OpenMP
+controls when appropriate (this is similar to the method used by other
+libraries such as Intel MKL).
+
+The maximum number of threads available to the application can be
+obtained by ::vl_get_thread_limit. This limit is controlled by the
+OpenMP library (the function is a wrapper around @c
+omp_get_thread_limit), which in turn may determined that based on the
+number of computational cores or the value of the @c OMP_THREAD_LIMIT
+variable when the program is launched.
+
+The desired number of computational threads is set by
+::vl_set_num_threads() and retrieved by ::vl_get_max_threads().  This
+number is a target value as well as an upper bound to the number of
+threads used by VLFeat. @c vl_set_num_threads(1) disables the use of
+multiple threads and @c vl_set_num_threads(0) uses OpenMP value
+(retrieved by calling @c omp_get_max_threads()). The actual number
+used in a specific computation is decided by OpenMP based on the
+number of threads available, accounting for example for nested
+parallelism when appropriate.
+ 
+@sa http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/GUID-C2295BC8-DD22-466B-94C9-5FAA79D4F56D.htm
+ http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/index.htm#GUID-DEEF0363-2B34-4BAB-87FA-A75DBE842040.htm
+ http://software.intel.com/sites/products/documentation/hpc/mkl/lin/MKL_UG_managing_performance/Using_Additional_Threading_Control.htm
+
+**/
+
 #include "generic.h"
 
 #include <assert.h>
@@ -748,14 +801,14 @@ vl_configuration_to_string_copy ()
                       "    Static config: %s\n"
                       "    %" VL_FMT_SIZE " CPU(s): %s\n"
 #if defined(_OPENMP)
-                      "    Threads (OpenMP): %" VL_FMT_SIZE " of %" VL_FMT_SIZE "\n"
+                      "    OpenMP: max threads: %d (library: %" VL_FMT_SIZE ")\n"
 #endif
                       "    Debug: %s\n",
                       vl_get_version_string (),
                       staticString,
                       vl_get_num_cpus(), cpuString,
 #if defined(_OPENMP)
-                      vl_get_num_threads(), vl_get_max_num_threads(),
+                      omp_get_max_threads(), vl_get_max_threads(),
 #endif
                       VL_YESNO(debug)) ;
     length += 1 ;
@@ -953,60 +1006,54 @@ vl_cpu_has_sse2 ()
 
 /* ---------------------------------------------------------------- */
 
-/** @brief Get the number of threads available for parallel computations
+#if 0
+/** @brief Get the number of computational threads available.
  ** @return number of threads.
- **
- ** This function returns the default number of threads used for
- ** parallel operations. This is ususally the number of threads
- ** that are used by parallel sections in the library, and is
- ** controlled by ::vl_set_num_threads. Normally, it defaults to the number
- ** of cores of the host. However, some objects and
- ** functions allow overriding this default value on a case-by-case basis.
+ ** @sa @ref threads-parallel
  **/
 
 vl_size
-vl_get_num_threads()
-{
-  return vl_get_state()->numThreads ;
-}
-
-/** @brief Get the maximum number of threads that the machine supports
- ** @return number of threads.
- **
- ** This function returns the maximum number of threads that can be used
- ** for parallel computations. Normally, it equals the number of processor
- ** cores of the host.
- **/
-
-vl_size
-vl_get_max_num_threads()
+vl_get_thread_limit()
 {
 #if defined(_OPENMP)
-  return (vl_size) omp_get_num_procs() ;
+  return omp_get_thread_limit() ;
+#else
+  return 1 ;
+#endif
+}
+#endif
+
+/** @brief Get the maximum number of computational threads.
+ ** @return number of threads.
+ ** @sa vl_set_num_threads(), @ref threads-parallel
+ **/
+
+vl_size
+vl_get_max_threads()
+{
+#if defined(_OPENMP)
+  return vl_get_state()->numThreads ;
 #else
   return 1 ;
 #endif
 }
 
-/** @brief Set the number of threads available for parallel computations
+/** @brief Set the number of threads targeted for parallel computations.
  ** @param numThreads number of threads to use.
- ** @return actual number of threads set.
- **
- ** This function sets the number of threads for parallel computations
- ** to @a numThreads (see ::vl_get_num_threads). It is clamped to the
- ** range from 1 to ::vl_get_max_num_threads.
+ ** @sa vl_get_max_threads(), @ref threads-parallel
  **/
 
-vl_size
+void
 vl_set_num_threads(vl_size numThreads)
 {
-  vl_size num = VL_MIN(numThreads, vl_get_max_num_threads()) ;
-  num = VL_MAX(1, num) ;
 #if defined(_OPENMP)
-  omp_set_num_threads((int)num) ;
+  if (numThreads == 0) {
+    numThreads = omp_get_max_threads() ;
+  }
+  vl_get_state()->numThreads = numThreads ;
+#else
+  return ;
 #endif
-  vl_get_state()->numThreads = num ;
-  return num ;
 }
 
 /* ---------------------------------------------------------------- */

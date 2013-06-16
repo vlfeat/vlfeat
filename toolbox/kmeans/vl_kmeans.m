@@ -1,4 +1,4 @@
-% VL_KMEANS  Cluster data using k-means
+%VL_KMEANS  Cluster data using k-means
 %   [C, A] = VL_KMEANS(X, NUMCENTERS) clusters the columns of the
 %   matrix X in NUMCENTERS centers C using k-means. X may be either
 %   SINGLE or DOUBLE. C has the same number of rows of X and NUMCENTER
@@ -47,10 +47,6 @@
 %   MaxNumComparisons:: [100]
 %     Maximum number of sample-to-center comparisons when searching
 %     for the closest center.
-%
-%   Multithreading:: [PARALLEL]
-%     One of PARALLEL or SERIAL. PARALLEL uses multiple threads to
-%     further accelerate the ANN algorithm.
 %
 %   Example::
 %     VL_KMEANS(X, 10, 'verbose', 'distance', 'l1', 'algorithm',

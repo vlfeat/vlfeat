@@ -1,10 +1,12 @@
 /** @file kmeans.h
  ** @brief K-means (@ref kmeans)
- ** @author Andrea Vedaldi, David Novotny
+ ** @author Andrea Vedaldi
+ ** @author David Novotny
  **/
 
 /*
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 Andrea Vedaldi and David Novotny.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -36,14 +38,6 @@ typedef enum _VlKMeansInitialization {
   VlKMeansPlusPlus          /**< Plus plus raondomized selection */
 } VlKMeansInitialization ;
 
-/** @brief K-means multithreading options */
-
-typedef enum _VlKMeansMultithreading {
-  VlKMeansParallel,  /**< Multithreaded ANN */
-  VlKMeansSerial     /**< Singlethreaded ANN */
-} VlKMeansMultithreading;
-
-
 /** ------------------------------------------------------------------
  ** @brief K-means quantizer
  **/
@@ -51,24 +45,23 @@ typedef enum _VlKMeansMultithreading {
 typedef struct _VlKMeans
 {
 
-  vl_type dataType ;                      /**< data type */
-  vl_size dimension ;                     /**< data dimensionality */
-  vl_size numCenters ;                    /**< number of centers   */
-  vl_size numTrees ;                      /**< number of trees in forest when using ANN-kmeans */
-  vl_size maxNumComparisons ;             /**< maximum number of comparisons when using ANN-kmeans */
+  vl_type dataType ;                      /**< Data type. */
+  vl_size dimension ;                     /**< Data dimensionality. */
+  vl_size numCenters ;                    /**< Number of centers. */
+  vl_size numTrees ;                      /**< Number of trees in forest when using ANN-kmeans. */
+  vl_size maxNumComparisons ;             /**< Maximum number of comparisons when using ANN-kmeans. */
 
-  VlKMeansInitialization initialization ; /**< initalization algorithm */
-  VlKMeansAlgorithm algorithm ;           /**< clustring algorithm */
-  VlVectorComparisonType distance ;       /**< distance */
-  VlKMeansMultithreading multithreading;  /**< multithreaded or singlethreaded */
-  vl_size maxNumIterations ;              /**< maximum number of refinement iterations */
-  vl_size numRepetitions ;                /**< number of clustering repetitions */
-  int verbosity ;                         /**< verbosity level */
+  VlKMeansInitialization initialization ; /**< Initalization algorithm. */
+  VlKMeansAlgorithm algorithm ;           /**< Clustring algorithm. */
+  VlVectorComparisonType distance ;       /**< Distance. */
+  vl_size maxNumIterations ;              /**< Maximum number of refinement iterations. */
+  vl_size numRepetitions ;                /**< Number of clustering repetitions. */
+  int verbosity ;                         /**< Verbosity level. */
 
-  void * centers ;                        /**< centers */
-  void * centerDistances ;                /**< centers inter-distances */
+  void * centers ;                        /**< Centers */
+  void * centerDistances ;                /**< Centers inter-distances. */
 
-  double energy ;                         /**< current solution energy */
+  double energy ;                         /**< Current solution energy. */
   VlFloatVectorComparisonFunction floatVectorComparisonFn ;
   VlDoubleVectorComparisonFunction doubleVectorComparisonFn ;
 } VlKMeans ;
@@ -160,7 +153,6 @@ VL_INLINE void const * vl_kmeans_get_centers (VlKMeans const * self) ;
  **/
 VL_INLINE void vl_kmeans_set_algorithm (VlKMeans * self, VlKMeansAlgorithm algorithm) ;
 VL_INLINE void vl_kmeans_set_initialization (VlKMeans * self, VlKMeansInitialization initialization) ;
-VL_INLINE void vl_kmeans_set_multithreading (VlKMeans * self, VlKMeansMultithreading multithreading) ;
 VL_INLINE void vl_kmeans_set_num_repetitions (VlKMeans * self, vl_size numRepetitions) ;
 VL_INLINE void vl_kmeans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations) ;
 VL_INLINE void vl_kmeans_set_verbosity (VlKMeans * self, int verbosity) ;
@@ -353,18 +345,6 @@ vl_kmeans_set_initialization (VlKMeans * self,
                               VlKMeansInitialization initialization)
 {
   self->initialization = initialization ;
-}
-
-/** @brief Set K-means multithreading option
- ** @param self KMeans object.
- ** @param multithreading multithreading option.
- **/
-
-VL_INLINE void
-vl_kmeans_set_multithreading (VlKMeans * self,
-                              VlKMeansMultithreading multithreading)
-{
-    self->multithreading = multithreading;
 }
 
 /** ------------------------------------------------------------------

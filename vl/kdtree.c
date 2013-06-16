@@ -90,7 +90,10 @@ using the vl_kdforest_delete_searcher method.
 #include "random.h"
 #include "mathop.h"
 #include <stdlib.h>
+
+#if defined(_OMP)
 #include <omp.h>
+#endif
 
 #define VL_HEAP_prefix     vl_kdforest_search_heap
 #define VL_HEAP_type       VlKDForestSearchState

@@ -50,13 +50,15 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_bool computeVlad = VL_FALSE;
 
   Init init = Rand;
-
+  
   //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
   //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
 
   TYPE * data = vl_malloc(sizeof(TYPE)*numData*dimension);
   TYPE * enc = vl_malloc(sizeof(TYPE)*2*dimension*numClusters);
   TYPE * assign;
+  
+  vl_set_num_threads(0) ; /* use the default number of threads */
 
   vl_rand_init (&rand) ;
   vl_rand_seed (&rand, 49000) ;
@@ -81,7 +83,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
       vl_kmeans_set_max_num_comparisons (kmeans, maxComp) ;
       vl_kmeans_set_num_trees (kmeans, ntrees);
       vl_kmeans_set_algorithm (kmeans, VlKMeansANN);
-      vl_kmeans_set_multithreading (kmeans, VlKMeansParallel);
       vl_kmeans_set_initialization(kmeans, VlKMeansRandomSelection);
 
       vl_gmm_set_initialization (gmm,VlGMMKMeans);

@@ -50,7 +50,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_kmeans_set_num_repetitions (kmeans, maxrep) ;
   vl_kmeans_set_num_trees (kmeans, ntrees);
   vl_kmeans_set_algorithm (kmeans, algorithm);
-  vl_kmeans_set_multithreading (kmeans,VlKMeansParallel);
 
   //struct timeval t1,t2;
   //gettimeofday(&t1, NULL);
