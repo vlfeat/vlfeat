@@ -108,10 +108,13 @@ vpath vl_%.c $(shell find $(VLDIR)/toolbox -type d)
 
 mex-all: $(mex_dll) $(mex_tgt)
 
+# generate the mex-dir target
+$(eval $(call gendir, mex, $(MEX_BINDIR)))
+
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
-$(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
+$(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	$(call C,CC) -m64								\
                     -dynamiclib								\
                     -undefined suppress							\
@@ -123,12 +126,12 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
 	            $(DLL_LDFLAGS)							\
 		    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
-                    $^									\
+                    $(dll_obj)								\
                     -o $@
 
-$(MEX_BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
+$(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	$(call C,CC) -shared								\
-	    $(^)									\
+	    $(dll_obj)									\
             $(DLL_LDFLAGS)								\
             $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)		\
 	    -o $(@)
