@@ -13,7 +13,7 @@ the terms of the BSD license (see the COPYING file).
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page vlad VLAD encoding
+@page vlad Vector of Locally Aggregated Descriptors (VLAD) encoding
 @author David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 

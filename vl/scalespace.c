@@ -15,7 +15,7 @@ the terms of the BSD license (see the COPYING file).
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page scalespace Gaussian Scale Space
+@page scalespace Gaussian Scale Space (GSS)
 @author Karel Lenc
 @author Andrea Vedaldi
 @author Michal Perdoch

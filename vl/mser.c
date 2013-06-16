@@ -13,7 +13,7 @@ the terms of the BSD license (see the COPYING file).
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page mser Maximally Stable Extremal Regions
+@page mser Maximally Stable Extremal Regions (MSER)
 @author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 

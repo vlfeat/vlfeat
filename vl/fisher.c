@@ -13,11 +13,11 @@ the terms of the BSD license (see the COPYING file).
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page fisher Fisher encoding
+@page fisher Fisher Vector encoding (FV)
 @author David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref fisher.h implements the calculation of a fisher vector @cite{Perronnin10improvingthe}
+@ref fisher.h implements the calculation of a fisher vector @cite{perronnin10improving}
 from the set of feature vectors with respect to the provided gaussian mixture model.
 The function can be applied to both @c float or @c double data types.
 The covariance matrices of individual gaussians are assumed to be diagonal.
@@ -27,7 +27,7 @@ with correct parameters.
 
 @section fisher-tech Technical details
 
-The fisher vector encoding @cite{Perronnin10improvingthe} is strongly bound to estimation of a gaussian
+The fisher vector encoding @cite{perronnin10improving} is strongly bound to estimation of a gaussian
 mixture model (see @ref gmm.h). Using the obtained means, variances and
 weights of individual gaussians, one can encode a set of features with
 respect to the gaussian model using the fisher vector encoding technique.
