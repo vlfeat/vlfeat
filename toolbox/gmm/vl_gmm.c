@@ -120,7 +120,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     break ;
   default:
     vlmxError (vlmxErrInvalidArgument,
-               "DATA must be of class SINGLE or DOUBLE") ;
+               "DATA is neither of class SINGLE or DOUBLE.") ;
     abort() ;
   }
 
@@ -129,7 +129,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   if (dimension == 0)
   {
-    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero.") ;
   }
 
   if (!vlmxIsPlainScalar(IN(NUMCLUSTERS)) ||
@@ -486,7 +486,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vl_get_type_size (dataType) * dimension * vl_gmm_get_num_clusters(gmm)) ;
 
   memcpy (mxGetData(OUT(WEIGHTS)),
-          vl_gmm_get_weights (gmm),
+          vl_gmm_get_priors (gmm),
           vl_get_type_size (dataType) * vl_gmm_get_num_clusters(gmm)) ;
 
   /* optionally return loglikelihood */
@@ -502,8 +502,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
             vl_gmm_get_posteriors (gmm),
             vl_get_type_size (dataType) * numData * vl_gmm_get_num_clusters(gmm)) ;
   }
-
-
 
   vl_gmm_delete (gmm) ;
 }

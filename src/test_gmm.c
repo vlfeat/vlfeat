@@ -194,7 +194,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      data,
      vl_gmm_get_means(gmm),
      vl_gmm_get_sigmas(gmm),
-     vl_gmm_get_weights(gmm),
+     vl_gmm_get_priors(gmm),
      enc,
      dimension,
      numData,
@@ -250,7 +250,7 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
   vl_type dataType = vl_gmm_get_data_type(gmm) ;
   double const * sigmas = vl_gmm_get_sigmas(gmm) ;
   double const * means = vl_gmm_get_means(gmm) ;
-  double const * weights = vl_gmm_get_weights(gmm) ;
+  double const * weights = vl_gmm_get_priors(gmm) ;
   double const * posteriors = vl_gmm_get_posteriors(gmm) ;
 
   ofp = fopen(dataFileData, mode);

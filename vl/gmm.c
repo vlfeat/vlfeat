@@ -1,6 +1,7 @@
 /** @file gmm.c
- ** @brief GMM - Implementation
+ ** @brief Gaussian Mixture Models - Implementation
  ** @author David Novotny
+ ** @author Andrea Vedaldi
  **/
 
 /*
@@ -10,38 +11,38 @@ All rights reserved.
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
-//
+
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page gmm Gaussian mixture model estimation
+@page gmm Gaussian Mixture Models (GMM)
 @author David Novotny
 @author Andrea Vedaldi
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h supports *Gaussian Mixture Models* (GMMs) in VLFeat.  The
-main goal of the module is to provide a tool to *learn* by using the
-expectation maximization algorithm @cite{dempster77maximum}). The code
-supports @c float or @c double data types, is parallelized and is
-tuned to work reliably and effectively on large dataset of computer
-vision features. This is partially obtained by restricting the
-parameters of the GMM to suitable classes.
+@ref gmm.h supports *Gaussian Mixture Models* (GMMs) in VLFeat,
+inlcuding learning GMMs from data by expectation maximization
+@cite{dempster77maximum}). The implementation supports @c float or @c
+double data types, is parallelized, and is tuned to work reliably and
+effectively on relatively large datasets. Stability is obtained in
+part by restricting the parameters of the GMM to selected classes.
 
 GMMs are at the basis of the computation of other useful features,
-such as the Fisher vectors.
+such as the Fisher vectors (@ref fisher).
 
-For detailed information on GMMs and their learning with the EM
-algorithm, see @subpage gmm-fundamentals.
+The rest of the page contains a short tutorial on the practical usage
+of this module. For detailed information on GMMs and their learning
+with the EM algorithm see @subpage gmm-fundamentals.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section gmm-starting Getting started
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-To use @ref gmm.h to learn a GMM from training data, instantiate a
-::VlGMM object, set the configuration parameters and run the training
-code. The following example learns @c numClusters Gaussian components
-from @c numData vectors of dimension @c dimension and storage class @c
-float using at most 100 EM iterations:
+In order to use @ref gmm.h to learn a GMM from training data,
+instantiate a ::VlGMM object, set the parameters as desired, and run
+the training code. The following example learns @c numClusters
+Gaussian components from @c numData vectors of dimension @c dimension
+and storage class @c float using at most 100 EM iterations:
 
 @code
 float * means ;
@@ -51,53 +52,51 @@ float * posteriors ;
 
 double loglikelihood ;
 
-// create a new instance of a GMM object, compute with float storage type
+// create a new instance of a GMM object for float data
 gmm = vl_gmm_new (VL_TYPE_FLOAT) ;
 
 // set the maximum number of EM iterations to 100
 vl_gmm_set_max_num_iterations (gmm, 100) ;
 
 // set the initialization to random selection
-vl_gmm_set_initialization	(gmm,VlGMMRand);
+vl_gmm_set_initialization (gmm,VlGMMRand);
 
 // set parallelized computation
 vl_gmm_set_multithreading (gmm,VlGMMParallel);
 
 // cluster the data, i.e. learn the GMM
-vl_gmm_cluster ( gmm, data, dimension, numData, numClusters);
+vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
 
-// get means of estimated gaussians
+// get the means, covariances, and weights of the GMM
 means = vl_gmm_get_means(gmm);
-
-// get covariance matrices of estimated gaussians
 sigmas = vl_gmm_get_sigmas(gmm);
+weights = vl_gmm_get_priors(gmm);
 
-// get weights of estimated gaussians
-weights = vl_gmm_get_weights(gmm);
-
-// get loglikelihood of the estimated mixture
+// get loglikelihood of the estimated GMM
 loglikelihood = vl_gmm_get_loglikelihood(gmm) ;
 
-// get soft assignments of data points to each cluster
+// get the soft assignments of the data points to each cluster
 posteriors = vl_gmm_get_posteriors(gmm) ;
 @endcode
 
 @note ::VlGMM assumes that the covariance matrices of the GMM are
 diagonal. This reduces significantly the number of parameters to learn
-and it is usually an acceptable assumption. Nevertheless, it may be
-beneficial to de-correlate the data by PCA rotation in pre-processing.
+and is usually an acceptable assumption. If the data is significantly
+correlated, it can be beneficial to de-correlate it by PCA rotation or
+projection in pre-processing.
 
 ::vl_gmm_get_loglikelihood is used to get the final loglikelihood of
 the estimated mixture, ::vl_gmm_get_means and ::vl_gmm_get_sigmas to
 obtain the means and the diagonals of the covariance matrices of the
-estimated Gaussian modes. ::vl_gmm_get_posteriors is used to get the
+estimated Gaussian modes, and ::vl_gmm_get_posteriors to get the
 posterior probabilities that a given point is associated to each of
-the modes, also called soft assignments.
+the modes (soft assignments).
 
-There are several initialization methods which affect the convergence
-speed and the quality of the estimated mixture, measured in term of
-the final loglikelihood. These methods are selected by using the
-::vl_gmm_set_initialization function, as follows:
+The learning algorithm, which is an implementation of EM, finds a
+local optimum of the objective function. Therefore the initialization
+is crucial in obtaining a good model, measured in term of the final
+loglikelihood. ::VlGMM supports a few methods (use
+::vl_gmm_set_initialization to choose one) as follows:
 
 Method                | ::VlGMMInitialization enumeration       | Description
 ----------------------|-----------------------------------------|-----------------------------------------------
@@ -105,10 +104,9 @@ Random initialization | ::VlGMMRand                             | Random initial
 KMeans                | ::VlGMMKMeans                           | Initialization of the mixture parameters using ::VlKMeans
 Custom                | ::VlGMMCustom                           | User specified initialization
 
-Note that in the case of ::VlGMMKMeans initialization, the user has
-also to specify a ::VlKMeans object, which will be later used for the
-initialization by the GMM code (please see @ref kmeans page to see how
-to correctly set up the object).
+Note that in the case of ::VlGMMKMeans initialization, an object of
+type ::VlKMeans object must be created and passed to the ::VlGMM
+instance (see @ref kmeans to see how to correctly set up this object).
 
 When a user wants to use the ::VlGMMCustom method, the initial means,
 sigmas and weights have to be specified using the ::vl_gmm_set_means,
@@ -126,16 +124,16 @@ uses SSE2 vector instructions when available.
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-A Gaussian Mixture Model (GMM) a mixture of $K$ multivariate Gaussian
-distributions. Each Gaussian component in the mixture represents a
-cluster of points that are distributed around a common mean.
+A *Gaussian Mixture Model* (GMM) is a mixture of $K$ multivariate
+Gaussian distributions. In order to sample from a GMM, one samples
+first the component index $k \in \{1,\dots,K\}$ with probability
+$\pi_k$, and then samples the vector $\bx \in \mathbb{R}^d$ from the
+$k$-th Gaussian distribution $p(\bx|\mu_k,\Sigma_k)$. Here $\mu_k$ and
+$\Sigma_k$ are respectively the mean and covariance matrix of the
+distribution. The GMM is completely defined by the parameters
+$\Theta=\{\pi_k,\mu_k,\Sigma_k; k = 1,\dots,K\}$
 
-Sampling from a GMM starts by drawing the index of a mixture component
-$k \in \{1,\dots,K\}$ with probability $\pi_k$ and then obtaining a
-sample $\bx \in \mathbb{R}^d$ from the Gaussian distribution
-$p(\bx|\mu_k,\Sigma_k)$ with covariance matrix $\Sigma_k$ and mean
-$\mu_k$. The overall probability density of $\bx$ is obtained by
-marginalizing the assignment variable $k$, obtaining:
+Marginalizing $k$ yields the probability density
 \[
 p(\bx|\Theta)
 = \sum_{k=1}^{K} \pi_k p( \bx_i |\mu_k,\Sigma_k),
@@ -147,17 +145,13 @@ p( \bx |\mu_k,\Sigma_k)
 -\frac{1}{2} (\bx-\mu_k)^\top\Sigma_k^{-1}(\bx-\mu_k)
 \right]
 \]
-
-Clustering a dataset $X=(\bx_1, \dots, \bx_n)$ by a GMM amounts to
-learn the model parameters $\Theta=\{p_k,\mu_k,\Sigma_k\}$ by
-maximizing the log-likelihood:
-
+Learning a GMM to fit a dataset $X=(\bx_1, \dots, \bx_n)$ is usually
+done by maximizing the log-likelihood of the data:
 @f[
- \ell(\theta;X)=
- E_{x\sim\hat p} \log p(x|\Theta)
- = \frac{1}{n}\sum_{i=1}^{n} \log \sum_{k=1}^{K} \pi_k p(x_i|\mu_k, \Sigma_k).
+ \ell(\Theta;X)=
+ E_{\bx\sim\hat p} \log p(x|\Theta)
+ = \frac{1}{n}\sum_{i=1}^{n} \log \sum_{k=1}^{K} \pi_k p(\bx_i|\mu_k, \Sigma_k).
 @f]
-
 where $\hat p$ is the empirical distribution of the data.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -165,94 +159,93 @@ where $\hat p$ is the empirical distribution of the data.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The direct maximization of the log-likelihood function of a GMM is
-difficult. The key reason is that the likelihood marginalizes over
-point-to-cluster assignments, effectively making the latter a latent
-(unobserved) variable, complicating inference.
+difficult due to the fact that the assignments of points to Gaussian
+mode is not observable and, as such, must be treated as a latent
+variable.
 
-*Expectation Maximization* (EM) is an alternating optimization
-algorithm that estimates an auxiliary distribution on the latent
-variables to simplify the inference process. Consider in general the
-problem of estimating to the maximum likelihood a distribution
-$p(x|\Theta) = \int p(x,h|\Theta)\,dh$, where $h$ is a *latent
-variable*. By introducing an auxiliary distribution $q(h|x)$ on the
-latent variable, one can use Jensen inequality to obtain the
-log-likelihood lower bound:
+Usually, GMMs are learned by using the *Expectation Maximization* (EM)
+algorithm @cite{dempster77maximum}. Consider in general the problem of
+estimating to the maximum likelihood a distribution $p(x|\Theta) =
+\int p(x,h|\Theta)\,dh$, where $x$ is a measurement, $h$ is a *latent
+variable*, and $\Theta$ are the model parameters. By introducing an
+auxiliary distribution $q(h|x)$ on the latent variable, one can use
+Jensen inequality to obtain the following lower bound on the
+log-likelihood:
 
 @f{align*}
 \ell(\Theta;X) =
 E_{x\sim\hat p} \log p(x|\Theta)
 &= E_{x\sim\hat p} \log \int p(x,h|\Theta) \,dh \\
 &= E_{x\sim\hat p} \log \int \frac{p(x,h|\Theta)}{q(h|x)} q(h|x)\,dh \\
-&\geq E_{x\sim\hat p} \int q(h) \log \frac{p(x,h|\Theta)}{q(h|x)} \\
-&= E_{x\sim\hat p, h\sim q} \log \frac{p(x,h|\Theta)}{q(h|x)} \\
-&= E_{x\sim\hat p, h\sim q} \log p(x,h|\Theta) -
-   E_{x\sim\hat p, h\sim q} \log q(h|x)
+&\geq E_{x\sim\hat p} \int q(h) \log \frac{p(x,h|\Theta)}{q(h|x)}\,dh \\
+&= E_{(x,q) \sim q(h|x) \hat p(x)} \log p(x,h|\Theta) -
+   E_{(x,q) \sim q(h|x) \hat p(x)} \log q(h|x)
 @f}
 
-The first term in the last expression is the log-likelihood of the
-model where both the $x$ and $h$ are now observed; the second term is
-the (differential) entropy of the auxiliary variable $q$ and does not
-depend on $\Theta$. Therefore, $\Theta$ can be estimated by maximizing
-the lower bound, which is usually far easier than estimating the
-original objective function.
-
-The problem is then the choice of the auxiliary distribution $q(h|x)$
-such that the lower bound is tight enough. The lower bound is
-maximized and become tight if we set $q(h|x) = p(h|x,\Theta)$, as it can
-be readily verified:
+The first term of the last expression is the log-likelihood of the
+model where both the $x$ and $h$ are observed and distributed as
+$q(x|h)\hat p(x)$; the second term is the a average entropy of the
+latent variable and does not depend on $\Theta$.  This lower bound is
+maximized and becomes tight by setting $q(h|x) = p(h|x,\Theta)$ to be
+the posterior distribution on the latent variable $h$ (given the
+current estimate of the parameters $\Theta$). In fact:
 
 \[
-E_{x\sim\hat p, h\sim q} \log \frac{p(x,h|\theta)}{p(h|x,\Theta)}
+E_{(x,h) \sim p(h|x,\Theta) \hat p(x)}\left[ \log \frac{p(x,h|\Theta)}{p(h|x,\Theta)}\right]
 =
-E_{x\sim\hat p, h\sim q} \log p(x|\Theta)
+E_{(x,h) \sim p(h|x,\Theta) \hat p(x)\log p(x|\Theta)
 =
 E_{x\sim\hat p} \log p(x|\theta)
 =
 \ell(\Theta;X).
 \]
 
-Thus the idea is to alternate between updating the latent variable
-auxiliary distribution $q(h|x) = p(h|x,\Theta_t)$ (*expectation step*)
-given the current estimate of the parameters $\Theta_t$, and then
-updating the model parameters $\Theta_{t+1}$ by maximizing the
-log-likelihood lower bound above (*maximization step*). This
-procedure, known as EM algorithm @cite{dempster77maximum}, converges
-to a local optimum of the actual log-likelihood.
+EM alternates between updating the latent variable auxiliary
+distribution $q(h|x) = p(h|x,\Theta_t)$ (*expectation step*) given the
+current estimate of the parameters $\Theta_t$, and then updating the
+model parameters $\Theta_{t+1}$ by maximizing the log-likelihood lower
+bound derived (*maximization step*). The simplification is that in the
+maximization step both $x$ and $h$ are now ``observed'' quantities.
+This procedure converges to a local optimum of the model
+log-likelihood.
 
 @par "Expectation step"
 
-In the case of a GMM, the auxiliary distribution $q(k|\bx_i) = q_{ik}$ is
-a matrix with $n \times K$ entries. Each row $q_{i,:}$ is a vector
-of soft assignments of point $\bx_i$ to each of the Gaussian components.
-Setting $q_{i,k} = p(k | \bx_i, \Theta)$ yields
+In the case of a GMM, the latent variables are the point-to-cluster
+assignments $k_i$, one for each of $n$ data points. The auxiliary
+distribution $q(k_i|\bx_i) = q_{ik}$ is a matrix with $n \times K$
+entries. Each row $q_{i,:}$ can be thought of as a vector of soft
+assignments of the data points $\bx_i$ to each of the Gaussian
+modes. Setting $q_{ik} = p(k_i | \bx_i, \Theta)$ yields
 
 \[
- q_{i,k} =
+ q_{ik} =
 \frac
 {\pi_k p(\bx_i|\mu_k,\Sigma_k)}
 {\sum_{l=1}^K \pi_l p(\bx_i|\mu_l,\Sigma_l)}
 \]
 
-where the Gaussian density $p(\bx_i|\mu_k,\Sigma_k)$ is given above.
+where the Gaussian density $p(\bx_i|\mu_k,\Sigma_k)$ was given above.
 
-Since the exponent of the multivariate gaussian distribution could
-become a very low negative number causing the $ exp $ function to
-underflow during the computations, the $ q_{i,k} $ coefficients are at
-first computed in the logarithm space. Also, as said above, the
-algorithm assumes that the the covariance matrices are diagonal, so
-the computation of the determinant of $ \Sigma_k $ reduces to
-computing the trace of the matrix and the inversion of $ \Sigma_k $
-could be obtained by inverting the elements on the diagonal of the
-covariance matrix.
+One important point to keep in mind when these probabilities are
+computed is the fact that the Gaussian densities may attain very low
+values and underflow in a vanilla implementation. Furthermore, VLFeat
+GMM implementation restricts the covariance matrices to be
+diagonal. In this case, the computation of the determinant of
+$\Sigma_k$ reduces to computing the trace of the matrix and the
+inversion of $\Sigma_k$ could be obtained by inverting the elements on
+the diagonal of the covariance matrix.
 
 @par "Maximization step"
 
 The M step estimates the parameters of the Gaussian mixture components
 and the prior probabilities $\pi_k$ given the auxiliary distribution
-computed in the E step. In the case of the GMM, this is the same as
-estimating $K$ Gaussian distributions and one discrete distribution to
-the maximum likelihood. So for example $\mu_k$ is the mean of the
-points assigned to it (accounting for the soft assignments), etc.:
+on the point-to-cluster assignments computed in the E step. Since all
+the variables are now ``observed'', the estimate is quite simple. For
+example, the mean $\mu_k$ of a Gaussian mode is obtained as the mean
+of the data points assigned to it (accounting for the strength of the
+soft assignments). The other quantities are obtained in a similar
+manner, yielding to:
 
 @f{align*}
  \mu_k &= { { \sum_{i=1}^n q_{i,k} \bx_{i} } \over { \sum_{i=1}^n q_{i,k} } },
@@ -266,32 +259,36 @@ points assigned to it (accounting for the soft assignments), etc.:
 @subsection gmm-fundamentals-init Initialization algorithms
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Since the EM algorithm is a stochastic method, which converges to
-one of the local minima of the criterion function, the speed of convergence
-and also the quality of the achieved local minimum is highly dependent on
-the initial configuration of the gaussians in the mixture.
+The EM algorithm is a local optimization method. As such, the quality
+of the solution strongly depends on the quality of the initial values
+of the parameters (i.e.  of the locations and shapes of the Gaussian
+modes).
 
 @ref gmm.h supports the following cluster initialization algorithms:
 
-- <b>Random data points</b> (::vl_gmm_rand_init_mixture)
-  initializes the means from a random selection of the training data.
-  The sigmas are initialized as the overall data covariance, weights
-  of the gaussians are set equal and sum to one. This approach is the
-  fastest, simplest and also the most likely to end in a bad local
-  minimum.
+- <b>Random data points.</b> (::vl_gmm_rand_init_mixture) This method
+  initializes the means of the modes by sampling at random an equal
+  number of data points, the covariance matrices of all the modes are
+  set to be equal to the covariance of the entire dataset, and the
+  prior probabilities of the Gaussian modes are initialized to be
+  uniform. This initialization method is the fastest, simplest, as
+  well as the one most likely to end in a bad local minimum.
 
-- <b>Custom initialization</b> (::vl_gmm_custom_init_mixture)
-  initialize the means, weights and variances according to the user input
-  using funtions ::vl_gmm_set_means, ::vl_gmm_set_weights and
-  ::vl_gmm_set_sigmas.
+- <b>Custom initialization</b> (::vl_gmm_custom_init_mixture) This
+  allows the user choose the initial values of the means, the
+  covariances, and the prior probabilities of the GMM. In order to set
+  these parameters, use the functions ::vl_gmm_set_means,
+  ::vl_gmm_set_weights, and ::vl_gmm_set_sigmas.
 
-- <b>KMeans initialization</b> (::vl_gmm_kmeans_init_mixture)
-  the means, covariances and weights are initialized as covariances, centers
-  and relative masses of clusters obtained using the KMeans algorithm.
-  A user has to specify a customized ::VlKMeans object using
-  function ::vl_gmm_set_kmeans_init_object.
-  If no ::VlKMeans object is specified at the start, a default object
-  is used.
+- <b>KMeans initialization</b> (::vl_gmm_kmeans_init_mixture) This
+  method uses KMeans to pre-cluster the points. It then sets the means
+  and covariances of the Gaussian distributions the sample means and
+  covariances of each KMeans cluster. It also sets the prior
+  probabilities to be proportional to the mass of each cluster. In
+  order to use this initialization method, a user can specify an
+  instance of ::VlKMeans by using the function
+  ::vl_gmm_set_kmeans_init_object, or let ::VlGMM create one
+  automatically.
 
 **/
 
@@ -305,7 +302,7 @@ the initial configuration of the gaussians in the mixture.
 #endif
 
 #ifdef __SSE2__
-  #include "mathop_sse2.h"
+#include "mathop_sse2.h"
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -317,26 +314,26 @@ the initial configuration of the gaussians in the mixture.
 
 struct _VlGMM
 {
-  vl_type dataType ;            /**< data type */
-  vl_size dimension ;           /**< data dimensionality */
-  vl_size numClusters ;         /**< number of clusters  */
-  vl_size numData ;             /**< number of last time clustered data points  */
-  vl_size maxNumIterations ;    /**< Maximum number of refinement iterations */
-  vl_size numRepetitions   ;    /**< Number of clustering repetitions */
-  int     verbosity ;           /**< verbosity level */
-  void *  means;                /**< Means of gaussians */
-  void *  weights;              /**< Weights of gaussians */
-  void *  sigmas;               /**< Diagonals of covariance matrices of gaussians */
-  void *  posteriors;           /**< Probabilities of correspondences of points to clusters */
-  
+  vl_type dataType ;                  /**< Data type. */
+  vl_size dimension ;                 /**< Data dimensionality. */
+  vl_size numClusters ;               /**< Number of clusters  */
+  vl_size numData ;                   /**< Number of last time clustered data points.  */
+  vl_size maxNumIterations ;          /**< Maximum number of refinement iterations. */
+  vl_size numRepetitions   ;          /**< Number of clustering repetitions. */
+  int     verbosity ;                 /**< Verbosity level. */
+  void *  means;                      /**< Means of Gaussian modes. */
+  void *  sigmas;                     /**< Diagonals of covariance matrices of Gaussian modes. */
+  void *  weights;                    /**< Weights of Gaussian modes. */
+  void *  posteriors;                 /**< Probabilities of correspondences of points to clusters. */
+
   double sigmaLowBound;
-  
-  VlGMMInitialization initialization;    /**< Initilaization option */
-  VlGMMMultithreading multithreading;    /**< Multithreading option */
-  
-  VlKMeans * kmeansInit;                 /**< Kmeans object for initialization of gaussians */
-  
-  double LL;                            /**< current solution loglikelihood */
+
+  VlGMMInitialization initialization; /**< Initialization option */
+  VlGMMMultithreading multithreading; /**< Multi-threading option */
+
+  VlKMeans * kmeansInit;              /**< Kmeans object for initialization of gaussians */
+
+  double LL ;                         /**< current solution loglikelihood */
 } ;
 
 /* ---------------------------------------------------------------- */
@@ -360,7 +357,6 @@ vl_gmm_new (vl_type dataType)
   self->numData = 0;
   self->dimension = 0;
   self->initialization = VlGMMRand;
-
   self->multithreading = VlGMMParallel;
 
   self->verbosity = 0 ;
@@ -425,7 +421,7 @@ vl_gmm_delete (VlGMM * self)
 /* ---------------------------------------------------------------- */
 
 /** @brief Get data type
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return data type.
  **/
 
@@ -436,7 +432,7 @@ vl_gmm_get_data_type (VlGMM const * self)
 }
 
 /** @brief Get the number of clusters
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return number of clusters.
  **/
 
@@ -447,7 +443,7 @@ vl_gmm_get_num_clusters (VlGMM const * self)
 }
 
 /** @brief Get the number of data points
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return number of data points.
  **/
 
@@ -458,7 +454,7 @@ vl_gmm_get_num_data (VlGMM const * self)
 }
 
 /** @brief Set the number of clusters
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param numClusters number of clusters..
  **/
 
@@ -469,7 +465,7 @@ vl_gmm_set_num_clusters (VlGMM * self, vl_size numClusters)
 }
 
 /** @brief Get the log likelihood of the current mixture
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return loglikelihood.
  **/
 
@@ -480,7 +476,7 @@ vl_gmm_get_loglikelihood (VlGMM const * self)
 }
 
 /** @brief Get verbosity level
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return verbosity level.
  **/
 
@@ -491,7 +487,7 @@ vl_gmm_get_verbosity (VlGMM const * self)
 }
 
 /** @brief Set verbosity level
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param verbosity verbosity level.
  **/
 
@@ -502,7 +498,7 @@ vl_gmm_set_verbosity (VlGMM * self, int verbosity)
 }
 
 /** @brief Get means
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return cluster means.
  **/
 
@@ -513,7 +509,7 @@ vl_gmm_get_means (VlGMM const * self)
 }
 
 /** @brief Get sigmas
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return diagonals of cluster covariance matrices.
  **/
 
@@ -524,18 +520,18 @@ vl_gmm_get_sigmas (VlGMM const * self)
 }
 
 /** @brief Get weights
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return weights of cluster gaussians.
  **/
 
 void const *
-vl_gmm_get_weights (VlGMM const * self)
+vl_gmm_get_priors (VlGMM const * self)
 {
   return self->weights ;
 }
 
 /** @brief Get posteriors
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return posterior probabilities of cluster memberships.
  **/
 
@@ -546,7 +542,7 @@ vl_gmm_get_posteriors (VlGMM const * self)
 }
 
 /** @brief Get maximum number of iterations
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return maximum number of iterations.
  **/
 
@@ -568,7 +564,7 @@ vl_gmm_set_max_num_iterations (VlGMM * self, vl_size maxNumIterations)
 }
 
 /** @brief Get maximum number of repetitions.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return current number of repretitions for quantization.
  **/
 
@@ -579,7 +575,7 @@ vl_gmm_get_num_repetitions (VlGMM const * self)
 }
 
 /** @brief Set maximum number of repetitions
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param numRepetitions maximum number of repetitions.
  ** The number of repetitions cannot be smaller than 1.
  **/
@@ -592,7 +588,7 @@ vl_gmm_set_num_repetitions (VlGMM * self, vl_size numRepetitions)
 }
 
 /** @brief Get data dimension
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return data dimension.
  **/
 
@@ -603,7 +599,7 @@ vl_gmm_get_dimension (VlGMM const * self)
 }
 
 /** @brief Set dimensionality of the data.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param dimension dimensionality of the data.
  ** The number of repetitions cannot be smaller than 1.
  **/
@@ -614,7 +610,7 @@ void vl_gmm_set_dimension (VlGMM * self, vl_size dimension)
 }
 
 /** @brief Get initialization algorithm
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return initialization algorithm.
  **/
 
@@ -625,7 +621,7 @@ vl_gmm_get_initialization (VlGMM const * self)
 }
 
 /** @brief Set initialization algorithm.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param init initialization algorithm.
  **/
 void
@@ -635,7 +631,7 @@ vl_gmm_set_initialization (VlGMM * self, VlGMMInitialization init)
 }
 
 /** @brief Get KMeans initialization object.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return kmeans initialization object.
  **/
 VlKMeans * vl_gmm_get_kmeans_init_object (VlGMM const * self)
@@ -644,7 +640,7 @@ VlKMeans * vl_gmm_get_kmeans_init_object (VlGMM const * self)
 }
 
 /** @brief Set KMeans initialization object.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param kmeans initialization KMeans object.
  **/
 void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans)
@@ -657,7 +653,7 @@ void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans)
 }
 
 /** @brief Get GMM multithreading otion
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return VlGMM multithreading option.
  **/
 VlGMMMultithreading vl_gmm_get_multithreading (VlGMM const * self)
@@ -666,7 +662,7 @@ VlGMMMultithreading vl_gmm_get_multithreading (VlGMM const * self)
 }
 
 /** @brief Set GMM multithreading option.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param multithreading multithreading option.
  **/
 void vl_gmm_set_multithreading (VlGMM * self, VlGMMMultithreading multithreading)
@@ -675,7 +671,7 @@ void vl_gmm_set_multithreading (VlGMM * self, VlGMMMultithreading multithreading
 }
 
 /** @brief Get lower bound on sigma diagonals.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @return lower bound on sigmas.
  **/
 double vl_gmm_get_sigma_lower_bound (VlGMM * self)
@@ -684,7 +680,7 @@ double vl_gmm_get_sigma_lower_bound (VlGMM * self)
 }
 
 /** @brief Set lower bound on sigma diagonals.
- ** @param self VlGMM object instance.
+ ** @param self object
  ** @param lowbound lower bound on sigma diagonals.
  **/
 void vl_gmm_set_sigma_lower_bound (VlGMM * self, double lowbound)
@@ -1040,16 +1036,14 @@ VL_XCAT(_vl_gmm_custom_init_mixture_, SFX)
  vl_size numData,
  vl_size numClusters)
 {
-
   self->numData = numData;
   self->dimension = dimension ;
   self->numClusters = numClusters;
 
-  if( !self->means || !self->weights || !self->sigmas ){
+  if(!self->means || !self->weights || !self->sigmas){
     VL_PRINT("VlGMM: Error: Custom initialization set, however not all initial parameters (weights,means,sigmas) were initialized!\n");
     abort();
   }
-
 }
 
 /* ---------------------------------------------------------------- */
@@ -1066,12 +1060,10 @@ VL_XCAT(_vl_gmm_logmultigaussian_, SFX)
  vl_size dimension
 )
 {
-
   vl_uindex dim;
   TYPE dist = 0;
 
   (*posterior) = log(*weight);
-
   (*posterior) -= (dimension/2.0)*log(2.0*VL_PI);
 
   for(dim = 0; dim < dimension; dim++) {
@@ -1082,7 +1074,6 @@ VL_XCAT(_vl_gmm_logmultigaussian_, SFX)
     dist += (VL_XCAT (_vl_gmm_pow2_,SFX) (datum[dim]-mean[dim])) / sigma[dim];
     (*posterior) -= (0.5 * VL_XCAT (_vl_gmm_pow2_,SFX) (datum[dim]-mean[dim])) / sigma[dim];
   }
-
 }
 
 /* ---------------------------------------------------------------- */
@@ -1453,7 +1444,6 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   return LL;
 }
 
-
 /* ---------------------------------------------------------------- */
 /*                               Expectation maximization algorithm */
 /* ---------------------------------------------------------------- */
@@ -1662,7 +1652,6 @@ vl_gmm_kmeans_init_mixture
 
 /** @brief Initialize mixture before EM takes place using the custom parameters
  ** @param self GMM object instance.
- ** @param data data points which should be clustered.
  ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.
  ** @param numClusters number of gaussians which should be estimated.
@@ -1972,4 +1961,3 @@ void vl_gmm_set_posteriors (VlGMM * self, void * posteriors, vl_size numClusters
 #undef TYPE
 #undef FLT
 #undef VL_GMM_INSTANTIATING
-

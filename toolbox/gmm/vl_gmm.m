@@ -1,23 +1,20 @@
-% VL_GMM  Cluster data using expectation maximization GMM
-%   [MEANS, SIGMAS, WEIGHTS] = VL_GMM(X, NUMCLUSTERS) estimates the
-%   gaussian mixture model of the data points stored in the columns of the
-%   matrix X in NUMCLUSTERS gaussians using EM algorithm. X may be either
-%   SINGLE or DOUBLE. MEANS and SIGMAS has the same number of rows as X and
-%   NUMCLUSTERS columns with one column per estimated gaussian.
-%   Note that the algorithm estimates the gaussians with diagonal sigma
-%   matrices. SIGMAS contains these diagonals in each column.
-%   WEIGHTS cointains individual weights of estimated gaussians in a 
-%   NUMCLUSTERS long one row vector.
+% Vl_GMM  Learn a Gaussian Mixture Model using EM
+%   [MEANS, SIGMAS, WEIGHTS] = VL_GMM(X, NUMCLUSTERS) fits a GMM with
+%   NUMCLUSTERS components to the data X. Each column of X represent a
+%   sample point. X may be either SINGLE or DOUBLE. MEANS, SIGMAS, and
+%   WEIGHTS are repsectively the means, the diagonal covariances, and
+%   the prior probabilities of the Guassian modes. MEANS and SIGMAS
+%   have the same number of rows as X and NUMCLUSTERS columns with one
+%   column per mode. WEIGHTS is a row vector with NUMCLUSTER entries
+%   summing to one.
 %
-%   [MEANS, SIGMAS, WEIGHTS, LL] = VL_GMM(...) returns the loglikelihood 
-%   (LL) of the solution as well.
+%   [MEANS, SIGMAS, WEIGHTS, LL] = VL_GMM(...) returns the
+%   loglikelihood (LL) of the model as well.
 %
-%   [MEANS, SIGMAS, WEIGHTS, LL, POSTERIORS] = VL_GMM(...) returns the 
-%   loglikelihood of the solution and posterior probabilities of the 
-%   correspondeces of individual data points to specific clusters. 
-%   POSTERIORS matrix has NUMCLUSTERS rows and NUMDATA columns.
-%   Each column contains the set of posteriors of a data point to a
-%   specific gaussian.
+%   [MEANS, SIGMAS, WEIGHTS, LL, POSTERIORS] = VL_GMM(...) returns the
+%   loglikelihood of the solution and posterior probabilities of the
+%   Gaussian modes given each data point. The POSTERIORS matrix has
+%   NUMCLUSTERS rows and NUMDATA columns.
 %
 %   VL_GMM() supports different initialization and optimization
 %   methods. Specifically, the following options are supported:
@@ -25,45 +22,44 @@
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
 %
-%   Initialization:: [RAND]
-%     Use either random data points as initial means, covariance of the 
-%     whole data as initial diagonals of covariance matrices (RAND) or 
-%     custom initialization of starting sigmas and means of the mixture 
-%     (CUSTOM).
+%   Initialization:: RAND
+%     RAND initializes the means as random data poitns and the
+%     covaraince matrices as the covariance of X. CUSTOM allow
+%     specifying the initial means, covariances, and prior
+%     probabilities.
 %
-%   InitMeans::
-%    Specify the initial means (size(X,1)-by-numClusters matrix) 
-%    of the gaussian mixture.
+%   InitMeans:: []
+%    Specify the initial means (size(X,1)-by-NUMCLUSTERS matrix).
 %
-%   InitWeights::
-%    Specify the initial weights (numClusters sized vector) 
-%    of the gaussian mixture.
+%   InitWeights:: []
+%    Specify the initial weights (a vector of dimension NUMCLUSTER).
 %
-%   InitSigmas::
-%    Specify the initial diagonals of covariance matrices
-%    (size(X,1)-by-numClusters matrix) of the gaussian mixture.
+%   InitSigmas:: []
+%    Specify the initial diagonal covariance matrices
 %
 %   Multithreading:: [SERIAL]
-%     Choose whether you want to use PARALLEL or SERIAL approach to the 
-%     computation of the expectation and maximization steps.
+%     Choose whether to use SERIAL or PARALLEL (multi-core)
+%     computations.
 %
-%   NumRepetitions:: [1]
-%     Number of times to restart EM. The solution with maximal
+%   NumRepetitions:: 1
+%     Number of times to restart EM. The solution with maximum
 %     loglikelihood is returned.
 %
-%   SigmaBound:: [10e-6]
-%     Set the lower bound on sigma diagonals. Suitable when data contains
-%     singleton dimensions.
+%   SigmaBound:: 10e-6
+%     Set the lower bound on the covariance diagonal entries. This
+%     is particularly important if the data contains singleton
+%     dimensions, and generally useful for stability.
 %
 %   Example::
-%     VL_GMM(X, 10, 'verbose', 'multithreading', 'parallel', 'MaxNumIterations', 20) 
-%     estimates the mixture of 10 gaussians in 20 iterations at maximum.
+%     VL_GMM(X, 10, 'verbose', 'multithreading', 'parallel',
+%     'MaxNumIterations', 20) estimates the mixture of 10 gaussians
+%     using at mosst 20 iterations.
 %
-%   See also: VL_HELP().
+%   See also: VL_KMEANS(), VL_HELP().
 
-% Authors: Andrea Vedaldi, David Novotny
+% Authors: David Novotny and Andrea Vedaldi
 
-% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 David Novotny and Andrea Vedaldi.
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under

@@ -145,13 +145,13 @@ VL_EXPORT void vl_gmm_set_sigma_lower_bound (VlGMM * self, double lowbound);
  **/
 VL_EXPORT void const * vl_gmm_get_means (VlGMM const * self);
 VL_EXPORT void const * vl_gmm_get_sigmas (VlGMM const * self);
-VL_EXPORT void const * vl_gmm_get_weights (VlGMM const * self);
+VL_EXPORT void const * vl_gmm_get_priors (VlGMM const * self);
 VL_EXPORT void const * vl_gmm_get_posteriors (VlGMM const * self);
 VL_EXPORT vl_type vl_gmm_get_data_type (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_dimension (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_clusters (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_data (VlGMM const * self);
-VL_EXPORT double vl_gmm_get_loglikelihood (VlGMM const * self);
+VL_EXPORT double vl_gmm_get_loglikelyhood (VlGMM const * self);
 VL_EXPORT int vl_gmm_get_verbosity (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_max_num_iterations (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
