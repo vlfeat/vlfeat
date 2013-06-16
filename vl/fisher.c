@@ -108,16 +108,16 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   memset(enc, 0, sizeof(TYPE) * 2 * dimension * numClusters);
 
 #if ! defined(_OPENMP)
-  if(multithreading == VlFisherParallel) {
-    VL_PRINT("VlFisher: Warning: OpenMP not included, continuing with serial computation.")
-  }
+  //if(multithreading == VlFisherParallel) {
+  //  VL_PRINT("VlFisher: Warning: OpenMP not included, continuing with serial computation.")
+  //}
 #endif
 
   /* parallel computation consts*/
   switch(multithreading) {
     case(VlFisherParallel):
 #ifdef _OPENMP
-      numChunks = vl_get_num_threads();
+      numChunks = vl_get_max_threads();
 #else
       numChunks = 1;
 #endif

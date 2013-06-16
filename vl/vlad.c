@@ -99,7 +99,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
   switch(multithreading) {
     case VlVLADParallel:
 #if defined(_OPENMP)
-      numChunks = (vl_int)vl_get_num_threads();
+      numChunks = (vl_int)vl_get_max_threads();
 #else
       numChunks = 1;
 #endif
