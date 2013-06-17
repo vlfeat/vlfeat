@@ -1,5 +1,5 @@
                    VLFeat (Vision Library Features)
-                            Version 0.9.15
+                            Version 0.9.17
 
 ABOUT
 
@@ -42,6 +42,17 @@ QUICK START WITH MATLAB
   > vl_demo
 
 CHANGES
+  0.9.17     Rewritten SVM implementation, adding support for SGD and
+             SDCA optimisers and various loss functions (hinge,
+             squared hinge, logistic, etc.) and improving the
+             interface. Added infrastructure to support multi-core
+             computations using OpenMP. Added OpenMP support to
+             KD-trees and KMeans. Added new Gaussian Mixture Models,
+             VLAD encoding, and Fisher Vector encodings (also with
+             OpenMP support). Added LIOP feature descriptors. Added
+             new object category recognition example code, supporting
+             several standard benchmarks off-the-shelf.
+
   0.9.16     Added VL_COVDET(). This function implements the following
              detectors: DoG, Hessian, Harris Laplace, Hessian Laplace,
              Multiscale Hessian, Multiscale Harris. It also implements
@@ -60,37 +71,52 @@ CHANGES
              future Xcode versions. Completed the migration of the old
              test code in toolbox/test, moving the functionality to
              the new unit tests toolbox/xtest.
+
   0.9.14     Added SLIC superpixels. Added VL_ALPHANUM(). Improved
              Windows binary package and added support for Visual
              Studio 2010. Improved the documentation layout and added
              a proper bibliography. Bugfixes and other minor
              improvements. Moved from the GPL to the less restrictive
              BSD license.
+
   0.9.13     Fixes Windows binary package.
+
   0.9.12     Fixes vl_compile and the architecture string on Linux 32 bit.
+
   0.9.11     Fixes a compatibility problem on older Mac OS X versions.
              A few bugfixes are included too.
+
   0.9.10     Improves the homogeneous kernel map. Plenty of small tweaks
              and improvements. Make maci64 the default architecture on
              the Mac.
+
   0.9.9      Added: sift matching example. Extended Caltech-101
              classification example to use kd-trees.
+
   0.9.8      Added: image distance transform, PEGASOS, floating point
              K-means, homogeneous kernel maps, a Caltech-101
              classification example. Improved documentation.
+
   0.9.7      Changed the Mac OS X binary distribution to require
              a less recent version of Mac OS X (10.5).
+
   0.9.6      Changed the GNU/Linux binary distribution to require
              a less recent version of the C library.
+
   0.9.5      Added kd-tree and new SSE-accelerated vector/histogram
              comparison code.  Improved dense SIFT (dsift) implementation.
              Added Snow Leopard and MATLAB R2009b support.
+
   0.9.4      Added quick shift. Renamed dhog to dsift and improved
              implementation and documentation. Improved tutorials.
              Added 64 bit Windows binaries. Many other small changes.
+
   0.9.3      Namespace change (everything begins with a vl_ prefix
              now). Many other changes to provide compilation support
              on Windows with MATLAB 7.
+
   beta-3     Completions to the ikmeans code.
+
   beta-2     Many completions.
+
   beta-1     Initial public release.
