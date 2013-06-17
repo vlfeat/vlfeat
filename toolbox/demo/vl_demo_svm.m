@@ -17,21 +17,20 @@ axis equal ;
 vl_demo_print('svm_training') ;
 % Parameters
 lambda = 0.01 ; % Regularization parameter
-maxIter = 30 ; % Maximum number of iterations
+maxIter = 1000 ; % Maximum number of iterations
 
 
 % Diagnostic function
 function diagnostics(svm)
-  energy = [energy [svm.energy ; svm.energyDual ; svm.dualityGap ] ] ;
+  energy = [energy [svm.objective ; svm.dualObjective ; svm.dualityGap ] ] ;
 end
 
 % Training the SVM
 energy = [] ;
-dataset = vl_maketrainingset(X, int8(y)) ;
-[w b info] = vl_svmtrain(dataset, lambda, 'DCA',...
-                           'MaxIterations',maxIter,...
+[w b info] = vl_svmtrain(X, y, lambda,...
+                           'MaxNumIterations',maxIter,...
                            'DiagnosticFunction',@diagnostics,...
-                           'EnergyFreq',1)
+                           'DiagnosticFrequency',1)
 
 % Visualisation
 eq = [num2str(w(1)) '*x+' num2str(w(2)) '*y+' num2str(b)];
@@ -47,7 +46,7 @@ hold on
 plot(energy(1,:),'--b') ;
 plot(energy(2,:),'-.g') ;
 plot(energy(3,:),'r') ;
-legend('Primal energy','Dual energy','Duality gap')
+legend('Primal objective','Dual objective','Duality gap')
 xlabel('Diagnostics iteration')
 ylabel('Energy')
 vl_demo_print('svm_energy') ;
