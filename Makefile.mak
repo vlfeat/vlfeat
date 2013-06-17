@@ -514,6 +514,18 @@ startmatlab:
 $(mexdir)\vl.dll : $(bindir)\vl.dll
 	copy "$(**)" "$(@)"
 
+# Ideally, the DLL should be linked to Intel compatibility library libiomp5md.dll that
+# ships with MATLAB. However, there does not seem to be a clean way to do so without
+# the .lib file. This is suboptimal as it casues two OMP libraries to be used (vcomp and iomp5).
+# Possible work arounds that did not work yet: generate the .lib file from the .dll file,
+# redirect somehow vcomp to iomp5.
+
+#$(LINK) /LIBPATH:"$(MATLABROOT)\extern\lib\win64\microsoft" /DLL $(LFLAGS) $(**) libmwblas.lib /nodefaultlib:vcomp /OUT:"$(@)"
+#$(mexdir)\vl.dll : $(libobj)
+#	@echo .. LINK [DLL] $(@R).dll
+#  $(LINK) /DLL $(LFLAGS) $(**) /OUT:"$(@)"
+#	@-del "$(@R).dll.manifest"
+
 # redistributable: msvcr__.dll => bin/win{32,64}/msvcr__.dll
 $(mexdir)\$(MSVCR).manifest : "$(MSVCR_PATH)\$(MSVCR).manifest"
         copy $(**) "$(@)"
