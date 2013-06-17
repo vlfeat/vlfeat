@@ -51,8 +51,6 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage kdtree
 
 - **Segmentation**
-  - @subpage homkermap
-  - @subpage svm
   - @subpage slic
   - @subpage quickshift
 
@@ -61,39 +59,36 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage homkermap
   - @subpage svm
 
-- **Support functionalities**
-  - @subpage host.h      "Platform abstraction"
-  - @subpage generic
+- **Utilities**
   - @subpage random
   - @subpage mathop.h    "Math operations"
-  - @subpage heap-def.h  "Generic heap object (priority queue)"
   - @subpage stringop.h  "String operations"
   - @subpage imopv.h     "Image operations"
-  - @subpage pgm.h       "PGM reading and writing"
+  - @subpage pgm.h       "PGM image format"
+  - @subpage heap-def.h  "Generic heap object (priority queue)"
   - @subpage rodrigues.h "Rodrigues formula"
   - @subpage mexutils.h  "MATLAB MEX helper functions"
   - @subpage getopt_long.h "Drop-in @c getopt_long replacement"
+ 
+- **General support functionalities**
+  - @subpage generic
+  - @subpage portability
+  - @ref resources
+  - @subpage objects
+  - @ref threads
+  - @subpage matlab
+  - @subpage metaprogram
 
-- @subpage design
-- @subpage dev
-- @subpage main-glossary
+- **Developing the library**
+  - @subpage dev
 
+- @subpage glossary
 **/
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page design VLFeat design concepts
+@page resources Memory and resource handling
 @author Andrea Vedaldi
-@tableofcontents
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-VLFeat is designed to be portable and simple to integrate with high
-level languages such as MATLAB. This section illustrates and
-motivates the aspects of the design that are relevant to the users of
-the library.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section design-resources Memory and resource handling
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Some VLFeat functions return pointers to memory blocks or
@@ -138,16 +133,20 @@ is unaffected by such an operation; conversely, since no VLFeat object
 references anything but memory, this guarantees that all allocated
 resources are properly disposed (avoiding leaking resource). This is
 used extensively in the design of MATLAB MEX files (see @ref
-design-matlab).
+matlab).
+**/
 
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section design-objects Objects
+@page objects Objects
+@author Andrea Vedaldi
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Many VLFeat algorithms are availale in the form of *objects*. The C
+Many VLFeat algorithms are available in the form of *objects*. The C
 language, used by VLFeat, does not support objects explicitly. Here an
 object is intended a C structure along with a number of functions (the
-object member functions or methods) operationg on it. Ideally, the
+object member functions or methods) operating on it. Ideally, the
 object data structure is kept opaque to the user, for example by
 defining it in the @c .c implementation files which are not accessible
 to the library user.
@@ -158,7 +157,7 @@ start with the <code>vl_<object_name>_</code> suffix
 (e.g. @c vl_example_object_new).
 
 <!-- ------------------------------------------------------------  -->
-@subsection design-objects-lifecycle Object lifecycle
+@section objects-lifecycle Object lifecycle
 <!-- ------------------------------------------------------------  -->
 
 Conceptually, an object undergoes four phases during its lifecylce:
@@ -196,7 +195,7 @@ finalization/deallocation are combined into two operations:
   @c vl_example_object_delete.
 
 <!-- ------------------------------------------------------------  -->
-@subsection design-objects-getters-setters Getters and setters
+@section objects-getters-setters Getters and setters
 <!-- ------------------------------------------------------------  -->
 
 Most objects contain a number of methods to get (getters) and set
@@ -211,39 +210,20 @@ vl_example_object_set_property(x) ;
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section design-portability Portability features
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-Platform dependent details are isolated in the @ref host.h
-library module. These include:
-
-- Atomic types (e.g. ::vl_int32).
-- Special syntaxes for the declaration of symbols exported by the library
-  and inline functions (e.g. ::VL_EXPORT).
-- Host-dependent conversion of data endianess
-  (e.g. ::vl_swap_host_big_endianness_8()).
-
-VLFeat uses processor specific features (e.g. Intel SSE) if those are
-available at run time.
-
-<!-- @see http://www.macresearch.org/how_to_properly_use_sse3_and_ssse3_and_future_intel_vector_extensions_0  -->
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section design-matlab MATLAB integration issues
+@page matlab MATLAB integration
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The VLFeat C library is designed to integrate seamlessly with MATLAB.
 Binary compatibility is simplified by the use of the C language
 (rather than C++). In addition, the library design follows certain
-restrictons that make it compatible with the MATLAB MEX interface.
+restrictions that make it compatible with the MATLAB MEX interface.
 
 The main issue in calling a library function from a MATLAB MEX
 function is that MATLAB can abort the execution of the MEX function
 at any point, either due to an error, or directly upon a user request
 (Ctrl-C) (empirically, however, a MEX function seems to be
-interruptible only during the invocation of certain functions of the
+incorruptible only during the invocation of certain functions of the
 MEX API such as @c mexErrMsgTxt).
 
 When a MEX function is interrupted, resources (memory blocks or
@@ -261,22 +241,26 @@ way, VLFeat memory allocation functions (::vl_malloc, ::vl_realloc,
 functions. Such functions automatically dispose of all the memory
 allocated by a MEX function when the function ends (even because of
 an exception). Because of the restrictions of the library design
-illustrated in @ref design-resources, this operation is safe and
+illustrated in @ref resources, this operation is safe and
 correctly dispose of VLFeat local state. As a consequence, it is
 possible to call @c mexErrMsgTxt at any point in the MEX function
 without worring about leaking resources.
 
 This however comes at the price of some limitations. Beyond the
-restrictions illustred in @ref design-resources, here we note that no
+restrictions illustred in @ref resources, here we note that no
 VLFeat local resoruce (memory blocks or objects) can persist across
 MEX file invocations. This implies that any result produced by a
 VLFeat MEX function must be converted back to a MATLAB object such as
 a vector or a structure. In particular, there is no direct way of
 creating an object within a MEX file, returning it to MATLAB, and
 passing it again to another MEX file.
+ 
+**/
 
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section main-metaprogramming Preprocessor metaprogramming
+@page metaprogram Preprocessor metaprogramming
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Part of VLFeat code uses a simple form of perprocessor metaprogramming.
@@ -286,9 +270,11 @@ multiple version of a given algorithm for different data types
 
 In most cases preprocessor metaprogramming is invisible to the library
 user, as it is used only internally.
+**/
 
+/**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page main-glossary Glossary
+@page glossary Glossary
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
  - <b>Column-major.</b> A <em>M x N </em> matrix <em>A</em> is
@@ -322,20 +308,20 @@ user, as it is used only internally.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 This page contains information useful to the developer of VLFeat.
- 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section dev-style Copyright
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-A short copyright notice is added at the beginnign of each file. For
+A short copyright notice is added at the beginning of each file. For
 example:
- 
+
 <pre>
 Copyright (C) 2013 Milan Sulc
 Copyright (C) 2012 Daniele Perrone.
 Copyright (C) 2011-13 Andrea Vedaldi.
 All rights reserved.
- 
+
 This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 </pre>
@@ -346,7 +332,7 @@ note its copyright by adding a line to the copyright list with the year
 of the modification. Year ranges are acceptable. Lines are never
 deleted, only appended, or potentially modified to list
 more years.
- 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section dev-style Coding style
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -381,6 +367,29 @@ is considered acceptable.</li>
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection dev-style-matlab MATLAB coding style
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<ul>
+<li><b>Help messages.</b> Each @c .m file should include a stantrad
+help comment block (accesbile from MATLAB @c help() command).
+The first line of the block has a space, the name of the function,
+4 spaces, and a brief command description. The body of the help
+message is indendet with 4 spaces. For example
+@code
+% VL_FUNCTION    An example function
+%    VL_FUNCTION() does nothing.
+@endcode
+The content HELP message itsel should follow MATLAB default style.
+For example, rather than giving a list of formal input and output
+arguments as often done, one simply shows how to use the function, explaining
+along the way the different ways the function can be called and
+the format of the parameters.
+</li>
+</ul>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section dev-doc Documenting the code
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
@@ -392,17 +401,17 @@ library module, usually corresponding to a certain header file.
 
 - **Inline comments.** Inline Doxygen comments are discouraged except
   in the documentation of data members of structures. They start with
-  a capital letter and end with a dot. For example:
+  a capital letter and end with a period. For example:
   @code
   struct VlExampleStructure {
-    int aMember ; /\*\*< A useful data member. 
+    int aMember ; /\*\*< A useful data member.
   }
   @endcode
- 
+
 - **Brief comments.** Brief Doxygen comments starts by a capital
   and end with a period. The documentation of all functions start
   with a brief comment.
- 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @subsection devl-doc-modules Documenting the library modules
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -460,7 +469,7 @@ brief comment.
 @subsection devl-doc-structures Documenting objects
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-As seen in @ref design-objects, VLFeat treats certain structures with
+As seen in @ref objects, VLFeat treats certain structures with
 an object-like semantics. Usually, a module defines exactly one such
 objects. In this case, the object member functions should be grouped
 (by using Doxygen grouping functionality) as
@@ -501,21 +510,30 @@ entry in the bibliography.
 @file generic.h
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page generic Preprocssor, library state, etc.
+@page generic General support functionalities
 @author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref generic.h provides the following functionalities:
+VLFeat contains several support functionalities addressing the C
+preprocessors, using multiple threads (including parallel computations),
+handling errors, allocating memory, etc. These are described in
+the following pages:
 
-- @ref generic-preproc
-- @ref generic-state
-- @ref generic-error
-- @ref generic-memory
-- @ref generic-logging
-- @ref generic-time
+- @subpage resources
+- @subpage threads
+- @subpage misc
+**/
+
+/**
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-preproc C preprocessor helpers
+@page misc Preprocssor, library state, etc.
+@author Andrea Vedaldi
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section misc-preproc C preprocessor helpers
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat provides a few C preprocessor macros of general
@@ -523,18 +541,18 @@ utility. These include stringification (::VL_STRINGIFY,
 ::VL_XSTRINGIFY) and concatenation (::VL_CAT, ::VL_XCAT) of symbols.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-state VLFeat state and configuration parameters
+@section misc-state VLFeat state and configuration parameters
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat has some global configuration parameters that can
 changed. Changing the configuration is thread unsave
-(@ref design-threads). Use ::vl_set_simd_enabled to toggle the use of
+(@ref threads). Use ::vl_set_simd_enabled to toggle the use of
 a SIMD unit (Intel SSE code), ::vl_set_alloc_func to change
 the memory allocation functions, and ::vl_set_printf_func
 to change the logging function.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-error Error handling
+@section misc-error Error handling
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Some VLFeat functions signal errors in a way similar to the
@@ -546,7 +564,7 @@ to retrieve further details about the error (these functions should be
 used right after an error has occurred, before any other VLFeat call).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-memory Memory allocation
+@section misc-memory Memory allocation
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat uses the ::vl_malloc, ::vl_realloc, ::vl_calloc and ::vl_free
@@ -558,7 +576,7 @@ are mapped to the MATLAB equivalent which has a garbage collection
 mechanism to cope with interruptions during execution.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-logging Logging
+@section misc-logging Logging
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat uses the macros ::VL_PRINT and ::VL_PRINTF to print progress
@@ -570,7 +588,7 @@ mapped to @c mexPrintf. Setting the function to @c NULL disables
 logging.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section generic-time Measuring time
+@section misc-time Measuring time
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat provides ::vl_tic and ::vl_toc as an easy way of measuring
@@ -1537,8 +1555,3 @@ vl_destructor ()
   printf("VLFeat DEBUG: destructor ends.\n") ;
 #endif
 }
-
-
-
-
-
