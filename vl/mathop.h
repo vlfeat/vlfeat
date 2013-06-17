@@ -16,6 +16,7 @@ the terms of the BSD license (see the COPYING file).
 
 #include "generic.h"
 #include <math.h>
+#include <float.h>
 
 /** @brief Euler constant*/
 #define VL_E 2.718281828459045
