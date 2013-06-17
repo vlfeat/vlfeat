@@ -127,7 +127,8 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
                     -isysroot $(SDKROOT)						\
 		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
 	            $(DLL_LDFLAGS)							\
-		    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
+	            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
+	            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
                     $(dll_obj)								\
                     -o $@
 
@@ -135,6 +136,7 @@ $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	$(call C,CC) -shared								\
 	    $(dll_obj)									\
             $(DLL_LDFLAGS)								\
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)                      \
             $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)		\
 	    -o $(@)
 
