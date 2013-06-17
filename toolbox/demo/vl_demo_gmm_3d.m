@@ -13,7 +13,6 @@ end
 elapsedKMEANS = tic;
 [initMeans, assignments] = vl_kmeans(X, numClusters, ...
     'verbose', ...
-    'multithreading', 'parallel', ...
     'algorithm','ann', ...
     'MaxNumIterations',10, ...
     'distance','l2', ...
@@ -30,9 +29,9 @@ subplot(1,2,1);
 hold on
 for i=1:numClusters
     Xk = X(:,assignments==i);
-    
+
     initWeights(i) = size(Xk,2) / numClusters;
-    
+
     plot3(Xk(1,:),Xk(2,:),Xk(3,:),'.','color',cc(i,:));
     if size(Xk,1) == 0 || size(Xk,2) == 0
         initSigmas(:,i) = diag(cov(X'));
