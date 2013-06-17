@@ -315,10 +315,7 @@ void compute_liop_descriptor(VlLiopDesc * self, float * patch, float *desc){
     for(i = 0; i < (signed)self->liopArraySize; i++){
         desc[i] = (float)vl_ceil_f((desc[i]/norm)*255);
     }
-
-
 }
-
 
 /**
  * @brief Compute one bin of LIOP descriptor
@@ -333,10 +330,10 @@ void compute_bin_liop_descriptor(VlLiopDesc *self, VlLiopBin * bin, float * patc
     float weight = 0;
 
     /* array for intensity values of neighbours */
-    float * intensities = vl_malloc(sizeof(vl_uint)*self->numberOfNeighbours);
+    float * intensities = vl_malloc(sizeof(float) * self->numberOfNeighbours);
 
     /* array with indexes to intensities array - used for getting index of a particular permutation */
-    vl_uindex * permutation = vl_malloc(sizeof(vl_uint)*self->numberOfNeighbours);
+    vl_uindex * permutation = vl_malloc(sizeof(vl_uindex) * self->numberOfNeighbours);
 
     /* compute liop for each point of the bin*/
     for(i = 0; i < bin->binSize; i++){
@@ -368,7 +365,6 @@ void compute_bin_liop_descriptor(VlLiopDesc *self, VlLiopBin * bin, float * patc
             bin->numOfUsedPoints++;
         }
     }
-
     vl_free(intensities);
     vl_free(permutation);
 }
@@ -498,7 +494,7 @@ void qsort_swap(vl_uindex * array,
  * @b 1 <code>[1 2 4 3]</code>, @b 2 <code>[1 3 2 4]</code>, @b 3 <code>[1 3 4 2]</code>
  * ,... and the highest <B> (size - 1) </B> <code>[4 3 2 1]</code>
  */
-vl_int get_permutation_index(vl_uint * permutation, vl_size size){
+vl_int get_permutation_index(vl_uindex * permutation, vl_size size){
     vl_int * controlArray = vl_malloc(sizeof(vl_int)*size);
     vl_int permutationIndex = 0;
 

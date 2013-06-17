@@ -25,16 +25,16 @@
 #define MAX_UINT8_VALUE 255
 
 /** @brief LIOP bin
- *
- *  Data of one LIOP descriptor bin
- */
-typedef struct _VlLiopBin{
-    vl_size binSize; /**< Number of points beloging to the bin. */
-    vl_uindex * binIndexes; /**< Patch indexes of points belonging to the bin. */
-    vl_size binLiopSize; /**< Size of the bin liop descriptor. */
-    float * binLiop; /**< Bin liop descriptor. */
-    vl_uint numOfUsedPoints; /**< Number of points used for computation of bin liop. */
-}VlLiopBin;
+ ** A bin of a LIOP descriptor
+ **/
+typedef struct _VlLiopBin
+{
+  vl_size binSize ; /**< Number of points beloging to the bin. */
+  vl_uindex * binIndexes ; /**< Patch indexes of points belonging to the bin. */
+  vl_size binLiopSize ; /**< Size of the bin LIOP descriptor. */
+  float * binLiop ; /**< Bin LIOP descriptor. */
+  vl_uint numOfUsedPoints ; /**< Number of points used for computation of bin LIOP. */
+} VlLiopBin ;
 
 /** @brief LIOP Descriptor settings
  *
@@ -54,7 +54,6 @@ typedef struct _VlLiopDesc
     vl_size liopArraySize; /**< Liop descriptor size. */
     VlLiopBin ** liopBins;/**< Array of liop bins. */
 } VlLiopDesc;
-
 
 /** @name Construct and destroy
  *  @{
@@ -131,8 +130,7 @@ void qsort_swap(vl_uindex * array,
  */
 
 VL_EXPORT
-vl_int get_permutation_index(vl_uint * permutation,
-                                 vl_size size);
+vl_int get_permutation_index(vl_index * permutation, vl_size size);
 
 VL_EXPORT
 float interpolate(float * patch,
