@@ -20,6 +20,10 @@ int main(){
     //testCircle();
     //testPermutation();
 
+    vl_int i;
+    VlLiopDesc * liop ;
+    vl_int * table ;
+    float * desc ;
     vl_size size = 11*11;
     float mat[] = {6,6,6,6,6,6,6,6,6,6,6,
                    6,6,6,5,4,4,4,5,6,6,6,
@@ -37,17 +41,17 @@ int main(){
     printf("cos(pi/2) %e\n",cosf(VL_PI/2));
     printf("sin(0) %e\n",sinf(0));
 
-    vl_int i;
+
     for(i = 0; i < size; i++){
         patch[i] = mat[i];
     }
     //float * patch2 = vl_malloc(sizeof(float)*size);//
     //vl_imsmooth_f(patch2,size,patch,size,size,size,0.11,0.11);//
 
-    VlLiopDesc * liop = vl_liopdesc_new(4,6,2,5,11);
+    liop = vl_liopdesc_new(4,6,2,5,11);
     //printFloatMatrix(patch2,size);//
 
-    vl_int * table = compute_circle_look_up_table(liop->patchRadius,liop->patchRadius*2 + 1);
+    table = compute_circle_look_up_table(liop->patchRadius,liop->patchRadius*2 + 1);
     printVlIntArray(table,liop->patchRadius*2 + 1);
     printf("%d\n",liop->innerPatchIndexesSize);
 
@@ -58,20 +62,18 @@ int main(){
         patch[liop->innerPatchIndexes[i]] = 0;
         printf("%d\n",liop->innerPatchIndexes[i]);
     }
- printf("first element: %f\n",patch[liop->innerPatchIndexes[0]]);
+    printf("first element: %f\n",patch[liop->innerPatchIndexes[0]]);
     printFloatMatrix(patch,size);
 
-
-
-    vl_uint * desc = vl_malloc(sizeof(vl_uint)*liop->liopArraySize);
+    desc = vl_malloc(sizeof(vl_uint)*liop->liopArraySize);
     printf("allocated\n");
     compute_liop_descriptor(liop, patch, desc);
     printf("computed\n");
 
     for(i = 0; i < liop->numberOfBins; i++){
-        printf("Bin %d\n", i);
         VlLiopBin * bin = liop->liopBins[i];
-        printVlIntArray(bin->binLiop, bin->binLiopSize);
+        printf("Bin %d\n", i);
+        printFloatArray(bin->binLiop, bin->binLiopSize);
     }
 
     // BIN DEVISION TEST
@@ -83,26 +85,28 @@ int main(){
     }
     */
 
-    // COORDINATE + POSITION TEST
+    {
+      float x,y;
+      vl_uindex ind ;
+      float inter  ;
 
-    float x,y;
-    get_coordinates(liop->patchSideLength, 15 , &x, &y);
-    printf("x: %f\n",x);
-    printf("y: %f\n",y);
+      // COORDINATE + POSITION TEST
+      get_coordinates(liop->patchSideLength, 15 , &x, &y);
+      printf("x: %f\n",x);
+      printf("y: %f\n",y);
 
-    vl_uindex ind =  get_vector_position(liop->patchSideLength, x, y);
-    printf("pos %d\n", ind);
+      ind =  get_vector_position(liop->patchSideLength, x, y);
+      printf("pos %d\n", ind);
 
-    // INTERPOLATION TEST
-   float inter = interpolate(patch, 11, -1.75, -4.75);
-   printf("interpolation: %f\n",inter);
-   printf("xM %f\n", (float)vl_ceil_f(x));
-   printf("yM %f\n", (float)vl_ceil_f(y));
-    //printVlIntArray(liop->circleLookUpTable, liop->patchSideLength);
+      // INTERPOLATION TEST
+      inter = interpolate(patch, 11, -1.75, -4.75);
+      printf("interpolation: %f\n",inter);
+      printf("xM %f\n", (float)vl_ceil_f(x));
+      printf("yM %f\n", (float)vl_ceil_f(y));
+      //printVlIntArray(liop->circleLookUpTable, liop->patchSideLength);
 
-    //printFloatMatrix(patch,size);
-
-
+      //printFloatMatrix(patch,size);
+    }
 }
 
 //----------------------FUNCTION TESTS------------------------------------
@@ -115,15 +119,15 @@ void testPermutation(){
     vl_size size = 4;
     vl_uint P[] = {3,2,0,1};
     vl_uint * permutation = vl_malloc(sizeof(vl_uint)*size);
-    vl_uindex i;
+    vl_uindex i; 
+    vl_int index ;
     for(i = 0; i < size; i++){
         permutation[i] = P[i];
         //printf("%d\n",permutation[i]);
     }
-    vl_int index = get_permutation_index(permutation,size);
+    index = get_permutation_index(permutation,size);
     printf("%d\n",index);
 }
-
 
 /*
  *circle table test
@@ -208,11 +212,11 @@ void printFloatArray(float * array, vl_size length){
         }
 }
 
-void printVlIntArray(vl_uint * array, vl_size length){
+void printVlIntArray(vl_int * array, vl_size length){
     vl_index i;
 
     for(i = 0; i < (signed)length; i++){
-       printf("%d\n", array[i]);
+       printf("%f\n", array[i]);
     }
 }
 
