@@ -25,9 +25,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="nmake /f Makefile.mak"
-				ReBuildCommandLine="nmake /f Makefile.mak clean all"
-				CleanCommandLine="nmake /f Makefile.mak clean"
+				BuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak&#x0D;&#x0A;"
+				ReBuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak clean all"
+				CleanCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak  clean"
 				Output=""
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -282,6 +282,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\lbp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\liop.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\liop.h"
 				>
 			</File>
 			<File
