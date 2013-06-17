@@ -197,6 +197,7 @@ vl_kdtree_build_recursively
     for (i = 0; i < dataSamplesEnd ; ++ i) {
       vl_uint32 sampleIndex;
       vl_index di;
+      double datum ;
 
       if(useAllData == VL_TRUE) {
         sampleIndex = i;
@@ -207,7 +208,7 @@ vl_kdtree_build_recursively
 
       di = tree->dataIndex[sampleIndex].index ;
       //vl_index di = tree->dataIndex[i].index ;
-      double datum ;
+
       switch(forest->dataType) {
         case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
           [di * forest->dimension + d] ;
