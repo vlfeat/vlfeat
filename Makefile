@@ -177,13 +177,17 @@ endif
 
 # Linux-32
 ifeq ($(ARCH),glnx86)
-STD_CFLAGS += -m32
+# Target compatibility with GLIBC 2.3.4
+# 1) _GNU_SOURCE avoids using isoc99_fscanf, limiting binray portability to recent GLIBC.
+# 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
+STD_CFLAGS += -m32 -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
 CC = gcc
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
+STD_CFLAGS += -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
 CC = gcc
 endif
