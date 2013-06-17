@@ -24,12 +24,12 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.16
-ARCH = win32
+VER = 0.9.17
+ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
-MSVSVER = 100
-MSVCROOT = $(VCInstallDir)
+MSVSVER =
+MSVCROOT = $(VCINSTALLDIR)
 WINSDKROOT = $(WindowsSdkDir)
 GIT = git
 
@@ -41,11 +41,13 @@ MSVCROOT = C:\Program Files\Microsoft Visual Studio 10.0\VC
 WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v7.0A
 !endif
 
+!include make/nmake_helper.mak
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
 !if "$(ARCH)" == "win32"
 !message === COMPILING FOR 32-BIT
 
-MATLABROOT = C:\Program Files\MATLAB\R2012a
+MATLABROOT = C:\Program Files (x86)\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw32
@@ -63,7 +65,7 @@ LFLAGS = /MACHINE:X86 \
 !elseif "$(ARCH)" == "win64"
 !message === COMPILING FOR 64-BIT
 
-MATLABROOT = C:\Program Files\MATLAB\R2012a
+MATLABROOT = C:\Program Files\MATLAB\R2009b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw64
@@ -159,134 +161,133 @@ EXE_LFLAGS = $(LFLAGS) /LIBPATH:"$(bindir)" vl.lib
 MEX_FLAGS = $(MEX_FLAGS) -f $(MEXOPT) -I. -Itoolbox -L"$(bindir)" -lvl
 
 libsrc = \
-  vl\imopv.c \
-  vl\generic.c \
-  vl\mathop.c \
-  vl\rodrigues.c \
-  vl\getopt_long.c \
-  vl\hog.c \
-  vl\gmm.c \
-  vl\homkermap.c \
-  vl\slic.c \
-  vl\kdtree.c \
-  vl\scalespace.c \
-  vl\dsift.c \
-  vl\liop.c \
-  vl\svm_sgd.c \
-  vl\lbp.c \
-  vl\array.c \
   vl\aib.c \
-  vl\pgm.c \
+  vl\array.c \
   vl\covdet.c \
-  vl\kmeans.c \
-  vl\stringop.c \
+  vl\dsift.c \
   vl\fisher.c \
-  vl\mathop_sse2.c \
-  vl\imopv_sse2.c \
-  vl\host.c \
+  vl\generic.c \
+  vl\getopt_long.c \
+  vl\gmm.c \
   vl\hikmeans.c \
-  vl\mser.c \
-  vl\quickshift.c \
-  vl\svm_dca.c \
-  vl\svmdataset.c \
-  vl\random.c \
-  vl\sift.c \
+  vl\hog.c \
+  vl\homkermap.c \
+  vl\host.c \
   vl\ikmeans.c \
+  vl\imopv.c \
+  vl\imopv_sse2.c \
+  vl\kdtree.c \
+  vl\kmeans.c \
+  vl\lbp.c \
+  vl\liop.c \
+  vl\mathop.c \
+  vl\mathop_sse2.c \
+  vl\mser.c \
+  vl\pgm.c \
+  vl\quickshift.c \
+  vl\random.c \
+  vl\rodrigues.c \
+  vl\scalespace.c \
+  vl\sift.c \
+  vl\slic.c \
+  vl\stringop.c \
+  vl\svm.c \
+  vl\svmdataset.c \
   vl\vlad.c
 
 cmdsrc = \
-  src\test_vec_comp.c \
-  src\test_qsort-def.c \
-  src\test_imopv.c \
-  src\test_getopt_long.c \
-  src\test_host.c \
-  src\test_liop.c \
-  src\test_heap-def.c \
-  src\test_svd2.c \
   src\aib.c \
-  src\test_mathop_abs.c \
-  src\test_mathop.c \
-  src\test_nan.c \
-  src\test_gauss_elimination.c \
-  src\test_rand.c \
   src\mser.c \
-  src\test_threads.c \
-  src\test_stringop.c \
-  src\test_kmeans.c \
+  src\sift.c \
+  src\test_gauss_elimination.c \
+  src\test_getopt_long.c \
   src\test_gmm.c \
-  src\sift.c
+  src\test_heap-def.c \
+  src\test_host.c \
+  src\test_imopv.c \
+  src\test_kmeans.c \
+  src\test_liop.c \
+  src\test_mathop.c \
+  src\test_mathop_abs.c \
+  src\test_nan.c \
+  src\test_qsort-def.c \
+  src\test_rand.c \
+  src\test_stringop.c \
+  src\test_svd2.c \
+  src\test_threads.c \
+  src\test_vec_comp.c
 
 cmdsrc = \
-  src\test_vec_comp.c \
-  src\test_qsort-def.c \
-  src\test_imopv.c \
-  src\test_getopt_long.c \
-  src\test_host.c \
-  src\test_liop.c \
-  src\test_heap-def.c \
-  src\test_svd2.c \
   src\aib.c \
-  src\test_mathop_abs.c \
-  src\test_mathop.c \
-  src\test_nan.c \
-  src\test_gauss_elimination.c \
-  src\test_rand.c \
   src\mser.c \
-  src\test_threads.c \
-  src\test_stringop.c \
-  src\test_kmeans.c \
+  src\sift.c \
+  src\test_gauss_elimination.c \
+  src\test_getopt_long.c \
   src\test_gmm.c \
-  src\sift.c
+  src\test_heap-def.c \
+  src\test_host.c \
+  src\test_imopv.c \
+  src\test_kmeans.c \
+  src\test_liop.c \
+  src\test_mathop.c \
+  src\test_mathop_abs.c \
+  src\test_nan.c \
+  src\test_qsort-def.c \
+  src\test_rand.c \
+  src\test_stringop.c \
+  src\test_svd2.c \
+  src\test_threads.c \
+  src\test_vec_comp.c
 
 mexsrc = \
-  toolbox\aib\vl_aibhist.c \
   toolbox\aib\vl_aib.c \
-  toolbox\slic\vl_slic.c \
+  toolbox\aib\vl_aibhist.c \
+  toolbox\fisher\vl_fisher.c \
+  toolbox\geometry\vl_irodr.c \
+  toolbox\geometry\vl_rodr.c \
+  toolbox\gmm\vl_gmm.c \
+  toolbox\imop\vl_imdisttf.c \
+  toolbox\imop\vl_imintegral.c \
+  toolbox\imop\vl_imsmooth.c \
+  toolbox\imop\vl_imwbackwardmx.c \
+  toolbox\imop\vl_tpsumx.c \
+  toolbox\kmeans\vl_hikmeans.c \
   toolbox\kmeans\vl_hikmeanspush.c \
   toolbox\kmeans\vl_ikmeans.c \
   toolbox\kmeans\vl_ikmeanspush.c \
-  toolbox\kmeans\vl_hikmeans.c \
   toolbox\kmeans\vl_kmeans.c \
-  toolbox\quickshift\vl_quickshift.c \
-  toolbox\mser\vl_mser.c \
-  toolbox\mser\vl_erfill.c \
-  toolbox\geometry\vl_irodr.c \
-  toolbox\geometry\vl_rodr.c \
-  toolbox\imop\vl_imintegral.c \
-  toolbox\imop\vl_imsmooth.c \
-  toolbox\imop\vl_imdisttf.c \
-  toolbox\imop\vl_imwbackwardmx.c \
-  toolbox\imop\vl_tpsumx.c \
-  toolbox\misc\vl_version.c \
-  toolbox\misc\vl_sampleinthist.c \
-  toolbox\misc\vl_lbp.c \
-  toolbox\misc\vl_svmtest.c \
-  toolbox\misc\vl_inthist.c \
-  toolbox\misc\vl_maketrainingset.c \
-  toolbox\misc\vl_ihashfind.c \
   toolbox\misc\vl_alldist.c \
+  toolbox\misc\vl_alldist2.c \
   toolbox\misc\vl_binsearch.c \
   toolbox\misc\vl_binsum.c \
-  toolbox\misc\vl_localmax.c \
-  toolbox\misc\vl_homkermap.c \
-  toolbox\misc\vl_kdtreebuild.c \
-  toolbox\misc\vl_twister.c \
-  toolbox\misc\vl_getpid.c \
-  toolbox\misc\vl_alldist2.c \
-  toolbox\misc\vl_kdtreequery.c \
-  toolbox\misc\vl_hog.c \
   toolbox\misc\vl_cummax.c \
-  toolbox\misc\vl_simdctrl.c \
+  toolbox\misc\vl_getpid.c \
+  toolbox\misc\vl_hog.c \
+  toolbox\misc\vl_homkermap.c \
+  toolbox\misc\vl_ihashfind.c \
   toolbox\misc\vl_ihashsum.c \
+  toolbox\misc\vl_inthist.c \
+  toolbox\misc\vl_kdtreebuild.c \
+  toolbox\misc\vl_kdtreequery.c \
+  toolbox\misc\vl_lbp.c \
+  toolbox\misc\vl_localmax.c \
+  toolbox\misc\vl_maketrainingset.c \
+  toolbox\misc\vl_sampleinthist.c \
+  toolbox\misc\vl_simdctrl.c \
   toolbox\misc\vl_svmtrain.c \
-  toolbox\gmm\vl_gmm.c \
-  toolbox\fisher\vl_fisher.c \
-  toolbox\sift\vl_sift.c \
-  toolbox\sift\vl_liop.c \
-  toolbox\sift\vl_siftdescriptor.c \
-  toolbox\sift\vl_dsift.c \
+  toolbox\misc\vl_threads.c \
+  toolbox\misc\vl_twister.c \
+  toolbox\misc\vl_version.c \
+  toolbox\mser\vl_erfill.c \
+  toolbox\mser\vl_mser.c \
+  toolbox\quickshift\vl_quickshift.c \
   toolbox\sift\vl_covdet.c \
+  toolbox\sift\vl_dsift.c \
+  toolbox\sift\vl_liop.c \
+  toolbox\sift\vl_sift.c \
+  toolbox\sift\vl_siftdescriptor.c \
   toolbox\sift\vl_ubcmatch.c \
+  toolbox\slic\vl_slic.c \
   toolbox\vlad\vl_vlad.c
 
 !if "$(ARCH)" == "win32"
