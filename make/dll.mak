@@ -32,11 +32,13 @@ BINDIR = bin/$(ARCH)
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 DLL_SUFFIX := dylib
+DLL_LDFLAGS += -m32
 endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 DLL_SUFFIX := dylib
+DLL_LDFLAGS += -m64
 endif
 
 # Linux-32
