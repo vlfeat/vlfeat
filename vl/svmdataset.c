@@ -267,8 +267,6 @@ vl_svmdataset_get_accumulate_function(VlSvmDataset const *self)
       case VL_TYPE_DOUBLE:
         return (VlSvmAccumulateFunction) vl_svmdataset_accumulate_d ;
         break ;
-      default:
-        assert(0) ;
     }
   } else {
     switch (self->dataType) {
@@ -278,10 +276,10 @@ vl_svmdataset_get_accumulate_function(VlSvmDataset const *self)
       case VL_TYPE_DOUBLE:
         return (VlSvmAccumulateFunction) vl_svmdataset_accumulate_hom_d ;
         break ;
-      default:
-        assert(0) ;
     }
   }
+  assert(0) ;
+  return NULL ;
 }
 
 /** @brief Get the inner product function.
