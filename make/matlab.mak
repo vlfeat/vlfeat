@@ -37,7 +37,7 @@ MEX_CFLAGS = -I$(VLDIR) -I$(VLDIR)/toolbox
 MEX_LDFLAGS = -L$(BINDIR) -lvl
 
 MEX_FLAGS = $(MEXFLAGS)
-MEX_FLAGS += -$(MEX_ARCH) -largeArrayDims
+MEX_FLAGS += -$(MEX_ARCH)
 MEX_FLAGS += $(if $(DEBUG), -g, -O)
 MEX_FLAGS += $(if $(PROFILE), -O -g,)
 MEX_FLAGS += CFLAGS='$$CFLAGS $(STD_CFLAGS)'
@@ -53,6 +53,7 @@ endif
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
 MEX_SUFFIX := mexmaci64
+MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
@@ -66,6 +67,7 @@ endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
+MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexa64
 endif

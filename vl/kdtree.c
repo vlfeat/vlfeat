@@ -91,7 +91,7 @@ using the vl_kdforest_delete_searcher method.
 #include "mathop.h"
 #include <stdlib.h>
 
-#if defined(_OMP)
+#if defined(_OPENMP)
 #include <omp.h>
 #endif
 

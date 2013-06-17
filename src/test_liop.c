@@ -7,7 +7,7 @@
 
 void printFloatArray(float * array, vl_size length);
 void printFloatArray(float * array, vl_size length);
-void printVlIntArray(vl_uint *array, vl_size length);
+void printVlIntArray(vl_int *array, vl_size length);
 void printFloatMatrix(float * array, vl_size length);
 
 // tests
@@ -42,7 +42,7 @@ int main(){
     printf("sin(0) %e\n",sinf(0));
 
 
-    for(i = 0; i < size; i++){
+    for(i = 0; i < (signed)size; i++){
         patch[i] = mat[i];
     }
     //float * patch2 = vl_malloc(sizeof(float)*size);//

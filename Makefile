@@ -177,8 +177,8 @@ endif
 
 # Linux-32
 ifeq ($(ARCH),glnx86)
-STD_CFLAGS += -march=i686
-STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
+STD_CFLAGS += -m32
+STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
 CC = gcc
 endif
 

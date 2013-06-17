@@ -130,7 +130,7 @@ void qsort_swap(vl_uindex * array,
  */
 
 VL_EXPORT
-vl_int get_permutation_index(vl_index * permutation, vl_size size);
+vl_int get_permutation_index(vl_uindex * permutation, vl_size size);
 
 VL_EXPORT
 float interpolate(float * patch,

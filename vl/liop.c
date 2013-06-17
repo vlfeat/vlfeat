@@ -494,7 +494,7 @@ void qsort_swap(vl_uindex * array,
  * @b 1 <code>[1 2 4 3]</code>, @b 2 <code>[1 3 2 4]</code>, @b 3 <code>[1 3 4 2]</code>
  * ,... and the highest <B> (size - 1) </B> <code>[4 3 2 1]</code>
  */
-vl_int get_permutation_index(vl_uindex * permutation, vl_size size){
+vl_int get_permutation_index(vl_uindex *permutation, vl_size size){
     vl_int * controlArray = vl_malloc(sizeof(vl_int)*size);
     vl_int permutationIndex = 0;
 

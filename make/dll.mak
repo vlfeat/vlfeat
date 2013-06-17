@@ -42,11 +42,13 @@ endif
 # Linux-32
 ifeq ($(ARCH),glnx86)
 DLL_SUFFIX := so
+DLL_LDFLAGS += -m32
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
 DLL_SUFFIX := so
+DLL_LDFLAGS += -m64
 endif
 
 # --------------------------------------------------------------------
