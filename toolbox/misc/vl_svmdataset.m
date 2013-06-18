@@ -13,7 +13,7 @@ function dataset = vl_svmdataset(x, varargin)
 %   prior to learning. The main advantage is the significant memory
 %   saving as the expanded data needs not to be stored in memory.
 %
-%   See:: VL_SVMTRAIN(), VL_HELP().
+%   See:: VL_SVMTRAIN(), VL_HOMKERMAP(), VL_HELP().
 
 % Author: Daniele Perrone and Andrea Vedaldi
 
