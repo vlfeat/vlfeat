@@ -128,9 +128,9 @@
 %
 %       scores = w'*xtest + b ;
 %
-%     Alternatively, VL_SVMTRAIN() can be used fro evaluation too:
+%     Alternatively, VL_SVMTRAIN() can be used for evaluation too:
 %
-%       [~,~,~, scores] = vl_svmtrain(xtest,y,0,'model',w,'bias',b) ;
+%       [~,~,~, scores] = vl_svmtrain(xtest, y, 0, 'model', w, 'bias', b, 'solver', 'NONE') ;
 %
 %     The latter form is particularly useful when X is a DATASET structure.
 %
