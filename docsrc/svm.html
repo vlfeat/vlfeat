@@ -44,23 +44,21 @@ axis equal ;
 
 <precode type='matlab'>
 lambda = 0.01 ; % Regularization parameter
-maxIter = 30 ; % Maximum number of iterations
+maxIter = 1000 ; % Maximum number of iterations
 </precode>
 
 
 
-<p>Learning a linear classifier can be easily done with the following 2
-lines of code:</p>
+<p>Learning a linear classifier can be easily done with the following 1
+line of code:</p>
 
 <precode type='matlab'>
-dataset = vl_maketrainingset(X, int8(y)) ;
-[w b info] = vl_svmtrain(dataset, lambda, 'DCA',...
-                           'MaxIterations', maxIter) 
+
+[w b info] = vl_svmtrain(X, y, lambda,'MaxNumIterations',maxIter)
+
 </precode>
 
-<p>where we first create a struct containing the training data
-using  <code>vl_maketrainingset</code> and then we call the the SVM
-solver for (S)DCA. The output model is plotted over the training
+<p>The output model is plotted over the training
 data in the following figure. </p>
 
 <div class="figure">
@@ -75,31 +73,28 @@ data in the following figure. </p>
 <p> The output <code>info</code> is a struct containing some
   statistic on the learned SVM: </p>
 
-
 <precode type='matlab'>
+
 info = 
 
-              model: [2x1 double]
-               bias: 0.0553
-          dimension: 2
-         iterations: 30
-      maxIterations: 30
-            epsilon: 0
-             lambda: 0.0100
-     biasMultiplier: 1
-        elapsedTime: 0
-             energy: 0.2106
-    regularizerTerm: 0.0774
-            lossPos: 0.0708
-            lossNeg: 0.0624
-        hardLossPos: 0.1520
-        hardLossNeg: 0.1287
-         energyDual: 0.2099
-         dualityGap: 7.5467e-04
+            solver: 'sdca'
+            lambda: 0.0100
+    biasMultiplier: 1
+              bias: 0.0657
+         objective: 0.2105
+       regularizer: 0.0726
+              loss: 0.1379
+     dualObjective: 0.2016
+          dualLoss: 0.2742
+        dualityGap: 0.0088
+         iteration: 525
+             epoch: 3
+       elapsedTime: 0.0300
+
 </precode>
 
-<p>It is also possible to  use under some
-  assumptions <a href="#ref3">[3]</a> an homogeneous kernel map expanded online inside the
+<p>It is also possible to use under some
+  assumptions <a href="#ref3">[3]</a> a homogeneous kernel map expanded online inside the
   solver. This can be done with the following command:  </p>
 
 <precode type='matlab'>
@@ -107,7 +102,7 @@ dataset = vl_maketrainingset(X, int8(y).'homkermap',2,'KChi2') ;
 </precode>
 
 <p>The above code creates a training set without applying any
-  homogeneous kernel map to the data. When the solver is called  it will expand each data point with a Chi Squared kernel
+  homogeneous kernel map to the data. When the solver is called it will expand each data point with a Chi Squared kernel
   of period 2.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -116,28 +111,27 @@ dataset = vl_maketrainingset(X, int8(y).'homkermap',2,'KChi2') ;
 
 <p>VLFeat allows to get statistics during the training process. It is
   sufficient to pass a function handle to the solver. The function
-  will be then called every <code>energyFrequency</code> time.</p>
+  will be then called every <code>DiagnosticFrequency</code> time.</p>
 
-<p>(S)DCA diagnostics provides the duality gap value (the difference between primal and dual energy),
+<p>(S)DCA diagnostics also provides the duality gap value (the difference between primal and dual energy),
   which is the upper bound of the primal task sub-optimality.</p>
 
 <precode type='matlab'>
 % Diagnostic function
 function diagnostics(svm)
-  energy = [energy [svm.energy ; svm.energyDual ; svm.dualityGap ] ] ;
+  energy = [energy [svm.objective ; svm.dualObjective ; svm.dualityGap ] ] ;
 end
 
 % Training the SVM
 energy = [] ;
-dataset = vl_maketrainingset(X, int8(y)) ;
-[w b info] = vl_svmtrain(dataset, lambda, 'DCA',...
-                           'MaxIterations',maxIter,...
-                           'DiagnosticFunction',@diagnostics,,...
-                           'EnergyFreq',1)
+[w b info] = vl_svmtrain(X, y, lambda,...
+                           'MaxNumIterations',maxIter,...
+                           'DiagnosticFunction',@diagnostics,...
+                           'DiagnosticFrequency',1)
 </precode>
 
-<p>The energy value for the past iterations are kept in the
-  matrix <code>energy</code>. Now we can plot the energy values from the learning process. </p>
+<p>The objective values for the past iterations are kept in the
+  matrix <code>energy</code>. Now we can plot the objective values from the learning process. </p>
 
 <precode type='matlab'>
 
@@ -146,10 +140,9 @@ hold on
 plot(energy(1,:),'--b') ;
 plot(energy(2,:),'-.g') ;
 plot(energy(3,:),'r') ;
-legend('Primal energy','Dual energy','Duality gap')
+legend('Primal objective','Dual objective','Duality gap')
 xlabel('Diagnostics iteration')
 ylabel('Energy')
-
 
 </precode>
 
@@ -157,7 +150,7 @@ ylabel('Energy')
  <img src="%pathto:root;demo/svm_energy.jpg"/>
  <div class="caption">
   <span class="content">
-   SVM energy values plot.
+   SVM objective values plot.
   </span>
  </div>
 </div>
