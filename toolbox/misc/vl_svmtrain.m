@@ -115,7 +115,7 @@
 %
 %    LAMBDA/2 (|W|^2 + WB^2) 1/N SUM_i LOSS(W' X(:,i) + WB B0, Y(i))
 %
-%   Note that this causes the learned bias B = WB B0 to shrinks
+%   Note that this causes the learned bias B = WB B0 to shrink
 %   towards the origin.
 %
 %   Example::
@@ -130,7 +130,7 @@
 %
 %     Alternatively, VL_SVMTRAIN() can be used fro evaluation too:
 %
-%       [~,~,~, scores] = vl_svmtrain(xtest,y,0,'model',w,'bias,'b) ;
+%       [~,~,~, scores] = vl_svmtrain(xtest,y,0,'model',w,'bias',b) ;
 %
 %     The latter form is particularly useful when X is a DATASET structure.
 %
