@@ -3,9 +3,6 @@
 #content .doxygen div,
 #content .doxygen p,
 #content .doxygen dl {
-  font-family: 'Lucida Grande', Verdana, Geneva, Arial, sans-serif;
-  font-size: 12px ;
-  line-height: 1.6em ;
 }
 #content .doxygen h1 {
   font-size: 150%;

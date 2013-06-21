@@ -1,9 +1,4 @@
 /* div, p, ul, li, ol, img {border: 1px solid red ;} */
-
-.clearfix {
-    display: inline-block;
-    width: 100%;
-}
 html, body, div, img, dl {
     margin: 0px ;
     padding: 0px ;
@@ -14,21 +9,15 @@ table {
     color: inherit ;
 }
 html {
-    background-color: #5d564e;
 }
 body {
-    min-width: 1024px ;
-    max-width: 1296px ;
-    background-color: #183a60;
-    margin: auto ;
-    font-family: 'Lucida Grande', Arial, Helvetica, sans-serif ;
-    font-size: 13px ;
-    line-height: 22px ;
+    font-size: 14px ;
+    line-height: 18px ;
+    font-family: Arial, 'Liberation Sans', 'DejaVu Sans', sans-serif ;
+    background-color: #f6f6f6 ;
 }
 h1, h2, h3, h4, h5, h6 {
-    /* font-family: 'Lucida Grande', Arial, Helvetica, sans-serif ; */
     font-weight: bold ;
-    /* color: #183a60 ; */
 }
 a {
     color: #004fdc;
@@ -51,76 +40,77 @@ code a {
     text-decoration: none ;
     color: inherit ! important ;
 }
-#pagebody {
-    background-color: #eee ;
+.clear {
+    clear: both ;
+    margin: 0px ;
+    padding: 0px ;
+    font-size: 1px;
+    line-height: 1px;
+}
+.standout {
+    margin: 1em ! important ;
+    font-family: Helvetica, sans-serif ;
+    font-style: italic ;
+    color: red ! important ;
+}
+.clearfix {
     display: inline-block;
     width: 100%;
 }
-#content {
-    overflow: hidden ;
-    padding-right: 26px ;
-    padding-left: 26px ;
-    background-color: white ;
-}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                          Sidebar */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
 #sidebar {
     float: left ;
-    width: 208px ;
-    padding: 13px ;
+    width: 180px ;
     min-height: 100%
 }
 #sidebar ul {
-    margin: 0 ;
+    margin: 1em 0 ;
     padding: 0 ;
-    margin-left: 13px ;
 }
 #sidebar ul ul {
-    margin-top: .3em ;
-    margin-bottom: .3em ;
+    margin: 0 ;
 }
 #sidebar li {
     list-style: none ; /* for buggy IE */
-    display: block ;
-    margin: 0px ;
-    margin-bottom: 0.5em ;
-    padding: .2em ;
-    font-size: 1em ;
+    margin: 1em 0 ;
+    padding: 0 ;
     font-weight: bold ;
 }
 #sidebar li li {
+    margin: 0.2em 0 ;
+    margin-left: 1em ;
     font-weight: normal ;
-    text-transform: none ;
-    margin-bottom: 0em ;
-}
-#sidebar li .active {
-    background-color: #ccc ;
 }
 #sidebar li a {
     color: rgb(40,40,40) ;
     text-decoration: none ;
-    padding: .2em;
 }
 #sidebar li .active a {
     text-decoration: none ;
-    padding: .2em;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                           Header */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#header-section {
+    background-color: #183a60 ;
 }
 #header {
-    padding-left: 20px ;
-    padding-bottom: 20px ;
-    padding-top: 20px ;
+    width: 920px ;
+    margin-left: auto ;
+    margin-right: auto ;
+    padding: 20px 1em ;
 }
 #header #cse-search-box {
     float: right ;
     margin-right: 1em ;
     margin-top: auto ;
     margin-bottom: auto ;
-}
-#headbanner {
-    color: #5a5a5a ;
-    background-color: #f6f6f6 ;
-    padding: 7px 20px ;
-    border-bottom: 1px solid #DDD ;
-    font-weight: bold ;
-    font-size: 15px ;
 }
 #header h1 {
     margin: 0 ;
@@ -130,34 +120,44 @@ code a {
 #dotorg {
     color: #AAA ;
 }
-#footer {
-    clear: both ;
-    text-align: center ;
-    color: white ;
-    padding: 0.5em ;
-    font-size: 0.9em ;
-}
-.clear {
-    clear: both ;
-    margin: 0px ;
-    padding: 0px ;
-    font-size: 1px;
-}
-.standout {
-    margin: 1em ! important ;
-    font-family: Lucida, Helvetica, sans-serif ;
-    font-style: italic ;
-    color: red ! important ;
-}
 #google {
     float: right ;
-    width: 50% ;
+    width: 20em ;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/*                                               Main content style */
+/*                                                      Head banner */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#headbanner-section {
+    border-bottom: 1px solid #DDD ;
+}
+#headbanner {
+    width: 920px ;
+    margin-left: auto ;
+    margin-right: auto ;
+    padding: 7px 1em ;
+    color: #5a5a5a ;
+    font-weight: bold ;
+    font-size: 15px ;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                          Content */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#content-section {
+    background-color: white ;
+}
+#content-wrapper {
+    width: 920px ;
+    margin-left: auto ;
+    margin-right: auto ;
+    padding: 0 1em ;
+}
+#content {
+    overflow: hidden ;
+}
 #content h1,
 #content h2,
 #content h3,
@@ -173,19 +173,14 @@ code a {
 #content h4 {font-size:1.1em; margin-bottom: 0.5em;}
 #content h5 {font-size:1.0em; margin-bottom: 0.5em;}
 #content h6 {font-size:1.0em; margin-bottom: 0.5em;}
-/*
 #content p,
 #content blockquote,
 #content div.figure,
 #content div.p {
     margin: 1em 0 ;
-    padding: 0 ;
-    padding-right: 10em ;
 }
-*/
 #content blockquote {
     margin: 1em ;
-    font-family: Lucida, Helvetica, sans-serif ;
     font-style: italic ;
 }
 #content pre {
@@ -314,6 +309,25 @@ code a {
 #content ul.text li {
     margin-top: 1em ;
     margin-bottom: 1em ;
+}
+#pagebody {
+    background-color: #eee ;
+    display: inline-block;
+    width: 100%;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                           Footer */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#footer-section {
+    clear: both ;
+    border-top: 1px solid #DDD ;
+}
+#footer {
+    text-align: center ;
+    padding: 0.5em ;
+    font-size: 0.9em ;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

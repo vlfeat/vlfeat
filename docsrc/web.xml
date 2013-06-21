@@ -52,25 +52,34 @@
 
  <!-- Body Start -->
  <body>
-  <div id="header">
-   <!-- Google CSE Search Box -->
-   <div class="gcse-searchbox-only" id="google" data-resultsUrl="http://www.vlfeat.org/search.html"></div>
-   <h1><a class="plain" href="%pathto:home;"><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></a></h1>
+  <div id="header-section">
+    <div id="header">
+      <!-- Google CSE Search Box -->
+      <div class="gcse-searchbox-only" id="google" data-resultsUrl="http://www.vlfeat.org/search.html"></div>
+      <h1><a class="plain" href="%pathto:home;"><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></a></h1>
+    </div>
   </div>
-  <div id="headbanner">
-   %path;
+  <div id="headbanner-section">
+    <div id="headbanner">
+      %path;
+    </div>
   </div>
-  <div id="pagebody">
-   <div id="sidebar"> <!-- Navigation Start -->
-    %navigation;
-   </div> <!-- sidebar -->
-   <div id="content">
-    %content;
-   </div>
-  </div> <!-- pagebody -->
-  <div id="footer">
-   &copy; 2007-13 The authors of VLFeat
-  </div> <!-- footer -->
+  <div id="content-section">
+    <div id="content-wrapper">
+      <div id="sidebar"> <!-- Navigation Start -->
+        %navigation;
+      </div> <!-- sidebar -->
+      <div id="content">
+        %content;
+      </div>
+      <div class="clear">&nbsp;</div>
+    </div>
+  </div> <!-- content-section -->
+  <div id="footer-section">
+    <div id="footer">
+      &copy; 2007-13 The authors of VLFeat
+    </div> <!-- footer -->
+  </div> <!-- footer section -->
  </body>
  <!-- Body ends -->
 </html>
