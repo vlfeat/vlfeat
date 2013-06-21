@@ -32,7 +32,7 @@ vlmxOption  options [] =
 
 /* driver */
 void
-mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
+mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
 {
   enum {IN_DATA = 0, IN_MEANS, IN_SIGMAS, IN_WEIGHTS, IN_END} ;
   enum {OUT_ENC} ;
@@ -40,9 +40,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int opt ;
   int next = IN_END ;
   mxArray const  *optarg ;
-
-  VlFisherMultithreading multithreading = VlFisherParallel;
-
+  
   vl_size numClusters = 10;
   vl_size dimension ;
   vl_size numData ;
@@ -111,41 +109,14 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0)
   {
-    char buf[1024];
     switch (opt)
     {
-    case opt_verbose :
-      ++ verbosity ;
-      break ;
-    case opt_multithreading :
-      if (!vlmxIsString (optarg, -1))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING must be a string.") ;
-      }
-      if (mxGetString (optarg, buf, sizeof(buf)))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING argument too long.") ;
-      }
-      if (vlmxCompareStringsI("parallel", buf) == 0)
-      {
-        multithreading = VlFisherParallel ;
-      }
-      else if (vlmxCompareStringsI("serial", buf) == 0)
-      {
-        multithreading = VlFisherSerial ;
-      }
-      else
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "Invalid value %s for MULTITHREADING.", buf) ;
-      }
-      break ;
-
-    default :
-      abort() ;
-      break ;
+      case opt_verbose :
+        ++ verbosity ;
+        break ;
+      default :
+        abort() ;
+        break ;
     }
   }
 
@@ -179,17 +150,15 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           break;
   }
 
-  vl_fisher_encode
-                    (dataType,
-                     data,
-                     means,
-                     sigmas,
-                     weights,
-                     enc,
-                     dimension,
-                     numData,
-                     numClusters,
-                     multithreading);
+  vl_fisher_encode (dataType,
+                    data,
+                    means,
+                    sigmas,
+                    weights,
+                    enc,
+                    dimension,
+                    numData,
+                    numClusters) ;
 
   OUT(ENC) = mxCreateNumericMatrix (dimension * numClusters * 2, 1, classID, mxREAL) ;
 
