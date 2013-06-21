@@ -91,7 +91,7 @@
 %   Loss:: HINGE
 %     Loss function. One of HINGE, HINGE2, L1, L2, LOGISTIC.
 %
-%   Solver:: SGD
+%   Solver:: SDCA
 %     One of SGD (stochastic gradient descent [1]), SDCA (stochastic
 %     dual coordinate ascent [2,3]), or NONE (no training). The
 %     last option can be used in combination with the options MODEL
