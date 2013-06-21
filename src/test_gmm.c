@@ -26,8 +26,6 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_size dataIdx, d, cIdx;
   VlGMM * gmm;
 
-  VlGMMMultithreading multithreading = VlGMMParallel;
-
   double sigmaLowerBound = 0.000001;
 
   vl_size numData = 100000;
@@ -75,26 +73,21 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   switch(init) {
     case KMeans:
-
       kmeans = vl_kmeans_new(VL_F_TYPE,VlDistanceL2);
-
       vl_kmeans_set_verbosity	(kmeans,1);
       vl_kmeans_set_max_num_iterations (kmeans, maxiterKM) ;
       vl_kmeans_set_max_num_comparisons (kmeans, maxComp) ;
       vl_kmeans_set_num_trees (kmeans, ntrees);
       vl_kmeans_set_algorithm (kmeans, VlKMeansANN);
       vl_kmeans_set_initialization(kmeans, VlKMeansRandomSelection);
-
       vl_gmm_set_initialization (gmm,VlGMMKMeans);
-
       vl_gmm_set_kmeans_init_object(gmm,kmeans);
-
       break;
+
     case Rand:
-
       vl_gmm_set_initialization (gmm,VlGMMRand);
-
       break;
+
     case Custom: {
       TYPE * initSigmas;
       TYPE * initMeans;
@@ -120,15 +113,14 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
       break;
     }
+
     default:
       abort();
   }
 
-
   vl_gmm_set_max_num_iterations (gmm, maxiter) ;
   vl_gmm_set_num_repetitions(gmm, maxrep);
   vl_gmm_set_verbosity(gmm,1);
-  vl_gmm_set_multithreading (gmm,multithreading);
   vl_gmm_set_sigma_lower_bound (gmm,sigmaLowerBound);
 
   //struct timeval t1,t2;
@@ -198,9 +190,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      enc,
      dimension,
      numData,
-     numClusters,
-     VlFisherParallel
-    );
+     numClusters);
   }
 
   assign = vl_malloc(numData*numClusters*sizeof(TYPE));

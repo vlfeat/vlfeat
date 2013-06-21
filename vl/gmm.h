@@ -26,15 +26,6 @@ typedef enum _VlGMMInitialization
 } VlGMMInitialization ;
 
 
-/** @brief GMM multithreading setup */
-typedef enum _VlGMMMultithreading
-{
-  VlGMMSerial,    /**< Compute using one thread */
-  VlGMMParallel   /**< Turn multithreading on */
-} VlGMMMultithreading ;
-
-/* ---------------------------------------------------------------- */
-
 #ifndef __DOXYGEN__
 struct _VlGMM ;
 typedef struct _VlGMM VlGMM ;
@@ -136,7 +127,6 @@ VL_EXPORT void vl_gmm_set_max_num_iterations (VlGMM * self, vl_size maxNumIterat
 VL_EXPORT void vl_gmm_set_num_clusters (VlGMM * self, vl_size numClusters);
 VL_EXPORT void vl_gmm_set_initialization (VlGMM * self, VlGMMInitialization init);
 VL_EXPORT void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans);
-VL_EXPORT void vl_gmm_set_multithreading (VlGMM * self, VlGMMMultithreading multithreading);
 VL_EXPORT void vl_gmm_set_sigma_lower_bound (VlGMM * self, double lowbound);
 /** @} */
 
@@ -157,9 +147,8 @@ VL_EXPORT vl_size vl_gmm_get_max_num_iterations (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
 VL_EXPORT VlGMMInitialization vl_gmm_get_initialization (VlGMM const * self);
 VL_EXPORT VlKMeans * vl_gmm_get_kmeans_init_object (VlGMM const * self);
-VL_EXPORT VlGMMMultithreading vl_gmm_get_multithreading (VlGMM const * self);
 VL_EXPORT double vl_gmm_get_sigma_lower_bound (VlGMM * self);
 /** @} */
 
-/* VL_IKMEANS_H */
+/* VL_GMM_H */
 #endif

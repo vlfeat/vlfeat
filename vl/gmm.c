@@ -20,19 +20,21 @@ the terms of the BSD license (see the COPYING file).
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref gmm.h supports *Gaussian Mixture Models* (GMMs) in VLFeat,
-inlcuding learning GMMs from data by expectation maximization
+@ref gmm.h is an implementation of *Gaussian Mixture Models* (GMMs).
+The main functionality provided by this module is learning GMMs from data.
+Learning maximises the likelihood of a GMM using the
+ expectation maximization
 @cite{dempster77maximum}). The implementation supports @c float or @c
 double data types, is parallelized, and is tuned to work reliably and
-effectively on relatively large datasets. Stability is obtained in
-part by restricting the parameters of the GMM to selected classes.
+effectively on datasets of visual features. Stability is obtained in
+part by regularizing and restricting the parameters of the GMM.
 
 GMMs are at the basis of the computation of other useful features,
 such as the Fisher vectors (@ref fisher).
 
-The rest of the page contains a short tutorial on the practical usage
-of this module. For detailed information on GMMs and their learning
-with the EM algorithm see @subpage gmm-fundamentals.
+To get started with the C API see @ref gmm-starting; for detailed
+information on GMMs, their learning with the EM algorithm, and other
+details of VLFeat implementation see @subpage gmm-fundamentals.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section gmm-starting Getting started
@@ -325,19 +327,14 @@ struct _VlGMM
   void *  sigmas;                     /**< Diagonals of covariance matrices of Gaussian modes. */
   void *  weights;                    /**< Weights of Gaussian modes. */
   void *  posteriors;                 /**< Probabilities of correspondences of points to clusters. */
-
-  double sigmaLowBound;
-
+  double sigmaLowBound ;              /**< Lower bound on the diagonal covariance values. */
   VlGMMInitialization initialization; /**< Initialization option */
-  VlGMMMultithreading multithreading; /**< Multi-threading option */
-
   VlKMeans * kmeansInit;              /**< Kmeans object for initialization of gaussians */
-
   double LL ;                         /**< current solution loglikelihood */
 } ;
 
 /* ---------------------------------------------------------------- */
-/*                                                      Constructor */
+/*                                                       Life-cycle */
 /* ---------------------------------------------------------------- */
 
 /** @brief Create a new GMM object
@@ -349,31 +346,26 @@ VlGMM *
 vl_gmm_new (vl_type dataType)
 {
 
-  VlGMM * self = vl_malloc(sizeof(VlGMM)) ;
-
+  VlGMM * self = vl_calloc(1, sizeof(VlGMM)) ;
   self->dataType = dataType;
-
   self->numClusters = 0;
   self->numData = 0;
   self->dimension = 0;
   self->initialization = VlGMMRand;
-  self->multithreading = VlGMMParallel;
-
   self->verbosity = 0 ;
   self->maxNumIterations = 50;
   self->numRepetitions = 1;
   self->sigmaLowBound = 10e-6;
-
   self->weights = NULL ;
   self->sigmas = NULL ;
   self->means = NULL ;
   self->posteriors = NULL ;
   self->kmeansInit = NULL ;
-
   return self ;
 }
 
 /** @brief Reset state
+ ** @param self object.
  **
  ** The function reset the state of the GMM object. It deletes
  ** any stored means, sigmas, weights and posterior probabilities
@@ -381,6 +373,7 @@ vl_gmm_new (vl_type dataType)
  ** cancels the effect of seeding or setting the means, sigmas and weights,
  ** but does not change the other configuration parameters.
  **/
+
 void
 vl_gmm_reset (VlGMM * self)
 {
@@ -652,24 +645,6 @@ void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans)
   self->kmeansInit = kmeans;
 }
 
-/** @brief Get GMM multithreading otion
- ** @param self object
- ** @return VlGMM multithreading option.
- **/
-VlGMMMultithreading vl_gmm_get_multithreading (VlGMM const * self)
-{
-  return self->multithreading;
-}
-
-/** @brief Set GMM multithreading option.
- ** @param self object
- ** @param multithreading multithreading option.
- **/
-void vl_gmm_set_multithreading (VlGMM * self, VlGMMMultithreading multithreading)
-{
-  self->multithreading = multithreading;
-}
-
 /** @brief Get lower bound on sigma diagonals.
  ** @param self object
  ** @return lower bound on sigmas.
@@ -725,7 +700,7 @@ VL_XCAT (_vl_gmm_print_,SFX)
     VL_PRINT("\n");
   }
 
-  VL_PRINT("sigmas:\n");
+  VL_PRINT("covariances:\n");
   for(i_cl = 0; i_cl < self->numClusters; i_cl++){
     for(dim = 0; dim < self->dimension; dim++){
       VL_PRINT("%f ",*((TYPE*)self->sigmas + i_cl*self->dimension + dim));
@@ -733,7 +708,7 @@ VL_XCAT (_vl_gmm_print_,SFX)
     VL_PRINT("\n");
   }
 
-  VL_PRINT("weights:\n");
+  VL_PRINT("priors:\n");
   for(i_cl = 0; i_cl < self->numClusters; i_cl++){
       VL_PRINT("%f ",*((TYPE*)self->weights + i_cl));
   }
@@ -763,14 +738,12 @@ VL_XCAT(_vl_gmm_new_copy_, SFX)
   self->numClusters = gmm->numClusters;
   self->initialization = gmm->initialization;
   self->kmeansInit = gmm->kmeansInit;
-  self->multithreading = gmm->multithreading;
-
   self->maxNumIterations = gmm->maxNumIterations;
   self->numRepetitions = gmm->numRepetitions;
   self->verbosity = gmm->verbosity;
-
   self->LL = gmm->LL;
 
+  /* TODO: check if this memory is allocated properly */
   if (gmm->means) {
     memcpy(self->means, gmm->means, sizeof(TYPE)*gmm->numClusters*gmm->dimension);
   }
@@ -783,7 +756,6 @@ VL_XCAT(_vl_gmm_new_copy_, SFX)
   if (gmm->weights) {
     memcpy(self->weights, gmm->weights, sizeof(TYPE)*gmm->numClusters);
   }
-
   return self;
 }
 
@@ -932,10 +904,8 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
       }
     }
   }
-
   vl_free(clusterMasses);
   vl_free(assignments);
-
 }
 
 /* ---------------------------------------------------------------- */
@@ -1172,36 +1142,12 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
  vl_size numData)
 {
   vl_size numClusters = self->numClusters;
-  vl_uindex i_d, i_cl;
-  vl_size dim;
-  vl_int t;
+  vl_index i_d, i_cl;
+  vl_size dim ;
   vl_size lowSigmas = 0;
-  int chunkSize = 1;
   TYPE posteriorSum = 0;
   TYPE * oldMeans;
 
-  TYPE ** clusterPosteriorSums;
-  TYPE ** chunkMeans;
-  TYPE ** chunkSigmas;
-
-  /* parallel computation consts*/
-  vl_int numChunks = 1;
-
-  switch(self->multithreading) {
-    case(VlGMMParallel):
-#if defined(_OPENMP)
-      numChunks = (vl_int)vl_get_max_threads();
-#else
-      numChunks = 1;
-#endif
-      break;
-    case(VlGMMSerial):
-      numChunks = 1;
-      break;
-    default:
-      VL_PRINT("Bad multithreading value.\n");
-      abort();
-  }
 
   oldMeans = vl_malloc(sizeof(TYPE) * self->dimension * numClusters);
   memcpy(oldMeans, means, sizeof(TYPE) * self->dimension * numClusters);
@@ -1210,89 +1156,85 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   memset(means, 0, sizeof(TYPE) * self->dimension * numClusters);
   memset(weights, 0, sizeof(TYPE) * numClusters);
 
-  /* chunks initialization */
-  clusterPosteriorSums = vl_malloc(sizeof(TYPE*) * numChunks);
-  chunkMeans = vl_malloc(sizeof(TYPE*) * numChunks);
-  chunkSigmas = vl_malloc(sizeof(TYPE*) * numChunks);
-
-  for(t = 0; t < numChunks; t++) {
-
-    chunkMeans[t]  = vl_malloc(sizeof(TYPE) * self->dimension * numClusters);
-    chunkSigmas[t] = vl_malloc(sizeof(TYPE) * self->dimension * numClusters);
-    clusterPosteriorSums[t] = vl_malloc(sizeof(TYPE) * numClusters);
-
-    memset(chunkMeans[t], 0, sizeof(TYPE) * self->dimension * numClusters);
-    memset(chunkSigmas[t], 0, sizeof(TYPE) * self->dimension * numClusters);
-    memset(clusterPosteriorSums[t], 0, sizeof(TYPE) * numClusters);
-
-  }
-
-//compute sigmas
+  /* compute covariance */
 #if defined(_OPENMP)
-#pragma omp parallel for private(t,i_d,i_cl,dim) schedule(static,chunkSize) reduction(+:posteriorSum)
+#pragma omp parallel default(shared) private(i_d, i_cl) reduction(+:posteriorSum)
 #endif
-  for(t=0; t < numChunks; t++) {
-    for (i_d = (vl_size)t ; i_d < numData ; i_d += numChunks) {
-      for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
+  {
+    TYPE * clusterPosteriorSum_, * means_, * sigmas_ ;
+#pragma omp critical
+    {
+      clusterPosteriorSum_ = vl_calloc(sizeof(TYPE), numClusters) ;
+      means_ = vl_calloc(sizeof(TYPE), self->dimension * numClusters) ;
+      sigmas_ = vl_calloc(sizeof(TYPE), self->dimension * numClusters) ;
+    }
 
-        clusterPosteriorSums[t][i_cl] += posteriors[i_cl * numData + i_d];
-        posteriorSum += posteriors[i_cl * numData + i_d];
-
+#pragma omp for
+    for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
+      for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+        
+        clusterPosteriorSum_ [i_cl] += posteriors[i_cl * numData + i_d] ;
+        posteriorSum += posteriors[i_cl * numData + i_d] ;
+        
+        /* TODO: this section must be conditional on the architecture at run time */
 #ifdef __AVX__
         VL_XCAT(_vl_weighted_mean_avx_, SFX)
         (self->dimension,
-         chunkMeans[t] + i_cl * self->dimension,
+         means_ + i_cl * self->dimension,
          data + i_d * self->dimension,
-         posteriors + i_cl*numData + i_d);
-
+         posteriors + i_cl * numData + i_d);
+        
         VL_XCAT(_vl_weighted_sigma_avx_, SFX)
         (self->dimension,
-         chunkSigmas[t] + i_cl * self->dimension ,
+         sigmas_ + i_cl * self->dimension ,
          data + i_d * self->dimension,
          oldMeans + i_cl * self->dimension,
          posteriors + i_cl*numData + i_d);
 #else
-  #ifdef __SSE2__
+#ifdef __SSE2__
         VL_XCAT(_vl_weighted_mean_sse2_, SFX)
         (self->dimension,
-         chunkMeans[t] + i_cl * self->dimension,
+         means_+ i_cl * self->dimension,
          data + i_d * self->dimension,
          posteriors + i_cl*numData + i_d);
-
+        
         VL_XCAT(_vl_weighted_sigma_sse2_, SFX)
         (self->dimension,
-         chunkSigmas[t] + i_cl * self->dimension ,
+         sigmas_ + i_cl * self->dimension ,
          data + i_d * self->dimension,
          oldMeans + i_cl * self->dimension,
          posteriors + i_cl*numData + i_d);
-  #else
+#else
         for (dim = 0 ; dim < self->dimension ; ++dim) {
           TYPE diff = data[i_d * self->dimension + dim] - oldMeans[i_cl*self->dimension + dim];
-          chunkSigmas[t][i_cl * self->dimension + dim] += posteriors[i_cl*numData + i_d] * diff*diff;
+          sigmas_ [i_cl * self->dimension + dim] += posteriors[i_cl*numData + i_d] * diff*diff;
         }
-
         for (dim = 0 ; dim < self->dimension ; ++dim) {
-          chunkMeans[t][self->dimension * i_cl + dim] += data[self->dimension * i_d + dim] * posteriors[i_cl * numData + i_d];
+          means_ [self->dimension * i_cl + dim] += data[self->dimension * i_d + dim] * posteriors[i_cl * numData + i_d];
         }
-  #endif
+#endif
 #endif
       }
     }
-  } /* end of parallel region */
 
-  //accumulate after aprallel section
-  for(t = 0; t < numChunks; t++) {
-    for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
-      weights[i_cl] += clusterPosteriorSums[t][i_cl];
-      for (dim = 0 ; dim < self->dimension ; ++dim) {
-        sigmas[i_cl * self->dimension + dim] += chunkSigmas[t][i_cl * self->dimension + dim];
-        means[i_cl * self->dimension + dim]  += chunkMeans[t][i_cl * self->dimension + dim];
+    /* accumulate */
+#pragma omp critical
+    {
+      for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+        weights[i_cl] += clusterPosteriorSum_ [i_cl];
+        for (dim = 0 ; dim < self->dimension ; ++dim) {
+          sigmas[i_cl * self->dimension + dim] += sigmas_ [i_cl * self->dimension + dim];
+          means[i_cl * self->dimension + dim]  += means_ [i_cl * self->dimension + dim];
+        }
       }
+      vl_free(means_);
+      vl_free(sigmas_);
+      vl_free(clusterPosteriorSum_);
     }
-  }
+  } /* parallel section */
 
-  // normalize
-  for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
+  /* normalize */
+  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
     vl_bool low = VL_FALSE;
     for (dim = 0 ; dim < self->dimension ; ++dim) {
       sigmas[i_cl * self->dimension + dim] /= weights[i_cl];
@@ -1311,19 +1253,10 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
     VL_PRINT("Detected %d low sigmas -> set to lower bound.\n",lowSigmas);
   }
 
-  for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
+  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
     weights[i_cl] /= posteriorSum;
   }
 
-  for(t = 0; t < numChunks; t++) {
-    vl_free(clusterPosteriorSums[t]);
-    vl_free(chunkMeans[t]);
-    vl_free(chunkSigmas[t]);
-  }
-
-  vl_free(chunkMeans);
-  vl_free(chunkSigmas);
-  vl_free(clusterPosteriorSums);
   vl_free(oldMeans);
 }
 
@@ -1341,13 +1274,12 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
  TYPE const * data,
  vl_size numData)
 {
-  vl_int numChunks = 1;
-  vl_size numClusters = self->numClusters;
-  vl_uindex i_d, i_cl;
+  vl_size numClusters = self->numClusters ;
+  vl_index i_d, i_cl;
   vl_size dim;
   double LL = 0;
-  int chunkSize = 1;
-  vl_int t;
+  
+  // TODO : check this statement
   //TYPE halfDimLog2Pi = (self->dimension/2.0)*log(2.0*VL_PI);
 
   TYPE * logSigmas;
@@ -1366,74 +1298,49 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
 
   /* parallel computation consts*/
 
-
-  switch(self->multithreading) {
-    case(VlGMMParallel):
-#ifdef _OPENMP
-      numChunks = (vl_int)vl_get_max_threads();
-#else
-      numChunks = 1;
-#endif
-      break;
-    case(VlGMMSerial):
-      numChunks = 1;
-      break;
-    default:
-      VL_PRINT("Bad multithreading value.\n");
-      abort();
-  }
-
-  //VL_XCAT(_vl_gmm_print_, SFX) (self);
-  //getchar();
-
-
 #if defined(_OPENMP)
-#pragma omp parallel for private(t,i_cl,dim) schedule(static,chunkSize)
+#pragma omp parallel for private(i_cl,dim)
 #endif
-  for(t=0; t < numChunks; t++) {
-    for (i_cl = (vl_size) t ; i_cl < numClusters ; i_cl += numChunks) {
-      TYPE logSigma = 0;
-      logWeights[i_cl] = log(weights[i_cl]);
-      for(dim = 0; dim < self->dimension; dim++) {
-        logSigma += log(sigmas[i_cl*self->dimension + dim]);
-        invSigmas[i_cl*self->dimension + dim] = 1/sigmas[i_cl*self->dimension + dim];
-      }
-      logSigmas[i_cl] = logSigma;
+  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
+    TYPE logSigma = 0;
+    logWeights[i_cl] = log(weights[i_cl]);
+    for(dim = 0; dim < self->dimension; dim++) {
+      logSigma += log(sigmas[i_cl*self->dimension + dim]);
+      invSigmas [i_cl*self->dimension + dim] = (TYPE) 1.0 / sigmas[i_cl*self->dimension + dim];
     }
+    logSigmas[i_cl] = logSigma;
   } /* end of parallel region */
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(t,i_cl,i_d) schedule(static,chunkSize) reduction(+:LL)
+#pragma omp parallel for private(i_cl,i_d) reduction(+:LL)
 #endif
-  for(t=0; t < numChunks; t++) {
-    for (i_d = (vl_size) t ; i_d < numData ; i_d += numChunks) {
-      TYPE clusterPosteriorsSum = 0;
-      TYPE maxPosterior = (TYPE)(-VL_INFINITY_D);
-
-      for (i_cl = 0 ; i_cl < numClusters ; i_cl++) {
-        posteriors[i_cl * numData + i_d] = logWeights[i_cl];
-        //posteriors[i_cl * numData + i_d] -= halfDimLog2Pi;
-        posteriors[i_cl * numData + i_d] -= 0.5*logSigmas[i_cl];
-        posteriors[i_cl * numData + i_d] -= 0.5 * distFn (self->dimension,
-                                            data + i_d * self->dimension,
-                                            means + i_cl * self->dimension,
-                                            invSigmas + i_cl * self->dimension);
-        if(posteriors[i_cl * numData + i_d] > maxPosterior) {
-          maxPosterior = posteriors[i_cl * numData + i_d];
-        }
+  for (i_d = 0 ; i_d < (signed)numData ; ++ i_d) {
+    TYPE clusterPosteriorsSum = 0;
+    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D);
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; i_cl++) {
+      posteriors[i_cl * numData + i_d] = logWeights[i_cl];
+      //posteriors[i_cl * numData + i_d] -= halfDimLog2Pi;
+      posteriors[i_cl * numData + i_d] -= 0.5*logSigmas[i_cl];
+      posteriors[i_cl * numData + i_d] -= 0.5 * distFn (self->dimension,
+                                                        data + i_d * self->dimension,
+                                                        means + i_cl * self->dimension,
+                                                        invSigmas + i_cl * self->dimension);
+      if(posteriors[i_cl * numData + i_d] > maxPosterior) {
+        maxPosterior = posteriors[i_cl * numData + i_d];
       }
-
-      for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
-        posteriors[i_cl * numData + i_d] -= maxPosterior;
-        posteriors[i_cl * numData + i_d] = exp(posteriors[i_cl * numData + i_d]);
-        clusterPosteriorsSum += posteriors[i_cl * numData + i_d];
-      }
-
-      LL += (double)log(clusterPosteriorsSum)+maxPosterior;
-
-      for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
-        posteriors[i_cl * numData + i_d] /= clusterPosteriorsSum;
-      }
+    }
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+      posteriors[i_cl * numData + i_d] -= maxPosterior;
+      posteriors[i_cl * numData + i_d] = exp(posteriors[i_cl * numData + i_d]);
+      clusterPosteriorsSum += posteriors[i_cl * numData + i_d];
+    }
+    
+    LL += (double)log(clusterPosteriorsSum)+maxPosterior;
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+      posteriors[i_cl * numData + i_d] /= clusterPosteriorsSum;
     }
   } /* end of parallel region */
 
@@ -1471,20 +1378,14 @@ VL_XCAT(_vl_gmm_EM_, SFX)
   }
 
   LL = VL_XCAT(_vl_gmm_expectation_, SFX) (self,posteriors,weights,sigmas,means,data,numData);
-
   VL_XCAT(_vl_gmm_maximization_, SFX) (self,posteriors,weights,sigmas,means,data,numData);
-
   restarted = VL_XCAT(_vl_gmm_zero_weights_disposal_, SFX) (self, weights, sigmas, means);
 
-  if(restarted > 0) {
-    VL_PRINT("Warning: %d gaussians had to be restarted because of their zero weight.\n",restarted);
+  if ((restarted > 0) & (self->verbosity > 0)) {
+    VL_PRINT("Warning: %d Gaussian modes reinitialized because they had become empty.\n",restarted);
   }
 
-  //VL_XCAT(_vl_gmm_print_, SFX)(self);
-  //getchar();
-
-  return LL;
-
+  return LL ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1503,15 +1404,7 @@ VL_XCAT(_vl_gmm_get_mixture_, SFX)
 
   self->posteriors = (TYPE*)vl_malloc(sizeof(TYPE) * numData * self->numClusters);
 
-#if ! defined(_OPENMP)
- // if(self->multithreading == VlGMMParallel) {
- //   VL_PRINT("VlGMM: Warning: OpenMP not included, continuing with serial computation.")
- // }
-#endif
-
-  for (  iteration = 0 ;
-         1 ;
-         ++ iteration) {
+  for (iteration = 0 ; 1 ; ++ iteration) {
     double eps;
 
     /* assign data to cluters */
@@ -1530,7 +1423,7 @@ VL_XCAT(_vl_gmm_get_mixture_, SFX)
     }
 
     eps = vl_abs_d ((LL - previousLL) / (LL));
-    if (iteration>0 && (eps < 0.00001)) {
+    if ((iteration > 0) && (eps < 0.00001)) {
       if (self->verbosity) {
         VL_PRINTF("GMM: GMM-EM terminating because the algorithm fully converged\n") ;
       }
@@ -1539,8 +1432,7 @@ VL_XCAT(_vl_gmm_get_mixture_, SFX)
 
     previousLL = LL;
   }
-
-  return (double)LL;
+  return LL;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1755,9 +1647,7 @@ double vl_gmm_cluster (VlGMM * self,
       VL_PRINTF("GMM: GMM initialized in %.2f s\n",
                 vl_get_cpu_time() - timeRef) ;
     }
-
-
-
+    
     timeRef = vl_get_cpu_time () ;
     LL = vl_gmm_get_mixture (self, data, numData) ;
 
@@ -1765,8 +1655,6 @@ double vl_gmm_cluster (VlGMM * self,
       VL_PRINTF("GMM: GMM terminated in %.2f s with loglikelihood %f\n",
                 vl_get_cpu_time() - timeRef, LL) ;
     }
-
-
 
     if (LL > bestLL || repetition == 0) {
       void * temp ;
@@ -1891,12 +1779,11 @@ void vl_gmm_set_sigmas (VlGMM * self, void * sigmas, vl_size numClusters, vl_siz
     default:
       abort();
   }
-  if(!self->sigmas) {
+  if (self->sigmas == NULL) {
     self->sigmas = vl_malloc(numClusters*typeSize*dimension);
   }
 
   memcpy(self->sigmas,sigmas,numClusters*typeSize*dimension);
-
 }
 
 /** @brief Explicitly set the initial weights of the gaussians.

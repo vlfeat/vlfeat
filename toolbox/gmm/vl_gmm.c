@@ -4,7 +4,7 @@
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 David Novotny.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -23,7 +23,6 @@ enum
   opt_initialization,
   opt_num_repetitions,
   opt_verbose,
-  opt_multithreading,
   opt_means,
   opt_sigmas,
   opt_weights,
@@ -43,7 +42,6 @@ vlmxOption  options [] =
   {"NumRepetitions",    1,   opt_num_repetitions,    },
   {"Initialization",    1,   opt_initialization      },
   {"Initialisation",    1,   opt_initialization      }, /* UK spelling */
-  {"Multithreading",    1,   opt_multithreading      },
   {"InitMeans",         1,   opt_means               },
   {"InitSigmas",        1,   opt_sigmas              },
   {"InitWeights",       1,   opt_weights             },
@@ -76,9 +74,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_bool weightsSet = VL_FALSE;
 
   double sigmaLowBound = 0.000001;
-
-  VlGMMMultithreading multithreading = VlGMMParallel;
-
   void const * data = NULL ;
 
   vl_size maxNumIterations = 100 ;
@@ -110,18 +105,13 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   }
 
   classID = mxGetClassID (IN(DATA)) ;
-  switch (classID)
-  {
-  case mxSINGLE_CLASS:
-    dataType = VL_TYPE_FLOAT ;
-    break ;
-  case mxDOUBLE_CLASS:
-    dataType = VL_TYPE_DOUBLE ;
-    break ;
-  default:
-    vlmxError (vlmxErrInvalidArgument,
-               "DATA is neither of class SINGLE or DOUBLE.") ;
-    abort() ;
+  switch (classID) {
+    case mxSINGLE_CLASS: dataType = VL_TYPE_FLOAT ; break ;
+    case mxDOUBLE_CLASS: dataType = VL_TYPE_DOUBLE ; break ;
+    default:
+      vlmxError (vlmxErrInvalidArgument,
+                 "DATA is neither of class SINGLE or DOUBLE.") ;
+      abort() ;
   }
 
   dimension = mxGetM (IN(DATA)) ;
@@ -321,33 +311,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       }
       break ;
 
-    case opt_multithreading :
-      if (!vlmxIsString (optarg, -1))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING must be a string.") ;
-      }
-      if (mxGetString (optarg, buf, sizeof(buf)))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING argument too long.") ;
-      }
-
-      if (vlmxCompareStringsI("serial", buf) == 0)
-      {
-        multithreading = VlGMMSerial ;
-      }
-      else if (vlmxCompareStringsI("parallel", buf) == 0)
-      {
-        multithreading = VlGMMParallel ;
-      }
-      else
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "Invalid value %s for MULTITHREADING.", buf) ;
-      }
-      break ;
-
     case opt_num_repetitions :
       if (!vlmxIsPlainScalar (optarg))
       {
@@ -401,7 +364,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_gmm_set_verbosity (gmm, verbosity) ;
   vl_gmm_set_num_repetitions (gmm, numRepetitions) ;
   vl_gmm_set_max_num_iterations (gmm, maxNumIterations) ;
-  vl_gmm_set_multithreading (gmm,multithreading);
   vl_gmm_set_initialization (gmm, initialization) ;
   vl_gmm_set_sigma_lower_bound (gmm, sigmaLowBound) ;
 
@@ -428,7 +390,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   if (verbosity)
   {
     char const * initializationName = 0 ;
-    char const * multithreadingName = 0 ;
 
     switch (vl_gmm_get_initialization(gmm))
     {
@@ -441,20 +402,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     default:
       abort() ;
     }
-    switch (vl_gmm_get_multithreading(gmm))
-    {
-    case VlGMMSerial :
-      multithreadingName = "serial" ;
-      break ;
-    case VlGMMParallel :
-      multithreadingName = "parallel" ;
-      break ;
-    default:
-      abort() ;
-    }
 
     mexPrintf("vl_gmm: initialization = %s\n", initializationName) ;
-    mexPrintf("vl_gmm: multithreading = %s\n", multithreadingName) ;
     mexPrintf("vl_gmm: maxNumIterations = %d\n", vl_gmm_get_max_num_iterations(gmm)) ;
     mexPrintf("vl_gmm: numRepetitions = %d\n", vl_gmm_get_num_repetitions(gmm)) ;
     mexPrintf("vl_gmm: dataType = %s\n", vl_get_type_name(vl_gmm_get_data_type(gmm))) ;
