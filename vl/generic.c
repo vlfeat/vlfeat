@@ -343,7 +343,7 @@ more years.
 is: try to match the style of the existing code as much as
 possible.</li>
 
-<li><b>No whitespaces at the end of lines.</b> Whitespaces introduce
+<li><b>No white spaces at the end of lines.</b> White spaces introduce
 invisible changes in the code that are however picked up by control
 version systems such as Git.</li>
 
@@ -357,13 +357,37 @@ indicate the array with each of the @c numDimensions dimensions.</li>
 
 <li><b>Short variable names.</b> For indexes in short for loops it is
 fine to use short index names such as @c i, @c j, and @c k. For example:
-
 <pre>
 for (i = 0 ; i < numEntries ; ++i) values[i] ++ ;
 </pre>
-
 is considered acceptable.</li>
 
+<li><b>Function arguments.</b> VLFeat functions that operate on an
+object (member functions) should be passed the object address as first
+argument; this argument should be called @c self. For example:
+<pre>
+   void vl_object_do_something(VlObject *self) ;
+</pre>
+Multi-dimensional arrays should be specified first by their address,
+and then by their dimensions. For example
+<pre>
+  void vl_use_array (float * array, vl_size numColumns, vl_size numRows) ; // good
+  void vl_use_array (vl_size numColumns, vl_size numRows, float * array) ; // bad
+</pre>
+Arguments that are used as outputs should be specified first (closer to
+the left-hand side of an expression). For example
+<pre>
+ void vl_sum_numbers (float * output, float input1, float input2) ; // good
+ void vl_sum_numbers (float input1, float input2, float * output) ; // bad
+</pre>
+These rule can be combined. For example
+<pre>
+ void vl_object_sum_to_array (VlObject * self, float * outArray, vl_size numColumns, vl_size numRows, float * inArray) ; // good
+</pre>
+Note that in this case no dimension for @c inArray is specified as it
+is assumed that @c numColumns and @c numRows are the dimensions of
+both arrays.
+</li>
 </ul>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -371,23 +395,22 @@ is considered acceptable.</li>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 <ul>
-<li><b>Help messages.</b> Each @c .m file should include a stantrad
-help comment block (accesbile from MATLAB @c help() command).
+<li><b>Help messages.</b> Each @c .m file should include a standard
+help comment block (accessible from MATLAB @c help() command).
 The first line of the block has a space, the name of the function,
 4 spaces, and a brief command description. The body of the help
-message is indendet with 4 spaces. For example
+message is indented with 4 spaces. For example
 @code
 % VL_FUNCTION    An example function
 %    VL_FUNCTION() does nothing.
 @endcode
-The content HELP message itsel should follow MATLAB default style.
+The content HELP message itself should follow MATLAB default style.
 For example, rather than giving a list of formal input and output
 arguments as often done, one simply shows how to use the function, explaining
 along the way the different ways the function can be called and
 the format of the parameters.
 </li>
 </ul>
-
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section dev-doc Documenting the code
