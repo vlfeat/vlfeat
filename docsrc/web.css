@@ -4,10 +4,6 @@ html, body, div, img, dl {
     padding: 0px ;
     border-style: none ; /* ie again */
 }
-table {
-    font: inherit ;
-    color: inherit ;
-}
 html {
 }
 body {
@@ -15,6 +11,10 @@ body {
     line-height: 18px ;
     font-family: Arial, 'Liberation Sans', 'DejaVu Sans', sans-serif ;
     background-color: #f6f6f6 ;
+}
+table {
+    font: inherit ;
+    color: inherit ;
 }
 h1, h2, h3, h4, h5, h6 {
     font-weight: bold ;
@@ -44,8 +44,8 @@ code a {
     clear: both ;
     margin: 0px ;
     padding: 0px ;
-    font-size: 1px;
-    line-height: 1px;
+    font-size: 1px ;
+    line-height: 1px ;
 }
 .standout {
     margin: 1em ! important ;
@@ -54,8 +54,8 @@ code a {
     color: red ! important ;
 }
 .clearfix {
-    display: inline-block;
-    width: 100%;
+    display: inline-block ;
+    width: 100% ;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -116,6 +116,10 @@ code a {
     margin: 0 ;
     color: white ;
     font-family: 'Trebuchet MS', Helvetica, sans-serif ;
+}
+#header h1 a {
+    text-decoration: none ;
+    color: white ;
 }
 #dotorg {
     color: #AAA ;
@@ -264,8 +268,8 @@ code a {
 #content table.boxes {
     min-width: 100% ;
     border-collapse: separate ;
-    border-spacing: 13px ;
-    margin: -13px ;
+    border-spacing: 4px ;
+/*    margin: -13px ; */
     padding: 0em ;
     box-sizing:border-box ; /* avoids exceeding 100% width */
 }
