@@ -1148,7 +1148,6 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   TYPE posteriorSum = 0;
   TYPE * oldMeans;
 
-
   oldMeans = vl_malloc(sizeof(TYPE) * self->dimension * numClusters);
   memcpy(oldMeans, means, sizeof(TYPE) * self->dimension * numClusters);
 
@@ -1158,7 +1157,9 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
 
   /* compute covariance */
 #if defined(_OPENMP)
-#pragma omp parallel default(shared) private(i_d, i_cl) reduction(+:posteriorSum)
+#pragma omp parallel default(shared) private(i_d, i_cl) \
+                     reduction(+:posteriorSum) \
+                     num_threads(vl_get_max_threads())
 #endif
   {
     TYPE * clusterPosteriorSum_, * means_, * sigmas_ ;
@@ -1299,7 +1300,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   /* parallel computation consts*/
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i_cl,dim)
+#pragma omp parallel for private(i_cl,dim) num_threads(vl_get_max_threads())
 #endif
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
     TYPE logSigma = 0;
@@ -1312,7 +1313,8 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   } /* end of parallel region */
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i_cl,i_d) reduction(+:LL)
+#pragma omp parallel for private(i_cl,i_d) reduction(+:LL) \
+                         num_threads(vl_get_max_threads())
 #endif
   for (i_d = 0 ; i_d < (signed)numData ; ++ i_d) {
     TYPE clusterPosteriorsSum = 0;
@@ -1497,7 +1499,6 @@ vl_gmm_rand_init_mixture
  vl_size numClusters)
 {
   switch (self->dataType) {
-
     case VL_TYPE_FLOAT :
       _vl_gmm_rand_init_mixture_f
       (self, (float const *)data, dimension, numData, numClusters) ;
@@ -1528,7 +1529,6 @@ vl_gmm_kmeans_init_mixture
  vl_size numClusters)
 {
   switch (self->dataType) {
-
     case VL_TYPE_FLOAT :
       _vl_gmm_kmeans_init_mixture_f
       (self, (float const *)data, dimension, numData, numClusters) ;
@@ -1557,7 +1557,6 @@ vl_gmm_custom_init_mixture
  vl_size numClusters)
 {
   switch (self->dataType) {
-
     case VL_TYPE_FLOAT :
       _vl_gmm_custom_init_mixture_f
       (self, dimension, numData, numClusters) ;
@@ -1630,7 +1629,6 @@ double vl_gmm_cluster (VlGMM * self,
   self->numData = numData;
   self->numClusters = numClusters;
 
-
   for (repetition = 0 ; repetition < self->numRepetitions ; ++ repetition) {
     double LL ;
     double timeRef ;
@@ -1695,7 +1693,6 @@ double vl_gmm_cluster (VlGMM * self,
   self->sigmas = bestSigmas ;
   self->LL = bestLL;
   return bestLL ;
-
 }
 
 /** @brief Invoke the EM algorithm.
