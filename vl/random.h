@@ -20,7 +20,7 @@ the terms of the BSD license (see the COPYING file).
 /** @brief Random numbber generator state */
 typedef struct _VlRand {
   vl_uint32 mt [624] ;
-  vl_size mti ;
+  vl_uint32 mti ;
 } VlRand ;
 
 /** @name Setting and reading the state
