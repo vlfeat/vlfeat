@@ -831,7 +831,7 @@ vlmxNextOption (mxArray const *args[], int nargs,
 
 /** @brief Get an emumeration member by name
  ** @param enumeration the enumeration to decode.
- ** @param name member name as a MATLAB string array.sb
+ ** @param name_array member name as a MATLAB string array.
  ** @param caseInsensitive if @c true match the string case-insensitive.
  ** @return the corresponding enumeration member, or @c NULL if any.
  **/
