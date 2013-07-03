@@ -343,12 +343,6 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahal) ;
 #endif
 
-#if defined(_OPENMP)
-  vl_size numThreads = vl_get_max_threads() ;
-#else
-  vl_size numThreads = 1 ;
-#endif
-
   logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
   logWeights = vl_malloc(sizeof(TYPE) * numClusters);
   invSigma = vl_malloc(dimension*sizeof(TYPE)*numClusters);
@@ -358,7 +352,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   memset(enc, 0, sizeof(TYPE) * 2 * dimension * numClusters);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl,dim) num_threads(numThreads)
+#pragma omp parallel for default(shared) private(i_cl,dim) num_threads(vl_get_max_threads())
 #endif
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
     TYPE logSigma = 0;
@@ -374,7 +368,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   } /* end of parallel region */
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_d,i_cl) num_threads(numThreads)
+#pragma omp parallel for default(shared) private(i_d,i_cl) num_threads(vl_get_max_threads())
 #endif
   for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
     TYPE clusterPosteriorsSum = 0;
@@ -406,7 +400,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl) num_threads(numThreads)
+#pragma omp parallel for default(shared) private(i_cl) num_threads(vl_get_max_threads())
 #endif
   for(i_cl = 0; i_cl < (signed)numClusters; ++ i_cl) {
     TYPE uprefix;
