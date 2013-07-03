@@ -25,6 +25,7 @@ C compiler, and CPU architecture. It also provides a few features to
 abstract from such details.
 
 @see http://predef.sourceforge.net/index.php
+@see http://en.wikipedia.org/wiki/64-bit_computing
 
 @section host-os Host operating system
 
@@ -51,14 +52,17 @@ platforms.
 
 @subsection host-compiler-data-model Data models
 
-The C language defines a number of atomic data types (such as @c
-char, @c short, @c int and so on). The number of bits (width) used to
-represent each data type depends on the compiler data model.  The
-following table summarizes the relevant conventions:
+The C language defines a number of atomic data types (such as @c char,
+@c short, @c int and so on). The number of bits (width) used to
+represent each data type depends on the compiler data model. The
+different models are *ILP32* (@c int, @c long, and pointer 32 bit),
+*LP64* (@c int 32 bit, @c long and pointer 64 bit), *ILP64* (@c int,
+@c long, and pointer 64 bit), and *LLP64* (@c int, @c long 32 bit and
+pointer 64 -- and `long long` -- 64 bit). Note in particular that
+`long long` is 64 bit in all models of interest. The following table
+summarizes them:
 
-<table><caption><b>Compiler data models.</b> The table shows
-how many bits are allocated to each atomic data type according to
-each model.</caption>
+<table><caption><b>Compiler data models.</b> </caption>
 <tr style="font-weight:bold;">
 <td>Data model</td>
 <td><code>short</code></td>
@@ -73,9 +77,9 @@ each model.</caption>
 <td style="background-color:#ffa;">16</td>
 <td style="background-color:#afa;">32</td>
 <td style="background-color:#afa;">32</td>
-<td >64</td>
+<td>64</td>
 <td style="background-color:#afa;">32</td>
-<td>common 32 bit architectures</td>
+<td>Most 32 bit architectures.</td>
 </tr>
 <tr>
 <td>LP64</td>
@@ -114,6 +118,9 @@ each model.</caption>
 <td>Windows-64</td>
 </tr>
 </table>
+
+Macros such as ::VL_UINT32_C can be used to generate integer literal
+with the correct suffix for a type of a given width.
 
 @subsection host-compiler-other Other compiler-specific features
 
@@ -291,6 +298,37 @@ it supports POSIX threads.
  ** @brief Defined if the host compiler data model is ILP32.
  ** @see @ref host-compiler-data-model
  **/
+
+/** @def VL_INT8_C(x)
+ ** @brief Create an integer constant of the specified width and sign
+ ** @param x integer constant.
+ ** @return @a x with the correct suffix for the given sign and size.
+ ** The suffix used depends on the @ref host-compiler-data-model.
+ ** @par "Example:"
+ ** The macro @c VL_INT64_C(1234) is expanded as @c 123L in a LP64 system and
+ ** as @c 123LL in a LLP64 system.
+ **/
+
+/** @def VL_INT16_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_INT32_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_INT64_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_UINT8_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_UINT16_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_UINT32_C(x)
+ ** @copydoc VL_INT8_C */
+
+/** @def VL_UINT64_C(x)
+ ** @copydoc VL_INT8_C */
 
 /** @def VL_ARCH_IX86
  ** @brief Defined if the host CPU is of the Intel x86 family.
