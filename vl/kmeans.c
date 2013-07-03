@@ -724,33 +724,22 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
 #endif
 
   VlKDForest * forest = vl_kdforest_new(self->dataType,self->dimension,self->numTrees, self->distance) ;
-  VlKDForestSearcher ** searchers ;
-  vl_index t ;
-
-#ifdef _OPENMP
-  vl_size numThreads = vl_get_max_threads() ;
-#else
-  vl_size numThreads = 1 ;
-#endif
-
   vl_kdforest_set_max_num_comparisons(forest,self->maxNumComparisons);
   vl_kdforest_set_thresholding_method(forest,VL_KDTREE_MEDIAN);
   vl_kdforest_build(forest,self->numCenters,self->centers);
 
-  searchers = vl_calloc(sizeof(VlKDForestSearcher*), numThreads) ;
-  for(t = 0 ; t < (signed)numThreads ; ++ t) {
-    searchers[t] = vl_kdforest_new_searcher(forest) ;
-  }
-
 #ifdef _OPENMP
 #pragma omp parallel default(none) \
-  num_threads(numThreads) \
-  shared(self, forest, searchers, iteration, assignments, distances, data, numData, distFn)
+  num_threads(vl_get_max_threads()) \
+  shared(self, forest, iteration, assignments, distances, data, numData, distFn)
 #endif
-  {    
+  {
     VlKDForestNeighbor neighbor ;
-    VlKDForestSearcher * searcher = searchers[omp_get_thread_num()] ;
+    VlKDForestSearcher * searcher ;
     vl_index x;
+
+#pragma omp critical
+    searcher = vl_kdforest_new_searcher(forest) ;
 
 #ifdef _OPENMP
 #pragma omp for
@@ -780,7 +769,6 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
   } /* end of parallel region */
 
   vl_kdforest_delete(forest);
-  vl_free(searchers);
 }
 
 /* ---------------------------------------------------------------- */
@@ -1165,12 +1153,6 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
   vl_size * clusterMasses = vl_malloc (sizeof(vl_size) * numData) ;
   VlRand * rand = vl_get_rand () ;
 
-#if defined(_OPENMP)
-  vl_size numThreads = vl_get_max_threads() ;
-#else
-  vl_size numThreads = 1 ;
-#endif
-
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
 #else
@@ -1431,7 +1413,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
      */
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(x,c) num_threads(numThreads)
+#pragma omp parallel for default(shared) private(x,c) num_threads(vl_get_max_threads())
 #endif
     for (x = 0 ; x < (signed)numData ; ++x) {
       for (c = 0 ; c < self->numCenters ; ++c) {
@@ -1493,7 +1475,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
               assignments,data,distFn,allDone) \
             private(c,x) \
             reduction(+:numDistanceComputationsToRefreshUB,numDistanceComputationsToRefreshLB) \
-            num_threads(numThreads)
+            num_threads(vl_get_max_threads())
 #endif
     for (x = 0 ; x < (signed)numData ; ++ x) {
       /*
