@@ -186,29 +186,28 @@ vl_kdtree_build_recursively
     double mean = 0 ; /* unnormalized */
     double secondMoment = 0 ;
     double variance = 0 ;
-    vl_size dataSamplesEnd = VL_KDTREE_VARIANCE_SAMPLES;
+    vl_size numSamples = VL_KDTREE_VARIANCE_EST_NUM_SAMPLES;
     vl_bool useAllData = VL_FALSE;
 
-    if(dataEnd-dataBegin < VL_KDTREE_VARIANCE_SAMPLES) {
+    if(dataEnd - dataBegin <= VL_KDTREE_VARIANCE_EST_NUM_SAMPLES) {
       useAllData = VL_TRUE;
-      dataSamplesEnd = dataEnd-dataBegin;
+      numSamples = dataEnd - dataBegin;
     }
 
-    for (i = 0; i < dataSamplesEnd ; ++ i) {
+    for (i = 0; i < numSamples ; ++ i) {
       vl_uint32 sampleIndex;
       vl_index di;
       double datum ;
 
       if(useAllData == VL_TRUE) {
-        sampleIndex = i;
+        sampleIndex = (vl_uint32)i;
       } else {
-        sampleIndex = (vl_rand_uint32(forest->rand) % VL_KDTREE_VARIANCE_SAMPLES);
+        sampleIndex = (vl_rand_uint32(forest->rand) % VL_KDTREE_VARIANCE_EST_NUM_SAMPLES);
       }
       sampleIndex += dataBegin;
 
       di = tree->dataIndex[sampleIndex].index ;
-      //vl_index di = tree->dataIndex[i].index ;
-
+   
       switch(forest->dataType) {
         case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
           [di * forest->dimension + d] ;
@@ -223,31 +222,11 @@ vl_kdtree_build_recursively
       secondMoment += datum * datum ;
     }
 
-    mean /= dataSamplesEnd ;
-    secondMoment /= dataSamplesEnd ;
+    mean /= numSamples ;
+    secondMoment /= numSamples ;
     variance = secondMoment - mean * mean ;
 
-    // for (i = dataBegin ; i < dataEnd ; ++ i) {
-    //   vl_index di = tree->dataIndex[i].index ;
-    //   double datum ;
-    //   switch(forest->dataType) {
-    //     case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
-    //       [di * forest->dimension + d] ;
-    //       break ;
-    //     case VL_TYPE_DOUBLE: datum = ((double const*)forest->data)
-    //       [di * forest->dimension + d] ;
-    //       break ;
-    //     default:
-    //       abort() ;
-    //   }
-    //   mean += datum ;
-    //   secondMoment += datum * datum ;
-    // }
-    // mean /= (dataEnd - dataBegin) ;
-    // secondMoment /= (dataEnd - dataBegin) ;
-    // variance = secondMoment - mean * mean ;
-
-    if (variance == 0) continue ;
+    if (variance <= 0) continue ;
 
     /* keep splitHeapSize most varying dimensions */
     if (forest->splitHeapNumNodes < forest->splitHeapSize) {
