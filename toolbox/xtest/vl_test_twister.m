@@ -30,11 +30,12 @@ b=vl_twister([1 2 3 4 5]) ;
 vl_assert_equal(a,b,'VL_TWISTER([M N P ...])') ;
 
 function test_multi_multi_args()
-a=rand(1, 2, 3, 4, 5) ;
-b=vl_twister(1, 2, 3, 4, 5) ;
+rand('twister',1) ; a=rand(1, 2, 3, 4, 5) ;
+vl_twister('state',1) ; b=vl_twister(1, 2, 3, 4, 5) ;
 vl_assert_equal(a,b,'VL_TWISTER(M, N, P, ...)') ;
 
 function test_square()
-a=rand(10) ;
-b=vl_twister(10) ;
+rand('twister',1) ; a=rand(10) ;
+vl_twister('state',1) ; b=vl_twister(10) ;
 vl_assert_equal(a,b,'VL_TWISTER(N)') ;
+
