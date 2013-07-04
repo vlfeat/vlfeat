@@ -324,11 +324,11 @@ vl_kdtree_build_recursively
  ** @return new KDForest.
  **/
 
-VL_EXPORT VlKDForest *
+VlKDForest *
 vl_kdforest_new (vl_type dataType,
                  vl_size dimension, vl_size numTrees, VlVectorComparisonType distance)
 {
-  VlKDForest * self = vl_malloc (sizeof(VlKDForest)) ;
+  VlKDForest * self = vl_calloc (sizeof(VlKDForest), 1) ;
 
   assert(dataType == VL_TYPE_FLOAT || dataType == VL_TYPE_DOUBLE) ;
   assert(dimension >= 1) ;
@@ -345,8 +345,9 @@ vl_kdforest_new (vl_type dataType,
   self -> splitHeapSize = VL_MIN(numTrees, VL_KDTREE_SPLIT_HEAP_SIZE) ;
   self -> splitHeapNumNodes = 0 ;
   self -> distance = distance;
-  self -> maxNumNodes = 0;
-  self -> numSearchers = 0;
+  self -> maxNumNodes = 0 ;
+  self -> numSearchers = 0 ;
+  self -> headSearcher = 0 ;
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT:
@@ -379,24 +380,16 @@ vl_kdforest_new (vl_type dataType,
  **
  **/
 
-VL_EXPORT VlKDForestSearcher *
+VlKDForestSearcher *
 vl_kdforest_new_searcher (VlKDForest * kdforest)
 {
-
-  VlKDForestSearcher * self = vl_malloc(sizeof(VlKDForestSearcher));
-
-  self -> searchId = 0 ;
-  self -> searchHeapNumNodes = 0 ;
-  self -> searchNumComparisons = 0 ;
-  self -> searchNumRecursions = 0 ;
-
+  VlKDForestSearcher * self = vl_calloc(sizeof(VlKDForestSearcher), 1);
   if(kdforest->numSearchers == 0) {
     kdforest->headSearcher = self;
     self->previous = NULL;
     self->next = NULL;
   } else {
     VlKDForestSearcher * lastSearcher = kdforest->headSearcher;
-
     while (1) {
       if(lastSearcher->next) {
         lastSearcher = lastSearcher->next;
@@ -412,60 +405,46 @@ vl_kdforest_new_searcher (VlKDForest * kdforest)
   kdforest->numSearchers++;
 
   self->forest = kdforest;
-  self -> searchHeapArray = vl_malloc (sizeof(VlKDForestSearchState) * kdforest->maxNumNodes) ;
-  self -> searchIdBook = vl_calloc (sizeof(vl_uindex), kdforest->numData) ;
-
-  return self;
+  self->searchHeapArray = vl_malloc (sizeof(VlKDForestSearchState) * kdforest->maxNumNodes) ;
+  self->searchIdBook = vl_calloc (sizeof(vl_uindex), kdforest->numData) ;
+  return self ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Delete a KDForest searcher object, created by vl_kdforest_new_searcher
- ** @param searcher a searcher which should be erased.
+ ** @brief Delete object
+ ** @param self object.
  **/
 
-VL_EXPORT void
-vl_kdforest_delete_searcher (VlKDForestSearcher * searcher)
+void
+vl_kdforestsearcher_delete (VlKDForestSearcher * self)
 {
-
-  if (searcher->previous && searcher->next) {
-    searcher->previous->next = searcher->next;
-    searcher->next->previous = searcher->previous;
-  } else if (searcher->previous && !searcher->next) {
-    searcher->previous->next = NULL;
-  } else if (!searcher->previous && searcher->next) {
-    searcher->next->previous = NULL;
-    searcher->forest->headSearcher = searcher->next;
+  if (self->previous && self->next) {
+    self->previous->next = self->next;
+    self->next->previous = self->previous;
+  } else if (self->previous && !self->next) {
+    self->previous->next = NULL;
+  } else if (!self->previous && self->next) {
+    self->next->previous = NULL;
+    self->forest->headSearcher = self->next;
   } else {
-    searcher->forest->headSearcher = NULL;
+    self->forest->headSearcher = NULL;
   }
-
-  searcher->forest->numSearchers--;
-
-  vl_free(searcher->searchHeapArray);
-  vl_free(searcher->searchIdBook);
-  vl_free(searcher);
+  self->forest->numSearchers -- ;
+  vl_free(self->searchHeapArray) ;
+  vl_free(self->searchIdBook) ;
+  vl_free(self) ;
 }
 
-VL_INLINE VlKDForestSearcher *
+VlKDForestSearcher *
 vl_kdforest_get_searcher (VlKDForest const * self, vl_uindex pos)
 {
-  VlKDForestSearcher * lastSearcher = self->headSearcher;
-  vl_uindex sIdx;
+  VlKDForestSearcher * lastSearcher = self->headSearcher ;
+  vl_uindex i ;
 
-  for(sIdx = 0; sIdx <= pos; sIdx++) {
-    if(lastSearcher) {
-      if(sIdx == pos) {
-        return lastSearcher;
-      } else {
-        lastSearcher = lastSearcher->next;
-      }
-    } else {
-      VL_PRINT("Search at idx %d does not exist -> aborting.", pos);
-      abort();
-    }
+  for(i = 0; (i < pos) & (lastSearcher != NULL) ; ++i) {
+    lastSearcher = lastSearcher->next ;
   }
-
-  return NULL;
+  return lastSearcher ;
 }
 
 /** ------------------------------------------------------------------
@@ -474,24 +453,14 @@ vl_kdforest_get_searcher (VlKDForest const * self, vl_uindex pos)
  ** @sa ::vl_kdforest_new
  **/
 
-VL_EXPORT void
+void
 vl_kdforest_delete (VlKDForest * self)
 {
   vl_uindex ti ;
-
-  if(self->numSearchers > 0) {
-    VlKDForestSearcher * underDeletion = self->headSearcher;
-    while (1) {
-      vl_free(underDeletion->searchHeapArray);
-      vl_free(underDeletion->searchIdBook);
-      if(underDeletion->next) {
-        underDeletion = underDeletion->next;
-        vl_free(underDeletion->previous);
-      } else {
-        vl_free(underDeletion);
-        break;
-      }
-    }
+  VlKDForestSearcher * searcher ;
+  
+  while ((searcher = vl_kdforest_get_searcher(self, 0))) {
+    vl_kdforestsearcher_delete(searcher) ;
   }
 
   if (self->trees) {
@@ -551,7 +520,7 @@ vl_kdtree_calc_bounds_recursively (VlKDTree * tree,
  ** is deleted.
  **/
 
-VL_EXPORT void
+void
 vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
 {
   vl_uindex di, ti ;
@@ -603,7 +572,7 @@ vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
  ** @internal @brief
  **/
 
-VL_EXPORT vl_uindex
+vl_uindex
 vl_kdforest_query_recursively (VlKDForestSearcher * searcher,
                                VlKDTree * tree,
                                vl_uindex nodeIndex,
@@ -749,8 +718,8 @@ vl_kdforest_query_recursively (VlKDForestSearcher * searcher,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Query operation
- ** @param searcher KDTree searcher object instance.
+ ** @brief Query the forest
+ ** @param selft object.
  ** @param neighbors list of nearest neighbors found (output).
  ** @param numNeighbors number of nearest neighbors to find.
  ** @param query query point.
@@ -762,15 +731,45 @@ vl_kdforest_query_recursively (VlKDForestSearcher * searcher,
  ** to the query point. Neighbors are sorted by increasing distance.
  **/
 
-VL_EXPORT vl_size
-vl_kdforest_query (VlKDForestSearcher * searcher,
-                   VlKDForestNeighbor * neighbors,
-                   vl_size numNeighbors,
-                   void const * query)
+vl_size
+vl_kdforests_query (VlKDForest * self,
+                    VlKDForestNeighbor * neighbors,
+                    vl_size numNeighbors,
+                    void const * query)
+{
+  VlKDForestSearcher * searcher = vl_kdforest_get_searcher(self, 0) ;
+  if (searcher == NULL) {
+    searcher = vl_kdforest_new_searcher(self) ;
+  }
+  return vl_kdforestsearcher_query(searcher,
+                                   neighbors,
+                                   numNeighbors,
+                                   query) ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Query the forest
+ ** @param selft object.
+ ** @param neighbors list of nearest neighbors found (output).
+ ** @param numNeighbors number of nearest neighbors to find.
+ ** @param query query point.
+ ** @return number of tree leaves visited.
+ **
+ ** A neighbor is represented by an instance of the structure
+ ** ::VlKDForestNeighbor. Each entry contains the index of the
+ ** neighbor (this is an index into the KDTree data) and its distance
+ ** to the query point. Neighbors are sorted by increasing distance.
+ **/
+
+vl_size
+vl_kdforestsearcher_query (VlKDForestSearcher * self,
+                           VlKDForestNeighbor * neighbors,
+                           vl_size numNeighbors,
+                           void const * query)
 {
 
   vl_uindex i, ti ;
-  vl_bool exactSearch = searcher->forest->searchMaxNumComparisons == 0 ;
+  vl_bool exactSearch = self->forest->searchMaxNumComparisons == 0 ;
 
   VlKDForestSearchState * searchState  ;
   vl_size numAddedNeighbors = 0 ;
@@ -780,42 +779,42 @@ vl_kdforest_query (VlKDForestSearcher * searcher,
   assert (query) ;
 
   /* this number is used to differentiate a query from the next */
-  searcher -> searchId += 1 ;
-  searcher -> searchNumRecursions = 0 ;
+  self -> searchId += 1 ;
+  self -> searchNumRecursions = 0 ;
 
-  searcher->searchNumComparisons = 0 ;
-  searcher->searchNumSimplifications = 0 ;
+  self->searchNumComparisons = 0 ;
+  self->searchNumSimplifications = 0 ;
 
   /* put the root node into the search heap */
-  searcher->searchHeapNumNodes = 0 ;
-  for (ti = 0 ; ti < searcher->forest->numTrees ; ++ ti) {
-    searchState = searcher->searchHeapArray + searcher->searchHeapNumNodes ;
-    searchState -> tree = searcher->forest->trees[ti] ;
+  self->searchHeapNumNodes = 0 ;
+  for (ti = 0 ; ti < self->forest->numTrees ; ++ ti) {
+    searchState = self->searchHeapArray + self->searchHeapNumNodes ;
+    searchState -> tree = self->forest->trees[ti] ;
     searchState -> nodeIndex = 0 ;
     searchState -> distanceLowerBound = 0 ;
 
-    vl_kdforest_search_heap_push (searcher->searchHeapArray, &searcher->searchHeapNumNodes) ;
+    vl_kdforest_search_heap_push (self->searchHeapArray, &self->searchHeapNumNodes) ;
   }
 
   /* branch and bound */
-  while (exactSearch || searcher->searchNumComparisons < searcher->forest->searchMaxNumComparisons)
+  while (exactSearch || self->searchNumComparisons < self->forest->searchMaxNumComparisons)
   {
     /* pop the next optimal search node */
     VlKDForestSearchState * searchState ;
 
     /* break if search space completed */
-    if (searcher->searchHeapNumNodes == 0) {
+    if (self->searchHeapNumNodes == 0) {
       break ;
     }
-    searchState = searcher->searchHeapArray +
-                  vl_kdforest_search_heap_pop (searcher->searchHeapArray, &searcher->searchHeapNumNodes) ;
+    searchState = self->searchHeapArray +
+                  vl_kdforest_search_heap_pop (self->searchHeapArray, &self->searchHeapNumNodes) ;
     /* break if no better solution may exist */
     if (numAddedNeighbors == numNeighbors &&
         neighbors[0].distance < searchState->distanceLowerBound) {
-      searcher->searchNumSimplifications ++ ;
+      self->searchNumSimplifications ++ ;
       break ;
     }
-    vl_kdforest_query_recursively (searcher,
+    vl_kdforest_query_recursively (self,
                                    searchState->tree,
                                    searchState->nodeIndex,
                                    neighbors,
@@ -835,86 +834,82 @@ vl_kdforest_query (VlKDForestSearcher * searcher,
     vl_kdforest_neighbor_heap_pop (neighbors, &numAddedNeighbors) ;
   }
 
-  return searcher->searchNumComparisons ;
+  return self->searchNumComparisons ;
 }
 
 /** ------------------------------------------------------------------
- ** @brief Run parallel queries - function for MATLAB interface
- ** @param forest KDTree forest object instance.
- ** @param index assignments of points.
- ** @param distance distances of query points.
+ ** @brief Run multiple queries
+ ** @param self object.
+ ** @param indexes assignments of points.
+ ** @param distances distances of query points.
  ** @param numQueries number of query points.
  ** @param numNeighbors number of nearest neighbors to be found for each data point
- ** @param dimension dimensionality of the data
- ** @param multithreading TRUE if multithreaded approach should be used
-
+ **
+ ** @a indexes and @a distances anre @a numNeighbors by @a numQueries
+ ** matrices containing the indexes and distances of the nearest neighbours
+ ** for each of the @a numQueries queries @a queries.
+ **
+ ** This function is similar to ::vl_kdforest_query. The main
+ ** difference is that the function can use multiple cores to query
+ ** large amounts of data.
+ **
+ ** @sa ::vl_kdforest_query.
  **/
 
-VL_EXPORT vl_size
-vl_kdforest_query_points (VlKDForest * forest,
-                          vl_uint32 * index,
-                          void * distance,
-                          void const * queries,
-                          vl_size numQueries,
-                          vl_size numNeighbors,
-                          vl_bool multithreading)
+vl_size
+vl_kdforest_query_with_array (VlKDForest * self,
+                              vl_uint32 * indexes,
+                              vl_size numNeighbors,
+                              vl_size numQueries,
+                              void * distances,
+                              void const * queries)
 {
-  vl_int numChunks ;
-  int chunkSize = 1;
-  vl_int t;
-  VlKDForestSearcher ** searchers;
-  VlKDForestNeighbor * neighbors;
   vl_size numComparisons = 0;
-  vl_type dataType;
-  vl_size dimension;
-
-  dataType = vl_kdforest_get_data_type(forest);
-  dimension = vl_kdforest_get_data_dimension(forest);
-
+  vl_type dataType = vl_kdforest_get_data_type(self) ;
+  vl_size dimension = vl_kdforest_get_data_dimension(self) ;
+  
 #ifdef _OPENMP
-  if(multithreading == VL_TRUE) {
-    numChunks = (vl_size)omp_get_max_threads();
-  } else {
-    numChunks = 1;
-  }
-#else
-  numChunks = 1;
-  VL_PRINT("Warning: OpenMP not included, continuing with serial computation.\n");
+#pragma omp parallel default(shared) num_threads(vl_get_max_threads())
 #endif
-
-  searchers = vl_malloc(sizeof(VlKDForestSearcher*) * numChunks);
-  neighbors = vl_malloc(sizeof(VlKDForestNeighbor) * numChunks * numNeighbors);
-
-  for(t = 0; t < (vl_int) numChunks; t++) {
-    searchers[t] = vl_kdforest_new_searcher(forest);
-  }
-
+  {
+    vl_index qi ;
+    vl_size thisNumComparisons = 0 ;
+    VlKDForestSearcher * searcher ;
+    VlKDForestNeighbor * neighbors ;
+    
 #ifdef _OPENMP
-#pragma omp parallel for private(t) schedule(static,chunkSize) reduction(+:numComparisons)
+#pragma omp critical
 #endif
-  for(t = 0 ; t < numChunks ; t++) {
-    VlKDForestSearcher * searcher = searchers[t];
-    vl_uindex qi;
-    for(qi = (vl_uindex)t; qi < (vl_uindex)numQueries; qi += numChunks) {
+    {
+      searcher = vl_kdforest_new_searcher(self) ;
+      neighbors = vl_calloc (sizeof(VlKDForestNeighbor), numNeighbors) ;
+    }
+    
+#ifdef _OPENMP
+#pragma omp for
+#endif
+    for(qi = 0 ; qi < (signed)numQueries; ++ qi) {
       switch (dataType) {
         case VL_TYPE_FLOAT: {
           vl_size ni;
-          numComparisons += vl_kdforest_query (searcher, neighbors + t*numNeighbors, numNeighbors, (float const *) (queries) + qi * dimension);
+          thisNumComparisons += vl_kdforestsearcher_query (searcher, neighbors, numNeighbors,
+                                                           (float const *) (queries) + qi * dimension) ;
           for (ni = 0 ; ni < numNeighbors ; ++ni) {
-            index[qi*numNeighbors + ni] = neighbors[t*numNeighbors + ni].index + 1 ;
-            if(distance){
-              *((float*)distance + qi*numNeighbors + ni) = neighbors[t*numNeighbors + ni].distance ;
+            indexes [qi*numNeighbors + ni] = (vl_uint32) neighbors[ni].index ;
+            if (distances){
+              *((float*)distances + qi*numNeighbors + ni) = neighbors[ni].distance ;
             }
           }
           break ;
         }
         case VL_TYPE_DOUBLE: {
           vl_size ni;
-          numComparisons += vl_kdforest_query (searcher, neighbors + t*numNeighbors, numNeighbors, (double const *) (queries) + qi * dimension);
+          thisNumComparisons += vl_kdforestsearcher_query (searcher, neighbors, numNeighbors,
+                                                           (double const *) (queries) + qi * dimension) ;
           for (ni = 0 ; ni < numNeighbors ; ++ni) {
-            index[qi*numNeighbors + ni] = neighbors[t*numNeighbors + ni].index + 1 ;
-            if(distance){
-              *((double*)distance + qi*numNeighbors + ni) = neighbors[t*numNeighbors + ni].distance ;
+            indexes [qi*numNeighbors + ni] = (vl_uint32) neighbors[ni].index ;
+            if (distances){
+              *((double*)distances + qi*numNeighbors + ni) = neighbors[ni].distance ;
             }
           }
           break ;
@@ -923,13 +918,155 @@ vl_kdforest_query_points (VlKDForest * forest,
           abort() ;
       }
     }
-  } /* end of parallel region */
-
-  for(t = 0; t < (vl_int) numChunks; t++) {
-    vl_kdforest_delete_searcher(searchers[t]);
+    
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+    {
+      numComparisons += thisNumComparisons ;
+      vl_kdforestsearcher_delete (searcher) ;
+      vl_free (neighbors) ;
+    }
   }
+  return numComparisons ;
+}
 
-  vl_free(neighbors);
+/** ------------------------------------------------------------------
+ ** @brief Get the number of nodes of a given tree
+ ** @param self KDForest object.
+ ** @param treeIndex index of the tree.
+ ** @return number of trees.
+ **/
 
-  return numComparisons;
+vl_size
+vl_kdforest_get_num_nodes_of_tree (VlKDForest const * self, vl_uindex treeIndex)
+{
+  assert (treeIndex < self->numTrees) ;
+  return self->trees[treeIndex]->numUsedNodes ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the detph of a given tree
+ ** @param self KDForest object.
+ ** @param treeIndex index of the tree.
+ ** @return number of trees.
+ **/
+
+vl_size
+vl_kdforest_get_depth_of_tree (VlKDForest const * self, vl_uindex treeIndex)
+{
+  assert (treeIndex < self->numTrees) ;
+  return self->trees[treeIndex]->depth ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the number of trees in the forest
+ **
+ ** @param self KDForest object.
+ ** @return number of trees.
+ **/
+
+vl_size
+vl_kdforest_get_num_trees (VlKDForest const * self)
+{
+  return self->numTrees ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set the maximum number of comparisons for a search
+ **
+ ** @param self KDForest object.
+ ** @param n maximum number of leaves.
+ **
+ ** This function sets the maximum number of comparisons for a
+ ** nearest neighbor search. Setting it to 0 means unbounded comparisons.
+ **
+ ** @sa ::vl_kdforest_query, ::vl_kdforest_get_max_num_comparisons.
+ **/
+
+void
+vl_kdforest_set_max_num_comparisons (VlKDForest * self, vl_size n)
+{
+  self->searchMaxNumComparisons = n ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the maximum number of comparisons for a search
+ **
+ ** @param self KDForest object.
+ ** @return maximum number of leaves.
+ **
+ ** @sa ::vl_kdforest_set_max_num_comparisons.
+ **/
+
+vl_size
+vl_kdforest_get_max_num_comparisons (VlKDForest * self)
+{
+  return self->searchMaxNumComparisons ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Set the thresholding method
+ ** @param self KDForest object.
+ ** @param method one of ::VlKDTreeThresholdingMethod.
+ **
+ ** @sa ::vl_kdforest_get_thresholding_method
+ **/
+
+ void
+vl_kdforest_set_thresholding_method (VlKDForest * self, VlKDTreeThresholdingMethod method)
+{
+  assert(method == VL_KDTREE_MEDIAN || method == VL_KDTREE_MEAN) ;
+  self->thresholdingMethod = method ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the thresholding method
+ **
+ ** @param self KDForest object.
+ ** @return thresholding method.
+ **
+ ** @sa ::vl_kdforest_set_thresholding_method
+ **/
+
+ VlKDTreeThresholdingMethod
+vl_kdforest_get_thresholding_method (VlKDForest const * self)
+{
+  return self->thresholdingMethod ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the dimension of the data
+ ** @param self KDForest object.
+ ** @return dimension of the data.
+ **/
+
+ vl_size
+vl_kdforest_get_data_dimension (VlKDForest const * self)
+{
+  return self->dimension ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the data type
+ ** @param self KDForest object.
+ ** @return data type (one of ::VL_TYPE_FLOAT, ::VL_TYPE_DOUBLE).
+ **/
+
+vl_type
+vl_kdforest_get_data_type (VlKDForest const * self)
+{
+  return self->dataType ;
+}
+
+/** ------------------------------------------------------------------
+ ** @brief Get the forest linked to the searcher
+ ** @param self object.
+ ** @return correspoinding KD-Forest.
+ **/
+
+VlKDForest *
+vl_kdforestsearcher_get_forest (VlKDForestSearcher const * self)
+{
+  return self->forest;
 }

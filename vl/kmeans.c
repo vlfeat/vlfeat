@@ -738,14 +738,16 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
     VlKDForestSearcher * searcher ;
     vl_index x;
 
+#ifdef _OPENMP
 #pragma omp critical
-    searcher = vl_kdforest_new_searcher(forest) ;
+#endif
+    searcher = vl_kdforest_new_searcher (forest) ;
 
 #ifdef _OPENMP
 #pragma omp for
 #endif
     for(x = 0 ; x < (signed)numData ; ++x) {
-      vl_kdforest_query (searcher, &neighbor, 1, (TYPE const *) (data + x*self->dimension));
+      vl_kdforestsearcher_query (searcher, &neighbor, 1, (TYPE const *) (data + x*self->dimension));
 
       if (distances) {
         if(iteration == 0) {

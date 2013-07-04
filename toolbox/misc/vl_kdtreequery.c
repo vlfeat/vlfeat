@@ -31,7 +31,6 @@ vlmxOption  options [] = {
   {"NumNeighbors",      1,   opt_num_neighs          },
   {"MaxComparisons",    1,   opt_max_num_comparisons },
   {"MaxNumComparisons", 1,   opt_max_num_comparisons },
-  {"Multithreading",    1,   opt_multithreading      },
   {0,                   0,   0                       }
 } ;
 
@@ -46,17 +45,15 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_FOREST = 0, IN_DATA, IN_QUERY, IN_END} ;
   enum {OUT_INDEX = 0, OUT_DISTANCE} ;
 
-  int            verbose = 0 ;
-  int            opt ;
-  int            next = IN_END ;
+  int verbose = 0 ;
+  int opt ;
+  int next = IN_END ;
   mxArray const *optarg ;
 
   VlKDForest * forest ;
   mxArray const * forest_array = in[IN_FOREST] ;
   mxArray const * data_array = in[IN_DATA] ;
   mxArray const * query_array = in[IN_QUERY] ;
-  mxArray * index_array ;
-  mxArray * distance_array ;
   void * query ;
   vl_uint32 * index ;
   void * distance ;
@@ -64,10 +61,8 @@ mexFunction(int nout, mxArray *out[],
   vl_size numQueries ;
   unsigned int numComparisons = 0 ;
   unsigned int maxNumComparisons = 0 ;
-  //VlKDForestNeighbor * neighbors ;
-  //VlKDForestSearcher * searcher;
-  vl_bool multithreading = VL_TRUE ;
   mxClassID dataClass ;
+  vl_index i ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -99,37 +94,7 @@ mexFunction(int nout, mxArray *out[],
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
-    char buf [1024] ;
-
     switch (opt) {
-
-      case opt_multithreading :
-        if (!vlmxIsString (optarg, -1))
-        {
-          vlmxError (vlmxErrInvalidArgument,
-                     "MULTITHREADING must be a string.") ;
-        }
-        if (mxGetString (optarg, buf, sizeof(buf)))
-        {
-          vlmxError (vlmxErrInvalidArgument,
-                     "MULTITHREADING argument too long.") ;
-        }
-
-        if (vlmxCompareStringsI("serial", buf) == 0)
-        {
-          multithreading = VL_FALSE ;
-        }
-        else if (vlmxCompareStringsI("parallel", buf) == 0)
-        {
-          multithreading = VL_TRUE ;
-        }
-        else
-        {
-          vlmxError (vlmxErrInvalidArgument,
-                     "Invalid value %s for MULTITHREADING.", buf) ;
-        }
-        break ;
-
       case opt_num_neighs :
         if (! vlmxIsScalar(optarg) ||
             (numNeighbors = mxGetScalar(optarg)) < 1) {
@@ -157,14 +122,11 @@ mexFunction(int nout, mxArray *out[],
   query = mxGetData (query_array) ;
   numQueries = mxGetN (query_array) ;
 
-  out[OUT_INDEX] = index_array = mxCreateNumericMatrix
-                                 (numNeighbors, numQueries, mxUINT32_CLASS, mxREAL) ;
+  out[OUT_INDEX] = mxCreateNumericMatrix (numNeighbors, numQueries, mxUINT32_CLASS, mxREAL) ;
+  out[OUT_DISTANCE] = mxCreateNumericMatrix (numNeighbors, numQueries, dataClass, mxREAL) ;
 
-  out[OUT_DISTANCE] = distance_array = mxCreateNumericMatrix
-                                       (numNeighbors, numQueries, dataClass, mxREAL) ;
-
-  index = mxGetData (index_array) ;
-  distance = mxGetData (distance_array) ;
+  index = mxGetData (out[OUT_INDEX]) ;
+  distance = mxGetData (out[OUT_DISTANCE]) ;
 
   if (verbose) {
     VL_PRINTF ("vl_kdforestquery: number of queries: %d\n", numQueries) ;
@@ -173,20 +135,12 @@ mexFunction(int nout, mxArray *out[],
                vl_kdforest_get_max_num_comparisons (forest)) ;
   }
 
-  switch (dataClass) {
-    case mxSINGLE_CLASS: {
-      numComparisons = vl_kdforest_query_points (forest, index, distance, query, numQueries, numNeighbors, multithreading);
-      break;
-    }
-    case mxDOUBLE_CLASS: {
-      numComparisons = vl_kdforest_query_points (forest, index, distance, query, numQueries, numNeighbors, multithreading);
-      break;
-    }
-    default:
-      abort();
-  }
-
-  vl_kdforest_delete(forest);
+  numComparisons = vl_kdforest_query_with_array (forest, index, numNeighbors, numQueries, distance, query) ;
+  
+  vl_kdforest_delete(forest) ;
+  
+  /* adjust for MATLAB indexing */
+  for (i = 0 ; i < (signed) (numNeighbors * numQueries) ; ++i) { index[i] ++ ; }
 
   if (verbose) {
     VL_PRINTF ("vl_kdforestquery: number of comparisons per query: %.3f\n",
@@ -194,5 +148,4 @@ mexFunction(int nout, mxArray *out[],
     VL_PRINTF ("vl_kdforestquery: number of comparisons per neighbor: %.3f\n",
                ((double) numComparisons) / (numQueries * numNeighbors)) ;
   }
-
 }
