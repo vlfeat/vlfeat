@@ -106,7 +106,7 @@ dist-bin-commit: dist-bin-release
 	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch) ; \
 	fi
 
-dist-bin-commit-common: $(TMPDIR)/tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-commit-common: tmp-dir=$(TMPDIR)/tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-release
 	@echo Building doc
