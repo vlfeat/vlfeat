@@ -25,8 +25,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak&#x0D;&#x0A;"
-				ReBuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak clean all"
+				BuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak DEBUG=yes&#x0D;&#x0A;"
+				ReBuildCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak distclean all DEBUG=yesl"
 				CleanCommandLine="set VCInstallDir=$(VCInstallDir)&#x0D;&#x0A;set WindowsSdkDir=$(WindowsSdkDir)&#x0D;&#x0A;nmake /f Makefile.mak  clean"
 				Output=""
 				PreprocessorDefinitions="WIN32;_DEBUG"
@@ -454,6 +454,10 @@
 			</File>
 			<File
 				RelativePath=".\toolbox\misc\vl_getpid.c"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbox\gmm\vl_gmm.c"
 				>
 			</File>
 			<File
