@@ -86,7 +86,6 @@ LFLAGS = /MACHINE:X64 \
 !error ARCH = $(ARCH) is an unknown architecture.
 !endif
 
-
 # --------------------------------------------------------------------
 #                                                                Flags
 # --------------------------------------------------------------------
@@ -151,6 +150,7 @@ LFLAGS = $(LFLAGS) /NOLOGO \
 !message === DEBUGGING ON
 CFLAGS = $(CFLAGS) /Z7 /D"DEBUG"
 LFLAGS = $(LFLAGS) /DEBUG
+MEX_FLAGS = $(MEX_FLAGS) -g
 !else
 !message === DEBUGGING OFF
 CFLAGS = $(CFLAGS) /D"NDEBUG"
