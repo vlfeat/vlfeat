@@ -1,10 +1,11 @@
 /** @file vlad.c
  ** @brief VLAD - Declaration
  ** @author David Novotny
+ ** @author Andrea Vedaldi
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 David Novotny and Andera Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -15,39 +16,60 @@ the terms of the BSD license (see the COPYING file).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page vlad Vector of Locally Aggregated Descriptors (VLAD) encoding
 @author David Novotny
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref vlad.h implements the calculation of VLAD encoding @cite{jegou10vlad}.
+@ref vlad.h implements the *Vector of Linearly Aggregated Descriptors*
+(VLAD) image representation @cite{jegou10vlad}
+@cite{arandjelovic13all-about}.
+
+@ref vlad-starting demonstrates ho to use VLFeat to compute the VLAD
+encoding of an image. For further details refere to:
+
+- @subpage vlad-fundamentals
+
+@section vlad-starting Getting started
 
 To get the VLAD vector siply run the function ::vl_vlad_encode
 with correct parameters. The function can be applied to both
 @c float or @c double data types.
 
-@section vlad-tech Technical details
+@page vlad-fundamentals Fundamentals
+@tableofcontents
 
-The VLAD (Vector of Linearly Aggregated Descriptors) encoding is bound
-to estimation of a gaussian mixture model (see @ref gmm.h) or to
-kmeans clustering (see @ref kmeans.h). Using the obtained soft (GMM) or hard (KMeans)
-assignments and means one can encode a bunch of feature vectors with respect to the
-estimated means and assignments.
+VLAD can be seen as a *feature encoding and pooling* method, similar
+to @ref fisher "Fisher vectors". VLAD encodes a set of local feature
+descriptors $I=(\bx_1,\dots,\bx_n)$ extracted from an image using a
+dictionary built using a clustering method such as @ref gmm or @ref
+kmeans. Let $q_{ik}$ be the strength of the association of data vector
+$\bx_i$ to cluster $\mu_k$, such that $q_{ik} \geq 0$ and
+$\sum_{k=1}^K q_{ik} = 1$. The association may be either soft
+(e.g. obtained as the posterior probabilities of the GMM clusters) or
+hard (e.g. obtained by vector quantization with K-means).
 
-Having a set of @f$ D @f$ dimensional features
-@f$ x_1 ... x_N @f$,
-a set of assignments
-@f$ q_{1,1} ... q_{N,K}  @f$
-and a set of means
-@f$ \mu_1 ... \mu_K  @f$
-the components @f$ v_{j} @f$ of VLAD encoding are defined as:
-@f[
-  v_{j} = \sum_{i=1}^{N} {  q_{i,j} (x_{i} - \mu_{j}) }
-@f]
+$\mu_k$ are the cluster *means*, vectors of the same dimension as the
+data $\bx_i$. VLAD encodes feature $\bx_$ by considering the *residuals*
+\[
+ \bv_k = \sum_{i=1}^{N} q_{ik} (\bx_{i} - \mu_k).
+\]
+The residulas are stacked together to obtain the vector
+\[
+\hat\Phi(I) =
+\begin{bmatrix}
+\vdots \\
+\bv_k \\
+\vdots
+\end{bmatrix}
+\]
 
-the <b>VLAD encoding</b> is an concatenation vector @f$ V @f$ of these components.
-Thus the size of this encoding is @f$ D @f$ x @f$ K @f$.
+Before the VLAD encoding is used it is usually globally $L^2$ normalized:
+\[
+ \Phi(I) = \hat\Phi(I) / \|\hat\Phi(I)\|_2.
+\]
+In this manner, the Euclidean distance and inner product between VLAD
+vectors becomre more meaningful.
 
-@f[
-  V = [ v_{1} ... v_{K} ]
-@f]
+@subsection vlad-component-normalization
 
 However the size of each cluster could have a negative imapact on the
 appearance of the vector @f$ V @f$ and so, the normalization of each
@@ -67,95 +89,94 @@ This normalization is controlled by the last argument of ::vl_vlad_encode.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #if defined(_OPENMP)
-  #include <omp.h>
+#include <omp.h>
 #endif
 
-#ifndef VL_VLAD_INSTANTIATING
-
-#endif
-
+/* ================================================================ */
 #ifdef VL_VLAD_INSTANTIATING
 
 static void
 VL_XCAT(_vl_vlad_encode_, SFX)
-(TYPE const * data,
- TYPE const * means,
- TYPE const * assignments,
- TYPE * enc,
- vl_size dimension,
+(TYPE * enc,
  vl_size numData,
+ TYPE const * means,
+ vl_size dimension,
  vl_size numClusters,
- vl_bool normalize,
- VlVLADMultithreading multithreading)
+ TYPE const * data,
+ TYPE const * assignments,
+ int flags)
 {
-  vl_size dim;
-  vl_size i_cl, i_d;
-  vl_int t;
-  vl_int numChunks;
-  int chunkSize = 1;
-  TYPE * clusterMasses;
+  vl_uindex dim ;
+  vl_index i_cl, i_d ;
 
-  switch(multithreading) {
-    case VlVLADParallel:
+  memset(enc, 0, sizeof(TYPE) * dimension * numClusters) ;
+
 #if defined(_OPENMP)
-      numChunks = (vl_int)vl_get_max_threads();
-#else
-      numChunks = 1;
+#pragma omp parallel for default(shared) private(i_cl,i_d,dim) num_threads(vl_get_max_threads())
 #endif
-      break;
-    case VlVLADSerial:
-      numChunks = 1;
-      break;
-    default:
-      VL_PRINT("Bad multithreading value!\n");
-      abort();
-  }
-
-  clusterMasses = vl_malloc(numClusters*sizeof(TYPE));
-  memset(clusterMasses,0,numClusters*sizeof(TYPE));
-
-  #if defined(_OPENMP)
-  #pragma omp parallel for private(t,i_d,i_cl) schedule(static,chunkSize)
-  #endif
-  for(t = 0; t < numChunks; t++){
-    for(i_cl = t; i_cl < numClusters; i_cl += numChunks) {
-      for(i_d = 0; i_d < numData; i_d++) {
-        clusterMasses[i_cl] += assignments[i_d*numClusters+i_cl];
-      }
-    }
-  } /* end of parallel section */
-
-  memset(enc,0,sizeof(TYPE) * dimension * numClusters);
-
-  #if defined(_OPENMP)
-  #pragma omp parallel for private(t,i_d,i_cl,dim) schedule(static,chunkSize)
-  #endif
-  for(t = 0; t < numChunks; t++){
-    for(i_cl = t; i_cl < numClusters; i_cl += numChunks) {
-      for(i_d = 0; i_d < numData; i_d++) {
-        if(assignments[i_d*numClusters + i_cl] != 0) {
-          for(dim = 0; dim < dimension; dim++) {
-            enc[i_cl*dimension + dim] += assignments[i_d*numClusters + i_cl] *
-                                         data [i_d  * dimension + dim];
-          }
+  for (i_cl = 0; i_cl < (signed)numClusters; i_cl++) {
+    double clusterMass = 0 ;
+    for (i_d = 0; i_d < (signed)numData; i_d++) {
+      if (assignments[i_d*numClusters + i_cl] > 0) {
+        double q = assignments[i_d*numClusters+i_cl] ;
+        clusterMass +=  q ;
+        for(dim = 0; dim < dimension; dim++) {
+          enc [i_cl * dimension + dim] += q * data [i_d  * dimension + dim] ;
         }
       }
-
-      if(clusterMasses[i_cl]!=0){
-        if (normalize) {
-          for(dim = 0; dim < dimension; dim++) {
-            enc[i_cl*dimension + dim] /= clusterMasses[i_cl];
-            enc[i_cl*dimension + dim] -= means[i_cl*dimension+dim];
-          }
+    }
+    
+    if (clusterMass > 0) {
+      if (flags & VL_VLAD_FLAG_NORMALIZE_MASS) {
+        for(dim = 0; dim < dimension; dim++) {
+          enc[i_cl*dimension + dim] /= clusterMass ;
+          enc[i_cl*dimension + dim] -= means[i_cl*dimension+dim];
+        }
+      } else {
+        for(dim = 0; dim < dimension; dim++) {
+          enc[i_cl*dimension + dim] -= clusterMass * means[i_cl*dimension+dim];
+        }
+      }
+    }
+    
+    if (flags & VL_VLAD_FLAG_SQUARE_ROOT) {
+      for(dim = 0; dim < dimension; dim++) {
+        TYPE z = enc[i_cl*dimension + dim] ;
+        if (z >= 0) {
+          enc[i_cl*dimension + dim] = VL_XCAT(vl_sqrt_, SFX)(z) ;
         } else {
-          for(dim = 0; dim < dimension; dim++) {
-            enc[i_cl*dimension + dim] -= clusterMasses[i_cl] * means[i_cl*dimension+dim];
-          }
+          enc[i_cl*dimension + dim] = - VL_XCAT(vl_sqrt_, SFX)(- z) ;
         }
       }
     }
-  } /* end of parallel section */
+    
+    if (flags & VL_VLAD_FLAG_NORMALIZE_COMPONENTS) {
+      dim = 0 ;
+      TYPE n = 0 ;
+      for(dim = 0; dim < dimension; dim++) {
+        TYPE z = enc[i_cl*dimension + dim] ;
+        n += z * z ;
+      }
+      n = VL_XCAT(vl_sqrt_, SFX)(n) ;
+      for(dim = 0; dim < dimension; dim++) {
+        enc[i_cl*dimension + dim] /= n ;
+      }
+    }
+  }
+  
+  if (! (flags & VL_VLAD_FLAG_UNNORMALIZED)) {
+    TYPE n = 0 ;
+    for(dim = 0 ; dim < dimension * numClusters ; dim++) {
+      TYPE z = enc [dim] ;
+      n += z * z ;
+    }
+    n = VL_XCAT(vl_sqrt_, SFX)(n) ;
+    for(dim = 0 ; dim < dimension * numClusters ; dim++) {
+      enc[dim] /= n ;
+    }
+  }
 }
 
 /* VL_FISHER_INSTANTIATING */
@@ -175,76 +196,62 @@ VL_XCAT(_vl_vlad_encode_, SFX)
 #include "vlad.c"
 #endif
 
+/* VL_VLAD_INSTANTIATING */
 #endif
 
 /* ================================================================ */
 #ifndef VL_VLAD_INSTANTIATING
 
-/** @brief Calculates vlad vector for given dataset
- ** @param dataType the type of the input data(VL_TYPE_DOUBLE or VL_TYPE_FLOAT)
- ** @param assignments probabilities of data points belonging to a specific cluster
- ** @param enc output VLAD encoding
- ** @param dimension dimensionality of the data
- ** @param numData number of data vectors
- ** @param numClusters number of gaussians in the mixture
- ** @param normalize set whetter you want to normalize the size of each cluster before encoding
- ** @param multithreading ::VL_TRUE to switch multithreading computation on
+/** @brief Calculates the VLAD encoding of a set of vectors.
+ ** @param enc output VLAD encoding (out).
+ ** @param dataType the type of the input data (::VL_TYPE_DOUBLE or ::VL_TYPE_FLOAT).
+ ** @param numData number of data vectors to encode.
+ ** @param means cluster means.
+ ** @param numClusters number of clusters.
+ ** @param data the data vectors to encode.
+ ** @param dimension dimensionality of the data.
+ ** @param assignments data to cluster soft assignments.
+ ** @param flags further options.
  **
- ** The format of assignments is
- ** [ p(c1|x1), p(c1|x2), ... p(c1|xN),
- **   p(c2|x1) ...            p(c2|xN),
- **   ...
- **   p(cK|x1), ...           p(cK|xN) ]
+ ** @a enc is the encoded output, a vector of size @a numClusters by
+ ** @a dimension. @a means is a matrix with @a numClusters columns and
+ ** @a dimension rows. @a data is the matrix of vectors to be encoded,
+ ** with @a dimension rows and @a numData columns. @a assignments is a
+ ** matrix with @a numClusters rows and @a numData columns.
  **
- ** where p(c_i|x_i) stands for a probability of point x_i belonging to a cluster c_i
- ** if hard assignments are used simply put to the corresponding p(c_i|x_i) fields
- ** 1 (assigned) or 0 (not assigned)
- **
+ ** @sa @ref vlad
  **/
 
-VL_EXPORT void
-vl_vlad_encode
-(vl_type dataType,
- void const * data,
- void const * means,
- void const * assignments,
- void * enc,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters,
- vl_bool normalize,
- VlVLADMultithreading multithreading)
+void
+vl_vlad_encode (void * enc,
+                vl_type dataType,
+                vl_size numData,
+                void const * means,
+                vl_size dimension,
+                vl_size numClusters,
+                void const * data,
+                void const * assignments,
+                int flags)
 {
   switch(dataType) {
     case VL_TYPE_FLOAT:
-      _vl_vlad_encode_f
-      ((float const *) data,
-       (float const *) means,
-       (float const *) assignments,
-       (float *) enc,
-       dimension,
-       numData,
-       numClusters,
-       normalize,
-       multithreading);
+      _vl_vlad_encode_f ((float *) enc, numData,
+                         (float const *) means, dimension, numClusters,
+                         (float const *) data,
+                         (float const *) assignments, flags) ;
       break;
     case VL_TYPE_DOUBLE:
-      _vl_vlad_encode_d
-      ((double const *) data,
-       (double const *) means,
-       (double const *) assignments,
-       (double *) enc,
-       dimension,
-       numData,
-       numClusters,
-       normalize,
-       multithreading);
+      _vl_vlad_encode_d ((double *) enc, numData,
+                         (double const *) means, dimension, numClusters,
+                         (double const *) data,
+                         (double const *) assignments, flags) ;
       break;
     default:
       abort();
   }
 }
 
+/* ! VL_VLAD_INSTANTIATING */
 #endif
 
 #undef SFX

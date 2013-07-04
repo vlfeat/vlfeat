@@ -18,43 +18,45 @@ the terms of the BSD license (see the COPYING file).
 
 enum {
   opt_verbose,
-  opt_normalize,
-  opt_multithreading
+  opt_normalize_components,
+  opt_unnormalized,
+  opt_square_root,
+  opt_normalize_mass
 } ;
 
 
 vlmxOption  options [] = {
-  {"Verbose",           0,   opt_verbose             },
-  {"Normalize",         0,   opt_normalize           },
-  {"Multithreading",    0,   opt_multithreading      }
+  {"Verbose",             0,   opt_verbose                  },
+  {"Unnormalized",        0,   opt_unnormalized             },
+  {"NormalizeComponents", 0,   opt_normalize_components     },
+  {"NormalizeMass",       0,   opt_normalize_mass           },
+  {"SquareRoot",          0,   opt_square_root              }
 } ;
 
 /* driver */
 void
-mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
+mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
 {
-  enum {IN_DATA = 0, IN_MEANS, IN_ASSIGN, IN_END} ;
+  enum {IN_DATA = 0, IN_MEANS, IN_ASSIGNMENTS, IN_END} ;
   enum {OUT_ENC} ;
 
   int opt ;
   int next = IN_END ;
   mxArray const  *optarg ;
 
-  mxArray const * means_array =      in[IN_MEANS] ;
-  mxArray const * data_array =       in[IN_DATA] ;
-  mxArray const * assign_array =     in[IN_ASSIGN] ;
+  mxArray const * means_array = in[IN_MEANS] ;
+  mxArray const * data_array = in[IN_DATA] ;
+  mxArray const * assign_array = in[IN_ASSIGNMENTS] ;
 
   vl_size numClusters ;
   vl_size dimension ;
   vl_size numData ;
-  vl_bool normalize = VL_FALSE;
-  VlVLADMultithreading multithreading = VlVLADParallel;
 
-  void * means = NULL;
-  void * assignments = NULL;
-  void * data = NULL ;
+  void const * means = NULL;
+  void const * assignments = NULL;
+  void const * data = NULL ;
   void * enc = NULL;
-
+  int flags = 0 ;
   int verbosity = 0 ;
 
   vl_type dataType ;
@@ -71,75 +73,55 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
                "At least three arguments required.");
   }
 
+  if (!vlmxIsMatrix(IN(DATA),-1,-1)) {
+    vlmxError (vlmxErrInvalidArgument,
+               "DATA is not a dense matrix.") ;
+  }
+  
   classID = mxGetClassID (IN(DATA)) ;
   switch (classID) {
-    case mxSINGLE_CLASS:
-      dataType = VL_TYPE_FLOAT ;
-      break ;
-    case mxDOUBLE_CLASS:
-      dataType = VL_TYPE_DOUBLE ;
-      break ;
+    case mxSINGLE_CLASS: dataType = VL_TYPE_FLOAT ; break ;
+    case mxDOUBLE_CLASS: dataType = VL_TYPE_DOUBLE ; break ;
     default:
       vlmxError (vlmxErrInvalidArgument,
-                 "DATA must be of class SINGLE or DOUBLE") ;
-      abort() ;
+                 "DATA is neither of class SINGLE or DOUBLE.") ;
   }
 
-  if( mxGetClassID (IN(MEANS)) != classID ||
-      mxGetClassID (IN(ASSIGN)) != classID ) {
-    vlmxError (vlmxErrInvalidArgument,
-               "MEANS and ASSIGNMENTS must be of same class as DATA.") ;
+  if (mxGetClassID (IN(MEANS)) != classID) {
+    vlmxError(vlmxErrInvalidArgument, "MEANS is not of the same class as DATA.") ;
+  }
+  if (mxGetClassID (IN(ASSIGNMENTS)) != classID) {
+    vlmxError(vlmxErrInvalidArgument, "ASSIGNMENTS is not of the same class as DATA.") ;
+
   }
 
   dimension = mxGetM (IN(DATA)) ;
   numData = mxGetN (IN(DATA)) ;
   numClusters = mxGetN (IN(MEANS)) ;
-
-
+  
   if (dimension == 0) {
-    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero.") ;
+  }
+  
+  if (!vlmxIsMatrix(IN(MEANS), dimension, -1)) {
+    vlmxError (vlmxErrInvalidArgument, "MEANS is not a matrix or does not have the right size.") ;
+  }
+  
+  if (!vlmxIsMatrix(IN(ASSIGNMENTS), numClusters, -1)) {
+    vlmxError (vlmxErrInvalidArgument, "ASSIGNMENTS is not a matrix or does not have the right size.") ;
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
-    char buf [1024] ;
     switch (opt) {
-      case opt_verbose :
-        ++ verbosity ;
-        break ;
-      case opt_normalize :
-        normalize = VL_TRUE ;
-        break ;
-    case opt_multithreading :
-      if (!vlmxIsString (optarg, -1))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING must be a string.") ;
-      }
-      if (mxGetString (optarg, buf, sizeof(buf)))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MULTITHREADING argument too long.") ;
-      }
-
-      if (vlmxCompareStringsI("serial", buf) == 0)
-      {
-        multithreading = VlVLADSerial ;
-      }
-      else if (vlmxCompareStringsI("parallel", buf) == 0)
-      {
-        multithreading = VlVLADParallel ;
-      }
-      else
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "Invalid value %s for MULTITHREADING.", buf) ;
-      }
-      break ;
-    default :
-      abort() ;
+      case opt_verbose : ++ verbosity ; break ;
+      case opt_unnormalized: flags |= VL_VLAD_FLAG_UNNORMALIZED ; break ;
+      case opt_normalize_components: flags |= VL_VLAD_FLAG_NORMALIZE_COMPONENTS ; break ;
+      case opt_normalize_mass: flags |= VL_VLAD_FLAG_NORMALIZE_MASS ; break ;
+      case opt_square_root: flags |= VL_VLAD_FLAG_SQUARE_ROOT ; break ;
+      default :
+        abort() ;
       break ;
     }
-
   }
 
   /* -----------------------------------------------------------------
@@ -148,10 +130,17 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   data = mxGetPr(data_array);
   means = mxGetPr(means_array);
-  assignments = mxGetPr(assign_array);
+  assignments = mxGetData(assign_array);
 
   if (verbosity) {
-    mexPrintf("VLAD encoding ...\n") ;
+    mexPrintf("vl_vlad: num data: %d\n", numData) ;
+    mexPrintf("vl_vlad: num clusters: %d\n", numClusters) ;
+    mexPrintf("vl_vlad: data dimension: %d\n", dimension) ;
+    mexPrintf("vl_vlad: code dimension: %d\n", numClusters * dimension) ;
+    mexPrintf("vl_vlad: unnormalized: %s\n", VL_YESNO(flags & VL_VLAD_FLAG_UNNORMALIZED)) ;
+    mexPrintf("vl_vlad: normalize mass: %s\n", VL_YESNO(flags & VL_VLAD_FLAG_NORMALIZE_MASS)) ;
+    mexPrintf("vl_vlad: normalize components: %s\n", VL_YESNO(flags & VL_VLAD_FLAG_NORMALIZE_COMPONENTS)) ;
+    mexPrintf("vl_vlad: square root: %s\n", VL_YESNO(flags & VL_VLAD_FLAG_SQUARE_ROOT)) ;
   }
 
   /* -------------------------------------------------------------- */
@@ -170,24 +159,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       break;
   }
 
-  vl_vlad_encode
-  (dataType,
-   data,
-   means,
-   assignments,
-   enc,
-   dimension,
-   numData,
-   numClusters,
-   normalize,
-   multithreading);
+  OUT(ENC) = mxCreateNumericMatrix (dimension * numClusters, 1, classID, mxREAL) ;
 
-  OUT(ENC) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
-
-  /* copy encodings */
-  memcpy (mxGetData(OUT(ENC)),
-          enc,
-          vl_get_type_size (dataType) * dimension * numClusters) ;
-
-
+  vl_vlad_encode(mxGetPr(OUT(ENC)),
+                 dataType, numData, means, dimension, numClusters, data, assignments, flags) ;
 }

@@ -1,23 +1,43 @@
-% VL_VLAD retrieve VLAD encoding of a given set of data
-%   [ENC] = VL_FISHER(X, MEANS, ASSIGN) 
-%   retrieves the vlad encoding of a set of vectors. Data vectors
-%   are stored in columns of matrix X, the means of individual
-%   clusters are also located in columns of the MEANS matrix.
-%   Assignments are soft or hard assignments organized in the matrix,
-%   such that:
-%   [ p(x1|c1), p(x2|c1), ... p(xN|c1);
-%     p(x1|c2), p(x2|c2), ... p(xN|c2);
-%     ...
-%     p(x1|cK), p(x2|cK), ... p(xN|cK) ] = POSTERIORS
+% VL_VLAD   Compute the VLAD encoding
+%   ENC = VL_FISHER(X, MEANS, ASSIGNMENTS) computes the VLAD
+%   encoding of the vectors X relative to cluster centers MEANS and
+%   vector-to-cluserr assignments ASSIGNMENTS.
 %
-%   To express a hard assignment, insert a 1(assigned) or zero to
-%   the corresponding place in the ASSIGN matrix
+%   X has one column per data vector (e.g. a SIFT descriptor), and
+%   MEANS has one column per cluster. X and MEANS have the same number
+%   of rows and data class, which can be either SINGLE or DOUBLE.
 %
-%   Verbose::
-%     Increase the verbosity level (may be specified multiple times).
+%   ASSIGNMENTS has as many rows as clusters and as many columns as
+%   X. Its columns are non-negative and shoudl sum to one,
+%   representing the soft assignment of the corresponding vector in X
+%   to each of the clusters. It is of the same class as X.
 %
-% Authors: Andrea Vedaldi, David Novotny
+%   ENC is a vector of the same class of X of size equal to the
+%   product of the data dimension and the number of clusters.
 %
+%   By default, ENC is L2 normalized. VL_VLAD() accepts the following
+%   options:
+%
+%   Unnormalized::
+%     If specified, no overall normalization is applied to ENC.
+%
+%   NormalizeComponents::
+%     If specified, the part of the encoding corresponding to each
+%     cluster is individually normalized.
+%
+%   NormalizeMass::
+%     If specified, each component is re-normalized by the mass
+%     of data vectors assigned to it. If NormalizedComponents is
+%     also selected, this has no effect.
+%
+%   SquareRoot::
+%     If specified, the signed square root function is applied to
+%     ENC before normalization.
+%
+%   See: http://www.vlfeat.org/doc/api/vlad.html.
+
+% Authors: , David Novotny and Andrea Vedaldi
+
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
 %
