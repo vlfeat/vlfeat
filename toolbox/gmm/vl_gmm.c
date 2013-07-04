@@ -138,9 +138,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     switch (opt)
     {
 
-    case opt_verbose :
-      ++ verbosity ;
-      break ;
+    case opt_verbose : ++ verbosity ; break ;
 
     case opt_max_num_iterations :
       if (!vlmxIsPlainScalar(optarg) || mxGetScalar(optarg) < 0)
@@ -155,137 +153,45 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       sigmaLowBound = (double) mxGetScalar(optarg) ;
       break ;
 
-    case opt_weights : ;
-	  {
-      mxClassID classIDweights = mxGetClassID (optarg) ;
-      switch (classIDweights)
-      {
-      case mxSINGLE_CLASS:
-        if (dataType == VL_TYPE_DOUBLE)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITWEIGHTS must be of same data type as X") ;
-        }
-        break ;
-      case mxDOUBLE_CLASS:
-        if (dataType == VL_TYPE_FLOAT)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITWEIGHTS must be of same data type as X") ;
-        }
-        break ;
-      default :
-        abort() ;
-        break ;
+    case opt_weights : {
+      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+        vlmxError (vlmxErrInvalidArgument, "INITWEIGHTS is not of the same class as X.") ;
       }
-
-      if (! vlmxIsMatrix (optarg, -1, -1) || ! vlmxIsReal (optarg))
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITWEIGHTS must be a real matrix ") ;
+      if (! vlmxIsVector (optarg, numClusters) || ! vlmxIsReal (optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "INITWEIGHTS is not a real vector or does not have the correct size.") ;
       }
-
-      if (mxGetNumberOfElements(optarg) != numClusters)
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITWEIGHTS has to have numClusters elements") ;
-      }
-
       weightsSet = VL_TRUE;
       initWeights = mxGetPr(optarg) ;
-
-      break;
+      break ;
 	  }
 
-    case opt_means : ;
+    case opt_means :
 	  {
-      mxClassID classIDmeans = mxGetClassID (optarg) ;
-      switch (classIDmeans)
-      {
-      case mxSINGLE_CLASS:
-        if (dataType == VL_TYPE_DOUBLE)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITMEANS must be of same data type as X") ;
-        }
-        break ;
-      case mxDOUBLE_CLASS:
-        if (dataType == VL_TYPE_FLOAT)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITMEANS must be of same data type as X") ;
-        }
-        break ;
-      default :
-        abort() ;
-        break ;
+      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+        vlmxError (vlmxErrInvalidArgument, "INITMEANS is not of the same class as X.") ;
       }
-
-      if (! vlmxIsMatrix (optarg, -1, -1) || ! vlmxIsReal (optarg))
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITMEANS must be a real matrix ") ;
+      if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "INITMEANS is not a real matrix or does not have the correct size.") ;
       }
-
-      if (mxGetM(optarg) != dimension)
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITMEANS has to have the same dimension (nb of rows) as input X") ;
-      }
-
-      if (mxGetN(optarg) != numClusters)
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITMEANS has to have NUMCLUSTERS number of points (columns)") ;
-      }
-
       meansSet = VL_TRUE;
       initMeans = mxGetPr(optarg) ;
-
       break;
 	  }
-    case opt_sigmas : ;
+
+    case opt_sigmas :
 	  {
-      mxClassID classIDsigma = mxGetClassID (optarg) ;
-      switch (classIDsigma)
-      {
-      case mxSINGLE_CLASS:
-        if (dataType == VL_TYPE_DOUBLE)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITSIGMAS must be of same data type as X") ;
-        }
-        break ;
-      case mxDOUBLE_CLASS:
-        if (dataType == VL_TYPE_FLOAT)
-        {
-          vlmxError (vlmxErrInvalidArgument, "INITSIGMAS must be of same data type as X") ;
-        }
-        break ;
-      default :
-        abort() ;
-        break ;
+      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+        vlmxError (vlmxErrInvalidArgument, "INITSIGMAS is not of the same class as X.") ;
       }
-
-      if (! vlmxIsMatrix (optarg, -1, -1) || ! vlmxIsReal (optarg))
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS must be a real matrix ") ;
+      if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "INITSIGMAS is not a real matrix or does not have the correct size.") ;
       }
-
-      if (mxGetM(optarg) != dimension)
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS has to have the same dimension (nb of rows) as input X") ;
-      }
-
-      if (mxGetN(optarg) != numClusters)
-      {
-        vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS has to have NUMCLUSTERS number of points (columns)") ;
-      }
-
       sigmasSet = VL_TRUE;
       initSigmas = mxGetPr(optarg) ;
-
       break;
 	  }
-    case opt_initialization :
+
+      case opt_initialization :
       if (!vlmxIsString (optarg, -1))
       {
         vlmxError (vlmxErrInvalidArgument,
@@ -391,16 +297,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   {
     char const * initializationName = 0 ;
 
-    switch (vl_gmm_get_initialization(gmm))
-    {
-    case VlGMMRand :
-      initializationName = "rand" ;
-      break ;
-    case VlGMMCustom :
-      initializationName = "custom" ;
-      break ;
-    default:
-      abort() ;
+    switch (vl_gmm_get_initialization(gmm)) {
+    case VlGMMRand : initializationName = "randn" ; break ;
+    case VlGMMCustom : initializationName = "custom" ; break ;
+    case VlGMMKMeans : initializationName = "kmeans" ; break ;
+    default: abort() ;
     }
 
     mexPrintf("vl_gmm: initialization = %s\n", initializationName) ;
@@ -439,14 +340,12 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           vl_get_type_size (dataType) * vl_gmm_get_num_clusters(gmm)) ;
 
   /* optionally return loglikelihood */
-  if (nout > 3)
-  {
+  if (nout > 3) {
     OUT(LL) = vlmxCreatePlainScalar (LL) ;
   }
 
   /* optionally return posterior probabilities */
-  if (nout > 4)
-  {
+  if (nout > 4) {
     memcpy (mxGetData(OUT(POSTERIORS)),
             vl_gmm_get_posteriors (gmm),
             vl_get_type_size (dataType) * numData * vl_gmm_get_num_clusters(gmm)) ;
