@@ -54,7 +54,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   TYPE * data = vl_malloc(sizeof(TYPE)*numData*dimension);
   TYPE * enc = vl_malloc(sizeof(TYPE)*2*dimension*numClusters);
-  TYPE * assign;
+  vl_uint32 * assign;
   
   vl_set_num_threads(0) ; /* use the default number of threads */
 
@@ -126,7 +126,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   //struct timeval t1,t2;
   //gettimeofday(&t1, NULL);
 
-  vl_gmm_cluster	(	gmm, data, dimension, numData, numClusters);
+  vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
 
   //gettimeofday(&t2, NULL);
   //VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);
@@ -193,10 +193,10 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
      numClusters);
   }
 
-  assign = vl_malloc(numData*numClusters*sizeof(TYPE));
+  assign = vl_malloc(numData*numClusters*sizeof(vl_uint32));
   for(dataIdx = 0; dataIdx < numData; dataIdx++) {
     for(cIdx = 0; cIdx < numClusters; cIdx++) {
-      assign[cIdx*numData+dataIdx] = (TYPE)vl_rand_real3(&rand);
+      assign[cIdx*numData+dataIdx] = (vl_uint32)vl_rand_real3(&rand);
     }
   }
 
@@ -204,16 +204,11 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     vl_free(enc);
     enc = vl_malloc(sizeof(TYPE)*dimension*numClusters);
     vl_vlad_encode
-    (VL_F_TYPE,
+    (enc, VL_F_TYPE, numData,
+     vl_gmm_get_means(gmm), dimension, numClusters,
      data,
-     vl_gmm_get_means(gmm),
      assign,
-     enc,
-     dimension,
-     numData,
-     numClusters,
-     VL_FALSE,
-     VL_TRUE);
+     0) ;
   }
 
   vl_gmm_delete(gmm);
