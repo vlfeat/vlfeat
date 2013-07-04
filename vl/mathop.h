@@ -283,6 +283,32 @@ vl_log2_f (float x)
 #endif
 }
 
+/** @brief Square root.
+ ** @param x argument.
+ ** @return @c sqrt(x).
+ **/
+
+VL_INLINE double
+vl_sqrt_d (double x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_sqrt(x) ;
+#else
+  return sqrt(x) ;
+#endif
+}
+
+/** @copydoc vl_sqrt_d */
+VL_INLINE float
+vl_sqrt_f (float x)
+{
+#ifdef VL_COMPILER_GNUC
+  return __builtin_sqrtf(x) ;
+#else
+  return sqrt(x) ;
+#endif
+}
+
 /** @brief Check whether a floating point value is NaN
  ** @param x argument.
  ** @return true if @a x is NaN.
