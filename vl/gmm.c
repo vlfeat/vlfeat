@@ -1157,20 +1157,25 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
 
   /* compute covariance */
 #if defined(_OPENMP)
-#pragma omp parallel default(shared) private(i_d, i_cl) \
+#pragma omp parallel default(shared) private(i_d, i_cl, dim) \
                      reduction(+:posteriorSum) \
                      num_threads(vl_get_max_threads())
 #endif
   {
     TYPE * clusterPosteriorSum_, * means_, * sigmas_ ;
+
+#if defined(_OPENMP)
 #pragma omp critical
+#endif
     {
       clusterPosteriorSum_ = vl_calloc(sizeof(TYPE), numClusters) ;
       means_ = vl_calloc(sizeof(TYPE), self->dimension * numClusters) ;
       sigmas_ = vl_calloc(sizeof(TYPE), self->dimension * numClusters) ;
     }
 
+#if defined(_OPENMP)
 #pragma omp for
+#endif
     for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
       for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
         
@@ -1219,7 +1224,9 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
     }
 
     /* accumulate */
+#if defined(_OPENMP)
 #pragma omp critical
+#endif
     {
       for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
         weights[i_cl] += clusterPosteriorSum_ [i_cl];
@@ -1473,12 +1480,11 @@ vl_gmm_new_copy (VlGMM const * gmm)
   switch(gmm->dataType) {
     case VL_TYPE_FLOAT:
       return _vl_gmm_new_copy_f (gmm);
-      break;
     case VL_TYPE_DOUBLE:
       return _vl_gmm_new_copy_d (gmm);
-      break;
     default:
-      abort();
+      abort() ;
+      return NULL ;
   }
 }
 
@@ -1615,16 +1621,18 @@ vl_gmm_init_mixture
  **/
 
 double vl_gmm_cluster (VlGMM * self,
-                                 void const * data,
-                                 vl_size dimension,
-                                 vl_size numData,
-                                 vl_size numClusters)
+                       void const * data,
+                       vl_size dimension,
+                       vl_size numData,
+                       vl_size numClusters)
 {
-  void * bestMeans = NULL;
-  void * bestSigmas = NULL;
-  void * bestPosteriors = NULL;
-  double bestLL = -VL_INFINITY_D;
+  void * bestMeans = NULL ;
+  void * bestSigmas = NULL ;
+  void * bestPosteriors = NULL ;
+  double bestLL = -VL_INFINITY_D ;
   vl_uindex repetition;
+
+  assert(self->numRepetitions >=1) ;
 
   self->numData = numData;
   self->numClusters = numClusters;
@@ -1637,18 +1645,17 @@ double vl_gmm_cluster (VlGMM * self,
       VL_PRINTF("GMM: repetition %d of %d\n", repetition + 1, self->numRepetitions) ;
     }
 
+    /* seed a new mixture model */
     timeRef = vl_get_cpu_time() ;
-
     vl_gmm_init_mixture (self, data, dimension, numData, numClusters) ;
-
     if (self->verbosity) {
       VL_PRINTF("GMM: GMM initialized in %.2f s\n",
                 vl_get_cpu_time() - timeRef) ;
     }
     
+    /* fit the model to data by running EM */
     timeRef = vl_get_cpu_time () ;
     LL = vl_gmm_get_mixture (self, data, numData) ;
-
     if (self->verbosity) {
       VL_PRINTF("GMM: GMM terminated in %.2f s with loglikelihood %f\n",
                 vl_get_cpu_time() - timeRef, LL) ;
@@ -1657,7 +1664,6 @@ double vl_gmm_cluster (VlGMM * self,
     if (LL > bestLL || repetition == 0) {
       void * temp ;
       bestLL = LL;
-
 
       if (bestMeans == NULL) {
         bestMeans = vl_malloc(vl_get_type_size(self->dataType) *
@@ -1688,10 +1694,12 @@ double vl_gmm_cluster (VlGMM * self,
   vl_free (self->posteriors) ;
   vl_free (self->means) ;
   vl_free (self->sigmas) ;
+
   self->posteriors = bestPosteriors ;
   self->means = bestMeans ;
   self->sigmas = bestSigmas ;
   self->LL = bestLL;
+
   return bestLL ;
 }
 
