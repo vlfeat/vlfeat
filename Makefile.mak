@@ -140,7 +140,7 @@ CFLAGS = /nologo /TC /MD \
          /D"_CRT_SECURE_NO_DEPRECATE" \
          /D"__LITTLE_ENDIAN__" \
          /I. \
-         /W1 /Zp8 /Ox /openmp
+         /W1 /Zp8 /openmp
 
 LFLAGS = $(LFLAGS) /NOLOGO \
          /INCREMENTAL:NO \
@@ -153,7 +153,7 @@ LFLAGS = $(LFLAGS) /DEBUG
 MEX_FLAGS = $(MEX_FLAGS) -g
 !else
 !message === DEBUGGING OFF
-CFLAGS = $(CFLAGS) /D"NDEBUG"
+CFLAGS = $(CFLAGS) /D"NDEBUG" /Ox
 !endif
 
 DLL_CFLAGS = /D"VL_BUILD_DLL"
