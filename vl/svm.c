@@ -33,7 +33,7 @@ the terms of the BSD license (see the COPYING file).
 discriminate classifiers. VLFeat implements two solvers, SGD and SDCA,
 capable of learning linear SVMs on a large scale. These linear solvers
 can be combined with explicit feature maps to learn non-linear models
-as well. The solver support learning a few variants of the standard
+as well. The solver supports a few variants of the standard
 SVM formulation, including using loss functions other than the hinge
 loss.
 
@@ -91,10 +91,10 @@ int main()
 }
 @endcode
 
-This code leanrs a binary linear SVM using the SGD algorithm on
+This code learns a binary linear SVM using the SGD algorithm on
 four two-dimensional points using 0.01 as regularization parameter.
 
-::VlSvmSolverSdca can be specified in place ov ::VlSvmSolverSdca
+::VlSvmSolverSdca can be specified in place of ::VlSvmSolverSdca
 in orer to use the SDCA algorithm instead.
 
 Convergence and other diagnostic information can be obtained after
@@ -104,14 +104,14 @@ The ::vl_svm_set_diagnostic_function can be used to specify a callback
 to be invoked when diagnostic is run. This can be used, for example,
 to dump information on the screen as the algorithm progresses.
 
-Convergence is reached after a maximum number of iteratiosn
+Convergence is reached after a maximum number of iterations
 (::vl_svm_set_max_num_iterations) or after a given criterion falls
-below a threshodl (::vl_svm_set_epsilon). The meaning of these
+below a threshold (::vl_svm_set_epsilon). The meaning of these
 may depend on the specific algorithm (see @ref svm for further details).
 
 ::VlSvm is a quite powerful object. Algorithms only need to perform
 inner product and accumulation operation on the data (see @ref svm-advanced).
-This is used to abstract form the data type and support almost anything
+This is used to abstract from the data type and support almost anything
 by speciying just two functions (::vl_svm_set_data_functions).
 
 A simple interface to this advanced functionality is provided by the
@@ -304,7 +304,7 @@ please refer to @ref svm and @ref svm-fundamentals.
 <!-- ------------------------------------------------------------- -->
 
 The SVM formulation given in @ref svm-fundamentals uses the
-hinge loss, which is only one of a variery of loss functions that
+hinge loss, which is only one of a variety of loss functions that
 are often used for SVMs. More in general, one
 can consider the objective
 
@@ -356,7 +356,7 @@ harder to optimize than the squared one.</td>
 <td>$\max\{0, |y_i - z| - \epsilon\}$.</td>
 <td>This is a variant of the previous loss, proposed in the original
 Support Vector Regression formulation. Differently from the previous
-two losses, the insensitivity may yeld to a sparse selection of
+two losses, the insensitivity may yield to a sparse selection of
 support vectors.</td>
 </tr>
 <tr>
@@ -523,7 +523,7 @@ where a parameter $C$ is used to scale the loss instead of the regularizer:
 E_C(\bw) = \frac{1}{2} \|\bw\|^2 + C \sum_{i=1}^n \ell_i(\langle \bx_i, \bw\rangle)
 \]
 
-This and the objecive function $E(\bw)$ in $\lambda$ are equivalent
+This and the objective function $E(\bw)$ in $\lambda$ are equivalent
 (proportional) if
 
 \[

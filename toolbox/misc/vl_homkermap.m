@@ -11,7 +11,7 @@
 %
 %   Kernel:: KCHI2
 %     One of KCHI2 (Chi2 kernel), KINTERS (intersection kernel), KJS
-%     (Jenen-Shannon kernel). The 'Kernel' option name can be omitted,
+%     (Jensen-Shannon kernel). The 'Kernel' option name can be omitted,
 %     i.e. VL_HOMKERMAP(..., 'kernel', 'kchi2') has the same effect of
 %     VL_HOMKERMAP(..., 'kchi2').
 %

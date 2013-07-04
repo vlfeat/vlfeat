@@ -91,7 +91,7 @@
 %   Loss:: HINGE
 %     Loss function. One of HINGE, HINGE2, L1, L2, LOGISTIC.
 %
-%   Solver:: SGD
+%   Solver:: SDCA
 %     One of SGD (stochastic gradient descent [1]), SDCA (stochastic
 %     dual coordinate ascent [2,3]), or NONE (no training). The
 %     last option can be used in combination with the options MODEL
@@ -120,7 +120,7 @@
 %
 %    LAMBDA/2 (|W|^2 + WB^2) 1/N SUM_i LOSS(W' X(:,i) + WB B0, Y(i))
 %
-%   Note that this causes the learned bias B = WB B0 to shrinks
+%   Note that this causes the learned bias B = WB B0 to shrink
 %   towards the origin.
 %
 %   Example::
@@ -133,9 +133,9 @@
 %
 %       scores = w'*xtest + b ;
 %
-%     Alternatively, VL_SVMTRAIN() can be used fro evaluation too:
+%     Alternatively, VL_SVMTRAIN() can be used for evaluation too:
 %
-%       [~,~,~, scores] = vl_svmtrain(xtest,y,0,'model',w,'bias,'b) ;
+%       [~,~,~, scores] = vl_svmtrain(xtest, y, 0, 'model', w, 'bias', b, 'solver', 'NONE') ;
 %
 %     The latter form is particularly useful when X is a DATASET structure.
 %

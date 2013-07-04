@@ -15,7 +15,7 @@
 %   Options:
 %
 %   Variant:: 'UoCTTI'
-%     Choose a HOG variant: 'UoCTTI' or 'Dalal-Triggs'.
+%     Choose a HOG variant: 'UoCTTI' or 'DalalTriggs'.
 %
 %   NumOrientations:: 9
 %     Choose a number of undirected orientations in the orientation
