@@ -153,8 +153,8 @@ VL_XCAT(_vl_vlad_encode_, SFX)
     }
     
     if (flags & VL_VLAD_FLAG_NORMALIZE_COMPONENTS) {
-      dim = 0 ;
       TYPE n = 0 ;
+      dim = 0 ;
       for(dim = 0; dim < dimension; dim++) {
         TYPE z = enc[i_cl*dimension + dim] ;
         n += z * z ;
