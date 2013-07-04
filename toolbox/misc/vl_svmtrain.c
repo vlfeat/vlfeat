@@ -35,6 +35,7 @@ enum {
   opt_loss,
   opt_model,
   opt_bias,
+  opt_weights,
 
   // switching to SDCA
   opt_verbose,
@@ -61,6 +62,7 @@ vlmxOption  options [] = {
   {"Solver",              1,   opt_solver              },
   {"Model",               1,   opt_model               },
   {"Bias",                1,   opt_bias                },
+  {"Weights",             1,   opt_weights             },
 
   // SGD specific
   {"StartingIteration",   1,   opt_starting_iteration  },
@@ -371,6 +373,7 @@ mexFunction(int nout, mxArray *out[],
   int verbose = 0 ;
   VlSvmDataset * dataset ;
   double * labels ;
+  double * weights = NULL ;
   double lambda ;
 
   double epsilon = -1 ;
@@ -515,20 +518,25 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
         break ;
 
       case opt_model :
-        if (!vlmxIsVector(optarg, -1) ||
-            mxIsComplex(optarg) ||
-            mxGetClassID(optarg) != mxDOUBLE_CLASS) {
-          vlmxError(vlmxErrInvalidArgument, "MODEL is not a real vector (double).") ;
+        if (!vlmxIsPlainVector(optarg, vl_svmdataset_get_dimension(dataset))) {
+          vlmxError(vlmxErrInvalidArgument, "MODEL is not a plain vector of size equal to the data dimension.") ;
         }
         initialModel_array = optarg ;
         break ;
 
       case opt_bias: GET_SCALAR(BIAS, initialBias) ; break ;
+        
+      case opt_weights:
+        if (!vlmxIsPlainVector(optarg, vl_svmdataset_get_num_data(dataset))) {
+          vlmxError(vlmxErrInvalidArgument, "WEIGHTS is not a plain vector of size equal to the number of training samples.") ;
+        }
+        weights = mxGetPr(optarg) ;
+        break ;
 
       /* SGD specific */
       case opt_starting_iteration: GET_NN_SCALAR(STARTINGITERATION, startingIteration) ; break ;
       case opt_bias_learning_rate: GET_NN_SCALAR(BIASLEARNINGRATE, sgdBiasLearningRate) ; break ;
-
+        
       /* DCA specific */
     } /* choose option */
   } /* next option */
@@ -560,6 +568,7 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
     if (sgdBiasLearningRate >= 0) vl_svm_set_bias_learning_rate(svm, sgdBiasLearningRate) ;
     if (diagnosticFrequency >= 0) vl_svm_set_diagnostic_frequency(svm, diagnosticFrequency) ;
     if (startingIteration >= 0) vl_svm_set_iteration_number(svm, (unsigned)startingIteration) ;
+    if (weights) vl_svm_set_weights(svm, weights) ;
     vl_svm_set_loss (svm, loss) ;
 
     dopts.verbose = verbose ;
@@ -584,6 +593,7 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
       mexPrintf("\tmax num iterations: %d\n", vl_svm_get_max_num_iterations(svm)) ;
       mexPrintf("\tepsilon: %g\n", vl_svm_get_epsilon(svm)) ;
       mexPrintf("\tdiagnostic frequency: %d\n", vl_svm_get_diagnostic_frequency(svm)) ;
+      mexPrintf("\tusing custom weights: %s\n", VL_YESNO(weights)) ;
       mexPrintf("\tbias multiplier: %g\n", vl_svm_get_bias_multiplier(svm)) ;
       switch (vl_svm_get_solver(svm)) {
         case VlSvmSolverNone:

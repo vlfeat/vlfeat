@@ -29,7 +29,7 @@ the terms of the BSD license (see the COPYING file).
 @tableofcontents
 <!-- ------------------------------------------------------------- -->
 
-Support Vector Machines (SVMs) are one of the most popular types of
+*Support Vector Machines* (SVMs) are one of the most popular types of
 discriminate classifiers. VLFeat implements two solvers, SGD and SDCA,
 capable of learning linear SVMs on a large scale. These linear solvers
 can be combined with explicit feature maps to learn non-linear models
@@ -487,7 +487,7 @@ bound $F(\bw,\balpha)$ w.r.t. to $\bw$:
 \[
 D(\balpha) = \inf_{\bw} F(\bw,\balpha) \leq E(\bw).
 \]
-The minimizer is and dual objective are now easy to find:
+The minimizer and the dual objective are now easy to find:
 \[
 \boxed{\displaystyle
 \bw(\balpha) =
@@ -614,15 +614,10 @@ range where the conjugate loss is not infinite. Ignoring such bounds,
 the update can be obtained by setting the derivative of the objective
 to zero, obtaining
 \[
-\tilde {\Delta \alpha_q }= \frac{y_q - f}{k/(\lambda n)},
-\quad f = \frac{\bx_q^\top X\balpha_t}{\lambda n} = \bx_q^\top \bw_t,
-\quad k = \bx_q^\top \bx_q.
-\]
-\[
 \tilde {\Delta \alpha_q}= \frac{y_q - B}{A}.
 \]
 Note that $B$ is simply current score associated by the SVM to
-the sample $\bx_q$. Accounting now for the fact that it must be $-1 \leq - y_q
+the sample $\bx_q$. Incorporating the constraint $-1 \leq - y_q
 (\alpha_q + \Delta \alpha_q) \leq 0$,
 i.e. $0 \leq y_q (\alpha_q + \Delta \alpha_q) \leq 1$, one obtains the update
 \[
@@ -637,30 +632,6 @@ Rather than visiting points completely at random, VLFeat SDCA follows
 the best practice of visiting all the points at every epoch (pass
 through the data), changing the order of the visit randomly by picking
 every time a new random permutation.
-
-<!-- ------------------------------------------------------------ --->
-@subsection svm-sdcd-online Online setting
-<!-- ------------------------------------------------------------ --->
-
-As a huge number of instances can cause an expensive outer iteration,
-it may be convenient to choose and update only one @f$ \alpha_i @f$ at
-the @f$ k @f$-th outer iteration.
-
-In @cite{hsieh08a-dual}, Online setting means randomly choosing an
-index @f$ i @f$ at a time.
-
-However, in VLFeat implementation, the Online setting option means
-doing the following three steps in every inner iteration:
-
-- run the diagnostic (if requested)
-- increase the number of "outer" iterations done
-- check the stopping condition (according to the preset frequency)
-
-Thus, compared to the proposed Online setting, in VLFeat
-implementation, chosen indexes do not repeat before processing whole
-@f$ A @f$, where @f$ A = {1,..,n} @f$.
-
-Online setting is an optional feature.
 **/
 
 /**
@@ -715,7 +686,7 @@ shown to converge properly. For example,
 @cite{shalev-shwartz07pegasos} show that, since $E(\bw)$ is
 $\lambda$-strongly convex, then using the learning rate
 \[
-\boxed{\eta_t = \frac{1}{\lambda t}.}
+\boxed{\eta_t = \frac{1}{\lambda t}}
 \]
 guarantees that the algorithm reaches primal-suboptimality $\epsilon_P$ in
 \[
@@ -727,7 +698,7 @@ VLFeat.
 
 The *convergence speed* is not sufficient to tell the *learning speed*,
 i.e. how quickly an algorithm can learn an SVM that performs optimally
-on the test set (the ultimate goal). The following two observations
+on the test set. The following two observations
 can be used to link convergence speed to learning speed:
 
 - The regularizer strength is often heuristically selected to be
@@ -751,8 +722,8 @@ SVM solvers.
 Adding a bias $b$ to the SVM scoring function $\langle \bw, \bx
 \rangle +b$ is done, as explained in @ref svm-bias, by appending a
 constant feature $B$ (the *bias multiplier*) to the data vectors $\bx$
-and a corresponding weight element $\bw_b$ to the weight vector $\bw$,
-so that $b = B \bw_b$ As noted, the bias multiplier should be
+and a corresponding weight element $w_b$ to the weight vector $\bw$,
+so that $b = B w_b$ As noted, the bias multiplier should be
 relatively large in order to avoid shrinking the bias towards zero,
 but small to make the optimization stable. In particular, setting $B$
 to zero learns an unbiased SVM (::vl_svm_set_bias_multiplier).
@@ -772,8 +743,8 @@ two parts of the extended feature vector $(\bx, B)$ are balanced).
 @section svm-sgd-starting-iteration Adjusting the learning rate
 <!-- ------------------------------------------------------------- -->
 
-Initially, the learning rate $eta_t = 1/\lambda t$ is usually too
-fast: as usually $\lambda \ll 1$, $eta_1 \gg 1$. But this is clearly
+Initially, the learning rate $\eta_t = 1/\lambda t$ is usually too
+fast: as usually $\lambda \ll 1$, $\eta_1 \gg 1$. But this is clearly
 excessive (for example, without a loss term, the best learning rate at
 the first iteration is simply $\eta_1=1$, as this nails the optimum in
 one step). Thus, the learning rate formula is modified to be $\eta_t =
@@ -933,7 +904,8 @@ struct VlSvm_ {
   double lambda ;               /**< Regularizer multiplier. */
   void const * data ;
   vl_size numData ;
-  double const * labels ;
+  double const * labels ;       /**< Data labels. */
+  double const * weights ;      /**< Data weights. */
 
   VlSvmDataset * ownDataset ;   /**< Optional owned dataset. */
 
@@ -1331,6 +1303,37 @@ double vl_svm_get_lambda (VlSvm const * self)
   return self->lambda ;
 }
 
+/** @brief Set the data weights.
+ ** @param self object.
+ ** @param weights data weights.
+ **
+ ** @a weights must be an array of non-negative weights.
+ ** The loss of each data point is multiplied by the corresponding
+ ** weight.
+ **
+ ** Set @a weights to @c NULL to weight the data uniformly by 1 (default).
+ **
+ ** Note that the @a weights array is *not* copied and must be valid
+ ** througout the object lifetime (unless it is replaced).
+ **/
+
+void vl_svm_set_weights (VlSvm * self, double const *weights)
+{
+  assert(self) ;
+  self->weights = weights ;
+}
+
+/** @brief Get the data weights.
+ ** @param self object.
+ ** @return data weights.
+ **/
+
+double const *vl_svm_get_weights (VlSvm const * self)
+{
+  assert(self) ;
+  return self->weights ;
+}
+
 /* ---------------------------------------------------------------- */
 /*                                                         Get data */
 /* ---------------------------------------------------------------- */
@@ -1579,15 +1582,19 @@ case VlSvmLoss ## x: \
  **
  ** The interface is the same for a loss function, its derivative,
  ** or the conjugate loss.
+ **
+ ** @sa @ref svm-fundamentals
  **/
 
 /** @typedef VlSvmDcaUpdateFunction
  ** @brief SVM SDCA update function pointer.
- ** @param label label $y$ of the sample.
+ ** @param alpha current value of the dual variable.
  ** @param inner inner product $\bw^\top \bx$ of the sample with the SVM model.
  ** @param norm2 normalization factor $\|\bx\|^2/\lambda n$.
- ** @param u current value of the dual variable.
- ** @return incremental update $\Delta\u$ of the dual variable.
+ ** @param label label $y$ of the sample.
+ ** @return incremental update $\Delta\alpha$ of the dual variable.
+ **
+ ** @sa @ref svm-sdca
  **/
 
 /** @brief SVM hinge loss
@@ -1864,7 +1871,7 @@ vl_svm_logistic_dca_update (double alpha, double inner, double norm2, double lab
 void _vl_svm_update_statistics (VlSvm *self)
 {
   vl_size i, k ;
-  double inner ;
+  double inner, p ;
 
   memset(&self->statistics, 0, sizeof(VlSvmStatistics)) ;
 
@@ -1875,12 +1882,15 @@ void _vl_svm_update_statistics (VlSvm *self)
   self->statistics.regularizer *= self->lambda * 0.5 ;
 
   for (k = 0; k < self->numData ; k++) {
+    p = (self->weights) ? self->weights[k] : 1.0 ;
+    if (p <= 0) continue ;
     inner = self->innerProductFn(self->data, k, self->model) ;
     inner += self->bias * self->biasMultiplier ;
     self->scores[k] = inner ;
-    self->statistics.loss += self->lossFn(inner, self->labels[k]) ;
+    self->statistics.loss += p * self->lossFn(inner, self->labels[k]) ;
     if (self->solver == VlSvmSolverSdca) {
-      self->statistics.dualLoss -= self->conjugateLossFn(- self->alpha[k], self->labels[k]) ;
+
+      self->statistics.dualLoss -= p * self->conjugateLossFn(- self->alpha[k] / p, self->labels[k]) ;
     }
   }
 
@@ -1923,7 +1933,7 @@ void _vl_svm_sdca_train (VlSvm *self)
   double * norm2 ;
   vl_index * permutation ;
   vl_uindex i, t  ;
-  double inner, delta, multiplier ;
+  double inner, delta, multiplier, p ;
 
   double startTime = vl_get_cpu_time () ;
   VlRand * rand = vl_get_rand() ;
@@ -1955,9 +1965,14 @@ void _vl_svm_sdca_train (VlSvm *self)
 
     /* pick a sample and compute update */
     i = permutation[t % self->numData] ;
-    inner = self->innerProductFn(self->data, i, self->model) ;
-    inner += self->bias * self->biasMultiplier ;
-    delta = self->dcaUpdateFn(self->alpha[i], inner, norm2[i], self->labels[i]) ;
+    p = (self->weights) ? self->weights[i] : 1.0 ;
+    if (p > 0) {
+      inner = self->innerProductFn(self->data, i, self->model) ;
+      inner += self->bias * self->biasMultiplier ;
+      delta = p * self->dcaUpdateFn(self->alpha[i] / p, inner, p * norm2[i], self->labels[i]) ;
+    } else {
+      delta = 0 ;
+    }
 
     /* apply update */
     if (delta != 0) {
@@ -2006,7 +2021,7 @@ void _vl_svm_sgd_train (VlSvm *self)
   double * scores ;
   double * previousScores ;
   vl_uindex i, t, k ;
-  double inner, gradient, rate, biasRate;
+  double inner, gradient, rate, biasRate, p ;
   double factor = 1.0 ;
   double biasFactor = 1.0 ; /* to allow slower bias learning rate */
   vl_index t0 = VL_MAX(2, vl_ceil_d(1.0 / self->lambda)) ;
@@ -2056,9 +2071,11 @@ void _vl_svm_sgd_train (VlSvm *self)
 
     /* pick a sample and compute update */
     i = permutation[t % self->numData] ;
+    p = (self->weights) ? self->weights[i] : 1.0 ;
+    p = VL_MAX(0.0, p) ; /* we assume non-negative weights, so this is just for robustness */
     inner = factor * self->innerProductFn(self->data, i, self->model) ;
     inner += biasFactor * (self->biasMultiplier * self->bias) ;
-    gradient = self->lossDerivativeFn(inner, self->labels[i]) ;
+    gradient = p * self->lossDerivativeFn(inner, self->labels[i]) ;
     previousScores[i] = scores[i] ;
     scores[i] = inner ;
 

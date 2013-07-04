@@ -103,6 +103,11 @@
 %   Bias:: 0
 %     Specifies the initial value of the bias term (SGD only).
 %
+%   Weights:: []
+%     Specifies a weight vector to assign a different non-negative
+%     weight to each data point. An application is to rebalance
+%     unbalanced datasets.
+%
 %   FORMULATION
 %
 %   VL_SVMTRAIN() minimizes the objective function of the form:

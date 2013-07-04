@@ -127,6 +127,7 @@ VL_EXPORT double vl_svm_get_bias_multiplier (VlSvm const *self) ;
 VL_EXPORT double vl_svm_get_lambda (VlSvm const *self) ;
 VL_EXPORT vl_size vl_svm_get_iteration_number (VlSvm const *self) ;
 VL_EXPORT double const * vl_svm_get_scores (VlSvm const *self) ;
+VL_EXPORT double const * vl_svm_get_weights (VlSvm const *self) ;
 /** @} */
 
 /** @name Set parameters
@@ -139,6 +140,7 @@ VL_EXPORT void vl_svm_set_bias_multiplier (VlSvm *self, double b) ;
 VL_EXPORT void vl_svm_set_model (VlSvm *self, double const *model) ;
 VL_EXPORT void vl_svm_set_bias (VlSvm *self, double b) ;
 VL_EXPORT void vl_svm_set_iteration_number (VlSvm *self, vl_uindex n) ;
+VL_EXPORT void vl_svm_set_weights (VlSvm *self, double const *weights) ;
 
 VL_EXPORT void vl_svm_set_diagnostic_function (VlSvm *self, VlSvmDiagnosticFunction f, void *data) ;
 VL_EXPORT void vl_svm_set_loss_function (VlSvm *self, VlSvmLossFunction f) ;
