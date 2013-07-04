@@ -18,13 +18,13 @@ for i=1:numClusters
 end
 X = single(X);
 
-%% kmeans
+%% KMeans
 elapsedKMEANS = tic;
 [initMeans, assignments] = vl_kmeans(X, numClusters, ...
-    'verbose', ...
-    'algorithm','ann', ...
+    'Verbose', ...
+    'Algorithm','ann', ...
     'MaxNumIterations',5, ...
-    'distance','l2', ...
+    'Distance','l2', ...
     'NumTrees',3, ...
     'MaxNumComparisons', 20);
 elapsedKMEANS = toc(elapsedKMEANS);
@@ -33,9 +33,8 @@ fprintf('\n ---------- \n KMeans time - %f \n ---------- \n\n',elapsedKMEANS);
 initSigmas = zeros(dimension,numClusters);
 initWeights = zeros(1,numClusters);
 
-figure
-subplot(3,1,1)
-hold on
+figure(1) ; clf ;
+subplot(3,1,1) ; hold on ;
 for i=1:numClusters
     Xk = X(:,assignments==i);
 
@@ -56,21 +55,19 @@ title('GMM: KMeans intialization');
 initSigmas = single(initSigmas);
 initWeights = single(initWeights);
 
-%% gmm kmeans
-elapsedGMM = tic;
+%% GMM kmeans
+elapsedGMM = tic ;
 [means,sigmas,weights,ll,posteriors] = vl_gmm(X, numClusters, ...
-    'initialization','custom', ...
+    'Initialization','custom', ...
     'InitMeans',initMeans, ...
     'InitSigmas',initSigmas, ...
     'InitWeights',initWeights, ...
-    'verbose', ...
-    'multithreading', 'parallel', ...
+    'Verbose', ...
     'MaxNumIterations', 20);
 elapsedGMM = toc(elapsedGMM);
 fprintf('\n ---------- \n GMM time - %f \n ---------- \n',elapsedGMM);
 
-subplot(3,1,2)
-hold on
+subplot(3,1,2) ; hold on ;
 [~,idx] = max(posteriors',[],1);
 for i=1:numClusters
     plot(X(1,idx == i),X(2,idx == i),'.','color',cc(i,:));
@@ -81,18 +78,16 @@ set(gca,'xtick',[],'ytick',[]);
 axis off
 axis equal
 
-%% gmm random
+%% GMM random
 elapsedGMM = tic;
 [means,sigmas,weights,ll,posteriors] = vl_gmm(X, numClusters, ...
-    'initialization','rand', ...
-    'verbose', ...
-    'multithreading', 'parallel', ...
+    'Initialization','rand', ...
+    'Verbose', ...
     'MaxNumIterations', 100);
 elapsedGMM = toc(elapsedGMM);
 fprintf('\n ---------- \n GMM time - %f \n ---------- \n',elapsedGMM);
 
-subplot(3,1,3)
-hold on
+subplot(3,1,3) ; hold on ;
 [~,idx] = max(posteriors',[],1);
 for i=1:numClusters
     plot(X(1,idx == i),X(2,idx == i),'.','color',cc(i,:));
