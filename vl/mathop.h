@@ -305,7 +305,7 @@ vl_sqrt_f (float x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_sqrtf(x) ;
 #else
-  return sqrt(x) ;
+  return sqrtf(x) ;
 #endif
 }
 
@@ -319,7 +319,7 @@ vl_is_nan_f (float x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isnan (x) ;
 #elif VL_COMPILER_MSC
-  return _isnan(x) ;
+  return ! _finite(x) ;
 #else
   return isnan(x) ;
 #endif
@@ -332,7 +332,7 @@ vl_is_nan_d (double x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isnan (x) ;
 #elif VL_COMPILER_MSC
-  return _isnan(x) ;
+  return ! _finite(x) ;
 #else
   return isnan(x) ;
 #endif
