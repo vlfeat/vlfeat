@@ -77,7 +77,7 @@ doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB_EXE) -$(ARCH) -nodesktop -nosplash -r "clear mex;vl_setup demo;vl_demo;exit"
 	@echo "Trimming images ..."
-	find doc/demo -name "*.jpg" -exec $(CONVERT) -trim \{\} \{\}\;
+	find doc/demo -name "*.jpg" -exec $(CONVERT) -trim "{}" "{}" ";"
 	@echo "Done trimming"
 	$(MAKE) doc
 
