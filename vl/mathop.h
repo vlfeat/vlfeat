@@ -319,7 +319,7 @@ vl_is_nan_f (float x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isnan (x) ;
 #elif VL_COMPILER_MSC
-  return ! _finite(x) ;
+  return _isnan(x) ;
 #else
   return isnan(x) ;
 #endif
@@ -332,7 +332,7 @@ vl_is_nan_d (double x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isnan (x) ;
 #elif VL_COMPILER_MSC
-  return ! _finite(x) ;
+  return _isnan(x) ;
 #else
   return isnan(x) ;
 #endif
@@ -348,7 +348,7 @@ vl_is_inf_f (float x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isinf (x) ;
 #elif VL_COMPILER_MSC
-  return _isinf(x) ;
+  return ! _finite(x) ;
 #else
   return isinf(x) ;
 #endif
@@ -361,7 +361,7 @@ vl_is_inf_d (double x)
 #ifdef VL_COMPILER_GNUC
   return __builtin_isinf (x) ;
 #elif VL_COMPILER_MSC
-  return _isinf(x) ;
+  return ! _finite(x) ;
 #else
   return isinf(x) ;
 #endif
