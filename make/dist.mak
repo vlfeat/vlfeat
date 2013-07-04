@@ -73,20 +73,20 @@ dist-src-info:
 no_dep_targets += dist-bin dist-bin-release dist-bin-commit dist-bin-info
 no_dep_targets += dist-bin-clean dist-bin-archclean dist-bin-distclean
 
-dist-bin-release: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-release: tmp-dir=$(TMPDIR)/tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-release:
 	@echo Cloning VLFeat ;
 	test -e "$(tmp-dir)" || $(GIT) clone --no-checkout . "$(tmp-dir)" ; \
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.bin.url $$($(GIT) config --get remote.bin.url) ; \
 	$(GIT) --git-dir="$(tmp-dir)/.git" config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
 	@echo Checking out v$(VER) ;
-	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags ;
-	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
+	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags v$(VER) ;
+	cd "$(tmp-dir)" ; $(GIT) fetch origin v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
 	echo Rebuilding binaries for release ;
 	make -C "$(tmp-dir)" ARCH=$(ARCH) all
 
-dist-bin-commit: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-commit: tmp-dir=$(TMPDIR)/tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit: branch=v$(VER)-$(ARCH)
 dist-bin-commit: dist-bin-release
 	@echo Setting $(branch) to v$(VER) ;
@@ -106,7 +106,7 @@ dist-bin-commit: dist-bin-release
 	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch) ; \
 	fi
 
-dist-bin-commit-common: tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
+dist-bin-commit-common: $(TMPDIR)/tmp-dir=tmp-$(NAME)-$(VER)-$(ARCH)
 dist-bin-commit-common: branch=v$(VER)-common
 dist-bin-commit-common: dist-bin-release
 	@echo Building doc
@@ -130,7 +130,7 @@ dist-bin-commit-common: dist-bin-release
 	  $(GIT) push -v --force bin $(branch):refs/heads/$(branch); \
 	fi
 
-dist-bin-merge: tmp-dir=tmp-$(NAME)-$(VER)-merge
+dist-bin-merge: tmp-dir=$(TMPDIR)/tmp-$(NAME)-$(VER)-merge
 dist-bin-merge: branch=v$(VER)-bin
 dist-bin-merge:
 	@echo Cleaning up merge directory
@@ -140,8 +140,8 @@ dist-bin-merge:
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.bin.url $$($(GIT) config --get remote.bin.url) ;
 	$(GIT) --git-dir=$(tmp-dir)/.git config remote.origin.url $$($(GIT) config --get remote.origin.url) ;
 	echo Creating or resetting and checking out branch $(branch) to v$(VER);
-	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags ;
-	cd "$(tmp-dir)" ; $(GIT) fetch origin ;
+	cd "$(tmp-dir)" ; $(GIT) fetch origin --tags v$(VER);
+	cd "$(tmp-dir)" ; $(GIT) fetch origin v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) checkout v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) branch -f $(branch) v$(VER) ;
 	cd "$(tmp-dir)" ; $(GIT) checkout $(branch) ;
@@ -174,10 +174,10 @@ dist-bin:
 dist-bin-clean:
 
 dist-bin-archclean:
-	rm -rf tmp-$(NAME)-$(VER)-$(ARCH)
+	rm -rf $(TMPDIR)/tmp-$(NAME)-$(VER)-$(ARCH)
 
 dist-bin-distclean:
-	rm -rf tmp-$(NAME)-$(VER)-*
+	rm -rf $(TMPDIR)/tmp-$(NAME)-$(VER)-*
 	rm -f $(BINDIST).tar.gz
 
 dist-bin-info:

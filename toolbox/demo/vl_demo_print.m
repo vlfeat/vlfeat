@@ -45,6 +45,11 @@ if ~ exist(figDir, 'dir')
   mkdir(figDir) ;
 end
 
-filePath = fullfile(figDir, [name '.eps']) ;
-print(fig, '-depsc2', filePath) ;
+if 0
+  filePath = fullfile(figDir, [name '.eps']) ;
+  print(fig, '-depsc2', filePath) ;
+else
+  filePath = fullfile(figDir, [name '.jpg']) ;
+  print(fig, '-djpeg95', filePath, '-r95') ;
+end
 fprintf('%s: wrote file ''%s''\n', mfilename,  filePath) ;

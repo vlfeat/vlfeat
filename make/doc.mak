@@ -46,15 +46,15 @@ no_dep_targets := doc-clean doc-archclean doc-distclean
 
 fig_src  := $(wildcard docsrc/figures/*.fig)
 svg_src  := $(wildcard docsrc/figures/*.svg)
-demo_src := $(wildcard doc/demo/*.eps)
+demo_src := $(wildcard doc/demo/*.jpg)
 html_src := $(wildcard docsrc/*.html)
 man_src  := $(wildcard src/*.1)
 man_src  += $(wildcard src/*.7)
 
 pdf_tgt := #$(fig_src:.fig=.pdf)
 eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
-png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png)) $(subst docsrc/,doc/,$(svg_src:.svg=.png)) 
-jpg_tgt := $(demo_src:.eps=.jpg)
+png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png)) $(subst docsrc/,doc/,$(svg_src:.svg=.png))
+jpg_tgt := $(demo_src)
 img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
 man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
 
@@ -75,7 +75,10 @@ doc-toolbox: doc/mdoc.build/mdoc.html
 
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLAB_EXE) -$(ARCH) -nodesktop -r "clear mex;vl_setup demo;vl_demo;exit"
+	$(MATLAB_EXE) -$(ARCH) -nodesktop -nosplash -r "clear mex;vl_setup demo;vl_demo;exit"
+	@echo "Trimming images ..."
+	find doc/demo -name "*.jpg" -exec $(CONVERT) -trim \{\} \{\}\;
+	@echo "Done trimming"
 	$(MAKE) doc
 
 #
