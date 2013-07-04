@@ -17,8 +17,8 @@ the terms of the BSD license (see the COPYING file).
 @mainpage Vision Lab Features Library (VLFeat)
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
-@par Copyright &copy; 2007-12 Andrea Vedaldi and Brian Fulkerson
-@par Copyright &copy; 2013 Andrea Vedaldi
+@par Copyright &copy; 2007-11 Andrea Vedaldi and Brian Fulkerson
+@par Copyright &copy; 2012-13 The VLFeat Authors
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The VLFeat C library implements common computer
@@ -79,9 +79,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage matlab
   - @subpage metaprogram
 
-- **Developing the library**
-  - @subpage dev
-
+- @subpage dev
 - @subpage glossary
 **/
 
@@ -254,7 +252,6 @@ VLFeat MEX function must be converted back to a MATLAB object such as
 a vector or a structure. In particular, there is no direct way of
 creating an object within a MEX file, returning it to MATLAB, and
 passing it again to another MEX file.
- 
 **/
 
 /**
@@ -310,7 +307,7 @@ user, as it is used only internally.
 This page contains information useful to the developer of VLFeat.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section dev-style Copyright
+@section dev-copy Copyright
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 A short copyright notice is added at the beginning of each file. For
@@ -380,9 +377,10 @@ the left-hand side of an expression). For example
  void vl_sum_numbers (float * output, float input1, float input2) ; // good
  void vl_sum_numbers (float input1, float input2, float * output) ; // bad
 </pre>
-These rule can be combined. For example
+These rules can be combined. For example
 <pre>
- void vl_object_sum_to_array (VlObject * self, float * outArray, vl_size numColumns, vl_size numRows, float * inArray) ; // good
+ void vl_object_sum_to_array (VlObject * self, float * outArray,
+        vl_size numColumns, vl_size numRows, float * inArray) ; // good
 </pre>
 Note that in this case no dimension for @c inArray is specified as it
 is assumed that @c numColumns and @c numRows are the dimensions of
@@ -792,10 +790,10 @@ VlState _vl_state ;
 /* ----------------------------------------------------------------- */
 VL_INLINE VlState * vl_get_state () ;
 VL_INLINE VlThreadState * vl_get_thread_specific_state () ;
-void vl_lock_state () ;
-void vl_unlock_state () ;
-VlThreadState * vl_thread_specific_state_new () ;
-void vl_thread_specific_state_delete (VlThreadState * self) ;
+static void vl_lock_state (void) ;
+static void vl_unlock_state (void) ;
+static VlThreadState * vl_thread_specific_state_new (void) ;
+static void vl_thread_specific_state_delete (VlThreadState * self) ;
 
 /** @brief Get VLFeat version string
  ** @return the library version string.
@@ -878,7 +876,8 @@ do_nothing_printf (char const* format VL_UNUSED, ...)
  ** @sa ::vl_unlock_state
  **/
 
-void vl_lock_state ()
+static void
+vl_lock_state (void)
 {
 #if ! defined(VL_DISABLE_THREADS)
 #if   defined(VL_THREADS_POSIX)
@@ -909,8 +908,8 @@ void vl_lock_state ()
  ** @sa ::vl_lock_state
  **/
 
-void
-vl_unlock_state ()
+static void
+vl_unlock_state (void)
 {
 #if ! defined(VL_DISABLE_THREADS)
 #if   defined(VL_THREADS_POSIX)
@@ -935,7 +934,7 @@ vl_unlock_state ()
  **/
 
 VL_INLINE VlState *
-vl_get_state ()
+vl_get_state (void)
 {
   return &_vl_state ;
 }
@@ -947,7 +946,7 @@ vl_get_state ()
  **/
 
 VL_INLINE VlThreadState *
-vl_get_thread_specific_state ()
+vl_get_thread_specific_state (void)
 {
 #ifdef VL_DISABLE_THREADS
   return vl_get_state()->threadState ;
@@ -985,7 +984,7 @@ vl_get_thread_specific_state ()
  **/
 
 vl_size
-vl_get_num_cpus ()
+vl_get_num_cpus (void)
 {
   return vl_get_state()->numCPUs ;
 }
@@ -995,7 +994,7 @@ vl_get_num_cpus ()
  ** @param x @c true if SIMD instructions are used.
  **
  ** Notice that SIMD instructions are used only if the CPU model
- ** supports them. Note also that data alignment may restrict the use
+ ** supports them. Note alsoc that data alignment may restrict the use
  ** of such instructions.
  **
  ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
@@ -1012,7 +1011,7 @@ vl_set_simd_enabled (vl_bool x)
  **/
 
 vl_bool
-vl_get_simd_enabled ()
+vl_get_simd_enabled (void)
 {
   return vl_get_state()->simdEnabled ;
 }
@@ -1022,7 +1021,7 @@ vl_get_simd_enabled ()
  **/
 
 vl_bool
-vl_cpu_has_sse3 ()
+vl_cpu_has_sse3 (void)
 {
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
   return vl_get_state()->cpuInfo.hasSSE3 ;
@@ -1036,7 +1035,7 @@ vl_cpu_has_sse3 ()
  **/
 
 vl_bool
-vl_cpu_has_sse2 ()
+vl_cpu_has_sse2 (void)
 {
 #if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
   return vl_get_state()->cpuInfo.hasSSE2 ;
@@ -1054,7 +1053,7 @@ vl_cpu_has_sse2 ()
  **/
 
 vl_size
-vl_get_thread_limit()
+vl_get_thread_limit (void)
 {
 #if defined(_OPENMP)
   return omp_get_thread_limit() ;
@@ -1070,7 +1069,7 @@ vl_get_thread_limit()
  **/
 
 vl_size
-vl_get_max_threads()
+vl_get_max_threads (void)
 {
 #if defined(_OPENMP)
   return vl_get_state()->numThreads ;
@@ -1085,7 +1084,12 @@ vl_get_max_threads()
  **/
 
 void
-vl_set_num_threads(vl_size numThreads)
+vl_set_num_threads (
+#if defined(_OPENMP)
+                    vl_size numThreads)
+#else
+                    vl_size numThreads VL_UNUSED)
+#endif
 {
 #if defined(_OPENMP)
   if (numThreads == 0) {
@@ -1142,7 +1146,7 @@ vl_set_last_error (int error, char const * errorMessage, ...)
  **/
 
 int
-vl_get_last_error () {
+vl_get_last_error (void) {
   return vl_get_thread_specific_state()->lastError ;
 }
 
@@ -1152,7 +1156,7 @@ vl_get_last_error () {
  **/
 
 char const *
-vl_get_last_error_message ()
+vl_get_last_error_message (void)
 {
   return vl_get_thread_specific_state()->lastErrorMessage ;
 }
@@ -1260,7 +1264,7 @@ vl_set_printf_func (printf_func_t printf_func)
  **/
 
 printf_func_t
-vl_get_printf_func () {
+vl_get_printf_func (void) {
   return vl_get_state()->printf_func ;
 }
 
@@ -1290,7 +1294,7 @@ vl_get_cpu_time ()
  **/
 
 void
-vl_tic ()
+vl_tic (void)
 {
   VlThreadState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
@@ -1315,7 +1319,7 @@ vl_tic ()
  **/
 
 double
-vl_toc ()
+vl_toc (void)
 {
   VlThreadState * threadState = vl_get_thread_specific_state() ;
 #ifdef VL_OS_WIN
@@ -1338,7 +1342,7 @@ vl_toc ()
  **/
 
 VL_EXPORT VlRand *
-vl_get_rand ()
+vl_get_rand (void)
 {
   return &vl_get_thread_specific_state()->rand ;
 }
@@ -1351,8 +1355,8 @@ vl_get_rand ()
  ** @return new state structure.
  **/
 
-VlThreadState *
-vl_thread_specific_state_new ()
+static VlThreadState *
+vl_thread_specific_state_new (void)
 {
   VlThreadState * self ;
 #if defined(DEBUG)
@@ -1376,7 +1380,7 @@ vl_thread_specific_state_new ()
  ** @param self thread state object.
  **/
 
-void
+static void
 vl_thread_specific_state_delete (VlThreadState * self)
 {
 #if defined(DEBUG)
@@ -1444,7 +1448,7 @@ BOOL WINAPI DllMain(
 
 /** @internal @brief Initialize VLFeat state */
 static void
-vl_constructor ()
+vl_constructor (void)
 {
   VlState * state ;
 #if defined(DEBUG)

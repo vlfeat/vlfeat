@@ -99,20 +99,19 @@ vl_get_type_size (vl_type type)
 }
 /** @} */
 
-
-VL_EXPORT char const * vl_get_version_string () ;
-VL_EXPORT char * vl_configuration_to_string_copy () ;
+VL_EXPORT char const * vl_get_version_string (void) ;
+VL_EXPORT char * vl_configuration_to_string_copy (void) ;
 VL_EXPORT void vl_set_simd_enabled (vl_bool x) ;
-VL_EXPORT vl_bool vl_get_simd_enabled () ;
-VL_EXPORT vl_bool vl_cpu_has_sse3 () ;
-VL_EXPORT vl_bool vl_cpu_has_sse2 () ;
-VL_EXPORT vl_size vl_get_num_cpus () ;
-VL_EXPORT vl_size vl_get_max_threads () ;
+VL_EXPORT vl_bool vl_get_simd_enabled (void) ;
+VL_EXPORT vl_bool vl_cpu_has_sse3 (void) ;
+VL_EXPORT vl_bool vl_cpu_has_sse2 (void) ;
+VL_EXPORT vl_size vl_get_num_cpus (void) ;
+VL_EXPORT vl_size vl_get_max_threads (void) ;
 VL_EXPORT void vl_set_num_threads (vl_size n) ;
-VL_EXPORT VlRand * vl_get_rand () ;
+VL_EXPORT VlRand * vl_get_rand (void) ;
 
 #if 0
-VL_EXPORT vl_size vl_get_thread_limit () ;
+VL_EXPORT vl_size vl_get_thread_limit (void) ;
 #endif
 
 /** ------------------------------------------------------------------
@@ -126,8 +125,8 @@ VL_EXPORT vl_size vl_get_thread_limit () ;
 #define VL_ERR_EOF      5  /**< End-of-file or end-of-sequence error */
 #define VL_ERR_NO_MORE  5  /**< End-of-sequence @deprecated */
 
-VL_EXPORT int vl_get_last_error () ;
-VL_EXPORT char const *  vl_get_last_error_message () ;
+VL_EXPORT int vl_get_last_error (void) ;
+VL_EXPORT char const *  vl_get_last_error_message (void) ;
 VL_EXPORT int vl_set_last_error (int error, char const * errorMessage, ...) ;
 /** @} */
 
@@ -139,11 +138,11 @@ vl_set_alloc_func (void *(*malloc_func)  (size_t),
                    void *(*realloc_func) (void*,size_t),
                    void *(*calloc_func)  (size_t, size_t),
                    void  (*free_func)    (void*)) ;
-VL_EXPORT void *vl_malloc  (size_t n) ;
+VL_EXPORT void *vl_malloc (size_t n) ;
 VL_EXPORT void *vl_realloc (void *ptr, size_t n) ;
-VL_EXPORT void *vl_calloc  (size_t n, size_t size) ;
-VL_EXPORT void *vl_memalign  (size_t n, size_t size) ;
-VL_EXPORT void  vl_free    (void* ptr) ;
+VL_EXPORT void *vl_calloc (size_t n, size_t size) ;
+VL_EXPORT void *vl_memalign (size_t n, size_t size) ;
+VL_EXPORT void  vl_free (void* ptr) ;
 /** @} */
 
 /** ------------------------------------------------------------------
@@ -152,7 +151,7 @@ VL_EXPORT void  vl_free    (void* ptr) ;
 /** @brief Customizable printf function pointer type */
 typedef int(*printf_func_t) (char const *format, ...) ;
 VL_EXPORT void vl_set_printf_func (printf_func_t printf_func) ;
-VL_EXPORT printf_func_t vl_get_printf_func () ;
+VL_EXPORT printf_func_t vl_get_printf_func (void) ;
 
 /** @def VL_PRINTF
  ** @brief Call user-customizable @c printf function
@@ -200,9 +199,9 @@ VL_EXPORT printf_func_t vl_get_printf_func () ;
  ** @name Measuring time
  ** @{
  **/
-VL_EXPORT void vl_tic () ;
-VL_EXPORT double vl_toc () ;
-VL_EXPORT double vl_get_cpu_time () ;
+VL_EXPORT void vl_tic (void) ;
+VL_EXPORT double vl_toc (void) ;
+VL_EXPORT double vl_get_cpu_time (void) ;
 /** @} */
 
 /* VL_GENERIC_H */
