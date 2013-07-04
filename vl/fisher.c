@@ -465,7 +465,6 @@ VL_XCAT(_vl_fisher_encode_, SFX)
  ** @param dimension dimensionality of the data
  ** @param numData number of data vectors
  ** @param numClusters number of gaussians in the mixture
- ** @param multithreading set to use serial or parallel computation
  **/
 
 VL_EXPORT void
