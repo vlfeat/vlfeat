@@ -19,10 +19,10 @@ info: dist-bin-info dist-src-info
 
 GIT ?= git
 RSYNC ?= rsync
+VER ?= $(shell cat vl/generic.h | sed -n \
+    's/.*VL_VERSION_STRING.*\"\([0-9.]*\)\".*/\1/p')
 
 NAME := vlfeat
-VER := $(shell cat vl/generic.h | sed -n \
-    's/.*VL_VERSION_STRING.*\"\([0-9.]*\)\".*/\1/p')
 DIST := $(NAME)-$(VER)
 BINDIST := $(DIST)-bin
 HOST := vlfeat-admin:vlfeat.org/sandbox
@@ -199,14 +199,14 @@ post:
 	    -aP $(DIST).tar.gz $(BINDIST).tar.gz                     \
 	    $(HOST)/download
 
-post-doc: doc
+post-doc:
+	tar xzvf $(BINDIST).tar.gz -C $(TMPDIR)/ $(NAME)-$(VER)/doc/
 	$(RSYNC)                                                     \
 	      --recursive                                            \
 	      --perms                                                \
 	      --group=lab                                            \
 	      --chmod=Dg+s,g+w,o-w                                   \
 	      --exclude=*.eps                                        \
-	      --progress                                             \
 	      --exclude=download                                     \
 	      --exclude=cvpr10wiki                                   \
 	      --exclude=benchmarks                                   \
@@ -215,7 +215,8 @@ post-doc: doc
 	      --exclude=.htaccess                                    \
 	      --exclude=favicon.ico                                  \
 	      --delete                                               \
-	      doc/ $(HOST)
+	      --progress                                             \
+	      $(TMPDIR)/$(NAME)-$(VER)/doc/ $(HOST)
 
 # Local variables:
 # mode: Makefile
