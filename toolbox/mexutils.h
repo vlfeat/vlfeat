@@ -134,7 +134,7 @@ mxSetDimensionsOctaveWorkaround(mxArray * array, const mwSize  *dims, int ndims)
    array can be of any numeric or other type. The elements of such a
    MATLAB array are stored as a plain C array with a number of
    elements equal to the number of elements in the array (obtained
-   with @c mxGetNumberOfElements). Use ::vlmxIsVector to test if an
+   with @c mxGetNumberOfElements). Use ::vlmxIsVector to test whether an
    array is a vector.
 
  - <b>Matrix array</b> is a non-sparse array for which all dimensions
@@ -367,22 +367,14 @@ vlmxIsVector (mxArray const * array, vl_index numElements)
     return VL_FALSE ;
   }
 
-  /* ok if empty */
-  if (mxGetNumberOfElements (array) == 0) {
-    return VL_TRUE ;
+  /* check that all but at most one dimension is singleton */
+  for (di = 0 ;  di < numDimensions ; ++ di) {
+    if (dimensions[di] != 1) break ;
   }
-
-  /* find first non-singleton dimension */
-  for (di = 0 ; (dimensions[di] == 1) && di < numDimensions ; ++ di) ;
-
-  /* skip it */
-  if (di < numDimensions) ++ di ;
-
-  /* find next non-singleton dimension */
-  for (; (dimensions[di] == 1) && di < numDimensions ; ++ di) ;
-
-  /* if none found, then ok */
-  return di == numDimensions ;
+  for (++ di ; di < numDimensions ; ++di) {
+    if (dimensions[di] != 1) return VL_FALSE ;
+  }
+  return VL_TRUE ;
 }
 
 /** ------------------------------------------------------------------
