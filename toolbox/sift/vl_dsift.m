@@ -33,10 +33,10 @@
 %
 %   VL_DSIFT() accepts the following options:
 %
-%   Step:: [1]
+%   Step:: 1
 %     Extracts a SIFT descriptor each STEP pixels.
 %
-%   Size:: [3]
+%   Size:: 3
 %     A spatial bin covers SIZE pixels.
 %
 %   Bounds:: [whole image]
@@ -59,6 +59,11 @@
 %   FloatDescriptors::
 %     If specified, the descriptor are returned in floating point
 %     rather than integer format.
+%
+%   Geomerty:: [4 4 8]
+%     Specify the geometry of the descriptor as [NX NY NO], where NX
+%     is the number of bin in the X direction, NY in the Y direction,
+%     and NO the nubmer of orientation bins.
 %
 %   Verbose::
 %     If specified, be verbose.

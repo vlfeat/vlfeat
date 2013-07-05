@@ -28,6 +28,7 @@ enum {
   opt_norm,
   opt_window_size,
   opt_float_descriptors,
+  opt_geometry,
   opt_verbose
 } ;
 
@@ -40,6 +41,7 @@ vlmxOption  options [] = {
 {"Norm",             0,   opt_norm             },
 {"WindowSize",       1,   opt_window_size      },
 {"FloatDescriptors", 0,   opt_float_descriptors},
+{"Geometry",         1,   opt_geometry         },
 {"Verbose",          0,   opt_verbose          },
 {0,                  0,   0                    }
 } ;
@@ -55,17 +57,16 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_I=0, IN_END} ;
   enum {OUT_FRAMES=0, OUT_DESCRIPTORS} ;
 
-  int                verbose = 0 ;
-  int                opt ;
-  int                next = IN_END ;
-  mxArray const     *optarg ;
+  int verbose = 0 ;
+  int opt ;
+  int next = IN_END ;
+  mxArray const *optarg ;
 
-  float const       *data ;
-  int                M, N ;
+  float const *data ;
+  int M, N ;
 
-  int                step = 1 ;
-  int                size = 3 ;
-  vl_bool            norm = 0 ;
+  int step [2] = {1,1} ;
+  vl_bool norm = 0 ;
 
   vl_bool floatDescriptors = VL_FALSE ;
   vl_bool useFlatWindow = VL_FALSE ;
@@ -73,8 +74,15 @@ mexFunction(int nout, mxArray *out[],
 
   double *bounds = NULL ;
   double boundBuffer [4] ;
+  VlDsiftDescriptorGeometry geom ;
 
   VL_USE_MATLAB_ENV ;
+
+  geom.numBinX = 4 ;
+  geom.numBinY = 4 ;
+  geom.numBinT = 8 ;
+  geom.binSizeX = 3 ;
+  geom.binSizeY = 3 ;
 
   /* -----------------------------------------------------------------
    *                                               Check the arguments
@@ -123,14 +131,38 @@ mexFunction(int nout, mxArray *out[],
         break ;
 
       case opt_size :
-        if (!vlmxIsPlainScalar(optarg) || (size = (int) *mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument,"SIZE is not a scalar or it is negative.") ;
+        if (!vlmxIsPlainVector(optarg,-1)) {
+          vlmxError(vlmxErrInvalidArgument,"SIZE is not a plain vector.") ;
+        }
+        if (mxGetNumberOfElements(optarg) == 1) {
+          geom.binSizeX = (int) mxGetPr(optarg)[0] ;
+          geom.binSizeY = (int) mxGetPr(optarg)[0] ;
+        } else if (mxGetNumberOfElements(optarg) == 2) {
+          geom.binSizeX = (int) mxGetPr(optarg)[1] ;
+          geom.binSizeY = (int) mxGetPr(optarg)[0] ;
+        } else {
+          vlmxError(vlmxErrInvalidArgument,"SIZE is neither a scalar or a 2D vector.") ;
+        }
+        if (geom.binSizeX < 1 || geom.binSizeY < 1) {
+          vlmxError(vlmxErrInvalidArgument,"SIZE value is invalid.") ;
         }
         break ;
 
       case opt_step :
-        if (!vlmxIsPlainScalar(optarg) || (step = (int) *mxGetPr(optarg)) <= 0) {
-          vlmxError(vlmxErrInvalidArgument,"STEP is not a scalar or it is negative.") ;
+        if (!vlmxIsPlainVector(optarg,-1)) {
+          vlmxError(vlmxErrInvalidArgument,"STEP is not a plain vector.") ;
+        }
+        if (mxGetNumberOfElements(optarg) == 1) {
+          step[0] = (int) mxGetPr(optarg)[0] ;
+          step[1] = (int) mxGetPr(optarg)[0] ;
+        } else if (mxGetNumberOfElements(optarg) == 2) {
+          step[0] = (int) mxGetPr(optarg)[1] ;
+          step[1] = (int) mxGetPr(optarg)[0] ;
+        } else {
+          vlmxError(vlmxErrInvalidArgument,"STEP is neither a scalar or a 2D vector.") ;
+        }
+        if (step[0] < 1 || step[1] < 1) {
+          vlmxError(vlmxErrInvalidArgument,"STEP value is invalid.") ;
         }
         break ;
 
@@ -142,6 +174,20 @@ mexFunction(int nout, mxArray *out[],
 
       case opt_float_descriptors :
         floatDescriptors = VL_TRUE ;
+        break ;
+
+      case opt_geometry :
+        if (!vlmxIsPlainVector(optarg,3)) {
+          vlmxError(vlmxErrInvalidArgument, "GEOMETRY is not a 3D vector.") ;
+        }
+        geom.numBinY = (int)mxGetPr(optarg)[0] ;
+        geom.numBinX = (int)mxGetPr(optarg)[1] ;
+        geom.numBinT = (int)mxGetPr(optarg)[2] ;
+        if (geom.numBinX < 1 ||
+            geom.numBinY < 1 ||
+            geom.numBinT < 1) {
+          vlmxError(vlmxErrInvalidArgument, "GEOMETRY value is invalid.") ;
+        }
         break ;
 
       default :
@@ -156,14 +202,16 @@ mexFunction(int nout, mxArray *out[],
     int numFrames ;
     int descrSize ;
     VlDsiftKeypoint const *frames ;
-    VlDsiftDescriptorGeometry const *geom ;
     float const *descrs ;
     int k, i ;
 
     VlDsiftFilter *dsift ;
 
     /* note that the image received from MATLAB is transposed */
-    dsift = vl_dsift_new_basic (M, N, step, size) ;
+    dsift = vl_dsift_new (M, N) ;
+    vl_dsift_set_geometry(dsift, &geom) ;
+    vl_dsift_set_steps(dsift, step[0], step[1]) ;
+
     if (bounds) {
       vl_dsift_set_bounds(dsift,
                           VL_MAX(bounds[1], 0),
@@ -179,7 +227,7 @@ mexFunction(int nout, mxArray *out[],
 
     numFrames = vl_dsift_get_keypoint_num (dsift) ;
     descrSize = vl_dsift_get_descriptor_size (dsift) ;
-    geom = vl_dsift_get_geometry (dsift) ;
+    geom = *vl_dsift_get_geometry (dsift) ;
 
     if (verbose) {
       int stepX ;
@@ -199,13 +247,13 @@ mexFunction(int nout, mxArray *out[],
                 minX+1, minY+1, maxX+1, maxY+1) ;
       mexPrintf("vl_dsift: subsampling steps: stepX=%d, stepY=%d\n", stepX, stepY) ;
       mexPrintf("vl_dsift: num bins:          [numBinT, numBinX, numBinY] = [%d, %d, %d]\n",
-                geom->numBinT,
-                geom->numBinX,
-                geom->numBinY) ;
+                geom.numBinT,
+                geom.numBinX,
+                geom.numBinY) ;
       mexPrintf("vl_dsift: descriptor size:   %d\n", descrSize) ;
       mexPrintf("vl_dsift: bin sizes:         [binSizeX, binSizeY] = [%d, %d]\n",
-                geom->binSizeX,
-                geom->binSizeY) ;
+                geom.binSizeX,
+                geom.binSizeY) ;
       mexPrintf("vl_dsift: flat window:       %s\n", VL_YESNO(useFlatWindow)) ;
       mexPrintf("vl_dsift: window size:       %g\n", vl_dsift_get_window_size(dsift)) ;
       mexPrintf("vl_dsift: num of features:   %d\n", numFrames) ;
@@ -257,9 +305,9 @@ mexFunction(int nout, mxArray *out[],
 
         vl_dsift_transpose_descriptor (tmpDescr,
                                        descrs + descrSize * k,
-                                       geom->numBinT,
-                                       geom->numBinX,
-                                       geom->numBinY) ;
+                                       geom.numBinT,
+                                       geom.numBinX,
+                                       geom.numBinY) ;
 
         if (floatDescriptors) {
           for (i = 0 ; i < descrSize ; ++i) {
