@@ -127,7 +127,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
         }
       }
     }
-    
+
     if (clusterMass > 0) {
       if (flags & VL_VLAD_FLAG_NORMALIZE_MASS) {
         for(dim = 0; dim < dimension; dim++) {
@@ -140,7 +140,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
         }
       }
     }
-    
+
     if (flags & VL_VLAD_FLAG_SQUARE_ROOT) {
       for(dim = 0; dim < dimension; dim++) {
         TYPE z = enc[i_cl*dimension + dim] ;
@@ -151,7 +151,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
         }
       }
     }
-    
+
     if (flags & VL_VLAD_FLAG_NORMALIZE_COMPONENTS) {
       TYPE n = 0 ;
       dim = 0 ;
@@ -160,12 +160,13 @@ VL_XCAT(_vl_vlad_encode_, SFX)
         n += z * z ;
       }
       n = VL_XCAT(vl_sqrt_, SFX)(n) ;
+      n = VL_MAX(n, 1e-12) ;
       for(dim = 0; dim < dimension; dim++) {
         enc[i_cl*dimension + dim] /= n ;
       }
     }
   }
-  
+
   if (! (flags & VL_VLAD_FLAG_UNNORMALIZED)) {
     TYPE n = 0 ;
     for(dim = 0 ; dim < dimension * numClusters ; dim++) {
@@ -173,6 +174,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
       n += z * z ;
     }
     n = VL_XCAT(vl_sqrt_, SFX)(n) ;
+    n = VL_MAX(n, 1e-12) ;
     for(dim = 0 ; dim < dimension * numClusters ; dim++) {
       enc[dim] /= n ;
     }
