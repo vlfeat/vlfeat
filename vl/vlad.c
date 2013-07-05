@@ -100,11 +100,8 @@ This normalization is controlled by the last argument of ::vl_vlad_encode.
 static void
 VL_XCAT(_vl_vlad_encode_, SFX)
 (TYPE * enc,
- vl_size numData,
- TYPE const * means,
- vl_size dimension,
- vl_size numClusters,
- TYPE const * data,
+ TYPE const * means, vl_size dimension, vl_size numClusters,
+ TYPE const * data, vl_size numData,
  TYPE const * assignments,
  int flags)
 {
@@ -204,7 +201,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
 /* ================================================================ */
 #ifndef VL_VLAD_INSTANTIATING
 
-/** @brief Calculates the VLAD encoding of a set of vectors.
+/** @brief VLAD encoding of a set of vectors.
  ** @param enc output VLAD encoding (out).
  ** @param dataType the type of the input data (::VL_TYPE_DOUBLE or ::VL_TYPE_FLOAT).
  ** @param numData number of data vectors to encode.
@@ -213,39 +210,39 @@ VL_XCAT(_vl_vlad_encode_, SFX)
  ** @param data the data vectors to encode.
  ** @param dimension dimensionality of the data.
  ** @param assignments data to cluster soft assignments.
- ** @param flags further options.
+ ** @param flags options.
  **
- ** @a enc is the encoded output, a vector of size @a numClusters by
+ ** @a enc is the VLAD vector of size @a numClusters by
  ** @a dimension. @a means is a matrix with @a numClusters columns and
  ** @a dimension rows. @a data is the matrix of vectors to be encoded,
  ** with @a dimension rows and @a numData columns. @a assignments is a
  ** matrix with @a numClusters rows and @a numData columns.
  **
+ ** @a flag allows controlling further options:
+ ** ::VL_VLAD_FLAG_NORMALIZE_COMPONENTS, ::VL_VLAD_FLAG_SQUARE_ROOT,
+ ** ::VL_VLAD_FLAG_UNNORMALIZED, and ::VL_VLAD_FLAG_NORMALIZE_MASS.
+ **
  ** @sa @ref vlad
  **/
 
 void
-vl_vlad_encode (void * enc,
-                vl_type dataType,
-                vl_size numData,
-                void const * means,
-                vl_size dimension,
-                vl_size numClusters,
-                void const * data,
+vl_vlad_encode (void * enc, vl_type dataType,
+                void const * means, vl_size dimension, vl_size numClusters,
+                void const * data, vl_size numData,
                 void const * assignments,
                 int flags)
 {
   switch(dataType) {
     case VL_TYPE_FLOAT:
-      _vl_vlad_encode_f ((float *) enc, numData,
+      _vl_vlad_encode_f ((float *) enc,
                          (float const *) means, dimension, numClusters,
-                         (float const *) data,
+                         (float const *) data,  numData,
                          (float const *) assignments, flags) ;
       break;
     case VL_TYPE_DOUBLE:
-      _vl_vlad_encode_d ((double *) enc, numData,
+      _vl_vlad_encode_d ((double *) enc,
                          (double const *) means, dimension, numClusters,
-                         (double const *) data,
+                         (double const *) data, numData,
                          (double const *) assignments, flags) ;
       break;
     default:

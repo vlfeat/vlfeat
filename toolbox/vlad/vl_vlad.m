@@ -1,14 +1,16 @@
-% VL_VLAD   Compute the VLAD encoding
-%   ENC = VL_FISHER(X, MEANS, ASSIGNMENTS) computes the VLAD
+% VL_VLAD   VLAD feature encoding
+%   ENC = VL_VLAD(X, MEANS, ASSIGNMENTS) computes the VLAD
 %   encoding of the vectors X relative to cluster centers MEANS and
-%   vector-to-cluserr assignments ASSIGNMENTS.
+%   vector-to-cluster soft assignments ASSIGNMENTS.
 %
 %   X has one column per data vector (e.g. a SIFT descriptor), and
-%   MEANS has one column per cluster. X and MEANS have the same number
-%   of rows and data class, which can be either SINGLE or DOUBLE.
+%   MEANS has one column per component. Usually one has one component
+%   per KMeans cluster and MEANS are the KMeans centers. X and MEANS
+%   have the same number of rows and the data class, which can be
+%   either SINGLE or DOUBLE.
 %
 %   ASSIGNMENTS has as many rows as clusters and as many columns as
-%   X. Its columns are non-negative and shoudl sum to one,
+%   X. Its columns are non-negative and should sum to one,
 %   representing the soft assignment of the corresponding vector in X
 %   to each of the clusters. It is of the same class as X.
 %
@@ -34,11 +36,14 @@
 %     If specified, the signed square root function is applied to
 %     ENC before normalization.
 %
-%   See: http://www.vlfeat.org/doc/api/vlad.html.
+%   Verbose::
+%     Increase the verbosity level (may be specified multiple times).
+%
+%   See: http://www.vlfeat.org/doc/api/vlad.html, VL_HELP().
 
-% Authors: , David Novotny and Andrea Vedaldi
+% Authors: David Novotny and Andrea Vedaldi
 
-% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 David Novotny and Andrea Vedaldi
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under

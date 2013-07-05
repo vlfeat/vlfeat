@@ -51,12 +51,11 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
   vl_size numClusters ;
   vl_size dimension ;
   vl_size numData ;
+  int flags = 0 ;
 
   void const * means = NULL;
   void const * assignments = NULL;
   void const * data = NULL ;
-  void * enc = NULL;
-  int flags = 0 ;
   int verbosity = 0 ;
 
   vl_type dataType ;
@@ -72,12 +71,16 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
     vlmxError (vlmxErrInvalidArgument,
                "At least three arguments required.");
   }
+  if (nout > 1) {
+    vlmxError (vlmxErrInvalidArgument,
+               "At most one output argument.");
+  }
 
   if (!vlmxIsMatrix(IN(DATA),-1,-1)) {
     vlmxError (vlmxErrInvalidArgument,
                "DATA is not a dense matrix.") ;
   }
-  
+
   classID = mxGetClassID (IN(DATA)) ;
   switch (classID) {
     case mxSINGLE_CLASS: dataType = VL_TYPE_FLOAT ; break ;
@@ -98,15 +101,15 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
   dimension = mxGetM (IN(DATA)) ;
   numData = mxGetN (IN(DATA)) ;
   numClusters = mxGetN (IN(MEANS)) ;
-  
+
   if (dimension == 0) {
     vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero.") ;
   }
-  
+
   if (!vlmxIsMatrix(IN(MEANS), dimension, -1)) {
     vlmxError (vlmxErrInvalidArgument, "MEANS is not a matrix or does not have the right size.") ;
   }
-  
+
   if (!vlmxIsMatrix(IN(ASSIGNMENTS), numClusters, -1)) {
     vlmxError (vlmxErrInvalidArgument, "ASSIGNMENTS is not a matrix or does not have the right size.") ;
   }
@@ -143,24 +146,11 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("vl_vlad: square root: %s\n", VL_YESNO(flags & VL_VLAD_FLAG_SQUARE_ROOT)) ;
   }
 
-  /* -------------------------------------------------------------- */
-  /*                                                       Encoding */
-  /* -------------------------------------------------------------- */
-
-  switch(dataType) {
-    case VL_TYPE_FLOAT:
-      enc = (void*)vl_malloc(sizeof(float) * dimension * numClusters);
-      break;
-    case VL_TYPE_DOUBLE:
-      enc = (void*)vl_malloc(sizeof(double) * dimension * numClusters);
-      break;
-    default:
-      abort();
-      break;
-  }
-
   OUT(ENC) = mxCreateNumericMatrix (dimension * numClusters, 1, classID, mxREAL) ;
 
-  vl_vlad_encode(mxGetPr(OUT(ENC)),
-                 dataType, numData, means, dimension, numClusters, data, assignments, flags) ;
+  vl_vlad_encode (mxGetPr(OUT(ENC)), dataType,
+                  means, dimension, numClusters,
+                  data, numData,
+                  assignments,
+                  flags) ;
 }

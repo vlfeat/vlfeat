@@ -1,14 +1,32 @@
-% VL_FISHER retrieve fisher encoding of a given set of data
-%   [ENC] = VL_FISHER(X, MEANS, SIGMAS, WEIGHTS) 
-%   retrieves the fisher encoding of a set of vectors. Data vectors
-%   are stored in columns of matrix X, the means of individual
-%   clusters are also located in columns of the MEANS matrix.
-%   The columns of SIGMAS contain the diagonals of variance matrices.
-%   weights is a column vector consisting of the weights of individiual
-%   clusters.
+% VL_FISHER    Fisher vector feature encoding
+%   ENC = VL_FISHER(X, MEANS, COVARIANCES, PRIORS) computes the
+%   Fisher vector encoding of the vectors X relative to the Gaussian
+%   mixture model with means MEANS, covariances COVARIANCES, and pror
+%   mode probabilities PRIORS.
+%
+%   X has one column per data vector (e.g. a SIFT descriptor), and
+%   MEANS and COVARIANCES one column per GMM component (covariance
+%   matrices are assumed diagonal). PRIORS has size equal to the
+%   number of GMM components. All data must be of the smae class,
+%   either SINGLE or DOUBLE.
+%
+%   ENC is a vector of the same class of X of size equal to the
+%   product of the data dimension and the number of components.
+%
+%   By default, the standard Fisher vector is computed. VL_FISER()
+%   accepts the following options:
+%
+%   Normalized::
+%     If specified, L2 normalize the Fisher vector.
+%
+%   SquareRoot::
+%     If specified, the signed square root function is applied to
+%     ENC before normalization.
 %
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
+%
+%   See: http://www.vlfeat.org/doc/api/fisher.html, VL_HELP().
 
 % Authors: David Novotny, Andrea Vedaldi
 

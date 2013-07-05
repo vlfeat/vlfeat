@@ -48,14 +48,14 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_bool computeVlad = VL_FALSE;
 
   Init init = Rand;
-  
+
   //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
   //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
 
   TYPE * data = vl_malloc(sizeof(TYPE)*numData*dimension);
   TYPE * enc = vl_malloc(sizeof(TYPE)*2*dimension*numClusters);
   vl_uint32 * assign;
-  
+
   vl_set_num_threads(0) ; /* use the default number of threads */
 
   vl_rand_init (&rand) ;
@@ -182,15 +182,13 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   if(computeFisher) {
     vl_fisher_encode
-    (VL_F_TYPE,
-     data,
-     vl_gmm_get_means(gmm),
+    (enc, VL_F_TYPE,
+     vl_gmm_get_means(gmm), dimension, numClusters,
      vl_gmm_get_sigmas(gmm),
      vl_gmm_get_priors(gmm),
-     enc,
-     dimension,
-     numData,
-     numClusters);
+     data, numData,
+     VL_FISHER_FLAG_IMPROVED
+     ) ;
   }
 
   assign = vl_malloc(numData*numClusters*sizeof(vl_uint32));
@@ -204,9 +202,9 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     vl_free(enc);
     enc = vl_malloc(sizeof(TYPE)*dimension*numClusters);
     vl_vlad_encode
-    (enc, VL_F_TYPE, numData,
+    (enc, VL_F_TYPE,
      vl_gmm_get_means(gmm), dimension, numClusters,
-     data,
+     data, numData,
      assign,
      0) ;
   }
@@ -229,7 +227,7 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
 
   vl_size d, cIdx;
   vl_uindex i_d;
-  
+
   vl_size dimension = vl_gmm_get_dimension(gmm) ;
   vl_size numClusters = vl_gmm_get_num_clusters(gmm) ;
   vl_type dataType = vl_gmm_get_data_type(gmm) ;

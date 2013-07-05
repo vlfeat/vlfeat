@@ -43,13 +43,9 @@ the terms of the BSD license (see the COPYING file).
 /** @} */
 
 VL_EXPORT void vl_vlad_encode
-  (void * enc,
-   vl_type dataType,
-   vl_size numData,
-   void const * means,
-   vl_size dimension,
-   vl_size numClusters,
-   void const * data,
+  (void * enc, vl_type dataType,
+   void const * means, vl_size dimension, vl_size numClusters,
+   void const * data, vl_size numData,
    void const * assignments,
    int flags) ;
 

@@ -17,39 +17,42 @@ the terms of the BSD license (see the COPYING file).
 #include <string.h>
 #include <stdio.h>
 
-enum
-{
+enum {
   opt_verbose,
-  opt_multithreading
+  opt_normalized,
+  opt_square_root,
+  opt_improved,
+  opt_fast
 } ;
 
-
-vlmxOption  options [] =
-{
-  {"Verbose",           0,   opt_verbose             },
-  {"Multithreading",    1,   opt_multithreading      }
+vlmxOption  options [] = {
+  {"Verbose",             0,   opt_verbose                  },
+  {"Normalized",          0,   opt_normalized               },
+  {"SquareRoot",          0,   opt_square_root              },
+  {"Improved",            0,   opt_improved                 },
+  {"Fast",                0,   opt_fast                     }
 } ;
 
 /* driver */
 void
 mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
 {
-  enum {IN_DATA = 0, IN_MEANS, IN_SIGMAS, IN_WEIGHTS, IN_END} ;
+  enum {IN_DATA = 0, IN_MEANS, IN_COVARIANCES, IN_PRIORS, IN_END} ;
   enum {OUT_ENC} ;
 
   int opt ;
   int next = IN_END ;
   mxArray const  *optarg ;
-  
+
   vl_size numClusters = 10;
   vl_size dimension ;
   vl_size numData ;
+  int flags = 0 ;
 
-  void * sigmas = NULL;
+  void * covariances = NULL;
   void * means = NULL;
-  void * weights = NULL;
+  void * priors = NULL;
   void * data = NULL ;
-  void * enc = NULL;
 
   int verbosity = 0 ;
 
@@ -62,61 +65,62 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
    *                                               Check the arguments
    * -------------------------------------------------------------- */
 
-  if (nin < 4)
-  {
+  if (nin < 4) {
     vlmxError (vlmxErrInvalidArgument,
                "At least four arguments required.");
   }
-
-  classID = mxGetClassID (IN(DATA)) ;
-  switch (classID)
-  {
-  case mxSINGLE_CLASS:
-    dataType = VL_TYPE_FLOAT ;
-    break ;
-  case mxDOUBLE_CLASS:
-    dataType = VL_TYPE_DOUBLE ;
-    break ;
-  default:
+  if (nout > 1) {
     vlmxError (vlmxErrInvalidArgument,
-               "DATA must be of class SINGLE or DOUBLE") ;
-    abort() ;
+               "At most one output argument.");
   }
 
-  if( mxGetClassID (IN(MEANS)) != classID ||
-      mxGetClassID (IN(SIGMAS)) != classID ||
-      mxGetClassID (IN(WEIGHTS)) != classID) {
-    vlmxError (vlmxErrInvalidArgument,
-               "MEANS, SIGMAS, WEIGHTS must be of same class as DATA.") ;
+  classID = mxGetClassID (IN(DATA)) ;
+  switch (classID) {
+    case mxSINGLE_CLASS: dataType = VL_TYPE_FLOAT ; break ;
+    case mxDOUBLE_CLASS: dataType = VL_TYPE_DOUBLE ; break ;
+    default:
+      vlmxError (vlmxErrInvalidArgument,
+                 "DATA is neither of class SINGLE or DOUBLE.") ;
+  }
+
+  if (mxGetClassID (IN(MEANS)) != classID) {
+    vlmxError(vlmxErrInvalidArgument, "MEANS is not of the same class as DATA.") ;
+  }
+  if (mxGetClassID (IN(COVARIANCES)) != classID) {
+    vlmxError(vlmxErrInvalidArgument, "COVARIANCES is not of the same class as DATA.") ;
+  }
+  if (mxGetClassID (IN(PRIORS)) != classID) {
+    vlmxError(vlmxErrInvalidArgument, "PRIORS is not of the same class as DATA.") ;
   }
 
   dimension = mxGetM (IN(DATA)) ;
   numData = mxGetN (IN(DATA)) ;
   numClusters = mxGetN (IN(MEANS)) ;
 
-  if (dimension == 0)
-  {
-    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero") ;
+  if (dimension == 0) {
+    vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero.") ;
+  }
+  if (!vlmxIsMatrix(IN(MEANS), dimension, numClusters)) {
+    vlmxError (vlmxErrInvalidArgument, "MEANS is not a matrix or does not have the right size.") ;
+  }
+  if (!vlmxIsMatrix(IN(COVARIANCES), dimension, numClusters)) {
+    vlmxError (vlmxErrInvalidArgument, "COVARIANCES is not a matrix or does not have the right size.") ;
+  }
+  if (!vlmxIsVector(IN(PRIORS), numClusters)) {
+    vlmxError (vlmxErrInvalidArgument, "PRIORS is not a vector or does not have the right size.") ;
+  }
+  if (!vlmxIsMatrix(IN(DATA), dimension, numData)) {
+    vlmxError (vlmxErrInvalidArgument, "DATA is not a matrix or does not have the right size.") ;
   }
 
-  if(mxGetM(IN(DATA)) != mxGetM(IN(MEANS)) || mxGetM(IN(SIGMAS)) != mxGetM(IN(DATA))) {
-    vlmxError (vlmxErrInvalidArgument,"MEANS, SIGMAS, must have the same dimensionality as DATA.") ;
-  }
-
-  if(mxGetM(IN(WEIGHTS)) != mxGetN(IN(MEANS)) || mxGetM(IN(WEIGHTS)) != mxGetN(IN(SIGMAS))) {
-    vlmxError (vlmxErrInvalidArgument,"WEIGHTS mus have the same number of rows as MEANS and SIGMAS columns.") ;
-  }
-
-  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0)
-  {
-    switch (opt)
-    {
-      case opt_verbose :
-        ++ verbosity ;
-        break ;
-      default :
-        abort() ;
-        break ;
+  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+    switch (opt) {
+      case opt_verbose : ++ verbosity ; break ;
+      case opt_normalized: flags |= VL_FISHER_FLAG_NORMALIZED ; break ;
+      case opt_square_root: flags |= VL_FISHER_FLAG_SQUARE_ROOT ; break ;
+      case opt_improved: flags |= VL_FISHER_FLAG_IMPROVED ; break ;
+      case opt_fast: flags |= VL_FISHER_FLAG_FAST ; break ;
+      default : abort() ;
     }
   }
 
@@ -126,46 +130,30 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
 
   data = mxGetPr(IN(DATA)) ;
   means = mxGetPr(IN(MEANS)) ;
-  sigmas = mxGetPr(IN(SIGMAS)) ;
-  weights = mxGetPr(IN(WEIGHTS)) ;
+  covariances = mxGetPr(IN(COVARIANCES)) ;
+  priors = mxGetPr(IN(PRIORS)) ;
 
-  if (verbosity)
-  {
-      mexPrintf("Fisher encoding ...\n") ;
+  if (verbosity) {
+    mexPrintf("vl_fisher: num data: %d\n", numData) ;
+    mexPrintf("vl_fisher: num clusters: %d\n", numClusters) ;
+    mexPrintf("vl_fisher: data dimension: %d\n", dimension) ;
+    mexPrintf("vl_fisher: code dimension: %d\n", numClusters * dimension) ;
+    mexPrintf("vl_fisher: normalized: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_NORMALIZED)) ;
+    mexPrintf("vl_fisher: square root: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_SQUARE_ROOT)) ;
+    mexPrintf("vl_fisher: normalized: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_NORMALIZED)) ;
+    mexPrintf("vl_fisher: fast: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_FAST)) ;
   }
 
   /* -------------------------------------------------------------- */
   /*                                                       Encoding */
   /* -------------------------------------------------------------- */
 
-  switch(dataType){
-      case VL_TYPE_FLOAT:
-          enc = (void*)vl_malloc(sizeof(float) * dimension * numClusters * 2);
-          break;
-      case VL_TYPE_DOUBLE:
-          enc = (void*)vl_malloc(sizeof(double) * dimension * numClusters * 2);
-          break;
-      default:
-          abort();
-          break;
-  }
-
-  vl_fisher_encode (dataType,
-                    data,
-                    means,
-                    sigmas,
-                    weights,
-                    enc,
-                    dimension,
-                    numData,
-                    numClusters) ;
-
   OUT(ENC) = mxCreateNumericMatrix (dimension * numClusters * 2, 1, classID, mxREAL) ;
 
-  /* copy encodings */
-  memcpy (mxGetData(OUT(ENC)),
-          enc,
-          vl_get_type_size (dataType) * 2 * dimension * numClusters) ;
-
-
+  vl_fisher_encode (mxGetData(OUT(ENC)), dataType,
+                    means, dimension, numClusters,
+                    covariances,
+                    priors,
+                    data, numData,
+                    flags) ;
 }

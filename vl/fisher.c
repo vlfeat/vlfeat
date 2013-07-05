@@ -86,11 +86,11 @@ q_{ik} \left[ \left(\frac{x_{ji} - \mu_{ik}}{\sigma_j}\right)^2 - 1 \right].
 @f}
 
 where $j=1,2,\dots,D$ spans the vector dimensions. The FV of image $I$
-is the stacking of the vectors $\bu_k$ and $\bv_k$ for each of the $K$
-modes in the Gaussian mixtures:
+is the stacking of the vectors $\bu_k$ and then of the vectors
+$\bv_k$ for each of the $K$ modes in the Gaussian mixtures:
 
 \[
- \Phi(I) = \begin{bmatrix} \vdots \\ \bu_k \\ \bv_k \\ \vdots \end{bmatrix}.
+ \Phi(I) = \begin{bmatrix} \vdots \\ \bu_k \\ \vdots \\ \bv_k \\ \vdots \end{bmatrix}.
 \]
 
 The *improved* Fisher Vector @cite{perronnin10improving} (IFV) improves the
@@ -280,7 +280,7 @@ $\bx$:
  \Phi_{\mu_{jk}}(\bx) = H_{\mu_{jk}}^{-\frac{1}{2}} q_k(\bx) g(\bx|\mu_{jk})
 = q_k(\bx) \frac{x_j - \mu_{jk}}{\sqrt{\pi_k}\sigma_{jk}},
 \qquad
- \Phi_{\sigma^2_{jk}}(\bx) = 
+ \Phi_{\sigma^2_{jk}}(\bx) =
 \frac{q_k(\bx)}{\sqrt{2 \pi_k}}
 \left(
 \left(\frac{x_j - \mu_{jk}}{\sigma_{jk}}\right)^2
@@ -319,14 +319,12 @@ factor). Note that:
 
 static void
 VL_XCAT(_vl_fisher_encode_, SFX)
-(TYPE const * data,
- TYPE const * means,
- TYPE const * sigmas,
- TYPE const * weights,
- TYPE * enc,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters)
+(TYPE * enc,
+ TYPE const * means, vl_size dimension, vl_size numClusters,
+ TYPE const * covariances,
+ TYPE const * priors,
+ TYPE const * data, vl_size numData,
+ int flags)
 {
   vl_size dim;
   vl_index i_cl, i_d;
@@ -335,7 +333,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   TYPE * posteriors;
   TYPE * logSigmas;
   TYPE * logWeights;
-  TYPE halfDimLog2Pi = (dimension/2.0)*log(2.0*VL_PI);
+//  TYPE halfDimLog2Pi = (dimension/2.0)*log(2.0*VL_PI);
 
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahal) ;
@@ -345,22 +343,22 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
   logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
   logWeights = vl_malloc(sizeof(TYPE) * numClusters);
-  invSigma = vl_malloc(dimension*sizeof(TYPE)*numClusters);
-  sqrtInvSigma = vl_malloc(dimension*sizeof(TYPE)*numClusters);
-  posteriors = vl_malloc(numData*numClusters*sizeof(TYPE));
+  invSigma = vl_malloc(dimension * sizeof(TYPE) * numClusters);
+  sqrtInvSigma = vl_malloc(dimension * sizeof(TYPE) * numClusters);
+  posteriors = vl_malloc(numData * numClusters * sizeof(TYPE));
 
-  memset(enc, 0, sizeof(TYPE) * 2 * dimension * numClusters);
+  memset(enc, 0, sizeof(TYPE) * 2 * dimension * numClusters) ;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i_cl,dim) num_threads(vl_get_max_threads())
 #endif
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
     TYPE logSigma = 0;
-    logWeights[i_cl] = log(weights[i_cl]) ;
+    logWeights[i_cl] = log(priors[i_cl]) ;
 
     for(dim = 0; dim < dimension; dim++) {
-      logSigma += log(sigmas[i_cl*dimension + dim]);
-      invSigma[i_cl*dimension + dim] = 1/(sigmas[i_cl*dimension + dim]);
+      logSigma += log(covariances[i_cl*dimension + dim]);
+      invSigma[i_cl*dimension + dim] = 1/(covariances[i_cl*dimension + dim]);
       sqrtInvSigma[i_cl*dimension + dim] = sqrt(invSigma[i_cl*dimension + dim]);
     }
 
@@ -372,35 +370,35 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #endif
   for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
     TYPE clusterPosteriorsSum = 0;
-    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D);
+    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D); /* log p can be negative */
 
     for (i_cl = 0 ; i_cl < (signed)numClusters ; i_cl++) {
-      posteriors[i_cl * numData + i_d] = logWeights[i_cl];
-      posteriors[i_cl * numData + i_d] -= halfDimLog2Pi;
-      posteriors[i_cl * numData + i_d] -= 0.5*logSigmas[i_cl];
-      posteriors[i_cl * numData + i_d] -= 0.5 * distFn (dimension,
-                                                        data + i_d * dimension,
-                                                        means + i_cl * dimension,
-                                                        invSigma + i_cl * dimension);
-      if(posteriors[i_cl * numData + i_d] > maxPosterior) {
-        maxPosterior = posteriors[i_cl * numData + i_d];
-      }
+      TYPE p =
+      logWeights[i_cl]
+      - 0.5 * logSigmas[i_cl]
+      - 0.5 * distFn (dimension,
+                      data + i_d * dimension,
+                      means + i_cl * dimension,
+                      invSigma + i_cl * dimension);
+      maxPosterior = VL_MAX(p, maxPosterior) ;
+      posteriors[i_cl + i_d * numClusters] = p ;
     }
 
     for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      posteriors[i_cl * numData + i_d] -= maxPosterior;
-      posteriors[i_cl * numData + i_d] = exp(posteriors[i_cl * numData + i_d]);
-      clusterPosteriorsSum += posteriors[i_cl * numData + i_d];
+      TYPE p = posteriors[i_cl + i_d * numClusters] ;
+      p = exp(p - maxPosterior) ;
+      if (flags & VL_FISHER_FLAG_FAST && p < 1e-3) { p = 0 ; }
+      clusterPosteriorsSum += p ;
+      posteriors[i_cl + i_d * numClusters] = p ;
     }
 
     for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      posteriors[i_cl * numData + i_d] /= clusterPosteriorsSum;
+      posteriors[i_cl + i_d * numClusters] /= clusterPosteriorsSum ;
     }
   }
 
-
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl) num_threads(vl_get_max_threads())
+#pragma omp parallel for default(shared) private(i_cl,i_d,dim) num_threads(vl_get_max_threads())
 #endif
   for(i_cl = 0; i_cl < (signed)numClusters; ++ i_cl) {
     TYPE uprefix;
@@ -409,28 +407,55 @@ VL_XCAT(_vl_fisher_encode_, SFX)
     TYPE * uk = enc + i_cl*dimension ;
     TYPE * vk = enc + i_cl*dimension + numClusters*dimension ;
 
-    uprefix = 1/(numData*sqrt(weights[i_cl]));
-    vprefix = 1/(numData*sqrt(2*weights[i_cl]));
-
     for(i_d = 0; i_d < (signed)numData; i_d++) {
+      TYPE p = posteriors[i_cl + i_d * numClusters] ;
+      if (p == 0) continue ;
       for(dim = 0; dim < dimension; dim++) {
-        TYPE diff = (data[i_d*dimension + dim]-means[i_cl*dimension + dim]);
-
-        *(uk + dim) += posteriors[i_cl*numData+i_d] * sqrtInvSigma[i_cl*dimension + dim] * diff;
-        *(vk + dim) += posteriors[i_cl*numData+i_d] * (invSigma[i_cl*dimension + dim] * diff * diff - 1);
+        TYPE diff = data[i_d*dimension + dim] - means[i_cl*dimension + dim] ;
+        diff *= sqrtInvSigma[i_cl*dimension + dim] ;
+        *(uk + dim) += p * diff ;
+        *(vk + dim) += p * (diff * diff - 1);
       }
     }
+
+    uprefix = 1/(numData*sqrt(priors[i_cl]));
+    vprefix = 1/(numData*sqrt(2*priors[i_cl]));
 
     for(dim = 0; dim < dimension; dim++) {
       *(uk + dim) = *(uk + dim) * uprefix;
       *(vk + dim) = *(vk + dim) * vprefix;
     }
   }
+
   vl_free(invSigma);
   vl_free(sqrtInvSigma);
   vl_free(logSigmas);
   vl_free(logWeights);
   vl_free(posteriors);
+
+  if (flags & VL_FISHER_FLAG_SQUARE_ROOT) {
+    for(dim = 0; dim < 2 * dimension * numClusters ; dim++) {
+      TYPE z = enc [dim] ;
+      if (z >= 0) {
+        enc[dim] = VL_XCAT(vl_sqrt_, SFX)(z) ;
+      } else {
+        enc[dim] = - VL_XCAT(vl_sqrt_, SFX)(- z) ;
+      }
+    }
+  }
+
+  if (flags & VL_FISHER_FLAG_NORMALIZED) {
+    TYPE n = 0 ;
+    for(dim = 0 ; dim < 2 * dimension * numClusters ; dim++) {
+      TYPE z = enc [dim] ;
+      n += z * z ;
+    }
+    n = VL_XCAT(vl_sqrt_, SFX)(n) ;
+    n = VL_MAX(n, 1e-12) ;
+    for(dim = 0 ; dim < 2 * dimension * numClusters ; dim++) {
+      enc[dim] /= n ;
+    }
+  }
 }
 
 /* VL_FISHER_INSTANTIATING */
@@ -455,52 +480,60 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 /* ================================================================ */
 #ifndef VL_FISHER_INSTANTIATING
 
-/** @brief Calculates fisher vector for a given feature set
- ** @param dataType the type of the input data (::VL_TYPE_DOUBLE or ::VL_TYPE_FLOAT)
- ** @param data set of features
- ** @param means gaussian mixture means
- ** @param sigmas diagonals of gaussian mixture covariance matrices
- ** @param weights weights of individual gaussians in the mixture
- ** @param enc output fisher vector
- ** @param dimension dimensionality of the data
- ** @param numData number of data vectors
- ** @param numClusters number of gaussians in the mixture
+/** @brief Fisher vector encoding of a set of vectors.
+ ** @param dataType the type of the input data (::VL_TYPE_DOUBLE or ::VL_TYPE_FLOAT).
+ ** @param enc Fisher vector (output).
+ ** @param means Gaussian mixture means.
+ ** @param dimension dimension of the data.
+ ** @param numClusters number of Gaussians mixture components.
+ ** @param covariances Gaussian mixture diagonal covariances.
+ ** @param priors Gaussian mixture prior probabilities.
+ ** @param data vectors to encode.
+ ** @param numData number of vectors to encode.
+ ** @param flags options.
+ **
+ ** @a means and @a covariances have @a dimension rows and @a numCluster columns.
+ ** @a priors is a vector of size @a numCluster. @a data has @a dimension
+ ** rows and @a numData columns. @a enc is a vecotr of size equal
+ ** to twice the product of @a dimension and @a numClusters.
+ ** All these vectors and matrices have the same class, as specified
+ ** by @a dataType.
+ **
+ ** @a flag can be used to control several options:
+ ** ::VL_FISHER_FLAG_SQUARE_ROOT, ::VL_FISHER_FLAG_NORMALIZE,
+ ** ::VL_FISHER_FLAG_IMPROVED.
+ **
+ ** @sa @ref fisher
  **/
 
 VL_EXPORT void
 vl_fisher_encode
-(vl_type dataType,
- void const * data,
- void const * means,
- void const * sigmas,
- void const * weights,
- void * enc,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters)
+(void * enc, vl_type dataType,
+ void const * means, vl_size dimension, vl_size numClusters,
+ void const * covariances,
+ void const * priors,
+ void const * data,  vl_size numData,
+ int flags
+)
 {
   switch(dataType) {
     case VL_TYPE_FLOAT:
       _vl_fisher_encode_f
-      ((float const *) data,
-       (float const *) means,
-       (float const *) sigmas,
-       (float const *) weights,
-       (float *) enc,
-       dimension,
-       numData,
-       numClusters);
+      ((float *) enc,
+       (float const *) means, dimension, numClusters,
+       (float const *) covariances,
+       (float const *) priors,
+       (float const *) data, numData,
+       flags);
       break;
     case VL_TYPE_DOUBLE:
       _vl_fisher_encode_d
-      ((double const *) data,
-       (double const *) means,
-       (double const *) sigmas,
-       (double const *) weights,
-       (double *) enc,
-       dimension,
-       numData,
-       numClusters);
+      ((double *) enc,
+       (double const *) means, dimension, numClusters,
+       (double const *) covariances,
+       (double const *) priors,
+       (double const *) data, numData,
+       flags);
       break;
     default:
       abort();
