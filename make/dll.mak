@@ -23,6 +23,7 @@ DLL_NAME = vl
 DLL_CFLAGS  = $(STD_CFLAGS)
 DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
 DLL_CFLAGS += $(call if-like,%_sse2,$*,-msse2)
+DLL_CFLAGS += $(call if-like,%_avx,$*,-mavx)
 DLL_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
 DLL_LDFLAGS += -lm

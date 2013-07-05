@@ -96,14 +96,14 @@ vl_gmm_set_means
  vl_size dimension);
 
 VL_EXPORT void
-vl_gmm_set_sigmas
+vl_gmm_set_covariances
 (VlGMM * self,
- void * sigmas,
+ void * covariances,
  vl_size numClusters,
  vl_size dimension);
 
 VL_EXPORT void
-vl_gmm_set_weights
+vl_gmm_set_priors
 (VlGMM * self,
  void * weights,
  vl_size numClusters);
@@ -134,13 +134,14 @@ VL_EXPORT void vl_gmm_set_sigma_lower_bound (VlGMM * self, double lowbound);
  ** @{
  **/
 VL_EXPORT void const * vl_gmm_get_means (VlGMM const * self);
-VL_EXPORT void const * vl_gmm_get_sigmas (VlGMM const * self);
+VL_EXPORT void const * vl_gmm_get_covariances (VlGMM const * self);
 VL_EXPORT void const * vl_gmm_get_priors (VlGMM const * self);
 VL_EXPORT void const * vl_gmm_get_posteriors (VlGMM const * self);
 VL_EXPORT vl_type vl_gmm_get_data_type (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_dimension (VlGMM const * self);
-VL_EXPORT vl_size vl_gmm_get_num_clusters (VlGMM const * self);
+VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_data (VlGMM const * self);
+VL_EXPORT vl_size vl_gmm_get_num_clusters (VlGMM const * self);
 VL_EXPORT double vl_gmm_get_loglikelyhood (VlGMM const * self);
 VL_EXPORT int vl_gmm_get_verbosity (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_max_num_iterations (VlGMM const * self);

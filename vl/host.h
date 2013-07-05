@@ -560,6 +560,7 @@ typedef struct _VlX86CpuInfo
     char string [0x20] ;
     vl_uint32 words [0x20 / 4] ;
   } vendor ;
+  vl_bool hasAVX ;
   vl_bool hasSSE42 ;
   vl_bool hasSSE41 ;
   vl_bool hasSSE3 ;

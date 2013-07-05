@@ -170,6 +170,7 @@ the terms of the BSD license (see the COPYING file).
 
 #include "mathop.h"
 #include "mathop_sse2.h"
+ #include "mathop_avx.h"
 #include <math.h>
 
 #undef FLT
@@ -396,16 +397,22 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {
-      #ifdef __AVX__
-      case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_avx_,             SFX) ; break ;
-      #else
       case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_sse2_,             SFX) ; break ;
-      #endif
       case VlDistanceL1    : function = VL_XCAT(_vl_distance_l1_sse2_,             SFX) ; break ;
       case VlDistanceChi2  : function = VL_XCAT(_vl_distance_chi2_sse2_,           SFX) ; break ;
       case VlKernelL2      : function = VL_XCAT(_vl_kernel_l2_sse2_,               SFX) ; break ;
       case VlKernelL1      : function = VL_XCAT(_vl_kernel_l1_sse2_,               SFX) ; break ;
       case VlKernelChi2    : function = VL_XCAT(_vl_kernel_chi2_sse2_,             SFX) ; break ;
+      default: break ;
+    }
+  }
+#endif
+
+#ifndef VL_DISABLE_AVX
+  /* if an AVX implementation is available, use it */
+  if (vl_cpu_has_avx() && vl_get_simd_enabled()) {
+    switch (type) {  
+      case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_avx_,             SFX) ; break ;
       default: break ;
     }
   }
@@ -421,7 +428,7 @@ VL_XCAT(vl_get_vector_3_comparison_function_, SFX)(VlVectorComparisonType type)
 {
   COMPARISONFUNCTION3_TYPE function = 0 ;
   switch (type) {
-    case VlDistanceMahal     : function = VL_XCAT(_vl_distance_mahalanobis_sq_, SFX) ; break ;
+    case VlDistanceMahalanobis : function = VL_XCAT(_vl_distance_mahalanobis_sq_, SFX) ; break ;
     default: abort() ;
   }
 
@@ -429,11 +436,17 @@ VL_XCAT(vl_get_vector_3_comparison_function_, SFX)(VlVectorComparisonType type)
   /* if a SSE2 implementation is available, use it */
   if (vl_cpu_has_sse2() && vl_get_simd_enabled()) {
     switch (type) {
-      #ifdef __AVX__
-      case VlDistanceMahal : function = VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX) ; break ;
-      #else
-      case VlDistanceMahal : function = VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX) ; break ;
-      #endif
+      case VlDistanceMahalanobis : function = VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX) ; break ;
+      default: break ;
+    }
+  }
+#endif
+
+#ifndef VL_DISABLE_AVX
+  /* if an AVX implementation is available, use it */
+  if (vl_cpu_has_avx() && vl_get_simd_enabled()) {
+    switch (type) {  
+      case VlDistanceMahalanobis : function = VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX) ; break ;
       default: break ;
     }
   }

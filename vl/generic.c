@@ -1007,13 +1007,27 @@ vl_set_simd_enabled (vl_bool x)
 }
 
 /** @brief Are SIMD instructons enabled?
- ** @return @c true is SIMD instructions are enabled.
+ ** @return @c true if SIMD instructions are enabled.
  **/
 
 vl_bool
 vl_get_simd_enabled (void)
 {
   return vl_get_state()->simdEnabled ;
+}
+
+/** @brief Check for AVX instruction set
+ ** @return @c true if AVX is present.
+ **/
+
+vl_bool
+vl_cpu_has_avx (void)
+{
+#if defined(VL_ARCH_IX86) || defined(VL_ARCH_X64) || defined(VL_ARCH_IA64)
+  return vl_get_state()->cpuInfo.hasAVX ;
+#else
+  return VL_FALSE ;
+#endif
 }
 
 /** @brief Check for SSE3 instruction set

@@ -107,8 +107,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
         initWeights[cIdx] = (TYPE)vl_rand_real3(&rand);
       }
 
-      vl_gmm_set_weights(gmm,initWeights,numClusters);
-      vl_gmm_set_sigmas(gmm,initSigmas,numClusters,dimension);
+      vl_gmm_set_priors(gmm,initWeights,numClusters);
+      vl_gmm_set_covariances(gmm,initSigmas,numClusters,dimension);
       vl_gmm_set_means(gmm,initMeans,numClusters,dimension);
 
       break;
@@ -185,7 +185,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     (VL_F_TYPE,
      data,
      vl_gmm_get_means(gmm),
-     vl_gmm_get_sigmas(gmm),
+     vl_gmm_get_covariances(gmm),
      vl_gmm_get_priors(gmm),
      enc,
      dimension,
@@ -233,7 +233,7 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
   vl_size dimension = vl_gmm_get_dimension(gmm) ;
   vl_size numClusters = vl_gmm_get_num_clusters(gmm) ;
   vl_type dataType = vl_gmm_get_data_type(gmm) ;
-  double const * sigmas = vl_gmm_get_sigmas(gmm) ;
+  double const * sigmas = vl_gmm_get_covariances(gmm) ;
   double const * means = vl_gmm_get_means(gmm) ;
   double const * weights = vl_gmm_get_priors(gmm) ;
   double const * posteriors = vl_gmm_get_posteriors(gmm) ;

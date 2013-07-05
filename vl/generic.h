@@ -103,6 +103,7 @@ VL_EXPORT char const * vl_get_version_string (void) ;
 VL_EXPORT char * vl_configuration_to_string_copy (void) ;
 VL_EXPORT void vl_set_simd_enabled (vl_bool x) ;
 VL_EXPORT vl_bool vl_get_simd_enabled (void) ;
+VL_EXPORT vl_bool vl_cpu_has_avx (void) ;
 VL_EXPORT vl_bool vl_cpu_has_sse3 (void) ;
 VL_EXPORT vl_bool vl_cpu_has_sse2 (void) ;
 VL_EXPORT vl_size vl_get_num_cpus (void) ;

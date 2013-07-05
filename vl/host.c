@@ -460,6 +460,7 @@ _vl_x86cpu_info_init (VlX86CpuInfo *self)
     self->hasSSE3  = info[2] & (1 <<  0) ;
     self->hasSSE41 = info[2] & (1 << 19) ;
     self->hasSSE42 = info[2] & (1 << 20) ;
+    self->hasAVX   = info[2] & (1 << 28) ;
   }
 }
 
@@ -480,7 +481,8 @@ _vl_x86cpu_info_to_string_copy (VlX86CpuInfo const *self)
                       self->hasSSE2  ? " SSE2" : "",
                       self->hasSSE3  ? " SSE3" : "",
                       self->hasSSE41 ? " SSE41" : "",
-                      self->hasSSE42 ? " SSE42" : "") ;
+                      self->hasSSE42 ? " SSE42" : "",
+                      self->hasAVX   ? " AVX" : "") ;
     length += 1 ;
   }
   return string ;
