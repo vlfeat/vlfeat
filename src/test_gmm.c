@@ -28,10 +28,10 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   double sigmaLowerBound = 0.000001;
 
-  vl_size numData = 100000;
+  vl_size numData = 1000;
   vl_size dimension = 3;
-  vl_size numClusters = 500;
-  vl_size maxiter = 9;
+  vl_size numClusters = 20;
+  vl_size maxiter = 5;
   vl_size maxrep = 1;
 
   vl_size maxiterKM = 5;
@@ -47,7 +47,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_bool computeFisher = VL_TRUE;
   vl_bool computeVlad = VL_FALSE;
 
-  Init init = Rand;
+  Init init = KMeans;
   
   //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
   //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";

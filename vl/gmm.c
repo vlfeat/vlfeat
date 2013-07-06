@@ -334,7 +334,8 @@ struct _VlGMM
   double sigmaLowBound ;              /**< Lower bound on the diagonal covariance values. */
   VlGMMInitialization initialization; /**< Initialization option */
   VlKMeans * kmeansInit;              /**< Kmeans object for initialization of gaussians */
-  double LL ;                         /**< current solution loglikelihood */
+  double LL ;                         /**< Current solution loglikelihood */
+  vl_bool freeKmeansInitObjectAtDisposal; /**< Indicates whether a user provided the kmeans initialization object */
 } ;
 
 /* ---------------------------------------------------------------- */
@@ -365,6 +366,7 @@ vl_gmm_new (vl_type dataType)
   self->means = NULL ;
   self->posteriors = NULL ;
   self->kmeansInit = NULL ;
+  self->freeKmeansInitObjectAtDisposal = VL_FALSE;
   return self ;
 }
 
@@ -389,6 +391,11 @@ vl_gmm_reset (VlGMM * self)
   if (self->covariances) vl_free(self->covariances) ;
   if (self->priors) vl_free(self->priors) ;
   if (self->posteriors) vl_free(self->posteriors) ;
+  if (self->kmeansInit && self->freeKmeansInitObjectAtDisposal) {
+    vl_kmeans_delete(self->kmeansInit);
+    self->kmeansInit = NULL;
+    VL_PRINT("reset kmeans delete\n");
+  }
 
   self->means = NULL ;
   self->covariances = NULL ;
@@ -410,6 +417,9 @@ vl_gmm_delete (VlGMM * self)
   if(self->covariances) vl_free(self->covariances);
   if(self->priors) vl_free(self->priors);
   if(self->posteriors) vl_free(self->posteriors);
+  if(self->kmeansInit && self->freeKmeansInitObjectAtDisposal) {
+    vl_kmeans_delete(self->kmeansInit);
+  }
   vl_free(self);
 }
 
@@ -647,6 +657,7 @@ void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans)
     vl_kmeans_delete(self->kmeansInit);
   }
   self->kmeansInit = kmeans;
+  self->freeKmeansInitObjectAtDisposal = VL_FALSE;
 }
 
 /** @brief Get lower bound on sigma diagonals.
@@ -822,7 +833,8 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
  TYPE const * data,
  vl_size dimension,
  vl_size numData,
- vl_size numClusters)
+ vl_size numClusters,
+ VlKMeans * kmeansInit)
 {
   vl_size i_d, i_cl, dim;
 
@@ -845,25 +857,33 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
   VL_XCAT(_vl_gmm_compute_init_sigma_, SFX) (self, data, initSigma, dimension, numData);
 
   /* if user did not provide kmeans object, create a default one */
-  if(self->kmeansInit == NULL) {
-    vl_size ncomparisons = numData/4;
-    vl_size niter = 5;
-    vl_size ntrees = 1;
-    vl_size nrepetitions = 1;
-    VlKMeansAlgorithm algorithm = VlKMeansANN;
-    VlKMeansInitialization initialization = VlKMeansRandomSelection;
+  if(kmeansInit == NULL) {
+    if(self->kmeansInit == NULL) {
+      vl_size ncomparisons = numData/4;
+      vl_size niter = 5;
+      vl_size ntrees = 1;
+      vl_size nrepetitions = 1;
+      VlKMeansAlgorithm algorithm = VlKMeansANN;
+      VlKMeansInitialization initialization = VlKMeansRandomSelection;
 
-    VlKMeans * kmeansInit = vl_kmeans_new(self->dataType,VlDistanceL2);
+      VlKMeans * kmeansInitDefault = vl_kmeans_new(self->dataType,VlDistanceL2);
 
-    vl_kmeans_set_initialization(kmeansInit, initialization);
-    vl_kmeans_set_max_num_iterations (kmeansInit, niter) ;
-    vl_kmeans_set_max_num_comparisons (kmeansInit, ncomparisons) ;
-    vl_kmeans_set_num_trees (kmeansInit, ntrees);
-    vl_kmeans_set_algorithm (kmeansInit, algorithm);
-    vl_kmeans_set_num_repetitions(kmeansInit, nrepetitions);
-    vl_kmeans_set_verbosity	(kmeansInit, self->verbosity);
+      vl_kmeans_set_initialization(kmeansInitDefault, initialization);
+      vl_kmeans_set_max_num_iterations (kmeansInitDefault, niter) ;
+      vl_kmeans_set_max_num_comparisons (kmeansInitDefault, ncomparisons) ;
+      vl_kmeans_set_num_trees (kmeansInitDefault, ntrees);
+      vl_kmeans_set_algorithm (kmeansInitDefault, algorithm);
+      vl_kmeans_set_num_repetitions(kmeansInitDefault, nrepetitions);
+      vl_kmeans_set_verbosity	(kmeansInitDefault, self->verbosity);
 
+      self->kmeansInit = kmeansInitDefault;
+      self->freeKmeansInitObjectAtDisposal = VL_TRUE;
+    } else {
+      self->freeKmeansInitObjectAtDisposal = VL_FALSE;
+    }
+  } else {
     self->kmeansInit = kmeansInit;
+    self->freeKmeansInitObjectAtDisposal = VL_FALSE;
   }
 
   vl_kmeans_cluster(self->kmeansInit, data, dimension, numData, numClusters);
@@ -877,7 +897,6 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
       *((TYPE*)self->means + assignments[i_d] * dimension + dim) += data[i_d*dimension + dim];
     }
   }
-
 
   for(i_cl = 0; i_cl < numClusters; i_cl++) {
     *((TYPE*)self->priors + i_cl) = (TYPE)clusterMasses[i_cl]/(TYPE)numData;
@@ -910,6 +929,7 @@ VL_XCAT(_vl_gmm_kmeans_init_mixture_, SFX)
   }
   vl_free(clusterMasses);
   vl_free(assignments);
+  vl_free(initSigma);
 }
 
 /* ---------------------------------------------------------------- */
@@ -1217,6 +1237,7 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
           calculated = VL_TRUE;
         }
         #endif
+
         if(!calculated) {
           for (dim = 0 ; dim < self->dimension ; ++dim) {
             TYPE diff = data[i_d * self->dimension + dim] - oldMeans[i_cl*self->dimension + dim];
@@ -1499,13 +1520,14 @@ vl_gmm_new_copy (VlGMM const * gmm)
  **/
 
 void
-vl_gmm_rand_init_mixture
+vl_gmm_init_mixture_with_rand_data
 (VlGMM * self,
  void const * data,
  vl_size dimension,
  vl_size numData,
  vl_size numClusters)
 {
+  vl_gmm_reset (self) ;
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
       _vl_gmm_rand_init_mixture_f
@@ -1529,21 +1551,23 @@ vl_gmm_rand_init_mixture
  **/
 
 void
-vl_gmm_kmeans_init_mixture
+vl_gmm_init_mixture_with_kmeans
 (VlGMM * self,
  void const * data,
  vl_size dimension,
  vl_size numData,
- vl_size numClusters)
+ vl_size numClusters,
+ VlKMeans * kmeansInit)
 {
+  vl_gmm_reset (self) ;
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
       _vl_gmm_kmeans_init_mixture_f
-      (self, (float const *)data, dimension, numData, numClusters) ;
+      (self, (float const *)data, dimension, numData, numClusters, kmeansInit) ;
       break ;
     case VL_TYPE_DOUBLE :
       _vl_gmm_kmeans_init_mixture_d
-      (self, (double const *)data, dimension, numData, numClusters) ;
+      (self, (double const *)data, dimension, numData, numClusters, kmeansInit) ;
       break ;
     default:
       abort() ;
@@ -1558,7 +1582,7 @@ vl_gmm_kmeans_init_mixture
  **/
 
 void
-vl_gmm_custom_init_mixture
+vl_gmm_init_mixture_with_custom_data
 (VlGMM * self,
  vl_size dimension,
  vl_size numData,
@@ -1596,17 +1620,15 @@ vl_gmm_init_mixture
 {
   switch (self->initialization) {
     case VlGMMKMeans :
-      vl_gmm_reset (self) ;
-      vl_gmm_kmeans_init_mixture
-      (self, data, dimension, numData, numClusters) ;
+      vl_gmm_init_mixture_with_kmeans
+      (self, data, dimension, numData, numClusters, NULL) ;
       break ;
     case VlGMMRand :
-      vl_gmm_reset (self) ;
-      vl_gmm_rand_init_mixture
+      vl_gmm_init_mixture_with_rand_data
       (self, data, dimension, numData, numClusters) ;
       break ;
     case VlGMMCustom:
-      vl_gmm_custom_init_mixture
+      vl_gmm_init_mixture_with_custom_data
       (self, dimension, numData, numClusters) ;
       break;
     default:

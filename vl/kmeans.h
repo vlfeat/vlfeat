@@ -107,14 +107,14 @@ VL_EXPORT void vl_kmeans_set_centers (VlKMeans * self,
                                       vl_size dimension,
                                       vl_size numCenters) ;
 
-VL_EXPORT void vl_kmeans_seed_centers_with_rand_data
+VL_EXPORT void vl_kmeans_init_centers_with_rand_data
                   (VlKMeans * self,
                    void const * data,
                    vl_size dimensions,
                    vl_size numData,
                    vl_size numCenters) ;
 
-VL_EXPORT void vl_kmeans_seed_centers_plus_plus
+VL_EXPORT void vl_kmeans_init_centers_plus_plus
                   (VlKMeans * self,
                    void const * data,
                    vl_size dimensions,

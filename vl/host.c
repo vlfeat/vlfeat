@@ -474,7 +474,7 @@ _vl_x86cpu_info_to_string_copy (VlX86CpuInfo const *self)
       string = vl_malloc(sizeof(char) * length) ;
       if (string == NULL) break ;
     }
-    length = snprintf(string, length, "%s%s%s%s%s%s%s",
+    length = snprintf(string, length, "%s%s%s%s%s%s%s%s",
                       self->vendor.string,
                       self->hasMMX   ? " MMX" : "",
                       self->hasSSE   ? " SSE" : "",

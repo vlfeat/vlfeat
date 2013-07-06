@@ -24,8 +24,8 @@ enum
   opt_num_repetitions,
   opt_verbose,
   opt_means,
-  opt_sigmas,
-  opt_weights,
+  opt_covariances,
+  opt_priors,
   opt_sigma_low_bound
 } ;
 
@@ -43,8 +43,8 @@ vlmxOption  options [] =
   {"Initialization",    1,   opt_initialization      },
   {"Initialisation",    1,   opt_initialization      }, /* UK spelling */
   {"InitMeans",         1,   opt_means               },
-  {"InitSigmas",        1,   opt_sigmas              },
-  {"InitWeights",       1,   opt_weights             },
+  {"InitCovariances",        1,   opt_covariances              },
+  {"InitPriors",       1,   opt_priors             },
   {"SigmaBound",        1,   opt_sigma_low_bound     },
   {0,                   0,   0                       }
 } ;
@@ -54,7 +54,7 @@ void
 mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 {
   enum {IN_DATA = 0, IN_NUMCLUSTERS, IN_END} ;
-  enum {OUT_MEANS, OUT_SIGMAS, OUT_WEIGHTS, OUT_LL, OUT_POSTERIORS} ;
+  enum {OUT_MEANS, OUT_COVARIANCES, OUT_PRIORS, OUT_LL, OUT_POSTERIORS} ;
 
   int opt ;
   int next = IN_END ;
@@ -66,12 +66,12 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_size dimension ;
   vl_size numData ;
 
-  void * initSigmas = 0;
+  void * initCovariances = 0;
   void * initMeans = 0;
-  void * initWeights = 0;
+  void * initPriors = 0;
   vl_bool meansSet = VL_FALSE;
-  vl_bool sigmasSet = VL_FALSE;
-  vl_bool weightsSet = VL_FALSE;
+  vl_bool covariancesSet = VL_FALSE;
+  vl_bool priorsSet = VL_FALSE;
 
   double sigmaLowBound = 0.000001;
   void const * data = NULL ;
@@ -155,21 +155,21 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       sigmaLowBound = (double) mxGetScalar(optarg) ;
       break ;
 
-    case opt_weights : ;
+    case opt_priors : ;
 	  {
-      mxClassID classIDweights = mxGetClassID (optarg) ;
-      switch (classIDweights)
+      mxClassID classIDpriors = mxGetClassID (optarg) ;
+      switch (classIDpriors)
       {
       case mxSINGLE_CLASS:
         if (dataType == VL_TYPE_DOUBLE)
         {
-          vlmxError (vlmxErrInvalidArgument, "INITWEIGHTS must be of same data type as X") ;
+          vlmxError (vlmxErrInvalidArgument, "INITPRIORS must be of same data type as X") ;
         }
         break ;
       case mxDOUBLE_CLASS:
         if (dataType == VL_TYPE_FLOAT)
         {
-          vlmxError (vlmxErrInvalidArgument, "INITWEIGHTS must be of same data type as X") ;
+          vlmxError (vlmxErrInvalidArgument, "INITPRIORS must be of same data type as X") ;
         }
         break ;
       default :
@@ -180,17 +180,17 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       if (! vlmxIsMatrix (optarg, -1, -1) || ! vlmxIsReal (optarg))
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITWEIGHTS must be a real matrix ") ;
+                  "INITPRIORS must be a real matrix ") ;
       }
 
       if (mxGetNumberOfElements(optarg) != numClusters)
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITWEIGHTS has to have numClusters elements") ;
+                  "INITPRIORS has to have numClusters elements") ;
       }
 
-      weightsSet = VL_TRUE;
-      initWeights = mxGetPr(optarg) ;
+      priorsSet = VL_TRUE;
+      initPriors = mxGetPr(optarg) ;
 
       break;
 	  }
@@ -240,7 +240,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
       break;
 	  }
-    case opt_sigmas : ;
+    case opt_covariances : ;
 	  {
       mxClassID classIDsigma = mxGetClassID (optarg) ;
       switch (classIDsigma)
@@ -248,13 +248,13 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       case mxSINGLE_CLASS:
         if (dataType == VL_TYPE_DOUBLE)
         {
-          vlmxError (vlmxErrInvalidArgument, "INITSIGMAS must be of same data type as X") ;
+          vlmxError (vlmxErrInvalidArgument, "INITcovariances must be of same data type as X") ;
         }
         break ;
       case mxDOUBLE_CLASS:
         if (dataType == VL_TYPE_FLOAT)
         {
-          vlmxError (vlmxErrInvalidArgument, "INITSIGMAS must be of same data type as X") ;
+          vlmxError (vlmxErrInvalidArgument, "INITCOVARIANCES must be of same data type as X") ;
         }
         break ;
       default :
@@ -265,23 +265,23 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       if (! vlmxIsMatrix (optarg, -1, -1) || ! vlmxIsReal (optarg))
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS must be a real matrix ") ;
+                  "INITCOVARIANCES must be a real matrix ") ;
       }
 
       if (mxGetM(optarg) != dimension)
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS has to have the same dimension (nb of rows) as input X") ;
+                  "INITCOVARIANCES has to have the same dimension (nb of rows) as input X") ;
       }
 
       if (mxGetN(optarg) != numClusters)
       {
         vlmxError(vlmxErrInvalidArgument,
-                  "INITSIGMAS has to have NUMCLUSTERS number of points (columns)") ;
+                  "INITCOVARIANCES has to have NUMCLUSTERS number of points (columns)") ;
       }
 
-      sigmasSet = VL_TRUE;
-      initSigmas = mxGetPr(optarg) ;
+      covariancesSet = VL_TRUE;
+      initCovariances = mxGetPr(optarg) ;
 
       break;
 	  }
@@ -367,24 +367,24 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_gmm_set_initialization (gmm, initialization) ;
   vl_gmm_set_sigma_lower_bound (gmm, sigmaLowBound) ;
 
-  if(sigmasSet || meansSet || weightsSet)
+  if(covariancesSet || meansSet || priorsSet)
   {
     if(vl_gmm_get_initialization(gmm) != VlGMMCustom)
     {
-      vlmxWarning (vlmxErrInconsistentData, "Initial sigmas, means or weights have been set -> switching to custom initialization.");
+      vlmxWarning (vlmxErrInconsistentData, "Initial covariances, means or priors have been set -> switching to custom initialization.");
     }
     vl_gmm_set_initialization(gmm,VlGMMCustom);
   }
 
   if(vl_gmm_get_initialization(gmm) == VlGMMCustom)
   {
-    if (!sigmasSet || !meansSet || !weightsSet)
+    if (!covariancesSet || !meansSet || !priorsSet)
     {
-      vlmxError (vlmxErrInvalidArgument, "When custom initialization is set, InitMeans, InitSigmas and initWeights options have to be specified.") ;
+      vlmxError (vlmxErrInvalidArgument, "When custom initialization is set, InitMeans, Initcovariances and InitPriors options have to be specified.") ;
     }
     vl_gmm_set_means (gmm,initMeans,numClusters,dimension);
-    vl_gmm_set_sigmas (gmm,initSigmas,numClusters,dimension);
-    vl_gmm_set_weights (gmm,initWeights,numClusters);
+    vl_gmm_set_covariances (gmm,initCovariances,numClusters,dimension);
+    vl_gmm_set_priors (gmm,initPriors,numClusters);
   }
 
   if (verbosity)
@@ -422,19 +422,19 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
   /* copy centers */
   OUT(MEANS) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
-  OUT(SIGMAS) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
-  OUT(WEIGHTS) = mxCreateNumericMatrix (numClusters, 1, classID, mxREAL) ;
+  OUT(COVARIANCES) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
+  OUT(PRIORS) = mxCreateNumericMatrix (numClusters, 1, classID, mxREAL) ;
   OUT(POSTERIORS) = mxCreateNumericMatrix (numData, numClusters, classID, mxREAL) ;
 
   memcpy (mxGetData(OUT(MEANS)),
           vl_gmm_get_means (gmm),
           vl_get_type_size (dataType) * dimension * vl_gmm_get_num_clusters(gmm)) ;
 
-  memcpy (mxGetData(OUT(SIGMAS)),
-          vl_gmm_get_sigmas (gmm),
+  memcpy (mxGetData(OUT(COVARIANCES)),
+          vl_gmm_get_covariances (gmm),
           vl_get_type_size (dataType) * dimension * vl_gmm_get_num_clusters(gmm)) ;
 
-  memcpy (mxGetData(OUT(WEIGHTS)),
+  memcpy (mxGetData(OUT(PRIORS)),
           vl_gmm_get_priors (gmm),
           vl_get_type_size (dataType) * vl_gmm_get_num_clusters(gmm)) ;
 

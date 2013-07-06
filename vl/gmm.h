@@ -61,7 +61,7 @@ vl_gmm_cluster
  vl_size numCenters);
 
 VL_EXPORT void
-vl_gmm_rand_init_mixture
+vl_gmm_init_mixture_with_rand_data
 (VlGMM * self,
  void const * data,
  vl_size dimension,
@@ -69,12 +69,20 @@ vl_gmm_rand_init_mixture
  vl_size numMeans);
 
 VL_EXPORT void
-vl_gmm_kmeans_init_mixture
+vl_gmm_init_mixture_with_custom_data
+(VlGMM * self,
+ vl_size dimension,
+ vl_size numData,
+ vl_size numClusters);
+
+VL_EXPORT void
+vl_gmm_init_mixture_with_kmeans
 (VlGMM * self,
  void const * data,
  vl_size dimension,
  vl_size numData,
- vl_size numClusters);
+ vl_size numClusters,
+ VlKMeans * kmeansInit);
 
 VL_EXPORT void
 vl_gmm_init_mixture

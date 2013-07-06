@@ -400,7 +400,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl) num_threads(vl_get_max_threads())
+#pragma omp parallel for default(shared) private(i_cl, i_d, dim) num_threads(vl_get_max_threads())
 #endif
   for(i_cl = 0; i_cl < (signed)numClusters; ++ i_cl) {
     TYPE uprefix;
