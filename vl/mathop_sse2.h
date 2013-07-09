@@ -13,17 +13,18 @@ the terms of the BSD license (see the COPYING file).
 
 /* ---------------------------------------------------------------- */
 #ifndef VL_MATHOP_SSE2_H_INSTANTIATING
-#define VL_MATHOP_SSE2_H_INSTANTIATING
 
 #ifndef VL_MATHOP_SSE2_H
 #define VL_MATHOP_SSE2_H
 
 #undef FLT
 #define FLT VL_TYPE_DOUBLE
+#define VL_MATHOP_SSE2_H_INSTANTIATING
 #include "mathop_sse2.h"
 
 #undef FLT
 #define FLT VL_TYPE_FLOAT
+#define VL_MATHOP_SSE2_H_INSTANTIATING
 #include "mathop_sse2.h"
 
 /* VL_MATHOP_SSE2_H */
@@ -72,34 +73,13 @@ VL_XCAT(_vl_distance_mahalanobis_sq_sse2_, SFX)
 
 VL_EXPORT void
 VL_XCAT(_vl_weighted_sigma_sse2_, SFX)
-(vl_size dimension, T * S, T const * X, T const * Y, T const * W);
+(vl_size dimension, T * S, T const * X, T const * Y, T const W);
 
 VL_EXPORT void
 VL_XCAT(_vl_weighted_mean_sse2_, SFX)
-(vl_size dimension, T * MU, T const * X, T const * W);
-
-#ifdef VL_ENABLE_AVX
-
-VL_EXPORT T
-VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX)
-(vl_size dimension, T const * X, T const * MU, T const * S);
-
-VL_EXPORT T
-VL_XCAT(_vl_distance_l2_avx_, SFX)
-(vl_size dimension, T const * X, T const * Y);
-
-VL_EXPORT void
-VL_XCAT(_vl_weighted_sigma_avx_, SFX)
-(vl_size dimension, T * S, T const * X, T const * Y, T const * W);
-
-VL_EXPORT void
-VL_XCAT(_vl_weighted_mean_avx_, SFX)
-(vl_size dimension, T * MU, T const * X, T const * W);
-
-#endif
+(vl_size dimension, T * MU, T const * X, T const W);
 
 /* ! VL_DISABLE_SSE2 */
 #endif
-
-/* VL_MATHOP_SSE2_INSTANTIATING */
+#undef VL_MATHOP_SSE2_INSTANTIATING
 #endif

@@ -85,10 +85,11 @@ SHELL = /bin/bash
 .PHONY : all
 all:
 
-# Feature selection
-DISABLE_SSE2=
-DISABLE_THREADS=
-DISABLE_OPENMP=
+# Select which features to disable
+# DISABLE_SSE2=yes
+# DISABLE_AVX=yes
+# DISABLE_THREADS=yes
+# DISABLE_OPENMP=yes
 
 # --------------------------------------------------------------------
 #                                                       Error Messages
@@ -148,7 +149,7 @@ STD_CFLAGS += $(if $(DISABLE_THREADS), -DVL_DISABLE_THREADS)
 STD_CFLAGS += $(if $(DISABLE_SSE2), -DVL_DISABLE_SSE2)
 STD_CFLAGS += $(if $(DISABLE_OPENMP), -DVL_DISABLE_OPENMP)
 STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
-STD_CFLAGS += $(if $(ENABLE_AVX), -DVL_ENABLE_AVX -mavx)
+STD_CFLAGS += $(if $(DISABLE_AVX), -DVL_DISABLE_AVX)
 STD_CFLAGS += $(if $(PROFILE), -g)
 
 STD_LDFLAGS = $(LDFLAGS)
@@ -162,6 +163,7 @@ SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed '
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+DISABLE_AVX ?= yes
 CC = gcc
 endif
 
@@ -172,6 +174,7 @@ SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed '
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
 CC = gcc
 endif
 
@@ -182,14 +185,14 @@ ifeq ($(ARCH),glnx86)
 # 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
 STD_CFLAGS += -m32 -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
-CC = gcc
+CC ?= gcc
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
 STD_CFLAGS += -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
-CC = gcc
+CC ?= gcc
 endif
 
 # --------------------------------------------------------------------
@@ -314,6 +317,10 @@ info:
 	$(call echo-var,CC)
 	$(call echo-var,STD_CFLAGS)
 	$(call echo-var,STD_LDFLAGS)
+	$(call echo-var,DISABLE_SSE2)
+	$(call echo-var,DISABLE_AVX)
+	$(call echo-var,DISABLE_THREADS)
+	$(call echo-var,DISABLE_OPENMP)
 	@printf "\nThere are %s lines of code.\n" \
 	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 

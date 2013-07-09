@@ -28,10 +28,10 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
 
   double sigmaLowerBound = 0.000001;
 
-  vl_size numData = 100000;
+  vl_size numData = 1000;
   vl_size dimension = 3;
-  vl_size numClusters = 500;
-  vl_size maxiter = 9;
+  vl_size numClusters = 20;
+  vl_size maxiter = 5;
   vl_size maxrep = 1;
 
   vl_size maxiterKM = 5;
@@ -47,8 +47,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_bool computeFisher = VL_TRUE;
   vl_bool computeVlad = VL_FALSE;
 
-  Init init = Rand;
-
+  Init init = KMeans;
+  
   //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
   //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
 
@@ -107,8 +107,8 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
         initWeights[cIdx] = (TYPE)vl_rand_real3(&rand);
       }
 
-      vl_gmm_set_weights(gmm,initWeights,numClusters);
-      vl_gmm_set_sigmas(gmm,initSigmas,numClusters,dimension);
+      vl_gmm_set_priors(gmm,initWeights,numClusters);
+      vl_gmm_set_covariances(gmm,initSigmas,numClusters,dimension);
       vl_gmm_set_means(gmm,initMeans,numClusters,dimension);
 
       break;
@@ -121,7 +121,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_gmm_set_max_num_iterations (gmm, maxiter) ;
   vl_gmm_set_num_repetitions(gmm, maxrep);
   vl_gmm_set_verbosity(gmm,1);
-  vl_gmm_set_sigma_lower_bound (gmm,sigmaLowerBound);
+  vl_gmm_set_covariance_lower_bound (gmm,sigmaLowerBound);
 
   //struct timeval t1,t2;
   //gettimeofday(&t1, NULL);
@@ -184,7 +184,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     vl_fisher_encode
     (enc, VL_F_TYPE,
      vl_gmm_get_means(gmm), dimension, numClusters,
-     vl_gmm_get_sigmas(gmm),
+     vl_gmm_get_covariances(gmm),
      vl_gmm_get_priors(gmm),
      data, numData,
      VL_FISHER_FLAG_IMPROVED
@@ -231,7 +231,7 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
   vl_size dimension = vl_gmm_get_dimension(gmm) ;
   vl_size numClusters = vl_gmm_get_num_clusters(gmm) ;
   vl_type dataType = vl_gmm_get_data_type(gmm) ;
-  double const * sigmas = vl_gmm_get_sigmas(gmm) ;
+  double const * sigmas = vl_gmm_get_covariances(gmm) ;
   double const * means = vl_gmm_get_means(gmm) ;
   double const * weights = vl_gmm_get_priors(gmm) ;
   double const * posteriors = vl_gmm_get_posteriors(gmm) ;

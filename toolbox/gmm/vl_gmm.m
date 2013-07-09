@@ -1,17 +1,17 @@
 % Vl_GMM  Learn a Gaussian Mixture Model using EM
-%   [MEANS, SIGMAS, WEIGHTS] = VL_GMM(X, NUMCLUSTERS) fits a GMM with
+%   [MEANS, COVARIANCES, PRIORS] = VL_GMM(X, NUMCLUSTERS) fits a GMM with
 %   NUMCLUSTERS components to the data X. Each column of X represent a
-%   sample point. X may be either SINGLE or DOUBLE. MEANS, SIGMAS, and
-%   WEIGHTS are repsectively the means, the diagonal covariances, and
-%   the prior probabilities of the Guassian modes. MEANS and SIGMAS
+%   sample point. X may be either SINGLE or DOUBLE. MEANS, COVARIANCES, and
+%   PRIORS are respectively the means, the diagonal covariances, and
+%   the prior probabilities of the Guassian modes. MEANS and COVARIANCES
 %   have the same number of rows as X and NUMCLUSTERS columns with one
-%   column per mode. WEIGHTS is a row vector with NUMCLUSTER entries
+%   column per mode. PRIORS is a row vector with NUMCLUSTER entries
 %   summing to one.
 %
-%   [MEANS, SIGMAS, WEIGHTS, LL] = VL_GMM(...) returns the
+%   [MEANS, COVARIANCES, PRIORS, LL] = VL_GMM(...) returns the
 %   loglikelihood (LL) of the model as well.
 %
-%   [MEANS, SIGMAS, WEIGHTS, LL, POSTERIORS] = VL_GMM(...) returns the
+%   [MEANS, COVARIANCES, PRIORS, LL, POSTERIORS] = VL_GMM(...) returns the
 %   loglikelihood of the solution and posterior probabilities of the
 %   Gaussian modes given each data point. The POSTERIORS matrix has
 %   NUMCLUSTERS rows and NUMDATA columns.
@@ -31,10 +31,10 @@
 %   InitMeans:: []
 %    Specify the initial means (size(X,1)-by-NUMCLUSTERS matrix).
 %
-%   InitWeights:: []
+%   InitPriors:: []
 %    Specify the initial weights (a vector of dimension NUMCLUSTER).
 %
-%   InitSigmas:: []
+%   InitCovariances:: []
 %    Specify the initial diagonal covariance matrices
 %
 %   Multithreading:: [SERIAL]

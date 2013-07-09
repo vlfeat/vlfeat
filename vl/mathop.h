@@ -665,7 +665,7 @@ enum _VlVectorComparisonType {
   VlDistanceChi2,      /**< squared Chi2 distance */
   VlDistanceHellinger, /**< squared Hellinger's distance */
   VlDistanceJS,        /**< squared Jensen-Shannon distance */
-  VlDistanceMahal,     /**< squared mahalanobis distance */
+  VlDistanceMahalanobis,     /**< squared mahalanobis distance */
   VlKernelL1,          /**< intersection kernel */
   VlKernelL2,          /**< l2 kernel */
   VlKernelChi2,        /**< Chi2 kernel */
@@ -688,7 +688,7 @@ vl_get_vector_comparison_type_name (int type)
     case VlDistanceL1   : return "l1" ;
     case VlDistanceL2   : return "l2" ;
     case VlDistanceChi2 : return "chi2" ;
-    case VlDistanceMahal  : return "mahalanobis" ;
+    case VlDistanceMahalanobis  : return "mahalanobis" ;
     case VlKernelL1     : return "kl1" ;
     case VlKernelL2     : return "kl2" ;
     case VlKernelChi2   : return "kchi2" ;

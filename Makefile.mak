@@ -181,6 +181,7 @@ libsrc = \
   vl\lbp.c \
   vl\liop.c \
   vl\mathop.c \
+  vl\mathop_avx.c \
   vl\mathop_sse2.c \
   vl\mser.c \
   vl\pgm.c \

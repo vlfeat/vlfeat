@@ -336,9 +336,9 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 //  TYPE halfDimLog2Pi = (dimension/2.0)*log(2.0*VL_PI);
 
 #if (FLT == VL_TYPE_FLOAT)
-  VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahal) ;
+  VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahalanobis) ;
 #else
-  VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahal) ;
+  VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
 #endif
 
   logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
@@ -398,7 +398,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
   }
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl,i_d,dim) num_threads(vl_get_max_threads())
+#pragma omp parallel for default(shared) private(i_cl, i_d, dim) num_threads(vl_get_max_threads())
 #endif
   for(i_cl = 0; i_cl < (signed)numClusters; ++ i_cl) {
     TYPE uprefix;

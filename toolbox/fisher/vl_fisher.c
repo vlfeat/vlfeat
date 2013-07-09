@@ -101,16 +101,16 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
     vlmxError (vlmxErrInvalidArgument, "SIZE(DATA,1) is zero.") ;
   }
   if (!vlmxIsMatrix(IN(MEANS), dimension, numClusters)) {
-    vlmxError (vlmxErrInvalidArgument, "MEANS is not a matrix or does not have the right size.") ;
+    vlmxError (vlmxErrInvalidArgument, "MEANS is not a matrix or does not have the correct size.") ;
   }
   if (!vlmxIsMatrix(IN(COVARIANCES), dimension, numClusters)) {
-    vlmxError (vlmxErrInvalidArgument, "COVARIANCES is not a matrix or does not have the right size.") ;
+    vlmxError (vlmxErrInvalidArgument, "COVARIANCES is not a matrix or does not have the correct size.") ;
   }
   if (!vlmxIsVector(IN(PRIORS), numClusters)) {
-    vlmxError (vlmxErrInvalidArgument, "PRIORS is not a vector or does not have the right size.") ;
+    vlmxError (vlmxErrInvalidArgument, "PRIORS is not a vector or does not have the correct size.") ;
   }
   if (!vlmxIsMatrix(IN(DATA), dimension, numData)) {
-    vlmxError (vlmxErrInvalidArgument, "DATA is not a matrix or does not have the right size.") ;
+    vlmxError (vlmxErrInvalidArgument, "DATA is not a matrix or does not have the correct size.") ;
   }
 
   while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {

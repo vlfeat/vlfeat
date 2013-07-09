@@ -53,7 +53,7 @@ KMeans * kmeans = vl_kmeans_new (VLDistanceL2, VL_TYPE_FLOAT) ;
 vl_kmeans_set_algorithm (kmeans, VlKMeansLloyd) ;
 
 // Initialize the cluster centers by randomly sampling the data
-vl_kmeans_seed_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
+vl_kmeans_init_centers_with_rand_data (kmeans, data, dimension, numData, numCenters) ;
 
 // Run at most 100 iterations of cluster refinement using Lloyd algorithm
 vl_kmeans_set_max_num_iterations (kmeans, 100) ;
@@ -85,13 +85,13 @@ initialization methods are supported:
 
 Method         | Function                                | Description
 ---------------|-----------------------------------------|-----------------------------------------------
-Random samples | ::vl_kmeans_seed_centers_with_rand_data | Random data points
-K-means++      | ::vl_kmeans_seed_centers_plus_plus      | Random selection biased towards diversity
+Random samples | ::vl_kmeans_init_centers_with_rand_data | Random data points
+K-means++      | ::vl_kmeans_init_centers_plus_plus      | Random selection biased towards diversity
 Custom         | ::vl_kmeans_set_centers                 | Choose centers (useful to run quantization only)
 
 See @ref kmeans-init for further details. The initialization methods
 use a randomized selection of the data points; the random number
-generator seed is controlled by ::vl_rand_seed.
+generator init is controlled by ::vl_rand_init.
 
 The second important choice is the **optimization algorithm**. The
 following optimization algorithms are supported:
@@ -524,7 +524,7 @@ VL_XCAT(_vl_kmeans_set_centers_, SFX)
 /* ---------------------------------------------------------------- */
 
 static void
-VL_XCAT(_vl_kmeans_seed_centers_with_rand_data_, SFX)
+VL_XCAT(_vl_kmeans_init_centers_with_rand_data_, SFX)
 (VlKMeans * self,
  TYPE const * data,
  vl_size dimension,
@@ -585,7 +585,7 @@ VL_XCAT(_vl_kmeans_seed_centers_with_rand_data_, SFX)
 /* ---------------------------------------------------------------- */
 
 static void
-VL_XCAT(_vl_kmeans_seed_centers_plus_plus_, SFX)
+VL_XCAT(_vl_kmeans_init_centers_plus_plus_, SFX)
 (VlKMeans * self,
  TYPE const * data,
  vl_size dimension,
@@ -1807,19 +1807,19 @@ vl_kmeans_set_centers
 }
 
 /** ------------------------------------------------------------------
- ** @brief Seed centers by randomly sampling data
+ ** @brief init centers by randomly sampling data
  ** @param self KMeans object.
  ** @param data data to sample from.
  ** @param dimension data dimension.
  ** @param numData nmber of data points.
  ** @param numCenters number of centers.
  **
- ** The function seeds the KMeans centers by randomly sampling
+ ** The function inits the KMeans centers by randomly sampling
  ** the data @a data.
  **/
 
 VL_EXPORT void
-vl_kmeans_seed_centers_with_rand_data
+vl_kmeans_init_centers_with_rand_data
 (VlKMeans * self,
  void const * data,
  vl_size dimension,
@@ -1830,11 +1830,11 @@ vl_kmeans_seed_centers_with_rand_data
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
-      _vl_kmeans_seed_centers_with_rand_data_f
+      _vl_kmeans_init_centers_with_rand_data_f
       (self, (float const *)data, dimension, numData, numCenters) ;
       break ;
     case VL_TYPE_DOUBLE :
-      _vl_kmeans_seed_centers_with_rand_data_d
+      _vl_kmeans_init_centers_with_rand_data_d
       (self, (double const *)data, dimension, numData, numCenters) ;
       break ;
     default:
@@ -1852,7 +1852,7 @@ vl_kmeans_seed_centers_with_rand_data
  **/
 
 VL_EXPORT void
-vl_kmeans_seed_centers_plus_plus
+vl_kmeans_init_centers_plus_plus
 (VlKMeans * self,
  void const * data,
  vl_size dimension,
@@ -1863,11 +1863,11 @@ vl_kmeans_seed_centers_plus_plus
 
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
-      _vl_kmeans_seed_centers_plus_plus_f
+      _vl_kmeans_init_centers_plus_plus_f
       (self, (float const *)data, dimension, numData, numCenters) ;
       break ;
     case VL_TYPE_DOUBLE :
-      _vl_kmeans_seed_centers_plus_plus_d
+      _vl_kmeans_init_centers_plus_plus_d
       (self, (double const *)data, dimension, numData, numCenters) ;
       break ;
     default:
@@ -2014,12 +2014,12 @@ vl_kmeans_cluster (VlKMeans * self,
     timeRef = vl_get_cpu_time() ;
     switch (self->initialization) {
       case VlKMeansRandomSelection :
-        vl_kmeans_seed_centers_with_rand_data (self,
+        vl_kmeans_init_centers_with_rand_data (self,
                                                data, dimension, numData,
                                                numCenters) ;
         break ;
       case VlKMeansPlusPlus :
-        vl_kmeans_seed_centers_plus_plus (self,
+        vl_kmeans_init_centers_plus_plus (self,
                                           data, dimension, numData,
                                           numCenters) ;
         break ;
