@@ -34,8 +34,10 @@ To get the VLAD vector siply run the function ::vl_vlad_encode
 with correct parameters. The function can be applied to both
 @c float or @c double data types.
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page vlad-fundamentals Fundamentals
 @tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLAD can be seen as a *feature encoding and pooling* method, similar
 to @ref fisher "Fisher vectors". VLAD encodes a set of local feature
@@ -69,7 +71,7 @@ Before the VLAD encoding is used it is usually globally $L^2$ normalized:
 In this manner, the Euclidean distance and inner product between VLAD
 vectors becomre more meaningful.
 
-@subsection vlad-component-normalization
+@section vlad-component-normalization
 
 However the size of each cluster could have a negative imapact on the
 appearance of the vector @f$ V @f$ and so, the normalization of each

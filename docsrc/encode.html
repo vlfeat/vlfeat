@@ -3,15 +3,20 @@
 
 <group>
 
-<p>The ongoing lines describe how to use <b>Fisher</b> and 
-<b>VLAD</b> encodings.
-</p>
+<p>This short tutorial shows how to
+compute <b><a href="%dox:fisher;">Fisher vector</a></b> and
+<b><a href="%dox:vlad;">VLAD</a></b> encodings with VLFeat MATLAB
+interface.</p>
 
-<p>
-The encoding methods are generally used for quantizing a set of vectors 
-with respect to a vocabulary model (obtained using Gaussian mixture estimation, 
-KMeans clustering, ...).
-</p>
+<p>These encoding serve a similar purposes: summarising in a vectorial
+statistic a number of local feature descriptors
+(e.g. <a href="%dox:sift;">SIFT</a>). Similarly to bag of visual
+words, they compare local descriptor to a dictionary, obtained with
+vectonr quantization (KMeans) in the case of VLAD
+and <a href="%dox:gmm;">Gaussina Mixture Models</a> for Fisher
+Vectors. However, rather than storing visual word occurences only,
+these representation store the difference between dictonary elements
+and pooled local features.</p>
 
 <ul>
  <li><a href="%pathto:tut.encoding.fisher;">Fisher encoding</a></li>
@@ -22,41 +27,40 @@ KMeans clustering, ...).
 <h1 id="tut.encoding.fisher">Fisher encoding</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>
-The Fisher encoding is best used with a particular estimated gaussian mixture model.
-Using the obtained means, sigmas and variances one can compute a 
-fisher vector. First we initialize random data and train the GMM model 
-(please see the <a href="%pathto:root;overview/gmm.html">GMM</a> tutorial page
-to find info on GMM usage).
-</p>
+<p>The Fisher encoding uses GMM to construct a visual word
+dicionary. To exemplify constructing a GMM, we consider a number of 2
+dimensional data points (see also the <a href="%pathto:tut.gmm;">GMM
+tutorial</a>). In practice, these would be a collection of SIFT or
+other local image features:</p>
 
-<precode>
-N         = 5000 ;
+<precode type='matlab'>
+numFeatures = 5000 ;
 dimension = 2 ;
-dataLearn = rand(dimension,N) ;
+data = rand(dimension,numFeatures) ;
 
 numClusters = 30 ;
-[means, sigmas, weights] = vl_gmm(dataLearn, numClusters);
+[means, sigmas, weights] = vl_gmm(data, numClusters);
 </precode>
 
-Next we initialize another random set of vectors,
-which should be encoded with respect to the model,
-we have just estimated.
+<p>Next we create another random set of vectors, which should be
+encoded using the Fisher vector representation and the GMM just
+obtained.</p>
 
-<precode>
-Nencode = 1000;
-dataEncode = rand(dimension,Nencode);
+<precode type='matlab'>
+numEncodedFeatures = 1000;
+dataToBeEncoded = rand(dimension,numEncodedFeatures);
 </precode>
 
-The fisher encoding <code>enc</code> of this new set can be easily obtained by pluging
-the <code>vl_gmm</code> outputs to the
-<code>vl_fisher</code> function:
+<p>The Fisher vector encoding <code>enc</code> of these vectors is
+obtained by calling the <code>vl_fisher</code> function using the
+output of the <code>vl_gmm</code> function:</p>
 
-<precode>
-enc = vl_fisher(dataEncode, means, sigmas, weights);
+<precode type='matlab'>
+encoding = vl_fisher(datatoBeEncoded, means, sigmas, weights);
 </precode>
 
-The <code>enc</code> is our final fisher vector.
+<p>The <code>encoding</code> vector is the Fisher vector
+representation of the data <code>dataToBeEncoded</code>.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.encoding.vlad">VLAD encoding</h1>

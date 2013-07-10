@@ -17,62 +17,45 @@ archclean: doc-archclean
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-CONVERT    ?= convert
 DOXYGEN    ?= doxygen
-DVIPNG     ?= dvipng
-DVIPS      ?= dvips
-EPSTOPDF   ?= epstopdf
+
+PDFLATEX   ?= pdflatex
 FIG2DEV    ?= fig2dev
-LATEX      ?= latex
+INKSCAPE   ?= inkscape
+CONVERT    ?= convert
+
 PYTHON     ?= python
 GROFF      ?= groff
 TIDY       ?= tidy
-INKSCAPE   ?= inkscape
+
 MV         ?= mv
 SED        ?= sed
 
 # 95 DPI makes a letter page 808 pixels large
 screen_dpi := 95
 
-# --------------------------------------------------------------------
-#                                                                Build
-# --------------------------------------------------------------------
-
-.PHONY: doc, doc-api, doc-toolbox, doc-figures, doc-man
-.PHONY: doc-web, doc-demo, doc-deep
-.PHONY: doc-clean, doc-archclean, doc-distclean
-.PHONY: autorights
-no_dep_targets := doc-clean doc-archclean doc-distclean
-
-fig_src  := $(wildcard docsrc/figures/*.fig)
-svg_src  := $(wildcard docsrc/figures/*.svg)
-demo_src := $(wildcard doc/demo/*.jpg)
-html_src := $(wildcard docsrc/*.html)
-man_src  := $(wildcard src/*.1)
-man_src  += $(wildcard src/*.7)
-
-pdf_tgt := #$(fig_src:.fig=.pdf)
-eps_tgt := #$(subst docsrc/,doc/,$(fig_src:.fig=.eps))
-png_tgt := $(subst docsrc/,doc/,$(fig_src:.fig=.png)) $(subst docsrc/,doc/,$(svg_src:.svg=.png))
-jpg_tgt := $(demo_src)
-img_tgt := $(jpg_tgt) $(png_tgt) $(pdf_tgt) $(eps_tgt)
-man_tgt := $(subst src/,doc/man-src/,$(addsuffix .html,$(man_src)))
+doc: doc-api doc-man doc-matlab
 
 # generate doc-dir: target
-$(eval $(call gendir, doc, doc doc/demo doc/figures doc/man-src))
+$(eval $(call gendir, doc, \
+	 doc \
+	 doc/build doc/build/api doc/build/man doc/build/figures \
+         doc/demo doc/figures doc/matlab doc/api))
 
 # generate results-dir: target
 $(eval $(call gendir, results, results))
 
-VERSION: vl/generic.h
-	echo "$(VER)" > VERSION
+# --------------------------------------------------------------------
+#                                                               MATLAB
+# --------------------------------------------------------------------
 
-doc: doc-api doc-man doc-web
-doc-man: doc/man-src/man.xml doc/man-src/man.html
-doc-api: doc/api/index.html
-doc-web: doc/index.html
-doc-toolbox: doc/mdoc.build/mdoc.html
+.PHONY: doc-deep
 
+ifdef MATLAB_PATH
+doc-matlab: doc/matlab/helpsearch/deletable
+endif
+
+# use MATLAB to create the figures for the tutorials
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
 	$(MATLAB_EXE) -$(ARCH) -nodesktop -nosplash -r "clear mex;vl_setup demo;vl_demo;exit"
@@ -81,43 +64,29 @@ doc-deep: all $(doc-dir) $(results-dir)
 	@echo "Done trimming"
 	$(MAKE) doc
 
-#
-# Use webdoc.py to generate the website
-#
-
-doc/index.html: \
- doc/mdoc.build/mdoc.html \
- doc/man-src/man.xml \
- doc/man-src/man.html \
- docsrc/web.xml \
- docsrc/web.css \
- docsrc/webdoc.py \
- $(img_tgt) $(html_src)
-	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py --outdir=doc \
-	     docsrc/web.xml --verbose
-	rsync -rv docsrc/images doc/
-	cp -v docsrc/web.css doc/
-	cp -v docsrc/pygmentize.css doc/
-	cp -v docsrc/doxygen.css doc/
-	cp -v doc/mdoc.build/helptoc.xml doc/mdoc/
-	rsync -rv doc/mdoc.build/helpsearch doc/mdoc/
-
-ifdef MATLAB_PATH
-doc/index.html: doc/mdoc.build/helpsearch/deletable
-endif
-
 # make documentation searchable in MATLAB
-doc/mdoc.build/helpsearch/deletable: doc/mdoc.build/htmltoc.xml
-	$(MATLAB_EXE) -$(ARCH) -nodisplay -r "builddocsearchdb('doc/mdoc.build/') ; exit"
+doc/matlab/helpsearch/deletable : doc/build/matlab/helpsearch/deletable $(doc-dir)
+	cp -v doc/build/matlab/helptoc.xml doc/matlab/
+	cp -rv doc/build/matlab/helpsearch doc/matlab/
+
+doc/build/matlab/helpsearch/deletable: doc/build/matlab/helptoc.xml
+	$(MATLAB_EXE) -$(ARCH) -nodisplay -r "builddocsearchdb('doc/build/matlab/') ; exit"
+
+# --------------------------------------------------------------------
+#                                                                 MDoc
+# --------------------------------------------------------------------
+
+doc-matlab: doc/build/matlab/mdoc.html
 
 #
 # Use mdoc.py to create the toolbox documentation that will be
 # embedded in the website.
 #
 
-doc/mdoc.build/mdoc.html doc/mdoc.build/htmltoc.xml: $(m_src) \
-docsrc/mdoc.py make/doc.mak
-	$(PYTHON) docsrc/mdoc.py toolbox doc/mdoc.build \
+doc/build/matlab/mdoc.html doc/build/matlab/helptoc.xml: \
+	$(m_src) \
+	docsrc/mdoc.py #make/doc.mak
+	$(PYTHON) docsrc/mdoc.py toolbox doc/build/matlab \
 	          --format=web \
 	          --exclude='noprefix/.*' \
                   --exclude='xtune/.*' \
@@ -128,48 +97,38 @@ docsrc/mdoc.py make/doc.mak
 	          --helptoc \
 	          --helptoc-toolbox-name VLFeat \
 	          --verbose
-#
-# Generate C API documentation. Doxygen should run after Webdoc
-# because it replaces in place the file doc/api/index.html constructed
-# by the latter. Running Webdoc after Doxygen will overwrite this file.
-#
 
-doc/doxygen_header.html doc/doxygen_footer.html: doc/index.html
-	cat doc/api/index.html | \
-	sed -n '/<!-- Doc Here -->/q;p'  > doc/doxygen_header.html
-	echo '<div>' >> doc/doxygen_header.html
-	cat doc/api/index.html | \
-	sed -n '/<!-- Doc Here -->/,$$p' > doc/doxygen_footer.html
+# --------------------------------------------------------------------
+#                                                                  Man
+# --------------------------------------------------------------------
 
-doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION    \
-  $(dll_src) $(dll_hdr) $(img_tgt) toolbox/mexutils.h                \
-  doc/doxygen_header.html doc/doxygen_footer.html
-	#$(call C,DOXYGEN) $<
-	ln -sf docsrc/vlfeat.bib vlfeat.bib
-	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
-	rm vlfeat.bib
+doc-man: doc/build/man/man.xml doc/build/man/man.html
+man_src := $(wildcard src/*.1) $(wildcard src/*.7)
+man_tgt := $(subst src/,doc/build/man/,$(addsuffix .html,$(man_src)))
 
-#
-# Generate Man documentation
-#
+doc/build/man/index.html : $(doc-dir)
 
-doc/man-src/man.xml : $(man_tgt) $(doc-dir)
-	echo "<group>" > "$@"
-	for fullName in $(man_src) ; \
+# Integrate in Webdoc
+doc/build/man/man.xml : $(man_tgt) $(doc-dir)
+	@echo "Generating MAN XML webdooc document $@"
+	@echo "<group>" > "$@"
+	@for fullName in $(man_src) ; \
 	do  \
 	  fileName=$${fullName#src/} ; \
 	  stem=$${fileName%.*} ; \
 	  ( \
 	    echo "<page id='man.$${stem}' name='$${stem}' title='$${stem}'>" ; \
-	    echo "<include src='doc/man-src/$${fileName}.html'/>" ; \
+	    echo "<include src='doc/build/man/$${fileName}.html'/>" ; \
 	    echo "</page>" \
 	  ) >> "$@" ; \
 	done
 	echo "</group>" >> "$@"
 
-doc/man-src/man.html : $(man_tgt) $(doc-dir)
-	echo "<ul>" > "$@"
-	for fullName in $(man_src) ; \
+# Index page
+doc/build/man/man.html : $(man_tgt) $(doc-dir)
+	@echo "Generating MAN HTML index page $@"
+	@echo "<ul>" > "$@"
+	@for fullName in $(man_src) ; \
 	do  \
 	  fileName=$${fullName#src/} ; \
 	  stem=$${fileName%.*} ; \
@@ -177,71 +136,133 @@ doc/man-src/man.html : $(man_tgt) $(doc-dir)
 	done
 	echo "</ul>" >> "$@"
 
-doc/man-src/%.html : src/% $(doc-dir)
-	( \
+# Convert the various man pages
+doc/build/man/%.html : src/% $(doc-dir)
+	@$(print-command MAN2HTML, $@)
+	@( \
 	  echo '<!DOCTYPE group PUBLIC ' ; \
 	  echo '  "-//W3C//DTD XHTML 1.0 Transitional//EN"' ; \
 	  echo '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' ; \
 	  echo "<group>" ; \
 	  $(GROFF) -mandoc -Thtml < "$<" | \
-	    $(TIDY) -asxhtml | \
+	    $(TIDY) -asxhtml 2>/dev/null | \
 	    sed -e '1,/<body>/ d' -e '/<\/body>/,$$ d' ; \
 	  echo "</group>" \
 	)  > "$@"
 
-doc/man-src/index.html : $(doc-dir)
+# --------------------------------------------------------------------
+#                                                              Doxygen
+# --------------------------------------------------------------------
 
-#
-# Convert figure formats
-#
+doc-api: doc/api/index.html
 
-doc-figures: $(img_tgt)
+doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION    \
+  $(dll_src) $(dll_hdr) $(doc_fig_tgt) toolbox/mexutils.h               \
+  doc/build/doxygen_header.html doc/build/doxygen_footer.html
+	ln -sf docsrc/vlfeat.bib vlfeat.bib
+	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
+	rm vlfeat.bib
 
-doc/figures/%.png : doc/figures/%.dvi
-	$(call C,DVIPNG) -D $(screen_dpi) -T tight -o $@ $<
+# --------------------------------------------------------------------
+#                                       FIG and SVG figures and images
+# --------------------------------------------------------------------
 
-doc/figures/%.eps : doc/figures/%.dvi
-	$(call C,DVIPS) -E -o $@ $<
+doc_fig_src := $(wildcard docsrc/figures/*.fig)
+doc_svg_src := $(wildcard docsrc/figures/*.svg)
+doc_fig_tgt += $(subst docsrc/,doc/,$(doc_fig_src:.fig=.png)) $(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
 
-doc/figures/%-raw.tex : docsrc/figures/%.fig
-	$(call C,FIG2DEV) -L pstex_t -p doc/figures/$*-raw.ps $< $@
+doc/figures/%.png : doc/build/figures/%.pdf
+	$(call C,CONVERT) -density 300 "$<" -resample $(screen_dpi) -trim  "$@"
 
-doc/figures/%-raw.ps doc/figures/%-raw.tex: docsrc/figures/%.svg
-	$(call C,INKSCAPE) --export-ps=doc/figures/$(*)-raw.ps --export-latex $<
-	$(call C,MV) doc/figures/$(*)-raw.ps_tex doc/figures/$(*)-raw.tex
-	$(call C,SED) -e 's/$(*)-raw.ps/doc\/figures\/$(*)-raw.ps/g' -i.bak 'doc/figures/$(*)-raw.tex'
+# Inkscape
+doc/build/figures/%-raw.pdf doc/build/figures/%-raw.tex: docsrc/figures/%.svg
+	$(call C,INKSCAPE) --export-pdf=doc/build/figures/$(*)-raw.pdf --export-latex "$<"
+	@$(MV) doc/build/figures/$(*)-raw.pdf_tex doc/build/figures/$(*)-raw.tex
+	@$(SED) -e 's/$(*)-raw/doc\/build\/figures\/$(*)-raw/g' -i.bak 'doc/build/figures/$(*)-raw.tex'
 
-doc/figures/%-raw.ps : docsrc/figures/%.fig
-	$(call C,FIG2DEV) -L pstex $< $@
+# Fig
+doc/build/figures/%-raw.tex : docsrc/figures/%.fig $(doc-dir)
+	$(call C,FIG2DEV) -L pdftex_t -p doc/build/figures/$*-raw.pdf "$<" "$@"
 
-doc/figures/%.dvi doc/figures/%.aux doc/figures/%.log :              \
-  doc/figures/%.tex doc/figures/%-raw.tex doc/figures/%-raw.ps $(doc-dir)
-	$(LATEX) -output-directory=$(dir $@) $<
+doc/build/figures/%-raw.pdf : docsrc/figures/%.fig $(doc-dir)
+	$(call C,FIG2DEV) -L pdftex "$<" "$@"
 
-doc/figures/%.tex : $(doc-dir)
+doc/build/figures/%.pdf doc/build/figures/%.aux doc/build/figures/%.log : \
+  doc/build/figures/%.tex doc/build/figures/%-raw.tex doc/build/figures/%-raw.pdf $(doc-dir)
+	$(call C,PDFLATEX) -interaction=batchmode -output-directory="$(dir $@)" "$<" 2>/dev/null
+
+doc/build/figures/%.tex : $(doc-dir)
 	@$(print-command GEN, $@)
-	@/bin/echo '\documentclass[landscape]{article}' >$@
-	@/bin/echo '\usepackage[margin=0pt]{geometry}' >>$@
-	@/bin/echo '\usepackage{graphicx,color}'       >>$@
-	@/bin/echo '\begin{document}'                  >>$@
-	@/bin/echo '\pagestyle{empty}'                 >>$@
-	@/bin/echo '\input{doc/figures/$(*)-raw.tex}'  >>$@
-	@/bin/echo '\end{document}'	               >>$@
+	@/bin/echo '\documentclass[landscape]{article}'          >$@
+	@/bin/echo '\usepackage[margin=0pt]{geometry}'		>>$@
+	@/bin/echo '\usepackage{graphicx,color}'		>>$@
+	@/bin/echo '\begin{document}'				>>$@
+	@/bin/echo '\pagestyle{empty}'				>>$@
+	@/bin/echo '\input{doc/build/figures/$(*)-raw.tex}'	>>$@
+	@/bin/echo '\end{document}'				>>$@
 
-doc/demo/%.jpg : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 -resample $(screen_dpi)  "$<" -colorspace rgb jpg:$@
+# --------------------------------------------------------------------
+#                                                               Webdoc
+# --------------------------------------------------------------------
 
-doc/demo/%.png : doc/demo/%.eps
-	$(call C,CONVERT) -density 400 -resample $(screen_dpi)  "$<" -colorspace rgb png:$@
+webdoc_src = $(wildcard docsrc/*.xml) $(wildcard docsrc/*.html)
 
-doc/%.pdf : doc/%.eps
-	$(call C,EPSTOPDF) --outfile=$@ $<
+doc: doc/index.html doc/vlfeat.css doc/doxygen.css doc/pygmentize.css
 
-#
-# Other documentation related targets
-#
+# prebuild to generate doxygen header and footer
+doc/build/doxygen_header.html doc/build/doxygen_footer.html: $(webdoc_src) $(doc-dir)
+	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py \
+	     --outdir=doc/build/ \
+             --verbose \
+	     docsrc/vlfeat-website-preproc.xml
+	cat doc/build/api/index.html | \
+	    sed -n '/<!-- Doc Here -->/q;p'  > doc/build/doxygen_header.html
+	echo '<div id="top">' >> doc/build/doxygen_header.html
+	cat doc/build/api/index.html | \
+	    sed -n '/<!-- Doc Here -->/,$$p' > doc/build/doxygen_footer.html
+
+doc/vlfeat.css : docsrc/vlfeat.css
+	cp -fv "$<" "$@"
+
+doc/doxygen.css : docsrc/doxygen.css
+	cp -fv "$<" "$@"
+
+doc/pygmentize.css : docsrc/pygmentize.css
+	cp -fv "$<" "$@"
+
+# build: this is the last step integrating all documentation
+doc/index.html: $(webdoc_src) $(doc-dir) \
+ doc/api/index.html \
+ doc/build/matlab/mdoc.html \
+ doc/build/man/man.xml \
+ doc/build/man/man.html \
+ docsrc/webdoc.py \
+ $(doc_fig_tgt) \
+ $(html_src)
+	cp doc/api/index.html doc/api/index.html.bak
+	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py \
+             --outdir=doc \
+	     --verbose \
+	     --doxytag=doc/doxygen.tag \
+	     --doxydir=api \
+	     --profile \
+	     docsrc/vlfeat-website.xml
+	mv doc/api/index.html.bak doc/api/index.html
+	rsync -r docsrc/images doc/
+
+# --------------------------------------------------------------------
+#                                               Maintenance and others
+# --------------------------------------------------------------------
+
+.PHONY: doc-clean, doc-archclean, doc-distclean
+no_dep_targets := doc-clean doc-archclean doc-distclean
+
+VERSION: vl/generic.h
+	echo "$(VER)" > VERSION
 
 doc-clean:
+	rm -rf doc/build
+
 doc-archclean:
 doc-distclean:
 	rm -f  docsrc/*.pyc
@@ -257,9 +278,6 @@ doc-info :
 	$(call dump-var,man_src)
 	$(call dump-var,fig_src)
 	$(call dump-var,demo_src)
-	$(call dump-var,bin_src)
-	$(call dump-var,bin_tgt)
-	$(call dump-var,bin_dep)
 	$(call dump-var,pdf_tgt)
 	$(call dump-var,eps_tgt)
 	$(call dump-var,png_tgt)

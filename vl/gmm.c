@@ -1548,12 +1548,13 @@ vl_gmm_init_mixture_with_rand_data
   }
 }
 
-/** @brief Initialize mixture before EM takes place using kmeans
+/** @brief Initializes the GMM using KMeans
  ** @param self GMM object instance.
  ** @param data data points which should be clustered.
  ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.
  ** @param numClusters number of gaussians which should be estimated.
+ ** @param kmeansInit KMeans object to use.
  **/
 
 void
@@ -1580,7 +1581,7 @@ vl_gmm_init_mixture_with_kmeans
   }
 }
 
-/** @brief Initialize mixture before EM takes place using the custom parameters
+/** @brief Initialize the GMM using custom parameters
  ** @param self GMM object instance.
  ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.

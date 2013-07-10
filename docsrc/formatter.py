@@ -168,7 +168,7 @@ class Lexer(object):
 class Formatter:
 # --------------------------------------------------------------------
     """
-    f = Formatter(LINES) parse the array of strings LINES.
+    f = Formatter(LINES) parses the array of strings LINES.
 
     f = Formatter(LINES, FUNCS) takes the dictionary of functions
     FUNCS. Function names must be uppercase. The dictionary entries

@@ -26,7 +26,7 @@
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
 %
-%   See: http://www.vlfeat.org/doc/api/fisher.html, VL_HELP().
+%   See: <a href="matlab:vl_help('fisher')">Fisher vectors</a>, VL_HELP().
 
 % Authors: David Novotny, Andrea Vedaldi
 

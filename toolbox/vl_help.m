@@ -1,19 +1,25 @@
-function vl_help(mode)
-% VL_HELP VLFeat Toolbox
-%   The VLFeat MATLAB toolbox provides implementations of common
-%   computer vision algorithms (HOG, SIFT, dense SIFT, MSER, AIB,
-%   KMEANS, learning large scale SVMs...) and many utility functions
-%   (e.g. precision-recall, ROC, DET curve calculation, plotting
-%   functions). To get started:
+function vl_help(topic, varargin)
+% VL_HELP   VLFeat toolbox builtin help
+%   VL_HELP('doc') displays the HTML documentation in MATLAB
+%   web-browser. VL_HELP('vl_function') displays the HTML
+%   documentation relative to the specified funtion. VL_HELP('topic')
+%   displays the HTML documentation relative to a particular 'topic'.
 %
-%   * Type vl_help doc
-%   * Type vl_help online
-%   * Use the help command to get information about any VLFeat function
-%   * Directly check the documentation online: http://www.vlfeat.org
+%   VL_HELP(..., 'ONLINE', true) uses the online documentation instead of
+%   the local copy.
+%
+%   Example::
+%     To get information about the library, a topic such as Fisher vectors,
+%     or a function such as VL_FISHER(), use:
+%        vl_help doc
+%        vl_help fisher
+%        vl_help vl_fisher
+%
+%   See: <a href="matlab:vl_help('doc')">VLFeat documentation</a>.
 
 % Author: Andrea Vedaldi
 
-% Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 Andrea Vedaldi
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under
@@ -21,11 +27,31 @@ function vl_help(mode)
 
 if nargin == 0
   help vl_help ;
+  return ;
+end
+
+opts.online = false ;
+opts = vl_argparse(opts, varargin) ;
+
+local = fullfile(vl_root, 'doc') ;
+if opts.online
+  prefix = 'http://www.vlfeat.org/doc' ;
 else
-  switch lower(mode)
-    case 'doc', web(fullfile(vl_root, 'doc', 'index.html'), '-helpbrowser') ;
-    case 'online', web('http://www.vlfeat.org/') ;
-    otherwise
-      error('Unkown help mode %s', mode);
-  end
+  prefix = local ;
+end
+
+if strcmp(topic, 'doc')
+  asFunction = 'index.html' ;
+  asTopic = 'index.html' ;
+else
+  asFunction = fullfile('mdoc', [lower(topic) '.html']) ;
+  asTopic = fullfile('api', [lower(topic) '.html']) ;
+end
+
+if exist(fullfile(local, asFunction), 'file')
+  web(fullfile(prefix, asFunction)) ;
+elseif exist(fullfile(local, asTopic), 'file')
+  web(fullfile(prefix, asTopic)) ;
+else
+  error('''%s'' is not a valid function or topic.', topic) ;
 end

@@ -314,7 +314,7 @@ def breadCrumb(m):
 # --------------------------------------------------------------------
     breadcrumb = "<ul class='breadcrumb'>"
     if format == 'web':
-        breadcrumb += "<li><a href='%pathto:mdoc;'>Index</a></li>"
+        breadcrumb += "<li><a href='%pathto:matlab;'>Index</a></li>"
     else:
         breadcrumb += "<li><a href='index.html'>Index</a></li>"
     if m.prev: breadcrumb += "<li><a href='%s'>Prev</a></li>" % m.prev.getRef(format)

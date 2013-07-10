@@ -1,0 +1,43 @@
+<!DOCTYPE site PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<site id='root'>
+
+ <template id="template.default">
+   <include src="vlfeat-website-template.xml"/>
+ </template>
+
+ <!-- Main content -->
+ <include src="vlfeat-website-main-content.xml"/>
+
+ <!-- Documentation sets -->
+ <page id="doc" name="doc" title="Documentation">
+  <include src="doc.html"/>
+
+  <dir name="matlab">
+   <page id="matlab" name="matlab" title="Matlab API">
+    <include src="doc/build/matlab/mdoc.html"/>
+    <include src="doc/build/matlab/mdoc.xml"/>
+   </page>
+  </dir>
+
+  <dir name="api">
+    <page id="api" name="index" title="C API">
+      <pagescript type="text/javascript" src="$relpath$jquery.js"/>
+      <pagescript type="text/javascript" src="$relpath$dynsections.js"/>
+      <!-- <pagestyle href="%pathto:root;api/tabs.css"/> -->
+      <pagestyle href="%pathto:root;doxygen.css"/>
+      <div class="doxygen">
+        <!-- Doc Here -->
+      </div>
+    </page>
+  </dir>
+
+  <dir name="man">
+    <page id="man" name="man" title="Man pages">
+      <p>These man pages describe VLFeat command line utilities.</p>
+      <include src="doc/build/man/man.html"/>
+      <include src="doc/build/man/man.xml"/>
+    </page>
+  </dir>
+ </page>
+
+</site>

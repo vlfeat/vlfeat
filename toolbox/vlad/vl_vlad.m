@@ -39,7 +39,7 @@
 %   Verbose::
 %     Increase the verbosity level (may be specified multiple times).
 %
-%   See: http://www.vlfeat.org/doc/api/vlad.html, VL_HELP().
+%   See: <a href="matlab:vl_help('vlad')">VLAD</a>, VL_HELP().
 
 % Authors: David Novotny and Andrea Vedaldi
 

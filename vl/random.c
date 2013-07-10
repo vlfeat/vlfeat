@@ -29,7 +29,7 @@ random generator from MATLAB version 7.4 onwards).
 <!-- ------------------------------------------------------------- -->
 
 In VLFeat, a random number generator is implemented by an object of
-type ::VLRand. The simplest way to obtain such an object is to get the
+type ::VlRand. The simplest way to obtain such an object is to get the
 default random generator by
 
 @code

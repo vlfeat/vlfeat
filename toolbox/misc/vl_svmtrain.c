@@ -442,13 +442,12 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
   {
     mxArray const* labels_array = in[IN_LABELS] ;
     if (!vlmxIsPlainMatrix(labels_array, -1, -1)) {
-      vlmxError (vlmxErrInvalidArgument,
-                 "Y is not a plain matrix.") ;
+      vlmxError (vlmxErrInvalidArgument, "Y is not a plain matrix.") ;
     }
     labels = mxGetPr(labels_array) ;
     if (mxGetNumberOfElements(labels_array) != vl_svmdataset_get_num_data(dataset)) {
       vlmxError  (vlmxErrInvalidArgument,
-                  "The number of elements of Y is not the same as the number of data samples.") ;
+                  "The number of labels Y is not the same as the number of data samples X.") ;
     }
     optarg = in[IN_LAMBDA] ;
     GET_NN_SCALAR(LAMBDA, lambda) ;

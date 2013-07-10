@@ -732,10 +732,10 @@ vl_kdforest_query_recursively (VlKDForestSearcher * searcher,
  **/
 
 vl_size
-vl_kdforests_query (VlKDForest * self,
-                    VlKDForestNeighbor * neighbors,
-                    vl_size numNeighbors,
-                    void const * query)
+vl_kdforest_query (VlKDForest * self,
+                   VlKDForestNeighbor * neighbors,
+                   vl_size numNeighbors,
+                   void const * query)
 {
   VlKDForestSearcher * searcher = vl_kdforest_get_searcher(self, 0) ;
   if (searcher == NULL) {

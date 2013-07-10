@@ -1,6 +1,6 @@
 % VL_DSIFT  Dense SIFT
 %   [FRAMES,DESCRS] = VL_DSIFT(I) extracts a dense set of SIFT
-%   keypoints from image I. I must be of class SINGLE and grayscale.
+%   features from image I. I must be of class SINGLE and grayscale.
 %   FRAMES is a 2 x NUMKEYPOINTS, each colum storing the center (X,Y)
 %   of a keypoint frame (all frames have the same scale and
 %   orientation). DESCRS is a 128 x NUMKEYPOINTS matrix with one
