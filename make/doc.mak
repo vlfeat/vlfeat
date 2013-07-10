@@ -156,12 +156,13 @@ doc/build/man/%.html : src/% $(doc-dir)
 
 doc-api: doc/api/index.html
 
-doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION    \
-  $(dll_src) $(dll_hdr) $(doc_fig_tgt) toolbox/mexutils.h               \
+doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION \
+  $(dll_src) $(dll_hdr) $(doc_fig_tgt) toolbox/mexutils.h \
   doc/build/doxygen_header.html doc/build/doxygen_footer.html
 	ln -sf docsrc/vlfeat.bib vlfeat.bib
 	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
 	rm vlfeat.bib
+	cp -fv docsrc/doxygen.css doc/api/doxygen.css
 
 # --------------------------------------------------------------------
 #                                       FIG and SVG figures and images
@@ -170,6 +171,8 @@ doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION    \
 doc_fig_src := $(wildcard docsrc/figures/*.fig)
 doc_svg_src := $(wildcard docsrc/figures/*.svg)
 doc_fig_tgt += $(subst docsrc/,doc/,$(doc_fig_src:.fig=.png)) $(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
+
+.PRECIOUS: doc/build/figures/%.pdf
 
 doc/figures/%.png : doc/build/figures/%.pdf
 	$(call C,CONVERT) -density 300 "$<" -resample $(screen_dpi) -trim  "$@"
@@ -207,7 +210,7 @@ doc/build/figures/%.tex : $(doc-dir)
 
 webdoc_src = $(wildcard docsrc/*.xml) $(wildcard docsrc/*.html)
 
-doc: doc/index.html doc/vlfeat.css doc/doxygen.css doc/pygmentize.css
+doc: doc/index.html doc/vlfeat.css doc/pygmentize.css
 
 # prebuild to generate doxygen header and footer
 doc/build/doxygen_header.html doc/build/doxygen_footer.html: $(webdoc_src) $(doc-dir)
@@ -222,9 +225,6 @@ doc/build/doxygen_header.html doc/build/doxygen_footer.html: $(webdoc_src) $(doc
 	    sed -n '/<!-- Doc Here -->/,$$p' > doc/build/doxygen_footer.html
 
 doc/vlfeat.css : docsrc/vlfeat.css
-	cp -fv "$<" "$@"
-
-doc/doxygen.css : docsrc/doxygen.css
 	cp -fv "$<" "$@"
 
 doc/pygmentize.css : docsrc/pygmentize.css
@@ -245,7 +245,6 @@ doc/index.html: $(webdoc_src) $(doc-dir) \
 	     --verbose \
 	     --doxytag=doc/doxygen.tag \
 	     --doxydir=api \
-	     --profile \
 	     docsrc/vlfeat-website.xml
 	mv doc/api/index.html.bak doc/api/index.html
 	rsync -r docsrc/images doc/

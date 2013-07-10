@@ -129,7 +129,9 @@ def calcRelURL(toURL, fromURL):
 
     return urlunparse(("", "", relPath, "", "", toURL.fragment))
 
-def walkNodes(rootNode, nodeType = None):
+def walkNodes(rootNode, nodeType = None, nodeBarrier = None):
+    if nodeBarrier and rootNode.isA(nodeBarrier):
+        return
     for n in rootNode.getChildren():
         for m in walkNodes(n, nodeType):
             yield m
@@ -555,12 +557,14 @@ class DocHtmlText(DocBareNode):
                 pageNode.publish(gen, pageNode)
 
             elif directive == "pagestyle":
-                for s in pageNode.findChildren(DocPageStyle):
-                    s.expand(gen, pageNode)
+                for q in pageNode.getChildren():
+                    for s in walkNodes(q, DocPageStyle, DocPage):
+                        s.expand(gen, pageNode)
 
             elif directive == "pagescript":
-                for s in pageNode.findChildren(DocPageScript):
-                    s.expand(gen, pageNode)
+                for q in pageNode.getChildren():
+                    for s in walkNodes(q, DocPageScript, DocPage):
+                        s.expand(gen, pageNode)
 
             elif directive == "pagetitle":
                 gen.putString(pageNode.title)
@@ -790,6 +794,7 @@ class DocPage(DocNode):
     def publish(self, generator, pageNode = None):
         if pageNode is self:
             # this is the page being published, so go on
+            print "publishing " + self.__str__()
             DocNode.publish(self, generator, pageNode)
         # otherwise this page has been encountered recursively
         # during publishing
