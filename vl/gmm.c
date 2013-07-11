@@ -21,27 +21,28 @@ the terms of the BSD license (see the COPYING file).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref gmm.h is an implementation of *Gaussian Mixture Models* (GMMs).
-The main functionality provided by this module is learning GMMs from data.
-Learning maximises the likelihood of a GMM using the
- expectation maximization
-@cite{dempster77maximum}). The implementation supports @c float or @c
-double data types, is parallelized, and is tuned to work reliably and
-effectively on datasets of visual features. Stability is obtained in
-part by regularizing and restricting the parameters of the GMM.
+The main functionality provided by this module is learning GMMs from
+data by maximum likelihood. Model optimization uses the Expectation
+Maximization (EM) algorithm @cite{dempster77maximum}. The
+implementation supports @c float or @c double data types, is
+parallelized, and is tuned to work reliably and effectively on
+datasets of visual features. Stability is obtained in part by
+regularizing and restricting the parameters of the GMM.
 
 GMMs are at the basis of the computation of other useful features,
 such as the Fisher vectors (@ref fisher).
 
-To get started with the C API see @ref gmm-starting; for detailed
-information on GMMs, their learning with the EM algorithm, and other
-details of VLFeat implementation see @subpage gmm-fundamentals.
+@ref gmm-starting demonstreates how to use the C API to compute the FV
+representation of an image. For further details refer to:
+
+- @subpage gmm-fundamentals
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section gmm-starting Getting started
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-In order to use @ref gmm.h to learn a GMM from training data,
-instantiate a ::VlGMM object, set the parameters as desired, and run
+In order to use @ref gmm.h to learn a GMM from training data, create a
+new ::VlGMM object instance, set the parameters as desired, and run
 the training code. The following example learns @c numClusters
 Gaussian components from @c numData vectors of dimension @c dimension
 and storage class @c float using at most 100 EM iterations:
@@ -63,9 +64,6 @@ vl_gmm_set_max_num_iterations (gmm, 100) ;
 // set the initialization to random selection
 vl_gmm_set_initialization (gmm,VlGMMRand);
 
-// set parallelized computation
-vl_gmm_set_multithreading (gmm,VlGMMParallel);
-
 // cluster the data, i.e. learn the GMM
 vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
 
@@ -83,20 +81,20 @@ posteriors = vl_gmm_get_posteriors(gmm) ;
 
 @note ::VlGMM assumes that the covariance matrices of the GMM are
 diagonal. This reduces significantly the number of parameters to learn
-and is usually an acceptable assumption. If the data is significantly
-correlated, it can be beneficial to de-correlate it by PCA rotation or
-projection in pre-processing.
+and is usually an acceptable compromise in vision applications. If the
+data is significantly correlated, it can be beneficial to de-correlate
+it by PCA rotation or projection in pre-processing.
 
 ::vl_gmm_get_loglikelihood is used to get the final loglikelihood of
-the estimated mixture, ::vl_gmm_get_means and ::vl_gmm_get_covariances to
-obtain the means and the diagonals of the covariance matrices of the
-estimated Gaussian modes, and ::vl_gmm_get_posteriors to get the
+the estimated mixture, ::vl_gmm_get_means and ::vl_gmm_get_covariances
+to obtain the means and the diagonals of the covariance matrices of
+the estimated Gaussian modes, and ::vl_gmm_get_posteriors to get the
 posterior probabilities that a given point is associated to each of
 the modes (soft assignments).
 
-The learning algorithm, which is an implementation of EM, finds a
-local optimum of the objective function. Therefore the initialization
-is crucial in obtaining a good model, measured in term of the final
+The learning algorithm, which uses EM, finds a local optimum of the
+objective function. Therefore the initialization is crucial in
+obtaining a good model, measured in term of the final
 loglikelihood. ::VlGMM supports a few methods (use
 ::vl_gmm_set_initialization to choose one) as follows:
 
@@ -111,13 +109,9 @@ type ::VlKMeans object must be created and passed to the ::VlGMM
 instance (see @ref kmeans to see how to correctly set up this object).
 
 When a user wants to use the ::VlGMMCustom method, the initial means,
-covariances and priors have to be specified using the ::vl_gmm_set_means,
-::vl_gmm_set_covariances and ::vl_gmm_set_priors methods.
-
-::VlGMM supports multi-core computations. This can controlled by using
-::vl_gmm_set_multithreading function. Furthermore, the implementation
-uses SSE2 vector instructions when available.
-
+covariances and priors have to be specified using the
+::vl_gmm_set_means, ::vl_gmm_set_covariances and ::vl_gmm_set_priors
+methods.
 **/
 
 /**
@@ -128,14 +122,16 @@ uses SSE2 vector instructions when available.
 
 A *Gaussian Mixture Model* (GMM) is a mixture of $K$ multivariate
 Gaussian distributions. In order to sample from a GMM, one samples
-first the component index $k \in \{1,\dots,K\}$ with probability
-$\pi_k$, and then samples the vector $\bx \in \mathbb{R}^d$ from the
-$k$-th Gaussian distribution $p(\bx|\mu_k,\Sigma_k)$. Here $\mu_k$ and
-$\Sigma_k$ are respectively the mean and covariance matrix of the
-distribution. The GMM is completely defined by the parameters
-$\Theta=\{\pi_k,\mu_k,\Sigma_k; k = 1,\dots,K\}$
+first the component index $k \in \{1,\dots,K\}$ with *prior
+probability* $\pi_k$, and then samples the vector $\bx \in
+\mathbb{R}^d$ from the $k$-th Gaussian distribution
+$p(\bx|\mu_k,\Sigma_k)$. Here $\mu_k$ and $\Sigma_k$ are respectively
+the *mean* and *covariance* of the distribution. The GMM is completely
+specified by the parameters $\Theta=\{\pi_k,\mu_k,\Sigma_k; k =
+1,\dots,K\}$
 
-Marginalizing $k$ yields the probability density
+The density $p(\bx|\Theta)$ induced on the training data is obtained
+by marginalizing the component selector $k$, obtaining
 \[
 p(\bx|\Theta)
 = \sum_{k=1}^{K} \pi_k p( \bx_i |\mu_k,\Sigma_k),
@@ -145,16 +141,17 @@ p( \bx |\mu_k,\Sigma_k)
 \frac{1}{\sqrt{(2\pi)^d\det\Sigma_k}}
 \exp\left[
 -\frac{1}{2} (\bx-\mu_k)^\top\Sigma_k^{-1}(\bx-\mu_k)
-\right]
+\right].
 \]
 Learning a GMM to fit a dataset $X=(\bx_1, \dots, \bx_n)$ is usually
 done by maximizing the log-likelihood of the data:
 @f[
- \ell(\Theta;X)=
- E_{\bx\sim\hat p} \log p(x|\Theta)
+ \ell(\Theta;X)
+ = E_{\bx\sim\hat p} [ \log p(x|\Theta) ]
  = \frac{1}{n}\sum_{i=1}^{n} \log \sum_{k=1}^{K} \pi_k p(\bx_i|\mu_k, \Sigma_k).
 @f]
-where $\hat p$ is the empirical distribution of the data.
+where $\hat p$ is the empirical distribution of the data. An algorithm
+to solve this problem is introduced next.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section gmm-em Learning a GMM by expectation maximization
@@ -185,19 +182,19 @@ E_{x\sim\hat p} \log p(x|\Theta)
 @f}
 
 The first term of the last expression is the log-likelihood of the
-model where both the $x$ and $h$ are observed and distributed as
-$q(x|h)\hat p(x)$; the second term is the a average entropy of the
-latent variable and does not depend on $\Theta$.  This lower bound is
-maximized and becomes tight by setting $q(h|x) = p(h|x,\Theta)$ to be
-the posterior distribution on the latent variable $h$ (given the
+model where both the $x$ and $h$ are observed and joinlty distributed
+as $q(x|h)\hat p(x)$; the second term is the a average entropy of the
+latent variable, which does not depend on $\Theta$. This lower bound
+is maximized and becomes tight by setting $q(h|x) = p(h|x,\Theta)$ to
+be the posterior distribution on the latent variable $h$ (given the
 current estimate of the parameters $\Theta$). In fact:
 
 \[
-E_{(x,h) \sim p(h|x,\Theta) \hat p(x)}\left[ \log \frac{p(x,h|\Theta)}{p(h|x,\Theta)}\right]
+E_{x \sim \hat p} \log p(x|\Theta)
 =
-E_{(x,h) \sim p(h|x,\Theta) \hat p(x)\log p(x|\Theta)
+E_{(x,h) \sim p(h|x,\Theta) \hat p(x)}\left[ \log \frac{p(x,h|\Theta)}{p(h|x,\Theta)} \right]
 =
-E_{x\sim\hat p} \log p(x|\theta)
+E_{(x,h) \sim p(h|x,\Theta) \hat p(x)} [ \log p(x|\Theta) ]
 =
 \ell(\Theta;X).
 \]
@@ -211,13 +208,13 @@ maximization step both $x$ and $h$ are now ``observed'' quantities.
 This procedure converges to a local optimum of the model
 log-likelihood.
 
-@par "Expectation step"
+@subsection gmm-expectation-step Expectation step
 
 In the case of a GMM, the latent variables are the point-to-cluster
-assignments $k_i$, one for each of $n$ data points. The auxiliary
-distribution $q(k_i|\bx_i) = q_{ik}$ is a matrix with $n \times K$
-entries. Each row $q_{i,:}$ can be thought of as a vector of soft
-assignments of the data points $\bx_i$ to each of the Gaussian
+assignments $k_i, i=1,\dots,n$, one for each of $n$ data points. The
+auxiliary distribution $q(k_i|\bx_i) = q_{ik}$ is a matrix with $n
+\times K$ entries. Each row $q_{i,:}$ can be thought of as a vector of
+soft assignments of the data points $\bx_i$ to each of the Gaussian
 modes. Setting $q_{ik} = p(k_i | \bx_i, \Theta)$ yields
 
 \[
@@ -238,7 +235,7 @@ $\Sigma_k$ reduces to computing the trace of the matrix and the
 inversion of $\Sigma_k$ could be obtained by inverting the elements on
 the diagonal of the covariance matrix.
 
-@par "Maximization step"
+@subsection gmm-maximization-step  Maximization step
 
 The M step estimates the parameters of the Gaussian mixture components
 and the prior probabilities $\pi_k$ given the auxiliary distribution
@@ -250,15 +247,15 @@ soft assignments). The other quantities are obtained in a similar
 manner, yielding to:
 
 @f{align*}
- \mu_k &= { { \sum_{i=1}^n q_{i,k} \bx_{i} } \over { \sum_{i=1}^n q_{i,k} } },
+ \mu_k &= { { \sum_{i=1}^n q_{ik} \bx_{i} } \over { \sum_{i=1}^n q_{ik} } },
 \\
- \Sigma_k &= { { \sum_{i=1}^n { q_{i,k} (\bx_{i} - \mu_{k}) {(\bx_{i} - \mu_{k})}^T } } \over { \sum_{i=1}^n q_{i,k} } },
+ \Sigma_k &= { { \sum_{i=1}^n { q_{ik} (\bx_{i} - \mu_{k}) {(\bx_{i} - \mu_{k})}^T } } \over { \sum_{i=1}^n q_{ik} } },
 \\
- \pi_k &= { \sum_{i=1}^n { q_{i,k} } \over { \sum_{i=1}^n \sum_{k=1}^K q_{i,k} } }.
+ \pi_k &= { \sum_{i=1}^n { q_{ik} } \over { \sum_{i=1}^n \sum_{k=1}^K q_{ik} } }.
 @f}
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection gmm-fundamentals-init Initialization algorithms
+@section gmm-fundamentals-init Initialization algorithms
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The EM algorithm is a local optimization method. As such, the quality
@@ -269,12 +266,12 @@ modes).
 @ref gmm.h supports the following cluster initialization algorithms:
 
 - <b>Random data points.</b> (::vl_gmm_rand_init_mixture) This method
-  initializes the means of the modes by sampling at random an equal
-  number of data points, the covariance matrices of all the modes are
-  set to be equal to the covariance of the entire dataset, and the
-  prior probabilities of the Gaussian modes are initialized to be
-  uniform. This initialization method is the fastest, simplest, as
-  well as the one most likely to end in a bad local minimum.
+  sets the means of the modes by sampling at random a corresponding
+  number of data points, sets the covariance matrices of all the modes
+  are to the covariance of the entire dataset, and sets the prior
+  probabilities of the Gaussian modes to be uniform. This
+  initialization method is the fastest, simplest, as well as the one
+  most likely to end in a bad local minimum.
 
 - <b>Custom initialization</b> (::vl_gmm_custom_init_mixture) This
   allows the user choose the initial values of the means, the
@@ -291,7 +288,6 @@ modes).
   instance of ::VlKMeans by using the function
   ::vl_gmm_set_kmeans_init_object, or let ::VlGMM create one
   automatically.
-
 **/
 
 #include "gmm.h"

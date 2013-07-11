@@ -519,7 +519,7 @@ the image frame). Assume that canonical and image frame are
 related by an affinity:
 
 @f[
-  \mathbf{x} = A \hat\mathbf{x} + T,
+  \mathbf{x} = A \hat{\mathbf{x}} + T,
   \qquad
   \mathbf{x} =
   \begin{bmatrix}{c}

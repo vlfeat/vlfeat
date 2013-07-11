@@ -23,24 +23,42 @@ the terms of the BSD license (see the COPYING file).
 (VLAD) image representation @cite{jegou10vlad}
 @cite{arandjelovic13all-about}.
 
-@ref vlad-starting demonstrates ho to use VLFeat to compute the VLAD
-encoding of an image. For further details refere to:
+@ref vlad-starting demonstreates how to use the C API to compute the VLAD
+representation of an image. For further details refer to:
 
 - @subpage vlad-fundamentals
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section vlad-starting Getting started
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-To get the VLAD vector siply run the function ::vl_vlad_encode
-with correct parameters. The function can be applied to both
-@c float or @c double data types.
+The VLAD encoding of a set of features is obtained by using the
+function ::vl_vlad_encode.  The function can be applied to both @c
+float or @c double data types.
+
+::vl_vlad_encode requires a visual dictionary, for example obtained by
+using @ref kmeans. Furthermore, the assignments of features to
+dictionary elements must be pre-computed, for example by using @ref
+kdtree.
+
+@code
+@endcode
+
+Various @ref vlad-normalization normalizations can be applied to the
+VLAD vecrtors. These are controlled by the parameter @a flag of
+::vl_vlad_encode.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page vlad-fundamentals Fundamentals
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-VLAD can be seen as a *feature encoding and pooling* method, similar
-to @ref fisher "Fisher vectors". VLAD encodes a set of local feature
+This page describes the *Vector of Locally Aggregated Descriptors*
+(VLAD) image encoding of @cite{jegou10vlad}. See @ref vlad for an
+overview of the C API.
+
+VLAD is a *feature encoding and pooling* method, similar to @ref
+fisher "Fisher vectors". VLAD encodes a set of local feature
 descriptors $I=(\bx_1,\dots,\bx_n)$ extracted from an image using a
 dictionary built using a clustering method such as @ref gmm or @ref
 kmeans. Let $q_{ik}$ be the strength of the association of data vector
@@ -64,26 +82,28 @@ The residulas are stacked together to obtain the vector
 \end{bmatrix}
 \]
 
-Before the VLAD encoding is used it is usually globally $L^2$ normalized:
-\[
- \Phi(I) = \hat\Phi(I) / \|\hat\Phi(I)\|_2.
-\]
-In this manner, the Euclidean distance and inner product between VLAD
-vectors becomre more meaningful.
+Before the VLAD encoding is used it is usually normalized, as
+explained @ref vlad-normalization next.
 
-@section vlad-component-normalization
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section vlad-normalization Normalization
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-However the size of each cluster could have a negative imapact on the
-appearance of the vector @f$ V @f$ and so, the normalization of each
-aggregate of vectors could be used:
+VLFeat VLAD implementation supports a number of different
+normalization strategies. These are optionally applied in this order:
 
-@f[
-  v_{j} = { \sum_{i=1}^{N} {q_{i,j} x_{i}}  \over { \sum_{i=1}^{N} {q_{i,j}} } } - \mu_{j}
-@f]
+- **Component-wise mass normalization.** Each vector $\bv_k$ is
+  divided by the total mass of features associated to it $\sum_{i=1}^N
+  q_{ik}$.
 
-This normalization is controlled by the last argument of ::vl_vlad_encode.
+- **Square-rooting.** The function $\sign(z)\sqrt{|z|}$ is applied to
+  all scalar components of the VLAD descriptor.
 
+- **Component-wise $L^2$ normalization.** The vectors $\bv_k$ are divided
+  by their norm $\|\bv_k\|_2$.
 
+- **Global $L^2$ normalization.** The VLAD descriptor $\hat\Phi(I)$ is divided
+  by its norm $\|\hat\Phi(I)\|_2$.
 */
 
 #include "vlad.h"

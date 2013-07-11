@@ -23,11 +23,12 @@
 statistics capturing the distribution of a set of vectors, usually a
 set of local image descriptors.
 
-@ref fisher-starting demonstrates how to use VLFeat to compute the FV
-representation of an image. For further details refer to:
+@ref fisher-starting demonstrates how to use the C API to compute the
+FV representation of an image. For further details refer to:
 
-- @subpage fisher-fundamentals - FV definition.
-- @subpage fisher-kernel - Deriving the FV as a the Fisher Kernel.
+- @subpage fisher-fundamentals - Fisher Vector definition.
+- @subpage fisher-derivation - Deriving the Fisher Vectors as a Fisher Kernel.
+- @subpage fisher-kernel - The Fisher Kernel in general.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section fisher-starting Getting started
@@ -37,6 +38,14 @@ The Fisher Vector encoding of a set of features is obtained by using
 the function ::vl_fisher_encode. Note that the function requires a
 @ref gmm "Gaussian Mixture Model" (GMM) of the encoded feature
 distribution.
+
+@code
+@endcode
+
+The performance of the standard Fisher Vector can be significantly
+improved @cite{perronnin10improving} by using appropriate @ref
+fisher-normalization normalizations. These are controlled by the @c
+flag parameter of ::vl_fisher_encode.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page fisher-fundamentals Fisher vector fundamentals
@@ -93,6 +102,10 @@ $\bv_k$ for each of the $K$ modes in the Gaussian mixtures:
  \Phi(I) = \begin{bmatrix} \vdots \\ \bu_k \\ \vdots \\ \bv_k \\ \vdots \end{bmatrix}.
 \]
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section fisher-normalization Normalization and improved Fisher vectors
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
 The *improved* Fisher Vector @cite{perronnin10improving} (IFV) improves the
 classification performance of the representation by using to ideas:
 
@@ -111,69 +124,18 @@ After square-rooting and normalization, the IFV can is often used in a
 linear classifier such as an @ref svm "SVM".
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page fisher-kernel Fisher kernel
-@tableofcontents
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-This page discusses the Fisher Kernels (FK) of
-@cite{jaakkola98exploiting} and shows how the FV of
-@cite{perronnin06fisher} can be derived from it as a special case. The
-FK induces a similarity measures between data points $\bx$ and $\bx'$
-from a parametric generative model $p(\bx|\Theta)$ of the data. The
-parameter $\Theta$ of the model is selected to fit the a-priori
-distribution of the data, and is usually the Maximum Likelihood (MLE)
-estimate obtained from a set of training examples. Once the generative
-model is learned, each particular datum $\bx$ is represented by
-looking at how it affects the MLE parameter estimate. This effect is
-measured by computing the gradient of the log-likelihood term
-corresponding to $\bx$:
-
-\[
-  \hat\Phi(\bx) = \nabla_\Theta \log p(\bx|\Theta)
-\]
-
-The vectors $\hat\Phi(\bx)$ should be appropriately scaled before they
-can be meaningfully compared. This is obtained by *whitening* the data
-by multiplying the vectors by the inverse of the square root of their
-*covariance matrix*. The covariance matrix can be obtained from the
-generative model $p(\bx|\Theta)$ itself. Since $\Theta$ is the ML
-parameter and $\hat\Phi(\bx)$ is the gradient of the log-likelihood
-function, its expected value $E[\hat\Phi(\bx)]$ is zero. Thus, since
-the vectors are already centered, their covariance matrix is simply:
-
-\[
-H = E_{\bx \sim p(\bx|\Theta)} [\hat\Phi(\bx) \hat\Phi(\bx)^\top]
-\]
-
-Note that $H$ is also the *Fisher information matrix* of the
-model. The final FV encoding $\Phi(\bx)$ is given by the whitened
-gradient of the log-likelihood function, i.e.:
-
-\[
- \Phi(\bx) = H^{-\frac{1}{2}}  \nabla_\Theta \log p(\bx|\Theta).
-\]
-
-Taking the inner product of two such vectors yields the *Fisher
-kernel*:
-
-\[
- K(\bx,\bx')
-= \langle \Phi(\bx),\Phi(\bx') \rangle
-=  \nabla_\Theta \log p(\bx|\Theta)^\top H^{-1} \nabla_\Theta \log p(\bx'|\Theta).
-\]
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section fisher-vector-derivation Fisher vector derivation
+@page fisher-derivation Fisher vector derivation
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The FV of @cite{perronnin06fisher} is a special case of the @ref
-fisher-kernel "Fisher kernel" construction to encode local image
-features in an easy-to-compare vector representation. In this
+fisher-kernel "Fisher kernel" construction. It is designed to encode
+local image features in a format that is suitable for learning and
+comparison with simple metrics such as the Euclidean. In this
 construction, an image is modeled as a collection of $D$-dimensional
 feature vectors $I=(\bx_1,\dots,\bx_n)$ generated by a GMM with $K$
 components $\Theta=(\mu_k,\Sigma_k,\pi_k:k=1,\dots,K)$. The covariance
 matrices are assumed to be diagonal, i.e. $\Sigma_k = \diag
-\bsigma_k^2$, $\sigma_k \in \real^D_+$.
+\bsigma_k^2$, $\bsigma_k \in \real^D_+$.
 
 The generative model of *one* feature vector $\bx$ is given by the GMM
 density function:
@@ -218,7 +180,8 @@ q_k(\bx) g(\bx|\Theta_k)
 
 where $q_k(\bx)$ is the soft-assignment of the point $\bx$ to the mode
 $k$. We make the approximation that $q_k(\bx)\approx 1$ if $\bx$ is
-sampled from mode $k$ and $\approx 0$ otherwise. Hence one gets:
+sampled from mode $k$ and $\approx 0$ otherwise
+@cite{perronnin06fisher}. Hence one gets:
 
 \[
 E_{\bx \sim p(\bx|\Theta)}
@@ -232,6 +195,7 @@ E_{\bx \sim p(\bx|\Theta)}
 0, & t\not=k.
 \end{cases}
 \]
+
 Thus under this approximation there is no correlation between the
 parameters of the various Gaussian modes.
 
@@ -301,6 +265,57 @@ factor). Note that:
   features requires the number of features to be the same in both
   images. Ultimately, however, the representation can be computed by
   using any number of features.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page fisher-kernel Fisher kernel
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+This page discusses the Fisher Kernels (FK) of
+@cite{jaakkola98exploiting} and shows how the FV of
+@cite{perronnin06fisher} can be derived from it as a special case. The
+FK induces a similarity measures between data points $\bx$ and $\bx'$
+from a parametric generative model $p(\bx|\Theta)$ of the data. The
+parameter $\Theta$ of the model is selected to fit the a-priori
+distribution of the data, and is usually the Maximum Likelihood (MLE)
+estimate obtained from a set of training examples. Once the generative
+model is learned, each particular datum $\bx$ is represented by
+looking at how it affects the MLE parameter estimate. This effect is
+measured by computing the gradient of the log-likelihood term
+corresponding to $\bx$:
+
+\[
+  \hat\Phi(\bx) = \nabla_\Theta \log p(\bx|\Theta)
+\]
+
+The vectors $\hat\Phi(\bx)$ should be appropriately scaled before they
+can be meaningfully compared. This is obtained by *whitening* the data
+by multiplying the vectors by the inverse of the square root of their
+*covariance matrix*. The covariance matrix can be obtained from the
+generative model $p(\bx|\Theta)$ itself. Since $\Theta$ is the ML
+parameter and $\hat\Phi(\bx)$ is the gradient of the log-likelihood
+function, its expected value $E[\hat\Phi(\bx)]$ is zero. Thus, since
+the vectors are already centered, their covariance matrix is simply:
+
+\[
+H = E_{\bx \sim p(\bx|\Theta)} [\hat\Phi(\bx) \hat\Phi(\bx)^\top]
+\]
+
+Note that $H$ is also the *Fisher information matrix* of the
+model. The final FV encoding $\Phi(\bx)$ is given by the whitened
+gradient of the log-likelihood function, i.e.:
+
+\[
+ \Phi(\bx) = H^{-\frac{1}{2}}  \nabla_\Theta \log p(\bx|\Theta).
+\]
+
+Taking the inner product of two such vectors yields the *Fisher
+kernel*:
+
+\[
+ K(\bx,\bx')
+= \langle \Phi(\bx),\Phi(\bx') \rangle
+=  \nabla_\Theta \log p(\bx|\Theta)^\top H^{-1} \nabla_\Theta \log p(\bx'|\Theta).
+\]
 
 **/
 
