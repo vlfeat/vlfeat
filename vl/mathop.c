@@ -189,6 +189,7 @@ the terms of the BSD license (see the COPYING file).
 #include "float.th"
 
 #undef COMPARISONFUNCTION_TYPE
+#undef COMPARISONFUNCTION3_TYPE
 #if (FLT == VL_TYPE_FLOAT)
 #  define COMPARISONFUNCTION_TYPE VlFloatVectorComparisonFunction
 #  define COMPARISONFUNCTION3_TYPE VlFloatVector3ComparisonFunction

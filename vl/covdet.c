@@ -1384,7 +1384,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
         /* start by filling the central horizontal band */
         for (yi = y0i + pady0 ; yi < y0i + patchHeight - pady1 ; ++ yi) {
           float *dst = self->patch + (yi - y0i) * patchWidth ;
-          float const *src = level + yi * width + VL_MIN(VL_MAX(0, x0i),width-1) ;
+          float const *src = level + yi * width + VL_MIN(VL_MAX(0, x0i),(signed)width-1) ;
           for (xi = x0i ; xi < x0i + padx0 ; ++xi) *dst++ = *src ;
           for ( ; xi < x0i + patchWidth - padx1 - 2 ; ++xi) *dst++ = *src++ ;
           for ( ; xi < x0i + patchWidth ; ++xi) *dst++ = *src ;
