@@ -1,22 +1,22 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <group>
 
-<p><b>VLFeat</b> includes fast SVM solvers, SGC <a href="#ref1">[1]</a> and (S)DCA <a href="#ref2">[2]</a>,
-both implemented in <code>vl_svmtrain</code>.
-The function also implements features, like Homogeneous kernel
-map expansion and SVM online statistics. (S)DCA can also be used with
-different loss functions.
-</p> 
+%tableofcontents;
 
+<p><b>VLFeat</b> includes fast SVM solvers,
+SGC <a href="#ref1">[1]</a> and (S)DCA <a href="#ref2">[2]</a>, both
+implemented in <code>vl_svmtrain</code>.  The function also implements
+features, like Homogeneous kernel map expansion and SVM online
+statistics. (S)DCA can also be used with different loss functions.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.svm">Support vector machine</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
+<p>A simple example on how to use <code>vl_svmtrain</code> is
+presented below. Let's first load and plot the training data:</p>
 
-<p>A simple example on how to use <code>vl_svmtrain</code> is presented below. Let's first load and plot the training data </p>
 <precode type='matlab'>
 % Load training data X and their labels y
 vl_setup demo % to load the demo data

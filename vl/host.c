@@ -305,8 +305,8 @@ it supports POSIX threads.
  ** @return @a x with the correct suffix for the given sign and size.
  ** The suffix used depends on the @ref host-compiler-data-model.
  ** @par "Example:"
- ** The macro @c VL_INT64_C(1234) is expanded as @c 123L in a LP64 system and
- ** as @c 123LL in a LLP64 system.
+ ** The macro <code>VL_INT64_C(1234)</code> is expanded as @c 123L in
+ ** a LP64 system and as @c 123LL in a LLP64 system.
  **/
 
 /** @def VL_INT16_C(x)

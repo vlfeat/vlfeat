@@ -749,7 +749,7 @@ vl_kdforest_query (VlKDForest * self,
 
 /** ------------------------------------------------------------------
  ** @brief Query the forest
- ** @param selft object.
+ ** @param self object.
  ** @param neighbors list of nearest neighbors found (output).
  ** @param numNeighbors number of nearest neighbors to find.
  ** @param query query point.

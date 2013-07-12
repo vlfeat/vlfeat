@@ -43,8 +43,7 @@ buffer in floating point format use ::vl_pgm_read_new_f() and
 #include <string.h>
 
 /** ------------------------------------------------------------------
- ** @internal
- ** @brief Remove all characters to the next new-line
+ ** @internal @brief Remove all characters to the next new-line.
  ** @param f file to strip.
  ** @return number of characters removed.
  **/
@@ -73,8 +72,7 @@ remove_line(FILE* f)
 }
 
 /** ------------------------------------------------------------------
- ** @internal
- ** @brief Remove white-spaces and comments
+ ** @internal @brief Remove white-spaces and comments.
  ** @param f file to strip.
  ** @return number of characters removed.
  **/
@@ -113,16 +111,14 @@ remove_blanks(FILE* f)
 
 /** ------------------------------------------------------------------
  ** @brief Get PGM image number of pixels.
- **
  ** @param im PGM image descriptor.
+ ** @return number of pixels of the image.
  **
  ** The functions returns the number of pixels of the PGM image @a im.
  **
  ** To calculate the image data size in bytes, this value must be
  ** multiplied by the number of byte per pixels (see
  ** ::vl_pgm_get_bpp()).
- **
- ** @return number of pixels of the image.
  **/
 
 VL_EXPORT vl_size
@@ -132,14 +128,12 @@ vl_pgm_get_npixels (VlPgmImage const *im)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get PGM image bytes per pixel
- **
+ ** @brief Get PGM image bytes per pixel.
  ** @param im PGM image descriptor.
+ ** @return number of bytes per pixel.
  **
  ** The function returns the number of bytes for each pixel of the
  ** PGM image @a im.
- **
- ** @return number of bytes per pixel.
  **/
 
 VL_EXPORT vl_size
@@ -149,18 +143,18 @@ vl_pgm_get_bpp (VlPgmImage const *im)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Extract PGM header from stream
- **
+ ** @brief Extract PGM header from stream.
  ** @param f  input file.
  ** @param im image structure to fill.
+ ** @return error code.
  **
  ** The function extracts from the file @a f the meta-data section of
  ** an image encoded in PGM format. The function fills the structure
  ** ::VlPgmImage accordingly.
  **
- ** @return error code. The error may be either
- ** #VL_PGM_INV_HEAD or #VL_PGM_INV_META depending whether the error
- ** occurred in decoding the header or meta section of the PGM file.
+ ** The error may be either ::VL_ERR_PGM_INV_HEAD or ::VL_ERR_PGM_INV_META
+ ** depending whether the error occurred in decoding the header or
+ ** meta section of the PGM file.
  **/
 
 VL_EXPORT int
@@ -173,7 +167,7 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
   int height ;
   int max_value ;
   size_t sz ;
-  vl_bool  good ;
+  vl_bool good ;
 
   /* -----------------------------------------------------------------
    *                                                check magic number
@@ -252,18 +246,16 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Extract PGM data from stream
- **
- ** @param f    input file.
- ** @param im   PGM image descriptor.
+ ** @brief Extract PGM data from stream.
+ ** @param f input file.
+ ** @param im PGM image descriptor.
  ** @param data data buffer to fill.
+ ** @return error code.
  **
  ** The function extracts from the file @a f the data section of an
  ** image encoded in PGM format. The function fills the buffer @a data
  ** according. The buffer @a data should be ::vl_pgm_get_npixels() by
  ** ::vl_pgm_get_bpp() bytes large.
- **
- ** @return error code.
  **/
 
 VL_EXPORT
@@ -333,8 +325,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Insert a PGM image into a stream
- **
+ ** @brief Insert a PGM image into a stream.
  ** @param f output file.
  ** @param im   PGM image meta-data.
  ** @param data image data.
@@ -384,21 +375,19 @@ vl_pgm_insert(FILE* f, VlPgmImage const *im, void const *data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Read a PGM file
- **
+ ** @brief Read a PGM file.
  ** @param name file name.
  ** @param im a pointer to the PGM image structure to fill.
  ** @param data a pointer to the pointer to the allocated buffer.
+ ** @return error code.
  **
- ** The function reads a PGM image from file @a name and initializes the
- ** structure @a im and the buffer @a data accordingly.
+ ** The function reads a PGM image from file @a name and initializes
+ ** the structure @a im and the buffer @a data accordingly.
  **
  ** The ownership of the buffer @a data is transfered to the caller.
  ** @a data should be freed by means of ::vl_free().
  **
  ** @bug Only PGM files with 1 BPP are supported.
- **
- ** @return error code.
  **/
 
 VL_EXPORT
@@ -434,22 +423,20 @@ int vl_pgm_read_new (char const *name, VlPgmImage *im, vl_uint8** data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Read floats from a PGM file
- **
+ ** @brief Read floats from a PGM file.
  ** @param name file name.
  ** @param im a pointer to the PGM image structure to fill.
  ** @param data a pointer to the pointer to the allocated buffer.
+ ** @return error code.
  **
- ** The function reads a PGM image from file @a name and initializes the
- ** structure @a im and the buffer @a data accordingly. The buffer
+ ** The function reads a PGM image from file @a name and initializes
+ ** the structure @a im and the buffer @a data accordingly. The buffer
  ** @a data is an array of floats in the range [0, 1].
  **
  ** The ownership of the buffer @a data is transfered to the caller.
  ** @a data should be freed by means of ::vl_free().
  **
  ** @bug Only PGM files with 1 BPP are supported.
- **
- ** @return error code.
  **/
 
 VL_EXPORT
@@ -477,13 +464,12 @@ int vl_pgm_read_new_f (char const *name,  VlPgmImage *im, float** data)
 }
 
 /** ------------------------------------------------------------------
- ** @brief Write bytes to a PGM file
- ** @return error code.
- **
+ ** @brief Write bytes to a PGM file.
  ** @param name file name.
  ** @param data data to write.
  ** @param width width of the image.
  ** @param height height of the image.
+ ** @return error code.
  **
  ** The function dumps the image @a data to the PGM file of the specified
  ** name. This is an helper function simplifying the usage of
@@ -515,18 +501,16 @@ int vl_pgm_write (char const *name, vl_uint8 const* data, int width, int height)
 
 /** -------------------------------------------------------------------
  ** @brief Write floats to PGM file
- **
  ** @param name file name.
  ** @param data data to write.
  ** @param width width of the image.
  ** @param height height of the image.
+ ** @return error code.
  **
- ** The function dumps the image @a data to the PGM file of the specified
- ** name. The data is re-scaled to fit in the range 0-255.
+ ** The function dumps the image @a data to the PGM file of the
+ ** specified name. The data is re-scaled to fit in the range 0-255.
  ** This is an helper function simplifying the usage of
  ** vl_pgm_insert().
- **
- ** @return error code.
  **/
 
 VL_EXPORT

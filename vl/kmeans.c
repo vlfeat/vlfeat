@@ -715,7 +715,7 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
  TYPE * distances,
  TYPE const * data,
  vl_size numData,
- vl_size iteration)
+ vl_bool update)
 {
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVectorComparisonFunction distFn = vl_get_vector_comparison_function_f(self->distance) ;
@@ -731,7 +731,7 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
 #ifdef _OPENMP
 #pragma omp parallel default(none) \
   num_threads(vl_get_max_threads()) \
-  shared(self, forest, iteration, assignments, distances, data, numData, distFn)
+  shared(self, forest, update, assignments, distances, data, numData, distFn)
 #endif
   {
     VlKDForestNeighbor neighbor ;
@@ -750,7 +750,7 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
       vl_kdforestsearcher_query (searcher, &neighbor, 1, (TYPE const *) (data + x*self->dimension));
 
       if (distances) {
-        if(iteration == 0) {
+        if(update) {
           distances[x] = (TYPE) neighbor.distance;
           assignments[x] = (vl_uint32) neighbor.index ;
         } else {
@@ -1024,7 +1024,7 @@ VL_XCAT(_vl_kmeans_refine_centers_ann_, SFX)
 	double eps;
 
     /* assign data to cluters */
-    VL_XCAT(_vl_kmeans_quantize_ann_, SFX)(self, assignments, distances, data, numData, iteration) ;
+    VL_XCAT(_vl_kmeans_quantize_ann_, SFX)(self, assignments, distances, data, numData, iteration > 0) ;
 
     /* compute energy */
     energy = 0 ;
@@ -1907,12 +1907,21 @@ vl_kmeans_quantize
 }
 
 /** ------------------------------------------------------------------
- ** @brief Quantize data using ANN
+ ** @brief Quantize data using approximate nearest neighbours (ANN).
  ** @param self KMeans object.
- ** @param assignments data to centers assignments.
- ** @param distances data to closes center distance/
+ ** @param assignments data to centers assignments (output).
+ ** @param distances data to closes center distance (output)
  ** @param data data to quantize.
  ** @param numData number of data points.
+ ** @param update choose wether to update current assignments.
+ **
+ ** The function uses an ANN procedure to compute the approximate
+ ** nearest neighbours of the input data point.
+ **
+ ** Setting @a update to ::VL_TRUE will cause the algorithm 
+ ** to *update existing assignments*. This means that each
+ ** element of @a assignments and @a distances is updated ony if the
+ ** ANN procedure can find a better assignment of the existing one.
  **/
 
 VL_EXPORT void
@@ -1922,16 +1931,16 @@ vl_kmeans_quantize_ann
  void * distances,
  void const * data,
  vl_size numData,
- vl_size iteration)
+ vl_bool update)
 {
   switch (self->dataType) {
     case VL_TYPE_FLOAT :
       _vl_kmeans_quantize_ann_f
-      (self, assignments, distances, (float const *)data, numData, iteration) ;
+      (self, assignments, distances, (float const *)data, numData, update) ;
       break ;
     case VL_TYPE_DOUBLE :
       _vl_kmeans_quantize_ann_d
-      (self, assignments, distances, (double const *)data, numData, iteration) ;
+      (self, assignments, distances, (double const *)data, numData, update) ;
       break ;
     default:
       abort() ;

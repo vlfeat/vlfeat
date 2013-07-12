@@ -373,3 +373,48 @@ code a {
     font-weight: normal ;
     color: green ;
 }
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/*                                                              Toc */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#content  div.toc {
+  padding: 14px 25px;
+  background-color: #F4F6FA;
+  border: 1px solid #D8DFEE;
+  border-radius: 3px 3px 3px 3px;
+  float: right;
+  height: auto;
+  margin: 1em 0px 10px 10px;
+  width: 200px;
+}
+#content  div.toc li {
+  background: url("api/bdwn.png") no-repeat scroll 0 5px transparent;
+  font: 10px/1.2 Verdana, DejaVu Sans, Geneva, sans-serif;
+  margin-top: 5px;
+  padding-left: 10px;
+  padding-top: 2px;
+}
+#content  div.toc h3 {
+  font: bold 12px/1.2 Arial, FreeSans, sans-serif;
+  color: #4665A2;
+  border-bottom: 0 none;
+  margin: 0;
+}
+#content  div.toc ul {
+  list-style: none outside none;
+  border: medium none;
+  padding: 0px;
+}
+#content  div.toc li.level1 {
+  margin-left: 0px;
+}
+#content  div.toc li.level2 {
+  margin-left: 15px;
+}
+#content  div.toc li.level3 {
+  margin-left: 30px;
+}
+#content  div.toc li.level4 {
+  margin-left: 45px;
+}

@@ -20,10 +20,10 @@ the terms of the BSD license (see the COPYING file).
 
 /** @name PGM parser error codes
  ** @{ */
-#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM header section */
-#define VL_ERR_PGM_INV_META  102 /**< Invalid PGM meta section */
-#define VL_ERR_PGM_INV_DATA  103 /**< Invalid PGM data section */
-#define VL_ERR_PGM_IO        104 /**< Generic I/O error */
+#define VL_ERR_PGM_INV_HEAD  101 /**< Invalid PGM header section. */
+#define VL_ERR_PGM_INV_META  102 /**< Invalid PGM meta section. */
+#define VL_ERR_PGM_INV_DATA  103 /**< Invalid PGM data section.*/
+#define VL_ERR_PGM_IO        104 /**< Generic I/O error. */
 /** @} */
 
 /** @brief PGM image meta data

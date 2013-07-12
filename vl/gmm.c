@@ -1847,11 +1847,11 @@ void vl_gmm_set_priors (VlGMM * self, void * priors, vl_size numClusters)
   memcpy(self->priors,priors,numClusters*typeSize);
 }
 
-/** @brief Explicitly set the posterior probabilities.
+/** @brief Set the posterior probabilities.
  ** @param self GMM object instance.
- ** @param posteriors initial values of the posterior probabilities.
+ ** @param posteriors value of the posterior probabilities.
  ** @param numClusters number of gaussians.
- ** @param numClusters number of data points.
+ ** @param numData number of data points.
  **/
 
 void vl_gmm_set_posteriors (VlGMM * self, void * posteriors, vl_size numClusters, vl_size numData)

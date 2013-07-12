@@ -20,13 +20,13 @@ the terms of the BSD license (see the COPYING file).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref vlad.h implements the *Vector of Linearly Aggregated Descriptors*
-(VLAD) image representation @cite{jegou10vlad}
+(VLAD) image representation @cite{jegou10aggregating}
 @cite{arandjelovic13all-about}.
 
 @ref vlad-starting demonstreates how to use the C API to compute the VLAD
 representation of an image. For further details refer to:
 
-- @subpage vlad-fundamentals
+- @subpage vlad-fundamentals - VLAD definition and computation.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section vlad-starting Getting started
@@ -54,8 +54,8 @@ VLAD vecrtors. These are controlled by the parameter @a flag of
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 This page describes the *Vector of Locally Aggregated Descriptors*
-(VLAD) image encoding of @cite{jegou10vlad}. See @ref vlad for an
-overview of the C API.
+(VLAD) image encoding of @cite{jegou10aggregating}. See @ref vlad for
+an overview of the C API.
 
 VLAD is a *feature encoding and pooling* method, similar to @ref
 fisher "Fisher vectors". VLAD encodes a set of local feature
@@ -68,7 +68,7 @@ $\sum_{k=1}^K q_{ik} = 1$. The association may be either soft
 hard (e.g. obtained by vector quantization with K-means).
 
 $\mu_k$ are the cluster *means*, vectors of the same dimension as the
-data $\bx_i$. VLAD encodes feature $\bx_$ by considering the *residuals*
+data $\bx_i$. VLAD encodes feature $\bx$ by considering the *residuals*
 \[
  \bv_k = \sum_{i=1}^{N} q_{ik} (\bx_{i} - \mu_k).
 \]
@@ -99,11 +99,11 @@ normalization strategies. These are optionally applied in this order:
 - **Square-rooting.** The function $\sign(z)\sqrt{|z|}$ is applied to
   all scalar components of the VLAD descriptor.
 
-- **Component-wise $L^2$ normalization.** The vectors $\bv_k$ are divided
-  by their norm $\|\bv_k\|_2$.
+- **Component-wise $l^2$ normalization.** The vectors $\bv_k$ are
+  divided by their norm $\|\bv_k\|_2$.
 
-- **Global $L^2$ normalization.** The VLAD descriptor $\hat\Phi(I)$ is divided
-  by its norm $\|\hat\Phi(I)\|_2$.
+- **Global $l^2$ normalization.** The VLAD descriptor $\hat\Phi(I)$ is
+  divided by its norm $\|\hat\Phi(I)\|_2$.
 */
 
 #include "vlad.h"

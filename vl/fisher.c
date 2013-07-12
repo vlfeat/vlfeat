@@ -117,10 +117,10 @@ classification performance of the representation by using to ideas:
    increased space or time cost.
 2. *Normalization.* Before using the representation in a linear model
    (e.g. a @ref svm "support vector machine"), the vector $\Phi(I)$ is
-   further normalized by the L2 norm (note that the standard Fisher
+   further normalized by the $l^2$ norm (note that the standard Fisher
    vector is normalized by the number of encoded feature vectors).
 
-After square-rooting and normalization, the IFV can is often used in a
+After square-rooting and normalization, the IFV is often used in a
 linear classifier such as an @ref svm "SVM".
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -515,7 +515,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
  ** by @a dataType.
  **
  ** @a flag can be used to control several options:
- ** ::VL_FISHER_FLAG_SQUARE_ROOT, ::VL_FISHER_FLAG_NORMALIZE,
+ ** ::VL_FISHER_FLAG_SQUARE_ROOT, ::VL_FISHER_FLAG_NORMALIZED,
  ** ::VL_FISHER_FLAG_IMPROVED.
  **
  ** @sa @ref fisher

@@ -411,6 +411,31 @@ class DocNode(DocBareNode):
                 or hasIndexedChildren
         return hasIndexedChildren
 
+    def publishTableOfContents(self, gen, pageNode):
+        """
+        """
+        gen.putString("<div class='toc'>\n")
+        gen.putString("<h3>Table of Contents</h3>")
+        previousLevel = 0
+        for q in pageNode.getChildren():
+            for x in walkNodes(q, DocHtmlElement, DocPage):
+                if x.tag not in ['h1', 'h2', 'h3', 'h4', 'h5']: continue
+                level = int(x.tag[1])
+                title = "".join([y.text for y in walkNodes(x, DocHtmlText)])
+                while previousLevel < level:
+                    gen.putString("<ul>")
+                    previousLevel += 1
+                while previousLevel > level:
+                    gen.putString("</ul>\n")
+                    previousLevel -= 1
+                gen.putString('<li class="level%d">'
+                             '<a href="#%s">%s</a>'
+                             '</li>\n' % (level, x.id, title))
+            while previousLevel > 0:
+                gen.putString("</ul>\n")
+                previousLevel -= 1
+        gen.putString("</div><!-- Table of contents -->\n")
+
     def expandAttr(self, value, pageNode):
         """
         Expand an attribute by substituting any directive with its value.
@@ -576,10 +601,15 @@ class DocHtmlText(DocBareNode):
 
             elif directive == "navigation":
                 gen.putString("<ul>\n")
+                # get the branch of DocPage nodes from the site root to this page
                 openNodeStack = [x for x in walkAncestors(pageNode, DocPage)]
+                # find the root site node and publish the contents
                 siteNode = walkAncestors(pageNode, DocSite).next()
                 siteNode.publishIndex(gen, pageNode, openNodeStack)
                 gen.putString("</ul>\n")
+
+            elif directive == "tableofcontents":
+                pageNode.publishTableOfContents(gen, pageNode)
 
             elif directive == "env":
                 envName = m.group(2)[1:]
