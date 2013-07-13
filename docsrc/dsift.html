@@ -4,13 +4,12 @@
 
 %tableofcontents;
 
-<p><b>VLFeat</b> implements a fast dense version of SIFT, called
+<p>VLFeat implements a <a href="%dox:dsift;">fast dense version of
+SIFT</a>, called
 <code>vl_dsift</code>. The function is roughly equivalent to running
 SIFT on a dense gird of locations at a fixed scale and
 orientation. This type of feature descriptors is often uses for object
 categorization.</p>
-
-
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.dsift.fast">Dense SIFT as a faster SIFT</h1>
@@ -18,6 +17,7 @@ categorization.</p>
 
 <p>The main advantage of using <code>vl_dsift</code>
 over <code>vl_sift</code> is speed. To see this, load a test image</p>
+
 <precode type='matlab'>
 I = vl_impattern('roofs1') ;
 I = single(vl_imdown(rgb2gray(I))) ;
@@ -28,7 +28,6 @@ and <code>vl_sift</code> it is necessary to understand in detail how
 the parameters of the two descriptors are related.</p>
 
 <ul>
-
 <li><p><b>Bin size vs keypoint scale</b>. DSIFT specifies the
 descriptor size by a single parameter, <code>size</code>, which controls
 the size of a SIFT spatial bin in pixels. In the standard SIFT
@@ -43,7 +42,6 @@ default, the smoothing is equivalent to a convolution by a Gaussian of
 variance <code>s^2 - .25</code>, where <code>s</code> is the scale of
 the keypoint and <code>.25</code> is a nominal adjustment that
 accounts for the smoothing induced by the camera CCD.</p></li>
-
 </ul>
 
 <p>Thus the following code produces equivalent descriptors using

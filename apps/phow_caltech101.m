@@ -1,4 +1,4 @@
-function phow_caltech101
+function phow_caltech101()
 % PHOW_CALTECH101 Image classification in the Caltech-101 dataset
 %   This program demonstrates how to use VLFeat to construct an image
 %   classifier on the Caltech-101 data. The classifier uses PHOW

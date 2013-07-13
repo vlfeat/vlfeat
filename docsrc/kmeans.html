@@ -4,159 +4,122 @@
 
 %tableofcontents;
 
-<p>The ongoing lines describe how to use <b>KMeans</b> algorithm
-implemented in <b>VlFeat</b>. A user can switch between several variations
-of the original algorithm (proposed by Lloyd), to improve the
-speed of convergence (sometimes at the expense of robustness).
-</p>
+<p>This tutorial shows how to use the <a href="%dox:kmeans;">K-means
+algorithm</a> using the VlFeat implementation of Llloyd's algorithm as
+well as other faster variants.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.kmeans.introduction">KMeans</h1>
+<h1 id="tut.kmeans.introduction">Running K-means</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>KMeans is a method for finding clusters in a dataset given a particular
-distance metric.</p>
+<p>KMeans is a clustering algorithm. Its purpose is to partition a set
+of vectors into $K$ groups that cluster around common mean
+vector. This can also be thought as <em>approximating</em> the input
+each of the input vector with one of the means, so the clustering
+process finds, in principle, the best dictionary or codebook to
+<em>vector quantize</em> the data.</p>
 
-<p>Consider a dataset containing 1000 randomly sampled points in 2-D.</p>
+<p>Consider a dataset containing 1000 randomly sampled 2D points:</p>
 
 <precode type='matlab'>
-N         = 5000 ;
+numData = 5000 ;
 dimension = 2 ;
-data = rand(dimension,N) ;
+data = rand(dimension,numData) ;
 </precode>
 
-<p>If one wants to split the data points data into 30 clusters, 
-the ongoing procedure could be invoked:</p>
+<p>The function <code>vl_kmeans</code> can be used to cluster the data
+into, say, 30 groups:</p>
 
 <precode type='matlab'>
 numClusters = 30 ;
 [centers, assignments] = vl_kmeans(data, numClusters);
 </precode>
 
-<p>After this, the centers of individual clusters
-are saved in the <code>centers</code> variable. If a user
-wants to find the assignments of data points to clusters, then
-he or she should take a look on the <code>assignments</code>
-variable which is a <code>N</code> element vector holding
-an index of a cluster center corresponding to each
-data point.</p>
+<p>By default, this uses the
+the <a href="%dox:kmeans-lloyd;">Lloyd</a> algorithm, a method that
+alternates between optimizing the cluster centers and the
+data-to-center assignments. Once this process terminates, the
+matrix <code>centers</code> contains the cluster centers and the
+vector <code>assignments</code> the (hard) assignments of the input
+data to the clusters. The cluster centers are also
+called <em>means</em> because it can be shown that, when the
+clustering is optimal, the centers are the means of the corresponding
+data points. The cluster centers and assignments can be visualized as
+follows:</p>
 
 <div class="figure">
   <image src="%pathto:root;demo/kmeans_2d_rand.jpg"/>
-  <div class="caption">KMeans clustering of 5000 randomly sampled data points. 
-                       The black dots are centers of each cluster.
-  </div>
+  <div class="caption">KMeans clustering of 5000 randomly sampled data
+  points. The black dots are the cluster centers.</div>
 </div>
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.kmeans.initialization">Initialization</h1>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<p>The KMeans algorithm in its original form initializes the centers of
-clusters to a <code>numClusters</code> sized subset of data points.
-After this initialization the algorithm runs iterative procces which
-outputs the refined centers of cllusters.</p>
-
-<p>The original random initialization process can be improved
-using so called <b>kmeans++</b> method. This procedure
-picks first center randomly, and then other centers are picked
-from data points, such that the probability of their selection
-is larger with increasing distance from already picked centers.</p>
-
-<p>This method could improve the speed of convergence as well
-as the quality of the final local minimum of the function,
-which KMeans minimizes. </p>
-
-<p><b>kmeans++</b> initialization can be turned on by specifying
-the <code>'Initialization'</code> parameter: </p>
+<p>Given a new data point <code>x</code>, this can be mapped to one of
+the clusters by looking for the closest center:</p>
 
 <precode type='matlab'>
-[centers, assignments] = vl_kmeans(data, numClusters,'Initialization','plusplus');
+x = rand(dimension, 1) ;
+[~, k] = min(vl_alldist(x, centers)) ;
+</precode>
+
+<p>For larger datastes, this process may be significantly accelerated
+by using <a href="%pathto:tut.kdtree;">KDTrees</a> or other
+approximate nearest neighbor procedures.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1 id="tut.kmeans.initialization">Choosing an initialization method</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>K-means uses local optimization algorithms and is therefore
+sensitive to initalization. By default, <code>vl_kmeans</code>
+initializes the cluster centers by picks $K$ data points at
+random. Other initalization strategies can be selected as well.
+<a href='%dox:kmeans-plus-plus'>kmeans++</a> is a popular method that
+greedily pick $K$ data points that are maximally different, and can be
+use as follows:</p>
+
+<precode type='matlab'>
+[centers, assignments] = vl_kmeans(data, numClusters, 'Initialization', 'plusplus') ;
 </precode>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.kmeans.algorithm">Algorithm selection</h1>
+<h1 id="tut.kmeans.algorithm">Choosing an optimization algorithm</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>Appart from the original KMeans algorithm proposed by Lloyd,
-also the Elkan and ANN methods could be used to speed up the process of
-finding the cluster centers.</p>
+<p>In addition to the original KMeans algorithm proposed by Lloyd,
+<code>vl_kmeans</code> supports two additional
+algorithms: <a href="%dox:kmeans-elkan">Elkan's</a> variant, an exact
+algorithm using an acceleration technique based the triangular
+inequality, and
+<a href="%dox:kmeans-ann;">ANN</a>, an approximated algorithm using
+approximate nearest neighbours.</p>
 
-<p><b>Lloyd</b> is the original method of finding the nearest cluster
-for each point. Basically, it is a naive computation of each
-point-to-center distance followed by picking the minimum of these
-computed values.</p>
-
-<p><b>Elkan</b> is almost the same approach as Lloyd but achieves
-a speedup by skipping as much distance computations as possible,
-by using the property of each distance metric called triangle
-inequality. </p>
-
-<p><b>ANN</b> uses randomized Approximate nearest neighbors
-KD-Tree forests to find the point-to-cluster correspondences. </p>
-
-<p>These optimization methods can be enabled by setting the 
+<p>These optimization methods can be enabled by setting the
 <code>'Algorithm'</code> parameter to <code>'Lloyd'</code>,
-<code>'Elkan'</code> or <code>'ANN'</code>. When using the
-<code>'ANN'</code> a user should supply the <code>'MaxNumComparisons'</code> 
-and <code>'NumTrees'</code> options to adjust the speed/accuracy of the ANN algorithm.
-(for detailed explanation on ANN KD-Tree forests see 
-<a href="%pathto:root;api/kdtree.html">KD-Trees and forests</a> page).
-</p>
+<code>'Elkan'</code> or <code>'ANN'</code> respectively. When using
+the <code>'ANN'</code> algorithm, the user can also specify the
+parameters <code>'MaxNumComparisons'</code>
+and <code>'NumTrees'</code> to <a href="%dox:kdtree;">configure
+the KD-tree</a> used used as ANN. In
+particular, <code>'MaxNumComparisons'</code> controls the trade-off
+between approximation quality and speed.</p>
 
-<p>The following benchmark shows the speed of implemented optimization methods.
-Because of the random initialization, each of the KMeans calls converges to a different local minimum
-in a different amount of iterations. Therefore we we fix the number of iterations 
-(by setting the <code>'MaxNumIterations'</code> option) to ensure the reliable measurement of ellapsed time.
-</p>
-
-<precode type='matlab'>
-N = 10000;
-numCenters = 100;
-dimension = 128;
-data = rand(dimension,N);
-
-tic
-[C] = vl_kmeans(data, numCenters, ...
-                'algorithm','lloyd', ...
-                'MaxNumIterations', 10);
-ellapsed_lloyd = toc
-
-tic
-[C] = vl_kmeans(data, numCenters, ...
-                'algorithm','elkan', ...
-                'MaxNumIterations', 10);
-ellapsed_elkan = toc
-
-tic;
-[C] = vl_kmeans(data, numCenters, ...
-                'algorithm','ann', ...
-                'NumTrees', 3, ...
-                'MaxNumComparisons', 5, ...
-                'MaxNumIterations', 10);
-ellapsed_ann = toc
-
-</precode>
-
-<p>The above code produces the following output:</p>
-
-<precode type='matlab'>
-ellapsed_lloyd =
-    6.9902
-ellapsed_elkan =
-    1.8153
-ellapsed_ann =
-    1.3716
-</precode>
-
-<p>More detailed statistics of the speed and achieved energies could be seen in the following figure (generated by vl_demo_kmeans_ann_speed):</p>
+<p><code>vl_demo_kmeans_ann_speed</code> compares the speed of the
+three algorithms. Because of the random initialization, each of the
+KMeans calls converges to a different local minimum in a different
+amount of iterations. In order to measure more accurately the speed of
+each pass, a relatively small number
+of <code>'MaxNumIterations'</code> option) is selected. Note that the
+speedup factor are in general much more dramatic when truly large
+datasets are considered.</p>
 
 <div class="figure">
-  <image src="%pathto:root;demo/kmeans_speed.jpg"/>
-  <div class="caption">Comparisons of Elkan, Lloyd and ANN 
-(expressed as a portion of maximum number of possible comparisons in KD-Tree forest) speeds and achieved energies when using serial and parallel computation.
-Also a Parallel/Serial speedup ratio is present (the experiment was run on a 4 core Intel Core i7 machine).
-  </div>
+<image src="%pathto:root;demo/kmeans_speed.jpg"/>
+<div class="caption">Comparisons of Elkan, Lloyd and ANN for different
+values of <code>MaxNumComparison</code>, expressed as a fraction of
+the number of clusters. The figure reports the duration, final energy
+value, and speedup factor, using both the serial and parallel versions
+of the code. The figure was generated using
+<code>vl_demo_kmeans_ann_speed</code>.</div>
 </div>
 
 </group>

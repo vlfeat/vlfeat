@@ -23,13 +23,14 @@ the terms of the BSD license (see the COPYING file).
 (VLAD) image representation @cite{jegou10aggregating}
 @cite{arandjelovic13all-about}.
 
-@ref vlad-starting demonstreates how to use the C API to compute the VLAD
-representation of an image. For further details refer to:
+@ref vlad-starting demonstreates how to use the C API to compute the
+VLAD representation of an image. For further details on the VLAD image
+representation refer to:
 
 - @subpage vlad-fundamentals - VLAD definition and computation.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section vlad-starting Getting started
+@section vlad-starting Getting started with VLAD
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The VLAD encoding of a set of features is obtained by using the
@@ -49,7 +50,7 @@ VLAD vecrtors. These are controlled by the parameter @a flag of
 ::vl_vlad_encode.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@page vlad-fundamentals Fundamentals
+@page vlad-fundamentals VLAD fundamentals
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
@@ -86,7 +87,7 @@ Before the VLAD encoding is used it is usually normalized, as
 explained @ref vlad-normalization next.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section vlad-normalization Normalization
+@section vlad-normalization VLAD normalization
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat VLAD implementation supports a number of different

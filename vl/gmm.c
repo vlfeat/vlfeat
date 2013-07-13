@@ -29,9 +29,6 @@ parallelized, and is tuned to work reliably and effectively on
 datasets of visual features. Stability is obtained in part by
 regularizing and restricting the parameters of the GMM.
 
-GMMs are at the basis of the computation of other useful features,
-such as the Fisher vectors (@ref fisher).
-
 @ref gmm-starting demonstreates how to use the C API to compute the FV
 representation of an image. For further details refer to:
 
@@ -147,8 +144,8 @@ Learning a GMM to fit a dataset $X=(\bx_1, \dots, \bx_n)$ is usually
 done by maximizing the log-likelihood of the data:
 @f[
  \ell(\Theta;X)
- = E_{\bx\sim\hat p} [ \log p(x|\Theta) ]
- = \frac{1}{n}\sum_{i=1}^{n} \log \sum_{k=1}^{K} \pi_k p(\bx_i|\mu_k, \Sigma_k).
+ = E_{\bx\sim\hat p} [ \log p(\bx|\Theta) ]
+ = \frac{1}{n}\sum_{i=1}^{n} \log \sum_{k=1}^{K} \pi_k p(\bx_i|\mu_k, \Sigma_k)
 @f]
 where $\hat p$ is the empirical distribution of the data. An algorithm
 to solve this problem is introduced next.
@@ -251,7 +248,7 @@ manner, yielding to:
 \\
  \Sigma_k &= { { \sum_{i=1}^n { q_{ik} (\bx_{i} - \mu_{k}) {(\bx_{i} - \mu_{k})}^T } } \over { \sum_{i=1}^n q_{ik} } },
 \\
- \pi_k &= { \sum_{i=1}^n { q_{ik} } \over { \sum_{i=1}^n \sum_{k=1}^K q_{ik} } }.
+ \pi_k &= { \sum_{i=1}^n { q_{ik} } \over { \sum_{i=1}^n \sum_{l=1}^K q_{il} } }.
 @f}
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->

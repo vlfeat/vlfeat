@@ -413,6 +413,7 @@ class DocNode(DocBareNode):
 
     def publishTableOfContents(self, gen, pageNode):
         """
+        Create a TOC by lookin at H1, H2, ... tags in a DocPage."
         """
         gen.putString("<div class='toc'>\n")
         gen.putString("<h3>Table of Contents</h3>")
@@ -473,7 +474,7 @@ class DocNode(DocBareNode):
                     print "%s:warning: no Doxygen tag file loaded, skipping this directive." % self.getLocation()
                     continue
                 if not mo.group(1) in doxygenIndex.index:
-                    print "%s:warning: tag %s not found in the Doxygen tag file." % (self.getLocation(), directive)
+                    print "%s:warning: the ID %s was not found in the Doxygen tag file." % (self.getLocation(), mo.group(2))
                     continue
                 toNodeURL = nodeIndex['root'].getPublishURL() + '/' + doxygenDir + '/' + doxygenIndex.index[mo.group(1)]
                 fromPageURL = pageNode.getPublishURL()
@@ -699,6 +700,17 @@ class DocHtmlElement(DocNode):
         if self.tag == 'br':
             # workaround for browser that do not like <br><br/>
             gen.putString("/>")
+        elif self.tag == 'code':
+            # expand tags such as <code>vl_function</code> as links
+            gen.putString("/>")
+            text = "".join([y.text for y in walkNodes(self, DocHtmlText)])
+            ok = nodeIndex.has_key(text)
+            if ok: gen.putString("<a href=" + self.expandAttr("%%pathto:%s;" % text, pageNode) + ">")
+            DocNode.publish(self, gen, pageNode)
+            if ok: gen.putString("</a>")
+            gen.putString("</")
+            gen.putString(self.tag)
+            gen.putString(">")
         else:
             gen.putString(">")
             DocNode.publish(self, gen, pageNode)

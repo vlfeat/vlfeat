@@ -3,24 +3,30 @@
 
 %tableofcontents;
 
-<p>This tutorial gives an overview of the <code>vl_covdet</code>
-VLFeat command implementing a number of co-variant feature detectors
-and corresponding descriptors. For example applications, see also
-the <a href="%pathto:tut.sift">SIFT tutorial</a>.</p>
+<p>This tutorial introduces the <code>vl_covdet</code> VLFeat command
+implementing a number of co-variant feature detectors and
+corresponding descriptors. This family of detectors
+include <a href="%dox:sift;">SIFT</a> as well as multi-scale conern
+(Harris-Laplace), and blob (Hessian-Laplace and Hessian-Hessian)
+detectors. For example applications, see also
+the <a href="%pathto:tut.sift;">SIFT tutorial</a>.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.covdet.extract">Extracting frames and descriptors</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>The first example shows how to use <code>vl_covdet</code> to
-compute and visualise co-variant features. Fist, let us load an
-example image and visualize it:</p>
+<p>The first example shows how to
+use <a href="%pathto:vl_covdet;"><code>vl_covdet</code></a> to compute
+and visualise co-variant features. Fist, let us load an example image
+and visualize it:</p>
 
+<div style="clear:both;">
 <precode type='matlab'>
 im = vl_impattern('roofs1') ;
 figure(1) ; clf ;
 image(im) ; axis image off ;
 </precode>
+</div>
 
 <div class="figure">
  <img src="%pathto:root;demo/covdet_basic_image.jpg"/>

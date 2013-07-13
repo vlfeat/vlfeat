@@ -58,7 +58,7 @@
   <page id="apps" name="apps" title="Applications">
     <include src="apps.html"/>
     <page id="apps.caltech-101.code" name="caltech-101-code" title="phow_caltech101.m" hide="yes">
-      <pre><include src="../apps/phow_caltech101.m" type="text"/></pre>
+      <precode type='matlab'><include src="../apps/phow_caltech101.m" type="text"/></precode>
     </page>
     <page id="apps.sift-mosaic.code" name="sift-mosaic-code" title="sift_mosaic.m" hide="yes">
       <pre><include src="../apps/sift_mosaic.m" type="text"/></pre>

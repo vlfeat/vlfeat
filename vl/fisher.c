@@ -49,8 +49,6 @@ flag parameter of ::vl_fisher_encode.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page fisher-fundamentals Fisher vector fundamentals
-@author David Novotny
-@author Andrea Vedaldi
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 

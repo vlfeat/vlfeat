@@ -99,17 +99,48 @@ doc/build/matlab/mdoc.html doc/build/matlab/helptoc.xml: \
 	          --verbose
 
 # --------------------------------------------------------------------
+#                                            Auto-include demo m-files
+# --------------------------------------------------------------------
+
+m_demo_src=$(wildcard toolbox/demo/vl_demo_*.m)
+
+# Convert the various man pages
+doc/build/matlab/demo.xml : $(m_demo_src) $(doc-dir) make/doc.mak
+	@echo "Indexing demo files -> $@"
+	@( \
+	  echo '<!DOCTYPE group PUBLIC ' ; \
+	  echo '  "-//W3C//DTD XHTML 1.0 Transitional//EN"' ; \
+	  echo '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' ; \
+	  echo "<group>" ; \
+	  for fullName in $(m_demo_src) ; \
+	  do  \
+	  fileName=$${fullName#toolbox/demo/} ; \
+	  stem=$${fileName%.*} ; \
+	  ( \
+	    echo "<page id='$${stem}' name='$${stem}' title='$${stem}' hide='yes'>" ; \
+	    printf "<h1>Source code for <code>%s.m</code></h1>" "$${stem}"; \
+	    echo "<p>This file is located in the <code>toolbox/demo</code> folder in VLFeat package.</p>" ; \
+	    echo "<precode type='matlab'>" ; \
+	    echo "<include src='toolbox/demo/$${fileName}' type='text'/>" ; \
+	    echo "</precode>" ; \
+	    echo "</page>" \
+	  ) ; \
+	  done ; \
+	  echo "</group>" ; \
+	)  > "$@"
+
+# --------------------------------------------------------------------
 #                                                                  Man
 # --------------------------------------------------------------------
 
-doc-man: doc/build/man/man.xml doc/build/man/man.html
+doc-man: doc/build/man/xman.xml doc/build/man/xman.html
 man_src := $(wildcard src/*.1) $(wildcard src/*.7)
 man_tgt := $(subst src/,doc/build/man/,$(addsuffix .html,$(man_src)))
 
 doc/build/man/index.html : $(doc-dir)
 
 # Integrate in Webdoc
-doc/build/man/man.xml : $(man_tgt) $(doc-dir)
+doc/build/man/xman.xml : $(man_tgt) $(doc-dir)
 	@echo "Generating MAN XML webdooc document $@"
 	@echo "<group>" > "$@"
 	@for fullName in $(man_src) ; \
@@ -125,7 +156,7 @@ doc/build/man/man.xml : $(man_tgt) $(doc-dir)
 	echo "</group>" >> "$@"
 
 # Index page
-doc/build/man/man.html : $(man_tgt) $(doc-dir)
+doc/build/man/xman.html : $(man_tgt) $(doc-dir)
 	@echo "Generating MAN HTML index page $@"
 	@echo "<ul>" > "$@"
 	@for fullName in $(man_src) ; \
@@ -236,6 +267,7 @@ doc/index.html: $(webdoc_src) $(doc-dir) \
  doc/build/matlab/mdoc.html \
  doc/build/man/man.xml \
  doc/build/man/man.html \
+ doc/build/matlab/demo.xml \
  docsrc/webdoc.py \
  $(doc_fig_tgt) \
  $(html_src)

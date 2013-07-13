@@ -1,56 +1,52 @@
-<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <group>
 
+%tableofcontents;
+
 <p>This section features a number of tutorials illustrating some of
-the main algorithms implemented in <b>VLFeat</b>. The tutorials can be
-roughly grouped into two categories. The first class of algorithms
-detect and describe image regions
-(<a href="%pathto:tut.features;"><em>features</em></a>). The second
-class of algorithms
-<a href="%pathto:tut.clustering;"><em>cluster</em></a> data.
+the algorithms implemented in <b>VLFeat</b>, roughly divided
+into <a href="%pathto:tut.features;"><em>visual features</em></a> such
+as SIFT and Fisher vectors and
+<a href="%pathto:tut.stat;"><em>statistical methods</em></a>, such as
+K-means, GMMs, KDTrees, and SVMs.</p>
 
-<h1 id="tut.features">Features</h1>
-
+<h1 id="tut.features">Visual features</h1>
 <ul>
   <li><p><a href="%pathto:tut.covdet;">Covariant detectors.</a> An
   introduction to computing co-variant features like Harris-Affine.
   </p></li>
   <li><p><a href="%pathto:tut.hog;">Histogram of Oriented Gradients
   (HOG).</a> Getting started with this ubiquitous representation for
-  object recognition.
+  object recognition and detection.
   </p></li>
   <li><p><a href="%pathto:tut.sift;">Scale Invariant Feature Transform
-  (SIFT)</a>. Getting started with this popular feature detector /
-  descriptor.</p></li>
+  (SIFT)</a>. An introduction to SIFT keypoint and descriptor
+  extraction and matching.
+  </p></li>
   <li><p><a href="%pathto:tut.dsift;">Dense SIFT (DSIFT) and
-  PHOW</a>. A state-of-the-art descriptor for image
-  categorization.</p></li>
+  PHOW</a>. Extracting dense SIFT features for image
+  classification.</p></li>
    <li><p><a href="%pathto:tut.sift;">Local Intensity Order Pattern
-  (LIOP)</a>. Getting started with LIOP /
-  descriptor.</p></li>
+  (LIOP)</a>. Getting started with the LIOP descriptor as an
+  alternative to SIFT in keypoint matching.</p></li>
   <li><p><a href="%pathto:tut.mser;">Maximally Stable Extremal Regions
-  (MSER)</a>. Extracting MSERs from an image.</p></li>
+  (MSER)</a>. Extracting MSERs from an image as an alternative
+  covariant feature detector.</p></li>
   <li><p><a href="%pathto:tut.imdisttf;">Image distance transform.</a>
   Compute the image distance transform for fast part models and edge
   matching.</p></li>
-  <li><p><a href="%pathto:tut.encodings;">VLAD and Fisher vector
-  encodings.</a> Compute global image encoding by pooling local image
-  features.</p></li>
+  <li><p><a href="%pathto:tut.encodings;">Fisher vector and VLAD
+  encodings.</a> Compute global image encodings by pooling local image
+  features with Fisher vectors and VLAD.</p></li>
 </ul>
 
-<h1 id="tut.clustering">Clustering</h1>
-
+<h1 id="tut.stat">Statistical methods</h1>
 <ul>
-  <li><p><a href="%pathto:tut.gmm;">GMM</a>. 
-  An implementation of a Gaussian mixture model estimation using the Expectation Maximization algorithm.</p></li>
-  <li><p><a href="%pathto:tut.kmeans;"><em>k</em>-means</a>. 
-  VlFeat <em>k</em>-means implementation.</p></li>
-  <li><p><a href="%pathto:tut.ikm;">Integer optimized <em>k</em>-means
-  (IKM)</a>. A quick overview of VLFeat fast <em>k</em>-means
-  implementation.</p></li>
-  <li><p><a href="%pathto:tut.hikm;">Hierarchical <em>k</em>-means
-  (HIKM)</a>. Create a fast <em>k</em>-means tree for integer
-  data.</p></li>
+  <li><p><a href="%pathto:tut.gmm;">GMM</a>. Learn Gaussian Mixture
+  Models using the Expectation Maximization algorithm.</p></li>
+  <li><p><a href="%pathto:tut.kmeans;"><em>k</em>-means</a>. Cluster
+      features with <em>k</em>-means.</p></li>
   <li><p><a href="%pathto:tut.aib;">Agglomerative Information Bottleneck
   (AIB)</a>. Cluster discrete data based on the mutual information
   between the data and class labels.</p></li>
@@ -59,23 +55,26 @@ class of algorithms
   method.</p></li>
   <li><p><a href="%pathto:tut.slic;">SLIC</a>. An introduction to SLIC
   supoerpixels.</p></li>
-</ul>
-
-<h1>Other</h1>
-
-<ul>
   <li><p><a href="%pathto:tut.svm;">Support Vector Machine (SVM)</a>.
   Learn a binary classifier and check its convergence by plotting
   various statistical information.</p></li>
   <li><p><a href="%pathto:tut.kdtree;">Forests of kd-trees</a>.
   Approximate nearest neighbor queries in high dimensions using an
   optimized forest of kd-trees.</p></li>
-  <li><p><a href="%pathto:tut.plots-rank;">Plotting functions for rank evaluation.</a>
-  Learn how to plot ROC, DET, and precision-recall curves.</p></li>
+  <li><p><a href="%pathto:tut.plots-rank;">Plotting functions for rank
+  evaluation.</a>  Learn how to plot ROC, DET, and precision-recall
+  curves.</p></li>
   <li><p><a href="%pathto:tut.utils;">MATLAB Utilities</a>. A list of
   useful MATLAB functions bundled with VLFeat.</p></li>
 </ul>
 
-</p>
-
+<h1>Obsolete tutorials</h1>
+<ul>
+  <li><p><a href="%pathto:tut.ikm;">Integer optimized <em>k</em>-means
+  (IKM)</a>. VLFeat integeger-otpimized <em>k</em>-means
+  implementation (obsolete).</p></li>
+  <li><p><a href="%pathto:tut.hikm;">Hierarchical <em>k</em>-means
+  (HIKM)</a>. Create a fast <em>k</em>-means tree for integer
+  data (obsolete).</p></li>
+</ul>
 </group>

@@ -40,6 +40,13 @@ class Doxytag:
 
     def xBuildIndex(self, node):
         if node.nodeType == node.ELEMENT_NODE:
+            if node.tagName == "docanchor":
+                anchor=self.getText(node.childNodes)
+                filename=node.getAttribute("file")
+                if os.path.splitext(filename)[1] != '.html':
+                        filename += '.html'
+                self.index[anchor] = filename + "#" + anchor
+            # do filenames
             filename = node.getElementsByTagName("filename")
             if filename.length > 0:
                 name = node.getElementsByTagName("name")
@@ -49,6 +56,7 @@ class Doxytag:
                     if os.path.splitext(s2)[1] != '.html':
                         s2 = s2 + '.html'
                     self.index[s1] = s2
+
         for x in node.childNodes:
             self.xBuildIndex(x)
 

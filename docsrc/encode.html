@@ -20,7 +20,7 @@ these representation store the difference between dictonary elements
 and pooled local features.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.encoding.fisher">Fisher encoding</h1>
+<h1 id="tut.fisher">Fisher encoding</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>The Fisher encoding uses GMM to construct a visual word
@@ -35,7 +35,7 @@ dimension = 2 ;
 data = rand(dimension,numFeatures) ;
 
 numClusters = 30 ;
-[means, sigmas, weights] = vl_gmm(data, numClusters);
+[means, covariances, priors] = vl_gmm(data, numClusters);
 </precode>
 
 <p>Next we create another random set of vectors, which should be
@@ -43,8 +43,8 @@ encoded using the Fisher vector representation and the GMM just
 obtained.</p>
 
 <precode type='matlab'>
-numEncodedFeatures = 1000;
-dataToBeEncoded = rand(dimension,numEncodedFeatures);
+numDataToBeEncoded = 1000;
+dataToBeEncoded = rand(dimension,numDataToBeEncoded);
 </precode>
 
 <p>The Fisher vector encoding <code>enc</code> of these vectors is
@@ -52,82 +52,72 @@ obtained by calling the <code>vl_fisher</code> function using the
 output of the <code>vl_gmm</code> function:</p>
 
 <precode type='matlab'>
-encoding = vl_fisher(datatoBeEncoded, means, sigmas, weights);
+encoding = vl_fisher(datatoBeEncoded, means, covariances, priors);
 </precode>
 
 <p>The <code>encoding</code> vector is the Fisher vector
 representation of the data <code>dataToBeEncoded</code>.</p>
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.encoding.vlad">VLAD encoding</h1>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<p>
-The <b>V</b>ector of <b>L</b>inearly <b>A</b>gregated <b>D</b>escriptors
-encodes the features in a slightly different way. Simillar to 
-the Fisher encoding, the VLAD encoding collaborates with
-a clustering technique. In the case of VLAD, this method is 
-KMeans clustering.
-</p>
+<p>Note that Fihser vectors support
+several <a href="%dox:fisher-normalization;">normalization options</a>
+that can affect substantially the performance of the
+representation.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h3 id="tut.encoding.vlad.kmeans">KMeans + VLAD</h3>
+<h1 id="tut.vlad">VLAD encoding</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>
-Let's first, as we did in the Fisher section,
-make a random dataset <code>dataLearn</code> and cluster
-it using KMeans (<a href="%pathto:root;overview/kmeans.html">KMeans</a> tutorial).
-Also we will need the dataset we want to encode, so we create one.
-</p>
+<p>The <b>V</b>ector
+of <b>L</b>inearly <b>A</b>gregated <b>D</b>escriptors is similar to
+Fisher vectors but (i) it does not store second-order information
+about the features and (ii) it typically use KMeans instead of GMMs to
+generate the feature vocabulary (although the latter is also an
+option).</p>
 
-<precode>
-N         = 5000 ;
-dimension = 2 ;
-dataLearn = rand(dimension,N) ;
+<p>Consider the same 2D data matrix <code>data</code> used in the
+previous section to train the Fisher vector representation. To compute
+VLAD, we first need to obtain a visual word dictionary. This time, we
+use K-means:</p>
 
+<precode type='matlab'>
 numClusters = 30 ;
 centers = vl_kmeans(dataLearn, numClusters);
-
-Nencode = 1000;
-dataEncode = rand(dimension,Nencode);
 </precode>
 
-<p>
-The <code>vl_vlad</code> function accepts centers of clusters,
-data we want to encode and also assignments (which are "hard" in the case of KMeans)  
-of each vector to a cluster. The assignments could be obtained by the
-vl_kdtree_query function, which quickly finds the nearest cluster center
-(stored in <code>centers</code>) for each <code>dataEncode</code> vector.
-Note that before running queries to KD-Tree it must be built
-using the <code>vl_kdtreebuild</code> function.
-</p>
+<p>Now consider the data <code>dataToBeEncoded</code> and use
+the <code>vl_vlad</code> function to compute the encoding. Differently
+from <code>vl_fhiser</code>, <code>vl_vlad</code> requires the
+data-to-cluster assignments to be passed in. This allows
+using a fast vector quantization technique (e.g. kd-tree) as well as
+switching from soft to hard assignment.</p>
+
+<p>In this example, we use a kd-tree for quantization:</p>
+
+<precode type='matlab'>
+kdtree = vl_kdtreebuild(centers) ;
+nn = vl_kdtreequery(kdtree, centers, dataEncode) ;
+</precode>
+
+<p>Now we have in the <code>nn</code> the indeces of the nearest
+center to each vector in the matrix <code>dataToBeEncoded</code>. The
+next step is to create an assignment matrix:</p>
 
 <precode>
-kd_tree = vl_kdtreebuild(centers) ;
-assign = vl_kdtreequery(kd_tree, centers, dataEncode) ;
+assignments = zeros(numClusters,numDataToBeEncoded);
+assignments(sub2ind(size(assignments), nn, 1:length(nn))) = 1;
 </precode>
 
-<p>
-Now we have in the <code>assign</code> variable indices of nearest centers
-to each <code>dataEncode</code> vector. The next step is 
-converting assign vector to the right format, which
-is accepted by <code>vl_vlad</code>.
-</p>
+<p>It is now possible to encode the data using
+the <code>vl_vlad</code> function:</p>
 
 <precode>
-assignments = zeros(numClusters,Nencode);
-assignments(sub2ind(size(assignments),assign,1:length(assign))) = 1;
+enc = vl_vlad(dataToBeEncoded,centers,assignments);
 </precode>
 
-<p>
-After this, we are ready to proceed to calculate
-the final VLAD vector <code>enc</code>.
-</p>
-
-<precode>
-enc = vl_vlad(dataEncode,centers,assignments);
-</precode>
+<p>Note that, similarly to Fisher vectors, VLAD supports
+several <a href="%dox:vlad-normalization;">normalization options</a>
+that can affect substantially the performance of the
+representation.</p>
 
 </group>
 

@@ -11,10 +11,10 @@
 %   [MEANS, COVARIANCES, PRIORS, LL] = VL_GMM(...) returns the
 %   loglikelihood (LL) of the model as well.
 %
-%   [MEANS, COVARIANCES, PRIORS, LL, POSTERIORS] = VL_GMM(...) returns the
-%   loglikelihood of the solution and posterior probabilities of the
-%   Gaussian modes given each data point. The POSTERIORS matrix has
-%   NUMCLUSTERS rows and NUMDATA columns.
+%   [MEANS, COVARIANCES, PRIORS, LL, POSTERIORS] = VL_GMM(...) returns
+%   the posterior probabilities POSTERIORS of the Gaussian modes given
+%   each data point. The POSTERIORS matrix has NUMCLUSTERS rows and
+%   NUMDATA columns.
 %
 %   VL_GMM() supports different initialization and optimization
 %   methods. Specifically, the following options are supported:
@@ -28,34 +28,30 @@
 %     specifying the initial means, covariances, and prior
 %     probabilities.
 %
-%   InitMeans:: []
+%   InitMeans:: none
 %    Specify the initial means (size(X,1)-by-NUMCLUSTERS matrix).
 %
-%   InitPriors:: []
+%   InitPriors:: none
 %    Specify the initial weights (a vector of dimension NUMCLUSTER).
 %
-%   InitCovariances:: []
+%   InitCovariances:: none
 %    Specify the initial diagonal covariance matrices
-%
-%   Multithreading:: [SERIAL]
-%     Choose whether to use SERIAL or PARALLEL (multi-core)
-%     computations.
 %
 %   NumRepetitions:: 1
 %     Number of times to restart EM. The solution with maximum
 %     loglikelihood is returned.
 %
 %   SigmaBound:: 10e-6
-%     Set the lower bound on the covariance diagonal entries. This
-%     is particularly important if the data contains singleton
-%     dimensions, and generally useful for stability.
+%     Set the lower bound on the diagonal entries of each mode
+%     covariance matrix. This is particularly important if the data
+%     contains singleton dimensions, and generally useful for
+%     stability.
 %
 %   Example::
-%     VL_GMM(X, 10, 'verbose', 'multithreading', 'parallel',
-%     'MaxNumIterations', 20) estimates the mixture of 10 gaussians
-%     using at mosst 20 iterations.
+%     VL_GMM(X, 10, 'verbose', 'MaxNumIterations', 20) estimates the
+%     mixture of 10 gaussians using at mosst 20 iterations.
 %
-%   See also: VL_KMEANS(), VL_HELP().
+%   See also: <a href="matlab:vl_help('gmm')">GMMs</a>, VL_KMEANS(), VL_HELP().
 
 % Authors: David Novotny and Andrea Vedaldi
 

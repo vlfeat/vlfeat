@@ -1,219 +1,80 @@
-dimension  = 128 ;
-numData    = 10000 ;
+% VL_DEMO_KMEANS_ANN_SPEED   Compares Lloyd's, Elkan, and ANN k-means
+
 numCenters = 200 ;
-numTrials  = 5;
-numIterations = 5;
-initialization = 'randsel';
-distance = 'l2';
+numTrials = 3 ;
+maxNumIterations = 10 ;
+initialization = 'randsel' ;
 %initialization = 'plusplus';
+distance = 'l2' ;
 
-X = [];
-switch 1
-    case 1
-        % one random cluster
-        X = randn(dimension,numData);
-    case 2
-        %several well refined clusters
-        mixtureDist = 50;
-        for i=1:numCenters
-            X = [X randn(dimension,numData/numCenters)+repmat(rand(dimension,1)*mixtureDist, 1, numData/numCenters)];
-        end
+%% Create an example dataset
+
+dimension = 32 ;
+numData = 50000 ;
+
+X = randn(dimension,numData);
+
+%% Run various k-means algorithms on the data
+algorithms = {'Lloyd','Elkan','ANN 1/4','ANN 1/10','ANN 1/50' } ;
+options = {{'Algorithm', 'Lloyd'}, ...
+           {'Algorithm', 'Elkan'}, ...
+           {'Algorithm', 'ANN', 'MaxNumComparisons', ceil(numCenters / 4)}, ...
+           {'Algorithm', 'ANN', 'MaxNumComparisons', ceil(numCenters / 10)}, ...
+           {'Algorithm', 'ANN', 'MaxNumComparisons', ceil(numCenters / 50)}} ;
+numCpus = [1 0] ;
+
+clear time energy ;
+for n = 1:2
+  for a = 1:numel(algorithms)
+    for t = 1:numTrials
+      vl_threads(numCpus(n)) ;
+      start = tic ;
+      [C, A, E] = vl_kmeans(X, ...
+                            numCenters, 'Verbose', ...
+                            'Distance', distance, ...
+                            'MaxNumIterations', maxNumIterations, ...
+                            options{a}{:}) ;
+      time(t,a,n) = toc(start) ;
+      energy(t,a,n) = E ;
+    end
+  end
 end
 
-if dimension == 3
-    figure
-    plot3(X(1,:),X(2,:),X(3,:),'r.')
-    axis equal
+% average over tirals
+time = squeeze(mean(time,1)) ;
+energy = squeeze(mean(energy,1)) ;
+
+figure(1) ; clf ;
+for n=1:2
+  if n == 1
+    str = 'Serial' ;
+  else
+    str = 'Parallel' ;
+  end
+    
+  subplot(3,2,(n-1)+1) ;
+  bar(time(:,n)) ;
+  set(gca,'XTickLabel',algorithms);
+  set(gca,'FontSize',8),
+  xlabel('Algorithm');
+  ylabel('Time [s]');
+  title(str) ;
+  
+  subplot(3,2,(n-1)+3) ;
+  bar(energy(:,n));
+  set(gca,'XTickLabel',algorithms);
+  set(gca,'FontSize',8),
+  xlabel('Algorithm');
+  ylabel('Energy');
+  title(str) ;
+
+  subplot(3,2,(n-1)+5) ;
+  bar(time(1,1)./time(:,n)) ;
+  set(gca,'XTickLabel',algorithms);
+  set(gca,'FontSize',8),
+  xlabel('Algorithm');
+  ylabel('Speedup');
+  title(str) ;
 end
 
-algs = {'Lloyd','Elkan','1/4','1/10','1/50'};
-
-timesSerial = zeros(numTrials,5);
-timesParallel = zeros(numTrials,5);
-
-eSerial = zeros(numTrials,5);
-eParallel = zeros(numTrials,5);
-
-%serial trials
-for trial = 1:numTrials
-    %lloyd
-    tic
-    vl_threads(1) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','lloyd', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance);
-    timesSerial(trial,1) = toc;
-    eSerial(trial,1) = E;
-
-    %elkan
-    tic
-    vl_threads(1) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','elkan', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance);
-    timesSerial(trial,2) = toc;
-    eSerial(trial,2) = E;
-
-    %ann 1/4
-    tic
-    vl_threads(1) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/4));
-    timesSerial(trial,3) = toc;
-    eSerial(trial,3) = E;
-
-    %ann 1/25
-    tic
-    vl_threads(1) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/10));
-    timesSerial(trial,4) = toc;
-    eSerial(trial,4) = E;
-
-    %acc 1/100
-    tic
-    vl_threads(1) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/50));
-    timesSerial(trial,5) = toc;
-    eSerial(trial,5) = E;
-end
-
-timesSerial = sum(timesSerial,1)/numTrials;
-eSerial = sum(eSerial,1)/numTrials;
-
-figure
-subplot(3,2,1)
-bar(timesSerial);
-set(gca,'xticklabel',algs);
-set(gca,'FontSize',8),
-xlabel('Algorithm');
-ylabel('Time serial [s]');
-
-subplot(3,2,2)
-bar(eSerial);
-set(gca,'xticklabel',algs);
-set(gca,'FontSize',8),
-xlabel('Algorithm');
-ylabel('Energy serial');
-
-%parallel trials
-for trial = 1:numTrials
-    %lloyd
-    tic
-    vl_threads(0) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','lloyd', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance);
-    timesParallel(trial,1) = toc;
-    eParallel(trial,1) = E;
-
-    %elkan
-    tic
-    vl_threads(0) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','elkan', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance);
-    timesParallel(trial,2) = toc;
-    eParallel(trial,2) = E;
-
-    %ann 1/4
-    tic
-    vl_threads(0) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/4));
-    timesParallel(trial,3) = toc;
-    eParallel(trial,3) = E;
-
-    %ann 1/25
-    tic
-    vl_threads(0) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/10));
-    timesParallel(trial,4) = toc;
-    eParallel(trial,4) = E;
-
-    %acc 1/100
-    tic
-    vl_threads(0) ;
-    [C, A, E] = vl_kmeans(X, numCenters, ...
-        'verbose', ...
-        'algorithm','ann', ...
-        'initialization', initialization, ...
-        'MaxNumIterations', numIterations, ...
-        'distance', distance, ...
-        'NumTrees', 3, ...
-        'MaxNumComparisons', ceil(numCenters/50));
-    timesParallel(trial,5) = toc;
-    eParallel(trial,5) = E;
-end
-
-timesParallel = sum(timesParallel,1)/numTrials;
-eParallel = sum(eParallel,1)/numTrials;
-
-subplot(3,2,3);
-bar(timesParallel);
-set(gca,'xticklabel',algs);
-set(gca,'FontSize',8),
-xlabel('Algorithm');
-ylabel('Time parallel [s]');
-
-subplot(3,2,4);
-bar(eParallel);
-set(gca,'xticklabel',algs);
-set(gca,'FontSize',8),
-xlabel('Algorithm');
-ylabel('Energy parallel');
-
-speedup = timesSerial./timesParallel;
-
-subplot(3,2,5);
-bar(speedup);
-set(gca,'xticklabel',algs);
-set(gca,'FontSize',8),
-xlabel('Algorithm');
-ylabel('Ser/Par speedup ratio');
-
-vl_demo_print('kmeans_speed',0.75);
+vl_demo_print('kmeans_speed',1);
