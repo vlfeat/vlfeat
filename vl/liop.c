@@ -15,20 +15,22 @@
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page liop Local Intensity Order Pattern descriptor
 @author Hana Sarbortova
+@author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref liop.h implements Local Intensity Order Pattern descriptor (LIOP)
-as proposed in @cite{wang11local}
+@ref liop.h implements *Local Intensity Order Pattern descriptor* (LIOP)
+of @cite{wang11local}
 
-Please see @subpage liop-fundamentals for a technical description of
-LIOP descriptor.
+@ref liop-starting shows how to compute LIOP using the C API.  Refer
+to @subpage liop-fundamentals for a technical description of LIOP
+descriptor.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section liop-starting Getting started
+@section liop-starting Getting started with LIOP
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-The Following code demonstrates how tow to use @ref liop.h in the C
-programming language in order to compute liop descriptor from a patch.
+The following code fragment demonstrates how tow to use @ref liop.h in
+a C program in order to compute the LIOP descriptor of an image patch.
 
 @code
 #include <vl/liop.h>
@@ -42,19 +44,18 @@ float * desc = vl_malloc(sizeof(float)*liop->liopArraySize);
 
 // compute descriptor from a patch (in this case, the patch must be
 // an array of length 41*41=1681)
-compute_liop_descriptor(liop, patch, desc);
+vl_liopdesc_process(liop, patch, desc);
 
 // delete object instance
 vl_liopdesc_delete(liop);
 @endcode
 
 Not all pixels from the patch will contribute to the descriptor as
-sample points. The sample points belong to the area of the inner circle,
-as all neighbours of sample points has to be computed from the patch.
-Please see the image below for better understanding.
+sample points. The sample points belonging to the area of the inner
+circle, as all neighbours of sample points has to be computed from the
+patch. Please see the image below for better understanding.
 
 @image html liop-patch-layout.png "LIOP patch layout"
-
 **/
 
 /**
@@ -63,58 +64,82 @@ Please see the image below for better understanding.
 @tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Local Invariant Order Pattern (LIOP) descriptor, as proposed in
-@cite{wang11local}, uses both local and overall intensity information
-of the local patch for the descriptor computation. It is invariant to
-monotonic intensity changes and image rotation and is robust to many
-other geometric and photometric transformations.
+The *Local Invariant Order Pattern* (LIOP) descriptor
+@cite{wang11local} is a local feature descriptor. It is by design
+invariant to monotonic intensity changes and image rotations and is
+robust to several other geometric and photometric transformations.
 
-The descriptor is computed from a normalized local patch. An image part that
-belongs to a feature frame which can be generally of shape of an oriented
-ellise is transformed to a circle.
+For convenience, LIOP is computed from a square image patch, obtained
+for example by normalizing a feature frame (keypoint) obtained from a
+covariant feature detector. However, LIOP is rotation invariant. On
+one side, this means that rotation detection and normalization is
+unnecessary with this descriptor. On the other side, this implies that
+only pixels withing a cricle inscribe in the square image patch are
+actually used to compute the descriptor.
 
-In this implementation, we are computing the LIOP descriptor from a patch
-which is represented by a square of an odd side length. Only points
-belonging to the area of a circle of a radius which is always smaller than
-half of the patch side will be used as sample points.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section liop-computation Descriptor computation
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-The descriptor computation has 2 steps based on intensity order.
-First, every sample point is assigned to a particular bin according
-to overall intensity. Second, intensities of neighbours of sample points
-contribute to actuall values of the computed descriptor.
+The descriptor computation can be divided into two steps. In the @ref
+liop-computation-regions first step, the image is partitioned into a
+number of regions basd on the intensity values of the pixels. In the
+@ref liop-computation-pooling second step, a local difference operator
+is applied to each image pixel, and a statistic of the output of this
+operator is pooled independenlty in each of the regions.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection liop-computation-bins Region division
+@subsection liop-computation-regions Region division
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-All sample points are sorted according to their intensity in a nondescending
-order. The points are than equally quantized into @c numberOfBins ordinal bins.
+The image patch is divided into a number @c numSpatialBins of sub-regions.
+Each region is defined as the set of pixels between two intensity
+values:
+\[
+ R_t = \{\bx : \tau_{t} \leq I(\bx) < \tau_{t+1} \}.
+\]
+In this manner, regions $R_t,$ $t=1,\dots,$ @c numSpatialBins are
+covariant with any image warping, including translation, rotation, and
+scaling.
 
-As a result, each bin contains the same number of points except for
-the last one which is between 0 to @c numberOfBins - 1 points larger. The first
-bin contains points with the lowest intensity values, similarly the
-last bin has the points with the highest intensity values.
+In order to make the selection of regions invariant to affine changes
+of the intensity, the thresholds $\tau_t$ are selected such that each
+region contains the same number of pixels. This is obtained quickly by
+sorting pixels by increasing intesity and then dividing the list into
+@c numSpatialBins equal parts.
+ 
+When @c numSpatialBins does not divide exactly the number of pixels,
+all the regions have the same area except the last one, which can be
+larger.
 
 (parameter to set @c numberOfBins)
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection liop-computation-points Sample point contribution
+@subsection liop-computation-pooling Sample point contribution
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Each point is represented by its neighbours. Specifically,
-@c numberOfNeighbours points are sampled from a circle of radius
-@c pointToNeighbourRadius and centre in the particular point.
-The neighbouring points are sampled in the same manner as shown on the
-image below ($C$ is the patch center). Sampling order is always anticlokwise.
+After regions are computed, an operator is applied to each pixel $\bx$
+in the patch in order to characterize its local appearance. This
+operator start by considering the intensities $I(\bx_1), I(\bx_2),
+\dots$ of @c numberOfNeighbours image pixels in a small circle of
+radius @c pointToNeighbourRadius around point $\bx$.
+
+The layout of the sample points $\bx_1,\by_2,\dots$ is show in the
+image below. The sampling order is always anticlokwise and uses the
+radious connecting the patch center to $\bx$ as a reference. In this
+manner, the set of samples is also co-variant with the image rotation.
 
 @image html liop-neighbours-sampling.png "Sampling order of neighbouring points"
 
-Intensity values of these neighbouring points are computed by linear
-interpolation.
+The sample points do not necessarily have integer coordinates; so
+$I(\bx_i)$ is computed using bilinear interpolation.
+
+The intensity values thus collected are sorted by increasing intesnity
+$I(\bx_{\sigma_1}) < I(\bx_{\sigma_2}) < \dots$ where $\sigma_i$ is a
+permuation.
+
+The set of local
+samples is then mapped to a discrete symbol by comparing pixel
+intensities.
+
+This is obtained as follows.
+
 
 We sort the neighbours according their intensities and take the indexes
 that points from the sorted array into the unsorted one. Then the
@@ -179,78 +204,209 @@ The final step is normalization of the descriptor $\phi$.
 */
 
 #include "liop.h"
+#include "mathop.h"
+#include "imopv.h"
+#include <strings.h>
+
+#define NO_VALUE -1
+#define THRESHOLD_MULTIPLIER 0.0196
+#define MAX_FLOAT_VALUE 1E+37
+#define MIN_FLOAT_VALUE 1E-37
+#define MAX_UINT8_VALUE 255
+
+static
+void get_intensities_of_neighbours(float *intensities,
+                                   float * patch,
+                                   VlLiopDesc * liop,
+                                   float x,
+                                   float y);
+
+static
+void stable_indexes_qsort(float * array,
+                 vl_uindex *indexes,
+                 vl_uindex begin,
+                 vl_uindex end);
+
+static
+void qsort_swap(vl_uindex * array,
+                vl_uindex index1,
+                vl_uindex index2);
+
+static
+vl_int get_permutation_index(vl_uindex * permutation, vl_size size);
+
+static
+float interpolate(float * patch,
+                  vl_int sideLength,
+                  float x,
+                  float y);
+
+static
+vl_int factorial(vl_int num);
+
+static
+void get_coordinates(vl_int a,
+                     vl_int pos,
+                     float * x,
+                     float * y);
+
+static
+vl_uindex get_vector_position(vl_int a,
+                              float x,
+                              float y);
+
+static
+void rotate_vector(float alpha,
+                   float * x,
+                   float * y);
+
+static
+float get_weight(float * intensities,
+                  vl_size size,
+                  float threshold);
+
+static
+float find_weight_threshold(float * data,
+                            vl_size length);
+
+static
+vl_int * compute_circle_look_up_table(vl_int radius,
+                                      vl_int sideLength);
+
+static
+void compute_inner_patch_indexes( VlLiopDesc * self,
+                                  vl_int length,
+                                  vl_int radius);
+
+
+/* ---------------------------------------------------------------- */
+/*                                                 Helper functions */
+/* ---------------------------------------------------------------- */
+
+static
+vl_int factorial(vl_int num)
+{
+  vl_int result = 1;
+  while(num > 1){
+    result = num*result;
+    num--;
+  }
+  return result ;
+}
+
+/* ---------------------------------------------------------------- */
+/*                                        Reshape patch to a circle */
+/* ---------------------------------------------------------------- */
+
+/**
+ * @brief Compute circle look up table
+ * @param radius circle radius
+ * @param sideLength patch side length
+ * @return array of length <code>sideLength</code> with number of pixels
+ *         that are outside of the circle bu`t still in the patch.
+ *         Each alement is for one column of a half of the patch.
+ */
+vl_int * compute_circle_look_up_table(vl_int radius, vl_int sideLength){
+    vl_int * table = vl_malloc(sideLength*sizeof(vl_int));
+    float y = (float)radius - 0.4;
+    vl_index i;
+    vl_int value;
+    for(i = 0; i < radius; i++){
+        value = radius - (vl_int)vl_round_f(vl_fast_sqrt_f((float)(radius*radius) - y*y));
+        table[i] = value;
+        table[sideLength - 1 - i] = value;
+        y = y - 1;
+        }
+    table[radius] = 0;
+
+    return table;
+}
+
+/**
+ * @brief Get indexes that will be used for descriptor computation (inner circle of the patch)
+ * @param length patch side length
+ * @param radius radius of the inner circle
+ */
+void compute_inner_patch_indexes(VlLiopDesc * self ,vl_int length, vl_int radius)
+{
+  vl_int * circleLookUpTable = compute_circle_look_up_table(radius,radius*2 + 1);
+  vl_int i,j;
+  vl_int outerArea = 0;
+  vl_uindex * indexes;
+  vl_uindex innerIndex, pos;
+  //sum area out of the circle
+  for(i = 0; i < radius; i++){
+    outerArea += circleLookUpTable[i];
+  }
+  outerArea = outerArea*4 + length*length - pow((2*radius + 1),2);
+  self->innerPatchIndexesSize = length*length - outerArea;
+
+  indexes = vl_malloc(sizeof(vl_uindex)*self->innerPatchIndexesSize);
+
+  innerIndex = ((length - 1)/2 - radius)*(length + 1);
+  pos = 0;
+  for(i = 0; i < (2*radius + 1); i++){
+    for(j = circleLookUpTable[i]; j < (2*radius - circleLookUpTable[i] + 1); j++){
+      indexes[pos++] = innerIndex + j;
+    }
+    innerIndex += length;
+  }
+  self->innerPatchIndexes = indexes;
+  vl_free(circleLookUpTable);
+}
 
 /* ---------------------------------------------------------------- */
 /*                                            Construct and destroy */
 /* ---------------------------------------------------------------- */
 
 /**
- * @brief Create a new object instance
- * @param neighbours number of neighbours
- * @param bins number of bins
- * @param radius radius between a point and it's neighbours
- * @param threshold weighting threshold
- * @param sideLength patch side length
- * @return new liop descriptor settings
- */
-VlLiopDesc * vl_liopdesc_new(vl_int neighbours, vl_int bins, float radius, float threshold, vl_size sideLength){
+ ** @brief Create a new object instance.
+ ** @param neighbours number of neighbours.
+ ** @param bins number of bins.
+ ** @param radius radius between a point and its neighbours.
+ ** @param threshold weighting threshold.
+ ** @param sideLength patch side length.
+ ** @return new liop descriptor settings.
+ **/
 
-    VlLiopDesc * self = vl_malloc(sizeof(VlLiopDesc));
-    self->numberOfNeighbours = neighbours;
-    self->numberOfBins = bins;
-    self->pointToNeighbourRadius = radius;
-    self->patchSideLength = sideLength;
-    self->patchArraySize = sideLength*sideLength;
-    self->patchRadius = (sideLength - 1)/2 - radius;
-    self->weightThreshold = threshold;
-    self->liopArraySize = factorial(neighbours)*bins;
-    self->liopBins = vl_malloc(sizeof(VlLiopBin)*bins);
-    compute_inner_patch_indexes(self, sideLength, self->patchRadius);
-    return self;
+VlLiopDesc *
+vl_liopdesc_new (vl_int neighbours, vl_int bins,
+                 float radius, float threshold, vl_size sideLength)
+{
+  VlLiopDesc * self = vl_malloc(sizeof(VlLiopDesc));
+  self->numberOfNeighbours = neighbours ;
+  self->numberOfBins = bins ;
+  self->pointToNeighbourRadius = radius ;
+  self->patchSideLength = sideLength ;
+  self->patchArraySize = sideLength*sideLength;
+  self->patchRadius = (sideLength - 1)/2 - radius ;
+  self->weightThreshold = threshold ;
+  self->liopArraySize = factorial(neighbours) * bins ;
+
+  compute_inner_patch_indexes(self, sideLength, self->patchRadius);
+  self->permutation = vl_malloc(sizeof(vl_uindex) * self->numberOfNeighbours);
+  self->intensities = vl_malloc(sizeof(float) * self->numberOfNeighbours);
+
+  return self ;
 }
 
-/**
- * @brief Create a new object instance
- * @param binIndexes patch indexes of points belonging to the bin
- * @param binSize number of points belonging to the bin
- * @param binLiop bin liop descriptor
- * @param binLiopSize size of the bin liop descriptor
- * @return
- */
-VlLiopBin * vl_liopbin_new(vl_uindex * binIndexes, vl_size binSize, float * binLiop, vl_size binLiopSize){
-    VlLiopBin * self = vl_malloc(sizeof(VlLiopBin));
-    self->binIndexes = binIndexes;
-    self->binSize = binSize;
-    self->binLiopSize = binLiopSize;
-    self->binLiop = binLiop;
-    self->numOfUsedPoints = 0;
-    return self;
+/** @brief Delete object instance.
+ ** @param self object instance.
+ **/
+
+void
+vl_liopdesc_delete (VlLiopDesc * self){
+  vl_free(self->innerPatchIndexes);
+  vl_free(self);
 }
 
-/**
- * @brief Delete object instance
- * @param self object instance
- */
-void vl_liopdesc_delete (VlLiopDesc * self){
-    vl_int i;
+/** @brief Get the dimension of a LIOP descriptor.
+ ** @return dimension. */
 
-    vl_free(self->innerPatchIndexes);
-
-    for(i = 0; i < self->numberOfBins; i++){
-        vl_liopbin_delete(self->liopBins[i]);
-    }
-    vl_free(self->liopBins);
-    vl_free(self);
-}
-
-/**
- * @brief Delete object instance
- * @param bin object instance
- */
-void vl_liopbin_delete(VlLiopBin * bin){
-    vl_free(bin->binIndexes);
-    vl_free(bin->binLiop);
-    vl_free(bin);
+vl_size
+vl_liopdesc_get_dimension (VlLiopDesc * self)
+{
+  return self->liopArraySize ;
 }
 
 /* ---------------------------------------------------------------- */
@@ -258,115 +414,89 @@ void vl_liopbin_delete(VlLiopBin * bin){
 /* ---------------------------------------------------------------- */
 
 /**
- * @brief Compute liop descriptor for a patch
- * @param self object instance
- * @param patch patch to process
- * @param desc descriptor to be computed
+ ** @brief Compute liop descriptor for a patch
+ ** @param self object instance
+ ** @param patch patch to process
+ ** @param desc descriptor to be computed
  */
-void compute_liop_descriptor(VlLiopDesc * self, float * patch, float *desc){
-    vl_int i,descShift,binShift,binLiopSize;
-    vl_size residue, binSize;
-    float norm;
 
-    if(self->weightThreshold == NO_VALUE){
-        self->weightThreshold = find_weight_threshold(patch, self->patchArraySize);
+void vl_liopdesc_process (VlLiopDesc * self, float * patch, float *desc)
+{
+  vl_int i,j,offset,numPermutations ;
+  vl_int spatialBinArea, spatialBinEnd, spatialBinIndex ;
+  vl_int center = (self->patchSideLength - 1) / 2 ;
+    
+  if(self->weightThreshold == NO_VALUE){
+    self->weightThreshold = find_weight_threshold(patch, self->patchArraySize);
+  }
+  
+  
+  /* sort patc pixels by increasing intensity */
+  stable_indexes_qsort(patch, self->innerPatchIndexes, 0, self->innerPatchIndexesSize - 1) ;
+
+  /* process pixels in order of increasing intenisity, dividing them into
+   spatial bins on the fly */
+  numPermutations = factorial(self->numberOfNeighbours) ;
+  spatialBinArea = self->innerPatchIndexesSize / self->numberOfBins ;
+  spatialBinEnd = spatialBinArea ;
+  spatialBinIndex = 0 ;
+  offset = 0 ;
+  
+  memset(desc, 0, self->liopArraySize) ;
+
+  for (i = 0 ; i < (signed)self->innerPatchIndexesSize ; ++i) {
+    vl_index x, y ;
+    vl_index pixel ;
+    vl_index permIndex ;
+    float weight ;
+    
+    if (i >= (signed)spatialBinEnd && spatialBinIndex < (signed)self->numberOfBins - 1) {
+      spatialBinEnd += spatialBinArea ;
+      spatialBinIndex ++ ;
+      offset += numPermutations ;
     }
+    
+    /* get pixel coordinates */
+    pixel = self->innerPatchIndexes[i] ;
+    x = (pixel % self->patchSideLength) - center ;
+    y = (pixel / self->patchSideLength) - center ;
+    
+    /* 
+     the pixel in the center cannot be used as we need a radius
+     from the patch center to the pixel in order to fix the rotation
+     */
+    if (x == 0 && y == 0) continue ;
 
-    /* set all values of descriptor to zero */
+    /* extract intensities of neighbours and get their permutation */
+    get_intensities_of_neighbours(self->intensities,patch,self,x,y);
+    for(j = 0; j < (signed)self->numberOfNeighbours; j++) {
+      self->permutation[j] = j;
+    }
+    stable_indexes_qsort(self->intensities,
+                         self->permutation,
+                         0, self->numberOfNeighbours - 1);
+    
+    /* get permutation inde */
+    permIndex = get_permutation_index(self->permutation, self->numberOfNeighbours);
+    
+    /* compute weight according to difference in intensity values */
+    weight = get_weight(self->intensities, self->numberOfNeighbours, self->weightThreshold);
+
+    /* accumulate to the descriptor */
+    desc[permIndex + offset] += weight;
+  }
+  
+  /* normalization */
+  {
+    float norm = 0;
+    for(i = 0; i < (signed)self->liopArraySize; i++) {
+      norm += desc[i]*desc[i];
+    }
+    norm = sqrt(norm) ;
     for(i = 0; i < (signed)self->liopArraySize; i++){
-        desc[i] = 0;
+      desc[i] = (float)((desc[i]/norm) * 255) ;
     }
-
-    /* sort indexes */
-    stable_indexes_qsort(patch, self->innerPatchIndexes, 0, self->innerPatchIndexesSize - 1);
-
-    /* create bins */
-    descShift = 0;
-    binShift = 0;
-    binLiopSize = factorial(self->numberOfNeighbours);
-    residue = self->innerPatchIndexesSize%self->numberOfBins;
-    binSize = (self->innerPatchIndexesSize - residue) / self->numberOfBins;
-
-    for(i = 0; i < (self->numberOfBins - 1); i++){
-
-        self->liopBins[i] = vl_liopbin_new(self->innerPatchIndexes + binShift, binSize,
-                                            desc + descShift, binLiopSize);
-         binShift += binSize;
-         descShift += binLiopSize;
-    }
-    /* the last bin may have more points - number of points is not generally devidable by number of bins*/
-    self->liopBins[self->numberOfBins - 1] = vl_liopbin_new(self->innerPatchIndexes + binShift, binSize + residue,
-                                        desc + descShift, binLiopSize);
-
-    /* compute descriptor for each bin */
-    for(i = 0; i < (self->numberOfBins); i++){
-        compute_bin_liop_descriptor(self ,self->liopBins[i], patch);
-    }
-
-    /* normalization */
-    norm = 0;
-
-    for(i = 0; i < (signed)self->liopArraySize; i++){
-       norm += desc[i]*desc[i];
-    }
-
-    norm = sqrt(norm);
-
-    for(i = 0; i < (signed)self->liopArraySize; i++){
-        desc[i] = (float)vl_ceil_f((desc[i]/norm)*255);
-    }
-}
-
-/**
- * @brief Compute one bin of LIOP descriptor
- * @param self object instance
- * @param bin object instance
- * @param patch patch to process
- */
-void compute_bin_liop_descriptor(VlLiopDesc *self, VlLiopBin * bin, float * patch){
-    vl_uindex i,j;
-    float x,y;
-    vl_int permIndex;
-    float weight = 0;
-
-    /* array for intensity values of neighbours */
-    float * intensities = vl_malloc(sizeof(float) * self->numberOfNeighbours);
-
-    /* array with indexes to intensities array - used for getting index of a particular permutation */
-    vl_uindex * permutation = vl_malloc(sizeof(vl_uindex) * self->numberOfNeighbours);
-
-    /* compute liop for each point of the bin*/
-    for(i = 0; i < bin->binSize; i++){
-        get_coordinates(self->patchSideLength, bin->binIndexes[i], &x, &y);
-
-        /* process only points which have all neighbours inside of the patch circle */
-        if(x != 0 || y != 0){
-
-            get_intensities_of_neighbours(intensities,patch,self,x,y);
-
-            /* reset indexes of permutation array to increasing sequence 1,2,...,N */
-            for(j = 0; j < (unsigned)self->numberOfNeighbours; j++){
-                permutation[j] = j;
-            }
-
-            /* sort permutation indexes according to intensities array*/
-            stable_indexes_qsort(intensities, permutation, 0, self->numberOfNeighbours - 1);
-
-            /* get permutation index */
-            permIndex = get_permutation_index(permutation, self->numberOfNeighbours);
-
-            /* compute weight according to difference in intensity values */
-            weight = get_weight(intensities, self->numberOfNeighbours, self->weightThreshold);
-            //mexPrintf("weight %f\n",weight);
-            /* increase value at the position of permutation index*/
-            bin->binLiop[permIndex] += weight;
-
-            /* keep the number of points which were used in each bin (debug information)*/
-            bin->numOfUsedPoints++;
-        }
-    }
-    vl_free(intensities);
-    vl_free(permutation);
+  }
 }
 
 /**
@@ -461,7 +591,6 @@ void stable_indexes_qsort(float * array, vl_uindex * indexes, vl_uindex begin, v
     if (pivot < end) {
       stable_indexes_qsort(array,indexes, pivot + 1, end) ;
     }
-
 }
 
 /**
@@ -482,18 +611,19 @@ void qsort_swap(vl_uindex * array,
 /*                                                  Other functions */
 /* ---------------------------------------------------------------- */
 
-/**
- * @brief Compute permutation index
- * @param permutation array containing all values from 0 to (size - 1)
- * @param size size of the permutation array
- * @return permutation index
- *
- * Compute a unique index of a particular permutation without comparing
- * arrays. Let's consider permutation array containing numbers from 1 to 4.
- * The lowest index @b 0 has permutation <code>[1 2 3 4]</code>,
- * @b 1 <code>[1 2 4 3]</code>, @b 2 <code>[1 3 2 4]</code>, @b 3 <code>[1 3 4 2]</code>
- * ,... and the highest <B> (size - 1) </B> <code>[4 3 2 1]</code>
+/** @internal @brief Compute permutation index.
+ ** @param permutation array containing all values from 0 to (size - 1).
+ ** @param size size of the permutation array.
+ ** @return permutation index.
+ **
+ ** Compute a unique index of a particular permutation without
+ ** comparing arrays. Let's consider permutation array containing
+ ** numbers from 1 to 4.  The lowest index @b 0 has permutation
+ ** <code>[1 2 3 4]</code>, @b 1 <code>[1 2 4 3]</code>, @b 2 <code>[1
+ ** 3 2 4]</code>, @b 3 <code>[1 3 4 2]</code> ,... and the highest
+ ** <B> (size - 1) </B> <code>[4 3 2 1]</code>.
  */
+
 vl_int get_permutation_index(vl_uindex *permutation, vl_size size){
     vl_int * controlArray = vl_malloc(sizeof(vl_int)*size);
     vl_int permutationIndex = 0;
@@ -558,35 +688,6 @@ float interpolate(float * patch, vl_int sideLength, float x, float y){
     return value;
 }
 
-/**
- * @brief Compute factorial of a number
- * @param num number
- * @return factorial of the number
- */
-vl_int factorial(vl_int num){
-    vl_int result = 1;
-    while(num > 1){
-        result = num*result;
-        num--;
-    }
-    return result;
-}
-
-/**
- * @brief Get coordinates (the patch center has coordinates [0,0])
- * @param sideLength patch side length
- * @param pos position in the patch vector
- * @param x x coordinate
- * @param y y coordinate
- */
-void get_coordinates(vl_int sideLength, vl_int pos, float * x, float * y){
-    vl_int x1, y1, shift;
-    x1 = pos % sideLength;
-    y1 = (pos - x1)/sideLength;
-    shift = (sideLength - 1)/2;
-    (*x) = x1 - shift;
-    (*y) = y1 - shift;
-}
 
 
 /**
@@ -680,69 +781,6 @@ float find_weight_threshold(float * data, vl_size length){
     return threshold;
 }
 
-/* ---------------------------------------------------------------- */
-/*                                        Reshape patch to a circle */
-/* ---------------------------------------------------------------- */
-
-/**
- * @brief Compute circle look up table
- * @param radius circle radius
- * @param sideLength patch side length
- * @return array of length <code>sideLength</code> with number of pixels
- *         that are outside of the circle but still in the patch.
- *         Each alement is for one column of a half of the patch.
- */
-vl_int * compute_circle_look_up_table(vl_int radius, vl_int sideLength){
-    vl_int * table = vl_malloc(sideLength*sizeof(vl_int));
-    float y = (float)radius - 0.4;
-    vl_index i;
-    vl_int value;
-    for(i = 0; i < radius; i++){
-        value = radius - (vl_int)vl_round_f(vl_fast_sqrt_f((float)(radius*radius) - y*y));
-        table[i] = value;
-        table[sideLength - 1 - i] = value;
-        y = y - 1;
-        }
-    table[radius] = 0;
-
-    return table;
-}
-
-/**
- * @brief Get indexes that will be used for descriptor computation (inner circle of the patch)
- * @param length patch side length
- * @param radius radius of the inner circle
- */
-void compute_inner_patch_indexes(VlLiopDesc * self ,vl_int length, vl_int radius){
-
-    vl_int * circleLookUpTable = compute_circle_look_up_table(radius,radius*2 + 1);
-    vl_int i,j;
-    vl_int outerArea = 0;
-    vl_uindex * indexes;
-    vl_uindex innerIndex, pos;
-    //sum area out of the circle
-    for(i = 0; i < radius; i++){
-        outerArea += circleLookUpTable[i];
-    }
-    outerArea = outerArea*4 + length*length - pow((2*radius + 1),2);
-    self->innerPatchIndexesSize = length*length - outerArea;
-
-    indexes = vl_malloc(sizeof(vl_uindex)*self->innerPatchIndexesSize);
-
-    innerIndex = ((length - 1)/2 - radius)*(length + 1);
-    pos = 0;
-    for(i = 0; i < (2*radius + 1); i++){
-        for(j = circleLookUpTable[i]; j < (2*radius - circleLookUpTable[i] + 1); j++){
-            indexes[pos++] = innerIndex + j;
-        }
-        innerIndex += length;
-    }
-
-    self->innerPatchIndexes = indexes;
-
-    vl_free(circleLookUpTable);
-
-}
 
 
 

@@ -34,20 +34,19 @@ mexFunction(int nout, mxArray *out[],
   enum {IN_I=0, IN_END} ;
   enum {OUT_DESCRIPTOR = 0} ;
 
-  int                verbose = 0 ;
-  int                opt ;
-  int                next = IN_END ;
-  mxArray const     *optarg ;
+  int verbose = 0 ;
+  int opt ;
+  int next = IN_END ;
+  mxArray const *optarg ;
 
-  float              *data ;
-  int                M, N ;
+  float *data ;
+  int M, N ;
 
-  int                neighbours = 4 ;
-  int                bins = 6 ;
-  float              radius = 6.0 ;
-  float              weightThreshold = NO_VALUE;
-  int                numOfPatches = 1;
-
+  int neighbours = 4 ;
+  int bins = 6 ;
+  float radius = 6.0 ;
+  float weightThreshold = -1 ;
+  int numOfPatches = 1;
 
   VL_USE_MATLAB_ENV ;
 
@@ -126,44 +125,22 @@ mexFunction(int nout, mxArray *out[],
   {
 
     VlLiopDesc *liop ;
-    vl_uint *desc ;
-
-    vl_int i;
+    float * desc ;
 
     liop = vl_liopdesc_new (neighbours, bins, radius, weightThreshold, M) ;
 
     out[OUT_DESCRIPTOR] = mxCreateNumericMatrix(liop->liopArraySize, 1, mxSINGLE_CLASS, mxREAL);
     desc = mxGetData(out[OUT_DESCRIPTOR]) ;
-    compute_liop_descriptor(liop, data, desc);
+    vl_liopdesc_process(liop, data, desc);
 
     if (verbose) {
-
       mexPrintf("vl_liop: patach size         [W, H] = [%d, %d]\n", N, M) ;
       mexPrintf("vl_liop: neighbours          %d\n", neighbours) ;
       mexPrintf("vl_liop: number of bins      %d\n", bins) ;
       mexPrintf("vl_liop: radius              %f\n", radius) ;
       mexPrintf("vl_liop: weighting threshold %f\n", liop->weightThreshold) ;
-      mexPrintf("vl_liop: descriptor size:    %d\n", liop->liopArraySize) ;
+      mexPrintf("vl_liop: descriptor size:    %d\n", vl_liopdesc_get_dimension(liop)) ;
       mexPrintf("\n") ;
-
-      mexPrintf("vl_liop: number of points assigned to each bin:\n") ;
-
-      for(i = 0; i < bins; i++){
-          mexPrintf("vl_liop: bins %d             %d\n",i, liop->liopBins[i]->binSize) ;
-      }
-
-      mexPrintf("\n") ;
-
-      mexPrintf("vl_liop: number of points used in each bin:\n") ;
-      for(i = 0; i < bins; i++){
-          mexPrintf("vl_liop: bins %d             %d\n",i, liop->liopBins[i]->numOfUsedPoints) ;
-      }
-
-
     }
-
-
-
-
   }
 }
