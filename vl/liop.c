@@ -383,7 +383,43 @@ vl_liopdesc_new (vl_int neighbours, vl_int bins,
   self->weightThreshold = threshold ;
   self->liopArraySize = factorial(neighbours) * bins ;
 
+  self->innerPatchIndexesSize = 0 ;
+  self->innerPatchIndexes = vl_malloc(sizeof(vl_uindex)*sideLength*sideLength) ;
+  {
+    vl_index x, y ;
+    vl_index center = (sideLength - 1) / 2 ;
+    double t = center - radius + 0.6 ;
+    vl_index t2 = (vl_index) (t * t) ;
+    for (y = 0 ; y < (signed)sideLength ; ++y) {
+      for (x = 0 ; x < (signed)sideLength ; ++x) {
+        vl_index dx = x - center ;
+        vl_index dy = y - center ;
+        if (dx*dx + dy*dy <= t2) {
+          self->innerPatchIndexes[self->innerPatchIndexesSize++] = x + y * sideLength ;
+        }
+      }
+    }    
+  }
+
+  VL_PRINTF("bla %d\n", self->innerPatchIndexesSize) ;
+
+  {
+    int i ;
+    for(i= 0 ; i < self->innerPatchIndexesSize ; i++) {VL_PRINTF("%d ", self->innerPatchIndexes[i]) ; if (i%30==0) VL_PRINTF("\n") ;}
+    VL_PRINTF("\n\n") ;
+  }
+
+  
   compute_inner_patch_indexes(self, sideLength, self->patchRadius);
+  
+  VL_PRINTF("bla %d\n", self->innerPatchIndexesSize) ;
+  
+  {
+    int i ;
+    for(i= 0 ; i < self->innerPatchIndexesSize ; i++) {VL_PRINTF("%d ", self->innerPatchIndexes[i]) ; if (i%30==0) VL_PRINTF("\n") ;}
+    VL_PRINTF("\n\n") ;
+  }
+  
   self->permutation = vl_malloc(sizeof(vl_uindex) * self->numberOfNeighbours);
   self->intensities = vl_malloc(sizeof(float) * self->numberOfNeighbours);
 
