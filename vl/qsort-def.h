@@ -13,28 +13,27 @@ the terms of the BSD license (see the COPYING file).
 
 /** @file qsort-def.h
 
- @section qsort-def-overview Overview
+@section qsort-def-overview Overview
 
- @ref qsort-def.h is a metaprogram to define specialized instances
- of the quick-sort algorithm.
+@ref qsort-def.h is a metaprogram to define specialized instances
+of the quick-sort algorithm.
 
- @section qsort-def-usage Usage
+@section qsort-def-usage Usage
 
- @ref qsort-def.h is used to define a specialization of the
- ::VL_QSORT_sort function that operatoes
- on a given type of array. For instance the code
+@ref qsort-def.h is used to define a specialization of the
+::VL_QSORT_sort function that operates
+on a given type of array. For instance the code
 
- @code
- #define VL_QSORT_type float
- #define VL_QSORT_prefix my_qsort
- #include <vl/qsort-def.h>
- @endcode
+@code
+#define VL_QSORT_type float
+#define VL_QSORT_prefix my_qsort
+#include <vl/qsort-def.h>
+@endcode
 
- defines a function @c my_qsort_sort that operates on an array of floats.
+defines a function @c my_qsort_sort that operates on an array of floats.
 
-
- @todo large array compatibility.
- **/
+@todo large array compatibility.
+**/
 
 #include "host.h"
 #include <assert.h>
@@ -197,3 +196,5 @@ VL_QSORT_sort
 #undef VL_QSORT_sort_recursive
 #undef VL_QSORT_type
 #undef VL_QSORT_array
+#undef VL_QSORT_cmp
+

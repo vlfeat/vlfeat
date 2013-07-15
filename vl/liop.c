@@ -85,7 +85,7 @@ is applied to each image pixel, and a statistic of the output of this
 operator is pooled independenlty in each of the regions.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection liop-computation-regions Region division
+@subsection liop-computation-regions Spatial binning
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The image patch is divided into a number @c numSpatialBins of sub-regions.
@@ -111,13 +111,13 @@ larger.
 (parameter to set @c numberOfBins)
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection liop-computation-pooling Sample point contribution
+@subsection liop-computation-pooling Rank features
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 After regions are computed, an operator is applied to each pixel $\bx$
 in the patch in order to characterize its local appearance. This
 operator start by considering the intensities $I(\bx_1), I(\bx_2),
-\dots$ of @c numberOfNeighbours image pixels in a small circle of
+\dots$ of @c numNeighbours image pixels in a small circle of
 radius @c pointToNeighbourRadius around point $\bx$.
 
 The layout of the sample points $\bx_1,\by_2,\dots$ is show in the
@@ -166,13 +166,15 @@ Array indexes | Permutation index
 4 3 1 2       | 22
 4 3 2 1       | 23
 
-Each bin forms a factorial(@numberOfNeighbours) length descriptor.
+Each bin forms a factorial(@numNeighbours) length descriptor.
 Each point increments the element of the bin descriptor at position
 of its permutation index. How much the element will be incremented is
 determined by a weighting function.
 
-@par Weighting function
-
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection liop-computation-weighting Weighting
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ 
 The bigger difference is between intensities of all neighbours of
 a particular point, the bigger weight is assigned. (In the following
 equation the $Th$ stands for @c weightThreshold.)
@@ -183,7 +185,7 @@ w = \sum \limits_{i,j} sgn( | I( N_{i} )- I( N_{j} )| - Th) + 1
 
 If $w > 0$ the particular element is increased by w, by 1 otherwise.
 
-(parameters to set @c numberOfNeighbours, @c pointToNeighbourRadius
+(parameters to set @c numNeighbours, @c pointToNeighbourRadius
 and @c weightThreshold)
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -191,9 +193,9 @@ and @c weightThreshold)
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 As the last step, descriptors of all bins are concatenated together.
-Therefore, the first group of factorial(@numberOfNeighbours) elements
+Therefore, the first group of factorial(@numNeighbours) elements
 of the descriptor come from the first bin, the second group of
-factorial(@numberOfNeighbours) elements represents the second bin ect.
+factorial(@numNeighbours) elements represents the second bin ect.
 
 The final step is normalization of the descriptor $\phi$.
 
@@ -251,16 +253,6 @@ void get_coordinates(vl_int a,
                      float * y);
 
 static
-vl_uindex get_vector_position(vl_int a,
-                              float x,
-                              float y);
-
-static
-void rotate_vector(float alpha,
-                   float * x,
-                   float * y);
-
-static
 float get_weight(float * intensities,
                   vl_size size,
                   float threshold);
@@ -294,73 +286,113 @@ vl_int factorial(vl_int num)
   return result ;
 }
 
-/* ---------------------------------------------------------------- */
-/*                                        Reshape patch to a circle */
-/* ---------------------------------------------------------------- */
 
-/**
- * @brief Compute circle look up table
- * @param radius circle radius
- * @param sideLength patch side length
- * @return array of length <code>sideLength</code> with number of pixels
- *         that are outside of the circle bu`t still in the patch.
- *         Each alement is for one column of a half of the patch.
- */
-vl_int * compute_circle_look_up_table(vl_int radius, vl_int sideLength){
-    vl_int * table = vl_malloc(sideLength*sizeof(vl_int));
-    float y = (float)radius - 0.4;
-    vl_index i;
-    vl_int value;
-    for(i = 0; i < radius; i++){
-        value = radius - (vl_int)vl_round_f(vl_fast_sqrt_f((float)(radius*radius) - y*y));
-        table[i] = value;
-        table[sideLength - 1 - i] = value;
-        y = y - 1;
-        }
-    table[radius] = 0;
+/** @internal @brief Get weight of a particular group of intensities
+ ** @param intensities array of intensities.
+ ** @param numIntensities size of the array.
+ ** @param threshold threshold.
+ ** @return weight */
 
-    return table;
-}
-
-/**
- * @brief Get indexes that will be used for descriptor computation (inner circle of the patch)
- * @param length patch side length
- * @param radius radius of the inner circle
- */
-void compute_inner_patch_indexes(VlLiopDesc * self ,vl_int length, vl_int radius)
-{
-  vl_int * circleLookUpTable = compute_circle_look_up_table(radius,radius*2 + 1);
-  vl_int i,j;
-  vl_int outerArea = 0;
-  vl_uindex * indexes;
-  vl_uindex innerIndex, pos;
-  //sum area out of the circle
-  for(i = 0; i < radius; i++){
-    outerArea += circleLookUpTable[i];
-  }
-  outerArea = outerArea*4 + length*length - pow((2*radius + 1),2);
-  self->innerPatchIndexesSize = length*length - outerArea;
-
-  indexes = vl_malloc(sizeof(vl_uindex)*self->innerPatchIndexesSize);
-
-  innerIndex = ((length - 1)/2 - radius)*(length + 1);
-  pos = 0;
-  for(i = 0; i < (2*radius + 1); i++){
-    for(j = circleLookUpTable[i]; j < (2*radius - circleLookUpTable[i] + 1); j++){
-      indexes[pos++] = innerIndex + j;
+static float
+get_weight (float * intensities, vl_size numIntensities, float threshold){
+  float weight = 0;
+  float value = 0;
+  vl_uindex i,j;
+  
+  for(i = 0; i < numIntensities; i++){
+    for(j = i + 1; j < numIntensities; j++){
+      value = vl_abs_f(intensities[i] - intensities[j]) - threshold;
+      if(value > 0){
+        weight += 2;
+      }else if(value == 0){
+        weight += 1;
+      }
     }
-    innerIndex += length;
   }
-  self->innerPatchIndexes = indexes;
-  vl_free(circleLookUpTable);
+  if(weight == 0){
+    return 1;
+  }else{
+    return weight;
+  }
 }
+
+/**
+ * @brief Find weight threshold according to data range
+ * @param data intensity values
+ * @param length length of the data array
+ * @return threshold
+ */
+float find_weight_threshold(float * data, vl_size length){
+  vl_uindex i;
+  float threshold = 0;
+  float maxVal = MIN_FLOAT_VALUE;
+  
+  /* find maximum intensity value in the data*/
+  for(i = 0; i < length; i++){
+    if(data[i] > maxVal){
+      maxVal = data[i];
+    }
+  }
+  
+  if(maxVal <= 1){ /* range 0 - 1*/
+    threshold = THRESHOLD_MULTIPLIER;
+  }else if(maxVal < MAX_UINT8_VALUE){ /* range 0 - 255 */
+    threshold = MAX_UINT8_VALUE*THRESHOLD_MULTIPLIER;
+  }else{ /* other range */
+    threshold = maxVal*THRESHOLD_MULTIPLIER;
+  }
+  
+  return threshold;
+}
+
+
+
+
+VL_INLINE float patch_cmp (VlLiopDesc * liop, vl_index i, vl_index j)
+{
+  vl_index ii = liop->patchPermutation[i] ;
+  vl_index jj = liop->patchPermutation[j] ;
+  return liop->patchIntensities[ii] - liop->patchIntensities[jj] ;
+}
+
+VL_INLINE void patch_swap (VlLiopDesc * liop, vl_index i, vl_index j)
+{
+  vl_index tmp = liop->patchPermutation[i] ;
+  liop->patchPermutation[i] = liop->patchPermutation[j] ;
+  liop->patchPermutation[j] = tmp ;
+}
+
+#define VL_QSORT_prefix patch
+#define VL_QSORT_array VlLiopDesc*
+#define VL_QSORT_cmp patch_cmp
+#define VL_QSORT_swap patch_swap
+#include "qsort-def.h"
+
+VL_INLINE float neigh_cmp (VlLiopDesc * liop, vl_index i, vl_index j)
+{
+  vl_index ii = liop->neighPermutation[i] ;
+  vl_index jj = liop->neighPermutation[j] ;
+  return liop->neighIntensities[ii] - liop->neighIntensities[jj] ;
+}
+
+VL_INLINE void neigh_swap (VlLiopDesc * liop, vl_index i, vl_index j)
+{
+  vl_index tmp = liop->neighPermutation[i] ;
+  liop->neighPermutation[i] = liop->neighPermutation[j] ;
+  liop->neighPermutation[j] = tmp ;
+}
+
+#define VL_QSORT_prefix neigh
+#define VL_QSORT_array VlLiopDesc*
+#define VL_QSORT_cmp neigh_cmp
+#define VL_QSORT_swap neigh_swap
+#include "qsort-def.h"
 
 /* ---------------------------------------------------------------- */
 /*                                            Construct and destroy */
 /* ---------------------------------------------------------------- */
 
-/**
- ** @brief Create a new object instance.
+/** @brief Create a new object instance.
  ** @param neighbours number of neighbours.
  ** @param bins number of bins.
  ** @param radius radius between a point and its neighbours.
@@ -373,8 +405,10 @@ VlLiopDesc *
 vl_liopdesc_new (vl_int neighbours, vl_int bins,
                  float radius, float threshold, vl_size sideLength)
 {
-  VlLiopDesc * self = vl_malloc(sizeof(VlLiopDesc));
-  self->numberOfNeighbours = neighbours ;
+  vl_index i, t ;
+  
+  VlLiopDesc * self = vl_calloc(sizeof(VlLiopDesc), 1);
+  self->numNeighbours = neighbours ;
   self->numberOfBins = bins ;
   self->pointToNeighbourRadius = radius ;
   self->patchSideLength = sideLength ;
@@ -383,8 +417,8 @@ vl_liopdesc_new (vl_int neighbours, vl_int bins,
   self->weightThreshold = threshold ;
   self->liopArraySize = factorial(neighbours) * bins ;
 
-  self->innerPatchIndexesSize = 0 ;
-  self->innerPatchIndexes = vl_malloc(sizeof(vl_uindex)*sideLength*sideLength) ;
+  self->patchSize = 0 ;
+  self->patchPixels = vl_malloc(sizeof(vl_uindex)*sideLength*sideLength) ;
   {
     vl_index x, y ;
     vl_index center = (sideLength - 1) / 2 ;
@@ -394,46 +428,54 @@ vl_liopdesc_new (vl_int neighbours, vl_int bins,
       for (x = 0 ; x < (signed)sideLength ; ++x) {
         vl_index dx = x - center ;
         vl_index dy = y - center ;
+        if (x == 0 && y == 0) continue ;
         if (dx*dx + dy*dy <= t2) {
-          self->innerPatchIndexes[self->innerPatchIndexesSize++] = x + y * sideLength ;
+          self->patchPixels[self->patchSize++] = x + y * sideLength ;
         }
       }
-    }    
+    }
   }
 
-  VL_PRINTF("bla %d\n", self->innerPatchIndexesSize) ;
+  self->patchIntensities = vl_malloc(sizeof(vl_uindex)*self->patchSize) ;
+  self->patchPermutation = vl_malloc(sizeof(vl_uindex)*self->patchSize) ;
+  
+  self->neighPermutation = vl_malloc(sizeof(vl_uindex) * self->numNeighbours) ;
+  self->neighIntensities = vl_malloc(sizeof(float) * self->numNeighbours) ;
+  
+  self->neighSamplesX = vl_calloc(sizeof(double), self->numNeighbours * self->patchSize) ;
+  self->neighSamplesY = vl_calloc(sizeof(double), self->numNeighbours * self->patchSize) ;
+  
+  for (i = 0 ; i < (signed)self->patchSize ; ++i) {
+    vl_index pixel ;
+    double x, y ;
+    double dangle = 2*VL_PI / (double)self->numNeighbours ;
+    double angle0 ;
+    vl_index center = (sideLength - 1) / 2 ;
+    
+    pixel = self->patchPixels[i] ;
+    x = (pixel % (signed)self->patchSideLength) - center ;
+    y = (pixel / (signed)self->patchSideLength) - center ;
 
-  {
-    int i ;
-    for(i= 0 ; i < self->innerPatchIndexesSize ; i++) {VL_PRINTF("%d ", self->innerPatchIndexes[i]) ; if (i%30==0) VL_PRINTF("\n") ;}
-    VL_PRINTF("\n\n") ;
+    angle0 = atan2(y,x) ;
+    
+    for (t = 0 ; t < (signed)self->numNeighbours ; ++t) {
+      double x1 = x + radius * cos(angle0 + dangle * t) + center ;
+      double y1 = y + radius * sin(angle0 + dangle * t) + center ;
+      self->neighSamplesX[t + (signed)self->numNeighbours * i] = x1 ;
+      self->neighSamplesY[t + (signed)self->numNeighbours * i] = y1 ;      
+    }
   }
-
-  
-  compute_inner_patch_indexes(self, sideLength, self->patchRadius);
-  
-  VL_PRINTF("bla %d\n", self->innerPatchIndexesSize) ;
-  
-  {
-    int i ;
-    for(i= 0 ; i < self->innerPatchIndexesSize ; i++) {VL_PRINTF("%d ", self->innerPatchIndexes[i]) ; if (i%30==0) VL_PRINTF("\n") ;}
-    VL_PRINTF("\n\n") ;
-  }
-  
-  self->permutation = vl_malloc(sizeof(vl_uindex) * self->numberOfNeighbours);
-  self->intensities = vl_malloc(sizeof(float) * self->numberOfNeighbours);
-
   return self ;
 }
 
 /** @brief Delete object instance.
- ** @param self object instance.
- **/
+ ** @param self object instance. */
 
 void
-vl_liopdesc_delete (VlLiopDesc * self){
-  vl_free(self->innerPatchIndexes);
-  vl_free(self);
+vl_liopdesc_delete (VlLiopDesc * self)
+{
+  vl_free (self->patchPixels);
+  vl_free (self);
 }
 
 /** @brief Get the dimension of a LIOP descriptor.
@@ -449,74 +491,94 @@ vl_liopdesc_get_dimension (VlLiopDesc * self)
 /*                                          Compute LIOP descriptor */
 /* ---------------------------------------------------------------- */
 
-/**
- ** @brief Compute liop descriptor for a patch
+/** @brief Compute liop descriptor for a patch
  ** @param self object instance
+ ** @param desc descriptor to be computed (output).
  ** @param patch patch to process
- ** @param desc descriptor to be computed
- */
+ **
+ ** Use ::vl_liopdesc_get_dimension to get the size of the descriptor
+ ** @desc. */
 
-void vl_liopdesc_process (VlLiopDesc * self, float * patch, float *desc)
+void
+vl_liopdesc_process (VlLiopDesc * self, float * patch, float *desc)
 {
-  vl_int i,j,offset,numPermutations ;
+  vl_int i,t ;
+  vl_int offset,numPermutations ;
   vl_int spatialBinArea, spatialBinEnd, spatialBinIndex ;
-  vl_int center = (self->patchSideLength - 1) / 2 ;
-    
+  
+  memset(desc, 0, self->liopArraySize) ;
+  
   if(self->weightThreshold == NO_VALUE){
     self->weightThreshold = find_weight_threshold(patch, self->patchArraySize);
   }
-  
-  
-  /* sort patc pixels by increasing intensity */
-  stable_indexes_qsort(patch, self->innerPatchIndexes, 0, self->innerPatchIndexesSize - 1) ;
+    
+  /* 
+   * Sort pixels in the patch by increasing intensity.
+   */
 
-  /* process pixels in order of increasing intenisity, dividing them into
-   spatial bins on the fly */
-  numPermutations = factorial(self->numberOfNeighbours) ;
-  spatialBinArea = self->innerPatchIndexesSize / self->numberOfBins ;
+  for (i = 0 ; i < (signed)self->patchSize ; ++i) {
+    vl_index pixel = self->patchPixels[i] ;
+    self->patchIntensities[i] = patch[pixel] ;
+    self->patchPermutation[i] = i ;
+  }
+  patch_sort(self, self->patchSize) ;
+  
+  /* 
+   * Process pixels in order of increasing intenisity, dividing them into
+   * spatial bins on the fly.
+   */
+  
+  numPermutations = factorial(self->numNeighbours) ;
+  spatialBinArea = self->patchSize / self->numberOfBins ;
   spatialBinEnd = spatialBinArea ;
   spatialBinIndex = 0 ;
   offset = 0 ;
-  
-  memset(desc, 0, self->liopArraySize) ;
 
-  for (i = 0 ; i < (signed)self->innerPatchIndexesSize ; ++i) {
-    vl_index x, y ;
-    vl_index pixel ;
+  for (i = 0 ; i < (signed)self->patchSize ; ++i) {
     vl_index permIndex ;
     float weight ;
+    double *sx, *sy ;
     
+    /* advance to the next spatial bin if needed */
     if (i >= (signed)spatialBinEnd && spatialBinIndex < (signed)self->numberOfBins - 1) {
       spatialBinEnd += spatialBinArea ;
       spatialBinIndex ++ ;
       offset += numPermutations ;
     }
     
-    /* get pixel coordinates */
-    pixel = self->innerPatchIndexes[i] ;
-    x = (pixel % self->patchSideLength) - center ;
-    y = (pixel / self->patchSideLength) - center ;
-    
-    /* 
-     the pixel in the center cannot be used as we need a radius
-     from the patch center to the pixel in order to fix the rotation
-     */
-    if (x == 0 && y == 0) continue ;
+    /* get intensities of neighbours of the current patch element and sor them */
+    sx = self->neighSamplesX + self->numNeighbours * self->patchPermutation[i] ;
+    sy = self->neighSamplesY + self->numNeighbours * self->patchPermutation[i] ;
+    for (t = 0 ; t < self->numNeighbours ; ++t) {
+      double x = *sx++ ;
+      double y = *sy++ ;
+      
+      /* bilinear interpolation */
+      int ix = vl_floor_d(x) ;
+      int iy = vl_floor_d(y) ;
+      
+      double wx = x - ix ;
+      double wy = y - iy ;
+      
+      double a = 0, b = 0, c = 0, d = 0 ;
+      
+      int L = (int) self->patchSideLength ;
+      
+      if (ix >= 0 && iy >= 0) { a = patch[ix   + iy * L] ; }
+      if (ix <  L && iy >= 0) { b = patch[ix+1 + iy * L] ; }
+      if (ix >= 0 && iy <  L) { c = patch[ix   + (iy+1) * L] ; }
+      if (ix <  L && iy <  L) { d = patch[ix+1 + (iy+1) * L] ; }
 
-    /* extract intensities of neighbours and get their permutation */
-    get_intensities_of_neighbours(self->intensities,patch,self,x,y);
-    for(j = 0; j < (signed)self->numberOfNeighbours; j++) {
-      self->permutation[j] = j;
+      self->neighPermutation[t] = t;
+      self->neighIntensities[t] = (1 - wy) * (a + (b - a) * wx) + wy * (c + (d - c) * wx) ;
     }
-    stable_indexes_qsort(self->intensities,
-                         self->permutation,
-                         0, self->numberOfNeighbours - 1);
+    neigh_sort (self, self->numNeighbours) ;
     
-    /* get permutation inde */
-    permIndex = get_permutation_index(self->permutation, self->numberOfNeighbours);
+    /* get permutation index */
+    permIndex = get_permutation_index(self->neighPermutation, self->numNeighbours);
     
     /* compute weight according to difference in intensity values */
-    weight = get_weight(self->intensities, self->numberOfNeighbours, self->weightThreshold);
+    weight = get_weight(self->neighIntensities, self->numNeighbours, self->weightThreshold);
 
     /* accumulate to the descriptor */
     desc[permIndex + offset] += weight;
@@ -528,119 +590,11 @@ void vl_liopdesc_process (VlLiopDesc * self, float * patch, float *desc)
     for(i = 0; i < (signed)self->liopArraySize; i++) {
       norm += desc[i]*desc[i];
     }
-    norm = sqrt(norm) ;
+    norm = VL_MAX(sqrt(norm), 1e-12) ;
     for(i = 0; i < (signed)self->liopArraySize; i++){
       desc[i] = (float)((desc[i]/norm) * 255) ;
     }
   }
-}
-
-/**
- * @brief Get intensities of neighbours
- * @param intensities array of neighbours' intensities
- * @param patch patch to process
- * @param self object instance
- * @param x x coordinate of the point X to be processed
- * @param y y coordinate of the point X to be processed
- */
-void get_intensities_of_neighbours(float * intensities, float * patch, VlLiopDesc * self, float x, float y){
-
-    float x1, y1, alpha,dist;
-    vl_int i;
-
-    /* distance between centre of coordinates and the point X*/
-    dist = vl_fast_sqrt_f(x*x + y*y);
-
-    /* create unit vector (x1,y1) */
-    x1 = x/dist;
-    y1 = y/dist;
-
-    /*
-     first neighbouring point belongs to the radial direction (from the center to the point X) and is distant
-     pointToNeighbourRadius from the point X. As this condition is satisfied by two points, the farther
-     point form the center is selected.
-    */
-    intensities[0] = interpolate(patch,self->patchSideLength, x1*self->pointToNeighbourRadius + x,
-                                 y1*self->pointToNeighbourRadius + y);
-
-    alpha = 2*VL_PI/(float)self->numberOfNeighbours;
-
-    /*
-     other neighbouring points are sampled on the circle (center in X, radius pointToNeighbourRadius)
-     in the anticlokwise direction
-    */
-    for(i = 1; i < self->numberOfNeighbours; i++){
-        rotate_vector(alpha,&x1,&y1);
-        intensities[i] = interpolate(patch,self->patchSideLength,x1*self->pointToNeighbourRadius + x,
-                                     y1*self->pointToNeighbourRadius + y);
-
-    }
-
-}
-
-/* ---------------------------------------------------------------- */
-/*                                                          Sorting */
-/* ---------------------------------------------------------------- */
-
-/**
- * @brief Stable quick sort (sort only indexes, not the array of values)
- * @param array array of values
- * @param indexes indexes to values of array that should be used for sorting
- * @param begin first index of the array of indexes
- * @param end last index of the array of indexes
- */
-void stable_indexes_qsort(float * array, vl_uindex * indexes, vl_uindex begin, vl_uindex end){
-
-
-    vl_uindex pivot, lowPart, i;
-
-    pivot = (end + begin) / 2 ;
-
-    /* swap pivot with last */
-    qsort_swap(indexes, pivot, end) ;
-    pivot = end ;
-
-    /*
-     Now scan from left to right, moving all element smaller
-     or equal than the pivot to the low part
-     array[0], array[1], ..., array[lowPart - 1].
-    */
-    lowPart = begin ;
-    for (i = begin; i < end ; ++i) { //one less
-        float diff = array[indexes[i]] - array[indexes[pivot]];
-        if ((diff < 0) || ((diff == 0) && (indexes[pivot] > indexes[i])) ) {
-            /* array[i] must be moved into the low part */
-            qsort_swap (indexes, lowPart, i) ;
-            lowPart ++ ;
-       }
-    }
-
-    /* the pivot should also go into the low part */
-    qsort_swap (indexes, lowPart, pivot) ;
-    pivot = lowPart ;
-
-    /* do recursion */
-    if (pivot > begin) {
-      /* note that pivot-1 stays non-negative */
-      stable_indexes_qsort(array,indexes, begin, pivot - 1) ;
-    }
-    if (pivot < end) {
-      stable_indexes_qsort(array,indexes, pivot + 1, end) ;
-    }
-}
-
-/**
- * @brief Quick sort swap (swap only indexes, not array values)
- * @param array array of values
- * @param index1 first index to be swaped
- * @param index2 second index to be swaped
- */
-void qsort_swap(vl_uindex * array,
-                   vl_uindex index1,
-                   vl_uindex index2){
-    vl_uindex t = array[index1];
-    array[index1] = array[index2];
-    array[index2] = t;
 }
 
 /* ---------------------------------------------------------------- */
@@ -691,130 +645,6 @@ vl_int get_permutation_index(vl_uindex *permutation, vl_size size){
     vl_free(controlArray);
 
     return permutationIndex;
-}
-
-/**
- * @brief Compute 4 point linear interpolation
- * @param patch patch to process
- * @param sideLength patch side length
- * @param x x coordinate
- * @param y y coordinate
- * @return interpolated intensity value
- */
-float interpolate(float * patch, vl_int sideLength, float x, float y){
-    float value, a, b, xM, yM;
-    vl_uindex pos, pos1, pos2, pos3, pos4;
-    float limit = (sideLength - 1)/2;
-    if((x <= -limit) || (y <=- limit) || (x >= limit) || (y >= limit)){
-        pos = get_vector_position(sideLength, (float)vl_round_f(x), (float)vl_round_f(y));
-        value = patch[pos];
-    }else{
-        xM = (float)vl_ceil_f(x);
-        yM = (float)vl_ceil_f(y);
-        pos1 = get_vector_position(sideLength,xM,yM);
-        pos2 = get_vector_position(sideLength,xM,(yM - 1));
-        pos3 = get_vector_position(sideLength,(xM - 1),yM);
-        pos4 = get_vector_position(sideLength,(xM - 1),(yM - 1));
-        a = yM - y;
-        b = xM - x;
-
-        value = a*b*patch[pos4] + (1 - a)*b*patch[pos3] + (1 - a)*(1 - b)*patch[pos1] + a*(1 - b)*patch[pos2];
-
-    }
-    return value;
-}
-
-
-
-/**
- * @brief Get position of a point in the patch vector
- * @param sideLength patch side length
- * @param x x coordinate
- * @param y y coordinate
- * @return position in the patch vector
- */
-vl_uindex get_vector_position(vl_int sideLength, float x, float y){
-    float shift;
-    vl_uindex pos;
-    shift = (sideLength - 1)/2;
-    x = x + shift;
-    y = y + shift;
-    pos = (vl_uindex)(y*sideLength + x);
-    return pos;
-}
-
-/**
- * @brief Rotate vector
- * @param alpha angle of rotation
- * @param x first element of the vector
- * @param y second element of the vector
- */
-void rotate_vector(float alpha, float * x, float * y){
-    float x1, y1;
-    x1 = *x;
-    y1 = *y;
-    (*x) = x1*cosf(alpha) - y1*sinf(alpha);
-    (*y) = x1*sinf(alpha) + y1*cosf(alpha);
-
-}
-
-/**
- * @brief Get weight of a particular group of intensities
- * @param intensities array of intensities
- * @param size size of the intensities array
- * @param threshold threshold (minimum difference between intensities that should be considered
- *                             as large enough for increasing weight)
- * @return weight
- */
-float get_weight(float * intensities, vl_size size, float threshold){
-    float weight = 0;
-    float value = 0;
-    vl_uindex i,j;
-
-    for(i = 0; i < size; i++){
-        for(j = i + 1; j < size; j++){
-            value = vl_abs_f(intensities[i] - intensities[j]) - threshold;
-            if(value > 0){
-                weight += 2;
-            }else if(value == 0){
-                weight += 1;
-            }
-        }
-    }
-    if(weight == 0){
-        return 1;
-    }else{
-        return weight;
-    }
-}
-
-/**
- * @brief Find weight threshold according to data range
- * @param data intensity values
- * @param length length of the data array
- * @return threshold
- */
-float find_weight_threshold(float * data, vl_size length){
-    vl_uindex i;
-    float threshold = 0;
-    float maxVal = MIN_FLOAT_VALUE;
-
-    /* find maximum intensity value in the data*/
-    for(i = 0; i < length; i++){
-        if(data[i] > maxVal){
-            maxVal = data[i];
-        }
-    }
-
-    if(maxVal <= 1){ /* range 0 - 1*/
-        threshold = THRESHOLD_MULTIPLIER;
-    }else if(maxVal < MAX_UINT8_VALUE){ /* range 0 - 255 */
-        threshold = MAX_UINT8_VALUE*THRESHOLD_MULTIPLIER;
-    }else{ /* other range */
-        threshold = maxVal*THRESHOLD_MULTIPLIER;
-    }
-
-    return threshold;
 }
 
 

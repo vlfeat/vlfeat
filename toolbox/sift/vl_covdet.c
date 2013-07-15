@@ -214,7 +214,7 @@ mexFunction(int nout, mxArray *out[],
   vl_int liopBins = 6;
   vl_int liopNeighbours = 4;
   float liopRadius = 6.0;
-  float liopThreshold = NO_VALUE;
+  float liopThreshold = -1 ;
 
   double boundaryMargin = 2.0 ;
 
@@ -734,7 +734,7 @@ mexFunction(int nout, mxArray *out[],
                                                 patchRelativeSmoothing,
                                                 feature[i].frame);
 
-              compute_liop_descriptor(liop, patch, desc);
+              vl_liopdesc_process(liop, patch, desc);
 
               desc += dimension;
 

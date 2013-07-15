@@ -21,19 +21,27 @@
 /** @brief LIOP descriptor extractor object */
 typedef struct _VlLiopDesc
 {
-  vl_int numberOfNeighbours; /**< Number of neighbours. */
+  vl_int numNeighbours; /**< Number of neighbours. */
   vl_int numberOfBins; /**< Number of bins. */
   float pointToNeighbourRadius; /**< Point to neighbour radius (distance). */
   vl_size patchSideLength;/**< Length of a patch side. */
   vl_size patchArraySize; /**< Length of the whole path array. */
   vl_int patchRadius; /**< Radius of circle inside of the patch (defining are of points to be used for computation). */
   float weightThreshold; /**< Weight threshold. */
-  vl_uindex * innerPatchIndexes; /**< Indexes of patch array that are used for descriptor computation. */
-  vl_size innerPatchIndexesSize; /**< Number of innerPatchIndexes. */
   vl_size liopArraySize; /**< LIOP descriptor size. */
 
-  float * intensities ;
-  vl_uindex * permutation ;
+  /* Pixels in the circular patch */
+  vl_size patchSize ;
+  vl_uindex * patchPixels ;
+  float * patchIntensities ;
+  vl_uindex * patchPermutation ;
+  
+  /* Neighbourhoods of each pixel (samples in a circle) */
+  float * neighIntensities ;
+  vl_uindex * neighPermutation ;
+  double * neighSamplesX ;
+  double * neighSamplesY ;
+
 } VlLiopDesc ;
 
 /** @name Construct and destroy
