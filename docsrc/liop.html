@@ -3,91 +3,47 @@
 
 %tableofcontents;
 
-<p>This tutorial gives an overview of the <code>vl_liop</code> VLFeat
-command implementing a Local Intensity Order Pattern (LIOP) feature
-descriptor. The function computes descriptor as proposed in
-<a href="%pathto:tut.liop.references;">[1]</a></p>
-
-<p>The LIOP computation is described
-in <a href="%pathto:root;api/liop-fundamentals.html"> API fundamental
-page for LIOP</a> </p>
+<p>This tutorial shows how to extract <a href='%dox:liop;'>Local
+Intensity Order Pattern</a> (LIOP) deascriptors using VLFeat. LIOP is
+implemented in the <code>vl_liop</code> as well as
+in <code>vl_covdet</code>.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.liop.computation">LIOP descriptor computation</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<p>The liop descriptor can be computed from a patch. The patch has to be
-a square matrix of an odd side length.</p>
+<p>A LIOP descriptor can be computed from a square, gray scale image
+with and odd side length <code>patch</code>. This is usually not a
+restriction since local patches are obtained by cropping and warpinig
+an input image. The descriptor is computed using
+the <code>vl_liop</code> function:</p>
 
 <precode type='matlab'>
-[descr] = vl_covdet(patch) ;
+descr = vl_covdet(patch) ;
 </precode>
 
-<p>You can add <code>verbose</code> if you wish to see the parametr and 
-descriptor details</p>
+<p>You can use the verbose option <code>verbose</code> if you wish to
+see the parametr and descriptor details.</p>
 
 <precode type='matlab'>
-[descr] = vl_covdet(patch,'verbose') ;
+descr = vl_covdet(patch,'Verbose') ;
 </precode>
 
-<p>This will use default parameters which are:</p>
+<p><code>patch</code> can be a 3D array, with one image per 2D
+layer. In this case, <code>descr</code> is a matrix with as many
+columns as images. LIOP is also integrated
+into <code>vl_covdet</code>.</p>
 
-<ul>
-	<li>Number of neighburs [4]	</li>
-	<li>Number of bins [6]	</li>
-	<li>Radius (between a point and its neighbours) [6]	</li>
-	<li>Weighting threshold [5]	</li>
-</ul>
-
-<p>Please note that the patch side length <b>a</b> has to be 
-long enough with respect to the radius <b>r</b> between a point 
-and its neighbours. The image below explains which pixels of the patch 
-are taken for descriptor computation.
-</p>
-
- <div class="figure">
- <img src="%pathto:root;figures/liop-patch-layout.png"/>
- <div class="caption">
-   <span class="content">
-     Descriptor computation from a patch 
-   </span>
- </div>
-</div>
-
-<p>Only points belonging to the area of the inner circle will be used 
-for descriptor computation as sample points. The points from the outer area
-will contribute only as neighbouring points. 
-</p>
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.liop.additional">Additional settings</h1>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<p>You can easily change all parameters listed above.</p>
+<p><code>vl_liop</code> allows full customization of the LIOP
+descriptor parameters. These are
+discussed <a href="%dox:liop-fundamentals;">here</a>. A parameter that
+is commonly tweaked is the <em>intensity threshold</em> to downweight
+unstalbe intensity order patterns in the descriptor computation. For
+example</p>
 
 <precode type='matlab'>
-[descr] = vl_covdet(patch,'neighbours',3,'OPTION',value) ;
+descr = vl_covdet(patch,'IntensityThreshold', 0.1) ;
 </precode>
 
-<p>The options are:</p>
-
-<ul>
-	<li><code>Neighbours</code> set the number of neighburs</li>
-	<li><code>'Bins'</code> set the number of bins</li>
-	<li><code>'Radius'</code> set the distance between a point and its neighbours</li>
-	<li><code>'WeightThreshold'</code> set the threshold of how big must be 
-	the difference between neighbours intensities to increase weight of the 
-	particular permutation</li>
-</ul>
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h1 id="tut.liop.references">References</h1>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<ul>
-  <li>[1] Z. Wang, B. Fan and F. Wu. <em>Local Intensity
-  Order Pattern for Feature Description.</em> In ICCV, 2011 
-  </li>
-</ul>
-
+<p>set this threshold to 0.1.</p>
 </group>

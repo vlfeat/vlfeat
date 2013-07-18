@@ -75,16 +75,21 @@
 %   [F,D] = VL_COVDET(I, 'descriptor', DESCRIPTOR) allows using one
 %   following descriptors instead
 %
-%   Liop::
-%     The Local Intensity Order Pattern descriptor. See VL_LIOP()
-%     for parameter definitions (all listed parameters can be used 
-%     as input to VL_COVDET())
+%   SIFT:
+%     The default SIFT descriptor.
 %
-%   Patch::
-%     Can be used to extract raw patches. In this case, each column
-%     of D is a stacked square image patch. 
+%   LIOP::
+%     The Local Intensity Order Pattern descriptor. See VL_LIOP() for
+%     parameter definitions. All listed parameters can be used as
+%     input to VL_COVDET(), prefixed by the 'Liop' string (e.g.
+%     'LiopIntensityThrehsold').
 %
-%   The following parameters can be used to control the produced 
+%   PATCH::
+%     Raw patches. In this case, each column of D is a stacked square
+%     image patch. This is very useful to compute alternative
+%     descriptors.
+%
+%   The following parameters can be used to control the produced
 %   descriptors:
 %
 %   PatchResolution:: Sift [15], Liop [20], Patch [20]
@@ -141,7 +146,7 @@
 %   [2] K. Mikolajcyk and C. Schmid, An affine invariant interest
 %   point detector. ICCV, vol. 2350, pp. 128-142, 2002.
 %
-%   See also: VL_SIFT(), VL_PLOTFRAME(), VL_PLOTSS(), VL_HELP().
+%   See also: VL_SIFT(), VL_LIOP(), VL_PLOTFRAME(), VL_PLOTSS(), VL_HELP().
 
 % Copyright (C) 2007-12 Karel Lenc, Andrea Vedaldi, and Michal Perdoch
 % All rights reserved.

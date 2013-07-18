@@ -41,6 +41,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage hog
   - @subpage fisher
   - @subpage vlad
+  - @subpage liop
 
 - **Clustering and indexing**
   - @subpage kmeans
@@ -69,7 +70,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage rodrigues.h "Rodrigues formula"
   - @subpage mexutils.h  "MATLAB MEX helper functions"
   - @subpage getopt_long.h "Drop-in @c getopt_long replacement"
- 
+
 - **General support functionalities**
   - @subpage generic
   - @subpage portability
@@ -695,7 +696,7 @@ multiple threads and @c vl_set_num_threads(0) uses OpenMP value
 used in a specific computation is decided by OpenMP based on the
 number of threads available, accounting for example for nested
 parallelism when appropriate.
- 
+
 @sa http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/GUID-C2295BC8-DD22-466B-94C9-5FAA79D4F56D.htm
  http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/index.htm#GUID-DEEF0363-2B34-4BAB-87FA-A75DBE842040.htm
  http://software.intel.com/sites/products/documentation/hpc/mkl/lin/MKL_UG_managing_performance/Using_Additional_Threading_Control.htm

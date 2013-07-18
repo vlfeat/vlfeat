@@ -57,10 +57,10 @@ vlmxOption  options [] = {
   {"Frames",                1,   opt_frames                  },
 
   {"Descriptor",            1,   opt_descriptor              },
-  {"Bins",                  1,   opt_liop_bins               },
-  {"Neighbours",            1,   opt_liop_neighbours         },
-  {"Threshold",             1,   opt_liop_threshold          },
-  {"Radius",                1,   opt_liop_radius             },
+  {"LiopNumSpatialBins",    1,   opt_liop_bins               },
+  {"LiopNumNeighbours",     1,   opt_liop_neighbours         },
+  {"LiopIntensityThreshold",1,   opt_liop_threshold          },
+  {"LiopRadius",            1,   opt_liop_radius             },
   {"PatchResolution",       1,   opt_patch_resolution        },
   {"PatchRelativeExtent",   1,   opt_patch_relative_extent   },
   {"PatchRelativeSmoothing",1,   opt_patch_relative_smoothing},
@@ -211,10 +211,10 @@ mexFunction(int nout, mxArray *out[],
   float *patch = NULL ;
   float *patchXY = NULL ;
 
-  vl_int liopBins = 6;
-  vl_int liopNeighbours = 4;
+  vl_int liopNumSpatialBins = 6;
+  vl_int liopNumNeighbours = 4;
   float liopRadius = 6.0;
-  float liopThreshold = -1 ;
+  float liopIntensityThreshold = VL_NAN_F ;
 
   double boundaryMargin = 2.0 ;
 
@@ -328,27 +328,28 @@ mexFunction(int nout, mxArray *out[],
       break ;
 
     case opt_liop_bins :
-      if (!vlmxIsPlainScalar(optarg) || (liopBins = (vl_int)*mxGetPr(optarg)) <= 0) {
-        vlmxError(vlmxErrInvalidArgument, "number of LIOP BINS must be a positive integer.") ;
+      if (!vlmxIsPlainScalar(optarg) || (liopNumSpatialBins = (vl_int)*mxGetPr(optarg)) <= 0) {
+        vlmxError(vlmxErrInvalidArgument, "number of LIOPNUMSPATIALBINS is not a positive scalar.") ;
       }
       break ;
 
     case opt_liop_neighbours :
-      if (!vlmxIsPlainScalar(optarg) || (liopNeighbours = (vl_int)*mxGetPr(optarg)) <= 0) {
-        vlmxError(vlmxErrInvalidArgument, "number of LIOP NEIGHBOURS must be a positive integer.") ;
+      if (!vlmxIsPlainScalar(optarg) || (liopNumNeighbours = (vl_int)*mxGetPr(optarg)) <= 0) {
+        vlmxError(vlmxErrInvalidArgument, "number of LIOPNUMNEIGHBOURS is not a positive scalar.") ;
       }
       break ;
 
     case opt_liop_radius :
-      if ((liopRadius = (float)*mxGetPr(optarg)) <= 0) {
-        vlmxError(vlmxErrInvalidArgument, "LIOP RADIUS must be a positive number.") ;
+      if (!vlmxIsPlainScalar(optarg) || (liopRadius = (float)*mxGetPr(optarg)) <= 0) {
+        vlmxError(vlmxErrInvalidArgument, "LIOPRADIUS must is not a positive scalar.") ;
       }
       break ;
 
     case opt_liop_threshold :
-      if ((liopThreshold = (float)*mxGetPr(optarg)) < 0) {
-        vlmxError(vlmxErrInvalidArgument, "LIOP THRESHOLD must be a positive number.") ;
+      if (!vlmxIsPlainScalar(optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "LIOPINTENSITYTHRESHOLD is not a scalar.") ;
       }
+      liopIntensityThreshold = *mxGetPr(optarg) ;
       break ;
 
     case opt_frames:
@@ -401,14 +402,17 @@ mexFunction(int nout, mxArray *out[],
       if (patchResolution < 0)  patchResolution = 20 ;
       if (patchRelativeExtent < 0) patchRelativeExtent = 4 ;
       if (patchRelativeSmoothing < 0) patchRelativeSmoothing = 0.5 ;
+      break ;
   }
-
-
 
   if (patchResolution > 0) {
     vl_size w = 2*patchResolution + 1 ;
     patch = mxMalloc(sizeof(float) * w * w);
     patchXY = mxMalloc(2 * sizeof(float) * w * w);
+  }
+
+  if (descriptorType == VL_COVDET_DESC_LIOP && liopRadius > patchResolution) {
+    vlmxError(vlmxErrInconsistentData, "LIOPRADIUS is larger than PATCHRESOLUTION.") ;
   }
 
   /* -----------------------------------------------------------------
@@ -714,9 +718,11 @@ mexFunction(int nout, mxArray *out[],
           vl_size patchSide = 2 * patchResolution + 1 ;
           float * desc ;
 
-
-          VlLiopDesc * liop = vl_liopdesc_new(liopNeighbours, liopBins, liopRadius, liopThreshold, (vl_size)patchSide) ;
-          vl_size dimension = liop->liopArraySize;
+          VlLiopDesc * liop = vl_liopdesc_new(liopNumNeighbours, liopNumSpatialBins, liopRadius, (vl_size)patchSide) ;
+          if (!vl_is_nan_f(liopIntensityThreshold)) {
+            vl_liopdesc_set_intensity_threshold(liop, liopIntensityThreshold) ;
+          }
+          vl_size dimension = vl_liopdesc_get_dimension(liop) ;
           if (verbose) {
             mexPrintf("vl_covdet: descriptors: type=liop, "
                       "resolution=%d, extent=%g, smoothing=%g\n",
@@ -740,7 +746,7 @@ mexFunction(int nout, mxArray *out[],
 
           }
           mexPrintf("time: %f\n",vl_toc());
-          mexPrintf("threshold: %f\n",liop->weightThreshold);
+          mexPrintf("threshold: %f\n",liop->intensityThreshold);
           break;
         }
 

@@ -28,9 +28,9 @@ int main(){
   for(i = 0; i < (signed)size; i++){
     patch[i] = mat[i];
   }
-  
-  liop = vl_liopdesc_new(4,6,2,5,11);
-  
+
+  liop = vl_liopdesc_new(4,6,2,11);
+
   vl_liopdesc_delete(liop) ;
 }
 

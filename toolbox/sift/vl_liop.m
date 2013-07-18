@@ -1,44 +1,36 @@
 % VL_LIOP Local Intensity Order Pattern descriptor
-%   D = VL_LIOP(I) compute the Liop descriptor of an image I.
-%   I is a square patch of an odd side length. Pixels belonging
-%   to the area of incircle of the patch will be used for
-%   computation. D is a column vector containing the liop
-%   descriptor of I. Implementation according to [1].
-%
-%   Use VL_COVDET() for computation of Liop descriptor from features frames.
+%   D = VL_LIOP(I) computes the LIOP descriptor of an image I, as
+%   described by [1]. I is a gray-scale square image with odd side
+%   length of class SINGLE. D is a column vector containing the LIOP
+%   descriptor of I. Note that LIOP is also integrated in the VL_COVDET()
+%   function for feature extraction.
 %
 %   VL_LIOP() accepts the following options:
 %
-%   Neighbours:: [4]
-%     Set the number of neighbours used for computation of permutation index.
+%   NumNeighbours:: 4
+%     Set the number of neighbours sampled to consruct the orer
+%     pattern of each image pixel.
 %
-%   Bins:: [6]
-%     Set the number of bins to which the points will be quintized according
-%     to their intensity.
+%   Radius:: 5
+%     Set the radius of the circular neighbourhood used to sampled
+%     the local order pattern of each pixel.
 %
-%   (the final descriptor will be of length factorial(neighbours)*bins)
+%   NumSpatialBins:: 6
+%     Set the number of spatial pooling regions. The LIOP descriptor
+%     has dimension factorial(NumNeighbours) * NumSpatialBins.
 %
-%   Radius:: [5]
-%     Set the distance between a point and it's neighbours.
-%
-%   WeightThreshold:: [see below]
-%     Set the weight threshold (i.e. how big must be the difference between
-%     intensities of all neighbouring points so that they influence descriptor
-%     value significantly).
-%     If not specified, the threshold is set according to the intensity values
-%     range:
-%           1) all values < 1    -> [0.02]
-%           2) all values < 255  -> [2]
-%           3) other             -> [maxIntensityValue * 0.02]
+%   IntensityThreshold:: -0.02
+%     Set the intensity threshold used to weight oder patterns as they
+%     are pooled into a histogram. A negative value is interpreted
+%     as a fraction of the difference between the maximum and minimum
+%     intesity in each local patch.
 %
 %   Verbose::
 %     If specified, be verbose
 %
 %   REFERENCES::
-%     [1] Z. Wang, B. Fan, F. Wu. Local Intensity Order Pattern for feature
-%         description. In ICCV, 2011
+%   [1] Z. Wang, B. Fan, F. Wu. Local Intensity Order Pattern for feature
+%   description. In ICCV, 2011
 %
-
-
-
-
+%   See: <a href="matlab:vl_help('liop')">LIOP</a>, VL_COVDET(),
+%   VL_HELP().
