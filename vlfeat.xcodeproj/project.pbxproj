@@ -40,8 +40,10 @@
 		2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EECCC1603E1B100C63DCE /* svmdataset.c */; };
 		2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED1D1604992A00C63DCE /* scalespace.c */; };
 		2D1EED201604992B00C63DCE /* scalespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1EED1E1604992A00C63DCE /* scalespace.h */; };
+		2D63C3A917969032001C6AE0 /* vl_liop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D9A805D17745CB500B9A9CD /* vl_liop.c */; };
 		2D81B9B11735666E000706C0 /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2D81B9B717356697000706C0 /* vl_svmtrain.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D81B9A917351EE5000706C0 /* vl_svmtrain.c */; };
+		2DA47BD41792E6C700EC02E0 /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2DA64CD917329C2400276F3D /* fisher.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DA64CD217329C2400276F3D /* fisher.c */; };
 		2DA64CDA17329C2400276F3D /* fisher.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DA64CD317329C2400276F3D /* fisher.h */; };
 		2DA64CDB17329C2400276F3D /* gmm.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DA64CD417329C2400276F3D /* gmm.c */; };
@@ -424,6 +426,7 @@
 		2D9AAB331769B6A300AFBCFC /* test_svd2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_svd2.c; sourceTree = "<group>"; };
 		2DA21722141D48DA0047E7C7 /* vl_alphanum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_alphanum.m; path = toolbox/misc/vl_alphanum.m; sourceTree = "<group>"; };
 		2DA21723141D49350047E7C7 /* vl_binsum.def */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = vl_binsum.def; path = toolbox/misc/vl_binsum.def; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
+		2DA47BD91792E6C700EC02E0 /* vl_liop.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = vl_liop.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DA64CD217329C2400276F3D /* fisher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fisher.c; sourceTree = "<group>"; };
 		2DA64CD317329C2400276F3D /* fisher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fisher.h; sourceTree = "<group>"; };
 		2DA64CD417329C2400276F3D /* gmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gmm.c; sourceTree = "<group>"; };
@@ -508,6 +511,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2DA47BD31792E6C700EC02E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DA47BD41792E6C700EC02E0 /* libvl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2DB3F0561605EC0B00862CCA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,6 +567,7 @@
 				2DFA239E173B7D0F0065603E /* vl_gmm.mexmaci64 */,
 				2DE607661785722900E1A24E /* vl_vlad.mexmaci64 */,
 				2D0E8A811786D18D005419DC /* vl_fisher.mexmaci64 */,
+				2DA47BD91792E6C700EC02E0 /* vl_liop.mexmaci64 */,
 			);
 			indentWidth = 2;
 			name = vlfeat;
@@ -1053,9 +1065,6 @@
 				2D765BB00FEC076700D08578 /* quickshift.h */,
 				2D94E6BC148E48440089ADA5 /* slic.c */,
 				2D94E6BE1490E4120089ADA5 /* slic.h */,
-				2D9941F410ECD04F00502DF6 /* heap-def.h */,
-				2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */,
-				2DBD0AA110F78FEB004DBA31 /* qsort-def.h */,
 				2DFA36D212F1A26D00E808D9 /* array.c */,
 				2DFA36D312F1A26D00E808D9 /* array.h */,
 				2D0E6C4B1003E0DF00F0864E /* float.th */,
@@ -1121,6 +1130,9 @@
 		2DBD0B2110F7AB58004DBA31 /* metaprograms */ = {
 			isa = PBXGroup;
 			children = (
+				2D9941F410ECD04F00502DF6 /* heap-def.h */,
+				2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */,
+				2DBD0AA110F78FEB004DBA31 /* qsort-def.h */,
 			);
 			name = metaprograms;
 			sourceTree = "<group>";
@@ -1212,6 +1224,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2D81B9B21735666E000706C0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DA47BD51792E6C700EC02E0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1338,6 +1357,23 @@
 			productReference = 2D81B9B61735666E000706C0 /* vl_svmtrain.mexmaci64 */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		2DA47BD01792E6C700EC02E0 /* vl_liop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DA47BD61792E6C700EC02E0 /* Build configuration list for PBXNativeTarget "vl_liop" */;
+			buildPhases = (
+				2DA47BD11792E6C700EC02E0 /* Sources */,
+				2DA47BD31792E6C700EC02E0 /* Frameworks */,
+				2DA47BD51792E6C700EC02E0 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vl_liop;
+			productName = vl_covdet;
+			productReference = 2DA47BD91792E6C700EC02E0 /* vl_liop.mexmaci64 */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		2DB3F0581605EC0B00862CCA /* vl_covdet */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DB3F05A1605EC0B00862CCA /* Build configuration list for PBXNativeTarget "vl_covdet" */;
@@ -1418,6 +1454,7 @@
 				2DFA2395173B7D0F0065603E /* vl_gmm */,
 				2DE6075D1785722900E1A24E /* vl_vlad */,
 				2D0E8A781786D18D005419DC /* vl_fisher */,
+				2DA47BD01792E6C700EC02E0 /* vl_liop */,
 			);
 		};
 /* End PBXProject section */
@@ -1477,6 +1514,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D81B9B717356697000706C0 /* vl_svmtrain.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DA47BD11792E6C700EC02E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D63C3A917969032001C6AE0 /* vl_liop.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1686,15 +1731,13 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = "$(ARCH_$(ARCHS))";
-				ARCHS = (
-					i386,
-					x86_64,
-				);
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
 				DEBUG = YES;
 				DOXYGEN = doxygen;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
@@ -1762,15 +1805,13 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = "$(ARCH_$(ARCHS))";
-				ARCHS = (
-					i386,
-					x86_64,
-				);
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
 				DEBUG = "";
 				DOXYGEN = doxygen;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
@@ -1830,6 +1871,70 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+			};
+			name = Release;
+		};
+		2DA47BD71792E6C700EC02E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = vl_liop;
+			};
+			name = Debug;
+		};
+		2DA47BD81792E6C700EC02E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = vl_liop;
 			};
 			name = Release;
 		};
@@ -2087,6 +2192,15 @@
 			buildConfigurations = (
 				2D81B9B41735666E000706C0 /* Debug */,
 				2D81B9B51735666E000706C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DA47BD61792E6C700EC02E0 /* Build configuration list for PBXNativeTarget "vl_liop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DA47BD71792E6C700EC02E0 /* Debug */,
+				2DA47BD81792E6C700EC02E0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
