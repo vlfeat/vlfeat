@@ -75,7 +75,7 @@
 %   [F,D] = VL_COVDET(I, 'descriptor', DESCRIPTOR) allows using one
 %   following descriptors instead
 %
-%   SIFT:
+%   SIFT::
 %     The default SIFT descriptor.
 %
 %   LIOP::
@@ -92,18 +92,18 @@
 %   The following parameters can be used to control the produced
 %   descriptors:
 %
-%   PatchResolution:: Sift [15], Liop [20], Patch [20]
+%   PatchResolution:: for SIFT descriptor 15, LIOP 20, PATCH 20
 %     The size of the patch R in pixel. Specifically, the patch is a
 %     square of side 2*R+1 pixels.
 %
-%   PatchRelativeExtent:: Sift [7.5], Liop [10], Patch [6]
+%   PatchRelativeExtent:: for SIFT descriptor 7.5, LIIP 10, PATCH 6
 %     The extent E of the patch in the feature frame. A feature F
 %     define a mapping from the feature reference frame to the image
 %     reference frame as an affine transformation A,T (see
 %     VL_PLOTFRAME()). The patch is a square [-E, E]^2 in this frame
 %     (transform this square by A,T to find the extent in the image).
 %
-%   PatchRelativeSmoothing: Sift [1], Liop [1], Patch [1.2]
+%   PatchRelativeSmoothing:: for SIFT descriptor 1, LIOP 1, PATCH 1.2
 %     The smoothing SIGMA of the patch in the patch frame. The
 %     computed patch can be thought as being obtained by first
 %     warping the image (as a continous signal) by A,T, then
@@ -124,7 +124,8 @@
 %   info.css::
 %     The cornerness measure scale space (see VL_PLOTSS()).
 %
-%   The function supports the following options:
+%   In addition to the ones discussed so far, the function supports
+%   the following options:
 %
 %   OctaveResolution:: 3
 %     The number of scale levels sampled per octave when constructing
