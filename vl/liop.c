@@ -38,7 +38,7 @@ a C program in order to compute the LIOP descriptor of an image patch.
 @code
 #include <vl/liop.h>
 
-// Create a new object instance (these numbers coresponds to parameter
+// Create a new object instance (these numbers corresponds to parameter
 // values proposed by authors of the paper, except for 41)
 vl_size sideLength = 41 ;
 VlLiopDesc * liop = vl_liopdesc_new_basic (sideLength);
@@ -71,20 +71,74 @@ statistics. This is changed by using ::vl_liopdesc_set_threshold.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The *Local Invariant Order Pattern* (LIOP) descriptor
-@cite{wang11local} is a local feature descriptor. It is by design
-invariant to monotonic intensity changes and image rotations and is
-robust to several other geometric and photometric transformations.
-
-LIOP is based on the concept of *orer pattern*. Consider a pixel $\bx$
-and $n$ neighbours $\bx_1,\bx_2,\dots,\bx_n$. The order pattern is the
-permutation $\sigma$ that sorts the neighbours by increasing intenstiy
+@cite{wang11local} is a local image descriptor based on the concept of
+*local order pattern*. An order pattern is simply the order obtained
+by sorting selected image samples by increasing intensity. Consider in
+particular a pixel $\bx$ and $n$ neighbors
+$\bx_1,\bx_2,\dots,\bx_n$. The local order pattern at $\bx$ is the
+permutation $\sigma$ that sorts the neighbours by increasing intensity
 $I(\bx_{\sigma(1)}) \leq I(\bx_{\sigma(2)}) \leq \dots \leq
 I(\bx_{\sigma(2)})$.
 
-LIOP builds a histograms of the order patterns in the patch. In order
-to map permutations to histogram bins one considers a lexycogrpahic
-ordering of the permutations. For example, for $n=4$ the
-lexycographical ordering is
+An advantage of order patterns is that they are invariant to monotonic
+changes of the image intensity. However, an order pattern describes
+only a small portion of a patch and is not very distinctive. LIOP
+assembles local order patterns computed at all image locations to
+obtain a descriptor that at the same time distinctive and invariant to
+monotonic intensity changes as well as image rotations.
+
+In order to make order patterns rotation invariant, the neighborhood
+of samples around $\bx$ is taken in a rotation-covariant manner. In
+particular, the points $\bx_1,\dots,\bx_n$ are sampled anticlockwise
+on a circle of radius $r$ around $\bx$, as shown in the following
+figure:
+
+@image html liop.png "LIOP descriptor layout: square input patch (shaded area), circular measurement region (white area), local neighborhood of a point (blue)."
+
+Since the sample points do not necessarily have integer coordinates,
+$I(\bx_i)$ is computed using bilinear interpolation.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section liop-spatial-binning Intensity rank spatial binning
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Once local order patterns are computed for all pixels $\bx$ in the
+image, they can be pooled into a histogram to form an image
+descriptor. Pooling discards spatial information resulting in a
+warp-invariant statistics. In practice, there are two restriction on
+which pixels can be used for this purpose:
+
+- A margin of $r$ pixels from the image boundary must be maintained so
+  that neighborhoods fall within the image boundaries.
+- Rotation invariance requires the pooling regions to be rotation
+  co-variant.  A way to do so is to make the shape of the pooling
+  region rotation invariant.
+
+For this reason, the histogram pooling region is restricted to the
+circular region shown with a light color in the figure above.
+
+In order to increase distinctiveness of the descriptor, LIOP pools
+multiple histograms from a number of regions $R_1,\dots,R_m$ (spatial
+pooling). These regions are selected in an illumination-invariant and
+rotation-covariant manner by looking at level sets:
+\[ 
+R_t = \{\bx :\tau_{t} \leq I(\bx) < \tau_{t+1} \}. 
+\] 
+In order to be invariant to monotonic changes of the intensity, the
+thresholds $\tau_t$ are selected so that all regions contain the same
+number of pixels. This can be done efficiently by sorting pixels by
+increasing intensity and then partitioning the resulting list into $m$
+equal parts (when $m$ does not divide the number of pixels exactly,
+the remaining pixels are incorporated into the last partition).
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section liop-weighing Weighted pooling
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In order to compute a histogram of order pattern occurrences, one
+needs to map permutations to histogram bins. This is obtained by
+sorting permutation in lexycogrpahical order. For example, for $n=4$
+neighbors one has the following $n!=24$ permutations:
 
 Permutation   | Lexycographical rank
 --------------|----------------------
@@ -96,80 +150,39 @@ Permutation   | Lexycographical rank
 4 3 1 2       | 23
 4 3 2 1       | 24
 
-The order pattern $\sigma$ computed at location $\bx$ is then mapped
-to the histogram bin of index $q(\bx) \in [1, n!]$, equal to the rank
-of the permutation in this ordering (thus the histogram has
-dimensionality $n!$).
+In the following, $q(\bx) \in [1, n!]$ will denote the index of the
+local order pattern $\sigma$ centered at pixel $\bx$.
 
-In order to make the order patterns invariant to a rotation of the
-patch, the samples $\bx_1,\dots,\bx_n$ are taken in a covariant
-manner. The simplest way to do so is to sample points in a circle
-around $\bx$, in anticlockwise order, using the radius connecting
-$\bx$ to the patch center as a reference to identify the first sample:
-
-@image html liop-neighbours-sampling.png "Sampling order of neighbouring points"
-
-The sample points do not necessarily have integer coordinates; so
-$I(\bx_i)$ is computed using bilinear interpolation.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section liop-spatial-binning Intensity rank spatial binning
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-Histograms of order patterns could be pooled from all pixels $bx$ in
-the image patch. However, there are a few restrictions:
-
-- Only pixels sufficiently far away from the boundary that their
-  circular neighbours are included in the patch can be used.
-- Only pixels within a cricular regions inside the patch can be used
-  in orer to guaranteee rotation invariance.
-
-Furthermore, in order to increase the discriminative power of these
-histograms, LIOP breaks the spatial domain in a number of regions,
-performing histogramming independently on each, and concatenating the
-results.  Such regions need to be extracted in a rotation covariant
-manner. This is obtained by considering level sets of the image patch:
-\[
- R_t = \{\bx : \tau_{t} \leq I(\bx) < \tau_{t+1} \}.
-\]
-In order to be invariant to monotonic changes of the intensity, the
-thresolds $\tau_t$ are selected such that each region contains the
-same number of pixels. This is obtained quickly by sorting pixels by
-increasing intesity and then dividing the list into $m$ equal parts.
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section liop-weighing Weighing and pooling
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-The local intensity features $q(\bx)$ are then pooled in each spatial
-bin, forming a histogram of size $!n$. However, contributions are
-weighted to account for the stability of each elementary feature. The
-latter, is assumed to be proportional to the number of sufficiently
-dissimilar pairs forming the local neighbourhood. Two intensities are
-sufficiently dissimilar if their absolute difference is above a
-threshod $\Theta$:
+The local order patterns $q(\bx)$ in a region $R_t$ are then pooled to
+form a histogram of size $!n$. In this process, patterns are weighted
+based on their stability. The latter is assumed to be proportional to
+the number of pairs of pixels in the neighborhood that have a
+sufficiently large intensity difference:
 
 @f[
-w(\bx) = \sum_{ij} [ |I(\bx_{i}) - I(\bx_{j})| >  \Theta) ]
+w(\bx) = \sum_{i=1}^n \sum_{j=1}^n [ |I(\bx_{i}) - I(\bx_{j})| >  \Theta) ]
 @f]
 
 where $[\cdot]$ is the indicator function.
 
-In VLFeat LIOP implementation, The threshold $\Theta$ is either set as
+In VLFeat LIOP implementation, the threshold $\Theta$ is either set as
 an absolute value, or as a faction of the difference between the
-maximum or minimum intensity in the circular patch.
+maximum and minimum intensity in the image (restricted to the pixels
+in the light area in the figure above).
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section liop-normalization Normalization
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-Consider the matrix of weighted histogram values
+Overall, LIOP consists of $m$ histograms of size $n!$ obtained as
 
 \[
   h_{qt} = \sum_{\bx : q(\bx) = q \ \wedge\  \bx \in R_t} w(\bx).
 \]
 
-The LIOP descriptor is obtained by stacking this matrix into a vector
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section liop-normalization Normalization
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+After computing the weighted counts $h_{qt}$, the LIOP descriptor is
+obtained by stacking the values $\{h_{qt}\}$ into a vector
 $\mathbf{h}$ and then normalising it:
 
 \[
@@ -178,8 +191,10 @@ $\mathbf{h}$ and then normalising it:
 
 The dimensionality is therefore $m n!$, where $m$ is the @c
 numSpatialBins number of spatial bins and $n$ is the @c numNeighbours
-number of neighbours. The descriptor is approximately stored as a
-vector of integers as
+number of neighbours (see ::vl_liopdesc_new). By default, this
+descriptor is stored in @c single format. It can be stored as a
+sequence of bytes by premultiplying the values by the constant 255 and
+then rounding:
 
 \[
  \operatorname{round}\left[ 255\, \times \Phi\right].

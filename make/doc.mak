@@ -204,6 +204,7 @@ doc_svg_src := $(wildcard docsrc/figures/*.svg)
 doc_fig_tgt += $(subst docsrc/,doc/,$(doc_fig_src:.fig=.png)) $(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
 
 .PRECIOUS: doc/build/figures/%.pdf
+.PRECIOUS: doc/build/figures/%.tex
 
 doc/figures/%.png : doc/build/figures/%.pdf
 	$(call C,CONVERT) -density 300 "$<" -resample $(screen_dpi) -trim  "$@"
@@ -223,17 +224,17 @@ doc/build/figures/%-raw.pdf : docsrc/figures/%.fig $(doc-dir)
 
 doc/build/figures/%.pdf doc/build/figures/%.aux doc/build/figures/%.log : \
   doc/build/figures/%.tex doc/build/figures/%-raw.tex doc/build/figures/%-raw.pdf $(doc-dir)
-	$(call C,PDFLATEX) -interaction=batchmode -output-directory="$(dir $@)" "$<" 2>/dev/null
+	$(call C,PDFLATEX) -shell-escape -interaction=batchmode -output-directory="$(dir $@)" "$<" 2>/dev/null
 
 doc/build/figures/%.tex : $(doc-dir)
 	@$(print-command GEN, $@)
-	@/bin/echo '\documentclass[landscape]{article}'          >$@
-	@/bin/echo '\usepackage[margin=0pt]{geometry}'		>>$@
-	@/bin/echo '\usepackage{graphicx,color}'		>>$@
-	@/bin/echo '\begin{document}'				>>$@
-	@/bin/echo '\pagestyle{empty}'				>>$@
-	@/bin/echo '\input{doc/build/figures/$(*)-raw.tex}'	>>$@
-	@/bin/echo '\end{document}'				>>$@
+	@/bin/echo '\documentclass[landscape]{article}'                 >$@
+	@/bin/echo '\usepackage[paper=a2paper,margin=0pt]{geometry}'	>>$@
+	@/bin/echo '\usepackage{graphicx,color}'			>>$@
+	@/bin/echo '\begin{document}'					>>$@
+	@/bin/echo '\pagestyle{empty}'					>>$@
+	@/bin/echo '\input{doc/build/figures/$(*)-raw.tex}'		>>$@
+	@/bin/echo '\end{document}'					>>$@
 
 # --------------------------------------------------------------------
 #                                                               Webdoc
@@ -241,7 +242,7 @@ doc/build/figures/%.tex : $(doc-dir)
 
 webdoc_src = $(wildcard docsrc/*.xml) $(wildcard docsrc/*.html)
 
-doc: doc/index.html doc/vlfeat.css doc/pygmentize.css
+doc: doc/index.html doc/vlfeat.css doc/pygmentize.css $(doc_fig_tgt)
 
 # prebuild to generate doxygen header and footer
 doc/build/doxygen_header.html doc/build/doxygen_footer.html: $(webdoc_src) $(doc-dir)
@@ -269,7 +270,6 @@ doc/index.html: $(webdoc_src) $(doc-dir) \
  doc/build/man/man.html \
  doc/build/matlab/demo.xml \
  docsrc/webdoc.py \
- $(doc_fig_tgt) \
  $(html_src)
 	cp doc/api/index.html doc/api/index.html.bak
 	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py \

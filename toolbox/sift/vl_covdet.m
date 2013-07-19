@@ -43,7 +43,7 @@
 %   features can be obtained in the INFO structure (see later).
 %
 %   Features can also be filtered by setting the 'EdgeThreshold'
-%   parameters, which sets an upper bound on the ratio of the maxium
+%   parameter, which sets an upper bound on the ratio of the maxium
 %   over the minium curvature of the cornerness measure at the
 %   detected location. The idea is that unbalanced curvatures
 %   correspond to features detected along image edges, and should
