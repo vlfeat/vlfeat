@@ -313,6 +313,8 @@ vl_svmdataset_get_inner_product_function (VlSvmDataset const *self)
         assert(0) ;
     }    
   }
+
+  return NULL;
 }
 
 /* VL_SVMDATASET_INSTANTIATING */

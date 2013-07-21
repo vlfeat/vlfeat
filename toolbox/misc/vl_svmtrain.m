@@ -1,7 +1,7 @@
 %VL_SVMTRAIN Train a Support Vector Machine
 %   [W B] = VL_SVMTRAIN(X, Y, LAMBDA) trains a linear Support Vector
 %   Machine (SVM) from the data vectors X and the labels Y. X is a D
-%   by N matrix, with one column for example and D feature dimensions
+%   by N matrix, with one column per example and D feature dimensions
 %   (SINGLE or DOUBLE). Y is a DOUBLE vector with N elements with a
 %   binary (-1 or +1) label for each training point. To a first order
 %   approximation, the function computes a weight vector W and offset
@@ -114,9 +114,10 @@
 %
 %     LAMBDA/2 |W|^2 + 1/N SUM_i LOSS(W' X(:,i), Y(i))
 %
-%   where LOSS(W,X,Y) is the loss (hinge by default). The bias is
-%   incorporated by extending each data point X with a feature of
-%   constant value B0, such that the objective becomes
+%   where LOSS(W' Xi,Yi) is the loss (hinge by default) for i-th
+%   data point. The bias is incorporated by extending each data
+%   point X with a feature of constant value B0, such that the
+%   objective becomes
 %
 %    LAMBDA/2 (|W|^2 + WB^2) 1/N SUM_i LOSS(W' X(:,i) + WB B0, Y(i))
 %
@@ -141,16 +142,15 @@
 %
 %   REFERENCES::
 %
-%   [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro. Pegasos: Primal
-%       estimated sub-GrAdient SOlver for SVM. In Proc. ICML, 2007.
+%   [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro.
+%        Pegasos: Primal estimated sub-GrAdient SOlver for SVM. In Proc. ICML, 2007.
 %
-%   [2] Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya
-%       Keerthi, and S. Sundararajan. 2008. A dual coordinate descent
-%       method for large-scale linear SVM. Proc. ICML, 2008.
+%   [2] Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya Keerthi, and S. Sundararajan. 
+%       A dual coordinate descent method for large-scale linear SVM. Proc. ICML, 2008.
 %
-%   [3] S. Shalev-Shwartz and T. Zhang. Stochastic Dual Coordinate
-%       Ascent Methods for Regularized Loss Minimization. In
-%       Proc. NIPS, 2012.
+%   [3] S. Shalev-Shwartz and T. Zhang.
+%       Stochastic Dual Coordinate Ascent Methods for Regularized Loss Minimization.
+%       In Proc. NIPS, 2012.
 %
 %   See also: VL_SVMDATASET(), VL_HELP().
 
