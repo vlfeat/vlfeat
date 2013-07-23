@@ -202,33 +202,20 @@ psix = vl_homkermap(hists, 1, 'kchi2', 'gamma', .5) ;
 
 if ~exist(conf.modelPath) || conf.clobber
   switch conf.svm.solver
-    case 'sgd'
+    case {'sgd', 'sdca'}
       lambda = 1 / (conf.svm.C *  length(selTrain)) ;
       w = [] ;
       parfor ci = 1:length(classes)
         perm = randperm(length(selTrain)) ;
         fprintf('Training model for class %s\n', classes{ci}) ;
         y = 2 * (imageClass(selTrain) == ci) - 1 ;
+        [w(:,ci) b(ci) info] = vl_svmtrain(psix(:, selTrain(perm)), y(perm), lambda, ...
+          'Solver', conf.svm.solver, ...
+          'MaxNumIterations', 50/lambda, ...
+          'BiasMultiplier', conf.svm.biasMultiplier, ...
+          'Epsilon', 1e-3);
+      end
 
-        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm))) ;
-        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, ...
-                                        'MaxIterations', 50/lambda, ...
-                                        'BiasMultiplier', conf.svm.biasMultiplier);
-      end
-    case 'sdca'
-      lambda = 1 / (conf.svm.C *  length(selTrain)) ;
-      w = [] ;
-      parfor ci = 1:length(classes)
-        perm = randperm(length(selTrain)) ;
-        fprintf('Training model for class %s\n', classes{ci}) ;
-        y = 2 * (imageClass(selTrain) == ci) - 1 ;
-        data = vl_maketrainingset(psix(:,selTrain(perm)), int8(y(perm))) ;
-        [w(:,ci) b(ci) info] = vl_svmtrain(data, lambda, 'DCA',...
-                                        'MaxIterations', 5/lambda, ...
-                                        'BiasMultiplier', conf.svm.biasMultiplier,...
-                                        'Epsilon',0.00,...
-                                        'OnlineSetting',logical(1));
-      end
     case 'liblinear'
       svm = train(imageClass(selTrain)', ...
                   sparse(double(psix(:,selTrain))),  ...
@@ -291,14 +278,15 @@ numWords = size(model.vocab, 2) ;
 
 % get PHOW features
 [frames, descrs] = vl_phow(im, model.phowOpts{:}) ;
-% quantize appearance
+
+% quantize local descriptors into visual words
 switch model.quantizer
   case 'vq'
     [drop, binsa] = min(vl_alldist(model.vocab, single(descrs)), [], 1) ;
   case 'kdtree'
     binsa = double(vl_kdtreequery(model.kdtree, model.vocab, ...
                                   single(descrs), ...
-                                  'MaxComparisons', 15)) ;
+                                  'MaxComparisons', 50)) ;
 end
 
 for i = 1:length(model.numSpatialX)
