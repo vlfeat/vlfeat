@@ -138,7 +138,6 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("vl_fisher: num clusters: %d\n", numClusters) ;
     mexPrintf("vl_fisher: data dimension: %d\n", dimension) ;
     mexPrintf("vl_fisher: code dimension: %d\n", numClusters * dimension) ;
-    mexPrintf("vl_fisher: normalized: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_NORMALIZED)) ;
     mexPrintf("vl_fisher: square root: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_SQUARE_ROOT)) ;
     mexPrintf("vl_fisher: normalized: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_NORMALIZED)) ;
     mexPrintf("vl_fisher: fast: %s\n", VL_YESNO(flags & VL_FISHER_FLAG_FAST)) ;
