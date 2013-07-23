@@ -24,9 +24,11 @@ ABOUT
 QUICK START WITH MATLAB
 
   To start using VLFeat as a MATLAB toolbox, download the latest
-  VLFeat binary package from http://www.vlfeat.org/download/. Unpack
-  it, for example by using WinZIP (Windows), by double clicking on the
-  archive (Mac), or by using the command line (Linux and Mac):
+  VLFeat binary package from http://www.vlfeat.org/download/. Note
+  that the pre-compiled binaries require MATLAB 2009B and
+  later. Unpack it, for example by using WinZIP (Windows), by double
+  clicking on the archive (Mac), or by using the command line (Linux
+  and Mac):
 
   > tar xzf vlfeat-X.Y.Z-bin.tar.gz
 
@@ -41,16 +43,26 @@ QUICK START WITH MATLAB
 
   > vl_demo
 
+OCTAVE SUPPORT
+
+  The toolbox should be laregly compatible with GNU Octave, an open
+  source MATLAB equivalent. However, the binary distribution does not
+  ship with pre-built GNU Octave MEX files. To compile them use
+
+  > cd <vlfeat directory>
+  > MKOCTFILE=<path to the mkoctfile program> make
+
 CHANGES
   0.9.17     Rewritten SVM implementation, adding support for SGD and
              SDCA optimisers and various loss functions (hinge,
              squared hinge, logistic, etc.) and improving the
              interface. Added infrastructure to support multi-core
-             computations using OpenMP. Added OpenMP support to
-             KD-trees and KMeans. Added new Gaussian Mixture Models,
-             VLAD encoding, and Fisher Vector encodings (also with
-             OpenMP support). Added LIOP feature descriptors. Added
-             new object category recognition example code, supporting
+             computations using OpenMP (MATLAB 2009B or later
+             required). Added OpenMP support to KD-trees and
+             KMeans. Added new Gaussian Mixture Models, VLAD encoding,
+             and Fisher Vector encodings (also with OpenMP
+             support). Added LIOP feature descriptors. Added new
+             object category recognition example code, supporting
              several standard benchmarks off-the-shelf.
 
   0.9.16     Added VL_COVDET(). This function implements the following

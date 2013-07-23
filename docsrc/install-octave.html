@@ -1,0 +1,45 @@
+<!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<group>
+
+<p>This page shows how to compile VLFeat MEX files for usage
+in <a href="http://www.gnu.org/software/octave/">GNU Octave</a>
+(tested on version 3.6.4).</p>
+
+<p>Make sure that the <code>image</code> toolbox is installed in
+Octave. This can be obtained, for example, by using
+the <code>pkg</code> builtin Octave command:</p>
+
+<precode type='matlabsession'>
+>> pkg install image
+</precode>
+
+<p>Unpack VLFeat and use the Makefile to compile the MEX files. To
+instruct the Makefile to target Octave as well, specify the path to
+the <code>mkoctfile</code> command. For example,
+if <code>mkoctfile</code> is in your current path and VLFeat is
+unpacked in <code>VLFEATROOT</code>, the following should work:</p>
+
+<precode type='sh'>
+> cd VLFEATROOT
+> MKOCTFILE=mkoctfile make
+</precode>
+
+<p>After the MEX files are successfully compiled (look for them
+into <code>toolbox/mex/octave/</code>), you can start using VLFeat in
+Octave in the <a href="%pathto:matlab-install;"> same way as
+MATLAB</a>. Do not forget to use the <code>vl_setup</code> command to
+initalize the paths:</p>
+
+<precode type='matlabsession'>
+octave:1> addpath VLFEATROOT/toolbox
+octave:2> vl_setup
+octave:3> vl_version verbose
+VLFeat version 0.9.17
+    Static config: X64, little_endian, GNU C 40201 LP64, POSIX_threads, SSE2, OpenMP
+    4 CPU(s): GenuineIntel MMX SSE SSE2 SSE3 SSE41 SSE42
+    OpenMP: max threads: 4 (library: 4)
+    Debug: yes
+    SIMD enabled: yes
+</precode>
+
+</group>

@@ -147,7 +147,7 @@ deviation $\sigma$:
 \[
   g_{\sigma}(x,y) = \frac{1}{2\pi\sigma^2}
   \exp\left(
-  \frac{x^2 + y^2}{2\sigma^2}
+  - \frac{x^2 + y^2}{2\sigma^2}
   \right).
 \]
 

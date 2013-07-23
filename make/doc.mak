@@ -58,7 +58,9 @@ endif
 # use MATLAB to create the figures for the tutorials
 doc-deep: all $(doc-dir) $(results-dir)
 	cd toolbox ; \
-	$(MATLAB_EXE) -$(ARCH) -nodesktop -nosplash -r "clear mex;vl_setup demo;vl_demo;exit"
+	VL_DEMO_PRINT=y $(MATLAB_EXE) \
+	    -$(ARCH) -nodesktop -nosplash \
+	    -r "clear mex;vl_setup demo;vl_demo;exit"
 	@echo "Trimming images ..."
 	find doc/demo -name "*.jpg" -exec $(CONVERT) -trim "{}" "{}" ";"
 	@echo "Done trimming"
@@ -266,8 +268,8 @@ doc/pygmentize.css : docsrc/pygmentize.css
 doc/index.html: $(webdoc_src) $(doc-dir) \
  doc/api/index.html \
  doc/build/matlab/mdoc.html \
- doc/build/man/man.xml \
- doc/build/man/man.html \
+ doc/build/man/xman.xml \
+ doc/build/man/xman.html \
  doc/build/matlab/demo.xml \
  docsrc/webdoc.py \
  $(html_src)

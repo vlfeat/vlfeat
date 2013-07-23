@@ -19,7 +19,7 @@ vl_demo_print('svm_training') ;
 lambda = 0.01 ; % Regularization parameter
 maxIter = 1000 ; % Maximum number of iterations
 
-
+energy = [] ;
 % Diagnostic function
 function diagnostics(svm)
   energy = [energy [svm.objective ; svm.dualObjective ; svm.dualityGap ] ] ;

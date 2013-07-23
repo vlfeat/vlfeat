@@ -34,7 +34,11 @@ for n = 1:2
                             'Distance', distance, ...
                             'MaxNumIterations', maxNumIterations, ...
                             options{a}{:}) ;
-      time(t,a,n) = toc(start) ;
+      if vl_isoctave()
+        time(t,a,n) = (tic() - start) / 1e6 ;
+      else
+        time(t,a,n) = toc(start) ;
+      end
       energy(t,a,n) = E ;
     end
   end

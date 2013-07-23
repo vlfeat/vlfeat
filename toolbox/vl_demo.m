@@ -12,6 +12,10 @@ function vl_demo
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
+if vl_isoctave()
+  more off ;
+end
+
 root = vl_root ;
 demo_path = fullfile(root,'toolbox','demo') ;
 addpath(demo_path) ;
@@ -21,14 +25,14 @@ vl_demo_covdet ;
 vl_demo_sift_basic ;
 vl_demo_sift_peak ;
 vl_demo_sift_edge ;
-vl_demo_sift_cmd ;
+%vl_demo_sift_cmd ;
 vl_demo_sift_or ;
 vl_demo_sift_match ;
 vl_demo_sift_vs_ubc ;
 
 vl_demo_mser_basic ;
 vl_demo_mser_delta ;
-vl_demo_mser_cmd ;
+%vl_demo_mser_cmd ;
 
 vl_demo_aib ;
 vl_demo_quickshift ;

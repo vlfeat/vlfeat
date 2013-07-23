@@ -45,8 +45,12 @@ vl_demo_print('mser_basic_frames') ;
 
 figure(2) ; clf ; imagesc(I) ; hold on ;
 colormap(gray(256)) ;
-[c,h]=contour(M,(0:max(M(:)))+.5) ;
-set(h,'color','y','linewidth',3) ;
+if vl_isoctave()
+  [c,h]=contour(M,(0:max(M(:)))+.5,'y','linewidth',3) ;
+else
+  [c,h]=contour(M,(0:max(M(:)))+.5) ;
+  set(h,'color','y','linewidth',3) ;
+end
 axis equal ; axis off ;
 vl_demo_print('mser_basic_contours') ;
 
@@ -74,8 +78,12 @@ h2 = vl_plotframe(f) ; set(h2,'color','k','linewidth',1) ;
 vl_demo_print('mser_basic_frames_both') ;
 
 figure(2) ;
-[c,h]=contour(M,(0:max(M(:)))+.5) ;
-set(h,'color','g','linewidth',3) ;
+if vl_isoctave()
+  [c,h]=contour(M,(0:max(M(:)))+.5,'y','linewidth',3) ;
+else
+  [c,h]=contour(M,(0:max(M(:)))+.5) ;
+  set(h,'color','g','linewidth',3) ;
+end
 
 hold on ; axis equal ; axis off ;
 vl_demo_print('mser_basic_contours_both') ;

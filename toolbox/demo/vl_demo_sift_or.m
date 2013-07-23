@@ -14,7 +14,7 @@ f = [f ; 4 * ones(1,K) ; 0 * ones(1,K)] ;
 f = vl_sift(single(I), 'frames', f, 'orientations') ;
 
 figure(1) ; clf ;
-imagesc(I) ; colormap gray ; hold on ;
+imagesc(single(I)) ; colormap gray ; hold on ;
 vl_plotframe(f,'color','k','linewidth',3) ;
 vl_plotframe(f,'color','y','linewidth',2) ;
 axis equal ; axis off ;

@@ -112,8 +112,6 @@ vl_demo_print('covdet_custom_frames',.8) ;
 
 [frames, descrs, info] = vl_covdet(imgs) ;
 
-info
-
 figure(8) ; clf ;
 vl_plotss(info.gss) ;
 colormap gray ;
@@ -125,7 +123,6 @@ vl_plotss(info.css) ;
 colormap gray ;
 vl_figaspect(2) ;
 vl_demo_print('covdet_css',.8) ;
-
 
 figure(10) ; clf ;
 subplot(1,2,1) ;

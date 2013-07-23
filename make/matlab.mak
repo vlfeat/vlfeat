@@ -61,15 +61,15 @@ endif
 
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 MEX_SUFFIX := mexglx
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
+MEX_SUFFIX := mexa64
 MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
-MEX_SUFFIX := mexa64
 endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)

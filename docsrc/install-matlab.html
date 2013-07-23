@@ -1,10 +1,11 @@
 <!DOCTYPE group PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <group>
 
-<p>These instructions explain how to setup VLFeat in MATLAB using the
-binary distribution (it is also possible
-to <a href="%pathto:compiling;">compile</a> the library and toolbox from
-source).</p>
+<p>These instructions explain how to setup VLFeat in MATLAB (at least
+2009B) using the binary distribution (it is also possible
+to <a href="%pathto:compiling;">compile</a> the library and toolbox
+from source, including running on earlier MATLAB versions by disabling
+some features such as OpenMP support).</p>
 
 <h1>One-time setup</h1>
 
@@ -18,7 +19,7 @@ enter</p>
 
 <precode type='matlabsession'>
 >> run('VLFEATROOT/toolbox/vl_setup')
-VLFeat 0.9.8 ready.
+VLFeat 0.9.17 ready.
 </precode>
 
 <p>To check that VLFeat is sucessfully installed, try to run
@@ -26,9 +27,11 @@ the <code>vl_version</code> command:</p>
 
 <precode type='matlabsession'>
 >> vl_version verbose
-VLFeat version 0.9.8
-    Static config: X64, little_endian, GNU C 40201 LP64, POSIX_threads, SSE2
+VLFeat version 0.9.17
+    Static config: X64, little_endian, GNU C 40201 LP64, POSIX_threads, SSE2, OpenMP
     4 CPU(s): GenuineIntel MMX SSE SSE2 SSE3 SSE41 SSE42
+    OpenMP: max threads: 4 (library: 4)
+    Debug: yes
     SIMD enabled: yes
 </precode>
 

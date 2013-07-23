@@ -12,13 +12,16 @@
 </page>
 
 <page id="download" name="download" title="Download"><include src="download.html"/>
-  <page id="install.matlab" name="install-matlab" title="MATLAB install">
+  <page id="install.matlab" name="install-matlab" title="Using from MATLAB">
     <include src="install-matlab.html"/>
   </page>
-  <page id="install.shell" name="install-shell" title="Shell install">
+  <page id="install.octave" name="install-octave" title="Using from Octave">
+    <include src="install-octave.html"/>
+  </page>
+  <page id="install.shell" name="install-shell" title="Using from the command line">
     <include src="install-shell.html"/>
   </page>
-  <page id="install.c" name="install-c" title="C library install">
+  <page id="install.c" name="install-c" title="Using from C">
     <include src="install-c.html"/>
     <page id="xcode" name="xcode" title="Xcode"><include src="using-xcode.html"/></page>
     <page id="vsexpress" name="vsexpress" title="Visual C++"><include src="using-vsexpress.html"/></page>
@@ -57,12 +60,6 @@
 <dir name="applications">
   <page id="apps" name="apps" title="Applications">
     <include src="apps.html"/>
-    <page id="apps.caltech-101.code" name="caltech-101-code" title="phow_caltech101.m" hide="yes">
-      <precode type='matlab'><include src="../apps/phow_caltech101.m" type="text"/></precode>
-    </page>
-    <page id="apps.sift-mosaic.code" name="sift-mosaic-code" title="sift_mosaic.m" hide="yes">
-      <pre><include src="../apps/sift_mosaic.m" type="text"/></pre>
-    </page>
   </page>
 </dir>
 

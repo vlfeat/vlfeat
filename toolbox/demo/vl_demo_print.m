@@ -1,11 +1,14 @@
 function vl_demo_print(varargin)
 % VL_DEMO_PRINT
-%   VL_DEMO_PRINT(NAME) print the current figure to the
-%   documentation directory with the specified filename.
+%   VL_DEMO_PRINT(NAME) prints the current figure to the documentation
+%   directory with the specified filename, assuming that the global
+%   variable VL_DEMO_PRINT is defined and non-empty when MATLAB is
+%   started (our using SETENV() from MATLAB). Otherwise the function
+%   flushes the displays and returns.
 %
-%   VL_DEMO_PRINT(NAME, R) specifies a magnification factor R, which
-%   express the figure width relative to the page width. If not
-%   specified, R is assumed to be 1/2.
+%   VL_DEMO_PRINT(NAME, R) specifies a magnification factor R, setting
+%   the figure width relatively to the page width. If not specified, R
+%   is assumed to be 1/2.
 %
 %   Remarks:: The figure paper type is set to letter, that has size 8.5 x
 %     11 inches. When converted for web viewing, images are rasterized
@@ -22,6 +25,11 @@ function vl_demo_print(varargin)
 %
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
+
+if isempty(getenv('VL_DEMO_PRINT'))
+  drawnow ;
+  return ;
+end
 
 if isa(varargin{1}, 'double')
   fig = varargin{1} ;
