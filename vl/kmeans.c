@@ -750,7 +750,7 @@ VL_XCAT(_vl_kmeans_quantize_ann_, SFX)
       vl_kdforestsearcher_query (searcher, &neighbor, 1, (TYPE const *) (data + x*self->dimension));
 
       if (distances) {
-        if(update) {
+        if(!update) {
           distances[x] = (TYPE) neighbor.distance;
           assignments[x] = (vl_uint32) neighbor.index ;
         } else {
