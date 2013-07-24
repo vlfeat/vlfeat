@@ -4,12 +4,12 @@
  **/
 
 /*
-Copyright (C) 2013 David Novotny.
-All rights reserved.
+ Copyright (C) 2013 David Novotny.
+ All rights reserved.
 
-This file is part of the VLFeat library and is made available under
-the terms of the BSD license (see the COPYING file).
-*/
+ This file is part of the VLFeat library and is made available under
+ the terms of the BSD license (see the COPYING file).
+ */
 
 #include <vl/gmm.h>
 #include <mexutils.h>
@@ -27,12 +27,6 @@ enum
   opt_covariances,
   opt_priors,
   opt_covariance_low_bound
-} ;
-
-enum
-{
-  INIT_RAND,
-  INIT_CUSTOM
 } ;
 
 vlmxOption  options [] =
@@ -66,14 +60,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_size dimension ;
   vl_size numData ;
 
-  void * initCovariances = 0;
-  void * initMeans = 0;
-  void * initPriors = 0;
-  vl_bool meansSet = VL_FALSE;
-  vl_bool covariancesSet = VL_FALSE;
-  vl_bool priorsSet = VL_FALSE;
+  void * initCovariances = 0 ;
+  void * initMeans = 0 ;
+  void * initPriors = 0 ;
 
-  double covarianceLowBound = 0.000001;
+  double const * covarianceLowBound = NULL ;
   void const * data = NULL ;
 
   vl_size maxNumIterations = 100 ;
@@ -81,6 +72,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   double LL ;
   int verbosity = 0 ;
   VlGMMInitialization initialization = VlGMMRand ;
+  vl_bool initializationSet = VL_FALSE ;
 
   vl_type dataType ;
   mxClassID classID ;
@@ -137,102 +129,99 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
     switch (opt)
     {
+      case opt_verbose : ++ verbosity ; break ;
 
-    case opt_verbose : ++ verbosity ; break ;
+      case opt_max_num_iterations :
+        if (!vlmxIsPlainScalar(optarg) || mxGetScalar(optarg) < 0) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "MAXNUMITERATIONS must be a non-negative integer scalar") ;
+        }
+        maxNumIterations = (vl_size) mxGetScalar(optarg) ;
+        break ;
 
-    case opt_max_num_iterations :
-      if (!vlmxIsPlainScalar(optarg) || mxGetScalar(optarg) < 0)
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "MAXNUMITERATIONS must be a non-negative integer scalar") ;
-      }
-      maxNumIterations = (vl_size) mxGetScalar(optarg) ;
-      break ;
+      case opt_covariance_low_bound :
+        if (!vlmxIsPlainVector(optarg,dimension)) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "COVARIANCEBOUND must be a DOUBLE vector of size equal to the dimension of the data X.") ;
+        }
+        covarianceLowBound = mxGetPr(optarg) ;
+        break ;
 
-    case opt_covariance_low_bound :
-      covarianceLowBound = (double) mxGetScalar(optarg) ;
-      break ;
+      case opt_priors : {
+        if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+          vlmxError (vlmxErrInvalidArgument, "INITPRIORS is not of the same class as the data X.") ;
+        }
+        if (! vlmxIsVector (optarg, numClusters) || ! vlmxIsReal (optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "INITPRIORS is not a real vector or does not have the correct size.") ;
+        }
+        initPriors = mxGetPr(optarg) ;
+        break ;
+      }
 
-    case opt_priors : {
-      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
-        vlmxError (vlmxErrInvalidArgument, "INITPRIORS is not of the same class as X.") ;
+      case opt_means : {
+        if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+          vlmxError (vlmxErrInvalidArgument, "INITMEANS is not of the same class as the data X.") ;
+        }
+        if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "INITMEANS is not a real matrix or does not have the correct size.") ;
+        }
+        initMeans = mxGetPr(optarg) ;
+        break;
       }
-      if (! vlmxIsVector (optarg, numClusters) || ! vlmxIsReal (optarg)) {
-        vlmxError(vlmxErrInvalidArgument, "INITPRIORS is not a real vector or does not have the correct size.") ;
-      }
-      priorsSet = VL_TRUE;
-      initPriors = mxGetPr(optarg) ;
-      break ;
-	  }
 
-    case opt_means :
-	  {
-      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
-        vlmxError (vlmxErrInvalidArgument, "INITMEANS is not of the same class as X.") ;
+      case opt_covariances : {
+        if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
+          vlmxError (vlmxErrInvalidArgument, "INITCOVARIANCES is not of the same class as the data X.") ;
+        }
+        if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
+          vlmxError(vlmxErrInvalidArgument, "INITCOVARIANCES is not a real matrix or does not have the correct size.") ;
+        }
+        initCovariances = mxGetPr(optarg) ;
+        break;
       }
-      if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
-        vlmxError(vlmxErrInvalidArgument, "INITMEANS is not a real matrix or does not have the correct size.") ;
-      }
-      meansSet = VL_TRUE;
-      initMeans = mxGetPr(optarg) ;
-      break;
-	  }
-
-    case opt_covariances :
-	  {
-      if (mxGetClassID (optarg) != mxGetClassID(IN(DATA))) {
-        vlmxError (vlmxErrInvalidArgument, "INITCOVARIANCES is not of the same class as X.") ;
-      }
-      if (! vlmxIsMatrix (optarg, dimension, numClusters) || ! vlmxIsReal (optarg)) {
-        vlmxError(vlmxErrInvalidArgument, "INITCOVARIANCES is not a real matrix or does not have the correct size.") ;
-      }
-      covariancesSet = VL_TRUE;
-      initCovariances = mxGetPr(optarg) ;
-      break;
-	  }
 
       case opt_initialization :
-      if (!vlmxIsString (optarg, -1))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "INITLAIZATION must be a string.") ;
-      }
-      if (mxGetString (optarg, buf, sizeof(buf)))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "INITIALIZATION argument too long.") ;
-      }
-      if (vlmxCompareStringsI("rand", buf) == 0)
-      {
-        initialization = VlGMMRand ;
-      }
-      else if (vlmxCompareStringsI("custom", buf) == 0)
-      {
-        initialization = VlGMMCustom ;
-      }
-      else
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "Invalid value %s for INITIALISATION.", buf) ;
-      }
-      break ;
+        if (!vlmxIsString (optarg, -1))
+        {
+          vlmxError (vlmxErrInvalidArgument,
+                     "INITLAIZATION must be a string.") ;
+        }
+        if (mxGetString (optarg, buf, sizeof(buf)))
+        {
+          vlmxError (vlmxErrInvalidArgument,
+                     "INITIALIZATION argument too long.") ;
+        }
+        if (vlmxCompareStringsI("rand", buf) == 0) {
+          initialization = VlGMMRand ;
+        }
+        else if (vlmxCompareStringsI("custom", buf) == 0) {
+          initialization = VlGMMCustom ;
+        }
+        else if (vlmxCompareStringsI("kmeans", buf) == 0) {
+          initialization = VlGMMKMeans ;
+        }
+        else {
+          vlmxError (vlmxErrInvalidArgument,
+                     "Invalid value '%s' for INITIALIZATION.", buf) ;
+        }
+        initializationSet = VL_TRUE ;
+        break ;
 
-    case opt_num_repetitions :
-      if (!vlmxIsPlainScalar (optarg))
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "NUMREPETITIONS must be a scalar.") ;
-      }
-      if (mxGetScalar (optarg) < 1)
-      {
-        vlmxError (vlmxErrInvalidArgument,
-                   "NUMREPETITIONS must be larger than or equal to 1.") ;
-      }
-      numRepetitions = (vl_size) mxGetScalar (optarg) ;
-      break ;
-    default :
-      abort() ;
-      break ;
+      case opt_num_repetitions :
+        if (!vlmxIsPlainScalar (optarg)) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "NUMREPETITIONS is not a scalar.") ;
+        }
+        if (mxGetScalar (optarg) < 1) {
+          vlmxError (vlmxErrInvalidArgument,
+                     "NUMREPETITIONS is not larger than or equal to 1.") ;
+        }
+        numRepetitions = (vl_size) mxGetScalar (optarg) ;
+        break ;
+
+      default :
+        abort() ;
+        break ;
     }
   }
 
@@ -243,83 +232,98 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   data = mxGetPr(IN(DATA)) ;
 
   switch(dataType){
-  case VL_TYPE_DOUBLE:
-        for(i = 0; i < numData*dimension; i++) {
-            double datum = *((double*)data + i);
-            if(!(datum < VL_INFINITY_D && datum > -VL_INFINITY_D)){
-                vlmxError (vlmxErrInvalidArgument,
-                   "DATA contains NaNs or Infs.") ;
-            }
+    case VL_TYPE_DOUBLE:
+      for(i = 0; i < numData*dimension; i++) {
+        double datum = *((double*)data + i);
+        if(!(datum < VL_INFINITY_D && datum > -VL_INFINITY_D)){
+          vlmxError (vlmxErrInvalidArgument,
+                     "DATA contains NaNs or Infs.") ;
         }
+      }
       break;
-  case VL_TYPE_FLOAT:
-        for(i = 0; i < numData*dimension; i++) {
-            float datum = *((float*)data + i);
-            if(!(datum < VL_INFINITY_F && datum > -VL_INFINITY_F)){
-                vlmxError (vlmxErrInvalidArgument,
-                   "DATA contains NaNs or Infs.") ;
-            }
+    case VL_TYPE_FLOAT:
+      for(i = 0; i < numData*dimension; i++) {
+        float datum = *((float*)data + i);
+        if(!(datum < VL_INFINITY_F && datum > -VL_INFINITY_F)){
+          vlmxError (vlmxErrInvalidArgument,
+                     "DATA contains NaNs or Infs.") ;
         }
-    break;
-  default:
-    abort();
-    break;
+      }
+      break;
+    default:
+      abort();
+      break;
   }
 
-  gmm = vl_gmm_new (dataType) ;
+  if (initPriors || initMeans || initCovariances) {
+    if (!initPriors || !initMeans || !initCovariances) {
+      vlmxError (vlmxErrInvalidArgument,
+                 "All or none of INITPRIORS, INITMEANS, "
+                 "INITCOVARIANCES must be set.") ;
+    }
+    if (initializationSet && initialization != VlGMMCustom) {
+      vlmxError (vlmxErrInvalidArgument,
+                 "INITPRIORS, INITMEANS, and "
+                 "INITCOVARIANCES requires 'custom' INITALIZATION.") ;
+    }
+    initialization = VlGMMCustom ;
+  }
+
+  gmm = vl_gmm_new (dataType, dimension, numClusters) ;
   vl_gmm_set_verbosity (gmm, verbosity) ;
   vl_gmm_set_num_repetitions (gmm, numRepetitions) ;
   vl_gmm_set_max_num_iterations (gmm, maxNumIterations) ;
   vl_gmm_set_initialization (gmm, initialization) ;
-  vl_gmm_set_covariance_lower_bound (gmm, covarianceLowBound) ;
 
-  if(covariancesSet || meansSet || priorsSet)
-  {
-    if(vl_gmm_get_initialization(gmm) != VlGMMCustom)
-    {
-      vlmxWarning (vlmxErrInconsistentData, "Initial covariances, means or priors have been set -> switching to custom initialization.");
-    }
-    vl_gmm_set_initialization(gmm,VlGMMCustom);
+  if (covarianceLowBound) {
+    vl_gmm_set_covariance_lower_bounds (gmm, covarianceLowBound) ;
+  }
+  if (initPriors) {
+    vl_gmm_set_priors(gmm, initPriors) ;
+  }
+  if (initMeans) {
+    vl_gmm_set_means(gmm, initMeans) ;
+  }
+  if (initCovariances) {
+    vl_gmm_set_covariances(gmm, initCovariances) ;
   }
 
-  if(vl_gmm_get_initialization(gmm) == VlGMMCustom)
-  {
-    if (!covariancesSet || !meansSet || !priorsSet)
-    {
-      vlmxError (vlmxErrInvalidArgument, "When custom initialization is set, InitMeans, Initcovariances and InitPriors options have to be specified.") ;
-    }
-    vl_gmm_set_means (gmm,initMeans,numClusters,dimension);
-    vl_gmm_set_covariances (gmm,initCovariances,numClusters,dimension);
-    vl_gmm_set_priors (gmm,initPriors,numClusters);
-  }
-
-  if (verbosity)
-  {
+  if (verbosity) {
     char const * initializationName = 0 ;
 
     switch (vl_gmm_get_initialization(gmm)) {
-    case VlGMMRand : initializationName = "randn" ; break ;
-    case VlGMMCustom : initializationName = "custom" ; break ;
-    case VlGMMKMeans : initializationName = "kmeans" ; break ;
-    default: abort() ;
+      case VlGMMRand : initializationName = "rand" ; break ;
+      case VlGMMKMeans : initializationName = "kmeans" ; break ;
+      case VlGMMCustom : initializationName = "custom" ; break ;
+      default: abort() ;
     }
 
     mexPrintf("vl_gmm: initialization = %s\n", initializationName) ;
     mexPrintf("vl_gmm: maxNumIterations = %d\n", vl_gmm_get_max_num_iterations(gmm)) ;
     mexPrintf("vl_gmm: numRepetitions = %d\n", vl_gmm_get_num_repetitions(gmm)) ;
-    mexPrintf("vl_gmm: dataType = %s\n", vl_get_type_name(vl_gmm_get_data_type(gmm))) ;
-    mexPrintf("vl_gmm: dataDimension = %d\n", dimension) ;
+    mexPrintf("vl_gmm: data type = %s\n", vl_get_type_name(vl_gmm_get_data_type(gmm))) ;
+    mexPrintf("vl_gmm: data dimension = %d\n", dimension) ;
     mexPrintf("vl_gmm: num. data points = %d\n", numData) ;
-    mexPrintf("vl_gmm: num. centers = %d\n", numClusters) ;
-    mexPrintf("vl_gmm: lower bound on covariance = %f\n", vl_gmm_get_covariance_lower_bound(gmm)) ;
-    mexPrintf("\n") ;
+    mexPrintf("vl_gmm: num. Gaussian modes = %d\n", numClusters) ;
+    mexPrintf("vl_gmm: lower bound on covariance = [") ;
+    if (dimension < 3) {
+      for (i = 0 ; i < dimension ; ++i) {
+        mexPrintf(" %f", vl_gmm_get_covariance_lower_bounds(gmm)[i]) ;
+      }
+    } else {
+      mexPrintf(" %f %f ... %f",
+                vl_gmm_get_covariance_lower_bounds(gmm)[0],
+                vl_gmm_get_covariance_lower_bounds(gmm)[1],
+                vl_gmm_get_covariance_lower_bounds(gmm)[dimension-1]) ;
+    }
+    mexPrintf("]\n") ;
   }
 
   /* -------------------------------------------------------------- */
   /*                                                     Clustering */
   /* -------------------------------------------------------------- */
 
-  LL = vl_gmm_cluster(gmm, data, dimension, numData, numClusters) ;
+  LL = vl_gmm_cluster(gmm, data, numData) ;
 
   /* copy centers */
   OUT(MEANS) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;

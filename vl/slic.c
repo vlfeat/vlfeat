@@ -223,8 +223,8 @@ vl_slic_segment (vl_uint32 * segmentation,
     for (u = 0 ; u < (signed)numRegionsX ; ++u) {
       vl_index xp ;
       vl_index yp ;
-      vl_index centerx ;
-      vl_index centery ;
+      vl_index centerx = 0 ;
+      vl_index centery = 0 ;
       float minEdgeValue = VL_INFINITY_F ;
 
       x = (vl_index) vl_round_d(regionSize * (u + 0.5)) ;

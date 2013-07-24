@@ -205,7 +205,7 @@ then rounding:
 #include "liop.h"
 #include "mathop.h"
 #include "imopv.h"
-#include <strings.h>
+#include <string.h>
 
 #define DEFAULT_INTENSITY_THRESHOLD -(5.0/255)
 #define DEFAULT_RADIUS 6.0

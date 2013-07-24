@@ -48,7 +48,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   vl_bool computeVlad = VL_FALSE;
 
   Init init = KMeans;
-  
+
   //char * dataFileResults = "/home/dave/vlfeat/data/gmm/gmm-results.mat";
   //char * dataFileData = "/home/dave/vlfeat/data/gmm/gmm-data.mat";
 
@@ -69,7 +69,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
     //VL_PRINT("\n");
   }
 
-  gmm = vl_gmm_new (VL_F_TYPE) ;
+  gmm = vl_gmm_new (VL_F_TYPE, dimension, numClusters) ;
 
   switch(init) {
     case KMeans:
@@ -107,9 +107,9 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
         initWeights[cIdx] = (TYPE)vl_rand_real3(&rand);
       }
 
-      vl_gmm_set_priors(gmm,initWeights,numClusters);
-      vl_gmm_set_covariances(gmm,initSigmas,numClusters,dimension);
-      vl_gmm_set_means(gmm,initMeans,numClusters,dimension);
+      vl_gmm_set_priors(gmm,initWeights);
+      vl_gmm_set_covariances(gmm,initSigmas);
+      vl_gmm_set_means(gmm,initMeans);
 
       break;
     }
@@ -126,7 +126,7 @@ int main(int argc VL_UNUSED, char ** argv VL_UNUSED)
   //struct timeval t1,t2;
   //gettimeofday(&t1, NULL);
 
-  vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
+  vl_gmm_cluster (gmm, data, numData);
 
   //gettimeofday(&t2, NULL);
   //VL_PRINT("elapsed vlfeat: %f s\n",(double)(t2.tv_sec - t1.tv_sec) + ((double)(t2.tv_usec - t1.tv_usec))/1000000.);

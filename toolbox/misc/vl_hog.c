@@ -199,7 +199,7 @@ mexFunction(int nout, mxArray *out[],
   switch (variant) {
     case VlHogVariantUoctti : variantName = "UOCTTI" ; break ;
     case VlHogVariantDalalTriggs : variantName = "DalalTriggs" ; break ;
-    default: assert(0) ; break ;
+    default: abort() ; break ;
   }
 
   switch (mode) {
@@ -230,7 +230,7 @@ mexFunction(int nout, mxArray *out[],
                                height, width, cellSize) ;
           break ;
       default:
-        assert(0) ;
+        abort() ;
       }
 
       dimensions[0] = vl_hog_get_width(hog) ;

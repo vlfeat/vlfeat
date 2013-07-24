@@ -1,11 +1,11 @@
 /** @file gmm.h
  ** @brief GMM (@ref gmm)
  ** @author David Novotny
+ ** @author Andrea Vedaldi
  **/
 
 /*
-Copyright (C) 2013 David Novotny.
-Copyright (C) 2013 Andrea Vedaldi.
+Copyright (C) 2013 David Novotny and Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -20,9 +20,9 @@ the terms of the BSD license (see the COPYING file).
 /** @brief GMM initialization algorithms */
 typedef enum _VlGMMInitialization
 {
-  VlGMMKMeans, /**< KMeans initialization */
-  VlGMMRand,   /**< Random selection initialization */
-  VlGMMCustom  /**< User specifies initialization parameters */
+  VlGMMKMeans, /**< Initialize GMM from KMeans clustering. */
+  VlGMMRand,   /**< Initialize GMM parameters by selecting points at random. */
+  VlGMMCustom  /**< User specifies the initial GMM parameters. */
 } VlGMMInitialization ;
 
 
@@ -32,12 +32,12 @@ typedef struct _VlGMM VlGMM ;
 #else
 /** @brief GMM quantizer */
 typedef OPAQUE VlGMM ;
-#endif 
+#endif
 
 /** @name Create and destroy
  ** @{
  **/
-VL_EXPORT VlGMM * vl_gmm_new (vl_type dataType) ;
+VL_EXPORT VlGMM * vl_gmm_new (vl_type dataType, vl_size dimension, vl_size numComponents) ;
 VL_EXPORT VlGMM * vl_gmm_new_copy (VlGMM const * gmm) ;
 VL_EXPORT void vl_gmm_delete (VlGMM * self) ;
 VL_EXPORT void vl_gmm_reset (VlGMM * self);
@@ -47,95 +47,61 @@ VL_EXPORT void vl_gmm_reset (VlGMM * self);
  ** @{
  **/
 VL_EXPORT double
-vl_gmm_get_mixture
-(VlGMM * self,
- void const * data,
- vl_size numData);
-
-VL_EXPORT double
 vl_gmm_cluster
 (VlGMM * self,
  void const * data,
- vl_size dimension,
- vl_size numData,
- vl_size numCenters);
-
-VL_EXPORT void
-vl_gmm_init_mixture_with_rand_data
-(VlGMM * self,
- void const * data,
- vl_size dimension,
- vl_size numData,
- vl_size numMeans);
-
-VL_EXPORT void
-vl_gmm_init_mixture_with_custom_data
-(VlGMM * self,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters);
-
-VL_EXPORT void
-vl_gmm_init_mixture_with_kmeans
-(VlGMM * self,
- void const * data,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters,
- VlKMeans * kmeansInit);
-
-VL_EXPORT void
-vl_gmm_init_mixture
-(VlGMM * self,
- void const * data,
- vl_size dimension,
- vl_size numData,
- vl_size numClusters);
+ vl_size numData);
 /** @} */
 
-/** @name Advanced data processing
- ** @{
- **/
+/** @name Fine grained data processing
+ ** @{ */
+
+VL_EXPORT void
+vl_gmm_init_with_rand_data
+(VlGMM * self,
+ void const * data,
+ vl_size numData) ;
+
+VL_EXPORT void
+vl_gmm_init_with_kmeans
+(VlGMM * self,
+ void const * data,
+ vl_size numData,
+ VlKMeans * kmeansInit);
+
+VL_EXPORT double
+vl_gmm_em
+(VlGMM * self,
+ void const * data,
+ vl_size numData);
+/** @} */
+
 VL_EXPORT void
 vl_gmm_set_means
 (VlGMM * self,
- void * means,
- vl_size numClusters,
- vl_size dimension);
+ void const * means);
 
 VL_EXPORT void
 vl_gmm_set_covariances
 (VlGMM * self,
- void * covariances,
- vl_size numClusters,
- vl_size dimension);
+ void const * covariances);
 
 VL_EXPORT void
 vl_gmm_set_priors
 (VlGMM * self,
- void * weights,
- vl_size numClusters);
-
-VL_EXPORT void
-vl_gmm_set_posteriors
-(VlGMM * self,
- void * posteriors,
- vl_size numClusters,
- vl_size numData);
+ void const * priors);
 /** @} */
 
 /** @name Set parameters
  ** @{
  **/
-VL_EXPORT void vl_gmm_set_dimension (VlGMM * self, vl_size dimension) ;
 VL_EXPORT void vl_gmm_set_num_repetitions (VlGMM * self, vl_size numRepetitions) ;
 VL_EXPORT void vl_gmm_set_max_num_iterations (VlGMM * self, vl_size maxNumIterations) ;
 VL_EXPORT void vl_gmm_set_verbosity (VlGMM * self, int verbosity) ;
-VL_EXPORT void vl_gmm_set_max_num_iterations (VlGMM * self, vl_size maxNumIterations);
-VL_EXPORT void vl_gmm_set_num_clusters (VlGMM * self, vl_size numClusters);
 VL_EXPORT void vl_gmm_set_initialization (VlGMM * self, VlGMMInitialization init);
 VL_EXPORT void vl_gmm_set_kmeans_init_object (VlGMM * self, VlKMeans * kmeans);
-VL_EXPORT void vl_gmm_set_covariance_lower_bound (VlGMM * self, double lowbound);
+VL_EXPORT void vl_gmm_set_covariance_lower_bounds (VlGMM * self, double const * bounds);
+VL_EXPORT void vl_gmm_set_covariance_lower_bound (VlGMM * self, double bound) ;
 /** @} */
 
 /** @name Get parameters
@@ -156,7 +122,7 @@ VL_EXPORT vl_size vl_gmm_get_max_num_iterations (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
 VL_EXPORT VlGMMInitialization vl_gmm_get_initialization (VlGMM const * self);
 VL_EXPORT VlKMeans * vl_gmm_get_kmeans_init_object (VlGMM const * self);
-VL_EXPORT double vl_gmm_get_covariance_lower_bound (VlGMM * self);
+VL_EXPORT double const * vl_gmm_get_covariance_lower_bounds (VlGMM const * self);
 /** @} */
 
 /* VL_GMM_H */

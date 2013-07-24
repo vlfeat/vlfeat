@@ -465,7 +465,7 @@ vl_hog_render (VlHog const * self,
             descriptor[(k + 3 * self->numOrientations) * hogStride] ;
             break ;
           default:
-            assert(0) ;
+            abort() ;
         }
         maxWeight = VL_MAX(weight, maxWeight) ;
         minWeight = VL_MIN(weight, minWeight);
