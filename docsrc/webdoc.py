@@ -692,6 +692,10 @@ class DocHtmlElement(DocNode):
     def publish(self, gen, pageNode = None):
         gen.putString("<")
         gen.putString(self.tag)
+        # make sure headings have and id (for ToCs)
+        if self.tag in ['h1', 'h2', 'h3', 'h4', 'h5'] and \
+           not "id" in self.attrs:
+            self.attrs["id"] = self.id ;
         for name, value in self.attrs.items():
             gen.putString(" ")
             gen.putString(name)
