@@ -37,9 +37,34 @@ FV representation of an image. For further details refer to:
 The Fisher Vector encoding of a set of features is obtained by using
 the function ::vl_fisher_encode. Note that the function requires a
 @ref gmm "Gaussian Mixture Model" (GMM) of the encoded feature
-distribution.
+distribution. In the following code, the result of the coding process
+is stored in the @c enc array and the improved fisher vector
+normalization is used.
 
 @code
+float * means ;
+float * covariances ;
+float * priors ;
+float * posteriors ;
+float * enc;
+
+// create a GMM object and cluster input data to get means, covariances 
+// and priors of the estimated mixture
+gmm = vl_gmm_new (VL_TYPE_FLOAT) ;
+vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
+
+// allocate space for the encoding
+enc = vl_malloc(sizeof(float) * 2 * dimension * numClusters);
+
+// run fisher encoding
+vl_fisher_encode
+    (enc, VL_F_TYPE,
+     vl_gmm_get_means(gmm), dimension, numClusters,
+     vl_gmm_get_covariances(gmm),
+     vl_gmm_get_priors(gmm),
+     dataToEncode, numDataToEncode,
+     VL_FISHER_FLAG_IMPROVED
+     ) ;
 @endcode
 
 The performance of the standard Fisher Vector can be significantly

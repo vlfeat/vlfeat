@@ -845,7 +845,7 @@ vl_kdforestsearcher_query (VlKDForestSearcher * self,
  ** @param numQueries number of query points.
  ** @param numNeighbors number of nearest neighbors to be found for each data point
  **
- ** @a indexes and @a distances anre @a numNeighbors by @a numQueries
+ ** @a indexes and @a distances are @a numNeighbors by @a numQueries
  ** matrices containing the indexes and distances of the nearest neighbours
  ** for each of the @a numQueries queries @a queries.
  **

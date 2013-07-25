@@ -42,7 +42,57 @@ using @ref kmeans. Furthermore, the assignments of features to
 dictionary elements must be pre-computed, for example by using @ref
 kdtree.
 
+In the following example code, the vocabulary is first created using
+the KMeans clustering, then the points, that are to be encoded are
+assigned to its corresponding nearest vocabulary words, then the
+original vlad encoding routine without any normalization option takes place. 
+At the end of the process the encoding is stored in the @c enc variable.
+
 @code
+vl_uint32 * indexes;
+float * assignments;
+float * enc
+int i;
+
+// create a KMeans object and run clustering to get vocabulary words (centers)
+kmeans = vl_kmeans_new (VLDistanceL2, VL_TYPE_FLOAT) ;
+vl_kmeans_cluster (kmeans,
+                   data,
+                   dimension,
+                   numData,
+                   numCenters) ;
+
+// build kdforest over estimated cluster centers
+kdforest = vl_kdforest_new ( VL_F_TYPE, dimension,
+                             3, VlDistanceL2) ;
+vl_kdforest_build(kdforest, numCenters, vl_kmeans_get_centers(kmeans));
+
+// assign the encoded points to its clusters 
+indexes = vl_malloc(sizeof(vl_uint32) * numDataToEncode);
+vl_kdforest_query_with_array (kdforest,
+                              indexes,
+                              1,
+                              numDataToEncode,
+                              NULL,
+                              (void const *) dataToEncode);
+
+// convert indexes array to assignments array, 
+// which can be processed by vl_vlad_encode
+assignments = vl_malloc(sizeof(float) * numDataToEncode * numCenters);
+memset(assignments, 0, sizeof(float) * numDataToEncode * numCenters);
+for(i = 0; i < numDataToEncode; i++) {
+  assignments[i + numDataToEncode * indexes[i]] = 1.;
+}
+
+// allocate space for vlad encoding
+enc = vl_malloc(sizeof(TYPE) * dimension * numCenters);
+
+// do the encoding job
+vl_vlad_encode (enc, VL_F_TYPE,
+                vl_kmeans_get_centers(kmeans), dimension, numCenters,
+                data, numData,
+                assignments,
+                0) ;
 @endcode
 
 Various @ref vlad-normalization normalizations can be applied to the
@@ -240,6 +290,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
  ** @a dimension rows. @a data is the matrix of vectors to be encoded,
  ** with @a dimension rows and @a numData columns. @a assignments is a
  ** matrix with @a numClusters rows and @a numData columns.
+ ** All the matrices should be stored in a row major order.
  **
  ** @a flag allows controlling further options:
  ** ::VL_VLAD_FLAG_NORMALIZE_COMPONENTS, ::VL_VLAD_FLAG_SQUARE_ROOT,
