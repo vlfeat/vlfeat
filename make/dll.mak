@@ -26,7 +26,7 @@ DLL_CFLAGS += $(call if-like,%_sse2,$*, $(if $(DISABLE_SSE2),,-msse2))
 DLL_CFLAGS += $(call if-like,%_avx,$*, $(if $(DISABLE_AVX),,-mavx))
 DLL_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
-DLL_LDFLAGS += -lm
+DLL_LDFLAGS += -lm -lpthread
 
 BINDIR = bin/$(ARCH)
 
