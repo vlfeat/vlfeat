@@ -44,7 +44,7 @@ kdtree.
 
 In the following example code, the vocabulary is first created using
 the KMeans clustering, then the points, that are to be encoded are
-assigned to its corresponding nearest vocabulary words, then the
+assigned to its corresponding nearest vocabulary words, after that the
 original vlad encoding routine without any normalization option takes place. 
 At the end of the process the encoding is stored in the @c enc variable.
 
@@ -62,19 +62,9 @@ vl_kmeans_cluster (kmeans,
                    numData,
                    numCenters) ;
 
-// build kdforest over estimated cluster centers
-kdforest = vl_kdforest_new ( VL_F_TYPE, dimension,
-                             3, VlDistanceL2) ;
-vl_kdforest_build(kdforest, numCenters, vl_kmeans_get_centers(kmeans));
-
-// assign the encoded points to its clusters 
+// find nearest cliuster centers for the data that should be encoded
 indexes = vl_malloc(sizeof(vl_uint32) * numDataToEncode);
-vl_kdforest_query_with_array (kdforest,
-                              indexes,
-                              1,
-                              numDataToEncode,
-                              NULL,
-                              (void const *) dataToEncode);
+vl_kmeans_quantize(kmeans,indexes,dataToEncode,numDataToEncode);
 
 // convert indexes array to assignments array, 
 // which can be processed by vl_vlad_encode
@@ -96,7 +86,7 @@ vl_vlad_encode (enc, VL_F_TYPE,
 @endcode
 
 Various @ref vlad-normalization normalizations can be applied to the
-VLAD vecrtors. These are controlled by the parameter @a flag of
+VLAD vectors. These are controlled by the parameter @a flag of
 ::vl_vlad_encode.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
