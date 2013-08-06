@@ -41,11 +41,11 @@
 %     Number of times to restart EM. The solution with maximum
 %     loglikelihood is returned.
 %
-%   SigmaBound:: 10e-6
-%     Set the lower bound on the diagonal entries of each mode
-%     covariance matrix. This is particularly important if the data
-%     contains singleton dimensions, and generally useful for
-%     stability.
+%   CovarianceBound:: 10e-6
+%     Set the lower bound on the diagonal covariance values.
+%     The bound can be either a scalar or a vector with one
+%     entry per dimension. Using null bounds is possible, but
+%     may yield degenerate solutions, including NaNs.
 %
 %   Example::
 %     VL_GMM(X, 10, 'verbose', 'MaxNumIterations', 20) estimates the

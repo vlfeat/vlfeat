@@ -838,8 +838,11 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   vl_index i_d, i_cl;
   vl_size dim ;
   TYPE * oldMeans ;
+  double time = 0 ;
 
-  if (self->verbosity) { VL_PRINTF("gmm: entering maximization step.\n") ; }
+  if (self->verbosity > 1) {
+    VL_PRINTF("gmm: em: entering maximization step.\n") ;
+  }
 
   oldMeans = vl_malloc(sizeof(TYPE) * self->dimension * numClusters) ;
   memcpy(oldMeans, means, sizeof(TYPE) * self->dimension * numClusters) ;
@@ -991,6 +994,11 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
     }
   }
 
+  if (self->verbosity > 1) {
+    VL_PRINTF("gmm: em: maximization step completed in %.2f s.\n",
+              vl_get_cpu_time() - time) ;
+  }
+
   vl_free(oldMeans);
 }
 
@@ -1012,6 +1020,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   vl_index i_d, i_cl;
   vl_size dim;
   double LL = 0;
+  double time = 0 ;
 
   TYPE halfDimLog2Pi = (self->dimension / 2.0) * log(2.0*VL_PI);
 
@@ -1025,7 +1034,10 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
 #endif
 
-  if (self->verbosity) { VL_PRINTF("gmm: entering expectation step.\n") ; }
+  if (self->verbosity > 1) {
+    VL_PRINTF("gmm: em: entering expectation step.\n") ;
+    time = vl_get_cpu_time() ;
+  }
 
   logCovariances = vl_malloc(sizeof(TYPE) * numClusters);
   invCovariances = vl_malloc(sizeof(TYPE) * numClusters * self->dimension);
@@ -1088,6 +1100,11 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   vl_free(logWeights);
   vl_free(invCovariances);
 
+  if (self->verbosity > 1) {
+    VL_PRINTF("gmm: em: expectation step completed in %.2f s.\n",
+              vl_get_cpu_time() - time) ;
+  }
+
   return LL;
 }
 
@@ -1123,11 +1140,12 @@ VL_XCAT(_vl_gmm_em_, SFX)
        Check the termination conditions.
     */
     if (self->verbosity) {
-      VL_PRINTF("gmm: EM iteration %d: loglikelihood = %f\n", iteration, LL) ;
+      VL_PRINTF("gmm: em: iteration %d: loglikelihood = %f\n", iteration, LL) ;
     }
     if (iteration >= self->maxNumIterations) {
       if (self->verbosity) {
-        VL_PRINTF("gmm: EM terminating because the maximum number of iterations "
+        VL_PRINTF("gmm: em: terminating because "
+                  "the maximum number of iterations "
                   "(%d) has been reached.\n", self->maxNumIterations) ;
       }
       break ;
@@ -1136,7 +1154,7 @@ VL_XCAT(_vl_gmm_em_, SFX)
     eps = vl_abs_d ((LL - previousLL) / (LL));
     if ((iteration > 0) && (eps < 0.00001)) {
       if (self->verbosity) {
-        VL_PRINTF("gmm: EM terminating because the algorithm "
+        VL_PRINTF("gmm: em: terminating because the algorithm "
                   "fully converged (log-likelihood variation = %f).\n", eps) ;
       }
       break ;
@@ -1150,7 +1168,7 @@ VL_XCAT(_vl_gmm_em_, SFX)
       restarted = VL_XCAT(_vl_gmm_zero_priors_disposal_, SFX)
         (self, self->priors, self->covariances, self->means);
       if ((restarted > 0) & (self->verbosity > 0)) {
-        VL_PRINTF("gmm: %d Gaussian modes restarted because "
+        VL_PRINTF("gmm: em: %d Gaussian modes restarted because "
                   "they had become empty.\n", restarted);
       }
     }
@@ -1474,10 +1492,16 @@ double vl_gmm_cluster (VlGMM * self,
   void * bestMeans = NULL;
   void * bestCovariances = NULL;
   void * bestPosteriors = NULL;
+  vl_size size = vl_get_type_size(self->dataType) ;
   double bestLL = -VL_INFINITY_D;
   vl_uindex repetition;
 
   assert(self->numRepetitions >=1) ;
+
+  bestPriors = vl_malloc(size * self->numClusters) ;
+  bestMeans = vl_malloc(size * self->dimension * self->numClusters) ;
+  bestCovariances = vl_malloc(size * self->dimension * self->numClusters) ;
+  bestPosteriors = vl_malloc(size * numData * self->numClusters) ;
 
 #if 0
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
@@ -1488,7 +1512,7 @@ double vl_gmm_cluster (VlGMM * self,
     double timeRef ;
 
     if (self->verbosity) {
-      VL_PRINTF("gmm: starting repetition %d of %d\n", repetition + 1, self->numRepetitions) ;
+      VL_PRINTF("gmm: clustering: starting repetition %d of %d\n", repetition + 1, self->numRepetitions) ;
     }
 
     /* seed a new mixture model */
@@ -1514,22 +1538,7 @@ double vl_gmm_cluster (VlGMM * self,
 
     if (LL > bestLL || repetition == 0) {
       void * temp ;
-      bestLL = LL;
 
-      if (bestMeans == NULL) {
-        bestPriors = vl_malloc(vl_get_type_size(self->dataType) *
-                               self->numClusters) ;
-        bestMeans = vl_malloc(vl_get_type_size(self->dataType) *
-                              self->dimension *
-                              self->numClusters) ;
-        bestCovariances = vl_malloc(vl_get_type_size(self->dataType) *
-                               self->numClusters) ;
-        bestPosteriors = vl_malloc(vl_get_type_size(self->dataType) *
-                                   numData *
-                                   self->numClusters) ;
-      }
-
-      /* swap buffers */
       temp = bestPriors ;
       bestPriors = self->priors ;
       self->priors = temp ;
@@ -1545,6 +1554,8 @@ double vl_gmm_cluster (VlGMM * self,
       temp = bestPosteriors ;
       bestPosteriors = self->posteriors ;
       self->posteriors = temp ;
+
+      bestLL = LL;
     }
   }
 
@@ -1558,6 +1569,10 @@ double vl_gmm_cluster (VlGMM * self,
   self->covariances = bestCovariances ;
   self->posteriors = bestPosteriors ;
   self->LL = bestLL;
+
+  if (self->verbosity) {
+    VL_PRINTF("gmm: all repetitions terminated with final loglikelihood %f\n", self->LL) ;
+  }
 
   return bestLL ;
 }

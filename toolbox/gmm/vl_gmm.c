@@ -26,7 +26,7 @@ enum
   opt_means,
   opt_covariances,
   opt_priors,
-  opt_covariance_low_bound
+  opt_covariance_bound
 } ;
 
 vlmxOption  options [] =
@@ -39,7 +39,7 @@ vlmxOption  options [] =
   {"InitMeans",         1,   opt_means               },
   {"InitCovariances",   1,   opt_covariances         },
   {"InitPriors",        1,   opt_priors              },
-  {"CovarianceBound",   1,   opt_covariance_low_bound},
+  {"CovarianceBound",   1,   opt_covariance_bound    },
   {0,                   0,   0                       }
 } ;
 
@@ -64,7 +64,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   void * initMeans = 0 ;
   void * initPriors = 0 ;
 
-  double const * covarianceLowBound = NULL ;
+  double covarianceScalarBound = VL_NAN_D ;
+  double const * covarianceBound = NULL ;
   void const * data = NULL ;
 
   vl_size maxNumIterations = 100 ;
@@ -139,12 +140,17 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
         maxNumIterations = (vl_size) mxGetScalar(optarg) ;
         break ;
 
-      case opt_covariance_low_bound :
+      case opt_covariance_bound :
+        if (vlmxIsPlainScalar(optarg)) {
+          covarianceScalarBound = mxGetScalar(optarg) ;
+          continue ;
+        }
         if (!vlmxIsPlainVector(optarg,dimension)) {
           vlmxError (vlmxErrInvalidArgument,
-                     "COVARIANCEBOUND must be a DOUBLE vector of size equal to the dimension of the data X.") ;
+                     "COVARIANCEBOUND must be a DOUBLE vector of size "
+                     "equal to the dimension of the data X.") ;
         }
-        covarianceLowBound = mxGetPr(optarg) ;
+        covarianceBound = mxGetPr(optarg) ;
         break ;
 
       case opt_priors : {
@@ -275,8 +281,11 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_gmm_set_max_num_iterations (gmm, maxNumIterations) ;
   vl_gmm_set_initialization (gmm, initialization) ;
 
-  if (covarianceLowBound) {
-    vl_gmm_set_covariance_lower_bounds (gmm, covarianceLowBound) ;
+  if (!vl_is_nan_d(covarianceScalarBound)) {
+    vl_gmm_set_covariance_lower_bound (gmm, covarianceScalarBound) ;
+  }
+  if (covarianceBound) {
+    vl_gmm_set_covariance_lower_bounds (gmm, covarianceBound) ;
   }
   if (initPriors) {
     vl_gmm_set_priors(gmm, initPriors) ;
