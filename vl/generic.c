@@ -1375,7 +1375,7 @@ vl_thread_specific_state_new (void)
 {
   VlThreadState * self ;
 #if defined(DEBUG)
-  printf("VLFeat thread constructor called\n") ;
+  printf("VLFeat DEBUG: thread constructor begins.\n") ;
 #endif
   self = malloc(sizeof(VlThreadState)) ;
   self->lastError = 0 ;
@@ -1399,7 +1399,7 @@ static void
 vl_thread_specific_state_delete (VlThreadState * self)
 {
 #if defined(DEBUG)
-  printf("VLFeat thread destructor called\n") ;
+  printf("VLFeat DEBUG: thread destructor begins.\n") ;
 #endif
   free (self) ;
 }
