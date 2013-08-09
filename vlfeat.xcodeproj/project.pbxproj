@@ -1057,14 +1057,6 @@
 				2DE7564216D544490016C1DC /* segmentation */,
 				2DBD0B2110F7AB58004DBA31 /* metaprograms */,
 				2D28A00116D540D100E81844 /* statistical methods */,
-				2D72EAF00E48A42F005DAA47 /* imopv.c */,
-				2D72EAF10E48A42F005DAA47 /* imopv.h */,
-				2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */,
-				2DD99CC50E58A8C700CE1DA1 /* imopv_sse2.h */,
-				2D765BAF0FEC076700D08578 /* quickshift.c */,
-				2D765BB00FEC076700D08578 /* quickshift.h */,
-				2D94E6BC148E48440089ADA5 /* slic.c */,
-				2D94E6BE1490E4120089ADA5 /* slic.h */,
 				2DFA36D212F1A26D00E808D9 /* array.c */,
 				2DFA36D312F1A26D00E808D9 /* array.h */,
 				2D0E6C4B1003E0DF00F0864E /* float.th */,
@@ -1081,8 +1073,6 @@
 				2D13EEE1100A511200C072E8 /* mathop_sse2.c */,
 				2D13EEE4100A539200C072E8 /* mathop_sse2.h */,
 				2D732E910CF8C2E40099B03C /* mser.h */,
-				2D732E920CF8C2E40099B03C /* pgm.c */,
-				2D732E930CF8C2E40099B03C /* pgm.h */,
 				2DD302780DE33107009443C7 /* random.c */,
 				2DD302790DE33107009443C7 /* random.h */,
 				2D732E940CF8C2E40099B03C /* rodrigues.c */,
@@ -1186,6 +1176,10 @@
 		2DE7564216D544490016C1DC /* segmentation */ = {
 			isa = PBXGroup;
 			children = (
+				2D765BAF0FEC076700D08578 /* quickshift.c */,
+				2D765BB00FEC076700D08578 /* quickshift.h */,
+				2D94E6BC148E48440089ADA5 /* slic.c */,
+				2D94E6BE1490E4120089ADA5 /* slic.h */,
 			);
 			name = segmentation;
 			sourceTree = "<group>";
@@ -1193,6 +1187,12 @@
 		2DE7564316D544740016C1DC /* image processing */ = {
 			isa = PBXGroup;
 			children = (
+				2D732E920CF8C2E40099B03C /* pgm.c */,
+				2D732E930CF8C2E40099B03C /* pgm.h */,
+				2D72EAF00E48A42F005DAA47 /* imopv.c */,
+				2D72EAF10E48A42F005DAA47 /* imopv.h */,
+				2DD99CC40E58A86B00CE1DA1 /* imopv_sse2.c */,
+				2DD99CC50E58A8C700CE1DA1 /* imopv_sse2.h */,
 			);
 			name = "image processing";
 			sourceTree = "<group>";
