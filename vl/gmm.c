@@ -815,7 +815,7 @@ VL_XCAT(_vl_gmm_apply_bounds_, SFX)(VlGMM * self)
 
   if (numAdjusted > 0 && self->verbosity > 0) {
     VL_PRINT("gmm: detected %d of %d modes with at least one dimension "
-             "with covariance too small (set to lower bound).\n",
+             "with covariance too small (set to lower bound)\n",
              numAdjusted, self->numClusters) ;
   }
 }
@@ -841,7 +841,8 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   double time = 0 ;
 
   if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: entering maximization step.\n") ;
+    VL_PRINTF("gmm: em: entering maximization step\n") ;
+    time = vl_get_cpu_time() ;
   }
 
   oldMeans = vl_malloc(sizeof(TYPE) * self->dimension * numClusters) ;
@@ -995,7 +996,7 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
   }
 
   if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: maximization step completed in %.2f s.\n",
+    VL_PRINTF("gmm: em: maximization step completed in %.2f s\n",
               vl_get_cpu_time() - time) ;
   }
 
@@ -1035,7 +1036,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
 #endif
 
   if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: entering expectation step.\n") ;
+    VL_PRINTF("gmm: em: entering expectation step\n") ;
     time = vl_get_cpu_time() ;
   }
 
@@ -1101,7 +1102,7 @@ VL_XCAT(_vl_gmm_expectation_, SFX)
   vl_free(invCovariances);
 
   if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: expectation step completed in %.2f s.\n",
+    VL_PRINTF("gmm: em: expectation step completed in %.2f s\n",
               vl_get_cpu_time() - time) ;
   }
 
