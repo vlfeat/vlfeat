@@ -392,7 +392,11 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #endif
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
     TYPE logSigma = 0;
-    logWeights[i_cl] = log(priors[i_cl]) ;
+    if (priors[i_cl] < 1e-8) {
+      logWeights[i_cl] = - (TYPE) VL_INFINITY_D ;
+    } else {
+      logWeights[i_cl] = log(priors[i_cl]) ;
+    }
 
     for(dim = 0; dim < dimension; dim++) {
       logSigma += log(covariances[i_cl*dimension + dim]);
@@ -444,6 +448,8 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 
     TYPE * uk = enc + i_cl*dimension ;
     TYPE * vk = enc + i_cl*dimension + numClusters*dimension ;
+
+    if (priors[i_cl] < 1e-8) { continue ; }
 
     for(i_d = 0; i_d < (signed)numData; i_d++) {
       TYPE p = posteriors[i_cl + i_d * numClusters] ;
