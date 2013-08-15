@@ -343,6 +343,7 @@ kernel*:
 **/
 
 #include "fisher.h"
+#include "gmm.h"
 #include "mathop.h"
 
 #include <stdio.h>
@@ -366,78 +367,25 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 {
   vl_size dim;
   vl_index i_cl, i_d;
-  TYPE * invSigma;
+  TYPE * posteriors ;
   TYPE * sqrtInvSigma;
-  TYPE * posteriors;
-  TYPE * logSigmas;
-  TYPE * logWeights;
-//  TYPE halfDimLog2Pi = (dimension/2.0)*log(2.0*VL_PI);
 
-#if (FLT == VL_TYPE_FLOAT)
-  VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahalanobis) ;
-#else
-  VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
-#endif
-
-  logSigmas = vl_malloc(sizeof(TYPE) * numClusters);
-  logWeights = vl_malloc(sizeof(TYPE) * numClusters);
-  invSigma = vl_malloc(dimension * sizeof(TYPE) * numClusters);
-  sqrtInvSigma = vl_malloc(dimension * sizeof(TYPE) * numClusters);
-  posteriors = vl_malloc(numData * numClusters * sizeof(TYPE));
+  posteriors = vl_malloc(sizeof(TYPE) * numClusters * numData);
+  sqrtInvSigma = vl_malloc(sizeof(TYPE) * dimension * numClusters);
 
   memset(enc, 0, sizeof(TYPE) * 2 * dimension * numClusters) ;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl,dim) num_threads(vl_get_max_threads())
-#endif
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-    TYPE logSigma = 0;
-    if (priors[i_cl] < 1e-8) {
-      logWeights[i_cl] = - (TYPE) VL_INFINITY_D ;
-    } else {
-      logWeights[i_cl] = log(priors[i_cl]) ;
-    }
-
     for(dim = 0; dim < dimension; dim++) {
-      logSigma += log(covariances[i_cl*dimension + dim]);
-      invSigma[i_cl*dimension + dim] = 1/(covariances[i_cl*dimension + dim]);
-      sqrtInvSigma[i_cl*dimension + dim] = sqrt(invSigma[i_cl*dimension + dim]);
-    }
-
-    logSigmas[i_cl] = logSigma;
-  } /* end of parallel region */
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_d,i_cl) num_threads(vl_get_max_threads())
-#endif
-  for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
-    TYPE clusterPosteriorsSum = 0;
-    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D); /* log p can be negative */
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; i_cl++) {
-      TYPE p =
-      logWeights[i_cl]
-      - 0.5 * logSigmas[i_cl]
-      - 0.5 * distFn (dimension,
-                      data + i_d * dimension,
-                      means + i_cl * dimension,
-                      invSigma + i_cl * dimension);
-      maxPosterior = VL_MAX(p, maxPosterior) ;
-      posteriors[i_cl + i_d * numClusters] = p ;
-    }
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      TYPE p = posteriors[i_cl + i_d * numClusters] ;
-      p = exp(p - maxPosterior) ;
-      if (flags & VL_FISHER_FLAG_FAST && p < 1e-3) { p = 0 ; }
-      clusterPosteriorsSum += p ;
-      posteriors[i_cl + i_d * numClusters] = p ;
-    }
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      posteriors[i_cl + i_d * numClusters] /= clusterPosteriorsSum ;
+      sqrtInvSigma[i_cl*dimension + dim] = sqrt(1.0 / covariances[i_cl*dimension + dim]);
     }
   }
+  
+  VL_XCAT(vl_get_gmm_data_posteriors_, SFX)(posteriors, numClusters, numData,
+                                            priors,
+                                            means, dimension,
+                                            covariances,
+                                            data) ;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i_cl, i_d, dim) num_threads(vl_get_max_threads())
@@ -447,9 +395,9 @@ VL_XCAT(_vl_fisher_encode_, SFX)
     TYPE vprefix;
 
     TYPE * uk = enc + i_cl*dimension ;
-    TYPE * vk = enc + i_cl*dimension + numClusters*dimension ;
+    TYPE * vk = enc + i_cl*dimension + numClusters * dimension ;
 
-    if (priors[i_cl] < 1e-8) { continue ; }
+    if (priors[i_cl] < 1e-6) { continue ; }
 
     for(i_d = 0; i_d < (signed)numData; i_d++) {
       TYPE p = posteriors[i_cl + i_d * numClusters] ;
@@ -471,11 +419,8 @@ VL_XCAT(_vl_fisher_encode_, SFX)
     }
   }
 
-  vl_free(invSigma);
-  vl_free(sqrtInvSigma);
-  vl_free(logSigmas);
-  vl_free(logWeights);
   vl_free(posteriors);
+  vl_free(sqrtInvSigma) ;
 
   if (flags & VL_FISHER_FLAG_SQUARE_ROOT) {
     for(dim = 0; dim < 2 * dimension * numClusters ; dim++) {
