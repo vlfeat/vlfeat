@@ -338,7 +338,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   OUT(MEANS) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
   OUT(COVARIANCES) = mxCreateNumericMatrix (dimension, numClusters, classID, mxREAL) ;
   OUT(PRIORS) = mxCreateNumericMatrix (numClusters, 1, classID, mxREAL) ;
-  OUT(POSTERIORS) = mxCreateNumericMatrix (numData, numClusters, classID, mxREAL) ;
+  OUT(POSTERIORS) = mxCreateNumericMatrix (numClusters, numData, classID, mxREAL) ;
 
   memcpy (mxGetData(OUT(MEANS)),
           vl_gmm_get_means (gmm),

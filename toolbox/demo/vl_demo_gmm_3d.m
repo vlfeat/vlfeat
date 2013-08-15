@@ -64,7 +64,7 @@ elapsedGMM = toc(elapsedGMM);
 fprintf('\n ---------- \n GMM time - %f \n ---------- \n',elapsedGMM) ;
 
 subplot(1,2,2) ; hold on ;
-[~,idx] = max(posteriors',[],1);
+[~,idx] = max(posteriors,[],1);
 for i=1:numClusters
   plot3(X(1,idx == i),X(2,idx == i),X(3,idx == i),'.','color',cc(i,:)) ;
 end

@@ -305,8 +305,9 @@ Alternatively, one can manually specify a starting point
 #ifndef VL_GMM_INSTANTIATING
 /* ---------------------------------------------------------------- */
 
-#define VL_GAUSSIAN_PREFIX 2.506628275
-#define VL_GMM_MIN_SIGMA 1e-6
+#define VL_GMM_MIN_VARIANCE 1e-6
+#define VL_GMM_MIN_POSTERIOR 1e-2
+#define VL_GMM_MIN_PRIOR 1e-6
 
 struct _VlGMM
 {
@@ -686,24 +687,165 @@ void vl_gmm_set_covariance_lower_bound (VlGMM * self, double bound)
 /* ---------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------- */
+/*                                            Posterior assignments */
+/* ---------------------------------------------------------------- */
+
+/** @fn vl_get_gmm_data_posterior_f(float*,vl_size,vl_size,float const*,float const*,vl_size,float const*,float const*)
+ ** @brief Get Gaussian modes posterior probabilities
+ ** @param posteriors posterior probabilities (output)/
+ ** @param numClusters number of modes in the GMM model.
+ ** @param numData number of data elements.
+ ** @param priors prior mode probabilities of the GMM model.
+ ** @param means means of the GMM model.
+ ** @param dimension data dimension.
+ ** @param covariances diagonal covariances of the GMM model.
+ ** @param data data.
+ ** @return data log-likelihood.
+ **
+ ** This is a helper function that does not require a ::VlGMM object
+ ** instance to operate.
+ **/
+
+double
+VL_XCAT(vl_get_gmm_data_posteriors_, SFX)
+(TYPE * posteriors,
+ vl_size numClusters,
+ vl_size numData,
+ TYPE const * priors,
+ TYPE const * means,
+ vl_size dimension,
+ TYPE const * covariances,
+ TYPE const * data)
+{
+  vl_index i_d, i_cl;
+  vl_size dim;
+  double LL = 0;
+
+  TYPE halfDimLog2Pi = (dimension / 2.0) * log(2.0*VL_PI);
+  TYPE * logCovariances ;
+  TYPE * logWeights ;
+  TYPE * invCovariances ;
+  
+#if (FLT == VL_TYPE_FLOAT)
+  VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahalanobis) ;
+#else
+  VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
+#endif
+    
+  logCovariances = vl_malloc(sizeof(TYPE) * numClusters) ;
+  invCovariances = vl_malloc(sizeof(TYPE) * numClusters * dimension) ;
+  logWeights = vl_malloc(numClusters * sizeof(TYPE)) ;
+  
+#if defined(_OPENMP)
+#pragma omp parallel for private(i_cl,dim) num_threads(vl_get_max_threads())
+#endif
+  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
+    TYPE logSigma = 0 ;
+    if (priors[i_cl] < VL_GMM_MIN_PRIOR) {
+      logWeights[i_cl] = - (TYPE) VL_INFINITY_D ;
+    } else {
+      logWeights[i_cl] = log(priors[i_cl]);
+    }
+    for(dim = 0 ; dim < dimension ; ++ dim) {
+      logSigma += log(covariances[i_cl*dimension + dim]);
+      invCovariances [i_cl*dimension + dim] = (TYPE) 1.0 / covariances[i_cl*dimension + dim];
+    }
+    logCovariances[i_cl] = logSigma;
+  } /* end of parallel region */
+  
+#if defined(_OPENMP)
+#pragma omp parallel for private(i_cl,i_d) reduction(+:LL) \
+num_threads(vl_get_max_threads())
+#endif
+  for (i_d = 0 ; i_d < (signed)numData ; ++ i_d) {
+    TYPE clusterPosteriorsSum = 0;
+    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D) ;
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
+      TYPE p =
+      logWeights[i_cl]
+      - halfDimLog2Pi
+      - 0.5 * logCovariances[i_cl]
+      - 0.5 * distFn (dimension,
+                      data + i_d * dimension,
+                      means + i_cl * dimension,
+                      invCovariances + i_cl * dimension) ;
+      posteriors[i_cl + i_d * numClusters] = p ;
+      if (p > maxPosterior) { maxPosterior = p ; }
+    }
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+      TYPE p = posteriors[i_cl + i_d * numClusters] ;
+      p =  exp(p - maxPosterior) ;
+      posteriors[i_cl + i_d * numClusters] = p ;
+      clusterPosteriorsSum += p ;
+    }
+    
+    LL +=  log(clusterPosteriorsSum) + (double) maxPosterior ;
+    
+    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+      posteriors[i_cl + i_d * numClusters] /= clusterPosteriorsSum ;
+    }
+  } /* end of parallel region */
+  
+  vl_free(logCovariances);
+  vl_free(logWeights);
+  vl_free(invCovariances);
+
+  return LL;
+}
+
+/* ---------------------------------------------------------------- */
 /*                                 Restarts zero-weighted Gaussians */
 /* ---------------------------------------------------------------- */
 
-static vl_size
-VL_XCAT(_vl_gmm_zero_priors_disposal_, SFX)
+static void
+VL_XCAT(_vl_gmm_maximization_, SFX)
 (VlGMM * self,
+ TYPE * posteriors,
  TYPE * priors,
  TYPE * covariances,
- TYPE * means)
+ TYPE * means,
+ TYPE const * data,
+ vl_size numData) ;
+
+static vl_size
+VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
 {
   vl_size dimension = self->dimension;
   vl_size numClusters = self->numClusters;
-  vl_uindex i_cl, j_cl, d;
+  vl_index i_cl, j_cl, i_d, d;
   vl_size zeroWNum = 0;
-  VlRand * rand = vl_get_rand() ;
+  TYPE * priors = (TYPE*)self->priors ;
+  TYPE * means = (TYPE*)self->means ;
+  TYPE * covariances = (TYPE*)self->covariances ;
+  TYPE * posteriors = (TYPE*)self->posteriors ;
+  
+  //VlRand * rand = vl_get_rand() ;
+  
+  TYPE * mass = vl_calloc(sizeof(TYPE), self->numClusters) ;
 
   if (numClusters <= 1) { return 0 ; }
 
+  /* compute statistics */
+  {
+    vl_uindex i, k ;
+    vl_size numNullAssignments = 0 ;
+    for (i = 0 ; i < self->numData ; ++i) {
+      for (k = 0 ; k < self->numClusters ; ++k) {
+        TYPE p = ((TYPE*)self->posteriors)[k + i * self->numClusters] ;
+        mass[k] += p ;
+        if (p < VL_GMM_MIN_POSTERIOR) {
+          numNullAssignments ++ ;
+        }
+      }
+    }
+    if (self->verbosity) {
+      VL_PRINTF("gmm: sparsity of data posterior: %.1f%%\n", (double)numNullAssignments / (self->numData * self->numClusters) * 100) ;
+    }
+  }
+
+#if 0
   /* search for cluster with negligible weight and reassign them to fat clusters */
   for (i_cl = 0 ; i_cl < numClusters ; ++i_cl) {
     if (priors[i_cl] < 0.00001/numClusters) {
@@ -722,7 +864,7 @@ VL_XCAT(_vl_gmm_zero_priors_disposal_, SFX)
       j_cl = best ;
       zeroWNum ++ ;
 
-      VL_PRINTF("gmm: restarting mode %d by splitting %d (with prior %f)\n", i_cl,j_cl,mass) ;
+      VL_PRINTF("gmm: restarting mode %d by splitting mode %d (with prior %f)\n", i_cl,j_cl,mass) ;
 
       priors[i_cl] = mass/2 ;
       priors[j_cl] = mass/2 ;
@@ -734,58 +876,108 @@ VL_XCAT(_vl_gmm_zero_priors_disposal_, SFX)
       }
     }
   }
+#endif
+  
+  /* search for cluster with negligible weight and reassign them to fat clusters */
+  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
 
-#if 0
-  vl_int8 * nullWeights = NULL;
-
-  if(priors[i_cl] < 0.00001/numClusters) {
-    if(!nullWeights) {
-      nullWeights = vl_malloc(sizeof(vl_int8) * numClusters);
-      memset(nullWeights,0,sizeof(vl_int8) * numClusters);
+    if (mass[i_cl] >= VL_GMM_MIN_POSTERIOR *
+        VL_MAX(1.0, (double) self->numData / self->numClusters))
+    {
+      continue ;
     }
-    nullWeights[i_cl] = (vl_int8)1;
-    zeroWNum++;
-  }
-
-
-  if(zeroWNum > 0) {
-    for(i_cl = 0; i_cl< numClusters; i_cl++) {
-      if(nullWeights[i_cl] == 1) {
-
-        TYPE maxDimSigma = 0;
-        TYPE maxl2 = 0;
-        vl_uindex maxClusterDim = 0;
-        vl_uindex maxCluster = 0 ;
-
-        /* find cluster with largest l2 norm of its sigma diagonal */
-        for(i_cl2 = 0; i_cl2 < numClusters; i_cl2++) {
-        }
-
-        /* find the dimension of the largest variance of the largest gaussian */
-        for(d = 0; d < dimension; d++) {
-          if(covariances[maxCluster * dimension + d] > maxDimSigma) {
-            maxClusterDim = d;
-            maxDimSigma = covariances[maxCluster * dimension + d];
-          }
-        }
-
-        /* split the largest gaussian in the falf of its largest dimension */
-        for(d = 0; d < dimension; d++) {
-          if(d == maxClusterDim) {
-            means[i_cl*dimension + d] = means[maxCluster*dimension + d] - maxDimSigma;
-            means[maxCluster*dimension + d] += maxDimSigma;
-            covariances[i_cl       * dimension + d] = maxDimSigma / 2;
-            covariances[maxCluster * dimension + d] = maxDimSigma / 2;
-          } else {
-            means[i_cl*dimension + d] = means[maxCluster*dimension + d];
-            covariances[i_cl*dimension + d] = covariances[maxCluster*dimension + d];
-          }
+    
+    if (self->verbosity) {
+      VL_PRINTF("gmm: mode %d is nearly empty (mass %f)\n", i_cl, mass[i_cl]) ;
+    }
+      
+    double size = - VL_INFINITY_D ;
+    vl_index best = -1 ;
+    
+    /*
+     Search for the cluster that (approximately)
+     maximally contribute to make the log-likelihood
+     small.
+     */
+    
+    for (j_cl = 0 ; j_cl < (signed)numClusters ; ++j_cl) {
+      double size_ ;
+      if (priors[j_cl] < VL_GMM_MIN_PRIOR) { continue ; }
+      size_ = - 0.5 * (1.0 + log(2*VL_PI)) ;
+      for(d = 0 ; d < (signed)dimension ; d++) {
+        double sigma2 = covariances[j_cl * dimension + d] ;
+        size_ -= 0.5 * log(sigma2) ;
+      }
+      size_ *= priors[j_cl] ;
+      
+      if (self->verbosity > 2) {
+        VL_PRINTF("gmm: mode %d: prior %f, mass %f, score %f\n",
+                  j_cl, priors[j_cl], mass[j_cl], size_) ;
+      }
+      
+      if (size_ > size) {
+        size = size_ ;
+        best = j_cl ;
+      }
+    }
+    
+    j_cl = best ;
+    
+    if (j_cl == i_cl || j_cl < 0) {
+      if (self->verbosity) {
+        VL_PRINTF("gmm: mode %d is empty, "
+                  "but no other mode to split could be found\n", i_cl) ;
+      }
+      continue ;
+    }
+    
+    if (self->verbosity) {
+      VL_PRINTF("gmm: reinitializing empty mode %d with mode %d (prior %f, mass %f, score %f)\n",
+                i_cl, j_cl, priors[j_cl], mass[j_cl], size) ;
+    }
+    
+    /*
+     Search for the dimension with maximum variance.
+     */
+    
+    size = - VL_INFINITY_D ;
+    best = - 1 ;
+    
+    for(d = 0; d < (signed)dimension; d++) {
+      double sigma2 = covariances[j_cl * dimension + d] ;
+      if (sigma2 > size) {
+        size = sigma2 ;
+        best = d ;
+      }
+    }
+    
+    /*
+     Reassign points j_cl (mode to split) to i_cl (empty mode).
+     */
+    {
+      TYPE mu = means[best + j_cl * self->dimension] ;
+      for(i_d = 0 ; i_d < (signed)self->numData ; ++ i_d) {
+        TYPE p = posteriors[j_cl + self->numClusters * i_d] ;
+        TYPE q = posteriors[i_cl + self->numClusters * i_d] ; /* ~= 0 */
+        if (data[best + i_d * self->dimension] < mu) {
+          /* assign this point to i_cl */
+          posteriors[i_cl + self->numClusters * i_d] += p ;
+          posteriors[j_cl + self->numClusters * i_d] = 0 ;
+        } else {
+          /* assign this point to j_cl */
+          posteriors[i_cl + self->numClusters * i_d] = 0 ;
+          posteriors[j_cl + self->numClusters * i_d] += q ;
         }
       }
     }
-    vl_free(nullWeights);
+    
+    /*
+     Re-estimate.
+     */
+    VL_XCAT(_vl_gmm_maximization_, SFX)
+    (self,posteriors,priors,covariances,means,data,self->numData) ;
   }
-#endif
+
   return zeroWNum;
 }
 
@@ -883,11 +1075,11 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
 #endif
     for (i_d = 0 ; i_d < (signed)numData ; ++i_d) {
       for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-        TYPE p = posteriors[i_cl * numData + i_d] ;
+        TYPE p = posteriors[i_cl + i_d * self->numClusters] ;
         vl_bool calculated = VL_FALSE ;
 
         /* skip very small associations for speed */
-        if (p < 0.00001 / numClusters) { continue ; }
+        if (p < VL_GMM_MIN_POSTERIOR / numClusters) { continue ; }
 
         clusterPosteriorSum_ [i_cl] += p ;
 
@@ -1004,112 +1196,6 @@ VL_XCAT(_vl_gmm_maximization_, SFX)
 }
 
 /* ---------------------------------------------------------------- */
-/*                                            EM - Expectation step */
-/* ---------------------------------------------------------------- */
-
-static double
-VL_XCAT(_vl_gmm_expectation_, SFX)
-(VlGMM * self,
- TYPE * posteriors,
- TYPE * priors,
- TYPE * covariances,
- TYPE * means,
- TYPE const * data,
- vl_size numData)
-{
-  vl_size numClusters = self->numClusters ;
-  vl_index i_d, i_cl;
-  vl_size dim;
-  double LL = 0;
-  double time = 0 ;
-
-  TYPE halfDimLog2Pi = (self->dimension / 2.0) * log(2.0*VL_PI);
-
-  TYPE * logCovariances ;
-  TYPE * logWeights ;
-  TYPE * invCovariances ;
-
-#if (FLT == VL_TYPE_FLOAT)
-  VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahalanobis) ;
-#else
-  VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
-#endif
-
-  if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: entering expectation step\n") ;
-    time = vl_get_cpu_time() ;
-  }
-
-  logCovariances = vl_malloc(sizeof(TYPE) * numClusters);
-  invCovariances = vl_malloc(sizeof(TYPE) * numClusters * self->dimension);
-  logWeights = vl_malloc(numClusters * sizeof(TYPE));
-
-#if defined(_OPENMP)
-#pragma omp parallel for private(i_cl,dim) num_threads(vl_get_max_threads())
-#endif
-  for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
-    TYPE logSigma = 0 ;
-    if (priors[i_cl] < 0.00001 / numClusters) {
-      /* avoids taking log of 0 */
-      logWeights[i_cl] = - (TYPE) VL_INFINITY_D ;
-    } else {
-      logWeights[i_cl] = log(priors[i_cl]);
-    }
-    for(dim = 0 ; dim < self->dimension ; ++ dim) {
-      logSigma += log(covariances[i_cl*self->dimension + dim]);
-      invCovariances [i_cl*self->dimension + dim] = (TYPE) 1.0 / covariances[i_cl*self->dimension + dim];
-    }
-    logCovariances[i_cl] = logSigma;
-  } /* end of parallel region */
-
-#if defined(_OPENMP)
-#pragma omp parallel for private(i_cl,i_d) reduction(+:LL) \
-                         num_threads(vl_get_max_threads())
-#endif
-  for (i_d = 0 ; i_d < (signed)numData ; ++ i_d) {
-    TYPE clusterPosteriorsSum = 0;
-    TYPE maxPosterior = (TYPE)(-VL_INFINITY_D) ;
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
-      TYPE p =
-        logWeights[i_cl]
-        - halfDimLog2Pi
-        - 0.5 * logCovariances[i_cl]
-        - 0.5 * distFn (self->dimension,
-                        data + i_d * self->dimension,
-                        means + i_cl * self->dimension,
-                        invCovariances + i_cl * self->dimension) ;
-      posteriors[i_cl * numData + i_d] = p ;
-      if (p > maxPosterior) { maxPosterior = p ; }
-    }
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      TYPE p = posteriors[i_cl * numData + i_d] ;
-      p =  exp(p - maxPosterior) ;
-      posteriors[i_cl * numData + i_d] = p ;
-      clusterPosteriorsSum += p ;
-    }
-
-    LL +=  log(clusterPosteriorsSum) + (double) maxPosterior ;
-
-    for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
-      posteriors[i_cl * numData + i_d] /= clusterPosteriorsSum ;
-    }
-  } /* end of parallel region */
-
-  vl_free(logCovariances);
-  vl_free(logWeights);
-  vl_free(invCovariances);
-
-  if (self->verbosity > 1) {
-    VL_PRINTF("gmm: em: expectation step completed in %.2f s\n",
-              vl_get_cpu_time() - time) ;
-  }
-
-  return LL;
-}
-
-/* ---------------------------------------------------------------- */
 /*                                                    EM iterations */
 /* ---------------------------------------------------------------- */
 
@@ -1121,8 +1207,9 @@ VL_XCAT(_vl_gmm_em_, SFX)
  vl_size numData)
 {
   vl_size iteration, restarted ;
-  double previousLL = (TYPE)(-VL_INFINITY_D);
-  double LL = (TYPE)(-VL_INFINITY_D);
+  double previousLL = (TYPE)(-VL_INFINITY_D) ;
+  double LL = (TYPE)(-VL_INFINITY_D) ;
+  double time ;
 
   _vl_gmm_prepare_for_data (self, numData) ;
 
@@ -1132,16 +1219,36 @@ VL_XCAT(_vl_gmm_em_, SFX)
     double eps ;
 
     /*
-      Expectation: assign data to Gaussian modes, and compute log-likelihood.
-    */
-    LL = VL_XCAT(_vl_gmm_expectation_, SFX)
-      (self,self->posteriors,self->priors,self->covariances,self->means,data,numData) ;
+     Expectation: assign data to Gaussian modes
+     and compute log-likelihood.
+     */
+
+    if (self->verbosity > 1) {
+      VL_PRINTF("gmm: em: entering expectation step\n") ;
+      time = vl_get_cpu_time() ;
+    }
+    
+    LL = VL_XCAT(vl_get_gmm_data_posteriors_,SFX)
+    (self->posteriors,
+     self->numClusters,
+     numData,
+     self->priors,
+     self->means,
+     self->dimension,
+     self->covariances,
+     data) ;
+        
+    if (self->verbosity > 1) {
+      VL_PRINTF("gmm: em: expectation step completed in %.2f s\n",
+                vl_get_cpu_time() - time) ;
+    }
 
     /*
-       Check the termination conditions.
-    */
+     Check the termination conditions.
+     */
     if (self->verbosity) {
-      VL_PRINTF("gmm: em: iteration %d: loglikelihood = %f\n", iteration, LL) ;
+      VL_PRINTF("gmm: em: iteration %d: loglikelihood = %f (variation = %f)\n",
+                iteration, LL, LL - previousLL) ;
     }
     if (iteration >= self->maxNumIterations) {
       if (self->verbosity) {
@@ -1163,11 +1270,11 @@ VL_XCAT(_vl_gmm_em_, SFX)
     previousLL = LL ;
 
     /*
-       Restart empty modes.
-    */
+     Restart empty modes.
+     */
     if (iteration > 1) {
-      restarted = VL_XCAT(_vl_gmm_zero_priors_disposal_, SFX)
-        (self, self->priors, self->covariances, self->means);
+      restarted = VL_XCAT(_vl_gmm_restart_empty_modes_, SFX)
+        (self, data);
       if ((restarted > 0) & (self->verbosity > 0)) {
         VL_PRINTF("gmm: em: %d Gaussian modes restarted because "
                   "they had become empty.\n", restarted);
@@ -1189,45 +1296,6 @@ VL_XCAT(_vl_gmm_em_, SFX)
 /* ---------------------------------------------------------------- */
 
 static void
-VL_XCAT(_vl_gmm_compute_init_sigma_, SFX)
-(VlGMM * self,
- TYPE const * data,
- TYPE * initSigma,
- vl_size dimension,
- vl_size numData)
-{
-  vl_size dim;
-  vl_uindex i;
-
-  TYPE * dataMean ;
-
-  memset(initSigma,0,sizeof(TYPE)*dimension) ;
-  if (numData <= 1) return ;
-
-  dataMean = vl_malloc(sizeof(TYPE)*dimension);
-  memset(dataMean,0,sizeof(TYPE)*dimension) ;
-
-  /* find mean of the whole dataset */
-  for(dim = 0 ; dim < dimension ; dim++) {
-    for(i = 0 ; i < numData ; i++) {
-      dataMean[dim] += data[i*dimension + dim];
-    }
-    dataMean[dim] /= numData;
-  }
-
-  /* compute variance of the whole dataset */
-  for(dim = 0; dim < dimension; dim++) {
-    for(i = 0; i < numData; i++) {
-      TYPE diff = (data[i*self->dimension + dim] - dataMean[dim]) ;
-      initSigma[dim] += diff*diff ;
-    }
-    initSigma[dim] /= numData - 1 ;
-  }
-
-  vl_free(dataMean) ;
-}
-
-static void
 VL_XCAT(_vl_gmm_init_with_kmeans_, SFX)
 (VlGMM * self,
  TYPE const * data,
@@ -1236,10 +1304,6 @@ VL_XCAT(_vl_gmm_init_with_kmeans_, SFX)
 {
   vl_size i_d ;
   vl_uint32 * assignments = vl_malloc(sizeof(vl_uint32) * numData);
-#if 0
-  vl_size * clusterMasses = vl_calloc(sizeof(vl_size), numClusters);
-  TYPE * initSigma = vl_malloc(sizeof(TYPE) * dimension);
-#endif
 
   _vl_gmm_prepare_for_data (self, numData) ;
 
@@ -1247,10 +1311,6 @@ VL_XCAT(_vl_gmm_init_with_kmeans_, SFX)
   memset(self->priors,0,sizeof(TYPE) * self->numClusters) ;
   memset(self->covariances,0,sizeof(TYPE) * self->numClusters * self->dimension) ;
   memset(self->posteriors,0,sizeof(TYPE) * self->numClusters * numData) ;
-
-#if 0
-  VL_XCAT(_vl_gmm_compute_init_sigma_, SFX) (self, data, initSigma, self->dimension, numData);
-#endif
 
   /* setup speified KMeans initialization object if any */
   if (kmeansInit) { vl_gmm_set_kmeans_init_object (self, kmeansInit) ; }
@@ -1283,59 +1343,57 @@ VL_XCAT(_vl_gmm_init_with_kmeans_, SFX)
 
   /* Transform the k-means assignments in posteriors and estimates the mode parameters */
   for(i_d = 0; i_d < numData; i_d++) {
-    ((TYPE*)self->posteriors)[assignments[i_d] * numData + i_d] = (TYPE) 1.0 ;
+    ((TYPE*)self->posteriors)[assignments[i_d] + i_d * self->numClusters] = (TYPE) 1.0 ;
   }
 
   /* Update cluster parameters */
   VL_XCAT(_vl_gmm_maximization_, SFX)
     (self,self->posteriors,self->priors,self->covariances,self->means,data,numData);
   vl_free(assignments) ;
-
-#if 0
-  // compute covariances, means and priors
-  for(i_d = 0; i_d < numData; i_d++) {
-    clusterMasses[assignments[i_d]]++;
-    for(dim = 0; dim < dimension; dim++) {
-      *((TYPE*)self->means + assignments[i_d] * dimension + dim) += data[i_d*dimension + dim];
-    }
-  }
-
-  for(i_cl = 0; i_cl < numClusters; i_cl++) {
-    *((TYPE*)self->priors + i_cl) = (TYPE)clusterMasses[i_cl]/(TYPE)numData;
-    for(dim = 0; dim < dimension; dim++) {
-      *((TYPE*)self->means + i_cl*dimension+dim) /= (TYPE)clusterMasses[i_cl];
-    }
-  }
-
-  for(i_d = 0; i_d < numData; i_d++) {
-    for(dim = 0; dim < dimension; dim++) {
-      TYPE diff = (data[i_d*dimension + dim] -
-                   *((TYPE*)self->means + assignments[i_d]*dimension+dim));
-
-      *((TYPE*)self->covariances + assignments[i_d]*dimension + dim) += diff*diff ;
-    }
-  }
-
-  for(i_cl = 0; i_cl < numClusters; i_cl++) {
-    if(clusterMasses[i_cl] != 0){
-      for(dim = 0; dim < dimension; dim++) {
-        *((TYPE*)self->covariances + i_cl*dimension + dim) /= (TYPE)clusterMasses[i_cl];
-      }
-    } else {
-      for(dim = 0; dim < dimension; dim++) {
-        *((TYPE*)self->covariances + i_cl*dimension + dim) = initSigma[dim];
-      }
-    }
-  }
-  vl_free(clusterMasses);
-  vl_free(initSigma);
-  vl_free(assignments);
-#endif
 }
 
 /* ---------------------------------------------------------------- */
 /*                                Random initialization of mixtures */
 /* ---------------------------------------------------------------- */
+
+static void
+VL_XCAT(_vl_gmm_compute_init_sigma_, SFX)
+(VlGMM * self,
+ TYPE const * data,
+ TYPE * initSigma,
+ vl_size dimension,
+ vl_size numData)
+{
+  vl_size dim;
+  vl_uindex i;
+  
+  TYPE * dataMean ;
+  
+  memset(initSigma,0,sizeof(TYPE)*dimension) ;
+  if (numData <= 1) return ;
+  
+  dataMean = vl_malloc(sizeof(TYPE)*dimension);
+  memset(dataMean,0,sizeof(TYPE)*dimension) ;
+  
+  /* find mean of the whole dataset */
+  for(dim = 0 ; dim < dimension ; dim++) {
+    for(i = 0 ; i < numData ; i++) {
+      dataMean[dim] += data[i*dimension + dim];
+    }
+    dataMean[dim] /= numData;
+  }
+  
+  /* compute variance of the whole dataset */
+  for(dim = 0; dim < dimension; dim++) {
+    for(i = 0; i < numData; i++) {
+      TYPE diff = (data[i*self->dimension + dim] - dataMean[dim]) ;
+      initSigma[dim] += diff*diff ;
+    }
+    initSigma[dim] /= numData - 1 ;
+  }
+  
+  vl_free(dataMean) ;
+}
 
 static void
 VL_XCAT(_vl_gmm_init_with_rand_data_, SFX)
@@ -1502,7 +1560,7 @@ double vl_gmm_cluster (VlGMM * self,
   bestPriors = vl_malloc(size * self->numClusters) ;
   bestMeans = vl_malloc(size * self->dimension * self->numClusters) ;
   bestCovariances = vl_malloc(size * self->dimension * self->numClusters) ;
-  bestPosteriors = vl_malloc(size * numData * self->numClusters) ;
+  bestPosteriors = vl_malloc(size * self->numClusters * numData) ;
 
 #if 0
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
@@ -1516,7 +1574,7 @@ double vl_gmm_cluster (VlGMM * self,
       VL_PRINTF("gmm: clustering: starting repetition %d of %d\n", repetition + 1, self->numRepetitions) ;
     }
 
-    /* seed a new mixture model */
+    /* initialize a new mixture model */
     timeRef = vl_get_cpu_time() ;
     switch (self->initialization) {
       case VlGMMKMeans : vl_gmm_init_with_kmeans (self, data, numData, NULL) ; break ;

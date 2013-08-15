@@ -68,7 +68,7 @@ elapsedGMM = toc(elapsedGMM);
 fprintf('\n ---------- \n GMM time - %f \n ---------- \n',elapsedGMM);
 
 subplot(3,1,2) ; hold on ;
-[~,idx] = max(posteriors',[],1);
+[~,idx] = max(posteriors,[],1);
 for i=1:numClusters
     plot(X(1,idx == i),X(2,idx == i),'.','color',cc(i,:));
     vl_plotframe([means(:,i)' sigmas(1,i) 0 sigmas(2,i)]);
@@ -88,7 +88,7 @@ elapsedGMM = toc(elapsedGMM);
 fprintf('\n ---------- \n GMM time - %f \n ---------- \n',elapsedGMM);
 
 subplot(3,1,3) ; hold on ;
-[~,idx] = max(posteriors',[],1);
+[~,idx] = max(posteriors,[],1);
 for i=1:numClusters
     plot(X(1,idx == i),X(2,idx == i),'.','color',cc(i,:));
     vl_plotframe([means(:,i)' sigmas(1,i) 0 sigmas(2,i)]);

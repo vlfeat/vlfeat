@@ -90,6 +90,26 @@ VL_EXPORT void
 vl_gmm_set_priors
 (VlGMM * self,
  void const * priors);
+
+VL_EXPORT double
+vl_get_gmm_data_posteriors_f(float * posteriors,
+                             vl_size numClusters,
+                             vl_size numData,
+                             float const * priors,
+                             float const * means,
+                             vl_size dimension,
+                             float const * covariances,
+                             float const * data) ;
+
+VL_EXPORT double
+vl_get_gmm_data_posteriors_d(double * posteriors,
+                             vl_size numClusters,
+                             vl_size numData,
+                             double const * priors,
+                             double const * means,
+                             vl_size dimension,
+                             double const * covariances,
+                             double const * data) ;
 /** @} */
 
 /** @name Set parameters
