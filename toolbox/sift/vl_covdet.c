@@ -740,7 +740,7 @@ mexFunction(int nout, mxArray *out[],
                                                 patchRelativeSmoothing,
                                                 feature[i].frame);
 
-              vl_liopdesc_process(liop, patch, desc);
+              vl_liopdesc_process(liop, desc, patch);
 
               desc += dimension;
 
