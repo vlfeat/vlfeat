@@ -184,20 +184,6 @@ doc/build/man/%.html : src/% $(doc-dir)
 	)  > "$@"
 
 # --------------------------------------------------------------------
-#                                                              Doxygen
-# --------------------------------------------------------------------
-
-doc-api: doc/api/index.html
-
-doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION \
-  $(dll_src) $(dll_hdr) $(doc_fig_tgt) toolbox/mexutils.h \
-  doc/build/doxygen_header.html doc/build/doxygen_footer.html
-	ln -sf docsrc/vlfeat.bib vlfeat.bib
-	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
-	rm vlfeat.bib
-	cp -fv docsrc/doxygen.css doc/api/doxygen.css
-
-# --------------------------------------------------------------------
 #                                       FIG and SVG figures and images
 # --------------------------------------------------------------------
 
@@ -237,6 +223,20 @@ doc/build/figures/%.tex : $(doc-dir)
 	@/bin/echo '\pagestyle{empty}'					>>$@
 	@/bin/echo '\input{doc/build/figures/$(*)-raw.tex}'		>>$@
 	@/bin/echo '\end{document}'					>>$@
+
+# --------------------------------------------------------------------
+#                                                              Doxygen
+# --------------------------------------------------------------------
+
+doc-api: doc/api/index.html
+
+doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION \
+  $(dll_src) $(dll_hdr) $(doc_fig_tgt) toolbox/mexutils.h \
+  doc/build/doxygen_header.html doc/build/doxygen_footer.html
+	ln -sf docsrc/vlfeat.bib vlfeat.bib
+	$(DOXYGEN) $< 2>&1 | sed -e 's/Warning:/warning: /g'
+	rm vlfeat.bib
+	cp -fv docsrc/doxygen.css doc/api/doxygen.css
 
 # --------------------------------------------------------------------
 #                                                               Webdoc
