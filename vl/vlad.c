@@ -45,7 +45,7 @@ kdtree.
 In the following example code, the vocabulary is first created using
 the KMeans clustering, then the points, that are to be encoded are
 assigned to its corresponding nearest vocabulary words, after that the
-original vlad encoding routine without any normalization option takes place. 
+original vlad encoding routine without any normalization option takes place.
 At the end of the process the encoding is stored in the @c enc variable.
 
 @code
@@ -66,7 +66,7 @@ vl_kmeans_cluster (kmeans,
 indexes = vl_malloc(sizeof(vl_uint32) * numDataToEncode);
 vl_kmeans_quantize(kmeans,indexes,dataToEncode,numDataToEncode);
 
-// convert indexes array to assignments array, 
+// convert indexes array to assignments array,
 // which can be processed by vl_vlad_encode
 assignments = vl_malloc(sizeof(float) * numDataToEncode * numCenters);
 memset(assignments, 0, sizeof(float) * numDataToEncode * numCenters);

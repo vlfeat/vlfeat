@@ -8,8 +8,6 @@
 int main(){
   vl_int i ;
   VlLiopDesc * liop ;
-  vl_int * table ;
-  float * desc ;
   vl_size size = 11*11 ;
   float mat[] = {
     6,6,6,6,6,6,6,6,6,6,6,
@@ -32,6 +30,7 @@ int main(){
   liop = vl_liopdesc_new(4,6,2,11);
 
   vl_liopdesc_delete(liop) ;
+  vl_free(patch) ;
 }
 
 

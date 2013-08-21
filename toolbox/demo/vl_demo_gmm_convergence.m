@@ -28,9 +28,9 @@ initWeights = zeros(1,numClusters);
 initSigmas = zeros(dimension,numClusters);
 for i=1:numClusters
     Xk = X(:,assignments==i);
-    
+
     initWeights(i) = size(Xk,2) / numClusters;
-    
+
     if size(Xk,1) == 0 || size(Xk,2) == 0
         initSigmas(:,i) = diag(cov(X'));
     else

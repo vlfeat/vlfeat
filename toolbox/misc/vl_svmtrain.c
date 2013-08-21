@@ -524,7 +524,7 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
         break ;
 
       case opt_bias: GET_SCALAR(BIAS, initialBias) ; break ;
-        
+
       case opt_weights:
         if (!vlmxIsPlainVector(optarg, vl_svmdataset_get_num_data(dataset))) {
           vlmxError(vlmxErrInvalidArgument, "WEIGHTS is not a plain vector of size equal to the number of training samples.") ;
@@ -535,7 +535,7 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
       /* SGD specific */
       case opt_starting_iteration: GET_NN_SCALAR(STARTINGITERATION, startingIteration) ; break ;
       case opt_bias_learning_rate: GET_NN_SCALAR(BIASLEARNINGRATE, sgdBiasLearningRate) ; break ;
-        
+
       /* DCA specific */
     } /* choose option */
   } /* next option */

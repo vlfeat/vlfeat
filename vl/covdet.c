@@ -192,9 +192,9 @@ v CMP *(pt - yo - xo - zo) )
           numExtrema ++ ;
           requiredSize += sizeof(vl_index) * 3 ;
           if (*bufferSize < requiredSize) {
-            int err = _vl_resize_buffer((void**)extrema, bufferSize,
-                                        requiredSize + 2000 * 3 * sizeof(vl_index)) ;
-            assert(err == VL_ERR_OK) ;
+            assert(VL_ERR_OK ==
+                   _vl_resize_buffer((void**)extrema, bufferSize,
+                                     requiredSize + 2000 * 3 * sizeof(vl_index))) ;
           }
           (*extrema) [3 * (numExtrema - 1) + 0] = x ;
           (*extrema) [3 * (numExtrema - 1) + 1] = y ;
@@ -252,9 +252,9 @@ v CMP *(pt - yo - xo) )
         numExtrema ++ ;
         requiredSize += sizeof(vl_index) * 2 ;
         if (*bufferSize < requiredSize) {
-          int err = _vl_resize_buffer((void**)extrema, bufferSize,
-                                      requiredSize + 2000 * 2 * sizeof(vl_index)) ;
-          assert(err == VL_ERR_OK) ;
+          assert(VL_ERR_OK ==
+                 _vl_resize_buffer((void**)extrema, bufferSize,
+                                   requiredSize + 2000 * 2 * sizeof(vl_index))) ;
         }
         (*extrema) [2 * (numExtrema - 1) + 0] = x ;
         (*extrema) [2 * (numExtrema - 1) + 1] = y ;

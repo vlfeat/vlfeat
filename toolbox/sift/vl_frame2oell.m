@@ -47,7 +47,7 @@ switch D
 
   case 6
     eframes = frames ;
-  
+
   otherwise
      error('FRAMES format is unknown.') ;
 end
@@ -69,6 +69,6 @@ A = zeros(4,size(S,2)) ;
 a = sqrt(S(1,:));
 b = S(2,:) ./ max(a, 1e-18) ;
 
-A(1,:) = a ; 
+A(1,:) = a ;
 A(2,:) = b ;
 A(4,:) = sqrt(max(S(3,:) - b.*b, 0)) ;

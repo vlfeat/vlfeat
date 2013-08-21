@@ -12,7 +12,7 @@ the terms of the BSD license (see the COPYING file).
 */
 
 /** @file rodrigues.h
- 
+
 @section rodrigues Rodrigues formulas
 
 - Use ::vl_rodrigues to compute the Rodrigues formula and its derivative.

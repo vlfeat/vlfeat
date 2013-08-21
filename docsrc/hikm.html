@@ -5,7 +5,7 @@
 
 <p><b>VLFeat</b> offers a hierarchical version of integer k-means, which
 recursively applies <code>vl_ikmeans</code> to compute finer and finer
-partitions. For more details see 
+partitions. For more details see
 <a href="%pathto:root;api/hikmeans_8h.html">Hierarchical Integer
   k-means API reference</a> and the <a href="%pathto:tut.ikm;">Integer
   k-means tutorial</a>.
@@ -65,7 +65,7 @@ clusters:</p>
 <precode type='matlab'>
 > tree
 tree =
- 
+
           K: 3
       depth: 5
     centers: [2x3 int32]
@@ -79,7 +79,7 @@ element is in turn a tree:</p>
 
 <precode type='matlab'>
 > tree.sub
-ans = 
+ans =
 
 1x3 struct array with fields:
     centers
@@ -93,7 +93,7 @@ field is equal to the empty matrix</p>
 <precode type='matlab'>
 > tree.sub(1).sub(1).sub(1).sub(1)
 
-ans = 
+ans =
 
     centers: [2x3 int32]
         sub: []

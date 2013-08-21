@@ -207,7 +207,7 @@ vl_kdtree_build_recursively
       sampleIndex += dataBegin;
 
       di = tree->dataIndex[sampleIndex].index ;
-   
+
       switch(forest->dataType) {
         case VL_TYPE_FLOAT: datum = ((float const*)forest->data)
           [di * forest->dimension + d] ;
@@ -458,7 +458,7 @@ vl_kdforest_delete (VlKDForest * self)
 {
   vl_uindex ti ;
   VlKDForestSearcher * searcher ;
-  
+
   while ((searcher = vl_kdforest_get_searcher(self, 0))) {
     vl_kdforestsearcher_delete(searcher) ;
   }
@@ -867,7 +867,7 @@ vl_kdforest_query_with_array (VlKDForest * self,
   vl_size numComparisons = 0;
   vl_type dataType = vl_kdforest_get_data_type(self) ;
   vl_size dimension = vl_kdforest_get_data_dimension(self) ;
-  
+
 #ifdef _OPENMP
 #pragma omp parallel default(shared) num_threads(vl_get_max_threads())
 #endif
@@ -876,7 +876,7 @@ vl_kdforest_query_with_array (VlKDForest * self,
     vl_size thisNumComparisons = 0 ;
     VlKDForestSearcher * searcher ;
     VlKDForestNeighbor * neighbors ;
-    
+
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -884,7 +884,7 @@ vl_kdforest_query_with_array (VlKDForest * self,
       searcher = vl_kdforest_new_searcher(self) ;
       neighbors = vl_calloc (sizeof(VlKDForestNeighbor), numNeighbors) ;
     }
-    
+
 #ifdef _OPENMP
 #pragma omp for
 #endif
@@ -918,7 +918,7 @@ vl_kdforest_query_with_array (VlKDForest * self,
           abort() ;
       }
     }
-    
+
 #ifdef _OPENMP
 #pragma omp critical
 #endif

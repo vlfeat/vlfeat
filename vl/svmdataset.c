@@ -21,7 +21,7 @@ the terms of the BSD license (see the COPYING file).
 
 The SVM solver object ::VlSvm, supporting SVM learning in VLFeat,
 uses an abstraction mechanism to work on arbitrary data types.
-This module provides an helper object, ::VlSvmDataset, 
+This module provides an helper object, ::VlSvmDataset,
 that simplify taking advantage of this functionality, supporting for example
 different data types and the computation of feature maps out of the box.
 
@@ -38,7 +38,7 @@ operations to be defined on the data:
 - *Accumulation* of a dataobint $\bx$ to the model vector $\bw$:
   $\bw \leftarrow \bw + \alpha \bx$. This is implemented
   by a function of the type ::VlSvmAccumulateFunction .
- 
+
 The SVM solver needs to know nothing about the data once these two
 operations are defined. These functions can do any number of things,
 such as supporting different formats for the data (dense or sparse,
@@ -50,7 +50,7 @@ of these functionalities out of the box (it is important to remark
 that its use with the SVM solver ::VlSvm is entirely optional).
 
 Presently, ::VlSvmDataset supports:
- 
+
 - @c float and @c double dense arrays.
 - The on-the-fly application of the homogeneous kernel map to implement
   additive non-linear kernels (see @ref homkermap).
@@ -140,10 +140,10 @@ vl_svmdataset_new (vl_type dataType, void *data, vl_size dimension, vl_size numD
   VlSvmDataset * self ;
   assert(dataType == VL_TYPE_DOUBLE || dataType == VL_TYPE_FLOAT) ;
   assert(data) ;
-  
+
   self = vl_calloc(1, sizeof(VlSvmDataset)) ;
   if (self == NULL) return NULL ;
-  
+
   self->dataType = dataType ;
   self->data = data ;
   self->dimension = dimension ;
@@ -311,7 +311,7 @@ vl_svmdataset_get_inner_product_function (VlSvmDataset const *self)
         break ;
       default:
         assert(0) ;
-    }    
+    }
   }
 
   return NULL;

@@ -29,7 +29,7 @@ detect scale invariant features @cite{lindeberg98principles} such as
 SIFT, Hessian-Affine, Harris-Affine, Harris-Laplace, etc.
 
 @tableofcontents
- 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section scalespace-overview Overview
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->

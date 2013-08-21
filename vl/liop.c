@@ -121,9 +121,9 @@ In order to increase distinctiveness of the descriptor, LIOP pools
 multiple histograms from a number of regions $R_1,\dots,R_m$ (spatial
 pooling). These regions are selected in an illumination-invariant and
 rotation-covariant manner by looking at level sets:
-\[ 
-R_t = \{\bx :\tau_{t} \leq I(\bx) < \tau_{t+1} \}. 
-\] 
+\[
+R_t = \{\bx :\tau_{t} \leq I(\bx) < \tau_{t+1} \}.
+\]
 In order to be invariant to monotonic changes of the intensity, the
 thresholds $\tau_t$ are selected so that all regions contain the same
 number of pixels. This can be done efficiently by sorting pixels by

@@ -282,7 +282,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexPrintf("kmeans: num. data points = %d\n", numData) ;
     mexPrintf("kmeans: num. centers = %d\n", numCenters) ;
     mexPrintf("kmeans: max num. comparisons = %d\n", maxNumComparisons) ;
-    mexPrintf("kmeans: num. trees = %d\n", numTrees) ;    
+    mexPrintf("kmeans: num. trees = %d\n", numTrees) ;
     mexPrintf("\n") ;
   }
 

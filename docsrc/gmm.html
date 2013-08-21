@@ -93,7 +93,7 @@ particularly sensitive to the initialization of the model. The
 simplest way to initiate the GMM is to pick <code>numClusters</code>
 data points at random as mode means, initialize the individual
 covariances as the covariance of the data, and assign equa prior
-probabilities to the modes. This is the default initialization 
+probabilities to the modes. This is the default initialization
 method used by <code>vl_gmm</code>.</p>
 
 <p>Alternatively, a user can specifiy manually the initial paramters
@@ -125,7 +125,7 @@ initPriors = zeros(1,numClusters);
 for i=1:numClusters
     data_k = data(:,assignments==i);
     initPriors(i) = size(data_k,2) / numClusters;
-    
+
     if size(data_k,1) == 0 || size(data_k,2) == 0
         initCovariances(:,i) = diag(cov(data'));
     else

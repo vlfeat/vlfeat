@@ -48,7 +48,7 @@ float * priors ;
 float * posteriors ;
 float * enc;
 
-// create a GMM object and cluster input data to get means, covariances 
+// create a GMM object and cluster input data to get means, covariances
 // and priors of the estimated mixture
 gmm = vl_gmm_new (VL_TYPE_FLOAT) ;
 vl_gmm_cluster (gmm, data, dimension, numData, numClusters);
@@ -380,7 +380,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
       sqrtInvSigma[i_cl*dimension + dim] = sqrt(1.0 / covariances[i_cl*dimension + dim]);
     }
   }
-  
+
   VL_XCAT(vl_get_gmm_data_posteriors_, SFX)(posteriors, numClusters, numData,
                                             priors,
                                             means, dimension,

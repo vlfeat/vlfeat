@@ -615,8 +615,8 @@ vl_hog_put_image (VlHog * self,
   /* compute gradients and map the to HOG cells by bilinear interpolation */
   for (y = 1 ; y < (signed)height - 1 ; ++y) {
     for (x = 1 ; x < (signed)width - 1 ; ++x) {
-      float gradx ;
-      float grady ;
+      float gradx = 0 ;
+      float grady = 0 ;
       float grad ;
       float orientationWeights [2] = {0,0} ;
       vl_index orientationBins [2] = {-1,-1} ;
@@ -693,7 +693,7 @@ vl_hog_put_image (VlHog * self,
         orientation = orientationBins[o] ;
         if (orientation < 0) continue ;
 
-        /*  (x - (w-1)/2) / w = (x + 0.5)/w - 0.5 */        
+        /*  (x - (w-1)/2) / w = (x + 0.5)/w - 0.5 */
         hx = (x + 0.5) / cellSize - 0.5 ;
         hy = (y + 0.5) / cellSize - 0.5 ;
         binx = vl_floor_f(hx) ;
@@ -785,9 +785,9 @@ void vl_hog_put_polar_field (VlHog * self,
       bino = vl_floor_f(ho) ;
       wo2 = ho - bino ;
       wo1 = 1.0f - wo2 ;
-      
+
       while (bino < 0) { bino += self->numOrientations * 2 ; }
-      
+
       if (self->useBilinearOrientationAssigment) {
         orientationBins[0] = bino % period ;
         orientationBins[1] = (bino + 1) % period ;
@@ -807,10 +807,10 @@ void vl_hog_put_polar_field (VlHog * self,
          has hx = 0, which gradually increases to 1 moving to the next
          center.
          */
-        
+
         orientation = orientationBins[o] ;
         if (orientation < 0) continue ;
-        
+
         hx = (x + 0.5) / cellSize - 0.5 ;
         hy = (y + 0.5) / cellSize - 0.5 ;
         binx = vl_floor_f(hx) ;
@@ -819,14 +819,14 @@ void vl_hog_put_polar_field (VlHog * self,
         wy2 = hy - biny ;
         wx1 = 1.0 - wx2 ;
         wy1 = 1.0 - wy2 ;
-        
+
         wx1 *= orientationWeights[o] ;
         wx2 *= orientationWeights[o] ;
         wy1 *= orientationWeights[o] ;
         wy2 *= orientationWeights[o] ;
-        
+
         /*VL_PRINTF("%d %d - %d %d %f %f - %f %f %f %f - %d \n ",x,y,binx,biny,hx,hy,wx1,wx2,wy1,wy2,o);*/
-        
+
         if (binx >= 0 && biny >=0) {
           at(binx,biny,orientation) += thisModulus * wx1 * wy1 ;
         }

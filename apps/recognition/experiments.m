@@ -143,8 +143,8 @@ ex(15).datasets = {'voc07'}  ;
 ex(15).C = 1 ;
 
 
-if lite, tag = 'lite3' ;
-else, tag = 'ex3' ; end
+if lite, tag = 'lite' ;
+else, tag = 'ex' ; end
 
 for i=1:numel(ex)
   for j=1:numel(ex(i).datasets)

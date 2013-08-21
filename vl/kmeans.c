@@ -699,7 +699,7 @@ VL_XCAT(_vl_kmeans_quantize_, SFX)
       }
       if (distances) distances[i] = bestDistance ;
     }
-    
+
     free(distanceToCenters) ;
   }
 }
@@ -1489,14 +1489,14 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           pointToClosestCenterUB[x] <= nextCenterDistances[assignments[x]]) {
         continue ;
       }
-      
+
       for (c = 0 ; c < self->numCenters ; ++c) {
         vl_uint32 cx = assignments[x] ;
         TYPE distance ;
-        
+
         /* The point is not reassigned to a given center c
          if either:
-         
+
          0 - c is already the assigned center
          1 - The UB of d(x, c[assignments[x]]) is smaller than half
          the distance of c[assigments[x]] to c, OR
@@ -1515,7 +1515,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
             [c + x * self->numCenters]) {
           continue ;
         }
-        
+
         /* If the UB is loose, try recomputing it and test again */
         if (! pointToClosestCenterUBIsStrict[x]) {
           distance = distFn(self->dimension,
@@ -1525,7 +1525,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
           pointToClosestCenterUBIsStrict[x] = VL_TRUE ;
           pointToCenterLB[cx + x * self->numCenters] = distance ;
           numDistanceComputationsToRefreshUB += 1 ;
-          
+
           if (((self->distance == VlDistanceL1) ? 2.0 : 4.0) *
               pointToClosestCenterUB[x] <= ((TYPE*)self->centerDistances)
               [c + cx * self->numCenters]) {
@@ -1536,7 +1536,7 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
             continue ;
           }
         }
-        
+
         /*
          Now the UB is strict (equal to d(x, assignments[x])), but
          we still could not exclude that x should be reassigned to
@@ -1548,14 +1548,14 @@ VL_XCAT(_vl_kmeans_refine_centers_elkan_, SFX)
                           (TYPE*)self->centers + c *  self->dimension) ;
         numDistanceComputationsToRefreshLB += 1 ;
         pointToCenterLB[c + x * self->numCenters] = distance ;
-        
+
         if (distance < pointToClosestCenterUB[x]) {
           assignments[x] = c ;
           pointToClosestCenterUB[x] = distance ;
           allDone = VL_FALSE ;
           /* the UB strict flag is already set here */
         }
-        
+
       } /* assign center */
     } /* next data point */
 
@@ -1918,7 +1918,7 @@ vl_kmeans_quantize
  ** The function uses an ANN procedure to compute the approximate
  ** nearest neighbours of the input data point.
  **
- ** Setting @a update to ::VL_TRUE will cause the algorithm 
+ ** Setting @a update to ::VL_TRUE will cause the algorithm
  ** to *update existing assignments*. This means that each
  ** element of @a assignments and @a distances is updated ony if the
  ** ANN procedure can find a better assignment of the existing one.

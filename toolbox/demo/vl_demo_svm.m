@@ -34,14 +34,14 @@ energy = [] ;
 
 % Visualisation
 eq = [num2str(w(1)) '*x+' num2str(w(2)) '*y+' num2str(b)];
-    
+
 line = ezplot(eq, [-0.9 0.9 -0.9 0.9]);
 set(line, 'Color', [0 0.8 0],'linewidth', 2);
 
 vl_demo_print('svm_training_result') ;
 
 
-figure 
+figure
 hold on
 plot(energy(1,:),'--b') ;
 plot(energy(2,:),'-.g') ;

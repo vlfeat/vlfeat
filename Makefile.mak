@@ -486,7 +486,7 @@ startmatlab:
 
 {toolbox\gmm}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
-	
+
 {toolbox\geometry}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 
@@ -504,7 +504,7 @@ startmatlab:
 
 {toolbox\slic}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
-	
+
 {toolbox\vlad}.c{$(mexdir)}.$(MEXEXT):
 	$(BUILD_MEX)
 

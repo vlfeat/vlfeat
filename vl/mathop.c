@@ -412,7 +412,7 @@ VL_XCAT(vl_get_vector_comparison_function_, SFX)(VlVectorComparisonType type)
 #ifndef VL_DISABLE_AVX
   /* if an AVX implementation is available, use it */
   if (vl_cpu_has_avx() && vl_get_simd_enabled()) {
-    switch (type) {  
+    switch (type) {
       case VlDistanceL2    : function = VL_XCAT(_vl_distance_l2_avx_,             SFX) ; break ;
       default: break ;
     }
@@ -446,7 +446,7 @@ VL_XCAT(vl_get_vector_3_comparison_function_, SFX)(VlVectorComparisonType type)
 #ifndef VL_DISABLE_AVX
   /* if an AVX implementation is available, use it */
   if (vl_cpu_has_avx() && vl_get_simd_enabled()) {
-    switch (type) {  
+    switch (type) {
       case VlDistanceMahalanobis : function = VL_XCAT(_vl_distance_mahalanobis_sq_avx_, SFX) ; break ;
       default: break ;
     }

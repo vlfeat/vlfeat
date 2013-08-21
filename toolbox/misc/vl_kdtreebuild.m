@@ -18,7 +18,7 @@
 %
 %   Verbose::
 %     Increases the verbosity level (can be repeated).
-%   
+%
 %   Distance:: [L2]
 %     Specifies the type of norm which the KD-Tree should use (L1 or L2)
 %

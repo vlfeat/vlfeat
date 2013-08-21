@@ -55,7 +55,7 @@ for n=1:2
   else
     str = 'Parallel' ;
   end
-    
+
   subplot(3,2,(n-1)+1) ;
   bar(time(:,n)) ;
   set(gca,'XTickLabel',algorithms);
@@ -63,7 +63,7 @@ for n=1:2
   xlabel('Algorithm');
   ylabel('Time [s]');
   title(str) ;
-  
+
   subplot(3,2,(n-1)+3) ;
   bar(energy(:,n));
   set(gca,'XTickLabel',algorithms);

@@ -725,17 +725,17 @@ VL_XCAT(vl_get_gmm_data_posteriors_, SFX)
   TYPE * logCovariances ;
   TYPE * logWeights ;
   TYPE * invCovariances ;
-  
+
 #if (FLT == VL_TYPE_FLOAT)
   VlFloatVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_f(VlDistanceMahalanobis) ;
 #else
   VlDoubleVector3ComparisonFunction distFn = vl_get_vector_3_comparison_function_d(VlDistanceMahalanobis) ;
 #endif
-    
+
   logCovariances = vl_malloc(sizeof(TYPE) * numClusters) ;
   invCovariances = vl_malloc(sizeof(TYPE) * numClusters * dimension) ;
   logWeights = vl_malloc(numClusters * sizeof(TYPE)) ;
-  
+
 #if defined(_OPENMP)
 #pragma omp parallel for private(i_cl,dim) num_threads(vl_get_max_threads())
 #endif
@@ -752,7 +752,7 @@ VL_XCAT(vl_get_gmm_data_posteriors_, SFX)
     }
     logCovariances[i_cl] = logSigma;
   } /* end of parallel region */
-  
+
 #if defined(_OPENMP)
 #pragma omp parallel for private(i_cl,i_d) reduction(+:LL) \
 num_threads(vl_get_max_threads())
@@ -760,7 +760,7 @@ num_threads(vl_get_max_threads())
   for (i_d = 0 ; i_d < (signed)numData ; ++ i_d) {
     TYPE clusterPosteriorsSum = 0;
     TYPE maxPosterior = (TYPE)(-VL_INFINITY_D) ;
-    
+
     for (i_cl = 0 ; i_cl < (signed)numClusters ; ++ i_cl) {
       TYPE p =
       logWeights[i_cl]
@@ -773,21 +773,21 @@ num_threads(vl_get_max_threads())
       posteriors[i_cl + i_d * numClusters] = p ;
       if (p > maxPosterior) { maxPosterior = p ; }
     }
-    
+
     for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
       TYPE p = posteriors[i_cl + i_d * numClusters] ;
       p =  exp(p - maxPosterior) ;
       posteriors[i_cl + i_d * numClusters] = p ;
       clusterPosteriorsSum += p ;
     }
-    
+
     LL +=  log(clusterPosteriorsSum) + (double) maxPosterior ;
-    
+
     for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
       posteriors[i_cl + i_d * numClusters] /= clusterPosteriorsSum ;
     }
   } /* end of parallel region */
-  
+
   vl_free(logCovariances);
   vl_free(logWeights);
   vl_free(invCovariances);
@@ -820,9 +820,9 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
   TYPE * means = (TYPE*)self->means ;
   TYPE * covariances = (TYPE*)self->covariances ;
   TYPE * posteriors = (TYPE*)self->posteriors ;
-  
+
   //VlRand * rand = vl_get_rand() ;
-  
+
   TYPE * mass = vl_calloc(sizeof(TYPE), self->numClusters) ;
 
   if (numClusters <= 1) { return 0 ; }
@@ -877,7 +877,7 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
     }
   }
 #endif
-  
+
   /* search for cluster with negligible weight and reassign them to fat clusters */
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
 
@@ -886,20 +886,20 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
     {
       continue ;
     }
-    
+
     if (self->verbosity) {
       VL_PRINTF("gmm: mode %d is nearly empty (mass %f)\n", i_cl, mass[i_cl]) ;
     }
-      
+
     double size = - VL_INFINITY_D ;
     vl_index best = -1 ;
-    
+
     /*
      Search for the cluster that (approximately)
      maximally contribute to make the log-likelihood
      small.
      */
-    
+
     for (j_cl = 0 ; j_cl < (signed)numClusters ; ++j_cl) {
       double size_ ;
       if (priors[j_cl] < VL_GMM_MIN_PRIOR) { continue ; }
@@ -909,20 +909,20 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
         size_ -= 0.5 * log(sigma2) ;
       }
       size_ *= priors[j_cl] ;
-      
+
       if (self->verbosity > 2) {
         VL_PRINTF("gmm: mode %d: prior %f, mass %f, score %f\n",
                   j_cl, priors[j_cl], mass[j_cl], size_) ;
       }
-      
+
       if (size_ > size) {
         size = size_ ;
         best = j_cl ;
       }
     }
-    
+
     j_cl = best ;
-    
+
     if (j_cl == i_cl || j_cl < 0) {
       if (self->verbosity) {
         VL_PRINTF("gmm: mode %d is empty, "
@@ -930,19 +930,19 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
       }
       continue ;
     }
-    
+
     if (self->verbosity) {
       VL_PRINTF("gmm: reinitializing empty mode %d with mode %d (prior %f, mass %f, score %f)\n",
                 i_cl, j_cl, priors[j_cl], mass[j_cl], size) ;
     }
-    
+
     /*
      Search for the dimension with maximum variance.
      */
-    
+
     size = - VL_INFINITY_D ;
     best = - 1 ;
-    
+
     for(d = 0; d < (signed)dimension; d++) {
       double sigma2 = covariances[j_cl * dimension + d] ;
       if (sigma2 > size) {
@@ -950,7 +950,7 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
         best = d ;
       }
     }
-    
+
     /*
      Reassign points j_cl (mode to split) to i_cl (empty mode).
      */
@@ -970,7 +970,7 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
         }
       }
     }
-    
+
     /*
      Re-estimate.
      */
@@ -1209,7 +1209,7 @@ VL_XCAT(_vl_gmm_em_, SFX)
   vl_size iteration, restarted ;
   double previousLL = (TYPE)(-VL_INFINITY_D) ;
   double LL = (TYPE)(-VL_INFINITY_D) ;
-  double time ;
+  double time = 0 ;
 
   _vl_gmm_prepare_for_data (self, numData) ;
 
@@ -1227,7 +1227,7 @@ VL_XCAT(_vl_gmm_em_, SFX)
       VL_PRINTF("gmm: em: entering expectation step\n") ;
       time = vl_get_cpu_time() ;
     }
-    
+
     LL = VL_XCAT(vl_get_gmm_data_posteriors_,SFX)
     (self->posteriors,
      self->numClusters,
@@ -1237,7 +1237,7 @@ VL_XCAT(_vl_gmm_em_, SFX)
      self->dimension,
      self->covariances,
      data) ;
-        
+
     if (self->verbosity > 1) {
       VL_PRINTF("gmm: em: expectation step completed in %.2f s\n",
                 vl_get_cpu_time() - time) ;
@@ -1366,15 +1366,15 @@ VL_XCAT(_vl_gmm_compute_init_sigma_, SFX)
 {
   vl_size dim;
   vl_uindex i;
-  
+
   TYPE * dataMean ;
-  
+
   memset(initSigma,0,sizeof(TYPE)*dimension) ;
   if (numData <= 1) return ;
-  
+
   dataMean = vl_malloc(sizeof(TYPE)*dimension);
   memset(dataMean,0,sizeof(TYPE)*dimension) ;
-  
+
   /* find mean of the whole dataset */
   for(dim = 0 ; dim < dimension ; dim++) {
     for(i = 0 ; i < numData ; i++) {
@@ -1382,7 +1382,7 @@ VL_XCAT(_vl_gmm_compute_init_sigma_, SFX)
     }
     dataMean[dim] /= numData;
   }
-  
+
   /* compute variance of the whole dataset */
   for(dim = 0; dim < dimension; dim++) {
     for(i = 0; i < numData; i++) {
@@ -1391,7 +1391,7 @@ VL_XCAT(_vl_gmm_compute_init_sigma_, SFX)
     }
     initSigma[dim] /= numData - 1 ;
   }
-  
+
   vl_free(dataMean) ;
 }
 

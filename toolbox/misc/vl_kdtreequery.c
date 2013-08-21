@@ -136,9 +136,9 @@ mexFunction(int nout, mxArray *out[],
   }
 
   numComparisons = vl_kdforest_query_with_array (forest, index, numNeighbors, numQueries, distance, query) ;
-  
+
   vl_kdforest_delete(forest) ;
-  
+
   /* adjust for MATLAB indexing */
   for (i = 0 ; i < (signed) (numNeighbors * numQueries) ; ++i) { index[i] ++ ; }
 

@@ -97,7 +97,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     vl_uint32 max_node = 0 ;
     vl_uint32 min_node = 0 ;
     vl_uint32 last_leaf = 0 ;
-    vl_uint32 root = 0 ;
+    /*vl_uint32 root = 0 ;*/
 
     /* exhamine parents for errors and informations */
     for (i = 0 ; i  < P ; ++i) {
@@ -132,15 +132,15 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
      */
 
     last_leaf = min_node - 1 ;
-    root = max_node ;
+    /*root = max_node ;*/
 
     /* process data */
     for (i = 0 ; i < N ; ++i) {
-      int w = 1 ;
+      /*int w = 1 ;*/
       vl_uint32 x = data [i] ;
 
       if (histmode) {
-        w = x ;
+        /*w = x ;*/
         x = i ;
       }
 

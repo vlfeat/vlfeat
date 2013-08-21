@@ -48,9 +48,9 @@ mexFunction(int nout, mxArray *out[],
             int nin, const mxArray *in[])
 {
   mxArray const * descriptor_array ;
-  float const * descriptor ;
-  float const * image ;
-  vl_size width, height, numChannels ;
+  float const * descriptor = NULL ;
+  float const * image = NULL ;
+  vl_size width = 0, height = 0, numChannels = 0 ;
   vl_size cellSize = 16 ;
   vl_size numOrientations = 9 ;
   vl_bool bilinearOrientations = VL_FALSE ;
