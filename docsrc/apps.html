@@ -2,10 +2,23 @@
 
 <group>
 
+<pagestyle>
+#content table.checker {
+    border-collapse: collapse ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+#content table.checker td {
+    background-color: #f6f6f6 ;
+    border: 1px solid #DDD ;
+    padding: 0.5em ;
+}
+</pagestyle>
+
 <p>This page lists a number of sample VLFeat applications. Their code
   can be found in the <code>VLROOT/apps/</code> subdirectory.</p>
 
-<h1 id="apps.caltech-101">Intorductory recognition</h1>
+<h1 id="apps.caltech-101">Basic recognition</h1>
 
 <page id="apps.caltech-101.code" name="caltech-101-code" title="phow_caltech101.m" hide="yes">
   <precode type='matlab'><include src="../apps/phow_caltech101.m" type="text"/></precode>
@@ -31,18 +44,58 @@ machine (SVM) into a linear one</li>
 a <a href="%pathto:apps.caltech-101.code;">single MATLAB M-file</a>,
 and can also be simply adapted to use your own data (change
 conf.calDir).</p>
-<!--
-<h1 id="apps.recognition">Advanced recognition</h1>
 
-<page id="apps.recognition_demo" name="recognition_demo" title="recognition_demo.m" hide="yes">
-  <precode type='matlab'><include src="../apps/recognition/recognition_demo.m" type="text"/></precode>
+<h1 id="apps.recognition">Advanced encodings for recognition</h1>
+
+<page id="apps.recognition.experiments" name="experiments" title="experiments.m" hide="yes">
+  <precode type='matlab'><include src="../apps/recognition/experiments.m" type="text"/></precode>
 </page>
--->
-<p>This application extends the Caltech-101 demo above in many ways:
-it supports multiple encoding methods, including BoVW, VLAD, and
+
+<p>This example application extends the Caltech-101 demo above in many
+ways: it supports multiple encoding methods, including BoVW, VLAD, and
 Fisher Vectors, tweaked image featuers, and multiple benchmark
 datasets. The code is located int <code>apps/recognition</code>. Start
-from the <a href="%pathto:apps.recognition_demo;">main file</a>.</p>
+from the <a href="%pathto:apps.recognition.experiments;">main
+file</a>.</p>
+
+<p>The following tables report results on a few standard benchmark
+datasets (PASCAL VOC 2007 classification challenge, Caltech 101 30
+training images, MIT Scene 67, and Flickr Material Dataset) for a
+number of different encodings:</p>
+
+<table class='checker'>
+<tr><th>method</th><th>VOC07</th><th>Caltech 101</th><th>Scene 67</th><th>FMD</th></tr>
+<tr><td>FV</td><td>59.12% <span style="font-size:8px;">mAP</span></td><td>73.02% <span style="font-size:8px;">Acc</span></td><td>58.25% <span style="font-size:8px;">Acc</span></td><td>59.60% <span style="font-size:8px;">Acc</span></td></tr>
+<tr><td>FV + aug.</td><td>60.25% <span style="font-size:8px;">mAP</span></td><td>75.61% <span style="font-size:8px;">Acc</span></td><td>57.57% <span style="font-size:8px;">Acc</span></td><td>60.80% <span style="font-size:8px;">Acc</span></td></tr>
+<tr><td>FV + s.p.</td><td>62.23% <span style="font-size:8px;">mAP</span></td><td>77.63% <span style="font-size:8px;">Acc</span></td><td>61.83% <span style="font-size:8px;">Acc</span></td><td>60.80% <span style="font-size:8px;">Acc</span></td></tr>
+<tr><td>VLAD + aug.</td><td>54.66% <span style="font-size:8px;">mAP</span></td><td>78.68% <span style="font-size:8px;">Acc</span></td><td>53.29% <span style="font-size:8px;">Acc</span></td><td>49.40% <span style="font-size:8px;">Acc</span></td></tr>
+<tr><td>BOVW + aug.</td><td>49.87% <span style="font-size:8px;">mAP</span></td><td>75.98% <span style="font-size:8px;">Acc</span></td><td>50.22% <span style="font-size:8px;">Acc</span></td><td>46.00% <span style="font-size:8px;">Acc</span></td></tr>
+</table>
+
+<p>The baseline feature is SIFT (<code>vl_dsift</code>) computed at
+seven scales with a factor $\sqrt{2}$ between successive scales, bins
+8 pixel wide, and comptued with a step of 4 pixels. All experiments
+but the Caltech-101 ones start by doubling the resolution of the input
+image. The details of the encodings are as follows:</p>
+
+<ul>
+<li>Bag-of-visual-words uses 4096 vector quantized visual words
+histogram square rooting, followed by $L^2$ normalization (Hellinger's
+kernel).</li>
+<li><a href='%dox:vlad;'>VLAD</a> uses 256 vector quantized visual
+words, signed square-rooting, component wise $L^2$ normalization, and
+global $L^2$ normalization (see <code>vl_vlad</code>).</li>
+<li><a href='%dox:fisher;'>Fisher vectors</a> uses a 256 visual words
+GMM and the improved formulation (signed square-rooting followed by
+$L^2$ normlization, see <code>vl_fisher</code>).</li>
+<li>Learning uses a <a href='%dox:svm;'>linear SVM</a>
+(see <code>vl_svmtrain</code>). The parameter $C$ is set to 10 for all
+dataset except PASCAL VOC, for which it is set to 1.</li>
+<li>Experiments labelled with &ldquo;aug.&rdquo; encode spatial
+information by appending the feature coordinates to the descriptor;
+the ones labelled with &ldquo;s.p.&rdquo; use a spatial pyramid with
+1x1 and 3x1 subdivisions.</li>
+</ul>
 
 <h1 id="apps.sift-mosaic">SIFT mosaic</h1>
 
