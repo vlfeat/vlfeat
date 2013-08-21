@@ -13,7 +13,7 @@
 %   ENC is a vector of the same class of X of size equal to the
 %   product of the data dimension and the number of components.
 %
-%   By default, the standard Fisher vector is computed. VL_FISER()
+%   By default, the standard Fisher vector is computed. VL_FISHER()
 %   accepts the following options:
 %
 %   Normalized::

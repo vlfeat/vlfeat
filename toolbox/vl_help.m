@@ -15,7 +15,8 @@ function vl_help(topic, varargin)
 %        vl_help fisher
 %        vl_help vl_fisher
 %
-%   See: <a href="matlab:vl_help('doc')">VLFeat documentation</a>.
+%   See also the <a href="matlab:vl_help('index')">core VLFeat
+%   documentation</a>.
 
 % Author: Andrea Vedaldi
 

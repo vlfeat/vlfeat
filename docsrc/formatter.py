@@ -209,14 +209,30 @@ class Formatter:
     def addFancyText(self, tag, s):
         "Adds text while transforming function references to links."
         xs = []
-        iter = re.finditer('([A-Z][A-Z0-9_]*)\([^\)]*\)', s)
         last = -1
+        iter = re.finditer(r'(?:'
+                           r'(?P<function>[A-Z][A-Z0-9_]*)'
+                           r'\([^\)]*\)'
+                           r')|(?:'
+                           r'<a href="matlab:vl_help\(\''
+                           r'(?P<page>[a-zA-Z0-9_]*)'
+                           r'\'\)">'
+                           r'(?P<text>[^<]*)'
+                           r'</a>'
+                           r')',s)
+
+                           # r'(?P<page>[a-zA-Z0-9_]*)'
+                           # r')', s)
+
+
+
+                           # r')', s)
 
         for i in iter:
-            func_name = i.group(1)
+            func_name = i.group("function")
+            page_name = i.group("page")
 
-            # lookup function name in dictionary
-            if self.funcs.has_key(func_name.upper()):
+            if func_name and self.funcs.has_key(func_name.upper()):
                 # retrieve function HTML location
                 func_href = self.funcs[func_name.upper()]
 
@@ -226,17 +242,35 @@ class Formatter:
                 if self.linktype == 'a':
                     # add link to function
                     atag = self.xmldoc.createElement(u"a")
-                    self.addText(atag, i.group(1))
+                    self.addText(atag, i.group('function'))
                     atag.setAttribute(u"href", u"%s" % (func_href))
                     xs.append(atag)
                 elif self.linktype == 'wiki':
-                    linktxt = "[[%s|%s]]" % (func_href, i.group(1))
+                    linktxt = "[[%s|%s]]" % (func_href, i.group('function'))
                     xs.append(self.toTextNode(linktxt))
 
                 # set head
                 last = i.start()+len(i.group(1))-1
-            #else:
-            #    print "function: %s not found" % func_name
+
+            elif page_name:
+                #print "page %s:" % page_name, i.group("text")
+                page_href = "%%dox:%s;" % page_name
+
+                # add text so far
+                xs.append(self.toTextNode(s[last+1:i.start()]))
+
+                if self.linktype == 'a':
+                    # add link to function
+                    atag = self.xmldoc.createElement(u"a")
+                    self.addText(atag, i.group('text'))
+                    atag.setAttribute(u"href", u"%s" % (page_href))
+                    xs.append(atag)
+                elif self.linktype == 'wiki':
+                    linktxt = "[[%s|%s]]" % (func_href, i.group('function'))
+                    xs.append(self.toTextNode(linktxt))
+
+                # set head
+                last = i.end()-1
 
         xs.append(self.toTextNode(s[last+1:]))
         for x in xs:
@@ -511,8 +545,7 @@ class Formatter:
 
 
 if __name__ == '__main__':
-    text="""
- Lorem Ipsum is simply dummy text of the printing and typesetting
+    text=""" Lorem Ipsum is simply dummy text of the printing and typesetting
  industry. Lorem Ipsum has been the industry's standard dummy text
  ever since the 1500s, when an unknown printer took a galley of type
  and scrambled it to make a type specimen book. It has survived not
@@ -521,6 +554,8 @@ if __name__ == '__main__':
  the release of Letraset sheets containing Lorem Ipsum passages, and
  more recently with desktop publishing software like Aldus PageMaker
  including versions of Lorem Ipsum.
+
+ Also <a href="matlab:vl_help('fisher')">Fisher vectors</a>.
 
  These are links BL(), BL(A,B) and BLA(A,A) (as long as the dictionary
  cites them).
