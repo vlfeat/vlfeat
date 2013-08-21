@@ -15,8 +15,9 @@
 }
 </pagestyle>
 
-<p>This page lists a number of sample VLFeat applications. Their code
-  can be found in the <code>VLROOT/apps/</code> subdirectory.</p>
+<p>This page lists a number of example VLFeat applications. The code
+can be found in the <code>VLROOT/apps/</code> subdirectory in the
+VLFeat package.</p>
 
 <h1 id="apps.caltech-101">Basic recognition</h1>
 
@@ -53,7 +54,7 @@ conf.calDir).</p>
 
 <p>This example application extends the Caltech-101 demo above in many
 ways: it supports multiple encoding methods, including BoVW, VLAD, and
-Fisher Vectors, tweaked image featuers, and multiple benchmark
+Fisher Vectors, tweaked image features, and multiple benchmark
 datasets. The code is located int <code>apps/recognition</code>. Start
 from the <a href="%pathto:apps.recognition.experiments;">main
 file</a>.</p>
@@ -74,7 +75,7 @@ number of different encodings:</p>
 
 <p>The baseline feature is SIFT (<code>vl_dsift</code>) computed at
 seven scales with a factor $\sqrt{2}$ between successive scales, bins
-8 pixel wide, and comptued with a step of 4 pixels. All experiments
+8 pixel wide, and computed with a step of 4 pixels. All experiments
 but the Caltech-101 ones start by doubling the resolution of the input
 image. The details of the encodings are as follows:</p>
 
@@ -87,7 +88,7 @@ words, signed square-rooting, component wise $L^2$ normalization, and
 global $L^2$ normalization (see <code>vl_vlad</code>).</li>
 <li><a href='%dox:fisher;'>Fisher vectors</a> uses a 256 visual words
 GMM and the improved formulation (signed square-rooting followed by
-$L^2$ normlization, see <code>vl_fisher</code>).</li>
+$L^2$ normalization, see <code>vl_fisher</code>).</li>
 <li>Learning uses a <a href='%dox:svm;'>linear SVM</a>
 (see <code>vl_svmtrain</code>). The parameter $C$ is set to 10 for all
 dataset except PASCAL VOC, for which it is set to 1.</li>
