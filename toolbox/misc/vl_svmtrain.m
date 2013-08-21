@@ -1,4 +1,4 @@
-%VL_SVMTRAIN Train a Support Vector Machine
+% VL_SVMTRAIN   Train a Support Vector Machine
 %   [W B] = VL_SVMTRAIN(X, Y, LAMBDA) trains a linear Support Vector
 %   Machine (SVM) from the data vectors X and the labels Y. X is a D
 %   by N matrix, with one column per example and D feature dimensions
@@ -136,22 +136,11 @@
 %
 %     Alternatively, VL_SVMTRAIN() can be used for evaluation too:
 %
-%       [~,~,~, scores] = vl_svmtrain(xtest, y, 0, 'model', w, 'bias', b, 'solver', 'NONE') ;
+%       [~,~,~, scores] = vl_svmtrain(xtest, y, 0, 'model', w, 'bias', b, 'solver', 'none') ;
 %
 %     The latter form is particularly useful when X is a DATASET structure.
 %
-%   REFERENCES::
-%
-%   [1] S. Shalev-Shwartz, Y. Singer, and N. Srebro.
-%        Pegasos: Primal estimated sub-GrAdient SOlver for SVM. In Proc. ICML, 2007.
-%
-%   [2] Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya Keerthi, and S. Sundararajan. 
-%       A dual coordinate descent method for large-scale linear SVM. Proc. ICML, 2008.
-%
-%   [3] S. Shalev-Shwartz and T. Zhang.
-%       Stochastic Dual Coordinate Ascent Methods for Regularized Loss Minimization.
-%       In Proc. NIPS, 2012.
-%
-%   See also: VL_SVMDATASET(), VL_HELP().
+%   See also: <a href="matlab:vl_help('svm')">SVM fundamentals</a>,
+%   VL_SVMDATASET(), VL_HELP().
 
 % AUTHORIGHTS
