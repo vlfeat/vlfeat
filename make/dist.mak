@@ -206,14 +206,7 @@ post-doc:
 	      --perms                                                \
 	      --group=lab                                            \
 	      --chmod=Dg+s,g+w,o-w                                   \
-	      --exclude=*.eps                                        \
-	      --exclude=download                                     \
-	      --exclude=cvpr10wiki                                   \
-	      --exclude=benchmarks                                   \
-	      --exclude=man-src                                      \
-	      --exclude=mdoc.build                                   \
-	      --exclude=.htaccess                                    \
-	      --exclude=favicon.ico                                  \
+	      --exclude=build                                        \
 	      --delete                                               \
 	      --progress                                             \
 	      $(TMPDIR)/$(NAME)-$(VER)/doc/ $(HOST)
