@@ -1,7 +1,26 @@
 function experiments()
+% EXPERIMENTS   Run image classification experiments
+%    The experimens download a number of benchmark datasets in the
+%    'data/' subfolder. Make sure that there are several GBs of
+%    space available.
+%
+%    By default, experiments run with a lite option turned on. This
+%    quickly runs all of them on tiny subsets of the actual data.
+%    This is used only for testing; to run the actual experiments,
+%    set the lite variable to false.
+%
+%    Running all the experiments is a slow process. Using parallel
+%    MATLAB and several cores/machiens is suggested.
 
-lite = false ;
-%lite = 1 ;
+% Author: Andrea Vedaldi
+
+% Copyright (C) 2013 Andrea Vedaldi
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
+
+lite = true ;
 clear ex ;
 
 ex(1).prefix = 'fv-aug' ;

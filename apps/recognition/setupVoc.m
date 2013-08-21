@@ -1,6 +1,24 @@
 function imdb = setupVoc(datasetDir, varargin)
 % SETUPVOC    Setup PASCAL VOC data
-%   IMDB = SETUPVOC(DATASETDIR, 'EDITION', '2007')
+%   IMDB = SETUPVOC(DATASETDIR, 'EDITION', '2007') setups the
+%   PASCAL VOC 2007 data. This is similar to SETUPGENERIC(), but adapted
+%   to the peculiarities of this dataset. In particular, the
+%   difficult image flag and the fact that multiple labels apply to
+%   each image are supported.
+%
+%   Note that only the PASCAL VOC 2007 data comes with test images
+%   and labels. For the other editions, setting up the test images
+%   cannot be automatized due to restrictions in the distribution.
+%
+%   See also: SETUPGENERIC().
+
+% Author: Andrea Vedaldi
+
+% Copyright (C) 2013 Andrea Vedaldi
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 opts.edition = '2007' ;
 opts.autoDownload = true ;

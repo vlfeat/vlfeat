@@ -66,7 +66,6 @@ function imdb = setupGeneric(datasetDir, varargin)
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
-
 opts.lite = false ;
 opts.numTrain = 50 ;
 opts.numVal = 0 ;

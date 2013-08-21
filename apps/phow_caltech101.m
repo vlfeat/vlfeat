@@ -43,7 +43,13 @@ function phow_caltech101()
 %     label = model.classify(model, im) ;
 %
 
-% AUTORIGHTS
+% Author: Andrea Vedaldi
+
+% Copyright (C) 2011-2013 Andrea Vedaldi
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
 
 conf.calDir = 'data/caltech-101' ;
 conf.dataDir = 'data/' ;
