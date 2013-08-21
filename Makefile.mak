@@ -139,6 +139,7 @@ objdir = $(bindir)\objs
 CFLAGS = /nologo /TC /MD \
          /D"_CRT_SECURE_NO_DEPRECATE" \
          /D"__LITTLE_ENDIAN__" \
+         /D"VL_DISABLE_AVX" \
          /I. \
          /W1 /Zp8 /openmp
 

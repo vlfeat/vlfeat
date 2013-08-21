@@ -709,9 +709,9 @@ mexFunction(int nout, mxArray *out[],
           break ;
         }
         case VL_COVDET_DESC_LIOP :
-        {
-          // TODO: get parameters form input
+        {          // TODO: get parameters form input
           vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
+          vl_size dimension ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
           vl_index i ;
 
@@ -722,7 +722,7 @@ mexFunction(int nout, mxArray *out[],
           if (!vl_is_nan_f(liopIntensityThreshold)) {
             vl_liopdesc_set_intensity_threshold(liop, liopIntensityThreshold) ;
           }
-          vl_size dimension = vl_liopdesc_get_dimension(liop) ;
+          dimension = vl_liopdesc_get_dimension(liop) ;
           if (verbose) {
             mexPrintf("vl_covdet: descriptors: type=liop, "
                       "resolution=%d, extent=%g, smoothing=%g\n",

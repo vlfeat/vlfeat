@@ -189,6 +189,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vl\gmm.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\gmm.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vl\heap-def.h"
 				>
 			</File>
@@ -298,6 +306,14 @@
 			</File>
 			<File
 				RelativePath=".\vl\mathop.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\mathop_avx.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vl\mathop_avx.h"
 				>
 			</File>
 			<File
@@ -639,10 +655,6 @@
 		</Filter>
 		<File
 			RelativePath=".\Makefile.mak"
-			>
-		</File>
-		<File
-			RelativePath=".\readme.txt"
 			>
 		</File>
 	</Files>

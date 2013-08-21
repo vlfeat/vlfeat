@@ -880,6 +880,8 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
 
   /* search for cluster with negligible weight and reassign them to fat clusters */
   for (i_cl = 0 ; i_cl < (signed)numClusters ; ++i_cl) {
+    double size = - VL_INFINITY_D ;
+    vl_index best = -1 ;
 
     if (mass[i_cl] >= VL_GMM_MIN_POSTERIOR *
         VL_MAX(1.0, (double) self->numData / self->numClusters))
@@ -890,9 +892,6 @@ VL_XCAT(_vl_gmm_restart_empty_modes_, SFX) (VlGMM * self, TYPE const * data)
     if (self->verbosity) {
       VL_PRINTF("gmm: mode %d is nearly empty (mass %f)\n", i_cl, mass[i_cl]) ;
     }
-
-    double size = - VL_INFINITY_D ;
-    vl_index best = -1 ;
 
     /*
      Search for the cluster that (approximately)
