@@ -3,13 +3,43 @@ function imdb = setupVoc(datasetDir, varargin)
 %   IMDB = SETUPVOC(DATASETDIR, 'EDITION', '2007')
 
 opts.edition = '2007' ;
+opts.autoDownload = true ;
 opts.lite = false ;
 opts = vl_argparse(opts, varargin) ;
 
 switch opts.edition
-  case {'2007', '2008', '2010', '2011', '2012'}
+  case '2007'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2007/VOCtrainval_06-Nov-2007.tar', ...
+            'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2007/VOCtest_06-Nov-2007.tar'} ;
+  case '2008'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2008/VOCtrainval_14-Jul-2008.tar'} ;
+  case '2009'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2009/VOCtrainval_11-May-2009.tar'} ;
+  case '2010'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2010/VOCtrainval_03-May-2010.tar'} ;
+  case '2011'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2011/VOCtrainval_25-May-2011.tar'} ;
+  case '2012'
+    urls = {'http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2012/VOCtrainval_11-May-2012.tar'} ;
   otherwise
     error('Unknown PASCAL VOC edition ''%s''.', opts.edition) ;
+end
+
+% Download and unpack
+vl_xmkdir(datasetDir) ;
+if exist(fullfile(datasetDir, ['VOC' opts.edition], 'Annotations'))
+  % ok
+elseif exist(fullfile(datasetDir, 'VOCdevkit', ['VOC' opts.edition], 'Annotations'))
+  % ok
+  datasetDir = fullfile(datasetDir, 'VOCdevkit') ;
+elseif opts.autoDownload
+  for i = 1:length(urls)
+    fprintf('Downloading VOC data ''%s'' to ''%s''. This will take a while.', urls{i}, datasetDir) ;
+    untar(urls{i}, datasetDir) ;
+  end
+  datasetDir = fullfile(datasetDir, 'VOCdevkit') ;
+else
+  error('VOC data not found in %s', datasetDir) ;
 end
 
 imdb.images.id = [] ;
@@ -23,7 +53,7 @@ imdb.meta.classes = {'aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'c
 imdb.imageDir = fullfile(datasetDir, ['VOC', opts.edition], 'JPEGImages') ;
 
 % Get the list of images
-map = containers.Map() ;  
+map = containers.Map() ;
 j = 0 ;
 for si = 1:numel(imdb.meta.sets)
   setName = imdb.meta.sets{si} ;
