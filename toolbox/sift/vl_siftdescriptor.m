@@ -6,7 +6,7 @@
 %   GRAD(2,:,:) contains the gradient angle (measured in radians,
 %   clockwise, starting from the X axis -- this assumes that the Y
 %   axis points down). The matrix F contains one column per keypoint
-%   with the X, Y, SGIMA and ANLGE parameters.
+%   with the X, Y, SIGMA and ANGLE parameters.
 %
 %   In order to match the standard SIFT descriptor, the gradient GRAD
 %   should be calculated after mapping the image to the keypoint
