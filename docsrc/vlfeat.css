@@ -70,6 +70,8 @@ code a {
 #sidebar ul {
     margin: 1em 0 ;
     padding: 0 ;
+    padding-right: 1.1em ;
+    line-height: 1em ;
 }
 #sidebar ul ul {
     margin: 0 ;
@@ -81,7 +83,7 @@ code a {
     font-weight: bold ;
 }
 #sidebar li li {
-    margin: 0.2em 0 ;
+    margin: 0.5em 0 ;
     margin-left: 1em ;
     font-weight: normal ;
 }
