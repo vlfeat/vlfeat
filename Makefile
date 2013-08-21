@@ -78,7 +78,11 @@
 # components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust parameters.
 
-# AUTORIGHTS
+# Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
+# All rights reserved.
+#
+# This file is part of the VLFeat library and is made available under
+# the terms of the BSD license (see the COPYING file).
 
 SHELL = /bin/bash
 

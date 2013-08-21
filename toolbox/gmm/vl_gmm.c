@@ -4,12 +4,12 @@
  **/
 
 /*
- Copyright (C) 2013 David Novotny.
- All rights reserved.
+Copyright (C) 2013 David Novotny.
+All rights reserved.
 
- This file is part of the VLFeat library and is made available under
- the terms of the BSD license (see the COPYING file).
- */
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
 #include <vl/gmm.h>
 #include <mexutils.h>

@@ -29,13 +29,13 @@
 %     probabilities.
 %
 %   InitMeans:: none
-%    Specify the initial means (size(X,1)-by-NUMCLUSTERS matrix).
+%     Specify the initial means (size(X,1)-by-NUMCLUSTERS matrix).
 %
 %   InitPriors:: none
-%    Specify the initial weights (a vector of dimension NUMCLUSTER).
+%     Specify the initial weights (a vector of dimension NUMCLUSTER).
 %
 %   InitCovariances:: none
-%    Specify the initial diagonal covariance matrices
+%     Specify the initial diagonal covariance matrices
 %
 %   NumRepetitions:: 1
 %     Number of times to restart EM. The solution with maximum
