@@ -579,18 +579,17 @@ mexFunction(int nout, mxArray *out[],
 
     /* orientation estimation if needed */
     if (estimateOrientation) {
-      if (verbose) {
-        vl_size numFeaturesBefore = vl_covdet_get_num_features(covdet) ;
-        mexPrintf("vl_covdet: estimating orientations for %d features\n", numFeaturesBefore) ;
-      }
+      vl_size numFeaturesBefore = vl_covdet_get_num_features(covdet) ;
+      vl_size numFeaturesAfter ;
 
       vl_covdet_extract_orientations(covdet) ;
 
-      if (verbose) {
-        vl_size numFeaturesAfter = vl_covdet_get_num_features(covdet) ;
-        mexPrintf("vl_covdet: %d features after estimating orientations\n", numFeaturesAfter) ;
+      numFeaturesAfter = vl_covdet_get_num_features(covdet) ;
+      if (verbose && numFeaturesAfter > numFeaturesBefore) {
+        mexPrintf("vl_covdet: %d duplicate features were crated due to ambiguous "
+                  "orientation detection (%d total)\n",
+                  numFeaturesAfter - numFeaturesBefore, numFeaturesAfter) ;
       }
-
     }
 
     /* store results back */
