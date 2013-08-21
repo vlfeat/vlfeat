@@ -272,7 +272,6 @@ mexsrc = \
   toolbox\misc\vl_kdtreequery.c \
   toolbox\misc\vl_lbp.c \
   toolbox\misc\vl_localmax.c \
-  toolbox\misc\vl_maketrainingset.c \
   toolbox\misc\vl_sampleinthist.c \
   toolbox\misc\vl_simdctrl.c \
   toolbox\misc\vl_svmtrain.c \
