@@ -19,7 +19,12 @@ info: bin-info
 # --------------------------------------------------------------------
 
 BIN_CFLAGS = $(STD_CFLAGS) -I$(VLDIR)
-BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl
+BIN_CFLAGS += $(if $(DISABLE_THREADS),,-pthread)
+BIN_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
+
+BIN_LDFLAGS = $(STD_LDFLAGS) -L$(BINDIR) -lvl -lm
+BIN_LDFLAGS += $(if $(DISABLE_THREADS),,-lpthread)
+BIN_LDFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)

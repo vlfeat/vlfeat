@@ -31,21 +31,32 @@ endif
 
 info: mex-info matlab-info
 
+# $(call escape, string) escapes $ symbol for shell
+escape =$(subst $$,\\$$,$(1))
+
 MEX_ARCH = $(ARCH)
 
-MEX_CFLAGS = -I$(VLDIR) -I$(VLDIR)/toolbox
-MEX_LDFLAGS = -L$(BINDIR) -lvl
+# MEX_CLFAGS and MEX_LDFLAGS contain standard flags, that would
+# be understood the C compiler directly. MEX_FLAGS contain any
+# additional parameter to be passed to MEX directly. This includes
+# C compiler options that are not understood by MEX by default and
+# MEX specific options.
 
-MEX_FLAGS = $(MEXFLAGS)
-MEX_FLAGS += -$(MEX_ARCH)
-MEX_FLAGS += $(if $(DEBUG), -g, -O)
-MEX_FLAGS += $(if $(PROFILE), -O -g,)
-MEX_FLAGS += CFLAGS='$$CFLAGS $(STD_CFLAGS)'
+MEX_CFLAGS = $(LINK_DLL_CFLAGS) -Itoolbox
+MEX_LDFLAGS = $(LINK_DLL_LDFLAGS) -lm
+
+MEX_FLAGS = \
+$(MEXFLAGS) \
+-$(MEX_ARCH) \
+$(if $(VERB),-v,) \
+$(if $(DEBUG),-g,-O) \
+$(if $(PROFILE),-g -O,) \
+CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))' \
+LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
 endif
@@ -54,7 +65,6 @@ endif
 ifeq ($(ARCH),maci64)
 MEX_SUFFIX := mexmaci64
 MEX_FLAGS += -largeArrayDims
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
 endif
@@ -62,14 +72,12 @@ endif
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
 MEX_SUFFIX := mexglx
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
 MEX_SUFFIX := mexa64
 MEX_FLAGS += -largeArrayDims
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
 endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
@@ -78,7 +86,7 @@ MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 #                                                         Sanity check
 # --------------------------------------------------------------------
 
-err_no_mex_suffix  = $(shell echo "** Could not set MEX_SUFFIX for ARCH = $(ARCH)"  1>&2)
+err_no_mex_suffix = $(shell echo "** Could not set MEX_SUFFIX for ARCH = $(ARCH)"  1>&2)
 err_no_mex_suffix +=no_mex_suffix
 
 ifeq ($(MEX_SUFFIX),)
@@ -116,46 +124,50 @@ $(eval $(call gendir, mex, $(MEX_BINDIR)))
 # generate mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
+# Create a copy of the VLFeat DLL that links to MATLAB OpenMP library
+# (Intel OMP 5) rather than the system one. The Intel library is
+# binary compatible with GCC. This avoids running two OpenMP
+# subsystems when VLFeat runs within MATLAB.
+
 $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
-	$(call C,CC) -m64								\
-                    -dynamiclib								\
-                    -undefined suppress							\
-                    -flat_namespace							\
-                    -install_name @loader_path/lib$(DLL_NAME).dylib			\
-	            -compatibility_version $(VER)					\
-                    -current_version $(VER)						\
-                    -isysroot $(SDKROOT)						\
-		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
-	            $(DLL_LDFLAGS)							\
-	            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
-	            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
-                    $(dll_obj)								\
-                    -o $@
+	$(call C,CC)                                                            \
+	    -m64								\
+	    -dynamiclib								\
+	    -undefined suppress							\
+	    -flat_namespace							\
+	    -install_name @loader_path/lib$(DLL_NAME).dylib			\
+	    -compatibility_version $(VER)					\
+	    -current_version $(VER)						\
+	    -isysroot $(SDKROOT)						\
+	    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
+	    $(filter-out, -fopenmp, $(DLL_LDFLAGS))                             \
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
+	    $(dll_obj)								\
+	   -o $@
 
 $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
-	$(call C,CC) -shared								\
-	    $(dll_obj)									\
-            $(DLL_LDFLAGS)								\
-	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)                      \
-            $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)		\
-	    -o $(@)
-
-#$(mex_dll) : $(dll_tgt) $(mex-dir)
-#	cp -v "$(<)" "$(@)"
+	$(call C,CC) -shared							\
+	    $(dll_obj)							        \
+	    $(filter-out, -fopenmp, $(DLL_LDFLAGS))                             \
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)   \
+	   -o $(@)
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
-	$(call C,CC) \
-	       $(MEX_CFLAGS) \
-	       -I"$(MATLAB_PATH)/extern/include" -M -MT \
-	       '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d' \
-	       "$(<)" -MF "$(@)"
+	$(call C,CC)								\
+	    -M									\
+	    -MF "$(@)"								\
+	    -MT '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'		\
+	    -I"$(MATLAB_PATH)/extern/include"					\
+	    $(MEX_CFLAGS) "$(<)"
 
 $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
-	$(call C,MEX) \
-	       $(MEX_FLAGS) \
-               $(MEX_CFLAGS) \
-               "$(<)" \
-	       $(MEX_LDFLAGS) \
+	$(call C,MEX)								\
+	    $(MEX_FLAGS)							\
+	    $(MEX_CFLAGS)							\
+	    "$(<)"								\
+	    $(MEX_LDFLAGS)							\
 	       -outdir "$(dir $(@))"
 
 mex-info:

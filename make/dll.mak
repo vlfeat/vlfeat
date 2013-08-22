@@ -18,15 +18,36 @@ info: dll-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
+# LINK_DLL_CLFAGS and LINK_DLL_LDFLAGS are the compiler options needed
+# to link to the VLFeat DLL. DLL_CLFAGS and DLL_LDFLAGS the options to
+# build the DLL.
+
 DLL_NAME = vl
 
-DLL_CFLAGS  = $(STD_CFLAGS)
-DLL_CFLAGS += -fvisibility=hidden -fPIC -DVL_BUILD_DLL -pthread
-DLL_CFLAGS += $(call if-like,%_sse2,$*, $(if $(DISABLE_SSE2),,-msse2))
-DLL_CFLAGS += $(call if-like,%_avx,$*, $(if $(DISABLE_AVX),,-mavx))
-DLL_CFLAGS += $(if $(DISABLE_OPENMP),,-fopenmp)
+LINK_DLL_CFLAGS = \
+$(if $(DISABLE_THREADS),-DVL_DISABLE_THREADS) \
+$(if $(DISABLE_OPENMP),-DVL_DISABLE_OPENMP) \
+$(if $(DISABLE_SSE2),-DVL_DISABLE_SSE2) \
+$(if $(DISABLE_AVX),-DVL_DISABLE_AVX) \
+-I$(VLDIR)
 
-DLL_LDFLAGS += -lm -lpthread
+LINK_DLL_LDFLAGS =\
+-L$(BINDIR) -lvl
+
+DLL_CFLAGS = \
+$(STD_CFLAGS) \
+-fvisibility=hidden -fPIC -DVL_BUILD_DLL \
+$(LINK_DLL_CFLAGS) \
+$(call if-like,%_sse2,$*, $(if $(DISABLE_SSE2),,-msse2)) \
+$(call if-like,%_avx,$*, $(if $(DISABLE_AVX),,-mavx)) \
+$(if $(DISABLE_THREADS),,-pthread) \
+$(if $(DISABLE_OPENMP),,-fopenmp)
+
+DLL_LDFLAGS = \
+$(STD_LDFLAGS) \
+-lm \
+$(if $(DISABLE_THREADS),,-lpthread) \
+$(if $(DISABLE_OPENMP),,-fopenmp)
 
 BINDIR = bin/$(ARCH)
 
@@ -86,35 +107,37 @@ dll: $(dll_tgt)
 $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
 
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
-	$(call C,CC) $(DLL_CFLAGS)                                   \
-	       -c "$(<)" -o "$(@)"
+	$(call C,CC)                                            \
+	     -c -o "$(@)"                                       \
+	     $(DLL_CFLAGS) "$(<)"
 
 $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
-	$(call C,CC) $(DLL_CFLAGS)                                   \
-	       -M -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
-	       "$(<)" -MF "$(@)"
+	$(call C,CC)						\
+	     -M							\
+	     -MF "$(@)"						\
+	     -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
+	     $(DLL_CFLAGS) "$(<)"
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
-	$(call C,CC) -m64                                            \
-                    -dynamiclib                                      \
-                    -undefined suppress                              \
-                    -flat_namespace                                  \
-                    -install_name @loader_path/lib$(DLL_NAME).dylib  \
-	            -compatibility_version $(VER)                    \
-                    -current_version $(VER)                          \
-                    -isysroot $(SDKROOT)                             \
-		    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET) \
-	            $(DLL_LDFLAGS)                                   \
-	            $(if $(DISABLE_OPENMP),,-fopenmp)                \
-                    $^                                               \
-                    -o $@
+	$(call C,CC)						\
+	  -m64							\
+	  -dynamiclib						\
+	  -undefined suppress					\
+	  -flat_namespace					\
+	  -install_name @loader_path/lib$(DLL_NAME).dylib	\
+	  -compatibility_version $(VER)				\
+	  -current_version $(VER)				\
+	  -isysroot $(SDKROOT)					\
+	  -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)	\
+	  $(DLL_LDFLAGS)					\
+	  $(^)							\
+	  -o "$(@)"
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
-	$(call C,CC) -shared    \
-	    $(^)                \
-	    $(DLL_LDFLAGS)	\
-	    $(if $(DISABLE_OPENMP),,-fopenmp) \
-	    -o $(@)
+	$(call C,CC) -shared                                    \
+	    $(^)                                                \
+	    $(DLL_LDFLAGS)	                                \
+	    -o "$(@)"
 
 dll-clean:
 	rm -f $(dll_dep) $(dll_obj)
@@ -133,6 +156,8 @@ dll-info:
 	$(call dump-var,dll_dep)
 	$(call echo-var,BINDIR)
 	$(call echo-var,DLL_NAME)
+	$(call echo-var,LINK_DLL_CFLAGS)
+	$(call echo-var,LINK_DLL_LDFLAGS)
 	$(call echo-var,DLL_CFLAGS)
 	$(call echo-var,DLL_LDFLAGS)
 	$(call echo-var,DLL_SUFFIX)

@@ -147,13 +147,8 @@ LIBTOOL ?= libtool
 STD_CLFAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99
 STD_CFLAGS += -Wall -Wextra
-
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-STD_CFLAGS += $(if $(DISABLE_THREADS), -DVL_DISABLE_THREADS)
-STD_CFLAGS += $(if $(DISABLE_SSE2), -DVL_DISABLE_SSE2)
-STD_CFLAGS += $(if $(DISABLE_OPENMP), -DVL_DISABLE_OPENMP)
 STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
-STD_CFLAGS += $(if $(DISABLE_AVX), -DVL_DISABLE_AVX)
 STD_CFLAGS += $(if $(PROFILE), -g)
 
 STD_LDFLAGS = $(LDFLAGS)
@@ -162,18 +157,16 @@ STD_LDFLAGS = $(LDFLAGS)
 
 # Mac OS X Intel 32
 ifeq ($(ARCH),maci)
-#SDKROOT ?= $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-DISABLE_AVX ?= yes
+DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
 CC = gcc
 endif
 
 # Mac OS X Intel 64
 ifeq ($(ARCH),maci64)
-#SDKROOT ?= $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
@@ -188,14 +181,14 @@ ifeq ($(ARCH),glnx86)
 # 1) _GNU_SOURCE avoids using isoc99_fscanf, limiting binray portability to recent GLIBC.
 # 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
 STD_CFLAGS += -m32 -D_GNU_SOURCE -fno-stack-protector
-STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
+STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 CC ?= gcc
 endif
 
 # Linux-64
 ifeq ($(ARCH),glnxa64)
 STD_CFLAGS += -D_GNU_SOURCE -fno-stack-protector
-STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
+STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 CC ?= gcc
 endif
 
