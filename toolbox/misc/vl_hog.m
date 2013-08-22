@@ -37,6 +37,9 @@
 %
 %   Example:: computing and visualizing HOG features
 %     hog = vl_hog(im2single(im)) ; % compute HOG features
+%
+%   See also: <a href="matlab:vl_help('hog')">HOG fundamentals</a>,
+%   VL_HELP().
 
 % Author: Andrea Vedaldi
 
