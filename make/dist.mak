@@ -192,15 +192,14 @@ dist-bin-info:
 #                                             Post packages on the web
 # --------------------------------------------------------------------
 
-.PHONY: post, post-doc
+.PHONY: post, post-doc, post-doc-from-dist
 
 post:
 	$(RSYNC)                                                     \
 	    -aP $(DIST).tar.gz $(BINDIST).tar.gz                     \
 	    $(HOST)/download
 
-post-doc:
-	tar xzvf $(BINDIST).tar.gz -C $(TMPDIR)/ $(NAME)-$(VER)/doc/
+rsync-doc = \
 	$(RSYNC)                                                     \
 	      --recursive                                            \
 	      --perms                                                \
@@ -209,7 +208,13 @@ post-doc:
 	      --exclude=build                                        \
 	      --delete                                               \
 	      --progress                                             \
-	      $(TMPDIR)/$(NAME)-$(VER)/doc/ $(HOST)
+
+post-doc:
+	$(rsync-doc) doc/ $(HOST)
+
+post-doc-from-dist: dist-bin
+	tar xzvf $(BINDIST).tar.gz -C $(TMPDIR)/ $(NAME)-$(VER)/doc/
+	$(rsync-doc) $(TMPDIR)/$(NAME)-$(VER)/doc/ $(HOST)
 
 # Local variables:
 # mode: Makefile
