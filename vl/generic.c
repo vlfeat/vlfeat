@@ -71,7 +71,8 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage mexutils.h  "MATLAB MEX helper functions"
   - @subpage getopt_long.h "Drop-in @c getopt_long replacement"
 
-- **General support functionalities**
+- **General information**
+  - @subpage conventions
   - @subpage generic
   - @subpage portability
   - @ref resources
@@ -133,6 +134,50 @@ references anything but memory, this guarantees that all allocated
 resources are properly disposed (avoiding leaking resource). This is
 used extensively in the design of MATLAB MEX files (see @ref
 matlab).
+**/
+
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page conventions Conventions
+@author Andrea Vedaldi
+@tablefocontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+This page summarizes some of the conventions used by the library.
+
+@section conventions-storage Matrix and image storage conventions
+
+If not otherwise specified, matrices in VLFeat are stored in memory in
+<em>column major</em> order. Givean a matrix $[A_{ij}] \in \real^{m
+\times n}$, this amounts of enumerating the elements one column per
+time: $A_{11}, A_{21}, \dots, A_{m1}, A_{12}, \dots, A_{mn}$. This
+convention is compatible with Fortran, MATLAB, and popular numerical
+libraries.
+
+Matrices are often used in the library to pack a number data vectors
+$\bx_1,\dots,\bx_n \in \real^m$ of equal dimension together. These are
+normally stored as the columns of the matrix:
+
+\[
+X = \begin{bmatrix} \bx_1, \dots, \bx_n \end{bmatrix},
+\qquad
+X \in \real_{m\times n}
+\]
+
+In this manner, consecutive elements of each data vector $\bx_i$ is
+stored in consecutive memory locations, improving memory access
+locality in most algorithms.
+
+Images $I(x,y)$ are stored instead in <em>row-major</em> order,
+i.e. one row after the other. Note that an image can be naturally
+identified as a matrix $I_{yx}$, where the vertical coordinate $y$
+indexes the rows and the horizontal coordinate $x$ the columns. The
+image convention amounts to storing this matrix in row-major rather
+than column-major order, which is in conflict with the rule given
+above. The reason for this choice is that most image processing and
+graphical libraries assume this convention; it is, however,
+<em>not</em> the same as MATLAB's.
+
 **/
 
 /**
