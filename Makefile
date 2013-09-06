@@ -89,6 +89,11 @@ SHELL = /bin/bash
 .PHONY : all
 all:
 
+# Pant-
+PREFIX := /usr/local
+PATH_INSTALL := $(PREFIX)/lib
+PATH_INCLUDE := $(PREFIX)/include
+
 # Select which features to disable
 # DISABLE_SSE2=yes
 # DISABLE_AVX=yes
@@ -310,6 +315,8 @@ clean:
 archclean: clean
 
 distclean:
+
+install: dll-install
 
 info:
 	$(call echo-title,General settings)
