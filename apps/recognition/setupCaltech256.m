@@ -68,11 +68,11 @@ imdb = setupGeneric(datasetDir, ...
 switch opts.variant
   case 'caltech101'
   case 'caltech256'
-    imdb.images.sets(classes == 257) = 0 ;
-    ok = find(imdb.images.sets ~= 0) ;
-    imdb.images.id = ids(ok) ;
-    imdb.images.name = names(ok) ;
-    imdb.images.set = sets(ok) ;
-    imdb.images.class = classes(ok) ;
+    imdb.images.set(imdb.images.class == 257) = 0 ;
+    ok = find(imdb.images.set ~= 0) ;
+    imdb.images.id = imdb.images.id(ok) ;
+    imdb.images.name = imdb.images.name(ok) ;
+    imdb.images.set = imdb.images.set(ok) ;
+    imdb.images.class = imdb.images.class(ok) ;
 end
 
