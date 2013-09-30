@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2D0E8A7A1786D18D005419DC /* vl_vlad.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D141E2B178376CA00E2958B /* vl_vlad.c */; };
 		2D0E8A7C1786D18D005419DC /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2D117999178C1EA900311182 /* mathop_avx.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D117997178C1EA900311182 /* mathop_avx.c */; };
 		2D11799A178C1EA900311182 /* mathop_avx.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D117998178C1EA900311182 /* mathop_avx.h */; };
@@ -54,6 +53,9 @@
 		2DA64CE11733089000276F3D /* svm.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DA64CE01733089000276F3D /* svm.c */; };
 		2DB3F05D1605ED2300862CCA /* vl_covdet.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DB3F04F1605DFDB00862CCA /* vl_covdet.c */; };
 		2DB3F06B1605F3A100862CCA /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
+		2DD9AD1917F9C41200C1FC78 /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
+		2DD9AD1F17F9C43700C1FC78 /* vl_kmeans.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EECFA16046F1B00C63DCE /* vl_kmeans.c */; };
+		2DD9AD2017F9C44A00C1FC78 /* vl_fisher.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D141E20178376CA00E2958B /* vl_fisher.c */; };
 		2DE607611785722900E1A24E /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2DE607671785725200E1A24E /* vl_vlad.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D141E2B178376CA00E2958B /* vl_vlad.c */; };
 		2DE7563D16D543A90016C1DC /* svm_dca.h.disabled in Headers */ = {isa = PBXBuildFile; fileRef = 2DE7563916D543A90016C1DC /* svm_dca.h.disabled */; };
@@ -467,6 +469,7 @@
 		2DD99E8F0E59EA8E00CE1DA1 /* host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = host.h; sourceTree = "<group>"; };
 		2DD99E900E59EA8E00CE1DA1 /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = host.c; sourceTree = "<group>"; };
 		2DD9A01F0E5A296700CE1DA1 /* test_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_host.c; sourceTree = "<group>"; };
+		2DD9AD1E17F9C41200C1FC78 /* vl_kmeans.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = vl_kmeans.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DDA2306124BD104003F6A9D /* lbp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lbp.h; sourceTree = "<group>"; };
 		2DDA2307124BD104003F6A9D /* lbp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lbp.c; sourceTree = "<group>"; };
 		2DE5B37D0FDC2BE9008CEB1D /* dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsift.c; sourceTree = "<group>"; };
@@ -527,6 +530,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2DD9AD1817F9C41200C1FC78 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD9AD1917F9C41200C1FC78 /* libvl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2DE607601785722900E1A24E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -568,6 +579,7 @@
 				2DE607661785722900E1A24E /* vl_vlad.mexmaci64 */,
 				2D0E8A811786D18D005419DC /* vl_fisher.mexmaci64 */,
 				2DA47BD91792E6C700EC02E0 /* vl_liop.mexmaci64 */,
+				2DD9AD1E17F9C41200C1FC78 /* vl_kmeans.mexmaci64 */,
 			);
 			indentWidth = 2;
 			name = vlfeat;
@@ -1244,6 +1256,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2DD9AD1A17F9C41200C1FC78 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2DE607621785722900E1A24E /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1391,6 +1410,23 @@
 			productReference = 2DB3F0591605EC0B00862CCA /* vl_covdet.mexmaci64 */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		2DD9AD1517F9C41200C1FC78 /* vl_kmeans */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DD9AD1B17F9C41200C1FC78 /* Build configuration list for PBXNativeTarget "vl_kmeans" */;
+			buildPhases = (
+				2DD9AD1617F9C41200C1FC78 /* Sources */,
+				2DD9AD1817F9C41200C1FC78 /* Frameworks */,
+				2DD9AD1A17F9C41200C1FC78 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vl_kmeans;
+			productName = vl_covdet;
+			productReference = 2DD9AD1E17F9C41200C1FC78 /* vl_kmeans.mexmaci64 */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		2DE6075D1785722900E1A24E /* vl_vlad */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE607631785722900E1A24E /* Build configuration list for PBXNativeTarget "vl_vlad" */;
@@ -1431,7 +1467,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0500;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "vlfeat" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1455,6 +1491,7 @@
 				2DE6075D1785722900E1A24E /* vl_vlad */,
 				2D0E8A781786D18D005419DC /* vl_fisher */,
 				2DA47BD01792E6C700EC02E0 /* vl_liop */,
+				2DD9AD1517F9C41200C1FC78 /* vl_kmeans */,
 			);
 		};
 /* End PBXProject section */
@@ -1464,7 +1501,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D0E8A7A1786D18D005419DC /* vl_vlad.c in Sources */,
+				2DD9AD2017F9C44A00C1FC78 /* vl_fisher.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1533,6 +1570,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2DD9AD1617F9C41200C1FC78 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DD9AD1F17F9C43700C1FC78 /* vl_kmeans.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2DE6075E1785722900E1A24E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1556,7 +1601,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1591,7 +1635,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1620,7 +1663,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1646,7 +1688,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1666,7 +1707,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1701,7 +1741,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1731,7 +1770,6 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = "$(ARCH_$(ARCHS))";
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1805,7 +1843,6 @@
 			buildSettings = {
 				ACTIVE_TEST = test_host;
 				ARCH = "$(ARCH_$(ARCHS))";
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1878,7 +1915,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1913,7 +1949,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1942,7 +1977,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1977,7 +2011,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2002,11 +2035,72 @@
 			};
 			name = Release;
 		};
+		2DD9AD1C17F9C41200C1FC78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = vl_kmeans;
+			};
+			name = Debug;
+		};
+		2DD9AD1D17F9C41200C1FC78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "$(MATLABROOT)/extern/lib/maci64/mexFunction.map";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				LIBRARY_SEARCH_PATHS = "$(MATLABROOT)/bin/maci64";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = (
+					"-lmx",
+					"-lmex",
+					"-lmat",
+					"-lstdc++",
+				);
+				PRODUCT_NAME = vl_kmeans;
+			};
+			name = Release;
+		};
 		2DE607641785722900E1A24E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2041,7 +2135,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2070,7 +2163,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2105,7 +2197,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2210,6 +2301,15 @@
 			buildConfigurations = (
 				2DB3F05B1605EC0B00862CCA /* Debug */,
 				2DB3F05C1605EC0B00862CCA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DD9AD1B17F9C41200C1FC78 /* Build configuration list for PBXNativeTarget "vl_kmeans" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DD9AD1C17F9C41200C1FC78 /* Debug */,
+				2DD9AD1D17F9C41200C1FC78 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
