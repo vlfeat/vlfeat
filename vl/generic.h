@@ -107,13 +107,14 @@ VL_EXPORT vl_bool vl_cpu_has_avx (void) ;
 VL_EXPORT vl_bool vl_cpu_has_sse3 (void) ;
 VL_EXPORT vl_bool vl_cpu_has_sse2 (void) ;
 VL_EXPORT vl_size vl_get_num_cpus (void) ;
-VL_EXPORT vl_size vl_get_max_threads (void) ;
-VL_EXPORT void vl_set_num_threads (vl_size n) ;
 VL_EXPORT VlRand * vl_get_rand (void) ;
 
-#if 0
+/** @name Multi-thread computations
+ ** @{ */
+VL_EXPORT vl_size vl_get_max_threads (void) ;
+VL_EXPORT void vl_set_num_threads (vl_size n) ;
 VL_EXPORT vl_size vl_get_thread_limit (void) ;
-#endif
+/** @} (*/
 
 /** ------------------------------------------------------------------
  ** @name Error handling
