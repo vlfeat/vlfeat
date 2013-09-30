@@ -262,7 +262,7 @@ modes).
 
 @ref gmm.h supports the following cluster initialization algorithms:
 
-- <b>Random data points.</b> (::vl_gmm_init_with_random_data) This method
+- <b>Random data points.</b> (::vl_gmm_init_with_rand_data) This method
   sets the means of the modes by sampling at random a corresponding
   number of data points, sets the covariance matrices of all the modes
   are to the covariance of the entire dataset, and sets the prior
@@ -345,6 +345,8 @@ _vl_gmm_prepare_for_data (VlGMM* self, vl_size numData)
 
 /** @brief Create a new GMM object
  ** @param dataType type of data (::VL_TYPE_FLOAT or ::VL_TYPE_DOUBLE)
+ ** @param dimension dimension of the data.
+ ** @param numComponents number of Gaussian mixture components.
  ** @return new GMM object instance.
  **/
 
@@ -648,7 +650,7 @@ double const * vl_gmm_get_covariance_lower_bounds (VlGMM const * self)
  ** @param self object.
  ** @param bounds bounds.
  **
- ** There is one lower bound per dimension. Use ::vl:gmm_set_covariance_lower_bound
+ ** There is one lower bound per dimension. Use ::vl_gmm_set_covariance_lower_bound
  ** to set all of them to a given scalar.
  **/
 void vl_gmm_set_covariance_lower_bounds (VlGMM * self, double const * bounds)
@@ -661,7 +663,7 @@ void vl_gmm_set_covariance_lower_bounds (VlGMM * self, double const * bounds)
  ** @param bound bound.
  **
  ** While there is one lower bound per dimension, this function sets
- ** all of them to the specified scalar. Use ::vl:gmm_set_covariance_lower_bounds
+ ** all of them to the specified scalar. Use ::vl_gmm_set_covariance_lower_bounds
  ** to set them individually.
  **/
 void vl_gmm_set_covariance_lower_bound (VlGMM * self, double bound)
@@ -1479,9 +1481,7 @@ vl_gmm_new_copy (VlGMM const * self)
 /** @brief Initialize mixture before EM takes place using random initialization
  ** @param self GMM object instance.
  ** @param data data points which should be clustered.
- ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.
- ** @param numClusters number of gaussians which should be estimated.
  **/
 
 void
@@ -1502,9 +1502,7 @@ vl_gmm_init_with_rand_data
 /** @brief Initializes the GMM using KMeans
  ** @param self GMM object instance.
  ** @param data data points which should be clustered.
- ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.
- ** @param numClusters number of gaussians which should be estimated.
  ** @param kmeansInit KMeans object to use.
  **/
 
@@ -1537,9 +1535,7 @@ vl_gmm_init_with_kmeans
 /** @brief Run GMM clustering - includes initialization and EM
  ** @param self GMM object instance.
  ** @param data data points which should be clustered.
- ** @param dimension dimensionality of the data points.
  ** @param numData number of data points.
- ** @param numClusters number of gaussians which should be estimated.
  **/
 
 double vl_gmm_cluster (VlGMM * self,

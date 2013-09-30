@@ -719,7 +719,7 @@ vl_kdforest_query_recursively (VlKDForestSearcher * searcher,
 
 /** ------------------------------------------------------------------
  ** @brief Query the forest
- ** @param selft object.
+ ** @param self object.
  ** @param neighbors list of nearest neighbors found (output).
  ** @param numNeighbors number of nearest neighbors to find.
  ** @param query query point.
@@ -841,9 +841,10 @@ vl_kdforestsearcher_query (VlKDForestSearcher * self,
  ** @brief Run multiple queries
  ** @param self object.
  ** @param indexes assignments of points.
- ** @param distances distances of query points.
- ** @param numQueries number of query points.
  ** @param numNeighbors number of nearest neighbors to be found for each data point
+ ** @param numQueries number of query points.
+ ** @param distances distances of query points.
+ ** @param queries lisf of vectors to use as queries.
  **
  ** @a indexes and @a distances are @a numNeighbors by @a numQueries
  ** matrices containing the indexes and distances of the nearest neighbours

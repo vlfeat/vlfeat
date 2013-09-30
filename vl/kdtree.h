@@ -113,8 +113,8 @@ typedef struct _VlKDForest
 
 } VlKDForest ;
 
-/** @brief KDForest searcher object */
-struct _VlKDForestSearcher
+/** @brief ::VlKDForest searcher object */
+typedef struct _VlKDForestSearcher
 {
   /* maintain a linked list of searchers for later disposal*/
   struct _VlKDForestSearcher * next;
@@ -130,9 +130,7 @@ struct _VlKDForestSearcher
 
   vl_size searchHeapNumNodes ;
   vl_uindex searchId ;
-} ;
-
-typedef struct _VlKDForestSearcher VlKDForestSearcher ;
+} VlKDForestSearcher ;
 
 /** @name Creating, copying and disposing
  ** @{ */

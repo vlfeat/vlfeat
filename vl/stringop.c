@@ -15,14 +15,11 @@ the terms of the BSD license (see the COPYING file).
 @file stringop.h
 @brief String operations
 @author Andrea Vedaldi
+@tableofcontents
 
 @ref stringop.h implements basic string operations. All functions that
 write to strings use range checking, which makes them safer than some
 standard POSIX equivalent (see @ref vl-stringop-err).
-
-- @ref vl-stringop-enumeration
-- @ref vl-stringop-file-protocol
-- @ref vl-stringop-err
 
 @section vl-stringop-enumeration Enumerations
 

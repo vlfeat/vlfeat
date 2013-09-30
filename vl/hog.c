@@ -83,7 +83,7 @@ of each cell must also be rearranged. This can be done by
 the permutation obtaiend by ::vl_hog_get_permutation.
 
 Furthermore, @ref hog.h suppots computing HOG features not from
-images but from vector fields ::vl_
+images but from vector fields.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @section hog-tech Technical details

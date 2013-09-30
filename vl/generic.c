@@ -110,7 +110,7 @@ global property, shared by all threads.
 VLFeat uses three rules that simplify handling exceptions when used in
 combination which certain environment such as MATLAB.
 
-- The library allocates local memory only through the reprogrammable
+- The library allocates local memory only through the re-programmable
   ::vl_malloc, ::vl_calloc, and ::vl_realloc functions.
 
 - The only resource referenced by VLFeat objects is memory (for
@@ -140,7 +140,7 @@ matlab).
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page conventions Conventions
 @author Andrea Vedaldi
-@tablefocontents
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 This page summarizes some of the conventions used by the library.
@@ -719,10 +719,10 @@ rules are followed.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 VLFeat uses OpenMP to implement parallel computations. VLFeat avoids
-changing OpenMP global state, such as the desired number of
+altering OpenMP global state, such as the desired number of
 computational threads, as this may affect the rest of the application
-(e.g. MATLAB) in undesriable ways. Instead, it duplicates OpenMP
-controls when appropriate (this is similar to the method used by other
+(e.g. MATLAB) in undesirable ways. Instead, it duplicates OpenMP
+control parameters when appropriate (this is similar to the method used by
 libraries such as Intel MKL).
 
 The maximum number of threads available to the application can be
@@ -730,17 +730,27 @@ obtained by ::vl_get_thread_limit. This limit is controlled by the
 OpenMP library (the function is a wrapper around @c
 omp_get_thread_limit), which in turn may determined that based on the
 number of computational cores or the value of the @c OMP_THREAD_LIMIT
-variable when the program is launched.
+variable when the program is launched. This value is an upper bound on
+the number of computation threads that can be used.
 
 The desired number of computational threads is set by
 ::vl_set_num_threads() and retrieved by ::vl_get_max_threads().  This
 number is a target value as well as an upper bound to the number of
 threads used by VLFeat. @c vl_set_num_threads(1) disables the use of
-multiple threads and @c vl_set_num_threads(0) uses OpenMP value
-(retrieved by calling @c omp_get_max_threads()). The actual number
-used in a specific computation is decided by OpenMP based on the
-number of threads available, accounting for example for nested
-parallelism when appropriate.
+multiple threads and @c vl_set_num_threads(0) uses the value returned
+by the OpenMP call @c omp_get_max_threads(). The latter value is
+controlled, for example, by calling @c omp_set_num_threads() in the
+application. Note that:
+
+- @c vl_set_num_threads(0) determines the number of treads using @c
+  omp_get_max_threads() upon invocation. Subsequent calls to @c
+  omp_set_num_threads() will therefore *not* affect the number of
+  threads used by VLFeat.
+- @c vl_set_num_threads(vl_get_thread_limit()) causes VLFeat use all
+  the available threads, regardless on the number of threads set
+  within the application by calls to @c omp_set_num_threads().
+- OpenMP may dynamically decide to use a smaller number of threads in
+  any specific parallel computation.
 
 @sa http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/GUID-C2295BC8-DD22-466B-94C9-5FAA79D4F56D.htm
  http://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_userguide_win/index.htm#GUID-DEEF0363-2B34-4BAB-87FA-A75DBE842040.htm
@@ -1106,8 +1116,7 @@ vl_cpu_has_sse2 (void)
 
 /* ---------------------------------------------------------------- */
 
-#if 0
-/** @brief Get the number of computational threads available.
+/** @brief Get the number of computational threads available to the application.
  ** @return number of threads.
  ** @sa @ref threads-parallel
  **/
@@ -1121,7 +1130,6 @@ vl_get_thread_limit (void)
   return 1 ;
 #endif
 }
-#endif
 
 /** @brief Get the maximum number of computational threads.
  ** @return number of threads.
@@ -1143,23 +1151,19 @@ vl_get_max_threads (void)
  ** @sa vl_get_max_threads(), @ref threads-parallel
  **/
 
+#if defined(_OPENMP)
 void
-vl_set_num_threads (
-#if defined(_OPENMP)
-                    vl_size numThreads)
-#else
-                    vl_size numThreads VL_UNUSED)
-#endif
+vl_set_num_threads (vl_size numThreads)
 {
-#if defined(_OPENMP)
   if (numThreads == 0) {
     numThreads = omp_get_max_threads() ;
   }
   vl_get_state()->numThreads = numThreads ;
-#else
-  return ;
-#endif
 }
+#else
+void
+vl_set_num_threads (vl_size numThreads VL_UNUSED) { }
+#endif
 
 /* ---------------------------------------------------------------- */
 /** @brief Set last VLFeat error

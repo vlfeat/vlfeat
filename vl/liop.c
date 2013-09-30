@@ -59,7 +59,7 @@ The image patch must be of odd side length and in single
 precision. There are several parameters affecting the LIOP
 descriptor. An example is the @ref liop-weighing "threshold" used to
 discard low-contrast oder pattern in the computation of the
-statistics. This is changed by using ::vl_liopdesc_set_threshold.
+statistics. This is changed by using ::vl_liopdesc_set_intensity_threshold.
 
 **/
 
@@ -399,7 +399,7 @@ vl_liopdesc_new (vl_int numNeighbours, vl_int numSpatialBins,
 }
 
 /** @brief Create a new object with default parameters
- ** @param patchSideLength size of the patches to be processed.
+ ** @param sideLength size of the patches to be processed.
  ** @return new object.
  **
  ** @see ::vl_liopdesc_new. */
@@ -436,7 +436,7 @@ vl_liopdesc_delete (VlLiopDesc * self)
  ** @param patch patch to process
  **
  ** Use ::vl_liopdesc_get_dimension to get the size of the descriptor
- ** @desc. */
+ ** @a desc. */
 
 void
 vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
@@ -562,6 +562,7 @@ vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
 /* ---------------------------------------------------------------- */
 
 /** @brief Get the dimension of a LIOP descriptor.
+ ** @param self object.
  ** @return dimension. */
 
 vl_size
