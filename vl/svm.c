@@ -621,7 +621,7 @@ the sample $\bx_q$. Incorporating the constraint $-1 \leq - y_q
 (\alpha_q + \Delta \alpha_q) \leq 0$,
 i.e. $0 \leq y_q (\alpha_q + \Delta \alpha_q) \leq 1$, one obtains the update
 \[
-\Delta\alpha_q =  y_q \max\{0, \min\{1, \tilde {\Delta\alpha_q } + y_q \alpha_q\}\} - \alpha_q.
+\Delta\alpha_q =  y_q \max\{0, \min\{1, y_q (\tilde {\Delta\alpha_q } + \alpha_q)\}\} - \alpha_q.
 \]
 
 <!-- ------------------------------------------------------------ --->
@@ -748,7 +748,7 @@ fast: as usually $\lambda \ll 1$, $\eta_1 \gg 1$. But this is clearly
 excessive (for example, without a loss term, the best learning rate at
 the first iteration is simply $\eta_1=1$, as this nails the optimum in
 one step). Thus, the learning rate formula is modified to be $\eta_t =
-1 / \lambda (t + t_0)$, where $t_0 \approx 0.5/\lambda$, which is
+1 / \lambda (t + t_0)$, where $t_0 \approx 2/\lambda$, which is
 equivalent to start $t_0$ iterations later. In this manner $\eta_1
 \approx 1/2$.
 
@@ -777,20 +777,20 @@ every time a new random permutation.
 
 At each iteration, the SGD algorithm updates the vector $\bw$
 (including the additional bias component $w_b$) as $\bw_{t+1}
-\leftarrow \bw_t - \eta_t \bw_t - \eta \bg_t$, where $\eta_t$ is the
-learning rate. If the subgradient of the loss function $\bg_t$ is zero
-at a given iteration, this amounts to simply shrink $\bw$ towards the
-origin by multiplying it by the factor $1 - \eta$. Thus such an
-iteration can be accelerated significantly by representing internally
-$\bw_t = f_t \bu_t$, where $f_t$ is a scaling factor. Then, the update
-becomes
+\leftarrow \bw_t - \lambda \eta_t \bw_t - \eta_t \bg_t$, where
+$\eta_t$ is the learning rate. If the subgradient of the loss function
+$\bg_t$ is zero at a given iteration, this amounts to simply shrink
+$\bw$ towards the origin by multiplying it by the factor $1 - \lambda
+\eta_t$. Thus such an iteration can be accelerated significantly by
+representing internally $\bw_t = f_t \bu_t$, where $f_t$ is a scaling
+factor. Then, the update becomes
 \[
    f_{t+1} \bu_{t+1}
-   = f_{t} \bu_{t} - \eta_t f_{t} \bu_{t} - \eta_t \bg_t
-   = (1-\eta_t) f_{t} \bu_{t} - \eta \bg_t.
+   = f_{t} \bu_{t} - \lambda \eta_t f_{t} \bu_{t} - \eta_t \bg_t
+   = (1-\lambda \eta_t) f_{t} \bu_{t} - \eta_t \bg_t.
 \]
-Setting $f_{t+1} = (1-\eta_t) f_{t}$, this gives the update equation
-for $\bu_t$
+Setting $f_{t+1} = (1-\lambda \eta_t) f_{t}$, this gives the update
+equation for $\bu_t$
 \[
 \bu_{t+1} = \bu_{t} - \frac{\eta_t}{f_{t+1}} \bg_t.
 \]
