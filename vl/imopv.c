@@ -499,7 +499,7 @@ VL_XCAT(vl_image_distance_transform_,SFX)
  ** trick. Overall, the algorithm complexity is independent on the
  ** parameter @a filterSize and linear in the nubmer of image pixels.
  **
- ** @see ::vl_imconvcol_d for details on the meaning of the other parameters.
+ ** @see ::vl_imconvcol_vd for details on the meaning of the other parameters.
  **/
 
 /** @fn vl_imconvcoltri_f(float*,vl_size,float const*,vl_size,vl_size,vl_size,vl_size,vl_size,int unsigned)
