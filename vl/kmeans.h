@@ -55,6 +55,7 @@ typedef struct _VlKMeans
   VlKMeansAlgorithm algorithm ;           /**< Clustring algorithm. */
   VlVectorComparisonType distance ;       /**< Distance. */
   vl_size maxNumIterations ;              /**< Maximum number of refinement iterations. */
+  double minEnergyVariation ;             /**< Minimum energy variation. */
   vl_size numRepetitions ;                /**< Number of clustering repetitions. */
   int verbosity ;                         /**< Verbosity level. */
 
@@ -142,6 +143,7 @@ VL_INLINE vl_size vl_kmeans_get_num_centers (VlKMeans const * self) ;
 
 VL_INLINE int vl_kmeans_get_verbosity (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kmeans_get_max_num_iterations (VlKMeans const * self) ;
+VL_INLINE double vl_kmeans_get_min_energy_variation (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kmeans_get_max_num_comparisons (VlKMeans const * self) ;
 VL_INLINE vl_size vl_kmeans_get_num_trees (VlKMeans const * self) ;
 VL_INLINE double vl_kmeans_get_energy (VlKMeans const * self) ;
@@ -155,6 +157,7 @@ VL_INLINE void vl_kmeans_set_algorithm (VlKMeans * self, VlKMeansAlgorithm algor
 VL_INLINE void vl_kmeans_set_initialization (VlKMeans * self, VlKMeansInitialization initialization) ;
 VL_INLINE void vl_kmeans_set_num_repetitions (VlKMeans * self, vl_size numRepetitions) ;
 VL_INLINE void vl_kmeans_set_max_num_iterations (VlKMeans * self, vl_size maxNumIterations) ;
+VL_INLINE void vl_kmeans_set_min_energy_variation (VlKMeans * self, double minEnergyVariation) ;
 VL_INLINE void vl_kmeans_set_verbosity (VlKMeans * self, int verbosity) ;
 VL_INLINE void vl_kmeans_set_max_num_comparisons (VlKMeans * self, vl_size maxNumComparisons) ;
 VL_INLINE void vl_kmeans_set_num_trees (VlKMeans * self, vl_size numTrees) ;
@@ -301,6 +304,44 @@ vl_kmeans_set_num_repetitions (VlKMeans * self,
 }
 
 /** ------------------------------------------------------------------
+ ** @brief Get the minimum relative energy variation for convergence.
+ ** @param self KMeans object instance.
+ ** @return minimum energy variation.
+ **/
+
+VL_INLINE double
+vl_kmeans_get_min_energy_variation (VlKMeans const * self)
+{
+  return self->minEnergyVariation ;
+}
+
+/** @brief Set the maximum relative energy variation for convergence.
+ ** @param self KMeans object instance.
+ ** @param minEnergyVariation maximum number of repetitions.
+ ** The variation cannot be negative.
+ **
+ ** The relative energy variation is calculated after the $t$-th update
+ ** to the parameters as:
+ **
+ ** \[ \epsilon_t =  \frac{E_{t-1} - E_t}{E_0 - E_t} \]
+ **
+ ** Note that this quantitiy is non-negative since $E_{t+1} \leq E_t$.
+ ** Hence, $\epsilon_t$ is the improvement to the energy made in the last
+ ** iteration compared to the total improvement so far. The algorithm
+ ** stops if this value is less or equal than @a minEnergyVariation.
+ **
+ ** This test is applied only to the LLoyd and ANN algorithms.
+ **/
+
+VL_INLINE void
+vl_kmeans_set_min_energy_variation (VlKMeans * self,
+                                    double minEnergyVariation)
+{
+  assert (minEnergyVariation >= 0) ;
+  self->minEnergyVariation = minEnergyVariation ;
+}
+
+/** ------------------------------------------------------------------
  ** @brief Get K-means algorithm
  ** @param self KMeans object.
  ** @return algorithm.
@@ -348,7 +389,7 @@ vl_kmeans_set_initialization (VlKMeans * self,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get maximum number of comparisons in ANN-KD-Tree.
+ ** @brief Get the maximum number of comparisons in the KD-forest ANN algorithm.
  ** @param self KMeans object instance.
  ** @return maximum number of comparisons.
  **/
@@ -372,9 +413,9 @@ vl_kmeans_set_max_num_comparisons (VlKMeans * self,
 }
 
 /** ------------------------------------------------------------------
- ** @brief Get number of trees in ANN-KD-Tree.
+ ** @brief Set the number of trees in the KD-forest ANN algorithm
  ** @param self KMeans object instance.
- ** @return number of trees.
+ ** @param numTrees number of trees to use.
  **/
 
 VL_INLINE void
