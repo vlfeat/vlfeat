@@ -1,53 +1,62 @@
 function h = vl_plotframe(frames,varargin)
-% VL_PLOTFRAME  Plot feature frame
-%  VL_PLOTFRAME(FRAME) plots the frames FRAME.  Frames are attributed
-%  image regions (as, for example, extracted by a feature detector). A
-%  frame is a vector of D=2,3,..,6 real numbers, depending on its
-%  class. VL_PLOTFRAME() supports the following classes:
+% VL_PLOTFRAME  Plot a geometric frame
+%  VL_PLOTFRAME(FRAME) plots the feature frame FRAME. The frame can be
+%  either a 2D point, a circle, an oriented circle, an ellipse, or an
+%  oriented ellipse, as follows:
 %
 %  Point::
-%    FRAME(1:2) are the x,y coordinates of the point
+%    FRAME has 2 components. FRAME(1:2) are the x,y coordinates of the
+%    point.
 %
 %  Circle::
-%    FRAME(1:2) are the x,y coordinates of the center. FRAME(3)
-%    is the circle radius..
+%    FRAME has 3 components. FRAME(1:2) are the x,y coordinates of the
+%    center and FRAME(3) is its radius.
 %
 %  Oriented circle::
-%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3) is the
-%    radius. FRAME(4) is the orientation, expressed as a ppsitive
-%    rotation (note that images use a left-handed system with the Y
-%    axis pointing downwards).
+%    FRAME has 4 components. FRAME(1:2) are the x,y coordiantes of the
+%    center of the circle, FRAME(3) is the radius, and FRAME(4) is the
+%    orientation, expressed as a rotation in radians of the standard
+%    oriented frame (see below). Positive rotations appear clockwise
+%    since the image coordiante system is left-handed.
 %
 %  Ellipse::
-%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3:5) are
-%    the element S11, S12, S22 of a 2x2 covariance matrix S (a positive
-%    semidefinite matrix) defining the ellipse shape. The ellipse
-%    is the set of points {x + T: x' inv(S) x = 1}, where T is the center.
+%    FRAME has 5 components. FRAME(1:2) are the x,y coordiantes of the
+%    center and FRAME(3:5) are the elements S11, S12, S22 of a 2x2
+%    covariance matrix S (a positive semidefinite matrix) defining the
+%    ellipse shape. The ellipse is the set of points {x + T: x' inv(S)
+%    x = 1}, where T is the ellipse center.
 %
 %  Oriented ellipse::
-%    FRAME(1:2) are the x,y coordiantes of the center. FRAME(3:6) is
-%    the column-wise stacking of a 2x2 matrix A defining the ellipse
-%    shape and orientation. The ellipse is obtaine by transforming
-%    a unit circle by A as the set of points {A x + T : |x| = 1}, where
-%    T is the center.
+%    FAME has 6 components. FRAME(1:2) are the coordiantes T=[x;y] of
+%    the center. FRAME(3:6) is the column-wise stacking of a 2x2
+%    matrix A. The oriented ellipse is obtained by applying the affine
+%    transformation (A,T) to the standard oriented frame (see below).
 %
-%  All frames can be thought of as an affine transformation of the unit circle.
-%  For unoriented frames, the affine transformation is selected so that
-%  the positive Y direction (downwards, graviy vector) is preserved.
+%  A standard unoriented frame is a circle of unit radius centered at
+%  the origin; a standard oriented frame is the same, but marked with
+%  a radius pointing towards the positive Y axis (downwards) to
+%  represent the frame orientation. All other frames can be obtained
+%  as affine transformations of these two. In the case of unoriented
+%  frames, this transformation is ambiguous up to a rotation.
+%
+%  VL_PLOTFRAME(FRAMES), where FRAMES is a D x N matrix, plots N
+%  frames, one per column. This is significantly more efficient than
+%  looping over frames explicitly.
 %
 %  H = VL_PLOTFRAME(...) returns the handle H of the graphical object
 %  representing the frames.
 %
-%  VL_PLOTFRAME(FRAMES) for a matrix of FRAMES plots multiple frames.
-%  Using this call is much faster than calling VL_PLOTFRAME() for each frame.
-%
 %  VL_PLOTFRAME(FRAMES,...) passes any extra argument to the
-%  underlying plot function. The first optional argument can be a line
-%  specification string such as the one used by PLOT().
+%  underlying plotting function. The first optional argument, in
+%  particular, can be a line specification string such as the one used
+%  by PLOT().
 %
-%  See also: VL_FRAME2OELL(), VL_HELP().
+%  See also: <a href="matlab:vl_help('sift')">SIFT</a>,
+%  <a href="matlab:vl_help('covdet')">covariant detectors</a>,
+%  VL_FRAME2OELL(), VL_HELP().
 
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+% Copyright (C) 2013 Andrea Vedaldi.
 % All rights reserved.
 %
 % This file is part of the VLFeat library and is made available under
@@ -107,8 +116,8 @@ Xp = [cos(thr) ; sin(thr) ;] ;
 
 for k=1:K
   % frame center
-	xc = frames(1,k) ;
-	yc = frames(2,k) ;
+  xc = frames(1,k) ;
+  yc = frames(2,k) ;
 
   % frame matrix
   A = reshape(frames(3:6,k),2,2) ;
@@ -119,8 +128,8 @@ for k=1:K
   X(2,:) = X(2,:) + yc ;
 
   % store
-	allx((k-1)*(np+1) + (1:np)) = X(1,:) ;
-	ally((k-1)*(np+1) + (1:np)) = X(2,:) ;
+  allx((k-1)*(np+1) + (1:np)) = X(1,:) ;
+  ally((k-1)*(np+1) + (1:np)) = X(2,:) ;
 
   if do_arrows
     allxf((k-1)*3 + (1:2)) = xc + [0 A(1,2)] ;

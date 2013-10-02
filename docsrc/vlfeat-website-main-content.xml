@@ -35,6 +35,7 @@
 <dir name="overview">
   <page id="tut" name="tut" title="Tutorials">
    <include src="tutorials.html"/>
+   <include src="tutorials/frame.html"/>
    <page id="tut.covdet" name="covdet" title="Covdet"> <include src="covdet.html"/></page>
    <page id="tut.hog" name="hog" title="HOG"> <include src="hog.html"/></page>
    <page id="tut.sift" name="sift" title="SIFT"> <include src="sift.html"/></page>

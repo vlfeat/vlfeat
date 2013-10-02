@@ -242,7 +242,7 @@ doc/api/index.html: docsrc/doxygen.conf docsrc/vlfeat.bib VERSION \
 #                                                               Webdoc
 # --------------------------------------------------------------------
 
-webdoc_src = $(wildcard docsrc/*.xml) $(wildcard docsrc/*.html)
+webdoc_src = $(wildcard docsrc/*.xml) $(wildcard docsrc/*.html) $(wildcard docsrc/tutorials/*.html)
 
 doc: doc/index.html doc/vlfeat.css doc/pygmentize.css $(doc_fig_tgt)
 
