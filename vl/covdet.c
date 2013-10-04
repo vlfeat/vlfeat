@@ -772,8 +772,8 @@ vl_covdet_put_image (VlCovDet * self,
   lastOctave = vl_floor_d(vl_log2_d(VL_MIN((double)width-1,(double)height-1) / (minOctaveSize - 1))) ;
 
   if (self->method == VL_COVDET_METHOD_DOG) {
-    octaveFirstSubdivision = -2 ;
-    octaveLastSubdivision = self->octaveResolution ;
+    octaveFirstSubdivision = -1 ;
+    octaveLastSubdivision = self->octaveResolution + 1 ;
   } else if (self->method == VL_COVDET_METHOD_HESSIAN) {
     octaveFirstSubdivision = -1 ;
     octaveLastSubdivision = self->octaveResolution ;
@@ -1007,7 +1007,7 @@ vl_covdet_detect (VlCovDet * self)
   /* prepare buffers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
   cgeom = geom ;
   if (self->method == VL_COVDET_METHOD_DOG) {
-    cgeom.octaveFirstSubdivision = -1 ;
+    cgeom.octaveLastSubdivision -= 1 ;
   }
   if (!self->css ||
       !vl_scalespacegeometry_is_equal(cgeom,
@@ -1034,8 +1034,9 @@ vl_covdet_detect (VlCovDet * self)
       double sigma = vl_scalespace_get_level_sigma(self->css, o, s) ;
       switch (self->method) {
         case VL_COVDET_METHOD_DOG:
-          _vl_dog_response(clevel, level,
-                           vl_scalespace_get_level(self->gss, o, s - 1),
+          _vl_dog_response(clevel,
+                           vl_scalespace_get_level(self->gss, o, s + 1),
+                           level,
                            oct.width, oct.height) ;
           break ;
 
@@ -1095,7 +1096,7 @@ vl_covdet_detect (VlCovDet * self)
             ok &= refined.edgeScore < self->edgeThreshold ;
             if (ok) {
               double sigma = cgeom.baseScale *
-              pow(2.0, o + (refined.z - cgeom.octaveFirstSubdivision)
+              pow(2.0, o + (refined.z + cgeom.octaveFirstSubdivision)
                   / cgeom.octaveResolution) ;
               feature.frame.x = refined.x * step ;
               feature.frame.y = refined.y * step ;
