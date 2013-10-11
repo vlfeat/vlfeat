@@ -15,7 +15,8 @@ the terms of the BSD license (see the COPYING file).
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page kdtree KD-trees and forests
-@author Andrea Vedaldi, David Novotny
+@author Andrea Vedaldi
+@author David Novotny
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref kdtree.h implements a KD-tree object, a data structure that can
@@ -322,6 +323,9 @@ vl_kdtree_build_recursively
  ** @param numTrees number of trees in the forest.
  ** @param distance type of distance norm (::VlDistanceL1 or ::VlDistanceL2).
  ** @return new KDForest.
+ **
+ ** The data dimension @a dimension and the number of trees @a
+ ** numTrees must not be smaller than one.
  **/
 
 VlKDForest *
@@ -515,9 +519,11 @@ vl_kdtree_calc_bounds_recursively (VlKDTree * tree,
  ** @param data pointer to the data.
  **
  ** The function builds the KDTree by processing the data @a data. For
- ** efficiency, KDTree does not copy the data, but retains a pointer to it.
- ** Therefore the data must survive (and not change) until the KDTree
- ** is deleted.
+ ** efficiency, KDTree does not make a copy the data, but retains a
+ ** pointer to it. Therefore the data buffer must be valid and
+ ** unchanged for the lifespan of the object.
+ **
+ ** The number of data points @c numData must not be smaller than one.
  **/
 
 void
@@ -526,6 +532,9 @@ vl_kdforest_build (VlKDForest * self, vl_size numData, void const * data)
   vl_uindex di, ti ;
   vl_size maxNumNodes ;
   double * searchBounds;
+
+  assert(data) ;
+  assert(numData >= 1) ;
 
   /* need to check: if alredy built, clean first */
   self->data = data ;

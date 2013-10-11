@@ -148,6 +148,17 @@ mexFunction(int nout, mxArray *out[],
   numData = mxGetN (IN(DATA)) ;
   dimension = mxGetM (IN(DATA)) ;
 
+  if (dimension < 1) {
+    vlmxError (vlmxErrInconsistentData,
+               "DATA must have at least one row.") ;
+  }
+
+  if (numData < 1) {
+    vlmxError (vlmxErrInconsistentData,
+               "DATA must have at least one column.") ;
+  }
+
+
   forest = vl_kdforest_new (dataType, dimension, numTrees, distance) ;
   vl_kdforest_set_thresholding_method (forest, thresholdingMethod) ;
 
