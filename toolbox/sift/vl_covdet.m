@@ -1,31 +1,31 @@
 % VL_COVDET  Covariant feature detectors and descriptors
 %   VL_COVDET() implements a number of co-variant feature detectors
-%   (e.g., DoG, Harris-Affine, Harris-Laplace) and allow to compute
-%   corresponding feature descriptors (SIFT, raw patches).
+%   (e.g., DoG, Harris-Affine, Harris-Laplace) and corresponding
+%   feature descriptors (SIFT, raw patches).
 %
 %   F = VL_COVDET(I) detects upright scale and translation covariant
 %   features based on the Difference of Gaussian (Dog) cornerness
-%   measure from image I (a grayscale image of class SINGLE). F is in
-%   the format of oriented ellipse feature frames (see VL_PLOTFRAME()
-%   for the definition) even if features are only scale-invariant
-%   (discs or oriented discs).
+%   measure from image I (a grayscale image of class SINGLE). Each
+%   column of F is an oriented ellipse (see VL_PLOTFRAME() for the
+%   definition) even if features are upright and/or not affine
+%   covariant (in which case unoriented/circular may suffice).
 %
-%   VL_COVDET(I, 'Method', METHOD) allows using one of the
-%   following methods instead:
+%   VL_COVDET(I, 'Method', METHOD) allows using one of the following
+%   detection methods instead of the default one:
 %
-%   DoG::
+%   DoG:: default
 %     The Difference of Gaussians is an approximate version of the
 %     multiscale trace of Laplacian operator [1].
 %
 %   Hessian::
-%     Determinant Hessian operator [2].
+%     Determinant of Hessian operator [2].
 %
 %   HessianLaplace::
-%     Determinant of Hessian for space localisation, trace of
+%     Determinant of Hessian for space localization, trace of
 %     Laplacian for scale detection [2].
 %
 %   HarrisLaplace::
-%     Harris cornerness measure for space localisation, trace
+%     Harris cornerness measure for space localization, trace
 %     of Laplacian for scale detection [2].
 %
 %   MultiscaleHessian::
@@ -36,80 +36,91 @@
 %     Same as HarrisLaplace, but Laplacian scale detection is not
 %     performend (features are simply detected at multiple scales) [2].
 %
-%   The number of detected features is affected by the
-%   'PeakThreshold', which sets the minimum absolute vale of the
-%   cornerness measure to accept a feature. A larger threshold select
-%   fewer features. To adjust the threshold, the score of the detected
-%   features can be obtained in the INFO structure (see later).
+%   The number of detected features is affected by the 'PeakThreshold'
+%   option, which sets the minimum absolute vale of the cornerness
+%   measure to accept a feature. A larger threshold causes fewer
+%   features to be extracted. A good way to choose a threshold is to
+%   look at the cornerness score of the features extracted from an
+%   example image. This score is returned as part of the INFO
+%   structure, as explained below.
 %
-%   Features can also be filtered by setting the 'EdgeThreshold'
-%   parameter, which sets an upper bound on the ratio of the maxium
-%   over the minium curvature of the cornerness measure at the
-%   detected location. The idea is that unbalanced curvatures
-%   correspond to features detected along image edges, and should
-%   therefore be discarded as spatially unstable.
+%   In addition to the absolute value of the cornerness measure,
+%   features are also filtered by the curvature of the latter. This is
+%   controlled by the 'EdgeThreshold' parameter, which is the upper
+%   bound on the ratio of the maximum over the minimum curvature of
+%   the cornerness measure at the location of the detected
+%   feature. Intuitively, a low ratio corresponds to an elongated
+%   valley in the cornerness score map, which usually arises from
+%   image edges. These locations are usually discarded as they tend to
+%   be unstable.
 %
 %   VL_COVDET(..., 'EstimateAffineShape', true) switches on affine
-%   adaptation, which attempts to estimate the affine co-variant shape
-%   of each feature based on the algorihtm of [2].
+%   adaptation, an algorithm [2] that attempts to estimate the affine
+%   covariant shape of each feature.
 %
 %   VL_COVDET(..., 'EstimateOrientation', true) switches on the
-%   estimation of the orientation of features (which are therefore not
-%   upright anymore) []. Note that more than one orientation can be
-%   associated to each feature, creating copies of them.
+%   estimation of the orientation of the features. The algorithm looks
+%   for one or more dominant orientations of the gradient in a patch
+%   around the feature as in [1]. Note that more than one orientation
+%   can be associated to each detected feature, creating multiple
+%   versions of the same feature with different orientations.
 %
-%   VL_COVDET(..., 'Frames', F) allows to specify user defined frames
-%   F. This skips detection, but estimating the affine shape or the
-%   orietnations can still be applied. Moreover, descriptors for these
-%   frames can be computed.
+%   VL_COVDET(..., 'Frames', F) uses the user specified frames F
+%   instead of running a detector. The estimation of the affine shape
+%   and of the feature orientation can still be performed starting
+%   from such frames. Moreover, descriptors for these frames can be
+%   computed.
 %
 %   [F,D] = VL_COVDET(I, ...) computes the SIFT descriptors [1] for
 %   the detected features. Each column of D is the descriptor of the
 %   corresponding frame in F. A descriptor is a 128-dimensional vector
 %   of class SINGLE. The same format of VL_SIFT() is used. SIFT
-%   features are computed on normalised image patches that are
-%   affected by the parameters explained next (for example, to comptue
-%   SIFT on a larger measurement reagion, increase the value of
-%   PatchRelativeExtent.
+%   features are computed on normalized image patches that are
+%   affected by the parameters explained next (for example, in order
+%   to compute SIFT on a larger measurement region, increase the value
+%   of PatchRelativeExtent).
 %
 %   [F,D] = VL_COVDET(I, 'descriptor', DESCRIPTOR) allows using one
 %   following descriptors instead
 %
-%   SIFT::
-%     The default SIFT descriptor.
+%   SIFT:: default
+%     The SIFT descriptor.
 %
 %   LIOP::
 %     The Local Intensity Order Pattern descriptor. See VL_LIOP() for
-%     parameter definitions. All listed parameters can be used as
-%     input to VL_COVDET(), prefixed by the 'Liop' string (e.g.
-%     'LiopIntensityThrehsold').
+%     the parameters affecting this descriptor. All LIOP parameters can
+%     be used as input to VL_COVDET(), prefixed by the 'Liop' string
+%     (e.g. 'LiopIntensityThrehsold').
 %
-%   PATCH::
+%   Patch::
 %     Raw patches. In this case, each column of D is a stacked square
 %     image patch. This is very useful to compute alternative
-%     descriptors.
+%     user-defined descriptors.
 %
 %   The following parameters can be used to control the produced
 %   descriptors:
 %
-%   PatchResolution:: for SIFT descriptor 15, LIOP 20, PATCH 20
+%   PatchResolution:: 15 (SIFT) or 20 (LIOP, Patch)
 %     The size of the patch R in pixel. Specifically, the patch is a
-%     square of side 2*R+1 pixels.
+%     square image of side 2*R+1 pixels.
 %
-%   PatchRelativeExtent:: for SIFT descriptor 7.5, LIIP 10, PATCH 6
-%     The extent E of the patch in the feature frame. A feature F
-%     define a mapping from the feature reference frame to the image
-%     reference frame as an affine transformation A,T (see
-%     VL_PLOTFRAME()). The patch is a square [-E, E]^2 in this frame
-%     (transform this square by A,T to find the extent in the image).
+%   PatchRelativeExtent:: 7.5 (SIFT), 10 (LIOP), or 6 (Patch)
+%     The extent E of the patch in the normalized feature frame. The
+%     normalized feature frame is mapped to the feature frame F
+%     detected in the image by a certain affine transformation (A,T)
+%     (see VL_PLOTFRAME() for details). The patch is a square [-E,
+%     E]^2 in the normalize frame, and its shape in the original image
+%     is the (A,T) of it.
 %
-%   PatchRelativeSmoothing:: for SIFT descriptor 1, LIOP 1, PATCH 1.2
-%     The smoothing SIGMA of the patch in the patch frame. The
-%     computed patch can be thought as being obtained by first
-%     warping the image (as a continous signal) by A,T, then
-%     smoothing the results by SIGMA, and then sampling.
+%   PatchRelativeSmoothing:: 1 (SIFT and LIOP), 1.2 (Patch)
+%     The smoothing SIGMA of the patch in the normalized feature
+%     frame. Conceptually, the normalized patch is computed by warping
+%     the image (thought as a continuous signal) by the inverse of the
+%     affine transformation (A,T) discussed above, then by smoothing
+%     the wrapped image by a 2D isotropic Gaussian of standard
+%     deviation SIGMA, and finally by sampling the resulting signal.
 %
-%   [F,D,INFO] = VL_COVDET(...) returns an additiona structure INFO
+%   [F,D,INFO] = VL_COVDET(...) returns an additional structure INFO
 %   with the following members:
 %
 %   info.peakScores::
@@ -133,12 +144,12 @@
 %
 %   DoubleImage:: true
 %     Whether to double the image before extracting features. This
-%     allows to detect features at a smoothing level of 0.5 and up
-%     rathern than 1.0 and up, resulting in many more small
+%     allows to detect features at minimum smoothing level (scale) of
+%     0.5 pixels rather than 1.0, resulting in many more small
 %     features being detected.
 %
 %   Verbose::
-%     If specified, it incerases the verbosity level.
+%     If specified, it increases the verbosity level.
 %
 %   REFERENCES::
 %   [1] D. G. Lowe, Distinctive image features from scale-invariant
