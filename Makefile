@@ -162,7 +162,7 @@ MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
-CC = gcc
+CC ?= gcc
 endif
 
 # Mac OS X Intel 64
@@ -172,7 +172,7 @@ MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
-CC = gcc
+CC ?= gcc
 endif
 
 # Linux-32

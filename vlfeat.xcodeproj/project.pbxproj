@@ -1772,6 +1772,7 @@
 				ARCH = "$(ARCH_$(ARCHS))";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
+				CC = /usr/bin/gcc;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
@@ -1806,7 +1807,6 @@
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2011A.app;
 				MEX = "$(MATLABROOT)/bin/mex";
-				New_Setting = python2.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
 				PROFILE = "";
@@ -1845,6 +1845,7 @@
 				ARCH = "$(ARCH_$(ARCHS))";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
+				CC = /usr/bin/gcc;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
@@ -1879,7 +1880,6 @@
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2011A.app;
 				MEX = "$(MATLABROOT)/bin/mex";
-				New_Setting = python2.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$(PATH):/opt/local/bin/";
 				PROFILE = YES;
