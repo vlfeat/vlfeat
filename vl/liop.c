@@ -446,7 +446,7 @@ vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
   vl_index spatialBinArea, spatialBinEnd, spatialBinIndex ;
   float threshold ;
 
-  memset(desc, 0, self->dimension) ;
+  memset(desc, 0, sizeof(float) * self->dimension) ;
 
   /*
    * Sort pixels in the patch by increasing intensity.
