@@ -318,6 +318,7 @@ distclean:
 
 install: dll-install
 
+uninstall: dll-uninstall
 info:
 	$(call echo-title,General settings)
 	$(call dump-var,deps)
