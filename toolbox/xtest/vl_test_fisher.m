@@ -39,15 +39,15 @@ vl_assert_almost_equal(phi, phi_, 1e-10) ;
 
 function enc = simple_fisher(x, mu, sigma2, pri)
 sigma = sqrt(sigma2) ;
-for i = 1:size(mu,2)
-  delta{i} = bsxfun(@times, bsxfun(@minus, x, mu(:,i)), 1./sigma(:,i)) ;
-  q(i,:) = log(pri(i)) - 0.5 * log(sigma2(i)) - 0.5 * sum(delta{i}.^2,1) ;
+for k = 1:size(mu,2)
+  delta{k} = bsxfun(@times, bsxfun(@minus, x, mu(:,k)), 1./sigma(:,k)) ;
+  q(k,:) = log(pri(k)) - 0.5 * sum(log(sigma2(:,k))) - 0.5 * sum(delta{k}.^2,1) ;
 end
 q = exp(bsxfun(@minus, q, max(q,[],1))) ;
 q = bsxfun(@times, q, 1 ./ sum(q,1)) ;
 n = size(x,2) ;
-for i = 1:size(mu,2)
-  u{i} = delta{i} * q(i,:)' / n / sqrt(pri(i)) ;
-  v{i} = (delta{i}.^2 - 1) * q(i,:)' / n / sqrt(2*pri(i)) ;
+for k = 1:size(mu,2)
+  u{k} = delta{k} * q(k,:)' / n / sqrt(pri(k)) ;
+  v{k} = (delta{k}.^2 - 1) * q(k,:)' / n / sqrt(2*pri(k)) ;
 end
 enc = cat(1, u{:}, v{:}) ;
