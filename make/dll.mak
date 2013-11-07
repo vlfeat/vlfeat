@@ -128,7 +128,6 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	  -compatibility_version $(VER)				\
 	  -current_version $(VER)				\
 	  -isysroot $(SDKROOT)					\
-	  -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)	\
 	  $(DLL_LDFLAGS)					\
 	  $(^)							\
 	  -o "$(@)"

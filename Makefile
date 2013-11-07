@@ -10,11 +10,9 @@
 
 # VLFEAT BUILDING INSTRUCTIONS
 #
-# This makefile builds VLFeat on modern UNIX boxes with the GNU
-# toolchain. Mac OS X and Linux are explicitly supported, and support
-# for similar architectures can be easily added.
-#
-# Usually, compiling VLFeat reduces to typing
+# This makefile builds VLFeat on standard Unix installations with the
+# GNU toolchain. Mac OS X and GNU-Linux are explicitly
+# supported. Usually, compiling VLFeat reduces to typing
 #
 # > cd PATH_TO_VLFEAT_SOURCE_TREE
 # > make
@@ -28,7 +26,7 @@
 #
 # builds VLFeat for Mac OS X Intel 64 bit.
 #
-# !! Unforunately MATLAB mex script (at least up to version 2009B) has
+# !! Unfortunately MATLAB mex script (at least up to version 2009B) has
 # !! a bug that prevents selecting an architecture different from the
 # !! default one for compilation. For instance, compiling maci64 may
 # !! not work as the default architecture is maci if both 32 and 64
@@ -37,28 +35,28 @@
 # !! instructions.
 #
 # Other useful variables are listed below (their default value is in
-# square bracked).
+# square brackets).
 #
-#   ARCH [undefined] - Active architecture. The supported
+#   ARCH [not defined] - Active architecture. The supported
 #       architectures are maci, maci64, glnx86, or glnxa64 (these are
-#       the same architecture identifers used by MATLAB:
+#       the same architecture identifiers used by MATLAB:
 #       http://www.mathworks.com/help/techdoc/ref/computer.html). If
 #       undefined, the makefile attempts to automatically detect the
 #       architecture.
 #
-#   DEBUG [undefined] - If defined, turns on debugging symbols and
+#   DEBUG [not defined] - If defined, turns on debugging symbols and
 #       turns off optimizations
 #
-#   PROFILE [undefined] - If defined, turns on debugging symbols but
+#   PROFILE [not defined] - If defined, turns on debugging symbols but
 #       does NOT turn off optimizations.
 #
-#   VERB [undefined] - If defined, display in full the command
+#   VERB [not defined] - If defined, display in full the command
 #       executed and their output.
 #
-#   MEX [mex]- Path to MATLAB MEX compiler. If undefined, MATLAB supprot
+#   MEX [mex]- Path to MATLAB MEX compiler. If undefined, MATLAB support
 #       is disabled.
 #
-#   MKOCTFILE [undefined] - Path to Octave MKOCTFILE compiler. If undefined,
+#   MKOCTFILE [not defined] - Path to Octave MKOCTFILE compiler. If undefined,
 #       Octave support is disabled.
 #
 # To completely remove all build products use
@@ -122,7 +120,7 @@ Darwin_i386_ARCH := maci64
 Darwin_x86_64_ARCH := maci64
 Linux_i386_ARCH := glnx86
 Linux_i686_ARCH := glnx86
-Linux_unknown_ARC := glnx86
+Linux_unknown_ARCH := glnx86
 Linux_x86_64_ARCH := glnxa64
 
 UNAME := $(shell uname -sm)
@@ -155,40 +153,41 @@ STD_LDFLAGS = $(LDFLAGS)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Mac OS X Intel 32
+# Mac OS X Intel
+ifeq ($(ARCH),$(filter $(ARCH),maci maci64))
 ifeq ($(ARCH),maci)
-SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
+march=32
+else
+march=64
+endif
+SDKROOT ?= $(shell xcrun -sdk macosx --show-sdk-path)
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
-STD_CFLAGS += -m32 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+STD_CFLAGS += -m$(march) -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
-CC ?= gcc
+CC ?= cc
+ifneq ($(shell $(CC) --version | grep clang),)
+$(info info: clang detected -- OpenMP not supported on this complier and hence disabled.)
+DISABLE_OPENMP = yes
+else
+ifndef DISABLE_AVX
+# AVX extensions require the clang assembler
+STD_CFLAGS += -Wa,-q
+endif
+endif
 endif
 
-# Mac OS X Intel 64
-ifeq ($(ARCH),maci64)
-SDKROOT ?= $(shell xcodebuild -version -sdk macosx | sed -n '/^Path\:/p' | sed 's/^Path: //')
-MACOSX_DEPLOYMENT_TARGET ?= 10.4
-STD_CFLAGS += -m64 -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-DISABLE_AVX ?= yes # GCC 4.2 need for OpenMP does not support -mavx
-CC ?= gcc
-endif
-
-# Linux-32
+# Linux
+ifeq ($(ARCH),$(filter $(ARCH),glnx86 glnxa64))
 ifeq ($(ARCH),glnx86)
-# Target compatibility with GLIBC 2.3.4
-# 1) _GNU_SOURCE avoids using isoc99_fscanf, limiting binray portability to recent GLIBC.
-# 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
-STD_CFLAGS += -m32 -D_GNU_SOURCE -fno-stack-protector
-STD_LDFLAGS += -m32 -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
-CC ?= gcc
+march=32
+else
+march=64
 endif
-
-# Linux-64
-ifeq ($(ARCH),glnxa64)
-STD_CFLAGS += -D_GNU_SOURCE -fno-stack-protector
-STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
+# Target compatibility with GLIBC 2.3.4
+# 1) _GNU_SOURCE avoids using isoc99_fscanf, limiting binary portability to recent GLIBC.
+# 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
+STD_CFLAGS += -m$(march) -D_GNU_SOURCE -fno-stack-protector
+STD_LDFLAGS += -m$(march) -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 CC ?= gcc
 endif
 

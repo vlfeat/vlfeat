@@ -34,31 +34,68 @@ info: mex-info matlab-info
 # $(call escape, string) escapes $ symbol for shell
 escape =$(subst $$,\\$$,$(1))
 
+# --------------------------------------------------------------------
+#                                                  Prepare MEX options
+# --------------------------------------------------------------------
+#
+# MATLAB provides the MEX command to compile and link MEX files. MEX is
+# in fact a wrapper of the host compiler. By itself, it understand a
+# set of standard compiler flags, but not, in general, flags which are
+# specific to the underlying complier.
+#
+# The MEX command is called as follows:
+#
+#   $(MEX) $(MEX_FLAGS) $(MEX_CFLAGS) $(MEX_LDFLAGS)
+#
+# where
+#
+# * MEX_CLFAGS are standard compiler flags such as -I (include path).
+# * MEX_LDFLAGS are standard linker flags such as -L (library path)
+#   and -l (link library)
+# * MEX_FLAGS are other MEX flags such as -v (verbose). This variable
+#   is also used to contain overrides for the variables used
+#   internally by MEX.
+#
+# The variables STD_CLFAGS and STD_LDFLAGS contain settings which are
+# specific to one complier (e.g. GCC or clang). To pass these to MEX,
+# the following is appended to MEX_FLAGS, and ultimately to the MEX
+# command line:
+#
+#   CFLAGS='$$CFLAGS $(STD_CFLAGS)'
+#   LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
+#
+# This causes MEX to append $(STD_CLFAGS) and $(STD_LDFLAGS) to its
+# default settings.
+#
+# While this usually achieves the desired effects, some versions of
+# MATLAB may not be compatible with certain compilers (e.g. MATLAB
+# 2013a and Xcode 5.0 and Mac OS X 10.9). Fixing this requires
+# changing CLFAGS and LDFLAGS completely (i.e.  not just appending to
+# their default values).
+
 MEX_ARCH = $(ARCH)
-
-# MEX_CLFAGS and MEX_LDFLAGS contain standard flags, that would
-# be understood the C compiler directly. MEX_FLAGS contain any
-# additional parameter to be passed to MEX directly. This includes
-# C compiler options that are not understood by MEX by default and
-# MEX specific options.
-
 MEX_CFLAGS = $(LINK_DLL_CFLAGS) -Itoolbox
 MEX_LDFLAGS = $(LINK_DLL_LDFLAGS) -lm
-
 MEX_FLAGS = \
 $(MEXFLAGS) \
 -$(MEX_ARCH) \
 $(if $(VERB),-v,) \
 $(if $(DEBUG),-g,-O) \
-$(if $(PROFILE),-g -O,) \
-CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))' \
-LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
+$(if $(PROFILE),-g -O,)
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
+MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CLAGS))'
+# a hack to support recent Xcode versions on old MATLABs
+MEX_FLAGS += LDFLAGS='\
+-arch i386 \
+-Wl,-syslibroot,$(SDKROOT) \
+-mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
+-bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+$(call escape,$(STD_LDFLAGS))'
 endif
 
 # Mac OS X on Intel 64 bit processor
@@ -67,17 +104,28 @@ MEX_SUFFIX := mexmaci64
 MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
+MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
+MEX_FLAGS += LDFLAGS='\
+-arch x86_64 \
+-Wl,-syslibroot,$(SDKROOT) \
+-mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
+-bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+$(call escape,$(STD_LDFLAGS))'
 endif
 
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
 MEX_SUFFIX := mexglx
+MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
 MEX_SUFFIX := mexa64
 MEX_FLAGS += -largeArrayDims
+MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
+MEX_FLAGS += LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
 endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
@@ -139,17 +187,16 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	    -compatibility_version $(VER)					\
 	    -current_version $(VER)						\
 	    -isysroot $(SDKROOT)						\
-	    -mmacosx_version_min=$(MACOSX_DEPLOYMENT_TARGET)			\
-	    $(filter-out, -fopenmp, $(DLL_LDFLAGS))                             \
+	    $(dll_obj)								\
+	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
-	    $(dll_obj)								\
 	   -o $@
 
 $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	$(call C,CC) -shared							\
 	    $(dll_obj)							        \
-	    $(filter-out, -fopenmp, $(DLL_LDFLAGS))                             \
+	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)   \
 	   -o $(@)

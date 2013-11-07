@@ -638,7 +638,7 @@ vlmxEnvelopeArrayInVlArray (VlArray * v, mxArray * x)
     case mxUINT16_CLASS: type =  VL_TYPE_UINT16 ; break ;
     case mxUINT32_CLASS: type =  VL_TYPE_UINT32 ; break ;
     case mxUINT64_CLASS: type =  VL_TYPE_UINT64 ; break ;
-    default: assert(VL_FALSE) ;
+    default: assert(VL_FALSE) ; abort() ;
   }
 
   vl_array_init_envelope(v, mxGetData(x), type, numDimensions, vdimensions) ;

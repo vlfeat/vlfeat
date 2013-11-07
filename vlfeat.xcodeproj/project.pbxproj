@@ -1772,7 +1772,7 @@
 				ARCH = "$(ARCH_$(ARCHS))";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
-				CC = /usr/bin/gcc;
+				CC = gcc;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
@@ -1845,7 +1845,7 @@
 				ARCH = "$(ARCH_$(ARCHS))";
 				ARCH_i386 = maci;
 				ARCH_x86_64 = maci64;
-				CC = /usr/bin/gcc;
+				CC = gcc;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
