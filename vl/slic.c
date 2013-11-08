@@ -334,6 +334,7 @@ vl_slic_segment (vl_uint32 * segmentation,
 
   vl_free(masses) ;
   vl_free(centers) ;
+  vl_free(edgeMap) ;
 
   /* elimiate small regions */
   {
