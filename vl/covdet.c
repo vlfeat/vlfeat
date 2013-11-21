@@ -520,7 +520,8 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_OR_ADDITIONAL_PEAKS_RELATIVE_SIZE 0.8
 #define VL_COVDET_LAP_NUM_LEVELS 10
 #define VL_COVDET_LAP_PATCH_RESOLUTION 16
-#define VL_COVDET_DOG_DEF_PEAK_THRESHOLD 0.01
+#define VL_COVDET_LAP_DEF_PEAK_THRESHOLD 0.01
+#define VL_COVDET_DOG_DEF_PEAK_THRESHOLD VL_COVDET_LAP_DEF_PEAK_THRESHOLD
 #define VL_COVDET_DOG_DEF_EDGE_THRESHOLD 10.0
 #define VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD 0.000002
 #define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
@@ -535,6 +536,7 @@ struct _VlCovDet
   VlCovDetMethod method ;    /**< feature extraction method. */
   double peakThreshold ;     /**< peak threshold. */
   double edgeThreshold ;     /**< edge threshold. */
+  double lapPeakThreshold;   /**< peak threshold for Laplacian scale selection. */
   vl_size octaveResolution ; /**< resolution of each octave. */
   vl_index firstOctave ;     /**< index of the first octave. */
 
@@ -589,17 +591,20 @@ vl_covdet_new (VlCovDetMethod method)
     case VL_COVDET_METHOD_DOG :
       self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_DOG_DEF_EDGE_THRESHOLD ;
+      self->lapPeakThreshold = 0  ; /* not used */
       break ;
     case VL_COVDET_METHOD_HARRIS_LAPLACE:
     case VL_COVDET_METHOD_MULTISCALE_HARRIS:
       self->peakThreshold = VL_COVDET_HARRIS_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD ;
+      self->lapPeakThreshold = VL_COVDET_LAP_DEF_PEAK_THRESHOLD ;
       break ;
     case VL_COVDET_METHOD_HESSIAN :
     case VL_COVDET_METHOD_HESSIAN_LAPLACE:
     case VL_COVDET_METHOD_MULTISCALE_HESSIAN:
       self->peakThreshold = VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD ;
       self->edgeThreshold = VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD ;
+      self->lapPeakThreshold = VL_COVDET_LAP_DEF_PEAK_THRESHOLD ;
       break;
     default:
       assert(0) ;
@@ -670,7 +675,6 @@ vl_covdet_new (VlCovDetMethod method)
   }
   return self ;
 }
-
 
 /** @brief Reset object
  ** @param self object.
@@ -2041,7 +2045,7 @@ vl_covdet_extract_laplacian_scales_for_frame (VlCovDet * self,
     double a = scores[k-1] ;
     double b = scores[k] ;
     double c = scores[k+1] ;
-    double t = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
+    double t = self->lapPeakThreshold ;
 
     if ((((b > a) && (b > c)) || ((b < a) && (b < c))) && (vl_abs_d(b) >= t)) {
       double dk = - 0.5 * (c - a) / (c + a - 2 * b) ;
@@ -2259,6 +2263,33 @@ vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold)
 {
   assert(peakThreshold >= 0) ;
   self->peakThreshold = peakThreshold ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get the Laplacian peak threshold
+ ** @param self ::VlCovDet object.
+ ** @return the Laplacian peak threshold.
+ **
+ ** This parameter affects only the detecors using the Laplacian
+ ** scale selectino method such as Harris-Laplace.
+ **/
+double
+vl_covdet_get_laplacian_peak_threshold (VlCovDet const * self)
+{
+  return self->lapPeakThreshold ;
+}
+
+/** @brief Set the Laplacian peak threshold
+ ** @param self ::VlCovDet object.
+ ** @param the Laplacian peak threshold.
+ **
+ ** The peak threshold must be non-negative.
+ **/
+void
+vl_covdet_set_laplacian_peak_threshold (VlCovDet * self, double peakThreshold)
+{
+  assert(peakThreshold >= 0) ;
+  self->lapPeakThreshold = peakThreshold ;
 }
 
 /* ---------------------------------------------------------------- */

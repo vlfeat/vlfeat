@@ -54,6 +54,11 @@
 %   image edges. These locations are usually discarded as they tend to
 %   be unstable.
 %
+%   Some corner detectors (e.g. HarrisLaplace) use peak in the
+%   response of the multi-scale Laplace operator to select the
+%   scale of the detected frames. These peaks are filtered by
+%   a threshold adjustable by using the 'LaplacianPeakThreshold' option.
+%
 %   VL_COVDET(..., 'EstimateAffineShape', true) switches on affine
 %   adaptation, an algorithm [2] that attempts to estimate the affine
 %   covariant shape of each feature.
@@ -128,6 +133,14 @@
 %
 %   info.edgeScores::
 %     The edge scores of the detected features.
+%
+%   info.orientationScores::
+%     The peak score of the gradient orientation histograms used to
+%     assign an orientation to the detected features.
+%
+%   info.laplacianScaleScores::
+%     The peak score of the Laplacian measure used to select
+%     the scale of the detected features.
 %
 %   info.gss::
 %     The Gaussian scale space (see VL_PLOTSS()).

@@ -29,6 +29,7 @@ enum {
   opt_double_image,
   opt_peak_threshold,
   opt_edge_threshold,
+  opt_laplacian_peak_threshold,
   opt_estimate_orientation,
   opt_estimate_affine_shape,
   opt_frames,
@@ -50,6 +51,7 @@ vlmxOption  options [] = {
   {"DoubleImage",           1,   opt_double_image            },
   {"PeakThreshold",         1,   opt_peak_threshold          },
   {"EdgeThreshold",         1,   opt_edge_threshold          },
+  {"LaplacianPeakThreshold",1,   opt_laplacian_peak_threshold},
 
   {"EstimateOrientation",   1,   opt_estimate_orientation    },
   {"EstimateAffineShape",   1,   opt_estimate_affine_shape   },
@@ -203,6 +205,7 @@ mexFunction(int nout, mxArray *out[],
   vl_index octaveResolution = -1 ;
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
+  double lapPeakThreshold = -1 ;
 
   int descriptorType = -1 ;
   vl_index patchResolution = -1 ;
@@ -306,6 +309,12 @@ mexFunction(int nout, mxArray *out[],
     case opt_peak_threshold :
       if (!vlmxIsPlainScalar(optarg) || (peakThreshold = *mxGetPr(optarg)) < 0) {
         vlmxError(vlmxErrInvalidArgument, "PEAKTHRESHOLD must be a non-negative real.") ;
+      }
+      break ;
+        
+    case opt_laplacian_peak_threshold :
+      if (!vlmxIsPlainScalar(optarg) || (lapPeakThreshold = *mxGetPr(optarg)) < 0) {
+        vlmxError(vlmxErrInvalidArgument, "LAPLACIANPEAKTHRESHOLD must be a non-negative real.") ;
       }
       break ;
 
@@ -427,7 +436,8 @@ mexFunction(int nout, mxArray *out[],
     if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
-
+    if (lapPeakThreshold >= 0) vl_covdet_set_laplacian_peak_threshold(covdet, lapPeakThreshold) ;
+    
     if (verbose) {
       VL_PRINTF("vl_covdet: doubling image: %s\n",
                 VL_YESNO(vl_covdet_get_first_octave(covdet) < 0)) ;
