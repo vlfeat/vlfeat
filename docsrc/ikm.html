@@ -50,6 +50,7 @@ for k=1:K
   selt = find(AT == k) ;
   plot(data(1,sel),  data(2,sel),  '.',...
        'Color',cl(mod(k,ncl)+1,:)) ;
+  hold on ;
   plot(datat(1,selt),datat(2,selt),'+',...
        'Color',cl(mod(k,ncl)+1,:)) ;
 end
