@@ -34,27 +34,7 @@
 
 <dir name="overview">
   <page id="tut" name="tut" title="Tutorials">
-   <include src="tutorials.html"/>
-   <include src="tutorials/frame.html"/>
-   <page id="tut.covdet" name="covdet" title="Covdet"> <include src="covdet.html"/></page>
-   <page id="tut.hog" name="hog" title="HOG"> <include src="hog.html"/></page>
-   <page id="tut.sift" name="sift" title="SIFT"> <include src="sift.html"/></page>
-   <page id="tut.dsift" name="dsift" title="DSIFT/PHOW"> <include src="dsift.html"/></page>
-   <page id="tut.liop" name="liop" title="LIOP"> <include src="liop.html"/></page>
-   <page id="tut.mser" name="mser" title="MSER"> <include src="mser.html"/></page>
-   <page id="tut.gmm" name="gmm" title="GMM">  <include src="gmm.html"/></page>
-   <page id="tut.kmeans" name="kmeans" title="KMeans">  <include src="kmeans.html"/></page>
-   <page id="tut.encodings" name="encodings" title="Encodings">  <include src="encode.html"/></page>
-   <page id="tut.ikm" name="ikm" title="IKM">  <include src="ikm.html"/></page>
-   <page id="tut.hikm" name="hikm" title="HIKM"> <include src="hikm.html"/></page>
-   <page id="tut.aib"  name="aib" title="AIB">  <include src="aib.html"/></page>
-   <page id="tut.qs" name="quickshift" title="Quick shift">  <include src="quickshift.html"/></page>
-   <page id="tut.slic" name="slic" title="SLIC"> <include src="slic.html"/></page>
-   <page id="tut.kdtree"  name="kdtree" title="kd-tree">  <include src="kdtree.html"/></page>
-   <page id="tut.imdisttf" name="imdisttf" title="Distance transf.">  <include src="imdisttf.html"/></page>
-   <page id="tut.utils" name="utils" title="Utils"> <include src="utils.html"/></page>
-   <page id="tut.svm" name="svm" title="SVM"> <include src="svm.html"/></page>
-   <page id="tut.plots-rank" name="plots-rank" title="Plots: rank"> <include src="plots-rank.html"/></page>
+    <include src="tutorials.html"/>
   </page>
 </dir>
 

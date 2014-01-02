@@ -13,63 +13,133 @@ K-means, GMMs, KDTrees, and SVMs.</p>
 
 <h1 id="tut.features">Visual features</h1>
 <ul>
-  <li><p><a href="%pathto:tutorial.frame;">Feature frames.</a> An
-  overview of the concept of <em>feature frame</em> used as geometric
-  reference in feature detection.
+  <li><p><a href="%pathto:tutorial.frame;">Local features: the concept
+  of frames (keypoints).</a> An overview of the concept of <em>feature
+  frame</em> used as geometric reference in feature detection.
   </p></li>
+  <page id="tutorial.frame" name="frame" title="Local feature frames">
+    <include src="tutorials/frame.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.covdet;">Covariant detectors.</a> An
   introduction to computing co-variant features like Harris-Affine.
   </p></li>
+  <page id="tut.covdet" name="covdet" title="Covariant feature detectors">
+    <include src="tutorials/covdet.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.hog;">Histogram of Oriented Gradients
   (HOG).</a> Getting started with this ubiquitous representation for
   object recognition and detection.
   </p></li>
+  <page id="tut.hog" name="hog" title="HOG features">
+    <include src="tutorials/hog.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.sift;">Scale Invariant Feature Transform
   (SIFT)</a>. An introduction to SIFT keypoint and descriptor
   extraction and matching.
   </p></li>
+  <page id="tut.sift" name="sift" title="SIFT detector and descriptor">
+    <include src="tutorials/sift.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.dsift;">Dense SIFT (DSIFT) and
   PHOW</a>. Extracting dense SIFT features for image
   classification.</p></li>
-   <li><p><a href="%pathto:tut.liop;">Local Intensity Order Pattern
+  <page id="tut.dsift" name="dsift" title="Dense SIFT">
+    <include src="tutorials/dsift.html"/>
+  </page>
+  
+  <li><p><a href="%pathto:tut.liop;">Local Intensity Order Pattern
   (LIOP)</a>. Getting started with the LIOP descriptor as an
   alternative to SIFT in keypoint matching.</p></li>
+  <page id="tut.liop" name="liop" title="LIOP local descriptor">
+    <include src="tutorials/liop.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.mser;">Maximally Stable Extremal Regions
   (MSER)</a>. Extracting MSERs from an image as an alternative
   covariant feature detector.</p></li>
+  <page id="tut.mser" name="mser" title="MSER feature detector">
+    <include src="tutorials/mser.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.imdisttf;">Image distance transform.</a>
   Compute the image distance transform for fast part models and edge
   matching.</p></li>
+  <page id="tut.imdisttf" name="imdisttf" title="Distance transform">
+    <include src="tutorials/imdisttf.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.encodings;">Fisher vector and VLAD
   encodings.</a> Compute global image encodings by pooling local image
   features with Fisher vectors and VLAD.</p></li>
+  <page id="tut.encodings" name="encodings" title="Fisher Vector and VLAD">
+    <include src="tutorials/encode.html"/>
+  </page>
 </ul>
 
 <h1 id="tut.stat">Statistical methods</h1>
 <ul>
   <li><p><a href="%pathto:tut.gmm;">GMM</a>. Learn Gaussian Mixture
   Models using the Expectation Maximization algorithm.</p></li>
+  <page id="tut.gmm" name="gmm" title="Gaussian Mixture Models">
+    <include src="tutorials/gmm.html"/>
+  </page>
+  
   <li><p><a href="%pathto:tut.kmeans;"><em>k</em>-means</a>. Cluster
-      features with <em>k</em>-means.</p></li>
+    features with <em>k</em>-means.</p></li>
+  <page id="tut.kmeans" name="kmeans" title="K-means clustering">
+    <include src="tutorials/kmeans.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.aib;">Agglomerative Information Bottleneck
   (AIB)</a>. Cluster discrete data based on the mutual information
   between the data and class labels.</p></li>
+  <page id="tut.aib"  name="aib" title="Agglomerative Infromation Bottleneck">
+    <include src="tutorials/aib.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.qs;">Quick shift</a>.  An introduction
   which shows how to create superpixels using this quick mode seeking
   method.</p></li>
+  <page id="tut.qs" name="quickshift" title="Quick shift superpixels">
+    <include src="tutorials/quickshift.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.slic;">SLIC</a>. An introduction to SLIC
-  supoerpixels.</p></li>
+  superpixels.</p></li>
+  <page id="tut.slic" name="slic" title="SLIC superpixels">
+    <include src="tutorials/slic.html"/>
+  </page>
+  
   <li><p><a href="%pathto:tut.svm;">Support Vector Machine (SVM)</a>.
   Learn a binary classifier and check its convergence by plotting
   various statistical information.</p></li>
+  <page id="tut.svm" name="svm" title="Support Vector Machines (SVMs)">
+    <include src="tutorials/svm.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.kdtree;">Forests of kd-trees</a>.
   Approximate nearest neighbor queries in high dimensions using an
   optimized forest of kd-trees.</p></li>
+  <page id="tut.kdtree" name="kdtree" title="KD-trees and forests">
+    <include src="tutorials/kdtree.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.plots-rank;">Plotting functions for rank
   evaluation.</a>  Learn how to plot ROC, DET, and precision-recall
   curves.</p></li>
+  <page id="tut.plots-rank" name="plots-rank" title="Plotting AP and ROC curves">
+    <include src="tutorials/plots-rank.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.utils;">MATLAB Utilities</a>. A list of
   useful MATLAB functions bundled with VLFeat.</p></li>
+  <page id="tut.utils" name="utils" title="Miscellaneous utilities">
+    <include src="tutorials/utils.html"/>
+  </page>
 </ul>
 
 <h1>Obsolete tutorials</h1>
@@ -77,8 +147,15 @@ K-means, GMMs, KDTrees, and SVMs.</p>
   <li><p><a href="%pathto:tut.ikm;">Integer optimized <em>k</em>-means
   (IKM)</a>. VLFeat integeger-otpimized <em>k</em>-means
   implementation (obsolete).</p></li>
+  <page id="tut.ikm" name="ikm" title="Integer K-means">
+    <include src="tutorials/ikm.html"/>
+  </page>
+
   <li><p><a href="%pathto:tut.hikm;">Hierarchical <em>k</em>-means
   (HIKM)</a>. Create a fast <em>k</em>-means tree for integer
   data (obsolete).</p></li>
+  <page id="tut.hikm" name="hikm" title="Hierarchical integer k-means">
+    <include src="tutorials/hikm.html"/>
+  </page>
 </ul>
 </group>
