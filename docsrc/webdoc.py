@@ -1,13 +1,13 @@
 #!/usr/bin/python
-# file:        webdoc.py
-# author:      Andrea Vedaldien
-# description: Implementation of webdoc.
+# file: webdoc.py
+# author: Andrea Vedaldi
+# description: A website formatter utility
 
-# Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+# Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
 # This file is part of the VLFeat library and is made available under
-# the terms of the BSD license (see the COPYING file).s
+# the terms of the BSD license (see the COPYING file).
 
 import cProfile
 import types
@@ -177,7 +177,7 @@ class DocError(BaseException):
         if len(self.locations) > 0:
             for i in xrange(len(self.locations)-1,0,-1):
                 str += "included from %s:\n" % self.locations[i]
-            return str + "%s:%s" % (self.locations[0], BaseException.__str__(self))
+            return str + "%s: error: %s" % (self.locations[0], BaseException.__str__(self))
         else:
             return self.message
 
@@ -455,7 +455,7 @@ class DocNode(DocBareNode):
                 if nodeIndex.has_key(toNodeID):
                     toNodeURL = nodeIndex[toNodeID].getPublishURL()
                 if toNodeURL is None:
-                    print "%s:warning: could not cross-reference '%s'" % (self.getLocation(), toNodeID)
+                    print "%s: warning: could not cross-reference '%s'" % (self.getLocation(), toNodeID)
                     toNodeURL = toNodeID
                 fromPageURL = pageNode.getPublishURL()
                 xvalue += calcRelURL(toNodeURL, fromPageURL)
@@ -466,15 +466,15 @@ class DocNode(DocBareNode):
                 if envName in os.environ:
                     xvalue += os.environ[envName]
                 else:
-                    print "%s:warning: the environment variable '%s' not defined" % (self.getLocation(), envName)
+                    print "%s: warning: the environment variable '%s' not defined" % (self.getLocation(), envName)
                 continue
             mo = re.match('dox:(.*)', directive)
             if mo:
                 if doxygenIndex is None:
-                    print "%s:warning: no Doxygen tag file loaded, skipping this directive." % self.getLocation()
+                    print "%s: warning: no Doxygen tag file loaded, skipping this directive." % self.getLocation()
                     continue
                 if not mo.group(1) in doxygenIndex.index:
-                    print "%s:warning: the ID %s was not found in the Doxygen tag file." % (self.getLocation(), mo.group(2))
+                    print "%s: warning: the ID %s was not found in the Doxygen tag file." % (self.getLocation(), mo.group(2))
                     continue
                 toNodeURL = nodeIndex['root'].getPublishURL() + '/' + doxygenDir + '/' + doxygenIndex.index[mo.group(1)]
                 fromPageURL = pageNode.getPublishURL()
@@ -1216,6 +1216,7 @@ if __name__ == '__main__':
 --verbose   Be verbose
 --doxytag   Doxygen tag file
 --doxydir   Doxygen documentation location
+--profile   Collect and print profiling information
 """
     parser = OptionParser(usage=usage)
     parser.add_option(
