@@ -133,7 +133,7 @@ def walkNodes(rootNode, nodeType = None, nodeBarrier = None):
     if nodeBarrier and rootNode.isA(nodeBarrier):
         return
     for n in rootNode.getChildren():
-        for m in walkNodes(n, nodeType):
+        for m in walkNodes(n, nodeType, nodeBarrier):
             yield m
     if not nodeType or rootNode.isA(nodeType):
         yield rootNode
@@ -413,7 +413,7 @@ class DocNode(DocBareNode):
 
     def publishTableOfContents(self, gen, pageNode):
         """
-        Create a TOC by lookin at H1, H2, ... tags in a DocPage."
+        Create a TOC corresponding to the H1, H2, ... tags in a DocPage."
         """
         gen.putString("<div class='toc'>\n")
         gen.putString("<h3>Table of Contents</h3>")
@@ -421,7 +421,7 @@ class DocNode(DocBareNode):
         for q in pageNode.getChildren():
             for x in walkNodes(q, DocHtmlElement, DocPage):
                 if x.tag not in ['h1', 'h2', 'h3', 'h4', 'h5']: continue
-                level = int(x.tag[1])
+                level = int(x.tag[1]) # e.g. h2 -> level = 2
                 title = "".join([y.text for y in walkNodes(x, DocHtmlText)])
                 while previousLevel < level:
                     gen.putString("<ul>")
