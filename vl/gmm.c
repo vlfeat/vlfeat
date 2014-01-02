@@ -736,7 +736,7 @@ VL_XCAT(vl_get_gmm_data_posteriors_, SFX)
 
   logCovariances = vl_malloc(sizeof(TYPE) * numClusters) ;
   invCovariances = vl_malloc(sizeof(TYPE) * numClusters * dimension) ;
-  logWeights = vl_malloc(numClusters * sizeof(TYPE)) ;
+  logWeights = vl_malloc(sizeof(TYPE) * numClusters) ;
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(i_cl,dim) num_threads(vl_get_max_threads())
