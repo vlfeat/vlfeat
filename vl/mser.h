@@ -102,7 +102,8 @@ VL_INLINE void  vl_mser_set_min_diversity   (VlMserFilt *f, double      x) ;
  *                                                   INLINE DEFINITIONS
  * ================================================================== */
 
-/** @internal @brief MSER accumulator data type
+/** @internal
+ ** @brief MSER accumulator data type
  **
  ** This is a large integer type. It should be large enough to contain
  ** a number equal to the area (volume) of the image by the image
@@ -119,7 +120,8 @@ typedef float vl_mser_acc ;
 #endif
 
 /* ----------------------------------------------------------------- */
-/** @internal @brief MSER: basic region (declaration)
+/** @internal
+ ** @brief MSER: basic region (declaration)
  **
  ** Extremal regions and maximally stable extremal regions are
  ** instances of image regions.
@@ -154,7 +156,8 @@ struct _VlMserReg
 typedef struct _VlMserReg VlMserReg ;
 
 /* ----------------------------------------------------------------- */
-/** @internal @brief MSER: extremal region (declaration)
+/** @internal
+ ** @brief MSER: extremal region (declaration)
  **
  ** Extremal regions (ER) are extracted from the region forest. Each
  ** region is represented by an instance of this structure. The
@@ -185,15 +188,17 @@ struct _VlMserExtrReg
   vl_mser_pix  value ;      /**< value of pivot pixel                         */
   vl_uint      shortcut ;   /**< shortcut used when building a tree           */
   vl_uint      area ;       /**< area of the region                           */
-  float    variation ;  /**< rel. area variation                          */
+  float        variation ;  /**< rel. area variation                          */
   vl_uint      max_stable ; /**< max stable number (=0 if not maxstable)      */
 } ;
 
-/** @internal @brief MSER: extremal region */
+/** @internal
+ ** @brief MSER: extremal region */
 typedef struct _VlMserExtrReg VlMserExtrReg ;
 
 /* ----------------------------------------------------------------- */
-/** @internal @brief MSER filter
+/** @internal
+ ** @brief MSER filter
  ** @see @ref mser
  **/
 struct _VlMserFilt
@@ -226,8 +231,8 @@ struct _VlMserFilt
 
   /** @name Ellipsoids fitting */
   /*@{*/
-  float         *acc ;     /**< moment accumulator.                    */
-  float         *ell ;     /**< ellipsoids list.                       */
+  float             *acc ;     /**< moment accumulator.                    */
+  float             *ell ;     /**< ellipsoids list.                       */
   int                rell ;    /**< size of ell buffer                     */
   int                nell ;    /**< number of ellipsoids extracted         */
   int                dof ;     /**< number of dof of ellipsoids.           */
@@ -237,7 +242,7 @@ struct _VlMserFilt
   /** @name Configuration */
   /*@{*/
   vl_bool   verbose ;          /**< be verbose                             */
-  int       delta ;            /**< delta filter parameter                  */
+  int       delta ;            /**< delta filter parameter                 */
   double    max_area ;         /**< badness test parameter                 */
   double    min_area ;         /**< badness test parameter                 */
   double    max_variation ;    /**< badness test parameter                 */

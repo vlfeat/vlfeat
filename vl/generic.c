@@ -929,7 +929,8 @@ do_nothing_printf (char const* format VL_UNUSED, ...)
   return 0 ;
 }
 
-/** @internal@brief Lock VLFeat state
+/** @internal
+ ** @brief Lock VLFeat state
  **
  ** The function locks VLFeat global state mutex.
  **
@@ -965,7 +966,8 @@ vl_lock_state (void)
 #endif
 }
 
-/** @internal@brief Unlock VLFeat state
+/** @internal
+ ** @brief Unlock VLFeat state
  **
  ** The function unlocks VLFeat global state mutex.
  **
@@ -990,7 +992,8 @@ vl_unlock_state (void)
 #endif
 }
 
-/** @internal@brief Return VLFeat global state
+/** @internal
+ ** @brief Return VLFeat global state
  **
  ** The function returns a pointer to VLFeat global state.
  **
