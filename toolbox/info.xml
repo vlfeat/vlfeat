@@ -6,7 +6,7 @@
     <name>VLFeat</name>
     <type>toolbox</type>
     <icon>../doc/images/vl_blue.png</icon>
-    <help_location>../doc/mdoc/</help_location>
+    <help_location>../doc/matlab/</help_location>
     <help_contents_icon>../doc/images/vl_blue.png</help_contents_icon>
 
 </productinfo>
