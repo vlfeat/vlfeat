@@ -8,7 +8,7 @@ function eframes = vl_frame2oell(frames)
 %   or an oriented ellipse. These are represented respectively by 2,
 %   3, 4, 5 and 6 parameters each, as described in VL_PLOTFRAME().  An
 %   oriented ellipse is the most general geometric frame; hence, there
-%   is no loss of information by this conversion.
+%   is no loss of information in this conversion.
 %
 %   If FRAME is an oriented disc or ellipse, then the conversion is
 %   immediate. If, however, FRAME is not oriented (it is either a
@@ -21,7 +21,8 @@ function eframes = vl_frame2oell(frames)
 %
 %   If FRAME is a point, then the output is an ellipse with null area.
 %
-%   See: VL_PLOTFRAME(), VL_HELP().
+%   See: <a href="matlab:vl_help('tut.frame')">feature frames</a>,
+%   VL_PLOTFRAME(), VL_HELP().
 
 % Author: Andrea Vedaldi
 

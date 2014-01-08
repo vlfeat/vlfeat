@@ -71,7 +71,7 @@ for i = 1 : 5
   frames1(:,i) = [i ; 0 ; A(:)] ;
 
   % get the unoriented variant of the same ellipse
-  S = A'*A ;
+  S = A*A' ;
   frames2(:,i) = [i ; 0 ; S(1,1) ; S(1,2) ; S(2,2)] ;
 end
 
