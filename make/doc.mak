@@ -21,7 +21,6 @@ DOXYGEN    ?= doxygen
 
 PDFLATEX   ?= pdflatex
 FIG2DEV    ?= fig2dev
-INKSCAPE   ?= inkscape
 CONVERT    ?= convert
 
 PYTHON     ?= python
@@ -189,19 +188,18 @@ doc/build/man/%.html : src/% $(doc-dir)
 
 doc_fig_src := $(wildcard docsrc/figures/*.fig)
 doc_svg_src := $(wildcard docsrc/figures/*.svg)
-doc_fig_tgt += $(subst docsrc/,doc/,$(doc_fig_src:.fig=.png)) $(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
+doc_fig_tgt += \
+$(subst docsrc/,doc/,$(doc_fig_src:.fig=.png)) \
+$(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
 
 .PRECIOUS: doc/build/figures/%.pdf
 .PRECIOUS: doc/build/figures/%.tex
 
 doc/figures/%.png : doc/build/figures/%.pdf
-	$(call C,CONVERT) -density 300 "$<" -resample $(screen_dpi) -trim  "$@"
+	$(call C,CONVERT) -units PixelsPerInch -density $(screen_dpi) -resample $(screen_dpi) -trim "$<" "$@"
 
-# Inkscape
-doc/build/figures/%-raw.pdf doc/build/figures/%-raw.tex: docsrc/figures/%.svg
-	$(call C,INKSCAPE) --export-pdf=doc/build/figures/$(*)-raw.pdf --export-latex "$<"
-	@$(MV) doc/build/figures/$(*)-raw.pdf_tex doc/build/figures/$(*)-raw.tex
-	@$(SED) -e 's/$(*)-raw/doc\/build\/figures\/$(*)-raw/g' -i.bak 'doc/build/figures/$(*)-raw.tex'
+doc/figures/%.png : docsrc/figures/%.svg
+	$(call C,CONVERT) -units PixelsPerInch -density $(screen_dpi) -resample $(screen_dpi) -trim "$<" "$@"
 
 # Fig
 doc/build/figures/%-raw.tex : docsrc/figures/%.fig $(doc-dir)
