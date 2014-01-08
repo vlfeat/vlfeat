@@ -54,6 +54,14 @@ nodeUniqueCount = 0
 doxygenIndex = None
 doxygenDir = ''
 
+def getDoxygenURL(tag):
+    url = ''
+    rootURL = nodeIndex['root'].getPublishURL()
+    if rootURL: url += rootURL + '/'
+    if doxygenDir: url += doxygenDir + '/'
+    url += doxygenIndex.index[tag]
+    return url
+
 def getUniqueNodeID(id = None):
     """
     getUniqueNodeID() generates an unique ID for a document node.
@@ -266,7 +274,7 @@ class DocNode(DocBareNode):
         nodeIndex[self.id] = self
 
     def __str__(self):
-        return "%s:%s" % (self.getLocation(), self.getID())
+        return "%s:%s -> %s" % (self.getLocation(), self.getID(), self.getPublishURL())
 
     def dump(self):
         """
@@ -476,7 +484,7 @@ class DocNode(DocBareNode):
                 if not mo.group(1) in doxygenIndex.index:
                     print "%s: warning: the ID %s was not found in the Doxygen tag file." % (self.getLocation(), mo.group(2))
                     continue
-                toNodeURL = nodeIndex['root'].getPublishURL() + '/' + doxygenDir + '/' + doxygenIndex.index[mo.group(1)]
+                toNodeURL = getDoxygenURL(mo.group(1))
                 fromPageURL = pageNode.getPublishURL()
                 xvalue += calcRelURL(toNodeURL, fromPageURL)
                 continue
@@ -883,6 +891,9 @@ class DocSite(DocNode):
     def getPublishURL(self):
         return self.siteURL
 
+    def setPublishURL(self, url):
+        self.siteURL = url
+
     def getPublishDirName(self):
         return ""
 
@@ -1175,8 +1186,11 @@ def start(filePath, opts):
         print e
         sys.exit(-1)
 
-    # configure
+    # configure site
     handler.rootNode.setOutDir(opts.outdir)
+    handler.rootNode.setPublishURL(opts.siteurl)
+
+    # load doxygen tag file
     if opts.doxytag:
         if opts.verb: print "Loading doxygen tag file", opts.doxytag
         try:
@@ -1186,13 +1200,6 @@ def start(filePath, opts):
             print "Error parsing Doxygen tag file ", opts.doxytag
             print e
             sys.exit(-1)
-
-
-    #print "== Index Content =="
-    # dumpIndex()
-    #print
-    #print "== Node Tree =="
-    #handler.rootNode.dump()
 
     if opts.verb:
         print "== All pages =="
@@ -1205,6 +1212,28 @@ def start(filePath, opts):
     except DocError, e:
         print e
         sys.exit(-1)
+
+    if opts.indexfile:
+        print "Storing website index to", opts.indexfile
+        try:
+            f = open(opts.indexfile, 'w+')
+            siteurl = nodeIndex['root'].getPublishURL()
+            for (id,x) in sorted(nodeIndex.items()):
+                if (x.isA(DocHtmlElement) or x.isA(DocPage)) and x.attrs.has_key('id'):
+                    url = x.getPublishURL()
+                    if not url: continue
+                    print >>f, '%s|%s' % (x.attrs['id'],
+                                          calcRelURL(url,siteurl))
+            if doxygenIndex:
+                for tag in sorted(doxygenIndex.index):
+                    url = getDoxygenURL(tag)
+                    print >>f, '%s|%s' % (tag,
+                                          calcRelURL(url,siteurl))
+        except Exception, e:
+            print "Error writing index file"
+            print e
+            sys.exit(-1)
+
     sys.exit(0)
 
 # --------------------------------------------------------------------
@@ -1249,6 +1278,18 @@ if __name__ == '__main__':
         default = False,
         action  = "store_true",
         help    = "run the profiler")
+    parser.add_option(
+        "", "--siteurl",
+        dest = "siteurl",
+        default = "",
+        action = "store",
+        help = "set the base URL of the website")
+    parser.add_option(
+        "", "--indexfile",
+        dest = "indexfile",
+        default = None,
+        action = "store",
+        help = "store the website index here")
 
     (opts, args) = parser.parse_args()
 
