@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="595.276" height="822.047" viewBox="0, 0, 595.276, 822.047">
+  <g id="Layer 1">
+    <g>
+      <path d="M12.5,12.5 L36.5,12.5 L36.5,36.5 L12.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,12.5 L36.5,12.5 L36.5,36.5 L12.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,12.5 L60.5,12.5 L60.5,36.5 L36.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M36.5,12.5 L60.5,12.5 L60.5,36.5 L36.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,12.5 L84.5,12.5 L84.5,36.5 L60.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M60.5,12.5 L84.5,12.5 L84.5,36.5 L60.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M12.5,36.5 L36.5,36.5 L36.5,60.5 L12.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,36.5 L36.5,36.5 L36.5,60.5 L12.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,36.5 L60.5,36.5 L60.5,60.5 L36.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M36.5,36.5 L60.5,36.5 L60.5,60.5 L36.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,36.5 L84.5,36.5 L84.5,60.5 L60.5,60.5 z" fill="#FFFFFF"/>
+      <path d="M60.5,36.5 L84.5,36.5 L84.5,60.5 L60.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M12.5,60.5 L36.5,60.5 L36.5,84.5 L12.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,60.5 L36.5,60.5 L36.5,84.5 L12.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,60.5 L60.5,60.5 L60.5,84.5 L36.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M36.5,60.5 L60.5,60.5 L60.5,84.5 L36.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,60.5 L84.5,60.5 L84.5,84.5 L60.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M60.5,60.5 L84.5,60.5 L84.5,84.5 L60.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M108.5,12.5 L132.5,12.5 L132.5,36.5 L108.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,12.5 L132.5,12.5 L132.5,36.5 L108.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,12.5 L156.5,12.5 L156.5,36.5 L132.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,12.5 L156.5,12.5 L156.5,36.5 L132.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,12.5 L180.5,12.5 L180.5,36.5 L156.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M156.5,12.5 L180.5,12.5 L180.5,36.5 L156.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M108.5,36.5 L132.5,36.5 L132.5,60.5 L108.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,36.5 L132.5,36.5 L132.5,60.5 L108.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,36.5 L156.5,36.5 L156.5,60.5 L132.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,36.5 L156.5,36.5 L156.5,60.5 L132.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,36.5 L180.5,36.5 L180.5,60.5 L156.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M156.5,36.5 L180.5,36.5 L180.5,60.5 L156.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M108.5,60.5 L132.5,60.5 L132.5,84.5 L108.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,60.5 L132.5,60.5 L132.5,84.5 L108.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,60.5 L156.5,60.5 L156.5,84.5 L132.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,60.5 L156.5,60.5 L156.5,84.5 L132.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,60.5 L180.5,60.5 L180.5,84.5 L156.5,84.5 z" fill="#FFFFFF"/>
+      <path d="M156.5,60.5 L180.5,60.5 L180.5,84.5 L156.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M204.5,12.5 L228.5,12.5 L228.5,36.5 L204.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,12.5 L228.5,12.5 L228.5,36.5 L204.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M228.5,12.5 L252.5,12.5 L252.5,36.5 L228.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M228.5,12.5 L252.5,12.5 L252.5,36.5 L228.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M252.5,12.5 L276.5,12.5 L276.5,36.5 L252.5,36.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,12.5 L276.5,12.5 L276.5,36.5 L252.5,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M204.5,36.5 L228.5,36.5 L228.5,60.5 L204.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,36.5 L228.5,36.5 L228.5,60.5 L204.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M228.5,36.5 L252.5,36.5 L252.5,60.5 L228.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M228.5,36.5 L252.5,36.5 L252.5,60.5 L228.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M252.5,36.5 L276.5,36.5 L276.5,60.5 L252.5,60.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,36.5 L276.5,36.5 L276.5,60.5 L252.5,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M204.5,60.5 L228.5,60.5 L228.5,84.5 L204.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,60.5 L228.5,60.5 L228.5,84.5 L204.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M228.5,60.5 L252.5,60.5 L252.5,84.5 L228.5,84.5 z" fill="#FFFFFF"/>
+      <path d="M228.5,60.5 L252.5,60.5 L252.5,84.5 L228.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M252.5,60.5 L276.5,60.5 L276.5,84.5 L252.5,84.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,60.5 L276.5,60.5 L276.5,84.5 L252.5,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M337.836,12.5 L361.836,12.5 L361.836,36.5 L337.836,36.5 z" fill="#D2D2D2"/>
+      <path d="M337.836,12.5 L361.836,12.5 L361.836,36.5 L337.836,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M361.836,12.5 L385.836,12.5 L385.836,36.5 L361.836,36.5 z" fill="#D2D2D2"/>
+      <path d="M361.836,12.5 L385.836,12.5 L385.836,36.5 L361.836,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M385.836,12.5 L409.836,12.5 L409.836,36.5 L385.836,36.5 z" fill="#D2D2D2"/>
+      <path d="M385.836,12.5 L409.836,12.5 L409.836,36.5 L385.836,36.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M337.836,36.5 L361.836,36.5 L361.836,60.5 L337.836,60.5 z" fill="#D2D2D2"/>
+      <path d="M337.836,36.5 L361.836,36.5 L361.836,60.5 L337.836,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M361.836,36.5 L385.836,36.5 L385.836,60.5 L361.836,60.5 z" fill="#D2D2D2"/>
+      <path d="M361.836,36.5 L385.836,36.5 L385.836,60.5 L361.836,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M385.836,36.5 L409.836,36.5 L409.836,60.5 L385.836,60.5 z" fill="#FFFFFF"/>
+      <path d="M385.836,36.5 L409.836,36.5 L409.836,60.5 L385.836,60.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M337.836,60.5 L361.836,60.5 L361.836,84.5 L337.836,84.5 z" fill="#D2D2D2"/>
+      <path d="M337.836,60.5 L361.836,60.5 L361.836,84.5 L337.836,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M361.836,60.5 L385.836,60.5 L385.836,84.5 L361.836,84.5 z" fill="#D2D2D2"/>
+      <path d="M361.836,60.5 L385.836,60.5 L385.836,84.5 L361.836,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M385.836,60.5 L409.836,60.5 L409.836,84.5 L385.836,84.5 z" fill="#FFFFFF"/>
+      <path d="M385.836,60.5 L409.836,60.5 L409.836,84.5 L385.836,84.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 240.5, 92)">
+      <tspan x="-3.837" y="4" font-family="Helvetica" font-size="12" fill="#000000">2</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 307.168, 46.5)">
+      <tspan x="-7.168" y="5.5" font-family="Helvetica" font-size="16" fill="#000000">...</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 48.5, 92)">
+      <tspan x="-3.837" y="4" font-family="Helvetica" font-size="12" fill="#000000">0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 144.5, 92)">
+      <tspan x="-3.837" y="4" font-family="Helvetica" font-size="12" fill="#000000">1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 373.836, 92)">
+      <tspan x="-3.837" y="4" font-family="Helvetica" font-size="12" fill="#000000">8</tspan>
+    </text>
+    <g>
+      <path d="M108.5,120.5 L132.5,120.5 L132.5,144.5 L108.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,120.5 L132.5,120.5 L132.5,144.5 L108.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,120.5 L156.5,120.5 L156.5,144.5 L132.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,120.5 L156.5,120.5 L156.5,144.5 L132.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,120.5 L180.5,120.5 L180.5,144.5 L156.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M156.5,120.5 L180.5,120.5 L180.5,144.5 L156.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M108.5,144.5 L132.5,144.5 L132.5,168.5 L108.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,144.5 L132.5,144.5 L132.5,168.5 L108.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,144.5 L156.5,144.5 L156.5,168.5 L132.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,144.5 L156.5,144.5 L156.5,168.5 L132.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,144.5 L180.5,144.5 L180.5,168.5 L156.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M156.5,144.5 L180.5,144.5 L180.5,168.5 L156.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M108.5,168.5 L132.5,168.5 L132.5,192.5 L108.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M108.5,168.5 L132.5,168.5 L132.5,192.5 L108.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M132.5,168.5 L156.5,168.5 L156.5,192.5 L132.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M132.5,168.5 L156.5,168.5 L156.5,192.5 L132.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M156.5,168.5 L180.5,168.5 L180.5,192.5 L156.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M156.5,168.5 L180.5,168.5 L180.5,192.5 L156.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 144.5, 200)">
+      <tspan x="-7.174" y="4" font-family="Helvetica" font-size="12" fill="#000000">57</tspan>
+    </text>
+    <g>
+      <path d="M204.5,120.5 L228.5,120.5 L228.5,144.5 L204.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,120.5 L228.5,120.5 L228.5,144.5 L204.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M228.5,120.5 L252.5,120.5 L252.5,144.5 L228.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M228.5,120.5 L252.5,120.5 L252.5,144.5 L228.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M252.5,120.5 L276.5,120.5 L276.5,144.5 L252.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,120.5 L276.5,120.5 L276.5,144.5 L252.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M204.5,144.5 L228.5,144.5 L228.5,168.5 L204.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,144.5 L228.5,144.5 L228.5,168.5 L204.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <path d="M228.5,144.5 L252.5,144.5 L252.5,168.5 L228.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    <g>
+      <path d="M252.5,144.5 L276.5,144.5 L276.5,168.5 L252.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,144.5 L276.5,144.5 L276.5,168.5 L252.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M204.5,168.5 L228.5,168.5 L228.5,192.5 L204.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M204.5,168.5 L228.5,168.5 L228.5,192.5 L204.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M228.5,168.5 L252.5,168.5 L252.5,192.5 L228.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M228.5,168.5 L252.5,168.5 L252.5,192.5 L228.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M252.5,168.5 L276.5,168.5 L276.5,192.5 L252.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M252.5,168.5 L276.5,168.5 L276.5,192.5 L252.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 240.5, 200)">
+      <tspan x="-7.174" y="4" font-family="Helvetica" font-size="12" fill="#000000">57</tspan>
+    </text>
+    <g>
+      <path d="M300.5,120.5 L324.5,120.5 L324.5,144.5 L300.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M300.5,120.5 L324.5,120.5 L324.5,144.5 L300.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M324.5,120.5 L348.5,120.5 L348.5,144.5 L324.5,144.5 z" fill="#FFFFFF"/>
+      <path d="M324.5,120.5 L348.5,120.5 L348.5,144.5 L324.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M348.5,120.5 L372.5,120.5 L372.5,144.5 L348.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M348.5,120.5 L372.5,120.5 L372.5,144.5 L348.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M300.5,144.5 L324.5,144.5 L324.5,168.5 L300.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M300.5,144.5 L324.5,144.5 L324.5,168.5 L300.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <path d="M324.5,144.5 L348.5,144.5 L348.5,168.5 L324.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    <g>
+      <path d="M348.5,144.5 L372.5,144.5 L372.5,168.5 L348.5,168.5 z" fill="#FFFFFF"/>
+      <path d="M348.5,144.5 L372.5,144.5 L372.5,168.5 L348.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M300.5,168.5 L324.5,168.5 L324.5,192.5 L300.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M300.5,168.5 L324.5,168.5 L324.5,192.5 L300.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M324.5,168.5 L348.5,168.5 L348.5,192.5 L324.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M324.5,168.5 L348.5,168.5 L348.5,192.5 L324.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M348.5,168.5 L372.5,168.5 L372.5,192.5 L348.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M348.5,168.5 L372.5,168.5 L372.5,192.5 L348.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 336.5, 200)">
+      <tspan x="-7.174" y="4" font-family="Helvetica" font-size="12" fill="#000000">58</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 403.168, 154.5)">
+      <tspan x="-7.168" y="5.5" font-family="Helvetica" font-size="16" fill="#000000">...</tspan>
+    </text>
+    <g>
+      <path d="M12.5,120.5 L36.5,120.5 L36.5,144.5 L12.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,120.5 L36.5,120.5 L36.5,144.5 L12.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,120.5 L60.5,120.5 L60.5,144.5 L36.5,144.5 z" fill="#FFFFFF"/>
+      <path d="M36.5,120.5 L60.5,120.5 L60.5,144.5 L36.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,120.5 L84.5,120.5 L84.5,144.5 L60.5,144.5 z" fill="#D2D2D2"/>
+      <path d="M60.5,120.5 L84.5,120.5 L84.5,144.5 L60.5,144.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M12.5,144.5 L36.5,144.5 L36.5,168.5 L12.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,144.5 L36.5,144.5 L36.5,168.5 L12.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,144.5 L60.5,144.5 L60.5,168.5 L36.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M36.5,144.5 L60.5,144.5 L60.5,168.5 L36.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,144.5 L84.5,144.5 L84.5,168.5 L60.5,168.5 z" fill="#D2D2D2"/>
+      <path d="M60.5,144.5 L84.5,144.5 L84.5,168.5 L60.5,168.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M12.5,168.5 L36.5,168.5 L36.5,192.5 L12.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M12.5,168.5 L36.5,168.5 L36.5,192.5 L12.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M36.5,168.5 L60.5,168.5 L60.5,192.5 L36.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M36.5,168.5 L60.5,168.5 L60.5,192.5 L36.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M60.5,168.5 L84.5,168.5 L84.5,192.5 L60.5,192.5 z" fill="#D2D2D2"/>
+      <path d="M60.5,168.5 L84.5,168.5 L84.5,192.5 L60.5,192.5 z" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 48.5, 200)">
+      <tspan x="-7.174" y="4" font-family="Helvetica" font-size="12" fill="#000000">56</tspan>
+    </text>
+  </g>
+  <defs/>
+</svg>

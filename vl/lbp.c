@@ -1,9 +1,10 @@
 /** @file lbp.c
- ** @brief Local Binary Patterns - Definition
+ ** @brief Local Binary Patterns (LBP) - Definition
  ** @author Andrea Vedaldi
  **/
 
 /*
+Copyright (C) 2013 Andrea Vedaldi.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -11,32 +12,77 @@ This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-/** @file lbp.h
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page lbp Local Binary Patterns (LBP) descriptor
+@author Andrea Vedaldi
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-::VlLbp implements the local binary pattern features.
+@ref lbp.h implements the Local Binary Pattern (LBP) feature
+descriptor.  The LBP descriptor @cite{ojala10multiresolution} is a
+histogram of quantized LBPs pooled in a local image neighborhood. @ref
+lbp-starting demonstrates how to use the C API to compute the LBP
+descriptors of an image. For further details refer to:
 
-An LBP feature [1] is a l2-normalized local histogram of quantized
-local binary patterns (LBP).
+- @subpage lbp-fundamentals - LBP definition and parameters.
 
-@section lbp Local Binary Patterns
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section lbp-starting Getting started with LBP
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-A LBP is a string of bit obtained by binarizing a local neighbourhood
-of pixels with respect to the brightness of the central pixel.
-::VlLbp implements only the case of 3x3 pixel neighbourhoods (this
-setting perform best in applications).  Thus the LBP at location @f$
-(x,y) @f$ is a string of eight bits. Each bit is equal to one if the
-corresponding pixel is brighter than the central one.  Pixels are
-scanned starting from the one to the right in anti-clockwise sense.
-For example the first bit is one if, and only if, @f$ I(x+1,y) >
-I(x,y), and the second bit if, and only if, @f$ I(x+1,y-1) > I(x,y).
+To compute the LBP descriptor of an image, start by creating a ::VlLbp
+object instance by specifying the type of LBP quantization. Given the
+configure LBP object, then call ::vl_lbp_process to process a
+grayscale image and obtain the corresponding LBP descriptors. This
+function expects as input a buffer large enough to contain the
+computed features. If the image has size @c width x @c height, there
+are exactly @c floor(width/cellSize) x @c floor(height/cellSize)
+cells, each of which has a histogram of LBPs of size @c dimension (as
+returned by ::vl_lbp_get_dimension). Thus the required buffer has size
+@c floor(width/cellSize) x @c floor(height/cellSize) x @c dimension.
 
-@subsection lbp-quantization Quantized LBP
+::VlLbp supports computing transposed LPBs as well. A transposed LBP
+is the LBP obtained by transposing the input image (regarded as a
+matrix). This functionality can be useful to compute the features when
+the input image is stored in column major format (e.g. MATLAB) rather
+than row major.
+**/
 
-For a 3x3 neighborhood, an LBP is a string of eight bits and so there
-are 256 possible LBPs. These are usually too many for a reliable
-statistics (histogram) to be computed. Therefore the 256 patterns are
-further quantized into a smaller number of patterns according to one
-of the following rules:
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page lbp-fundamentals Local Binary Patterns fundamentals
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+A *Locally Binary Pattern* (LBP) is a local descriptor that captures
+the appearance of an image in a small neighborhood around a pixel.  An
+LBP is a string of bits, with one bit for each of the pixels in the
+neighborhood. Each bit is turned on or off depending on whether the
+intensity of the corresponding pixel is greater than the intensity of
+the central pixel. LBP are seldom used directly, however. Instead, the
+binary string thus produced are further quantized (@ref
+lbp-quantization) and pooled in local histograms (@ref
+lbp-histograms).
+
+While many variants are possible, ::VlLbp implements only the case of
+3 &times; 3 pixel neighborhoods (this setting was found to be optimal
+in several applications). In particular, the LBP centered on pixel
+$(x,y)$ is a string of eight bits. Each bit is equal to one if the
+corresponding pixel is brighter than the central one. Pixels are
+scanned starting from the one to the right in anti-clockwise order.
+For example the first bit is one if, and only if, $I(x+1,y) >
+I(x,y)$, and the second bit is one if, and only if, $I(x+1,y-1) >
+I(x,y)$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section lbp-quantization Quantized LBP
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+For a 3 &times; 3 neighborhood, an LBP is a string of eight bits and
+so there are 256 possible LBPs. These are usually too many for a
+reliable statistics (histogram) to be computed. Therefore the 256
+patterns are further quantized into a smaller number of patterns
+according to one of the following rules:
 
 - <b>Uniform</b> (::VlLbpUniform) There is one quantized pattern for
   each LBP that has exactly a transitions from 0 to 1 and one from 1
@@ -45,41 +91,22 @@ of the following rules:
   comprising all the other LBPs. This yields a total of 58 quantized
   patterns.
 
+  @image html lbp.png "LBP quantized patterns."
+
 The number of quantized LBPs, which depends on the quantization type,
 can be obtained by ::vl_lbp_get_dimension.
 
-@subsection lbp-histograms Histograms of LBPs
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section lbp-histograms Histograms of LBPs
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The quantized LBP patterns are further grouped into local
 histograms. The image is divided into a number of cells of a
-prescribed size (@c cellSize).  Then the quantized LBPs are aggregated
-into histogram by using bilinear interpolation along the two spatial
-dimensions (similar to HOG and SIFT).
-
-@subsection lbp-usage Usage
-
-First, one creates a ::VlLbp object instance by specifying the type of
-quantization (this initializes some internal tables to speedup the
-computation). Then, one obtains all the quantized LBPs histograms by
-calling ::vl_lbp_process. This function expects as input a buffer
-large enough to contain the computed features. If the image has size
-@c width x @c height, there are exactly @c floor(width/cellSize) x @c
-floor(height/cellSize) cells, each of which has a histogram of LBPs of
-size @c dimension (as returned by ::vl_lbp_get_dimension). Thus the
-required buffer has size @c floor(width/cellSize) x @c
-floor(height/cellSize) x @c dimension.
-
-::VlLbp supports computing transposed LPBs as well. A transposed LBP
-is the LBP obtained by transposing the underlying image patch
-(regarded as a matrix). This can be useful to compute the features
-when the image is column major rather than row major.
-
-@section lbp-references References
-
-[1] T. Ojala, M. Pietikainen, and M. Maenpaa. "Multiresolution
-    gray-scale and rotation invariant texture classification with
-    local binary patterns". PAMI, 2010.
-
+prescribed size (as specified by the parameter @c cellSize passed to
+::vl_lbp_process as described in @ref lbp-starting). Then the
+quantized LBPs are aggregated into histogram by using bilinear
+interpolation along the two spatial dimensions (similar to HOG and
+SIFT).
 **/
 
 #include "lbp.h"
@@ -90,49 +117,88 @@ when the image is column major rather than row major.
 /*                                           Initialization helpers */
 /* ---------------------------------------------------------------- */
 
+/*
+ This function creates the LBP quantization table for the uniform LBP
+ patterns. The purpose of this lookup table is to map a 8-bit LBP
+ strings to one of 58 uniform pattern codes.
+
+ Pixels in the 8-neighbourhoods are read in counterclockwise order
+ starting from the east direction, as follows:
+
+ NW(5)  N(6) NE(7)
+ W(4)         E(0)  -> b0 b1 b2 b3 b4 b5 b6 b7
+ SW(3)  S(2) SE(1)
+
+ There are 256 such strings, indexing the lookup table. The table
+ contains the corresponding code, effectively quantizing the 256
+ patterns into 58. There is one bin for constant patterns (all zeros
+ or ones), 8*7 for the uniform ones, and one for all other.
+
+ A uniform pattern is a circular sequence of bit b0b1...b7 such that
+ there is exactly one switch from 0 to 1 and one from 1 to 0.  These
+ uniform patterns are enumerated as follows. The slowest varying index
+ i (0...7) points to the first bit that is on and the slowest varying
+ index j (1...7) to the length of the run of bits equal to one,
+ resulting in the sequence:
+
+ 0:  1000 0000
+ 1:  1100 0000
+ ...
+ 7:  1111 1110
+ 8:  0100 0000
+ 9:  0110 0000
+ ...
+ 56: 1111 1101
+
+ The function also accounts for when the image is stored in transposed
+ format. The sampling function is unchanged, so that the first bit to
+ be read is not the one to the east, but the one to the south, and
+ overall the following sequence is read:
+
+ NW(5)  W(4) SW(3)
+ N(6)         S(2)  -> b2 b1 b0 b7 b6 b5 b4 b3
+ NE(7)  E(0) SE(1)
+
+ In enumerating the uniform patterns, the index j is unchanged as it
+ encodes the runlenght. On the contrary, the index i changes to
+ account for the transposition and for the fact that the beginning and
+ ending of the run are swapped. With modular arithmetic, the i must be
+ transformed as
+
+ ip = - i + 2 - (j - 1)
+ */
+
 static void
 _vl_lbp_init_uniform(VlLbp * self)
 {
   int i, j ;
 
-  /* one bin for constant patterns, 8*7 for 2-uniform, one for rest */
+  /* overall number of quantized LBPs */
   self->dimension = 58 ;
 
-  /* all but selected patterns map to 57 */
+  /* all but selected patterns map to bin 57 (the first bin has index 0) */
   for (i = 0 ; i < 256 ; ++i) {
     self->mapping[i] = 57 ;
   }
 
-  /* uniform patterns map to 56 */
+  /* the uniform (all zeros or ones) patterns map to bin 56 */
   self->mapping[0x00] = 56 ;
   self->mapping[0xff] = 56 ;
 
-  /* now uniform pattenrs, in order */
-  /* locations: 0:E, 1:SE, 2:S, ..., 7:NE */
-  for (i = 0 ; i < 8 ; ++i) { /* string[i-1]=0, string[i]=1 */
-    for (j = 1 ; j <= 7 ; ++j) { /* length of sequence of ones */
+  /* 56 uniform patterns */
+  for (i = 0 ; i < 8 ; ++i) {
+    for (j = 1 ; j <= 7 ; ++j) {
+      int ip ;
+      if (self->transposed) {
+        ip = (- i + 2 - (j - 1) + 16) % 8 ;
+      } else {
+        ip = i ;
+      }
+
       /* string starting with j ones */
       int unsigned string = (1 << j) - 1 ;
-      /* put i zeroes in front */
-      string <<= i ;
-      /* wrap around 8 bit boundaries */
+      string <<= ip ;
       string = (string | (string >> 8)) & 0xff ;
-
-      /* optionally transpose the pattern */
-      if (self->transposed) {
-        int unsigned original = string;
-        int k ;
-        /* flip the string left-right */
-        string = 0 ;
-        for (k = 0 ; k < 8 ; ++k) {
-          string <<= 1 ;
-          string |= original & 0x1  ;
-          original >>= 1 ;
-        }
-        /* rotate 90 degrees */
-        string <<= 3 ;
-        string = (string | (string >> 8)) & 0xff ;
-      }
 
       self->mapping[string] = i * 7 + (j-1) ;
     }
@@ -172,6 +238,16 @@ vl_lbp_delete(VlLbp * self) {
   vl_free(self) ;
 }
 
+/** @brief Get the dimension of the LBP histograms
+ ** @return dimension of the LBP histograms.
+ ** The dimension depends on the type of quantization used.
+ ** @see ::vl_lbp_new().
+ **/
+
+VL_EXPORT vl_size vl_lbp_get_dimension(VlLbp * self)
+{
+  return self->dimension ;
+}
 
 /* ---------------------------------------------------------------- */
 

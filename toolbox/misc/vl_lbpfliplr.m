@@ -12,7 +12,16 @@ function f = vl_lbpfliplr(f)
 %
 %   See also: VL_LBP(), VL_HELP().
 
-% construct permutation
+% Copyright (C) 2013 Andrea Vedaldi.
+% Copyright (C) 2010-11 Andrea Vedaldi.
+% All rights reserved.
+%
+% This file is part of the VLFeat library and is made available under
+% the terms of the BSD license (see the COPYING file).
+
+% Uniform patterns for a 8-neighbourhood: patterns 58 (generic) and 57
+% (constant) are invariant to an image warp.
+
 perm = zeros(1,58) ;
 perm(58) = 58 ;
 perm(57) = 57 ;

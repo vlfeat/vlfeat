@@ -42,6 +42,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
   - @subpage fisher
   - @subpage vlad
   - @subpage liop
+  - @subpage lbp
 
 - **Clustering and indexing**
   - @subpage kmeans
