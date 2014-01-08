@@ -60,9 +60,7 @@ precision. There are several parameters affecting the LIOP
 descriptor. An example is the @ref liop-weighing "threshold" used to
 discard low-contrast oder pattern in the computation of the
 statistics. This is changed by using ::vl_liopdesc_set_intensity_threshold.
-
 **/
-
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
