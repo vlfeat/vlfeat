@@ -52,3 +52,6 @@ vc/*
 
 # Opt directory
 opt/*
+
+# iDraw files
+*.idraw
