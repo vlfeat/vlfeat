@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="595.276" height="841.89" viewBox="0, 0, 595.276, 841.89">
+  <g id="Layer 1">
+    <path d="M17.717,53.15 L306.239,53.15" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <path d="M17.717,27.928 L306.239,27.928" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <g>
+      <path d="M315.967,33.928 L315.967,47.15" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M318.967,35.928 L315.967,28.928 L312.967,35.928 M315.967,33.928 L315.967,28.928 M320.967,27.928 L310.967,27.928" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+      <path d="M312.967,45.15 L315.967,52.15 L318.967,45.15 M315.967,47.15 L315.967,52.15 M310.967,53.15 L320.967,53.15" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <path d="M99.798,7.087 L120.472,7.087 L120.472,9.674 L99.798,9.674 z" fill="#FEC743"/>
+    <path d="M212.386,7.087 L240.945,7.087 L240.945,9.674 L212.386,9.674 z" fill="#FEC743"/>
+    <path d="M120.472,49.606 L212.386,49.606 L212.386,53.15 L120.472,53.15 z" fill="#BA2122"/>
+    <path d="M99.798,24.803 L240.945,24.803 L240.945,27.928 L99.798,27.928 z" fill="#BA2122"/>
+    <path d="M120.472,49.182 L120.472,7.087" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <path d="M99.798,27.928 L99.798,7.087" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <path d="M212.386,50.745 L212.386,7.087" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <path d="M240.945,27.928 L240.945,7.087" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-dasharray="2,2" stroke-miterlimit="1"/>
+    <text transform="matrix(1, 0, 0, 1, 280.485, 9.968)">
+      <tspan x="-32.454" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">| R(l+</tspan>
+      <tspan x="-8.464" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">Δ</tspan>
+      <tspan x="-1.243" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">) - R(l) |</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 162.62, 17.674)">
+      <tspan x="-14.583" y="2" font-family="Helvetica" font-size="10" fill="#000000">R(l+</tspan>
+      <tspan x="4.031" y="2" font-family="Helvetica" font-size="10" fill="#000000">Δ</tspan>
+      <tspan x="11.252" y="2" font-family="Helvetica" font-size="10" fill="#000000">)</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 162.62, 42.745)">
+      <tspan x="-8.052" y="2" font-family="Helvetica" font-size="10" fill="#000000">R(l)</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 327.771, 40.539)">
+      <tspan x="-4.333" y="4" font-family="Helvetica" font-size="12" fill="#000000">Δ</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 320.938, 85.039)">
+      <tspan x="-2.5" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">x</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 40.277, 73.39)">
+      <tspan x="-7.219" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">I(x)</tspan>
+    </text>
+    <g>
+      <path d="M17.717,85.039 L306.967,85.039" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M306.967,88.039 L314.967,85.039 L306.967,82.039 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <path d="M24.139,82.688 C36.268,53.239 56.15,16.667 75.474,16.47 C118.355,16.034 132.245,92.777 161,94 C189.755,95.223 223.103,23.55 250.696,24.095 C271.451,24.504 295.203,68.71 301.102,82.688" fill-opacity="0" stroke="#0433FF" stroke-width="2"/>
+  </g>
+  <defs/>
+</svg>
