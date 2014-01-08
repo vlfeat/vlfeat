@@ -17,6 +17,9 @@ MATLAB_PATH ?= $(strip $(shell test "$$(command -v '$(MEX)')" && \
   $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
 MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
 
+# transform in immediate for efficiency
+MATLAB_PATH := $(MATLAB_PATH)
+
 # if expand to empty string, set to empty string for use with ifdef
 ifeq ($(MATLAB_PATH),)
 MATLAB_PATH=
@@ -130,6 +133,9 @@ endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
+# For efficiency reason, immediately expand this variable now
+MEX_FLAGS := $(MEX_FLAGS)
+
 # --------------------------------------------------------------------
 #                                                         Sanity check
 # --------------------------------------------------------------------
@@ -169,9 +175,6 @@ mex-all: $(mex_dll) $(mex_tgt)
 # generate the mex-dir target
 $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
-# generate mex-dir target
-$(eval $(call gendir, mex, $(MEX_BINDIR)))
-
 # Create a copy of the VLFeat DLL that links to MATLAB OpenMP library
 # (Intel OMP 5) rather than the system one. The Intel library is
 # binary compatible with GCC. This avoids running two OpenMP
@@ -203,7 +206,7 @@ $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	$(call C,CC)								\
-	    -M									\
+	    -MM									\
 	    -MF "$(@)"								\
 	    -MT '$(MEX_BINDIR)/$*.$(MEX_SUFFIX) $(MEX_BINDIR)/$*.d'		\
 	    -I"$(MATLAB_PATH)/extern/include"					\

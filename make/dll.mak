@@ -113,7 +113,7 @@ $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
 
 $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC)						\
-	     -M							\
+	     -MM						\
 	     -MF "$(@)"						\
 	     -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
 	     $(DLL_CFLAGS) "$(<)"
