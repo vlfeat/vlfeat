@@ -277,6 +277,7 @@ doc/index.html: $(webdoc_src) $(doc-dir) \
 	VERSION=$(VER) $(PYTHON) docsrc/webdoc.py \
              --outdir=doc \
 	     --verbose \
+	     --indexfile=doc/index.txt \
 	     --doxytag=doc/doxygen.tag \
 	     --doxydir=api \
 	     docsrc/vlfeat-website.xml
