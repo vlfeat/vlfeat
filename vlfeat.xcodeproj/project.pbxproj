@@ -139,7 +139,7 @@
 		2D1EED211604FE5900C63DCE /* covdet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = covdet.c; sourceTree = "<group>"; };
 		2D1EED221604FE5900C63DCE /* covdet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = covdet.h; sourceTree = "<group>"; };
 		2D21907E187099540094BCA2 /* covdet.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = covdet.html; path = docsrc/tutorials/covdet.html; sourceTree = "<group>"; };
-		2D21907F187099540094BCA2 /* doxytag.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = doxytag.py; path = docsrc/doxytag.py; sourceTree = "<group>"; };
+		2D21907F187099540094BCA2 /* doxytag.py */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text.script.python; name = doxytag.py; path = docsrc/doxytag.py; sourceTree = "<group>"; tabWidth = 4; };
 		2D219080187099540094BCA2 /* gmm.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = gmm.html; path = docsrc/tutorials/gmm.html; sourceTree = "<group>"; };
 		2D219081187099540094BCA2 /* hog.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = hog.html; path = docsrc/tutorials/hog.html; sourceTree = "<group>"; };
 		2D219082187099540094BCA2 /* install-octave.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "install-octave.html"; path = "docsrc/install-octave.html"; sourceTree = "<group>"; };
@@ -379,10 +379,10 @@
 		2D765BAE0FEC076700D08578 /* kdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kdtree.h; sourceTree = "<group>"; };
 		2D765BAF0FEC076700D08578 /* quickshift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quickshift.c; sourceTree = "<group>"; };
 		2D765BB00FEC076700D08578 /* quickshift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quickshift.h; sourceTree = "<group>"; };
-		2D7AD0800E38911C00783252 /* formatter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = formatter.py; path = docsrc/formatter.py; sourceTree = "<group>"; };
-		2D7AD0810E38911C00783252 /* mdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = mdoc.py; path = docsrc/mdoc.py; sourceTree = "<group>"; };
-		2D7AD0820E38911C00783252 /* webdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = webdoc.py; path = docsrc/webdoc.py; sourceTree = "<group>"; };
-		2D7AD0830E38911C00783252 /* wikidoc.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = wikidoc.py; path = docsrc/wikidoc.py; sourceTree = "<group>"; };
+		2D7AD0800E38911C00783252 /* formatter.py */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text.script.python; name = formatter.py; path = docsrc/formatter.py; sourceTree = "<group>"; tabWidth = 4; };
+		2D7AD0810E38911C00783252 /* mdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text.script.python; name = mdoc.py; path = docsrc/mdoc.py; sourceTree = "<group>"; tabWidth = 4; };
+		2D7AD0820E38911C00783252 /* webdoc.py */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text.script.python; name = webdoc.py; path = docsrc/webdoc.py; sourceTree = "<group>"; tabWidth = 4; };
+		2D7AD0830E38911C00783252 /* wikidoc.py */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text.script.python; name = wikidoc.py; path = docsrc/wikidoc.py; sourceTree = "<group>"; tabWidth = 4; };
 		2D7AD0A90E38C18600783252 /* aib.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = aib.html; path = docsrc/tutorials/aib.html; sourceTree = "<group>"; };
 		2D7AD0AA0E38C18600783252 /* api.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = api.html; path = docsrc/api.html; sourceTree = "<group>"; };
 		2D7AD0AB0E38C18600783252 /* download.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = download.html; path = docsrc/download.html; sourceTree = "<group>"; };
