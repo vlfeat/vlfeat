@@ -19,50 +19,29 @@ the terms of the BSD license (see the COPYING file).
 @author Karel Lenc
 @author Andrea Vedaldi
 @author Michal Perdoch
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref scalespace.h implements a Gaussian scale space, a data structure
 representing an image at multiple resolutions
 @cite{witkin83scale-space} @cite{koenderink84the-structure}
-@cite{lindeberg94scale-space}. Scale spaces are used, for example, to
-detect scale invariant features @cite{lindeberg98principles} such as
-SIFT, Hessian-Affine, Harris-Affine, Harris-Laplace, etc.
+@cite{lindeberg94scale-space}. Scale spaces have many use, including
+the detection of co-variant local features
+@cite{lindeberg98principles} such as SIFT, Hessian-Affine,
+Harris-Affine, Harris-Laplace, etc. @ref scalespace-starting
+demonstreates how to use the C API to compute the scalespace of an
+image. For further details refer to:
 
-@tableofcontents
+- @subpage scalespace-fundamentals
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section scalespace-overview Overview
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-A *scale space* is representation of an image at multiple resolution
-levels. An image is a function $\ell(x,y)$ of two coordinates $x$,
-$y$; the scale space $\ell(x,y,\sigma)$ adds a third coordinate
-$\sigma$ indexing the *scale*. @ref scalespace.h implements in
-particular the Gaussian scale space, where the image
-$\ell(x,y,\sigma)$ is obtained by smoothing $\ell(x,y)$ by a Gaussian
-kernel of isotropic standard deviation $\sigma$.
-
-In practice, the spatial coordiantes $(x,y)$ and the scale coordinate
-$\sigma$ are sampled. The density of the spatial sampling is adjusted
-as a function of the scale: intuitively, coarser resolution images can
-be sampled more coarsely. Thus, the scale space has the structure of a
-*pyramid*: a collection of images of progressively coarser resolution
-and smaller size (in pixels).
-
-The pyramid is organised in a number of *octaves*, indexed by a
-parameter `o`, and further *sublevels* for each octave, indexed by a
-parameter `s`. These are related to the scale $\sigma$ by
-
-\[
-  \sigma(s,o) = \sigma_o 2^{\displaystyle o + \frac{s}{\mathtt{octaveResolution}}}
-\]
-
-where `octaveResolution` is the resolution of the octave subsampling
-$\sigma_0$ is the *base smoothing*.
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section scalespace-starting Getting started
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 Given an input image `image`, the following example uses the
-::VlScaleSpace object to compute the image `level`, which is the
-version of `image` at scales `(o,s)`:
+::VlScaleSpace object to compute its Gaussian scale space and return
+the image `level` at scale `(o,s)`, where `o` is the octave and `s` is
+the octave subdivision or sublevel:
 
 @code
 float* level ;
@@ -71,55 +50,47 @@ vl_scalespace_put_image(ss, image) ;
 level = vl_scalespace_get_level(ss, o, s) ;
 @endcode
 
-Note that `level` has not necessarily the same dimensions or sampling
-density of `image`. The geometry of `level` can be obtained as
+The image `level` is obtained by convolving `image` by a Gaussian
+filter of isotropic standard deviation given by
+
+@code
+double sigma = vl_scalespace_get_sigma(ss, o, s) ;
+@endcode
+
+The resolution of `level` is in general different from the resolution
+of `image` and is determined by the octave `o`. It can be obtained as
+follows:
 
 @code
 VlScaleSpaceOctaveGeometry ogeom = vl_scalespace_get_octave_geometry(ss, o) ;
-ogeom.width \\ width of level (in number of pixels)
-ogeom.height \\ height of level (in number of pixels)
-ogeom.step \\ spatial sampling step
+ogeom.width // width of level (in number of pixels)
+ogeom.height // height of level (in number of pixels)
+ogeom.step // spatial sampling step
 @endcode
 
-This means that $\ell(x,y,\sigma) = \mathtt{level}[i,j]$, where
-\[
- x = \mathtt{ogeom.step} \times  i,
- \quad
- 0 \leq i < \mathtt{ogeom.width},
-\]
-
-and similarly for $y$. The other impotant information in order to use
-scale space is to know the range of the paramerters `o` and `s`. This
-can be obtained as
+The parameter `ogeom.step` is the sampling step relatively to the
+sampling of the input image `image`. The ranges of valid octaves and
+scale sublevels can be obtained as
 
 @code
-VlScaleSpaceGeometry geom = vl_scalespace_get_geomerty(ss) ;
+VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(ss) ;
+geom.firstOctave // Index of the fisrt octave
+geom.lastOctave // Index of the last octave
+geom.octaveResolution ; // Number of octave subdivisions
+geom.octaveFirstSubdivision // Index of the first octave subdivision
+geom.octaveLastSubdivision  // Index of the last octave subdivision
 @endcode
 
-So for example `o` varies in the range from `geom.firstOctave` to
-`geom.lastOctave` and `s` in the range `geom.octaveFirstSubdivision`
-to `geom.octaveLastSubdivision`.
+So for example `o` minimum value is `geom.firstOctave` and maximum
+value is `geom.lastOctave`. The subdivision index `s` naturally spans
+the range 0 to `geom.octaveResolution-1`. However, the scale space
+object is flexible in that it allows different ranges of subdivisions
+to be computed and `s` varies in the range
+`geom.octaveFirstSubdivision` to `geom.octaveLastSubdivision`. See
+@ref scalespace-fundamentals for further details.
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@subsection scalespace-finer Finer control
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-
-::VlScaleSpace offers more control on how the pyramid is constructed.
-Two usage cases are the following:
-
-- In feature detection it is often convenient to sample a few redudant
-  sublevels per octave, effectively representing the same scale with
-  two different spatial samplings. This simplifies detecting extrema
-  in scales at boundary scale levels.
-
-- Often there is a convenience in oversampling (at more than the
-  Nyquist frequency) the finer scales. While oversampling does not add
-  information to the image, it may simplify significantly the
-  implementation of filers such as derivatives.
-
-All this is possible by using a more advanced interface to
-::VlScaleSpace.  For example, in oerder to start sampling at octave -1
-and have two redundant subdivisions per octave, one can use:
+The geometry of the scale space can be customized upon creation, as
+follows:
 
 @code
 VlScaleSpaceGeometry geom = vl_scalespace_get_default_geometry(imageWidth, imageHeight) ;
@@ -130,7 +101,24 @@ VlScaleSpacae ss = vl_scalespace_new_with_geometry (geom) ;
 @endcode
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
-@section scalespace-algorithm Algorithm and limitations
+@page scalespace-fundamentals Gaussian scale space fundamentals
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+This page discusses the notion of *Gaussian scale space* and the
+relative data structure. For the C API see @ref scalespace.h and @ref
+scalespace-starting.
+
+A *scale space* is representation of an image at multiple resolution
+levels. An image is a function $\ell(x,y)$ of two coordinates $x$,
+$y$; the scale space $\ell(x,y,\sigma)$ adds a third coordinate
+$\sigma$ indexing the *scale*. Here the focus is the Gaussian scale
+space, where the image $\ell(x,y,\sigma)$ is obtained by smoothing
+$\ell(x,y)$ by a Gaussian kernel of isotropic standard deviation
+$\sigma$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section scalespace-definition Scale space definition
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Formally, the *Gaussian scale space* of an image $\ell(x,y)$ is
@@ -151,33 +139,135 @@ deviation $\sigma$:
   \right).
 \]
 
-An important detail is that the algorithm is not fed with the dieal
-infinite resolution image $\ell(x,y)$, but with a pre-smoothed and
-sampled version measured by the CCD. This is modelled by assuming that
-the input is in fact the sampled image $\ell(x,y,\sigma_n)$, where
-$\sigma_n$ is a *nominal smoothing*, usually taken to be 0.5 (half a
-pixel standard deviation). This also means that $\sigma = \sigma_n =
-0.5$ is the *finest scale* that can actually be computed.
+An important detail is that the algorithm computing the scale space
+assumes that the input image $\ell(x,y)$ is pre-smoothed, roughly
+capturing the effect of the finite pixel size in a CCD. This is
+modelled by assuming that the input is not $\ell(x,y)$, but
+$\ell(x,y,\sigma_n)$, where $\sigma_n$ is a *nominal smoothing*,
+usually taken to be 0.5 (half a pixel standard deviation). This also
+means that $\sigma = \sigma_n = 0.5$ is the *finest scale* that can
+actually be computed.
+
+The scale space structure stores samples of the function
+$\ell(x,y,\sigma)$. The density of the sampling of the spatial
+coordinates $x$ and $y$ is adjusted as a function of the scale
+$\sigma$, corresponding to the intuition that images at a coarse
+resolution can be sampled more coarsely without loss of
+information. Thus, the scale space has the structure of a *pyramid*: a
+collection of digital images sampled at progressively coarser spatial
+resolution and hence of progressively smaller size (in pixels).
+
+The following figure illustrates the scale space pyramid structure:
+
+@image html scalespace-basic.png "A scalespace structure with 2 octaves and S=3 subdivisions per octave"
+
+The pyramid is organised in a number of *octaves*, indexed by a
+parameter `o`. Each octave is further subdivided into *sublevels*,
+indexed by a parameter `s`. These are related to the scale $\sigma$ by
+the equation
+
+\[
+  \sigma(s,o) = \sigma_o 2^{\displaystyle o + \frac{s}{\mathtt{octaveResolution}}}
+\]
+
+where `octaveResolution` is the resolution of the octave subsampling
+$\sigma_0$ is the *base smoothing*.
+
+At each octave the spatial resolution is doubled, in the sense that
+samples are take with a step of
+\[
+\mathtt{step} = 2^o.
+\]
+Hence, denoting as `level[i,j]` the corresponding samples, one has
+$\ell(x,y,\sigma) = \mathtt{level}[i,j]$, where
+\[
+ (x,y) = (i,j) \times \mathtt{step},
+\quad
+\sigma = \sigma(o,s),
+ \quad
+ 0 \leq i < \mathtt{lwidth},
+\quad
+ 0 \leq j < \mathtt{lheight},
+\]
+where
+\[
+  \mathtt{lwidth} = \lfloor \frac{\mathtt{width}}{2^\mathtt{o}}\rfloor, \quad
+  \mathtt{lheight} = \lfloor \frac{\mathtt{height}}{2^\mathtt{o}}\rfloor.
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section scalespace-geometry Scale space geometry
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In addition to the parameters discussed above, the geometry of the
+data stored in a scale space structure depends on the range of
+allowable octaves `o` and scale sublevels `s`.
+
+While `o` may range in any reasonable value given the size of the
+input image `image`, usually its minimum value is either 0 or -1. The
+latter corresponds to doubling the resolution of the image in the
+first octave of the scale space and it is often used in feature
+extraction. While there is no information added to the image by
+upsampling in this manner, fine scale filters, including derivative
+filters, are much easier to compute by upsalmpling first. The maximum
+practical value is dictated by the image resolution, as it should be
+$2^o\leq\min\{\mathtt{width},\mathtt{height}\}$. VLFeat has the
+flexibility of specifying the range of `o` using the `firstOctave` and
+`lastOctave` parameters of the ::VlScaleSpaceGeometry structure.
+
+The sublevel `s` varies naturally in the range
+$\{0,\dots,\mathtt{octaveResolution}-1\}$. However, it is often
+convenient to store a few extra levels per octave (e.g. to compute the
+local maxima of a function in scale or the Difference of Gaussian
+cornerness measure). Thus VLFeat scale space structure allows this
+parameter to vary in an arbitrary range, specified by the parameters
+`octaveFirstSubdivision` and `octaveLastSubdivision` of
+::VlScaleSpaceGeometry.
+
+Overall the possible values of the indexes `o` and `s` are:
+
+\[
+\mathtt{firstOctave} \leq o \leq \mathtt{lastOctave},
+\qquad
+\mathtt{octaveFirstSubdivision} \leq s \leq \mathtt{octaveLastSubdivision}.
+\]
+
+Note that, depending on these ranges, there could be *redundant pairs*
+of indexes `o` and `s` that represent the *same* pyramid level at more
+than one sampling resolution. In practice, the ability to generate
+such redundant information is very useful in algorithms using
+scalespaces, as coding multiscale operations using a fixed sampling
+resolution is far easier. For example, the DoG feature detector
+computes the scalespace with three redundant levels per octave, as
+follows:
+
+@image html scalespace.png "A scalespace containing redundant representation of certain scale levels."
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section scalespace-algorithm Algorithm and limitations
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 Given $\ell(x,y,\sigma_n)$, any of a vast number digitial filtering
-techniques can be used to compute the succesive scales. Presently,
-::VlScaleSpace uses a basic FIR implementation of the Gaussian
-filters.
+techniques can be used to compute the scale levels. Presently, VLFeat
+uses a basic FIR implementation of the Gaussian filters.
 
 The FIR implementation is obtained by sampling the Gaussian function
-and re-normalizing it to have unit norm. As a rule of thumb, such a
-filter works sufficiently well for, say, feature detection if the
-standard deviation $\sigma$ is at least 1.6 times the spatial sampling
-step. The same filter works better still the input image is
-oversampled.
+and re-normalizing it to have unit norm. This simple construction does
+not account properly for sampling effect, which may be a problem for
+very small Gausisan kernels. As a rule of thumb, such filters work
+sufficiently well for, say, standard deviation $\sigma$ at least 1.6
+times the sampling step. A work around to apply this basic FIR
+implementation to very small Gaussian filters is to upsample the image
+first.
 
-The limitations on the FIR filters have impliciations on the pyramid
-itself, as the latter is constructed by *incremental smoothing*: each
-successive level is obtained from the previous one by adding the
-needed amount of smoothing. In this manner, the size of the FIR
-filters remains small; however, if the scale sublevels are too packed,
-the incremental smoothing is so small that the FIR implementation may
-break.
+The limitations on the FIR filters have relatively important for the
+pyramid construction, as the latter is obtained by *incremental
+smoothing*: each successive level is obtained from the previous one by
+adding the needed amount of smoothing. In this manner, the size of the
+FIR filters remains small, which makes them efficient; at the same
+time, for what discussed, excessively small filters are not
+represented properly.
+
 */
 
 #include "scalespace.h"
@@ -311,14 +401,13 @@ vl_scalespace_get_level (VlScaleSpace *self, vl_index o, vl_index s)
   return octave + ogeom.width * ogeom.height * (s - self->geom.octaveFirstSubdivision) ;
 }
 
-
 /** @brief Get the data of a scale space level (const)
  ** @param self object.
  ** @param o octave index.
  ** @param s level index.
  ** @return pointer to the data for octave @a o, level @a s.
  **
- ** This function is the same as ::vl_scalespce_get_level but reutrns
+ ** This function is the same as ::vl_scalespace_get_level but reutrns
  ** a @c const pointer to the data.
  **/
 
@@ -327,7 +416,6 @@ vl_scalespace_get_level_const (VlScaleSpace const * self, vl_index o, vl_index s
 {
   return vl_scalespace_get_level((VlScaleSpace*)self, o, s) ;
 }
-
 
 /** ------------------------------------------------------------------
  ** @brief Get the scale of a given octave and sublevel
@@ -566,8 +654,9 @@ vl_scalespace_delete (VlScaleSpace * self)
   }
 }
 
-/** ------------------------------------------------------------------
- ** @internal @brief Fill octave starting from the first level
+/* ---------------------------------------------------------------- */
+
+/** @internal @brief Fill octave starting from the first level
  ** @param self object instance.
  ** @param o octave to process.
  **
@@ -639,7 +728,7 @@ _vl_scalespace_start_octave_from_image (VlScaleSpace *self,
   /*
    * Adjust the smoothing of the first level just initialised, accounting
    * for the fact that the input image is assumed to be a nominal scale
-   * level self->sigman.
+   * level.
    */
 
   sigma = vl_scalespace_get_level_sigma(self, o, self->geom.octaveFirstSubdivision) ;
@@ -655,9 +744,8 @@ _vl_scalespace_start_octave_from_image (VlScaleSpace *self,
   }
 }
 
-/** ------------------------------------------------------------------
- ** @internal @brief Initialize the first level of an octave from the previous octave
- ** @param ::VlScaleSpace objet instance.
+/** @internal @brief Initialize the first level of an octave from the previous octave
+ ** @param self object.
  ** @param o octave to initialize.
  **
  ** The function initializes the first level of octave @a o from the
@@ -680,7 +768,7 @@ _vl_scalespace_start_octave_from_previous_octave (VlScaleSpace *self, vl_index o
    * From the previous octave pick the level which is closer to
    * self->geom.octaveFirstSubdivision in this octave.
    * The is self->geom.octaveFirstSubdivision + self->numLevels since there are
-   * self->numLevels levels in an octave, provided that
+   * self->geom.octaveResolution levels in an octave, provided that
    * this value does not exceed self->geom.octaveLastSubdivision.
    */
 
@@ -700,7 +788,6 @@ _vl_scalespace_start_octave_from_previous_octave (VlScaleSpace *self, vl_index o
   sigma = vl_scalespace_get_level_sigma(self, o, self->geom.octaveFirstSubdivision) ;
   prevSigma = vl_scalespace_get_level_sigma(self, o - 1, prevLevelIndex) ;
 
-
   if (sigma > prevSigma) {
     VlScaleSpaceOctaveGeometry ogeom = vl_scalespace_get_octave_geometry(self, o) ;
     double deltaSigma = sqrt (sigma*sigma - prevSigma*prevSigma) ;
@@ -713,8 +800,7 @@ _vl_scalespace_start_octave_from_previous_octave (VlScaleSpace *self, vl_index o
   }
 }
 
-/** ------------------------------------------------------------------
- ** @brief Initialise Scale space with new image
+/** @brief Initialise Scale space with new image
  ** @param self ::VlScaleSpace object instance.
  ** @param image image to process.
  **

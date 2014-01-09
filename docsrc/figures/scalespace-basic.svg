@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="595.276" height="841.89" viewBox="0, 0, 595.276, 841.89">
+  <g id="Layer 1">
+    <g>
+      <path d="M35.933,96.169 L78.453,67.823 L78.453,174.122 L35.933,202.469 z" fill="#FEC743"/>
+      <path d="M35.933,96.169 L78.453,67.823 L78.453,174.122 L35.933,202.469 z" fill-opacity="0" stroke="#858585" stroke-width="1" stroke-dasharray="3,2"/>
+    </g>
+    <path d="M244.988,220.185 L244.988,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <path d="M188.295,220.185 L188.295,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <path d="M159.949,78.453 L159.949,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <path d="M216.642,220.185 L216.642,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <g>
+      <path d="M177.441,227.272 L198.701,213.098 L198.701,266.248 L177.441,280.421 z" fill="#D7D4D8"/>
+      <path d="M177.441,227.272 L198.701,213.098 L198.701,266.248 L177.441,280.421 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M205.788,227.272 L227.048,213.098 L227.048,266.248 L205.788,280.421 z" fill="#D7D4D8"/>
+      <path d="M205.788,227.272 L227.048,213.098 L227.048,266.248 L205.788,280.421 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M81.772,92.626 L124.292,64.28 L124.292,170.579 L81.772,198.925 z" fill="#D7D4D8"/>
+      <path d="M81.772,92.626 L124.292,64.28 L124.292,170.579 L81.772,198.925 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M110.119,92.626 L152.638,64.28 L152.638,170.579 L110.119,198.925 z" fill="#D7D4D8"/>
+      <path d="M110.119,92.626 L152.638,64.28 L152.638,170.579 L110.119,198.925 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M138.689,92.626 L181.209,64.28 L181.209,170.579 L138.689,198.925 z" fill="#D7D4D8"/>
+      <path d="M138.689,92.626 L181.209,64.28 L181.209,170.579 L138.689,198.925 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M27.52,43.02 L455.673,43.02" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M455.673,46.02 L463.673,43.02 L455.673,40.02 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 470.217, 42.52)">
+      <tspan x="-2.5" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">s</tspan>
+    </text>
+    <path d="M131.602,78.453 L131.602,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <text transform="matrix(1, 0, 0, 1, 109.488, 52.563)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 137.834, 52.563)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 171.39, 52.563)">
+      <tspan x="-7.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">S-1</tspan>
+    </text>
+    <path d="M103.256,78.453 L103.256,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <g>
+      <path d="M234.134,227.272 L255.394,213.098 L255.394,266.248 L234.134,280.421 z" fill="#D7D4D8"/>
+      <path d="M234.134,227.272 L255.394,213.098 L255.394,266.248 L234.134,280.421 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <path d="M273.335,294.295 L273.335,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <path d="M301.681,294.295 L301.681,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <path d="M330.028,294.295 L329.611,43.02" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <g>
+      <path d="M295.737,298.138 L306.366,291.051 L306.366,317.626 L295.737,324.713 z" fill="#D7D4D8"/>
+      <path d="M295.737,298.138 L306.366,291.051 L306.366,317.626 L295.737,324.713 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M325.294,298.138 L335.924,291.051 L335.924,317.626 L325.294,324.713 z" fill="#D7D4D8"/>
+      <path d="M325.294,298.138 L335.924,291.051 L335.924,317.626 L325.294,324.713 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <g>
+      <path d="M267.421,298.138 L278.051,291.051 L278.051,317.626 L267.421,324.713 z" fill="#D7D4D8"/>
+      <path d="M267.421,298.138 L278.051,291.051 L278.051,317.626 L267.421,324.713 z" fill-opacity="0" stroke="#858585" stroke-width="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 22.022, 131.102)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 22.022, 239.173)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 23.131, 300.295)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">2</tspan>
+    </text>
+    <g>
+      <path d="M33.915,38.303 L33.915,317.484" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M30.915,317.484 L33.915,325.484 L36.915,317.484 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 43.282, 321.854)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">o</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 195.43, 206.098)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 223.776, 206.098)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 257.617, 206.098)">
+      <tspan x="-7.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">S-1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 281.727, 284.051)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 310.074, 284.051)">
+      <tspan x="-2.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">1</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 343.915, 284.051)">
+      <tspan x="-7.781" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">S-1</tspan>
+    </text>
+    <g>
+      <path d="M27.52,32.39 L455.673,32.39" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M455.673,35.39 L463.673,32.39 L455.673,29.39 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 480.217, 31.303)">
+      <tspan x="-13.054" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">σ(s,o)</tspan>
+    </text>
+    <path d="M57.193,81.996 L57.193,25.303" fill-opacity="0" stroke="#0433FF" stroke-width="1"/>
+    <text transform="matrix(1, 0, 0, 1, 56.693, 18.303)">
+      <tspan x="-5.835" y="3.5" font-family="Helvetica" font-size="10" fill="#000000">σn</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 89.166, 260.031)">
+      <tspan x="-45.527" y="-3" font-family="Helvetica" font-size="9" fill="#000000">Input image at nominal</tspan>
+      <tspan x="-28.095" y="9" font-family="Helvetica" font-size="9" fill="#000000">scale level </tspan>
+      <tspan x="16.426" y="9" font-family="Helvetica" font-size="10" fill="#000000">σn</tspan>
+      <tspan x="28.095" y="9" font-family="Helvetica" font-size="9" fill="#000000"> </tspan>
+    </text>
+    <g>
+      <path d="M85.539,248.532 L59.5,176.922" fill-opacity="0" stroke="#858585" stroke-width="0.75"/>
+      <path d="M61.614,176.153 L57.449,171.284 L57.385,177.691 z" fill="#858585" fill-opacity="1" stroke="#858585" stroke-width="0.75" stroke-opacity="1"/>
+    </g>
+  </g>
+  <defs/>
+</svg>

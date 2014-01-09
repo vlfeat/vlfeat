@@ -35,7 +35,7 @@ typedef struct _VlScaleSpaceGeometry
   vl_index firstOctave ; /**< Index of the fisrt octave */
   vl_index lastOctave ; /**< Index of the last octave */
   vl_size octaveResolution ; /**< Number of octave subdivisions */
-  vl_index octaveFirstSubdivision ; /**< Index of the first octave subdivsion */
+  vl_index octaveFirstSubdivision ; /**< Index of the first octave subdivision */
   vl_index octaveLastSubdivision ; /**< Index of the last octave subdivision */
   double baseScale ; /**< Base smoothing (smoothing of octave 0, level 0) */
   double nominalScale ; /**< Nominal smoothing of the original image */
