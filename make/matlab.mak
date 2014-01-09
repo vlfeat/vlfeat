@@ -2,6 +2,7 @@
 # description: Build MATALB toolbox
 # author: Andrea Vedaldi
 
+# Copyright (C) 2013 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -34,7 +35,7 @@ endif
 
 info: mex-info matlab-info
 
-# $(call escape, string) escapes $ symbol for shell
+# $(call escape, string) escapes the $ symbol for shell
 escape =$(subst $$,\\$$,$(1))
 
 # --------------------------------------------------------------------
@@ -133,7 +134,7 @@ endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
-# For efficiency reason, immediately expand this variable now
+# For efficiency reasons, immediately expand this variable once
 MEX_FLAGS := $(MEX_FLAGS)
 
 # --------------------------------------------------------------------
