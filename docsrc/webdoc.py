@@ -479,7 +479,8 @@ class DocNode(DocBareNode):
             mo = re.match('dox:(.*)', directive)
             if mo:
                 if doxygenIndex is None:
-                    print "%s: warning: no Doxygen tag file loaded, skipping this directive." % self.getLocation()
+                    if opts.verb > 1:
+						print "%s: warning: no Doxygen tag file loaded, skipping this directive." % self.getLocation()
                     continue
                 if not mo.group(1) in doxygenIndex.index:
                     print "%s: warning: the ID %s was not found in the Doxygen tag file." % (self.getLocation(), mo.group(2))
@@ -848,7 +849,7 @@ class DocPage(DocNode):
     def publish(self, generator, pageNode = None):
         if pageNode is self:
             # this is the page being published, so go on
-            print "publishing " + self.__str__()
+            if opts.verb: print 'Publishing \'%s\''  % self.getPublishURL()
             DocNode.publish(self, generator, pageNode)
         # otherwise this page has been encountered recursively
         # during publishing
@@ -990,7 +991,6 @@ class DocHandler(ContentHandler):
         self.stack = []
         self.locatorStack = []
         self.filePathStack = []
-        self.verbosity = 1
         self.inDTD = False
 
     def resolveEntity(self, publicid, systemid):
@@ -1050,8 +1050,7 @@ class DocHandler(ContentHandler):
             qualFilePath = self.lookupFile(filePath)
             if qualFilePath is None:
                 raise self.makeError("the file '%s' could not be found while expanding <web:include>" % filePath)
-            if self.verbosity > 0:
-                print "parsing '%s'" % qualFilePath
+            if opts.verb: print "Parsing '%s'" % qualFilePath
             if attrs.has_key("type"):
                 includeType = attrs["type"]
             else:
@@ -1192,21 +1191,21 @@ def start(filePath, opts):
 
     # load doxygen tag file
     if opts.doxytag:
-        if opts.verb: print "Loading doxygen tag file", opts.doxytag
+        if opts.verb: print "Loading the Doxygen tag file", opts.doxytag
         try:
             doxygenIndex = Doxytag(opts.doxytag)
             doxygenDir = opts.doxydir
         except Exception, e:
-            print "Error parsing Doxygen tag file ", opts.doxytag
+            print "Error parsing the Doxygen tag file", opts.doxytag
             print e
             sys.exit(-1)
 
-    if opts.verb:
+    if opts.verb > 2:
         print "== All pages =="
         for x in walkNodes(handler.rootNode, DocPage):
             print x
 
-    if opts.verb: print "== Publish =="
+    if opts.verb: print "Publishing website..."
     try:
         handler.rootNode.publish()
     except DocError, e:
@@ -1214,7 +1213,7 @@ def start(filePath, opts):
         sys.exit(-1)
 
     if opts.indexfile:
-        print "Storing website index to", opts.indexfile
+        if opts.verb: print "Storing the website index to", opts.indexfile
         try:
             f = open(opts.indexfile, 'w+')
             siteurl = nodeIndex['root'].getPublishURL()
@@ -1230,7 +1229,7 @@ def start(filePath, opts):
                     print >>f, '%s|%s' % (tag,
                                           calcRelURL(url,siteurl))
         except Exception, e:
-            print "Error writing index file"
+            print "Error writing the website index file"
             print e
             sys.exit(-1)
 
@@ -1251,9 +1250,9 @@ if __name__ == '__main__':
     parser.add_option(
         "-v", "--verbose",
         dest    = "verb",
-        default = False,
-        action  = "store_true",
-        help    = "print debug informations")
+        default = 0,
+        action  = "count",
+        help    = "print more debuging information")
     parser.add_option(
         "-o", "--outdir",
         dest    = "outdir",
