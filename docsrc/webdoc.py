@@ -857,11 +857,13 @@ class DocPage(DocNode):
 
     def publishIndex(self, gen, pageNode, openNodeStack):
         if self.hide: return
-        gen.putString("<li><a href=")
+        active = len(openNodeStack) == 1 and self == openNodeStack[0]
+        gen.putString("<li")
+        if active: gen.putString(" class='active'")
+        gen.putString("><a href=")
         gen.putXMLAttr(
             self.expandAttr("%%pathto:%s;" % self.getID(), pageNode))
-        if len(openNodeStack) == 1 and self == openNodeStack[0]:
-            gen.putString(" class='active' ")
+        if active: gen.putString(" class='active' ")
         gen.putString(">")
         gen.putXMLString(self.title)
         gen.putString("</a>\n")
