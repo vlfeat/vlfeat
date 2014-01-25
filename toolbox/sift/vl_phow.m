@@ -1,10 +1,16 @@
 function [frames, descrs] = vl_phow(im, varargin)
 % VL_PHOW  Extract PHOW features
-%   [FRAMES, DESCRS] = VL_PHOW(IM) extracts PHOW features from the
-%   image IM. This function is a wrapper around VL_DSIFT() and
+%   [FRAMES, DESCRS] = VL_PHOW(IM) extracts PHOW features [1] from the
+%   image IM. PHOW is simply dense SIFT applied at several resolutions. This function is a commodity interface to VL_DSIFT() and
 %   VL_IMSMOOTH().
 %
-%   The PHOW descriptors where introduced in [1]. By default,
+%   DESCRS has the same format of VL_SIFT() and VL_DSIFT(). FRAMES(1:2,:)
+%   are the x,y coordinates of the center of each descriptor, FRAMES(3,:)
+%   is the contrast of the descriptor, as returned by VL_DSIFT() (for
+%   colour variant, contranst is computed on the intensity channel).
+%   FRAMES(4,:) is the size of the bin of the descriptor.
+%
+%   By default,
 %   VL_PHOW() computes the gray-scale variant of the descriptor.  The
 %   COLOR option can be used to compute the color variant instead.
 %
@@ -38,7 +44,9 @@ function [frames, descrs] = vl_phow(im, varargin)
 %
 %   Magnif:: 6
 %     The image is smoothed by a Gaussian kernel of standard deviation
-%     SIZE / MAGNIF.
+%     SIZE / MAGNIF. Note that, in the standard SIFT descriptor, the
+%     magnification value is 3; here the default one is 6 as it seems
+%     to perform better in applications.
 %
 %   FloatDescriptors:: false
 %     If set to TRUE, the descriptors are returned in floating point
