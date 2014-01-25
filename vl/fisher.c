@@ -99,8 +99,8 @@ the mixture with a strength given by the posterior probability:
 \[
   q_{ik} =
   \frac
-  {(\bx_i - \mu_k)^T \Sigma_k^{-1} (\bx_i - \mu_k)}
-  {\sum_{t=1}^K (\bx_i - \mu_t)^T \Sigma_t^{-1} (\bx_i - \mu_t)}.
+  {\exp\left[-\frac{1}{2}(\bx_i - \mu_k)^T \Sigma_k^{-1} (\bx_i - \mu_k)\right]}
+  {\sum_{t=1}^K \exp\left[-\frac{1}{2}(\bx_i - \mu_t)^T \Sigma_k^{-1} (\bx_i - \mu_t)\right]}.
 \]
 
 For each mode $k$, consider the mean and covariance deviation vectors
@@ -109,12 +109,12 @@ For each mode $k$, consider the mean and covariance deviation vectors
 u_{jk} &=
 {1 \over {N \sqrt{\pi_k}}}
 \sum_{i=1}^{N}
-q_{ik} \frac{x_{ji} - \mu_{ik}}{\sigma_i},
+q_{ik} \frac{x_{ji} - \mu_{jk}}{\sigma_{jk}},
 \\
 v_{jk} &=
 {1 \over {N \sqrt{2 \pi_k}}}
 \sum_{i=1}^{N}
-q_{ik} \left[ \left(\frac{x_{ji} - \mu_{ik}}{\sigma_j}\right)^2 - 1 \right].
+q_{ik} \left[ \left(\frac{x_{ji} - \mu_{jk}}{\sigma_{jk}}\right)^2 - 1 \right].
 @f}
 
 where $j=1,2,\dots,D$ spans the vector dimensions. The FV of image $I$
