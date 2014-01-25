@@ -89,7 +89,7 @@ transpose_descriptor (vl_sift_pix* dst, vl_sift_pix* src)
  ** @brief Ordering of tuples by increasing scale
  **
  ** @param a tuple.
- ** @param b tuble.
+ ** @param b tuple.
  **
  ** @return @c a[2] < b[2]
  **/
