@@ -17,7 +17,7 @@ the terms of the BSD license (see the COPYING file).
 @author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-@ref slic.h implements the Simple Linear Iterative Clustering (SLIC)
+@ref slic.h implements the *Simple Linear Iterative Clustering* (SLIC)
 algorithm, an image segmentation method described in @cite{achanta10slic}.
 
 - @ref slic-overview
