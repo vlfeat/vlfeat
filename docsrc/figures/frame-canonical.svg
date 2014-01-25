@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="595.276" height="841.89" viewBox="0, 0, 595.276, 841.89">
+  <g id="Layer 1">
+    <g>
+      <path d="M127.559,297.638 C104.076,297.638 85.039,278.601 85.039,255.118 C85.039,231.635 104.076,212.598 127.559,212.598 C151.042,212.598 170.079,231.635 170.079,255.118 C170.079,278.601 151.042,297.638 127.559,297.638 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M127.559,297.638 C104.076,297.638 85.039,278.601 85.039,255.118 C85.039,231.635 104.076,212.598 127.559,212.598 C151.042,212.598 170.079,231.635 170.079,255.118 C170.079,278.601 151.042,297.638 127.559,297.638 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M324.844,272.635 C314.078,262.595 318.334,240.534 334.349,223.36 C350.364,206.185 372.075,200.402 382.841,210.441 C393.607,220.481 389.352,242.542 373.337,259.716 C357.321,276.891 335.611,282.674 324.844,272.635 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M324.844,272.635 C314.078,262.595 318.334,240.534 334.349,223.36 C350.364,206.185 372.075,200.402 382.841,210.441 C393.607,220.481 389.352,242.542 373.337,259.716 C357.321,276.891 335.611,282.674 324.844,272.635 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M64.28,255.618 L182.839,255.618" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M182.839,258.618 L190.839,255.618 L182.839,252.618 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <g>
+      <path d="M128.059,310.398 L128.059,191.839" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M125.059,310.398 L128.059,318.398 L131.059,310.398 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <g>
+      <path d="M269.791,255.618 L388.35,255.618" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M388.35,258.618 L396.35,255.618 L388.35,252.618 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <g>
+      <path d="M333.571,310.398 L333.571,191.839" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M330.571,310.398 L333.571,318.398 L336.571,310.398 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <g>
+      <path d="M198.925,220.185 L274.965,220.185" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M274.965,223.185 L282.965,220.185 L274.965,217.185 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <g>
+      <path d="M207.925,291.051 L283.965,291.051" fill-opacity="0" stroke="#000000" stroke-width="1"/>
+      <path d="M207.925,288.051 L199.925,291.051 L207.925,294.051 z" fill="#000000" fill-opacity="1" stroke="#000000" stroke-width="1" stroke-opacity="1"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 147.485, 232.772)">
+      <tspan x="-5.752" y="3" font-family="Helvetica" font-size="9" fill="#000000">R0</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 371.754, 232.772)">
+      <tspan x="-3.25" y="3" font-family="Helvetica" font-size="9" fill="#000000">R</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 240.945, 204.425)">
+      <tspan x="-30.771" y="3" font-family="Helvetica" font-size="9" fill="#000000">feature location</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 240.945, 275.785)">
+      <tspan x="-34.014" y="2.507" font-family="Helvetica" font-size="9" fill="#000000">normalizing warp</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 127.559, 176.079)">
+      <tspan x="-31.766" y="3" font-family="Helvetica" font-size="9" fill="#000000">canonical frame</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 333.071, 177.165)">
+      <tspan x="-30.017" y="1.913" font-family="Helvetica" font-size="9" fill="#000000">detected frame</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 172.581, 190.252)">
+      <tspan x="-2.503" y="3" font-family="Helvetica" font-size="9" fill="#000000">1</tspan>
+    </text>
+    <path d="M170.579,198.925 L170.579,255.618" fill-opacity="0" stroke="#000000" stroke-width="0.5" stroke-dasharray="1.5,1"/>
+  </g>
+  <defs/>
+</svg>

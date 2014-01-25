@@ -6,19 +6,21 @@
  **/
 
 /*
- Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
- All rights reserved.
+Copyright (C) 2013-14 Andrea Vedaldi.
+Copyright (C) 2012 Karel Lenc, Andrea Vedaldi and Michal Perdoch.
+All rights reserved.
 
- This file is part of the VLFeat library and is made available under
- the terms of the BSD license (see the COPYING file).
- */
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page covdet Covariant feature detectors
-@auhtor Karel Lenc
+@author Karel Lenc
 @author Andrea Vedaldi
 @author Michal Perdoch
+@tableofcontents
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 @ref covdet.h implements a number of covariant feature detectors, based
@@ -26,6 +28,913 @@ on three cornerness measures (determinant of the Hessian, trace of the Hessian
 (aka Difference of Gaussians, and Harris). It supprots affine adaptation,
 orientation estimation, as well as Laplacian scale detection.
 
+- @subpage covdet-fundamentals
+- @subpage covdet-principles
+- @subpage covdet-differential
+- @subpage covdet-corner-types
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-starting Getting started
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The ::VlCovDet object implements a number of covariant feature
+detectors: Difference of Gaussian, Harris, determinant of Hessian.
+Variant of the basic detectors support scale selection by maximizing
+the Laplacian measure as well as affine normalization.
+
+@code
+// create a detector object
+VlCovDet * covdet = vl_covdet_new(method) ;
+
+// set various parameters (optional)
+vl_covdet_set_first_octave(covdet, -1) ; // start by doubling the image resolution
+vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
+vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
+vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
+
+// process the image and run the detector
+vl_covdet_put_image(covdet, image, numRows, numCols) ;
+vl_covdet_detect(covdet) ;
+
+// drop features on the margin (optional)
+vl_covdet_drop_features_outside (covdet, boundaryMargin) ;
+
+// compute the affine shape of the features (optional)
+vl_covdet_extract_affine_shape(covdet) ;
+
+// compute the orientation of the features (optional)
+vl_covdet_extract_orientations(covdet) ;
+
+// get feature frames back
+vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
+VlCovDetFeature const * feature = vl_covdet_get_features(covdet) ;
+
+// get normalized feature appearance patches (optional)
+vl_size w = 2*patchResolution + 1 ;
+for (i = 0 ; i < numFeatures ; ++i) {
+  float * patch = malloc(w*w*sizeof(*desc)) ;
+  vl_covdet_extract_patch_for_frame(covdet,
+                                    patch,
+                                    patchResolution,
+                                    patchRelativeExtent,
+                                    patchRelativeSmoothing,
+                                    feature[i].frame) ;
+  // do something with patch
+}
+@endcode
+
+This example code:
+
+- Calls ::vl_covdet_new constructs a new detector object. @ref
+  covdet.h supports a variety of different detectors (see
+  ::VlCovDetMethod).
+- Optionally calls various functions to set the detector parameters if
+  needed (e.g. ::vl_covdet_set_peak_threshold).
+- Calls ::vl_covdet_put_image to start processing a new image. It
+  causes the detector to compute the scale space representation of the
+  image, but does not compute the features yet.
+- Calls ::vl_covdet_detect runs the detector. At this point features are
+  ready to be extracted. However, one or all of the following steps
+  may be executed in order to process the features further.
+- Optionally calls ::vl_covdet_drop_features_outside to drop features
+  outside the image boundary.
+- Optionally calls ::vl_covdet_extract_affine_shape to compute the
+  affine shape of features using affine adaptation.
+- Optionally calls ::vl_covdet_extract_orientations to compute the
+  dominant orientation of features looking for the dominant gradient
+  orientation in patches.
+- Optionally calls ::vl_covdet_extract_patch_for_frame to extract a
+  normalized feature patch, for example to compute an invariant
+  feature descriptor.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@page covdet-fundamentals Covariant detectors fundamentals
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+This page describes the fundamental concepts required to understand a
+covariant feature detector, the geometry of covariant features, and
+the process of feature normalization.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section covdet-covariance Covariant detection
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+The purpose of a *covariant detector* is to extract from an image a
+set of local features in a manner which is consistent with spatial
+transformations of the image itself. For instance, a covariant
+detector that extracts interest points $\bx_1,\dots,\bx_n$ from image
+$\ell$ extracts the translated points $\bx_1+T,\dots,\bx_n+T$ from the
+translated image $\ell'(\bx) = \ell(\bx-T)$.
+
+More in general, consider a image $\ell$ and a transformed version
+$\ell' = \ell \circ w^{-1}$ of it, as in the following figure:
+
+@image html covdet.png "Covariant detection of local features."
+
+The transformation or <em>warp</em> $w : \real^2 \mapsto \real^2$ is a
+deformation of the image domain which may capture a change of camera
+viewpoint or similar imaging factor. Examples of warps typically
+considered are translations, scaling, rotations, and general affine
+transformations; however, in $w$ could be another type of continuous
+and invertible transformation.
+
+Given an image $\ell$, a **detector** selects features $R_1,\dots,R_n$
+(one such features is shown in the example as a green circle). The
+detector is said to be **covariant** with the warps $w$ if it extracts
+the transformed features $w[R_1],\dots, w[R_n]$ from the transformed
+image $w[\ell]$. Intuitively, this means that the &ldquo;same
+features&rdquo; are extracted in both cases up to the transformation
+$w$. This property is described more formally in @ref
+covdet-principles.
+
+Covariance is a key property of local feature detectors as it allows
+extracting corresponding features from two or more images, making it
+possible to match them in a meaningful way.
+
+The @ref covdet.h module in VLFeat implements an array of feature
+detection algorithm that have are covariant to different classes of
+transformations.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section covdet-frame Feature geometry and feature frames
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+As we have seen, local features are subject to image transformations,
+and they apply a fundamental role in matching and normalizing
+images. To operates effectively with local features is therefore
+necessary to understand their geometry.
+
+The geometry of a local feature is captured by a <b>feature frame</b>
+$R$. In VLFeat, depending on the specific detector, the frame can be
+either a point, a disc, an ellipse, an oriented disc, or an oriented
+ellipse.
+
+A frame captures both the extent of the local features, useful to know
+which portions of two images are put in correspondence, as well their
+shape.  The latter can be used to associate to diagnose the
+transformation that affects a feature and remove it through the
+process of **normalization**.
+
+More precisely, in covariant detection feature frames are constructed
+to be compatible with a certain class of transformations. For example,
+circles are compatible with similarity transformations as they are
+closed under them. Likewise, ellipses are compatible with affine
+transformations.
+
+Beyond this closure property, the key idea here is that all feature
+occurrences can be seen as transformed versions of a base or
+<b>canonical</b> feature. For example, all discs $R$ can be obtained
+by applying a similarity transformation to the unit disc $\bar R$
+centered at the origin. $\bar R$ is an example of canonical frame
+as any other disc can be written as $R = w[\bar R]$ for a suitable
+similarity $w$.
+
+@image html frame-canonical.png "The idea of canonical frame and normalization"
+
+The equation $R = w[\bar R_0]$ matching the canonical and detected
+feature frames establishes a constraint on the warp $w$, very similar
+to the way two reference frames in geometry establish a transformation
+between spaces. The transformation $w$ can be thought as a the
+**pose** of the detected feature, a generalization of its location.
+
+In the case of discs and similarity transformations, the equation $R =
+w[\bar R_0]$ fixes $w$ up to a residual rotation. This can be
+addressed by considering oriented discs instead. An **oriented disc**
+is a disc with a radius highlighted to represent the feature
+orientation.
+
+While discs are appropriate for similarity transformations, they are
+not closed under general affine transformations. In this case, one
+should consider the more general class of (oriented) ellipses. The
+following image illustrates the five types of feature frames used in
+VLFeat:
+
+@image html frame-types.png "Types of local feature frames: points, discs, oriented discs, ellipses, oriented ellipses."
+
+Note that these frames are described respectively by 2, 3, 4, 5 and 6
+parameters. The most general type are the oriented ellipses, which can
+be used to represent all the other frame types as well.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section covdet-frame-transformation Transforming feature frames
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+Consider a warp $w$ mapping image $\ell$ into image $\ell'$ as in the
+figure below. A feature $R$ in the first image co-variantly transform
+into a feature $R'=w[R]$ in the second image:
+
+@image html covdet-normalization.png "Normalization removes the effect of an image deformation."
+
+The poses $u,u'$ of $R=u[R_0]$ and $R' = u'[R_0]$ are then related by
+the simple expression:
+
+\[
+  u' = w \circ u.
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section covdet-frame-normalization Normalizing feature frames
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+In the example above, the poses $u$ and $u'$ relate the two
+occurrences $R$ and $R'$ of the feature to its canonical version
+$R_0$. If the pose $u$ of the feature in image $\ell$ is known, the
+canonical feature appearance can be computed by un-warping it:
+
+\[
+ \ell_0 = u^{-1}[\ell] = \ell \circ u.
+\]
+
+This process is known as **normalization** and is the key in the
+computation of invariant feature descriptors as well as in the
+construction of most co-variant detectors.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@page covdet-principles Principles of covariant detection
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+The goals of a co-variant detector were discussed in @ref
+covdet-fundamentals. This page introduces a few general principles
+that are at the basis of most covariant detection algorithms. Consider
+an input image $\ell$ and a two dimensional continuous and invertible
+warp $w$. The *warped image* $w[\ell]$ is defined to be
+
+\[
+ w[\ell] = \ell \circ w^{-1},
+\]
+
+or, equivalently,
+
+\[
+ w[\ell](x,y) =  \ell(w^{-1}(x,y)), \qquad \forall (x,y)\in\real^2.
+\]
+
+Note that, while $w$ pushes pixels forward, from the original to the
+transformed image domain, defining the transformed image $\ell'$
+requires inverting the warp and composing $\ell$ with $w^{-1}$.
+
+The goal a covariant detector is to extract the same local features
+irregardless of image transformations. The detector is said to be
+<b>covariant</b> or <b>equivariant</b> with a class of warps
+$w\in\mathcal{W}$ if, when the feature $R$ is detected in image
+$\ell$, then the transformed feature $w[R]$ is detected in the
+transformed image $w[\ell]$.
+
+The net effect is that a covariant feature detector appears to
+&ldquo;track&rdquo; image transformations; however, it is important to
+note that a detector *is not a tracker* because it processes images
+individually rather than jointly as part of a sequence.
+
+An intuitive way to construct a covariant feature detector is to
+extract features in correspondence of images structures that are
+easily identifiable even after a transformation. Example of specific
+structures include dots, corners, and blobs. These will be generically
+indicated as **corners** in the followup.
+
+A covariant detector faces two challenges. First, corners have, in
+practice, an infinite variety of individual appearances and the
+detector must be able to capture them to be of general applicability.
+Second, the way corners are identified and detected must remain stable
+under transformations of the image. These two problems are addressed
+in @ref covdet-cornerness-localmax and @ref
+covdet-cornerness-normalization respectively.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-cornerness Detection using a cornerness measure
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+One way to decide whether an image region $R$ contains a corner is to
+compare the local appearance to a model or template of the corner; the
+result of this comparisons produces a *cornerness score* at that
+location. This page describe general theoretical properties of the
+cornerness and the detection process. Concrete examples of cornerness
+are given in @ref covdet-corner-types.
+
+A **cornerness measure** associate a score to all possible feature
+locations in an image $\ell$. As described in @ref covdet-frame, the
+location or, more in general, pose $u$ of a feature $R$ is the warp
+$w$ that maps the canonical feature frame $R_0$ to $R$:
+
+\[
+    R = u[R_0].
+\]
+
+The goal of a cornerness measure is to associate a score $F(u;\ell)$
+to all possible feature poses $u$ and use this score to extract a
+finite number of co-variant features from any image.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-cornerness-localmax Local maxima of a cornerness measure
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Given the cornerness of each candidate feature, the detector must
+extract a finite number of them. However, the cornerness of features
+with nearly identical pose must be similar (otherwise the cornerness
+measure would be unstable). As such, simply thresholding $F(w;\ell)$
+would detect an infinite number of nearly identical features rather
+than a finite number.
+
+The solution is to detect features in correspondence of the local
+maxima of the score measure:
+
+\[
+ \{w_1,\dots,w_n\} = \operatorname{localmax}_{w\in\mathcal{W}} F(w;\ell).
+\]
+
+This also means that features are never detected in isolation, but by
+comparing neighborhoods of them.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-cornerness-normalization Covariant detection by normalization
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The next difficulty is to guarantee that detection is co-variant with
+image transformations. Hence, if $u$ is the pose of a feature
+extracted from image $\ell$, then the feature of pose $u' = w[u]$ must
+be detected in the transformed image $\ell' = w[\ell]$.
+
+Since features are extracted in correspondence of the local maxima of
+the cornerness score, a sufficient condition is that corresponding
+features attain the same score in the two images.
+
+\[
+\forall u\in\mathcal{W}: \quad F(u;\ell) = F(w[u];w[\ell]),
+\qquad\text{or}\qquad
+F(u;\ell) = F(w \circ u ;\ell \circ w^{-1}).
+\]
+
+One simple way to satisfy this equation is to compute a cornerness
+score *after normalizing the image* by the inverse of the candidate
+feature pose warp $u$, as follows:
+
+\[
+  F(u;\ell) = F(1;u^{-1}[\ell]) = F(1;\ell \circ u) = \mathcal{F}(\ell \circ u).
+\]
+
+where $1 = u^{-1} \circ u$ is the identity transformation and
+$\mathcal{F}$ is an arbitrary functional. Intuitively, co-variant
+detection is obtained by looking if the appearance of the feature
+resembles a corner only *after normalization*. Formally:
+
+\[
+F(w \circ u ;\ell \circ w^{-1})
+=
+\mathcal{F}(1; \ell \circ w^{-1} \circ w \circ u)
+=
+\mathcal{F}(1; \ell\circ u)
+=
+F(w;\ell).
+\]
+
+Concrete examples of the functional $\mathcal{F}$ are given in @ref
+covdet-corner-types.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-locality Locality of the detected features
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In the definition above, the cornenress functional $\mathcal{F}$ is an
+arbitrary functional of the entire normalized image $u^{-1}[\ell]$.
+In practice, one is always interested in detecting **local features**
+(at the very least because the image extent is finite).
+
+This is easily obtained by considering a cornerness $\mathcal{F}$
+which only looks in a small region of the normalized image, usually
+corresponding to the extent of the canonical feature $R_0$ (e.g. a
+unit disc centered at the origin).
+
+In this case the extent of the local feature in the original image is
+simply given by $R = u[R_0]$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-partial Partial and iterated normalization
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Practical detectors implement variants of the ideas above. Very often,
+for instance, detection is an iterative process, in which successive
+parameters of the pose of a feature are determined. For instance, it
+is typical to first detect the location and scale of a feature using a
+rotation-invariant cornerness score $\mathcal{F}$. Once these two
+parameters are known, the rotation can be determined using a different
+score, sensitive to the orientation of the local image structures.
+
+Certain detectors (such as Harris-Laplace and Hessian-Laplace) use
+even more sophisticated schemes, in which different scores are used to
+jointly (rather than in succession) different parameters of the pose
+of a feature, such as its translation and scale. While a formal
+treatment of these cases is possible as well, we point to the original
+papers.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page covdet-differential Differential and integral image operations
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Dealing with covariant interest point detector requires working a good
+deal with derivatives, convolutions, and transformations of images.
+The notation and fundamental properties of interest here are discussed
+next.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-derivatives Derivative operations: gradients
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+For the derivatives, we borrow the notation of
+@cite{kinghorn96integrals}. Let $f: \mathbb{R}^m \rightarrow
+\mathbb{R}^n, \bx \mapsto f(\bx)$ be a vector function. The derivative
+of the function with respect to $\bx$ is given by its *Jacobian
+matrix* denoted by the symbol:
+
+\[
+\frac{\partial f}{\partial \bx^\top}
+=
+\begin{bmatrix}
+  \frac{\partial f_1}{x_1} & \frac{\partial f_1}{x_2} & \dots \\
+  \frac{\partial f_2}{x_1} & \frac{\partial f_2}{x_2} & \dots \\
+  \vdots & \vdots & \ddots \\
+\end{bmatrix}.
+\]
+
+When the function $ f $ is scalar ($n=1$), the Jacobian is the same as
+the gradient of the function (or, in fact, its transpose). More
+precisely, the <b>gradient</b> $\nabla f $ of $ f $ denotes the column
+vector of partial derivatives:
+
+\[
+\nabla f
+ = \frac{\partial f}{\partial \bx}
+ =
+ \begin{bmatrix}
+  \frac{\partial f}{\partial x_1} \\
+  \frac{\partial f}{\partial x_2} \\
+  \vdots
+\end{bmatrix}.
+\]
+
+The second derivative $H_f $ of a scalar function $ f $, or
+<b>Hessian</b>, is denoted as
+
+\[
+H_f
+= \frac{\partial f}{\partial \bx \partial \bx^\top}
+= \frac{\partial \nabla f}{\partial \bx^\top}
+=
+\begin{bmatrix}
+  \frac{\partial f}{\partial x_1 \partial x_1} & \frac{\partial f}{\partial x_1 \partial x_2} & \dots \\
+  \frac{\partial f}{\partial x_2 \partial x_1} & \frac{\partial f}{\partial x_2 \partial x_2} & \dots \\
+  \vdots & \vdots & \ddots \\
+\end{bmatrix}.
+\]
+
+The determinant of the Hessian is also known as <b>Laplacian</b> and denoted as
+
+\[
+ \Delta f = \operatorname{det} H_f =
+\frac{\partial f}{\partial x_1^2} +
+\frac{\partial f}{\partial x_2^2} +
+\dots
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-derivative-transformations Derivative and image warps
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In the following, we will often been interested in domain warpings $u:
+\mathbb{R}^m \rightarrow \mathbb{R}^n, \bx \mapsto u(\bx)$ of a
+function $f(\bar\bx) $ and its effect on the derivatives of the
+function. The key transformation is the chain rule:
+
+\[
+\frac{\partial f \circ u}{\partial \bx^\top}
+=
+\left(\frac{\partial f}{\partial \bar\bx^\top} \circ u\right)
+\frac{\partial u}{\partial \bx^\top}
+\]
+
+In particular, for an affine transformation $u = (A,T) : \bx \mapsto
+A\bx + T$, one obtains the transformation rules:
+
+\[
+\begin{align*}
+\frac{\partial f \circ (A,T)}{\partial \bx^\top}
+&=
+\left(\frac{\partial f}{\partial \bar\bx^\top} \circ (A,T)\right)A,
+\\
+\nabla (f \circ (A,T))
+&= A^\top (\nabla f) \circ (A,T),
+\\
+H_{f \circ(A,T)}
+&= A^\top (H_f \circ (A,T)) A,
+\\
+\Delta (f \circ(A,T))
+&= \det(A)^2\, (\Delta f) \circ (A,T).
+\end{align*}
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-smoothing Integral operations: smoothing
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In practice, given an image $\ell$ expressed in digital format, good
+derivative approximations can be computed only if the bandwidth of the
+image is limited and, in particular, compatible with the sampling
+density. Since it is unreasonable to expect real images to be
+band-limited, the bandwidth is artificially constrained by suitably
+smoothing the image prior to computing its derivatives. This is also
+interpreted as a form of regularization or as a way of focusing on the
+image content at a particular scale.
+
+Formally, we will focus on Gaussian smoothing kernels. For the 2D case
+$\bx\in\real^2$, the Gaussian kernel of covariance $\Sigma$ is given
+by
+
+\[
+g_{\Sigma}(\bx) = \frac{1}{2\pi \sqrt{\det\Sigma}}
+  \exp\left(
+  - \frac{1}{2} \bx^\top \Sigma^{-1} \bx
+  \right).
+\]
+
+The symbol $g_{\sigma^2}$ will be used to denote a Gaussian kernel
+with isotropic standard deviation $\sigma$, i.e. $\Sigma = \sigma^2
+I$. Given an image $\ell$, the symbol $\ell_\Sigma$ will be used to
+denote the image smoothed by the Gaussian kernel of parameter
+$\Sigma$:
+
+\[
+\ell_\Sigma(\bx) = (g_\Sigma * \ell)(\bx)
+=
+\int_{\real^m}
+g_\Sigma(\bx - \by) \ell(\by)\,d\by.
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-smoothing-transformations Smoothing and image warps
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+One advantage of Gaussian kernels is that they are (up to
+renormalization) closed under a linear warp:
+
+\[
+ |A|\, g_\Sigma \circ A = g_{A^{-1} \Sigma A^{-\top}}
+\]
+
+This also means that smoothing a warped image is the same as warping
+the result of smoothing the original image by a suitably adjusted
+Gaussian kernel:
+
+\[
+g_{\Sigma} * (\ell \circ (A,T))
+=
+(g_{A\Sigma A^\top} * \ell) \circ (A,T).
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page covdet-corner-types Cornerness measures
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The goal of a cornerness measure (@ref covdet-cornerness) is to
+associate to an image patch a score proportional to how strongly the
+patch contain a certain strucuture, for example a corner or a
+blob. This page reviews the most important cornerness measures as
+implemented in VLFeat:
+
+- @ref covdet-harris
+- @ref covdet-laplacian
+- @ref covdet-hessian
+
+This page makes use of notation introduced in @ref
+covdet-differential.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-harris Harris corners
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+This section introduces the fist of the cornerness measure
+$\mathcal{F}[\ell]$. Recall (@ref covdet-cornerness) that the goal of
+this functional is to respond strongly to images $\ell$ of corner-like
+structure.
+
+Rather than explicitly encoding the appearance of corners, the idea of
+the Harris measure is to label as corner *any* image patch whose
+appearance is sufficiently distinctive to allow accurate
+localization. In particular, consider an image patch $\ell(\bx),
+\bx\in\Omega$, where $\Omega$ is a smooth circular window of radius
+approximately $\sigma_i$; at necessary condition for the patch to
+allow accurate localization is that even a small translation
+$\ell(\bx+\delta)$ causes the appearance to vary significantly (if not
+the origin and location $\delta$ would not be distinguishable from the
+image alone). This variation is measured by the sum of squared
+differences
+
+\[
+E(\delta) = \int g_{\sigma_i^2}(\bx)
+(\ell_{\sigma_d^2}(\bx+\delta) -
+ \ell_{\sigma_d^2}(\bx))^2 \,d\bx
+\]
+
+Note that images are compared at scale $\sigma_d$, known as
+ *differentiation scale* for reasons that will be clear in a moment,
+and that the squared differences are summed over a window softly
+defined by $\sigma_i$, also known as *integration scale*. This
+function can be approximated as $E(\delta)\approx \delta^\top
+M[\ell;\sigma_i^2,\sigma_d^2] \delta$ where
+
+\[
+  M[\ell;\sigma_i^2,\sigma_d^2]
+= \int  g_{\sigma_i^2}(\bx)
+ (\nabla \ell_{\sigma_d^2}(\bx))
+ (\nabla \ell_{\sigma_d^2}(\bx))^\top \, d\bx.
+\]
+
+is the so called **structure tensor**.
+
+A corner is identified when the sum of squared differences $E(\delta)$
+is large for displacements $\delta$ in all directions. This condition
+is obtained when both the eignenvalues $\lambda_1,\lambda_2$ of the
+structure tensor $M$ are large. The **Harris cornerness measure**
+captures this fact:
+
+\[
+ \operatorname{Harris}[\ell;\sigma_i^2,\sigma_d^2] =
+ \det M - \kappa \operatorname{trace}^2 M =
+ \lambda_1\lambda_2 - \kappa (\lambda_1+\lambda_2)^2
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-harris-warped Harris in the warped domain
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The cornerness measure of a feature a location $u$ (recall that
+locations $u$ are in general defined as image warps) should be
+computed after normalizing the image (by applying to it the warp
+$u^{-1}$). This section shows that, for affine warps, the Harris
+cornerness measure can be computed directly in the Gaussian affine
+scale space of the image. In particular, for similarities, it can be
+computed in the standard Gaussian scale space.
+
+To this end, let $u=(A,T)$ be an affine warp identifying a feature
+location in image $\ell(\bx)$. Let $\bar\ell(\bar\bx) =
+\ell(A\bar\bx+T)$ be the normalized image and rewrite the structure
+tensor of the normalized image as follows:
+
+\[
+ M[\bar\ell; \bar\Sigma_i, \bar\Sigma_d]
+=
+ M[\bar\ell; \bar\Sigma_i, \bar\Sigma_d](\mathbf{0})
+=
+\left[
+g_{\bar\Sigma_i} *
+(\nabla\bar\ell_{\bar\Sigma_d})
+(\nabla\bar\ell_{\bar\Sigma_d})^\top
+\right](\mathbf{0})
+\]
+
+This notation emphasizes that the structure tensor is obtained by
+taking derivatives and convolutions of the image. Using the fact that
+$\nabla g_{\bar\Sigma_d} * \bar\ell = A^\top (\nabla g_{A\bar\Sigma
+A^\top} * \ell) \circ (A,T)$ and that $g_{\bar\Sigma} * \bar \ell =
+(g_{A\bar\Sigma A^\top} * \ell) \circ (A,T)$, we get the equivalent
+expression:
+
+\[
+ M[\bar\ell; \bar\Sigma_i, \bar\Sigma_d](\mathbf{0})
+ =
+A^\top
+\left[
+g_{A\bar\Sigma_i A^\top} *
+(\nabla\ell_{A\bar\Sigma_dA^\top})(\nabla\ell_{A\bar\Sigma_d A^\top})^\top
+\right](A\mathbf{0}+T)
+A.
+\]
+
+In other words, the structure tensor of the normalized image can be
+computed as:
+
+\[
+M[\bar\ell; \bar\Sigma_i, \bar\Sigma_d](\mathbf{0})
+=
+A^\top M[\ell; \Sigma_i, \Sigma_d](T) A,
+\quad
+\Sigma_{i} = A\bar\Sigma_{i}A^\top,
+\quad
+\Sigma_{d} = A\bar\Sigma_{d}A^\top.
+\]
+
+This equation allows to compute the structure tensor for feature at
+all locations directly in the original image. In particular, features
+at all translations $T$ can be evaluated efficiently by computing
+convolutions and derivatives of the image
+$\ell_{A\bar\Sigma_dA^\top}$.
+
+A case of particular instance is when $\bar\Sigma_i= \bar\sigma_i^2 I$
+and $\bar\Sigma_d = \bar\sigma_d^2$ are both isotropic covariance
+matrices and the affine transformation is a similarity $A=sR$.  Using
+the fact that $\det\left( s^2 R^\top M R \right)= s^4 \det M$ and
+$\operatorname{tr}\left(s^2 R^\top M R\right) = s^2 \operatorname{tr}
+M$, one obtains the relation
+
+\[
+ \operatorname{Harris}[\bar \ell;\bar\sigma_i^2,\bar\sigma_d^2] =
+ s^4 \operatorname{Harris}[\ell;s^2\bar\sigma_i^2,s^2\bar\sigma_d^2](T).
+\]
+
+This equation indicates that, for similarity transformations, not only
+the structure tensor, but directly the Harris cornerness measure can
+be computed on the original image and then be transferred back to the
+normalized domain. Note, however, that this requires rescaling the
+measure by the factor $s^4$.
+
+Another important consequence of this relation is that the Harris
+measure is invariant to pure image rotations. It cannot, therefore, be
+used to associate an orientation to the detected features.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-hessian Hessian blobs
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The *(determinant of the) Hessian* cornerness measure is given
+determinant of the Hessian of the image:
+
+\[
+ \operatorname{DetHess}[\ell;\sigma_d^2]
+ =
+ \det H_{g_{\sigma_d^2} * \ell}(\mathbf{0})
+\]
+
+This number is large and positive if the image is locally curved
+(peaked), roughly corresponding to blob-like structures in the image.
+In particular, a large score requires the product of the eigenvalues
+of the Hessian to be large, which requires both of them to have the
+same sign and are large in absolute value.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@subsection covdet-hessian-warped Hessian in the warped domain
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+Similarly to the Harris measure, it is possible to work with the
+Hessian measure on the original unnormalized image. As before, let
+$\bar\ell(\bar\bx) = \ell(A\bar\bx+T)$ be the normalized image and
+rewrite the Hessian of the normalized image as follows:
+
+\[
+H_{g_{\bar\Sigma_d} * \bar\ell}(\mathbf{0}) = A^\top \left(H_{g_{\Sigma_d} * \ell}(T)\right) A.
+\]
+
+Then
+
+\[
+ \operatorname{DetHess}[\bar\ell;\bar\Sigma_d]
+ =
+ (\det A)^2 \operatorname{DetHess}[\ell;A\bar\Sigma_d A^\top](T).
+\]
+
+In particular, for isotropic covariance matrices and similarity
+transformations $A=sR$:
+
+\[
+ \operatorname{DetHess}[\bar\ell;\bar\sigma_d^2]
+ =
+ s^4 \operatorname{DetHess}[\ell;s^2\bar\sigma_d^2](T)
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section covdet-laplacian Laplacian and Difference of Gaussians blobs
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+The **Laplacian of Gaussian (LoG)** or **trace of the Hessian**
+cornerness measure is given by the trace of the Hessian of the image:
+
+\[
+ \operatorname{Lap}[\ell;\sigma_d^2]
+ =
+ \operatorname{tr} H_{g_{\sigma_d}^2 * \ell}
+\]
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@subsection covdet-laplacian-warped Laplacian in the warped domain
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+Similarly to the Hessian measure, the Laplacian cornenress can often
+be efficiently computed for features at all locations in the original
+unnormalized image domain. In particular, if the derivative covariance
+matrix $\Sigma_d$ is isotropic and one considers as warpings
+similarity transformations $A=sR$, where $R$ is a rotatin and $s$ a
+rescaling, one has
+
+\[
+ \operatorname{Lap}[\bar\ell;\bar\sigma_d^2]
+ =
+ s^2 \operatorname{Lap}[\ell;s^2\bar\sigma_d^2](T)
+\]
+
+Note that, comparing to the Harris and determinant of Hessian
+measures, the scaling for the Laplacian is $s^2$ rather than $s^4$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@subsection covdet-laplacian-matched Laplacian as a matched filter
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+The Laplacian is given by the trace of the Hessian
+operator. Differently from the determinant of the Hessian, this is a
+linear operation. This means that computing the Laplacian cornerness
+measure can be seen as applying a linear filtering operator to the
+image. This filter can then be interpreted as a *template* of a corner
+being matched to the image. Hence, the Laplacian cornerness measure
+can be interpreted as matching this corner template at all possible
+image locations.
+
+To see this formally, compute the Laplacian score in the input image domain:
+
+\[
+ \operatorname{Lap}[\bar\ell;\bar\sigma_d^2]
+ =
+ s^2 \operatorname{Lap}[\ell;s^2\bar\sigma_d^2](T)
+ =
+ s^2 (\Delta g_{s^2\bar\sigma_d^2} * \ell)(T)
+\]
+
+The Laplacian fitler is obtained by moving the Laplacian operator from
+the image to the Gaussian smoothing kernel:
+
+\[
+ s^2 (\Delta g_{s^2\bar\sigma_d^2} * \ell)
+=
+ (s^2 \Delta g_{s^2\bar\sigma_d^2}) * \ell
+\]
+
+Note that the filter is rescaled by the $s^2$; sometimes, this factor
+is incorporated in the Laplacian operator, yielding the so-called
+normalized Laplacian.
+
+The Laplacian of Gaussian is also called *top-hat function* and has
+the expression:
+
+\[
+\Delta g_{\sigma^2}(x,y)
+=
+\frac{x^2+y^2 - 2 \sigma^2}{\sigma^4} g_{\sigma^2}(x,y).
+\]
+
+This filter, which acts as corner template, resembles a blob (a dark
+disk surrounded by a bright ring).
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@subsection covdet-laplacian-dog Difference of Gaussians
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+The **Difference of Gaussian** (DoG) cornerness measure can be
+interpreted as an approximation of the Laplacian that is easy to
+obtain once a scalespace of the input image has been computed.
+
+As noted above, the Laplacian cornerness of the normalized feature can
+be computed directly from the input image by convolving the image by
+the normalized Laplacian of Gaussian filter $s^2 \Delta
+g_{s^2\bar\sigma_d^2}$.
+
+Like the other derivative operators, this filter is simpe to
+discriteize. However, it is often approximated by computing the the
+*Difference of Gaussians* (DoG) approximation instead. This
+approximation is obtained from the easily-proved identity:
+
+\[
+  \frac{\partial}{\partial \sigma} g_{\sigma^2} =
+  \sigma \Delta g_{\sigma^2}.
+\]
+
+This indicates that computing the normalized Laplacian of a Gaussian
+filter is, in the limit, the same as taking the difference between
+Gaussian filters of slightly increasing standard deviation $\sigma$
+and $\kappa\sigma$, where $\kappa \approx 1$:
+
+\[
+\sigma^2 \Delta g_{\sigma^2}
+\approx
+\sigma \frac{g_{(\kappa\sigma)^2} - g_{\sigma^2}}{\kappa\sigma - \sigma}
+=
+\frac{1}{\kappa - 1}
+(g_{(\kappa\sigma)^2} - g_{\sigma^2}).
+\]
+
+One nice propery of this expression is that the factor $\sigma$
+cancels out in the right-hand side. Usually, scales $\sigma$ and
+$\kappa\sigma$ are pre-computed in the image scale-space and
+successive scales are sampled with uniform geometric spacing, meaning
+that the factor $\kappa$ is the same for all scales. Then, up to a
+overall scaling factor, the LoG cornerness measure can be obtained by
+taking the difference of successive scale space images
+$\ell_{(\kappa\sigma)^2}$ and $\ell_{\sigma^2}$.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page covdet-affine-adaptation Affine adaptation
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@page covdet-dominant-orientation Dominant orientation
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 **/
 
 #include "covdet.h"
@@ -126,15 +1035,17 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
                            vl_size width, vl_size height,
                            vl_index x, vl_index y) ;
 
-/** @brief Find extrema in 3D function
- ** @param extrema
- ** @param bufferSize
+/** @internal
+ ** @brief Find the extrema of a 3D function
+ ** @param extrema buffer containing the extrema found (in/out).
+ ** @param bufferSize size of the @a extrema buffer in bytes (in/out).
  ** @param map a 3D array representing the map.
  ** @param width of the map.
  ** @param height of the map.
- ** @param deepth of the map.
+ ** @param depth of the map.
  ** @param threshold minumum extremum value.
  ** @return number of extrema found.
+ ** @see @ref ::vl_refine_local_extreum_2.
  **/
 
 vl_size
@@ -209,15 +1120,22 @@ v CMP *(pt - yo - xo - zo) )
   return numExtrema ;
 }
 
-/** @brief Find extrema in 3D function
- ** @param extrema
- ** @param bufferSize
+/** @internal
+ ** @brief Find extrema in a 2D function
+ ** @param extrema buffer containing the found extrema (in/out).
+ ** @param bufferSize size of the @a extrema buffer in bytes (in/out).
  ** @param map a 3D array representing the map.
  ** @param width of the map.
  ** @param height of the map.
- ** @param deepth of the map.
  ** @param threshold minumum extremum value.
  ** @return number of extrema found.
+ **
+ ** An extremum contains 2 ::vl_index values; they are arranged
+ ** sequentially.
+ **
+ ** The function can reuse an already allocated buffer if
+ ** @a extrema and @a bufferSize are initialized on input.
+ ** It may have to @a realloc the memory if the buffer is too small.
  **/
 
 vl_size
@@ -266,16 +1184,17 @@ v CMP *(pt - yo - xo) )
   return numExtrema ;
 }
 
-/** @brief Refine extrema in 3D function
- ** @param refined refined extrema.
+/** @internal
+ ** @brief Refine the location of a local extremum of a 3D map
+ ** @param refined refined extremum (out).
  ** @param map a 3D array representing the map.
  ** @param width of the map.
  ** @param height of the map.
- ** @param deepth of the map.
- ** @param x
- ** @param y
- ** @param z
- ** @return extrema refinement was stable.
+ ** @param depth of the map.
+ ** @param x initial x position.
+ ** @param y initial y position.
+ ** @param z initial z position.
+ ** @return a flat indicating whether the extrema refinement was stable.
  **/
 
 VL_EXPORT vl_bool
@@ -393,16 +1312,15 @@ vl_refine_local_extreum_3 (VlCovDetExtremum3 * refined,
 #undef at
 }
 
-/** @brief Refine extrema in 3D function
- ** @param refined refined extrema.
- ** @param map a 3D array representing the map.
+/** @internal
+ ** @brief Refine the location of a local extremum of a 2D map
+ ** @param refined refined extremum (out).
+ ** @param map a 2D array representing the map.
  ** @param width of the map.
  ** @param height of the map.
- ** @param deepth of the map.
- ** @param x
- ** @param y
- ** @param z
- ** @return extrema refinement was stable.
+ ** @param x initial x position.
+ ** @param y initial y position.
+ ** @return a flat indicating whether the extrema refinement was stable.
  **/
 
 VL_EXPORT vl_bool
@@ -792,7 +1710,7 @@ vl_covdet_put_image (VlCovDet * self,
   geom.lastOctave = lastOctave ;
   geom.octaveResolution = self->octaveResolution ;
   geom.octaveFirstSubdivision = octaveFirstSubdivision ;
-  geom.octaveLastSubdivision = octaveLastSubdivision ;
+  geom.octaveLastSubdivision = octaveLastSubdiv ision ;
 
   if (self->gss == NULL ||
       ! vl_scalespacegeometry_is_equal (geom,
@@ -988,8 +1906,10 @@ _vl_dog_response (float * dog,
 /* ---------------------------------------------------------------- */
 
 /** @brief Detect scale-space features
- ** @param method
- ** @return new covariant detector.
+ ** @param self object.
+ **
+ ** This function runs the configured feature detector on the image
+ ** that was passed by using ::vl_covdet_put_image.
  **/
 
 void
@@ -1214,16 +2134,17 @@ vl_covdet_detect (VlCovDet * self)
 /*                                                  Extract patches */
 /* ---------------------------------------------------------------- */
 
-/** @brief Helper for extracting patches
+/** @internal
+ ** @brief Helper for extracting patches
  ** @param self object.
- ** @param sigma1 actual patch smoothing along the first axis (out).
- ** @param sigma2 actual patch smoothing along the second axis (out).
+ ** @param[out] sigma1 actual patch smoothing along the first axis.
+ ** @param[out] sigma2 actual patch smoothing along the second axis.
  ** @param patch buffer.
  ** @param resolution patch resolution.
  ** @param extent patch extent.
  ** @param sigma desired smoothing in the patch frame.
- ** @param A linear transfomration from patch to image.
- ** @param T translation from patch to image.
+ ** @param A_ linear transfomration from patch to image.
+ ** @param T_ translation from patch to image.
  ** @param d1 first singular value @a A.
  ** @param d2 second singular value of @a A.
  **/
@@ -1236,8 +2157,8 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
                                 vl_size resolution,
                                 double extent,
                                 double sigma,
-                                double (A_) [4],
-                                double (T_) [2],
+                                double A_ [4],
+                                double T_ [2],
                                 double d1, double d2)
 {
   vl_index o, s ;
@@ -1748,9 +2669,10 @@ _vl_covdet_compare_orientations_descending (void const * a_,
   return 0 ;
 }
 
-/** @brief Extract the orientation(s) for a feature frame
+/** @brief Extract the orientation(s) for a feature
  ** @param self object.
  ** @param numOrientations the number of detected orientations.
+ ** @param frame pose of the feature.
  ** @return an array of detected orientations with their scores.
  **
  ** The returned array is a matrix of size @f$ 2 \times n @f$
@@ -1963,6 +2885,7 @@ vl_covdet_extract_orientations (VlCovDet * self)
 /** @brief Extract the Laplacian scale(s) for a feature frame.
  ** @param self object.
  ** @param numScales the number of detected scales.
+ ** @param frame pose of the feature.
  ** @return an array of detected scales.
  **
  ** The function returns @c NULL if memory is insufficient.
@@ -2198,7 +3121,7 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get wether images are passed in transposed
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return whether images are transposed.
  **/
 vl_bool
@@ -2208,7 +3131,7 @@ vl_covdet_get_transposed (VlCovDet const  * self)
 }
 
 /** @brief Set the index of the first octave
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @param t whether images are transposed.
  **/
 void
@@ -2219,7 +3142,7 @@ vl_covdet_set_transposed (VlCovDet * self, vl_bool t)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the edge threshold
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return the edge threshold.
  **/
 double
@@ -2229,8 +3152,8 @@ vl_covdet_get_edge_threshold (VlCovDet const * self)
 }
 
 /** @brief Set the edge threshold
- ** @param self ::VlCovDet object.
- ** @param the edge threshold.
+ ** @param self object.
+ ** @param edgeThreshold the edge threshold.
  **
  ** The edge threshold must be non-negative.
  **/
@@ -2243,7 +3166,7 @@ vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the peak threshold
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return the peak threshold.
  **/
 double
@@ -2253,8 +3176,8 @@ vl_covdet_get_peak_threshold (VlCovDet const * self)
 }
 
 /** @brief Set the peak threshold
- ** @param self ::VlCovDet object.
- ** @param the peak threshold.
+ ** @param self object.
+ ** @param peakThreshold the peak threshold.
  **
  ** The peak threshold must be non-negative.
  **/
@@ -2267,7 +3190,7 @@ vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the Laplacian peak threshold
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return the Laplacian peak threshold.
  **
  ** This parameter affects only the detecors using the Laplacian
@@ -2280,8 +3203,8 @@ vl_covdet_get_laplacian_peak_threshold (VlCovDet const * self)
 }
 
 /** @brief Set the Laplacian peak threshold
- ** @param self ::VlCovDet object.
- ** @param the Laplacian peak threshold.
+ ** @param self object.
+ ** @param peakThreshold the Laplacian peak threshold.
  **
  ** The peak threshold must be non-negative.
  **/
@@ -2294,7 +3217,7 @@ vl_covdet_set_laplacian_peak_threshold (VlCovDet * self, double peakThreshold)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the index of the first octave
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return index of the first octave.
  **/
 vl_index
@@ -2304,8 +3227,8 @@ vl_covdet_get_first_octave (VlCovDet const * self)
 }
 
 /** @brief Set the index of the first octave
- ** @param self ::VlCovDet object.
- ** @param index of the first octave.
+ ** @param self object.
+ ** @param o index of the first octave.
  **
  ** Calling this function resets the detector.
  **/
@@ -2318,7 +3241,7 @@ vl_covdet_set_first_octave (VlCovDet * self, vl_index o)
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the octave resolution.
- ** @param self ::VlCovDet object.
+ ** @param self object.
  ** @return octave resolution.
  **/
 
@@ -2329,8 +3252,8 @@ vl_covdet_get_octave_resolution (VlCovDet const * self)
 }
 
 /** @brief Set the octave resolutuon.
- ** @param self ::VlCovDet object.
- ** @param octave resoltuion.
+ ** @param self object.
+ ** @param r octave resoltuion.
  **
  ** Calling this function resets the detector.
  **/
@@ -2446,7 +3369,7 @@ vl_covdet_get_css (VlCovDet const * self)
 }
 
 /** @brief Get the number of features found with a certain number of scales
- ** @param sellf object.
+ ** @param self object.
  ** @param numScales length of the histogram (out).
  ** @return histogram.
  **

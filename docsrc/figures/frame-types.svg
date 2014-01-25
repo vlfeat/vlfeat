@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="744.094" height="1052.362" viewBox="0, 0, 744.094, 1052.362">
+  <g id="Layer 1">
+    <g>
+      <path d="M155.906,99.213 C132.423,99.213 113.386,80.176 113.386,56.693 C113.386,33.21 132.423,14.173 155.906,14.173 C179.389,14.173 198.425,33.21 198.425,56.693 C198.425,80.176 179.389,99.213 155.906,99.213 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M155.906,99.213 C132.423,99.213 113.386,80.176 113.386,56.693 C113.386,33.21 132.423,14.173 155.906,14.173 C179.389,14.173 198.425,33.21 198.425,56.693 C198.425,80.176 179.389,99.213 155.906,99.213 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M283.465,99.213 C259.982,99.213 240.945,80.176 240.945,56.693 C240.945,33.21 259.982,14.173 283.465,14.173 C306.948,14.173 325.984,33.21 325.984,56.693 C325.984,80.176 306.948,99.213 283.465,99.213 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M283.465,99.213 C259.982,99.213 240.945,80.176 240.945,56.693 C240.945,33.21 259.982,14.173 283.465,14.173 C306.948,14.173 325.984,33.21 325.984,56.693 C325.984,80.176 306.948,99.213 283.465,99.213 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M283.465,56.693 L311.811,85.039" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M283.465,56.693 L311.811,85.039" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M422.791,92.353 C411.302,99.814 391.621,89.896 378.831,70.202 C366.042,50.507 364.987,28.494 376.475,21.033 C387.964,13.572 407.645,23.49 420.435,43.184 C433.224,62.879 434.279,84.892 422.791,92.353 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M422.791,92.353 C411.302,99.814 391.621,89.896 378.831,70.202 C366.042,50.507 364.987,28.494 376.475,21.033 C387.964,13.572 407.645,23.49 420.435,43.184 C433.224,62.879 434.279,84.892 422.791,92.353 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M507.83,92.353 C496.342,99.814 476.66,89.896 463.871,70.202 C451.081,50.507 450.026,28.494 461.514,21.033 C473.003,13.572 492.684,23.49 505.474,43.184 C518.264,62.879 519.319,84.892 507.83,92.353 z" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M507.83,92.353 C496.342,99.814 476.66,89.896 463.871,70.202 C451.081,50.507 450.026,28.494 461.514,21.033 C473.003,13.572 492.684,23.49 505.474,43.184 C518.264,62.879 519.319,84.892 507.83,92.353 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <g>
+      <path d="M484.672,56.693 L513.979,71.46" fill-opacity="0" stroke="#69F903" stroke-width="4"/>
+      <path d="M484.672,56.693 L513.979,71.46" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 155.906, 117.799)">
+      <tspan x="-8.002" y="-2.5" font-family="Helvetica" font-size="9" fill="#000000">disc</tspan>
+      <tspan x="-26.512" y="8.5" font-family="Helvetica" font-size="9" fill="#000000">3 parameters</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 283.465, 117.799)">
+      <tspan x="-25.515" y="-2.5" font-family="Helvetica" font-size="9" fill="#000000">oriented disc</tspan>
+      <tspan x="-26.512" y="8.5" font-family="Helvetica" font-size="9" fill="#000000">4 parameters</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 400.394, 117.799)">
+      <tspan x="-12.757" y="-2.5" font-family="Helvetica" font-size="9" fill="#000000">ellipse</tspan>
+      <tspan x="-26.512" y="8.5" font-family="Helvetica" font-size="9" fill="#000000">5 parameters</tspan>
+    </text>
+    <text transform="matrix(1, 0, 0, 1, 488.976, 123.299)">
+      <tspan x="-30.27" y="-8" font-family="Helvetica" font-size="9" fill="#000000">oriented ellipse</tspan>
+      <tspan x="-26.512" y="3" font-family="Helvetica" font-size="9" fill="#000000">6 parameters</tspan>
+    </text>
+    <g>
+      <path d="M63.78,60.236 C61.823,60.236 60.236,58.65 60.236,56.693 C60.236,54.736 61.823,53.15 63.78,53.15 C65.736,53.15 67.323,54.736 67.323,56.693 C67.323,58.65 65.736,60.236 63.78,60.236 z" fill="#69F903"/>
+      <path d="M63.78,60.236 C61.823,60.236 60.236,58.65 60.236,56.693 C60.236,54.736 61.823,53.15 63.78,53.15 C65.736,53.15 67.323,54.736 67.323,56.693 C67.323,58.65 65.736,60.236 63.78,60.236 z" fill-opacity="0" stroke="#000000" stroke-width="0.5"/>
+    </g>
+    <text transform="matrix(1, 0, 0, 1, 61.945, 117.799)">
+      <tspan x="-9.758" y="-2.5" font-family="Helvetica" font-size="9" fill="#000000">point</tspan>
+      <tspan x="-26.512" y="8.5" font-family="Helvetica" font-size="9" fill="#000000">2 parameters</tspan>
+    </text>
+  </g>
+  <defs/>
+</svg>
