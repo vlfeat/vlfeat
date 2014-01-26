@@ -3,53 +3,134 @@
 
 %tableofcontents;
 
-<p>These instructions explain how to compile VLFeat on your own. This
-can be useful to customize or contribute to VLFeat, but it is
-otherwise not necessary (use the
-<a href="%pathto:download;">binary package</a> instead).</p>
+<p>These instructions explain how to compile VLFeat from sources.
+While this is necessary in order to develop or modify VLFeat, using
+the <a href="%pathto:download;">pre-compiled binaries</a> will work in
+most other cases.</p>
 
-<h1 id="compiling.unix">Compiling on Unix</h1>
+<p>VLFeat is largely self-contained and hence easy to compile. While
+certain features such as multi-core computation and vector instruction
+support may require specific compilers, most compilers and
+environments should be capable of producing fully functional version
+of the library. Compiling MATALB or Octave support requires the
+corresponding applications to be installed too.</p>
 
-<p>Compiling for UNIX-like platforms (e.g. Mac OS X, Linux) uses the
-standard GNU toolchain. It is usually sufficient to change to VLFeat
-root directory, denoted <code>VLFEATROOT</code> in the following, and
-type <code>make</code>:</p>
+<ul>
+<li><a href="%pathto:compiling.unix;">GNU/Linux and Mac OS X compilation instructions</a></li>
+<li><a href="%pathto:compiling.windows;">Windows compilation instructions</a></li>
+</ul>
+
+<page id="compiling.unix" name="compiling-unix" title="Compiling on UNIX-like platforms">
+
+%tableofcontents;
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1>General instructions</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Compiling for UNIX-like platforms (e.g. GNU/Linux, Mac OS X)
+assumes that the standard GNU toolchain is available. In particular,
+while compilers other than GCC can be used, the compilation scripts
+require GNU/make.</p>
+
+<p>To compile the library, it is usually sufficient to change to
+VLFeat root directory, denoted <code>VLFEATROOT</code> in the
+following, and type <code>make</code>:</p>
+
 <precode type='sh'>
 $ cd VLFEATROOT
 $ make
 </precode>
+
 <p>The make script attempts to automatically detect the host
 architecture and configure itself accordingly. If the architecture is
 not detected correctly, it can be specified manually. For instance</p>
+
 <precode type='sh'>
 $ make ARCH=glnx86
 </precode>
-<p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
-to obtain a list of other useful options. You can also use <code>make info</code>
-to obtain a list of the configuration parameters used by the Makefile,
-which might allow you do debug any potential issue.</p>
 
-<p><b>MATLAB support.</b> In order for MATLAB support to be compiled,
-the MATLAB <code>mex</code> script must be in the current path. If it
-is not, its location must be passed to <code>make</code> as
+<p>compiles for GNU/Linux 32-bit. <code>make help</code> can be used
+to obtain a list of other useful options. You can also use <code>make
+info</code> to obtain a list of the configuration parameters used by
+the Makefile, which might allow you do debug any potential issue.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h2>Compiling MATLAB support</h2>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>In order for MATLAB support to be compiled, the
+MATLAB <code>mex</code> script must be in the current path. If it is
+not, its location must be passed to <code>make</code> as
 follows. First, determine MATLAB's root directory by running a MATLAB
 session and issuing the <code>matlabroot</code>
 command. Let <code>MATLABROOT</code> denote the returned path
 (e.g. <code>/Applications/MATLAB_R2009b.app/</code>). The <code>mex</code>
 script is usually located in <code>MALTABROOT/bin/mex</code>. Then run
 the compilation with the command</p>
+
 <precode type='sh'>
 $ make MEX=MATLABROOT/bin/mex
 </precode>
-<p>VLFeat must be compiled for the architecture used by MATLAB (run
- MATLAB's <code>computer</code> command to obtain this
- information). On Mac OS X it is often necessary to turn on 64-bit
- support explicitly by setting <code>ARCH=maci64</code> as both the 32
- and 64 bit versions are plausible targets on 64-bit machines.</p>
 
-<div class="parbox">
-<p><b>Mac OS X 10.6 (Snow Leopard), 64-bit, and MATLAB 2009b.</b>
-MATLAB 2009b for Snow Leopard has added 64 bit mex support and a
+<p>VLFeat must be compiled for the architecture used by MATLAB (run
+MATLAB's <code>computer</code> command to obtain this information). On
+Mac OS X it is often necessary to turn on 64-bit support explicitly by
+setting <code>ARCH=maci64</code> as both the 32 and 64 bit versions
+are plausible targets on 64-bit machines.</p>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h2>Compiling Octave support</h2>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Octave support is still experimental. Similarly to MATLAB, Octave
+requires compiling MEX files. This can be turned on by passing to make
+the path to the <code>mkoctfile</code> command:</p>
+
+<precode type='sh'>
+$ make MKOCTFILE=/path/to/mkoctfile
+</precode>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h1>Mac OS X troubleshooting</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<h2>OS X 10.9 Mavericks, Xcode 5, and clang</h2>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<p>Recent changes to Mac OS X toolkit that ships with  Xcode have made
+compilation of VLFeat slightly more complex. Out of the box, Xcode 5.0
+on Mac OS X Mavericks, for example, incorporates the clang compiler
+but not the GCC compiler. While VLFeat has been updated to use clang
+in this case, it is worth noting that this compiler does not yet
+support the OpenMP standard, meaning that multi-core computations
+would be disabled in this case.</p>
+
+<p>A way of compiling a OpenMP into the library under Mac OS X is to
+install a suitable version of GCC. For example, using MacPorts, the
+following should setup a suitable version of the compiler:</p>
+
+<precode type='sh'>
+$ sudo port install gcc48 # Install MacPort's GCC
+$ make CC=/opt/local/bin/gcc-mp-4.8 # compile VLFeat using MacPort's GCC
+</precode>
+
+<p>Unfortunately, the assembler used by default by this compiler does
+not appear to support the AVX vector instruction set. To support AVX
+instructions, VLFeat passess to GCC the <code>-Wq,-a</code> option,
+which causes the clang assembler to be invoked instead. This requires
+the correct assembler to be installed in MacPorts, which can be
+obtained by:</p>
+
+<precode type='sh'>
+$ sudo port install clang-3.5
+$ sudo port select clang mp-clang-3.5
+</precode>
+
+<h2>OS X 10.6 Snow Leopard, 64-bit, and MATLAB 2009b.</h2>
+
+<p>MATLAB 2009b for Snow Leopard has added 64 bit mex support and a
 corresponding extension <code>mexmaci64</code>. VLFeat now supports
 compiling for this platform, but the architecture must be specified
 manually when compiling, either like:</p>
@@ -64,8 +145,8 @@ $ make ARCH=maci64
 $ make ARCH=maci
 </precode>
 
-<p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug that
-must be manually fixed in order for this procedure to work
+<p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug
+that must be manually fixed in order for this procedure to work
 correctly. It is recommend to make backup of the <code>mex</code>
 script before attempting this. Th fix the bug, edit the
 <code>MATLABROOT/bin/mex</code> script by cutting the line:</p>
@@ -88,15 +169,17 @@ if [ $v7_compat -eq 1 ] ; then
 fc_flags="$fc_flags -DMX_COMPAT_32"
 ...
 </precode>
-</div>
+</page>
 
-<h1 id="compiling.windows">Compiling on Windows</h1>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<page id="compiling.windows" name="compiling-windows" title="Compiling on Windows">
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>For Windows, the library bundles an NMake makefile
- (<code>Makefile.mak</code>). In order to use it, you must edit
- Makefile.mak to adjust the values of a number of configuration
- variables to match your setup. Once you have done that, start the
- Visual Studio Command Prompt and type</p>
+(<code>Makefile.mak</code>). In order to use it, you must edit
+Makefile.mak to adjust the values of a number of configuration
+variables to match your setup. Once you have done that, start the
+Visual Studio Command Prompt and type</p>
 
 <precode type="sh">
 $ nmake /f Makefile.mak # for the Windows 64 target
@@ -109,7 +192,7 @@ command). This is meant to help less experienced users that may need
 to recompile the mex file due to binary incompatibilities with older
 MATLAB versions.</p>
 
-<h3>Windows troubleshooting</h3>
+<h1>Windows troubleshooting</h1>
 
 <dl>
  <dt>syntax error: '=' unexpected:</dt>
@@ -120,6 +203,6 @@ MATLAB versions.</p>
  <dd><p>This error is usually caused by
    attempting to compile outside of the Visual Studio Command Prompt.</p></dd>
 </dl>
-
+</page>
 
 </group>
