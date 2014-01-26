@@ -12,7 +12,7 @@ the terms of the BSD license (see the COPYING file).
 */
 
 #ifndef VL_IMOPV_H
-#define VL_IMPOV_H
+#define VL_IMOPV_H
 
 #include "generic.h"
 
