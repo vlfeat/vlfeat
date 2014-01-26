@@ -17,8 +17,8 @@ the terms of the BSD license (see the COPYING file).
 @mainpage Vision Lab Features Library (VLFeat)
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
+@par Copyright &copy; 2012-14 The VLFeat Authors
 @par Copyright &copy; 2007-11 Andrea Vedaldi and Brian Fulkerson
-@par Copyright &copy; 2012-13 The VLFeat Authors
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 The VLFeat C library implements common computer
@@ -63,7 +63,7 @@ VLFeat strives to be clutter-free, simple, portable, and well documented.
 
 - **Utilities**
   - @subpage random
-  - @subpage mathop.h    "Math operations"
+  - @subpage mathop
   - @subpage stringop.h  "String operations"
   - @subpage imopv.h     "Image operations"
   - @subpage pgm.h       "PGM image format"

@@ -4,6 +4,7 @@
  **/
 
 /*
+Copyright (C) 2014 Andrea Vedaldi.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -11,121 +12,146 @@ This file is part of the VLFeat library and is made available under
 the terms of the BSD license (see the COPYING file).
 */
 
-/** @file mathop.h
+/**
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@page mathop Mathematical operations
+@author Andrea Vedaldi
+@author Brian Fulkerson
+@tableofcontents
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- @section mathop-usage-vector-comparison Comparing vectors
+VLFeat include several low-level routines to speedup common
+mathematical operations used throughout the library. Most are
+collected in the @ref mathop.h module.
 
- @ref mathop.h includes a number of functions to quickly compute
- distances or similarity of pairs of vector. Applications include
- clustering and evaluation of SVM-like classifiers.
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section mathop-usage-vector-comparison Comparing vectors
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
- Use ::vl_get_vector_comparison_function_f or
- ::vl_get_vector_comparison_function_d obtain an approprite function
- to comprare vectors of floats or doubles, respectively.  Such
- functions are usually optimized (for instance, on X86 platforms they
- use the SSE vector extension) and are several times faster than a
- naive implementation.  ::vl_eval_vector_comparison_on_all_pairs_f and
- ::vl_eval_vector_comparison_on_all_pairs_d can be used to evaluate
- the comparison function on all pairs of one or two sequences of
- vectors.
+@ref mathop.h includes a number of functions to quickly compute
+distances or similarity of pairs of vector. Applications include
+clustering and evaluation of SVM-like classifiers.
 
- Let @f$ \mathbf{x} = (x_1,\dots,x_d) @f$ and @f$ \mathbf{y} =
- (y_1,\dots,y_d) @f$ be two vectors.  The following comparison
- functions are supported:
+Use ::vl_get_vector_comparison_function_f or
+::vl_get_vector_comparison_function_d obtain an approprite function
+to comprare vectors of floats or doubles, respectively.  Such
+functions are usually optimized (for instance, on X86 platforms they
+use the SSE vector extension) and are several times faster than a
+naive implementation.  ::vl_eval_vector_comparison_on_all_pairs_f and
+::vl_eval_vector_comparison_on_all_pairs_d can be used to evaluate
+the comparison function on all pairs of one or two sequences of
+vectors.
 
- <table>
- <tr>
- <td>@f$ l^1 @f$</td>
- <td>::VlDistanceL1</td>
- <td>@f$ \sum_{i=1}^d |x_i - y_i| @f$</td>
- <td>l1 distance (squared intersection metric)</td>
- </tr>
- <tr>
- <td>@f$ l^2 @f$</td>
- <td>::VlDistanceL2</td>
- <td>@f$\sum_{i=1}^d (x_i - y_i)^2@f$</td>
- <td>Squared Euclidean disance</td>
- </tr>
- <tr>
- <td>@f$ \chi^2 @f$</td>
- <td>::VlDistanceChi2</td>
- <td>@f$\sum_{i=1}^d \frac{(x_i - y_i)^2}{x_i + y_i}@f$</td>
- <td>Squared chi-square distance</td>
- </tr>
- <tr>
- <td>-</td>
- <td>::VlDistanceHellinger</td>
- <td>@f$\sum_{i=1}^d (\sqrt{x_i} - \sqrt{y_i})^2@f$</td>
- <td>Squared Hellinger's distance</td>
- </tr>
- <tr>
- <td>-</td>
- <td>::VlDistanceJS</td>
- <td>@f$
- \sum_{i=1}^d
- \left(
-   x_i \log\frac{2x_i}{x_i+y_i}
- + y_i \log\frac{2y_i}{x_i+y_i}
- \right)
- @f$
- </td>
- <td>Squared Jensen-Shannon distance</td>
- </tr>
- <tr>
- <td>@f$ l^1 @f$</td>
- <td>::VlKernelL1</td>
- <td>@f$ \sum_{i=1}^d \min\{ x_i, y_i \} @f$</td>
- <td>intersection kernel</td>
- </tr>
- <tr>
- <td>@f$ l^2 @f$</td>
- <td>::VlKernelL2</td>
- <td>@f$\sum_{i=1}^d x_iy_i @f$</td>
- <td>linear kernel</td>
- </tr>
- <tr>
- <td>@f$ \chi^2 @f$</td>
- <td>::VlKernelChi2</td>
- <td>@f$\sum_{i=1}^d 2 \frac{x_iy_i}{x_i + y_i}@f$</td>
- <td>chi-square kernel</td>
- </tr>
- <tr>
- <td>-</td>
- <td>::VlKernelHellinger</td>
- <td>@f$\sum_{i=1}^d 2 \sqrt{x_i y_i}@f$</td>
- <td>Hellinger's kernel (Bhattacharya coefficient)</td>
- </tr>
- <tr>
- <td>-</td>
- <td>::VlKernelJS</td>
- <td>@f$
- \sum_{i=1}^d
- \left(
-   \frac{x_i}{2} \log_2\frac{x_i+y_i}{x_i}
- + \frac{y_i}{2} \log_2\frac{x_i+y_i}{y_i}
- \right)
- @f$
- </td>
- <td>Jensen-Shannon kernel</td>
- </tr>
- </table>
+Let @f$ \mathbf{x} = (x_1,\dots,x_d) @f$ and @f$ \mathbf{y} =
+(y_1,\dots,y_d) @f$ be two vectors.  The following comparison
+functions are supported:
 
- @remark The definitions have been choosen so that corresponding kernels and
- distances are related by the equation:
- @f[
-  d^2(\mathbf{x},\mathbf{y})
-  =
-  k(\mathbf{x},\mathbf{x})
-  +k(\mathbf{y},\mathbf{y})
-  -k(\mathbf{x},\mathbf{y})
-  -k(\mathbf{y},\mathbf{x})
- @f]
- This means that each of these distances can be interpreted as a
- squared distance or metric in the corresponding reproducing kernel
- Hilbert space. Notice in particular that the @f$ l^1 @f$ or Manhattan
- distance is also a <em>squared</em> distance in this sense.
+<table>
+<tr>
+<td>@f$ l^1 @f$</td>
+<td>::VlDistanceL1</td>
+<td>@f$ \sum_{i=1}^d |x_i - y_i| @f$</td>
+<td>l1 distance (squared intersection metric)</td>
+</tr>
+<tr>
+<td>@f$ l^2 @f$</td>
+<td>::VlDistanceL2</td>
+<td>@f$\sum_{i=1}^d (x_i - y_i)^2@f$</td>
+<td>Squared Euclidean disance</td>
+</tr>
+<tr>
+<td>@f$ \chi^2 @f$</td>
+<td>::VlDistanceChi2</td>
+<td>@f$\sum_{i=1}^d \frac{(x_i - y_i)^2}{x_i + y_i}@f$</td>
+<td>Squared chi-square distance</td>
+</tr>
+<tr>
+<td>-</td>
+<td>::VlDistanceHellinger</td>
+<td>@f$\sum_{i=1}^d (\sqrt{x_i} - \sqrt{y_i})^2@f$</td>
+<td>Squared Hellinger's distance</td>
+</tr>
+<tr>
+<td>-</td>
+<td>::VlDistanceJS</td>
+<td>@f$
+\sum_{i=1}^d
+\left(
+  x_i \log\frac{2x_i}{x_i+y_i}
++ y_i \log\frac{2y_i}{x_i+y_i}
+\right)
+@f$
+</td>
+<td>Squared Jensen-Shannon distance</td>
+</tr>
+<tr>
+<td>@f$ l^1 @f$</td>
+<td>::VlKernelL1</td>
+<td>@f$ \sum_{i=1}^d \min\{ x_i, y_i \} @f$</td>
+<td>intersection kernel</td>
+</tr>
+<tr>
+<td>@f$ l^2 @f$</td>
+<td>::VlKernelL2</td>
+<td>@f$\sum_{i=1}^d x_iy_i @f$</td>
+<td>linear kernel</td>
+</tr>
+<tr>
+<td>@f$ \chi^2 @f$</td>
+<td>::VlKernelChi2</td>
+<td>@f$\sum_{i=1}^d 2 \frac{x_iy_i}{x_i + y_i}@f$</td>
+<td>chi-square kernel</td>
+</tr>
+<tr>
+<td>-</td>
+<td>::VlKernelHellinger</td>
+<td>@f$\sum_{i=1}^d 2 \sqrt{x_i y_i}@f$</td>
+<td>Hellinger's kernel (Bhattacharya coefficient)</td>
+</tr>
+<tr>
+<td>-</td>
+<td>::VlKernelJS</td>
+<td>@f$
+\sum_{i=1}^d
+\left(
+  \frac{x_i}{2} \log_2\frac{x_i+y_i}{x_i}
++ \frac{y_i}{2} \log_2\frac{x_i+y_i}{y_i}
+\right)
+@f$
+</td>
+<td>Jensen-Shannon kernel</td>
+</tr>
+</table>
 
- **/
+@remark The definitions have been choosen so that corresponding kernels and
+distances are related by the equation:
+@f[
+ d^2(\mathbf{x},\mathbf{y})
+ =
+ k(\mathbf{x},\mathbf{x})
+ +k(\mathbf{y},\mathbf{y})
+ -k(\mathbf{x},\mathbf{y})
+ -k(\mathbf{y},\mathbf{x})
+@f]
+This means that each of these distances can be interpreted as a
+squared distance or metric in the corresponding reproducing kernel
+Hilbert space. Notice in particular that the @f$ l^1 @f$ or Manhattan
+distance is also a <em>squared</em> distance in this sense.
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+@section mathop-integer-ops Fast basic functions operations
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+In certain algorithm it is useful to quickly compute integer
+approximation of certain mathematical operations. Presently, VLFeat
+includes and implementations of:
+
+- Fast single precision atan2: ::vl_fast_sqrt_f.
+- Fast inverse square root: ::vl_fast_resqrt_f, ::vl_fast_resqrt_d.
+- Fast square root: ::vl_fast_sqrt_f, ::vl_fast_sqrt_d.
+- Fast integer square root: ::vl_fast_sqrt_ui16, ::vl_fast_sqrt_ui32,
+  ::vl_fast_sqrt_ui64 (see also @subpage mathop-sqrti).
+**/
 
 /** @fn vl_get_vector_comparison_function_f(VlVectorComparisonType)
  **
@@ -164,6 +190,73 @@ the terms of the BSD license (see the COPYING file).
  ** @brief Evaluate vector comparison function on all vector pairs
  ** @sa vl_eval_vector_comparison_on_all_pairs_f
  **/
+
+/**
+@page mathop-sqrti Fast integer square root algorithm
+@tableofcontents
+
+This section describes the fast integer square root algorithm used by
+vl_fast_sqrt_ui8, ::vl_fast_sqrt_ui16, ::vl_fast_sqrt_ui32,
+::vl_fast_sqrt_ui64.
+
+Given a non-negative integer $x \in \mathbb{Z}_+$, the goal of this
+algorithm is to quickly compute the integer approximation of the
+square root of an integer number:
+
+\[
+y = \max_{\bar y\in\mathbb{Z}} \bar y, \qquad \text{such that}\  \bar y^2 \leq x.
+\]
+
+Consider determining the k-th bit of $y$. To this end, decompose $y$
+in three parts:
+
+\[
+y = y_{k+1} + q 2^k + r,
+\qquad \text{where}\   y_{k+1} \geq 2^{k+1}, r < 2^k,
+\]
+
+and $q\in\{0,1\}$ is the bit to be determined. Here $y_{k+1}$ is a part
+of the result $y$ that has already been determined, while the bit $q$
+and the remainder $r$ are still unknown. Recall that the goal is to
+find the largest $y^2$ such that $y^2 \leq x$. Expanding $y^2$ this
+condition becomes
+
+\[
+q (2^{2k} + 2 y_{k+1} 2^k) + r(r + 2q 2^k + 2 y_{k+1}) \leq x - y_{k+1}^2.
+\]
+
+We can now determine if $q=1$ or $q=0$ based on the value of the
+residual $x - y_{k+1}^2$. Specifically, $q=1$ requires that:
+
+\[
+\boxed{
+2^{2k} + 2a2^k \leq x - y_{k+1}^2.
+}
+\]
+
+On the other hand, if this equation is satisfied, then setting $r=0$
+shows that there exists at least one $y$ such that $q=1$ and $y^2 \leq
+x$. In particular, greedily choosing $q=1$ in $x=y_{k+1} + 2^k q + r$ is
+optimal because $2^k > r$. This yields the algorithm:
+
+1. Note that if $x$ is stored in $n$ bits and $n$ is even, then the
+   integer square root $y$ does not require more than $m = n / 2$ bit
+   to be stored. Thus the first bit to be determined is $k \leftarrow
+   m - 1 = n/2 - 1$ and $y_{n/2}=0$.
+2. The algorithm stores and updates $y_k/2^{k}$ and $x - y_{k}^2$ for
+   convenience.
+3. During iteration $k$, $y_k$ is determined. On entering the
+   iteration, the first step is to compute $y_{k+1}/2^k = 2
+   y_{k+1}/2^{k+1}$.
+4. Then the bound $t = (2^{2k} + 2 y_{k+1})2^k = 2^{2k}(1 + 2
+   y_{k+1}/2^k)$.
+5. If $t \geq x - y_{k+1}$, the $k$-th bit of $y_k$ is set to
+   one. This means applying the update $\hat y_{k}/2^k \leftarrow
+   y_{k+1}/2^k + 1$. This also requires computing $x - y_{k}^2
+   \leftarrow x - y_{k+1}^2 - t$.
+6. Decrement $k \leftarrow k -1$ and, if $k\geq 0$, continue from 3.
+
+**/
 
 /* ---------------------------------------------------------------- */
 #ifndef VL_MATHOP_INSTANTIATING
@@ -932,7 +1025,6 @@ vl_gaussian_elimination (double * A, vl_size numRows, vl_size numColumns)
 
   return VL_ERR_OK ;
 }
-
 
 /* VL_MATHOP_INSTANTIATING */
 #endif
