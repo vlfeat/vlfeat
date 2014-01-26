@@ -39,6 +39,8 @@
 		2D1EECF01603E8E900C63DCE /* svmdataset.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EECCC1603E1B100C63DCE /* svmdataset.c */; };
 		2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED1D1604992A00C63DCE /* scalespace.c */; };
 		2D1EED201604992B00C63DCE /* scalespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1EED1E1604992A00C63DCE /* scalespace.h */; };
+		2D4938AF1895ACE400B775EE /* test_sqrti.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D4938AE1895ACE400B775EE /* test_sqrti.c */; };
+		2D4938B11895BAAA00B775EE /* vl_demo_ikmeans.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D4938B01895BAAA00B775EE /* vl_demo_ikmeans.m */; };
 		2D63C3A917969032001C6AE0 /* vl_liop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D9A805D17745CB500B9A9CD /* vl_liop.c */; };
 		2D81B9B11735666E000706C0 /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2D81B9B717356697000706C0 /* vl_svmtrain.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D81B9A917351EE5000706C0 /* vl_svmtrain.c */; };
@@ -167,6 +169,8 @@
 		2D3E1F2F15FFE6110035AA1E /* vl_hog.m */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; name = vl_hog.m; path = toolbox/misc/vl_hog.m; sourceTree = "<group>"; };
 		2D3F063417838CF100B27808 /* vl_slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_slic.c; path = toolbox/slic/vl_slic.c; sourceTree = "<group>"; };
 		2D471AA710DD2C7900FA4182 /* test_threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_threads.c; sourceTree = "<group>"; };
+		2D4938AE1895ACE400B775EE /* test_sqrti.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_sqrti.c; sourceTree = "<group>"; };
+		2D4938B01895BAAA00B775EE /* vl_demo_ikmeans.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_demo_ikmeans.m; path = toolbox/demo/vl_demo_ikmeans.m; sourceTree = "<group>"; };
 		2D4EB0BF10F3C1E800ADA534 /* kmeans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmeans.c; sourceTree = "<group>"; };
 		2D4EB0C010F3C1E800ADA534 /* kmeans.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmeans.h; sourceTree = "<group>"; };
 		2D4EB14D10F3F3A500ADA534 /* shuffle-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shuffle-def.h"; sourceTree = "<group>"; };
@@ -613,6 +617,7 @@
 				2D141E21178376CA00E2958B /* vl_demo_gmm_2d_twist.m */,
 				2D141E1F178376CA00E2958B /* vl_demo_gmm_3d.m */,
 				2D9A8061177476E300B9A9CD /* vl_demo_gmm_convergence.m */,
+				2D4938B01895BAAA00B775EE /* vl_demo_ikmeans.m */,
 				2D66AC7413AE05BD0060594E /* vl_demo_imdisttf.m */,
 				2D66AC7A13AE05BD0060594E /* vl_demo_kdtree.m */,
 				2D66AC7513AE05BD0060594E /* vl_demo_kdtree_ann.m */,
@@ -1090,6 +1095,7 @@
 				2D9AAB331769B6A300AFBCFC /* test_svd2.c */,
 				2D471AA710DD2C7900FA4182 /* test_threads.c */,
 				2D13EEF8100A5CFE00C072E8 /* test_vec_comp.c */,
+				2D4938AE1895ACE400B775EE /* test_sqrti.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -1574,10 +1580,12 @@
 				2D1EECDF1603E8E900C63DCE /* ikmeans.c in Sources */,
 				2D1EECE01603E8E900C63DCE /* imopv.c in Sources */,
 				2D1EECE11603E8E900C63DCE /* imopv_sse2.c in Sources */,
+				2D4938AF1895ACE400B775EE /* test_sqrti.c in Sources */,
 				2D1EECE21603E8E900C63DCE /* kdtree.c in Sources */,
 				2D1EECE31603E8E900C63DCE /* kmeans.c in Sources */,
 				2D1EECE41603E8E900C63DCE /* lbp.c in Sources */,
 				2D1EECE51603E8E900C63DCE /* mathop.c in Sources */,
+				2D4938B11895BAAA00B775EE /* vl_demo_ikmeans.m in Sources */,
 				2D1EECE61603E8E900C63DCE /* mathop_sse2.c in Sources */,
 				2D1EECE71603E8E900C63DCE /* mser.c in Sources */,
 				2D1EECE91603E8E900C63DCE /* pgm.c in Sources */,

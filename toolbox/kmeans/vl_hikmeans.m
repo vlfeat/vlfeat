@@ -1,13 +1,13 @@
 function [tree,asgn] = vl_hikmeans(data,K,nleaves)
 % VL_HIKMEANS  Hierachical integer K-means
-%   [TREE,ASGN] = VL_HIKMEANS(DATA,K,NLEAVES) applies recursive integer
-%   K-menas to cluster the data DATA, returing a structure TREE
+%   [TREE,ASGN] = VL_HIKMEANS(DATA,K,NLEAVES) applies integer K-menas
+%   recursively to cluster the data DATA, returing a structure TREE
 %   representing the clusters and a vector ASGN with the data to
 %   cluster assignments. The depth of the recursive partition is
 %   computed so that at least NLEAVES are generated.
 %
-%   VL_HIKMEANS() is built on top of VL_IKMEANS() and requires the data to
-%   be of class UINT8.
+%   VL_HIKMEANS() is built on top of VL_IKMEANS() and requires the
+%   data to be of class UINT8.
 %
 %   TREE is a structure representing the hierarchical clusters.  Each
 %   node of the tree is also a structure with fields:
@@ -33,6 +33,7 @@ function [tree,asgn] = vl_hikmeans(data,K,nleaves)
 %
 %   See also: VL_HIKMEANSPUSH(), VL_HIKMEANSHIST(), VL_IKMEANS(), VL_HELP().
 
+% Copyright (C) 2014 Andrea Vedaldi.
 % Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 % All rights reserved.
 %

@@ -16,27 +16,27 @@ the terms of the BSD license (see the COPYING file).
 /* pairs are used to generate random permutations of data */
 typedef struct
 {
-  vl_int32 w;
-  vl_int32 j;
+  vl_index w;
+  vl_index j;
 } pair_t;
 
 static int cmp_pair (void const *a, void const *b)
 {
   pair_t *pa = (pair_t *) a;
   pair_t *pb = (pair_t *) b;
-  vl_int32 d = pa->w - pb->w ;
+  int d = (int)(pa->w - pb->w) ;
   if (d) return d ;
-  /* break ties (qsort not stable) */
-  return pa->j - pb->j;
+  /* break ties based on index (compensates for qsort not being stable) */
+  return (int)(pa->j - pb->j);
 }
 
-VL_INLINE vl_uint32 calc_dist2 (vl_int32 const* A, vl_uint8 const* B, int M)
+VL_INLINE vl_ikmacc_t calc_dist2 (vl_ikmacc_t const* A, vl_uint8 const* B, vl_size M)
 {
-  vl_uint32 acc = 0;
-  int i = 0 ;
+  vl_ikmacc_t acc = 0 ;
+  vl_uindex i = 0 ;
   for (i = 0 ; i < M ; ++i) {
-    vl_int32 dist = A [i] - B [i] ;
-    acc += dist * dist ;
+    vl_ikmacc_t dist = (vl_ikmacc_t)A[i] - (vl_ikmacc_t)B[i] ;
+    acc += (vl_uindex)(dist * dist) ;
   }
   return acc ;
 }
@@ -48,12 +48,12 @@ VL_INLINE vl_uint32 calc_dist2 (vl_int32 const* A, vl_uint8 const* B, int M)
  ** @param K number of clusters.
  **/
 
-static void alloc (VlIKMFilt *f, int M, int K)
+static void alloc (VlIKMFilt *f, vl_size M, vl_size K)
 {
-  if (f-> centers) vl_free (f-> centers) ;
-  f-> K = K ;
-  f-> M = M ;
-  f-> centers = vl_malloc (sizeof(vl_ikm_acc) * M * K) ;
+  if (f->centers) vl_free(f->centers) ;
+  f->K = K ;
+  f->M = M ;
+  f->centers = vl_malloc(sizeof(vl_ikmacc_t) * M * K) ;
 }
 
 
@@ -65,26 +65,23 @@ static
 void vl_ikm_init_helper (VlIKMFilt *f)
 {
   switch (f-> method) {
-  case VL_IKM_LLOYD:  vl_ikm_init_lloyd (f) ; break ;
-  case VL_IKM_ELKAN:  vl_ikm_init_elkan (f) ; break ;
+  case VL_IKM_LLOYD: vl_ikm_init_lloyd (f) ; break ;
+  case VL_IKM_ELKAN: vl_ikm_init_elkan (f) ; break ;
   }
 }
 
 /** @brief Initialize quantizer with centers
- ** @param f       IKM quantizer.
+ ** @param f IKM quantizer.
  ** @param centers centers.
- ** @param M       data dimensionality.
- ** @param K       number of clusters.
+ ** @param M data dimensionality.
+ ** @param K number of clusters.
  **/
 
-VL_EXPORT
-void
-vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
+VL_EXPORT void
+vl_ikm_init (VlIKMFilt* f, vl_ikmacc_t const * centers, vl_size M, vl_size K)
 {
   alloc (f, M, K) ;
-
-  memcpy (f-> centers, centers, sizeof(vl_ikm_acc) * M * K) ;
-
+  memcpy (f->centers, centers, sizeof(vl_ikmacc_t) * M * K) ;
   vl_ikm_init_helper (f) ;
 }
 
@@ -94,19 +91,18 @@ vl_ikm_init (VlIKMFilt* f, vl_ikm_acc const * centers, int M, int K)
  ** @param K number of clusters.
  **/
 
-VL_EXPORT
-void
+VL_EXPORT void
 vl_ikm_init_rand
-(VlIKMFilt* f, int M, int K)
+(VlIKMFilt* f, vl_size M, vl_size K)
 {
-  int k, i ;
+  vl_uindex k, i ;
   VlRand * rand = vl_get_rand() ;
 
   alloc (f, M, K) ;
 
   for (k = 0 ; k < K ; ++ k) {
     for (i = 0 ; i < M ; ++ i) {
-      f-> centers [k * M + i] = (vl_ikm_acc) (vl_rand_uint32 (rand)) ;
+      f-> centers [k * M + i] = (vl_ikmacc_t) (vl_rand_uint32 (rand)) ;
     }
   }
 
@@ -121,14 +117,13 @@ vl_ikm_init_rand
  ** @param K number of clusters.
  **/
 
-VL_EXPORT
-void
+VL_EXPORT void
 vl_ikm_init_rand_data
-(VlIKMFilt* f, vl_uint8 const* data, int M, int N, int K)
+(VlIKMFilt* f, vl_uint8 const* data, vl_size M, vl_size N, vl_size K)
 {
-  int i, j, k ;
-  VlRand * rand = vl_get_rand () ;
-  pair_t  *pairs = (pair_t *) vl_malloc (sizeof(pair_t) * N);
+  vl_uindex i, j, k ;
+  VlRand *rand = vl_get_rand () ;
+  pair_t *pairs = (pair_t *) vl_malloc (sizeof(pair_t) * N);
 
   alloc (f, M, K) ;
 
@@ -145,11 +140,11 @@ vl_ikm_init_rand_data
 
     /* search for the next candidate which is not a dup */
     for ( ; j < N - 1 ; ++j) {
-      int prevk = 0 ;
+      vl_uindex prevk = 0 ;
       for (prevk = 0 ; prevk < k ; ++ prevk) {
-        vl_uint32 dist = calc_dist2
-          (f-> centers + prevk * M,
-           data + (vl_uint64)pairs[j].j * M, M) ;
+        vl_ikmacc_t dist = calc_dist2(f-> centers + prevk * M,
+                                      data + pairs[j].j * M,
+                                      M) ;
         if (dist == 0)  break ;
       }
       if (prevk == k) break ;

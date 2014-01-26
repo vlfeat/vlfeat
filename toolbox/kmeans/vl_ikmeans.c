@@ -4,6 +4,7 @@
 **/
 
 /*
+Copyright (C) 2014 Andrea Vedaldi.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -46,24 +47,20 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   int next = IN_END ;
   mxArray const  *optarg ;
 
-  int M, N, K = 0 ;
-  int err = 0 ;
 
-  vl_uint     *asgn = 0 ;
-  vl_ikm_acc  *centers = 0 ;
+  VlIKMFilt *ikmf ;
   vl_uint8 *data ;
-
+  mwSize M, N, K ;
   int method_type = VL_IKM_LLOYD ;
   int max_niters  = 200 ;
   int verb = 0 ;
-
-  VlIKMFilt *ikmf ;
+  int err = 0 ;
 
   VL_USE_MATLAB_ENV ;
 
-  /* ------------------------------------------------------------------
-   *                                                Check the arguments
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                               Check the arguments
+   * -------------------------------------------------------------- */
   if (nin < 2) {
     mexErrMsgTxt ("At least two arguments required.");
   }
@@ -71,15 +68,15 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     mexErrMsgTxt ("Too many output arguments.");
   }
   if (mxGetClassID (in[IN_X]) != mxUINT8_CLASS) {
-    mexErrMsgTxt ("X must be of class uint8");
+    mexErrMsgTxt ("X must be of class UINT8.");
   }
 
-  M = mxGetM (in[IN_X]);   /* n of components */
-  N = mxGetN (in[IN_X]);   /* n of elements */
+  M = mxGetM(in[IN_X]);   /* n of components */
+  N = mxGetN(in[IN_X]);   /* n of elements */
 
-  if (!vlmxIsPlainScalar (in[IN_K])          ||
+  if (!vlmxIsPlainScalar (in[IN_K]) ||
       (K = (int) *mxGetPr(in[IN_K])) < 1 ||
-      K > N                               ) {
+      K > N) {
     mexErrMsgTxt ("K must be a positive integer not greater than the number of data.");
   }
 
@@ -94,7 +91,7 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
 
     case opt_max_niters :
       if (!vlmxIsPlainScalar(optarg) || (max_niters = (int) *mxGetPr(optarg)) < 1) {
-        mexErrMsgTxt("MaxNiters must be not smaller than 1.") ;
+        mexErrMsgTxt("MaxNIters must be not smaller than 1.") ;
       }
       break ;
 
@@ -119,9 +116,9 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     }
   }
 
-  /* ------------------------------------------------------------------
-   *                                                         Do the job
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+   *                                                        Do the job
+   * -------------------------------------------------------------- */
 
   if (verb) {
     char const * method_name = 0 ;
@@ -131,44 +128,45 @@ void mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     default :
       abort() ;
     }
-    mexPrintf("ikmeans: MaxInters = %d\n", max_niters) ;
-    mexPrintf("ikmeans: Method    = %s\n", method_name) ;
+    mexPrintf("vl_ikmeans: MaxInters = %d\n", max_niters) ;
+    mexPrintf("vl_ikmeans: Method = %s\n", method_name) ;
   }
 
-  data = (vl_uint8*) mxGetPr(in[IN_X]) ;
+  data = (vl_uint8*) mxGetData(in[IN_X]) ;
   ikmf = vl_ikm_new (method_type) ;
 
-  vl_ikm_set_verbosity  (ikmf, verb) ;
+  vl_ikm_set_verbosity (ikmf, verb) ;
   vl_ikm_set_max_niters (ikmf, max_niters) ;
   vl_ikm_init_rand_data (ikmf, data, M, N, K) ;
 
   err = vl_ikm_train (ikmf, data, N) ;
-  if (err) mexWarnMsgTxt("ikmeans: possible overflow!") ;
+  if (err) mexWarnMsgTxt("vl_ikmeans: possible overflow!") ;
 
-  /* ------------------------------------------------------------------
- *                                                       Return results
-   * --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+ *                                                      Return results
+   * -------------------------------------------------------------- */
 
   {
     out[OUT_C] = mxCreateNumericMatrix (M, K, mxINT32_CLASS, mxREAL) ;
-    centers    = mxGetData (out[OUT_C]) ;
-    memcpy (centers, vl_ikm_get_centers (ikmf), sizeof(vl_ikm_acc) * M * K) ;
+    memcpy(mxGetData(OUT(C)),
+           vl_ikm_get_centers(ikmf),
+           sizeof(vl_ikmacc_t) * M * K) ;
   }
 
   if (nout > 1) {
-    int j ;
+    vl_uindex i ;
+    vl_uint32 *asgn  ;
     out[OUT_I] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
-    asgn       = mxGetData (out[OUT_I]) ;
+    asgn = (vl_uint32*) mxGetData (out[OUT_I]) ;
 
     vl_ikm_push (ikmf, asgn, data, N) ;
 
-    for (j = 0 ; j < N ; ++j)
-      ++ asgn [j] ;
+    for (i = 0 ; i < N ; ++i) { ++ asgn [i] ; }
   }
 
   vl_ikm_delete (ikmf) ;
 
   if (verb) {
-    mexPrintf("ikmeans: done\n") ;
+    mexPrintf("vl_ikmeans: done\n") ;
   }
 }

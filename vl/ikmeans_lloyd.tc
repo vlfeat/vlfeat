@@ -24,21 +24,19 @@ vl_ikm_init_lloyd (VlIKMFilt * f VL_UNUSED)
 
 /** @internal
  ** @brief LLoyd algorithm
- ** @param f     IKM quantizer.
- ** @param data  Training data.
- ** @param N     Number of traning data.
+ ** @param f IKM quantizer.
+ ** @param data Training data.
+ ** @param N Number of traning data.
+ ** @return error code.
  **/
 
 static int
-vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
+vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, vl_size N)
 {
-  int iter, i, j, k,
-    K = f-> K,
-    M = f-> M,
-    err =  0 ;
-  vl_ikm_acc *centers = f->centers ;
-  vl_uint    *asgn    = vl_malloc (sizeof(vl_uint) * N) ;
-  vl_uint    *counts  = vl_malloc (sizeof(vl_uint) * N) ;
+  int err =  0 ;
+  vl_uindex iter, i, j, k  ;
+  vl_uint32 *asgn = vl_malloc (sizeof(vl_uint32) * N) ;
+  vl_uint32 *counts = vl_malloc (sizeof(vl_uint32) * N) ;
 
   for (iter = 0 ; 1 ; ++ iter) {
     vl_bool done = 1 ;
@@ -48,27 +46,27 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
      * ------------------------------------------------------------ */
 
     for (j = 0 ; j < N ; ++j) {
-      vl_ikm_acc best_dist = 0 ;
-      vl_uint    best = (vl_uint)-1 ;
+      vl_ikmacc_t best_dist = 0 ;
+      vl_index best = -1 ;
 
-      for (k = 0; k < K; ++k) {
-        vl_ikm_acc dist = 0;
+      for (k = 0; k < f->K ; ++k) {
+        vl_index dist = 0;
 
         /* compute distance with this center */
-        for (i = 0; i < M; ++i) {
-          vl_ikm_acc delta =
-            data [j * M + i] - centers [k * M + i] ;
+        for (i = 0; i < f->M ; ++i) {
+          vl_ikmacc_t delta =
+            data [j * f->M + i] - f->centers [k * f->M + i] ;
           dist += delta * delta ;
         }
 
         /* compare with current best */
-        if (best == (vl_uint) -1 || dist < best_dist) {
+        if (best == -1 || dist < best_dist) {
           best = k ;
           best_dist = dist ;
         }
       }
       if (asgn [j] != best) {
-        asgn [j] = best ;
+        asgn [j] = (vl_uint32) best ;
         done = 0 ;
       }
     }
@@ -76,28 +74,30 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
     /* stopping condition */
     if (done || iter == f->max_niters) break ;
 
-    /* -----------------------------------------------------------------
-     *                                                     Calc. centers
-     * -------------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+     *                                                   Calc. centers
+     * ------------------------------------------------------------ */
 
     /* re-compute centers */
-    memset (centers, 0, sizeof (vl_int32) * M * K);
-    memset (counts,  0, sizeof (vl_int32) * K);
+    memset (f->centers, 0, sizeof(*f->centers) * f->M * f->K);
+    memset (counts,  0, sizeof(*counts) * f->K);
     for (j = 0; j < N; ++j) {
-      int this_center = asgn [j] ;
+      vl_uindex this_center = asgn [j] ;
       ++ counts [this_center] ;
-      for (i = 0; i < M; ++i)
-        centers [this_center * M + i] += data[j * M + i];
+      for (i = 0; i < f->M ; ++i) {
+        f->centers [this_center * f->M + i] += data[j * f->M + i] ;
+      }
     }
 
-    for (k = 0; k < K; ++k) {
-      vl_int32 n = counts [k];
+    for (k = 0; k < f->K; ++k) {
+      vl_index n = counts [k];
       if (n > 0xffffff) {
         err = 1 ;
       }
       if (n > 0) {
-        for (i = 0; i < M; ++i)
-          centers [k * M + i] /= n;
+        for (i = 0; i < f->M; ++i) {
+          f->centers [k * f->M + i] /= n;
+        }
       } else {
         /*
            If no data are assigned to the center, it is not changed
@@ -122,10 +122,10 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, int N)
  **/
 
 static void
-vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N)
+vl_ikm_push_lloyd (VlIKMFilt *f, vl_uint32 *asgn, vl_uint8 const *data, vl_size N)
 {
-  int j ;
-  for(j=0 ; j < N ; ++j) {
+  vl_uindex j ;
+  for(j = 0 ; j < N ; ++j) {
     asgn[j] = vl_ikm_push_one (f->centers, data + j * f->M, f->M, f->K);
   }
 }

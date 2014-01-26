@@ -43,44 +43,44 @@ the terms of the BSD license (see the COPYING file).
 /** ------------------------------------------------------------------
  ** @internal
  ** @brief Copy a subset of the data to a buffer
- **
- ** @param data  Data
- ** @param ids   Data labels
- ** @param N     Number of indices
- ** @param M     Data dimensionality
- ** @param id    Label of data to copy
- ** @param N2    Number of data copied (out)
- **
+ ** @param data Data
+ ** @param ids Data labels
+ ** @param N Number of indices
+ ** @param M Data dimensionality
+ ** @param id Label of data to copy
+ ** @param N2 Number of data copied (out)
  ** @return a new buffer with a copy of the selected data.
  **/
 
 vl_uint8*
 vl_hikm_copy_subset (vl_uint8 const * data,
-                     vl_uint * ids,
-                     int N, int M,
-                     vl_uint id, int *N2)
+                     vl_uint32 *ids,
+                     vl_size N, vl_size M,
+                     vl_uint id, vl_size *N2)
 {
-  int i ;
-  int count = 0;
+  vl_uindex i ;
+  vl_size count = 0;
 
   /* count how many data points with this label there are */
-  for (i = 0 ; i < N ; i++)
-    if (ids[i] == id)
+  for (i = 0 ; i < N ; i++) {
+    if (ids[i] == id) {
       count ++ ;
+    }
+  }
   *N2 = count ;
 
   /* copy each datum to the buffer */
   {
-    vl_uint8 * new_data = vl_malloc (sizeof(vl_uint8) * M * count);
+    vl_uint8 *new_data = vl_malloc (sizeof(*new_data) * M * count);
     count = 0;
-    for (i = 0 ; i < N ; i ++)
-      if (ids[i] == id)
-        {
-          memcpy(new_data + count * M,
-                 data     + i     * M,
-                 sizeof(vl_uint8) * M);
-          count ++ ;
-        }
+    for (i = 0 ; i < N ; i ++) {
+      if (ids[i] == id) {
+        memcpy(new_data + count * M,
+               data + i * M,
+               sizeof(*new_data) * M);
+        count ++ ;
+      }
+    }
     *N2 = count ;
     return new_data ;
   }
@@ -103,26 +103,26 @@ vl_hikm_copy_subset (vl_uint8 const * data,
 static VlHIKMNode *
 xmeans (VlHIKMTree *tree,
         vl_uint8 const *data,
-        int N, int K, int height)
+        vl_size N, vl_size K, vl_size height)
 {
-  VlHIKMNode *node = vl_malloc (sizeof(VlHIKMNode)) ;
-  vl_uint     *ids = vl_malloc (sizeof(vl_uint) * N) ;
+  VlHIKMNode *node = vl_malloc (sizeof(*node)) ;
+  vl_uint32 *ids = vl_malloc (sizeof(*ids) * N) ;
 
-  node-> filter   = vl_ikm_new (tree -> method) ;
-  node-> children = (height == 1) ? 0 : vl_malloc (sizeof(VlHIKMNode*) * K) ;
+  node->filter = vl_ikm_new (tree -> method) ;
+  node->children = (height == 1) ? 0 : vl_malloc (sizeof(*node->children) * K) ;
 
   vl_ikm_set_max_niters (node->filter, tree->max_niters) ;
   vl_ikm_set_verbosity  (node->filter, tree->verb - 1  ) ;
   vl_ikm_init_rand_data (node->filter, data, tree->M, N, K) ;
-  vl_ikm_train          (node->filter, data, N) ;
-  vl_ikm_push           (node->filter, ids, data, N) ;
+  vl_ikm_train (node->filter, data, N) ;
+  vl_ikm_push (node->filter, ids, data, N) ;
 
-  /* recurse for each child */
+  /* recursively process each child */
   if (height > 1) {
-    int k ;
-    for (k = 0 ; k < K ; k ++) {
-      int partition_N ;
-      int partition_K ;
+    vl_uindex k ;
+    for (k = 0 ; k < K ; ++k) {
+      vl_size partition_N ;
+      vl_size partition_K ;
       vl_uint8 *partition ;
 
       partition = vl_hikm_copy_subset
@@ -135,7 +135,7 @@ xmeans (VlHIKMTree *tree,
 
       vl_free (partition) ;
 
-      if (tree->verb > tree->depth - height) {
+      if (tree->verb > (signed)tree->depth - (signed)height) {
         VL_PRINTF("hikmeans: branch at depth %d: %6.1f %% completed\n",
                   tree->depth - height,
                   (double) (k+1) / K * 100) ;
@@ -160,14 +160,15 @@ static void
 xdelete (VlHIKMNode *node)
 {
   if(node) {
-    int k ;
+    vl_uindex k ;
     if (node->children) {
       for(k = 0 ; k < vl_ikm_get_K (node->filter) ; ++k)
         xdelete (node->children[k]) ;
       vl_free (node->children) ;
     }
-    if (node->filter)
+    if (node->filter) {
       vl_ikm_delete (node->filter) ;
+    }
     vl_free(node);
   }
 }
@@ -178,18 +179,12 @@ xdelete (VlHIKMNode *node)
  ** @return new HIKM tree.
  **/
 
-VL_EXPORT
 VlHIKMTree *
 vl_hikm_new (int method)
 {
-  VlHIKMTree *f = vl_malloc (sizeof(VlHIKMTree)) ;
-  f -> M          = 0 ;
-  f -> K          = 0 ;
-  f -> max_niters = 200 ;
-  f -> method     = method ;
-  f -> verb       = 0 ;
-  f -> depth      = 0 ;
-  f -> root       = 0 ;
+  VlHIKMTree *f = vl_calloc (sizeof(VlHIKMTree), 1) ;
+  f->max_niters = 200 ;
+  f->method = method ;
   return f ;
 }
 
@@ -198,43 +193,38 @@ vl_hikm_new (int method)
  ** @param f HIKM tree.
  **/
 
-VL_EXPORT
 void
 vl_hikm_delete (VlHIKMTree *f)
 {
   if (f) {
-    xdelete (f -> root) ;
+    xdelete (f->root) ;
     vl_free (f) ;
   }
 }
 
 /** ------------------------------------------------------------------
  ** @brief Initialize HIKM tree
- **
- ** @param f     HIKM tree.
- ** @param M     Data dimensionality.
- ** @param K     Number of clusters per node.
+ ** @param f HIKM tree.
+ ** @param M Data dimensionality.
+ ** @param K Number of clusters per node.
  ** @param depth Tree depth.
+ ** @return a new HIKM tree representing the clustering.
  **
  ** @remark @a depth cannot be smaller than 1.
- **
- ** @return a new HIKM tree representing the clustering.
  **/
 
-VL_EXPORT
 void
-vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
+vl_hikm_init (VlHIKMTree *f, vl_size M, vl_size K, vl_size depth)
 {
   assert(depth > 0) ;
-  assert(M     > 0) ;
-  assert(K     > 0) ;
+  assert(M > 0) ;
+  assert(K > 0) ;
 
   xdelete (f -> root) ;
-  f -> root = 0;
-
-  f -> M = M ;
-  f -> K = K ;
-  f -> depth = depth ;
+  f->root = 0;
+  f->M = M ;
+  f->K = K ;
+  f->depth = depth ;
 }
 
 /** ------------------------------------------------------------------
@@ -244,20 +234,18 @@ vl_hikm_init (VlHIKMTree *f, int M, int K, int depth)
  ** @param N       Number of data.
  **/
 
-VL_EXPORT
 void
-vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, int N)
+vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, vl_size N)
 {
-  f -> root  = xmeans (f, data, N, VL_MIN(f->K, N), f->depth) ;
+  f->root= xmeans (f, data, N, VL_MIN(f->K, N), f->depth) ;
 }
 
 /** ------------------------------------------------------------------
  ** @brief Project data down HIKM tree
- **
- ** @param f    HIKM tree.
+ ** @param f HIKM tree.
  ** @param asgn Path down the tree (out).
  ** @param data Data to project.
- ** @param N    Number of data.
+ ** @param N Number of data.
  **
  ** The function writes to @a asgn the path of the data @a data
  ** down the HIKM tree @a f. The parameter @a asgn must point to
@@ -265,35 +253,119 @@ vl_hikm_train (VlHIKMTree *f, vl_uint8 const *data, int N)
  ** the HIKM tree and @c N is the number of data point to process.
  **/
 
-VL_EXPORT
 void
-vl_hikm_push (VlHIKMTree *f, vl_uint *asgn, vl_uint8 const *data, int N)
+vl_hikm_push (VlHIKMTree *f, vl_uint32 *asgn, vl_uint8 const *data, vl_size N)
 {
-  int i, d,
-    M = vl_hikm_get_ndims (f),
-    depth = vl_hikm_get_depth (f) ;
+  vl_uindex i, d ;
+  vl_size M = vl_hikm_get_ndims (f) ;
+  vl_size depth = vl_hikm_get_depth (f) ;
 
   /* for each datum */
   for(i = 0 ; i < N ; i++) {
     VlHIKMNode *node = f->root ;
     d = 0 ;
     while (node) {
-      /*
-      vl_uint best =
-        vl_ikm_push_one (vl_ikm_get_centers (node->filter),
-                         data + i * M,
-                         M,
-                         vl_ikm_get_K (node->filter)) ;
-      */
-
-      vl_uint best ;
-      vl_ikm_push (node->filter, &best, data + i * M, 1) ;
-
-      asgn [i*depth + d] = best ;
+      vl_uint32 best ;
+      vl_ikm_push (node->filter,
+                   &best,
+                   data + i * M, 1) ;
+      asgn[i * depth + d] = best ;
       ++ d ;
-
       if (!node->children) break ;
       node = node->children [best] ;
     }
   }
+}
+
+/* ---------------------------------------------------------------- */
+/*                                              Setters and getters */
+/* ---------------------------------------------------------------- */
+
+/** @brief Get data dimensionality
+ ** @param f HIKM tree.
+ ** @return data dimensionality.
+ **/
+
+vl_size
+vl_hikm_get_ndims (VlHIKMTree const* f)
+{
+  return f->M ;
+}
+
+/** @brief Get K
+ ** @param f HIKM tree.
+ ** @return K.
+ **/
+
+vl_size
+vl_hikm_get_K (VlHIKMTree const *f)
+{
+  return f->K ;
+}
+
+/** @brief Get depth
+ ** @param f HIKM tree.
+ ** @return depth.
+ **/
+
+vl_size
+vl_hikm_get_depth (VlHIKMTree const *f)
+{
+  return f->depth ;
+}
+
+
+/** @brief Get verbosity level
+ ** @param f HIKM tree.
+ ** @return verbosity level.
+ **/
+
+int
+vl_hikm_get_verbosity (VlHIKMTree const *f)
+{
+  return f->verb ;
+}
+
+/** @brief Get maximum number of iterations
+ ** @param f HIKM tree.
+ ** @return maximum number of iterations.
+ **/
+
+vl_size
+vl_hikm_get_max_niters (VlHIKMTree const *f)
+{
+  return f-> max_niters ;
+}
+
+/** @brief Get maximum number of iterations
+ ** @param f HIKM tree.
+ ** @return maximum number of iterations.
+ **/
+
+VlHIKMNode const *
+vl_hikm_get_root (VlHIKMTree const *f)
+{
+  return f->root ;
+}
+
+/** @brief Set verbosity level
+ ** @param f HIKM tree.
+ ** @param verb verbosity level.
+ **/
+
+void
+vl_hikm_set_verbosity (VlHIKMTree *f, int verb)
+{
+  f->verb = verb ;
+}
+
+/** @brief Set maximum number of iterations
+ ** @param f HIKM tree.
+ ** @param max_niters maximum number of iterations.
+ **/
+
+void
+vl_hikm_set_max_niters (VlHIKMTree *f, int max_niters)
+{
+  f->max_niters = max_niters ;
 }

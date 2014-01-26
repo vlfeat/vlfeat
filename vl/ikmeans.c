@@ -83,66 +83,55 @@ the terms of the BSD license (see the COPYING file).
 #include <string.h> /* memset */
 #include "assert.h"
 
-static void    vl_ikm_init_lloyd      (VlIKMFilt*) ;
-static void    vl_ikm_init_elkan      (VlIKMFilt*) ;
-static int     vl_ikm_train_lloyd     (VlIKMFilt*, vl_uint8 const*, int) ;
-static int     vl_ikm_train_elkan     (VlIKMFilt*, vl_uint8 const*, int) ;
-static void    vl_ikm_push_lloyd      (VlIKMFilt*, vl_uint*, vl_uint8 const*, int) ;
-static void    vl_ikm_push_elkan      (VlIKMFilt*, vl_uint*, vl_uint8 const*, int) ;
+static void vl_ikm_init_lloyd (VlIKMFilt*) ;
+static void vl_ikm_init_elkan (VlIKMFilt*) ;
+static int vl_ikm_train_lloyd (VlIKMFilt*, vl_uint8 const*, vl_size) ;
+static int vl_ikm_train_elkan (VlIKMFilt*, vl_uint8 const*, vl_size) ;
+static void vl_ikm_push_lloyd (VlIKMFilt*, vl_uint32*, vl_uint8 const*, vl_size) ;
+static void  vl_ikm_push_elkan  (VlIKMFilt*, vl_uint32*, vl_uint8 const*, vl_size) ;
 
 /** @brief Create a new IKM quantizer
- **
  ** @param method Clustering algorithm.
+ ** @return new IKM quantizer.
  **
  ** The function allocates initializes a new IKM quantizer to
  ** operate based algorithm @a method.
  **
  ** @a method has values in the enumerations ::VlIKMAlgorithms.
- **
- ** @return new IKM quantizer.
  **/
 
 VlIKMFilt *
 vl_ikm_new (int method)
 {
-  VlIKMFilt *f =  vl_malloc (sizeof(VlIKMFilt)) ;
-  f -> centers = 0 ;
-  f -> inter_dist = 0 ;
-
-  f -> M = 0 ;
-  f -> K = 0 ;
-  f -> method     = method ;
+  VlIKMFilt *f = vl_calloc (sizeof(VlIKMFilt), 1) ;
+  f -> method = method ;
   f -> max_niters = 200 ;
-  f -> verb       = 0 ;
-
   return f ;
 }
 
 /** @brief Delete IKM quantizer
- **
  ** @param f IKM quantizer.
  **/
 
-void vl_ikm_delete (VlIKMFilt* f)
+void
+vl_ikm_delete (VlIKMFilt* f)
 {
   if (f) {
-    if (f-> centers)    vl_free (f-> centers) ;
-    if (f-> inter_dist) vl_free (f-> inter_dist) ;
-    vl_free (f) ;
+    if (f->centers) vl_free(f->centers) ;
+    if (f->inter_dist) vl_free(f->inter_dist) ;
+    vl_free(f) ;
   }
 }
 
 /** @brief Train clusters
- **
- ** @param f     IKM quantizer.
- ** @param data  data.
- ** @param N     number of data (@a N @c >= 1).
- **
+ ** @param f IKM quantizer.
+ ** @param data data.
+ ** @param N number of data (@a N @c >= 1).
  ** @return -1 if an overflow may have occurred.
  **/
 
-VL_EXPORT
-int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
+int
+vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, vl_size N)
 {
   int err ;
 
@@ -161,7 +150,6 @@ int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
 }
 
 /** @brief Project data to clusters
- **
  ** @param f     IKM quantizer.
  ** @param asgn  Assignments (out).
  ** @param data  data.
@@ -172,9 +160,8 @@ int vl_ikm_train (VlIKMFilt *f, vl_uint8 const *data, int N)
  ** quantizer must be initialized.
  **/
 
-VL_EXPORT
 void
-vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) {
+vl_ikm_push (VlIKMFilt *f, vl_uint32 *asgn, vl_uint8 const *data, vl_size N) {
   switch (f -> method) {
   case VL_IKM_LLOYD : vl_ikm_push_lloyd (f, asgn, data, N) ; break ;
   case VL_IKM_ELKAN : vl_ikm_push_elkan (f, asgn, data, N) ; break ;
@@ -184,46 +171,125 @@ vl_ikm_push (VlIKMFilt *f, vl_uint *asgn, vl_uint8 const *data, int N) {
 }
 
 /** @brief Project one datum to clusters
- **
  ** @param centers centers.
- ** @param data    datum to project.
- ** @param K       number of centers.
- ** @param M       dimensionality of the datum.
+ ** @param data datum to project.
+ ** @param K number of centers.
+ ** @param M dimensionality of the datum.
+ ** @return the cluster index.
  **
  ** The function projects the specified datum @a data on the clusters
  ** specified by the centers @a centers.
- **
- ** @return the cluster index.
  **/
 
-VL_EXPORT
-vl_uint
-vl_ikm_push_one (vl_ikm_acc const *centers,
+vl_uint32
+vl_ikm_push_one (vl_ikmacc_t const *centers,
 		 vl_uint8 const *data,
-		 int M, int K)
+		 vl_size M, vl_size K)
 {
-  int i,k ;
+  vl_uindex i,k ;
 
   /* assign data to centers */
-  vl_int32 best_dist = 0 ;
-  vl_uint  best      = (vl_uint)-1 ;
+  vl_uindex best = (vl_uindex) -1 ;
+  vl_ikmacc_t best_dist = 0 ;
 
   for(k = 0 ; k < K ; ++k) {
-    vl_int32 dist = 0 ;
+    vl_ikmacc_t dist = 0 ;
 
     /* compute distance with this center */
     for(i = 0 ; i < M ; ++i) {
-      vl_int32 delta = data[i] - centers[k*M + i] ;
+      vl_ikmacc_t delta = (vl_ikmacc_t)data[i] - centers[k*M + i] ;
       dist += delta * delta ;
     }
 
     /* compare with current best */
-    if (best == (vl_uint)-1 || dist < best_dist) {
+    if (best == (vl_uindex) -1 || dist < best_dist) {
       best = k  ;
       best_dist = dist ;
     }
   }
-  return best;
+  return (vl_uint32)best;
+}
+
+/* ---------------------------------------------------------------- */
+/*                                              Getters and setters */
+/* ---------------------------------------------------------------- */
+
+/** @brief Get data dimensionality
+ ** @param f IKM filter.
+ ** @return data dimensionality.
+ **/
+
+vl_size
+vl_ikm_get_ndims (VlIKMFilt const* f)
+{
+  return f->M ;
+}
+
+
+/** @brief Get the number of centers K
+ ** @param f IKM filter.
+ ** @return number of centers K.
+ **/
+
+vl_size
+vl_ikm_get_K (VlIKMFilt const* f)
+{
+  return f->K ;
+}
+
+/** @brief Get verbosity level
+ ** @param f IKM filter.
+ ** @return verbosity level.
+ **/
+
+int
+vl_ikm_get_verbosity (VlIKMFilt const* f)
+{
+  return f->verb ;
+}
+
+/** @brief Get maximum number of iterations
+ ** @param f IKM filter.
+ ** @return maximum number of iterations.
+ **/
+
+vl_size
+vl_ikm_get_max_niters (VlIKMFilt const* f)
+{
+  return f->max_niters ;
+}
+
+/** @brief Get maximum number of iterations
+ ** @param f IKM filter.
+ ** @return maximum number of iterations.
+ **/
+
+vl_ikmacc_t const *
+vl_ikm_get_centers (VlIKMFilt const* f)
+{
+  return f-> centers ;
+}
+
+/** @brief Set verbosity level
+ ** @param f IKM filter.
+ ** @param verb verbosity level.
+ **/
+
+void
+vl_ikm_set_verbosity (VlIKMFilt *f, int verb)
+{
+  f-> verb = VL_MAX(0,verb) ;
+}
+
+/** @brief Set maximum number of iterations
+ ** @param f IKM filter.
+ ** @param max_niters maximum number of iterations.
+ **/
+
+void
+vl_ikm_set_max_niters (VlIKMFilt *f, vl_size max_niters)
+{
+  f-> max_niters = max_niters ;
 }
 
 #include "ikmeans_init.tc"

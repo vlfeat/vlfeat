@@ -40,20 +40,18 @@ mexFunction(int nout, mxArray *out[],
 {
   enum {IN_X=0,IN_C,IN_END} ;
   enum {OUT_ASGN=0} ;
-  vl_uint*     asgn ;
-  vl_ikm_acc*  centers ;
+  VlIKMFilt *ikmf ;
+  vl_uint32* asgn ;
+  vl_ikmacc_t* centers ;
   vl_uint8* data ;
-
-  int M,N,j,K=0 ;
-
-  int             opt ;
-  int             next = IN_END ;
-  mxArray const  *optarg ;
-
+  mwSize M,N,K ;
+  vl_uindex j ;
   int method_type = VL_IKM_LLOYD ;
   int verb = 0 ;
 
-  VlIKMFilt *ikmf ;
+  int opt ;
+  int next = IN_END ;
+  mxArray const *optarg ;
 
   VL_USE_MATLAB_ENV ;
 
@@ -68,18 +66,18 @@ mexFunction(int nout, mxArray *out[],
   }
 
   if(mxGetClassID(in[IN_X]) != mxUINT8_CLASS) {
-    mexErrMsgTxt("X must be of class UINT8") ;
+    mexErrMsgTxt("X is not of class UINT8.") ;
   }
 
   if(mxGetClassID(in[IN_C]) != mxINT32_CLASS) {
-    mexErrMsgTxt("C must be of class INT32") ;
+    mexErrMsgTxt("C is not of class INT32.") ;
   }
 
-  M = mxGetM(in[IN_X]) ;  /* n of components */
-  N = mxGetN(in[IN_X]) ;  /* n of elements */
-  K = mxGetN(in[IN_C]) ;  /* n of centers */
+  M = mxGetM(in[IN_X]) ; /* n of components */
+  N = mxGetN(in[IN_X]) ; /* n of elements */
+  K = mxGetN(in[IN_C]) ; /* n of centers */
 
-  if( (int) mxGetM(in[IN_C]) != M ) {
+  if (mxGetM(in[IN_C]) != M ) {
     mexErrMsgTxt("DATA and CENTERS must have the same number of columns.") ;
   }
 
@@ -106,7 +104,6 @@ mexFunction(int nout, mxArray *out[],
       } else {
         mexErrMsgTxt("Unknown cost type.") ;
       }
-
       break ;
 
     default :
@@ -132,14 +129,14 @@ mexFunction(int nout, mxArray *out[],
 
   out[OUT_ASGN] = mxCreateNumericMatrix (1, N, mxUINT32_CLASS, mxREAL) ;
 
-  data    = (vl_uint8*) mxGetData (in[IN_X]) ;
-  centers = (vl_ikm_acc*)  mxGetData (in[IN_C]) ;
-  asgn    = (vl_uint*)     mxGetData (out[OUT_ASGN]) ;
-  ikmf    = vl_ikm_new (method_type) ;
+  data = (vl_uint8*) mxGetData (in[IN_X]) ;
+  centers = (vl_ikmacc_t*) mxGetData (in[IN_C]) ;
+  asgn = (vl_uint32*) mxGetData (out[OUT_ASGN]) ;
+  ikmf = vl_ikm_new (method_type) ;
 
-  vl_ikm_set_verbosity  (ikmf, verb) ;
-  vl_ikm_init           (ikmf, centers, M, K) ;
-  vl_ikm_push           (ikmf, asgn, data, N) ;
+  vl_ikm_set_verbosity (ikmf, verb) ;
+  vl_ikm_init (ikmf, centers, M, K) ;
+  vl_ikm_push (ikmf, asgn, data, N) ;
 
   /* adjust for MATLAB indexing */
   for(j = 0 ; j < N ; ++j) ++ asgn[j] ;
