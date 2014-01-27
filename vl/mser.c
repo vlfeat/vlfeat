@@ -82,7 +82,7 @@ This score is a relative measure of how much $R_l$ changes as the
 index is increased from $l$ to $l+\Delta$, as illustrated in the
 following figure.
 
-@image html mser-er.png "Stability is measured by looking at how much a region changes with $l$."
+@image html mser-er.png "Stability is measured by looking at how much a region changes with the intensity level."
 
 The score is low if the regions along the branch have similar area
 (and thus similar shape). We aim to select maximally stable
