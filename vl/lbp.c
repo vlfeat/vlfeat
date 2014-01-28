@@ -189,6 +189,7 @@ _vl_lbp_init_uniform(VlLbp * self)
   for (i = 0 ; i < 8 ; ++i) {
     for (j = 1 ; j <= 7 ; ++j) {
       int ip ;
+      int unsigned string ;
       if (self->transposed) {
         ip = (- i + 2 - (j - 1) + 16) % 8 ;
       } else {
@@ -196,7 +197,7 @@ _vl_lbp_init_uniform(VlLbp * self)
       }
 
       /* string starting with j ones */
-      int unsigned string = (1 << j) - 1 ;
+      string = (1 << j) - 1 ;
       string <<= ip ;
       string = (string | (string >> 8)) & 0xff ;
 
