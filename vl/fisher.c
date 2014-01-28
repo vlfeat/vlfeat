@@ -4,12 +4,12 @@
  **/
 
 /*
- Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
- All rights reserved.
+Copyright (C) 2013 David Novotny and Andrea Vedaldi.
+All rights reserved.
 
- This file is part of the VLFeat library and is made available under
- the terms of the BSD license (see the COPYING file).
- */
+This file is part of the VLFeat library and is made available under
+the terms of the BSD license (see the COPYING file).
+*/
 
 /**
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
@@ -145,6 +145,14 @@ classification performance of the representation by using to ideas:
 
 After square-rooting and normalization, the IFV is often used in a
 linear classifier such as an @ref svm "SVM".
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+@section fisher-fast Faster computations
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+
+In practice, several data to cluster assignments $q_{ik}$ are likely
+to be very small or even negligible. The *fast* version of the FV sets
+to zero all but the largest assignment for each input feature $\bx_i$.
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 @page fisher-derivation Fisher vector derivation
@@ -337,7 +345,7 @@ kernel*:
 \[
  K(\bx,\bx')
 = \langle \Phi(\bx),\Phi(\bx') \rangle
-=  \nabla_\Theta \log p(\bx|\Theta)^\top H^{-1} \nabla_\Theta \log p(\bx'|\Theta).
+= \nabla_\Theta \log p(\bx|\Theta)^\top H^{-1} \nabla_\Theta \log p(\bx'|\Theta).
 \]
 
 **/
@@ -350,13 +358,9 @@ kernel*:
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef VL_FISHER_INSTANTIATING
-
-#endif
-
 #ifdef VL_FISHER_INSTANTIATING
 
-static void
+static vl_size
 VL_XCAT(_vl_fisher_encode_, SFX)
 (TYPE * enc,
  TYPE const * means, vl_size dimension, vl_size numClusters,
@@ -367,8 +371,12 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 {
   vl_size dim;
   vl_index i_cl, i_d;
+  vl_size numTerms = 0 ;
   TYPE * posteriors ;
   TYPE * sqrtInvSigma;
+
+  assert(numClusters >= 1) ;
+  assert(dimension >= 1) ;
 
   posteriors = vl_malloc(sizeof(TYPE) * numClusters * numData);
   sqrtInvSigma = vl_malloc(sizeof(TYPE) * dimension * numClusters);
@@ -387,8 +395,29 @@ VL_XCAT(_vl_fisher_encode_, SFX)
                                             covariances,
                                             data) ;
 
+  /* sparsify posterior assignments with the FAST option */
+  if (flags & VL_FISHER_FLAG_FAST) {
+    for(i_d = 0; i_d < (signed)numData; i_d++) {
+      /* find largest posterior assignment for datum i_d */
+      vl_index best = 0 ;
+      TYPE bestValue = posteriors[i_d * numClusters] ;
+      for (i_cl = 1 ; i_cl < (signed)numClusters; ++ i_cl) {
+        TYPE p = posteriors[i_cl + i_d * numClusters] ;
+        if (p > bestValue) {
+          bestValue = p ;
+          best = i_cl ;
+        }
+      }
+      /* make all posterior assignments zero but the best one */
+      for (i_cl = 0 ; i_cl < (signed)numClusters; ++ i_cl) {
+        posteriors[i_cl + i_d * numClusters] =
+        (TYPE)(i_cl == best) ;
+      }
+    }
+  }
+
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i_cl, i_d, dim) num_threads(vl_get_max_threads())
+#pragma omp parallel for default(shared) private(i_cl, i_d, dim) num_threads(vl_get_max_threads()) reduction(+:numTerms)
 #endif
   for(i_cl = 0; i_cl < (signed)numClusters; ++ i_cl) {
     TYPE uprefix;
@@ -397,11 +426,10 @@ VL_XCAT(_vl_fisher_encode_, SFX)
     TYPE * uk = enc + i_cl*dimension ;
     TYPE * vk = enc + i_cl*dimension + numClusters * dimension ;
 
-    if (priors[i_cl] < 1e-6) { continue ; }
-
     for(i_d = 0; i_d < (signed)numData; i_d++) {
       TYPE p = posteriors[i_cl + i_d * numClusters] ;
-      if (p == 0) continue ;
+      if (p < 1e-6) continue ;
+      numTerms += 1;
       for(dim = 0; dim < dimension; dim++) {
         TYPE diff = data[i_d*dimension + dim] - means[i_cl*dimension + dim] ;
         diff *= sqrtInvSigma[i_cl*dimension + dim] ;
@@ -445,10 +473,12 @@ VL_XCAT(_vl_fisher_encode_, SFX)
       enc[dim] /= n ;
     }
   }
+
+  return numTerms ;
 }
 
-/* VL_FISHER_INSTANTIATING */
 #else
+/* not VL_FISHER_INSTANTIATING */
 
 #ifndef __DOXYGEN__
 #define FLT VL_TYPE_FLOAT
@@ -464,6 +494,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
 #include "fisher.c"
 #endif
 
+/* not VL_FISHER_INSTANTIATING */
 #endif
 
 /* ================================================================ */
@@ -480,6 +511,7 @@ VL_XCAT(_vl_fisher_encode_, SFX)
  ** @param data vectors to encode.
  ** @param numData number of vectors to encode.
  ** @param flags options.
+ ** @return number of averaging operations.
  **
  ** @a means and @a covariances have @a dimension rows and @a numCluster columns.
  ** @a priors is a vector of size @a numCluster. @a data has @a dimension
@@ -490,12 +522,20 @@ VL_XCAT(_vl_fisher_encode_, SFX)
  **
  ** @a flag can be used to control several options:
  ** ::VL_FISHER_FLAG_SQUARE_ROOT, ::VL_FISHER_FLAG_NORMALIZED,
- ** ::VL_FISHER_FLAG_IMPROVED.
+ ** ::VL_FISHER_FLAG_IMPROVED, and ::VL_FISHER_FLAG_FAST.
+ **
+ ** The function returns the number of averaging operations actually
+ ** computed.  The upper bound is the number of input features by the
+ ** number of GMM modes; however, in practice assignments are usually
+ ** failry sparse, so this number is less. In particular, with the
+ ** ::VL_FISHER_FLAG_FAST, this number should be equal to the number
+ ** of input features only. This information can be used for
+ ** diagnostic purposes.
  **
  ** @sa @ref fisher
  **/
 
-VL_EXPORT void
+VL_EXPORT vl_size
 vl_fisher_encode
 (void * enc, vl_type dataType,
  void const * means, vl_size dimension, vl_size numClusters,
@@ -507,16 +547,15 @@ vl_fisher_encode
 {
   switch(dataType) {
     case VL_TYPE_FLOAT:
-      _vl_fisher_encode_f
+      return _vl_fisher_encode_f
       ((float *) enc,
        (float const *) means, dimension, numClusters,
        (float const *) covariances,
        (float const *) priors,
        (float const *) data, numData,
        flags);
-      break;
     case VL_TYPE_DOUBLE:
-      _vl_fisher_encode_d
+      return _vl_fisher_encode_d
       ((double *) enc,
        (double const *) means, dimension, numClusters,
        (double const *) covariances,
@@ -528,7 +567,7 @@ vl_fisher_encode
       abort();
   }
 }
-
+/* not VL_FISHER_INSTANTIATING */
 #endif
 
 #undef SFX

@@ -6,7 +6,7 @@
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2013 David Novotny and Andrea Vedaldi.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -26,11 +26,11 @@ the terms of the BSD license (see the COPYING file).
 #define VL_FISHER_FLAG_FAST                 (0x1 << 2)
 
 /** @def VL_FISHER_FLAG_SQUARE_ROOT
- ** @brief Use signed squared-root.
+ ** @brief Use signed squared-root (@ref fisher-normalization).
  **/
 
 /** @def VL_FISHER_FLAG_NORMALIZED
- ** @brief Gobally normalize the Fisher vector in L2 norm.
+ ** @brief Gobally normalize the Fisher vector in L2 norm (@ref fisher-normalization).
  **/
 
 /** @def VL_FISHER_FLAG_IMPROVED
@@ -39,14 +39,13 @@ the terms of the BSD license (see the COPYING file).
  **/
 
 /** @def VL_FISHER_FLAG_FAST
- ** @brief Fast but more approximate calculations
- ** Clamps to zero data to cluster assignments that are very small.
- ** Typically this makes the computation much faster.
+ ** @brief Fast but more approximate calculations (@ref fisher-fast).
+ ** Keep only the larges data to cluster assignment (posterior).
  **/
 
 /** @} */
 
-VL_EXPORT void vl_fisher_encode
+VL_EXPORT vl_size vl_fisher_encode
 (void * enc, vl_type dataType,
  void const * means, vl_size dimension, vl_size numClusters,
  void const * covariances,

@@ -37,7 +37,15 @@ phi_ = phi_ / norm(phi_) ;
 phi = vl_fisher(s.x, s.mu, s.sigma2, s.prior, 'improved') ;
 vl_assert_almost_equal(phi, phi_, 1e-10) ;
 
-function enc = simple_fisher(x, mu, sigma2, pri)
+function test_fast(s)
+phi_ = simple_fisher(s.x, s.mu, s.sigma2, s.prior, true) ;
+phi_ = sign(phi_) .* sqrt(abs(phi_)) ;
+phi_ = phi_ / norm(phi_) ;
+phi = vl_fisher(s.x, s.mu, s.sigma2, s.prior, 'improved', 'fast') ;
+vl_assert_almost_equal(phi, phi_, 1e-10) ;
+
+function enc = simple_fisher(x, mu, sigma2, pri, fast)
+if nargin < 5, fast = false ; end
 sigma = sqrt(sigma2) ;
 for k = 1:size(mu,2)
   delta{k} = bsxfun(@times, bsxfun(@minus, x, mu(:,k)), 1./sigma(:,k)) ;
@@ -46,6 +54,11 @@ end
 q = exp(bsxfun(@minus, q, max(q,[],1))) ;
 q = bsxfun(@times, q, 1 ./ sum(q,1)) ;
 n = size(x,2) ;
+if fast
+  [~,i] = max(q) ;
+  q = zeros(size(q)) ;
+  q(sub2ind(size(q),i,1:n)) = 1 ;
+end
 for k = 1:size(mu,2)
   u{k} = delta{k} * q(k,:)' / n / sqrt(pri(k)) ;
   v{k} = (delta{k}.^2 - 1) * q(k,:)' / n / sqrt(2*pri(k)) ;
