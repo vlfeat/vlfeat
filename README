@@ -1,5 +1,5 @@
                    VLFeat (Vision Library Features)
-                            Version 0.9.17
+                            Version 0.9.18
 
 ABOUT
 
@@ -53,6 +53,11 @@ OCTAVE SUPPORT
   > MKOCTFILE=<path to the mkoctfile program> make
 
 CHANGES
+
+  0.9.18     Several bugfixes. Improved documentation, particularly
+             of the covariant detectors. Minor enhancements of
+             the Fisher vectors.
+
   0.9.17     Rewritten SVM implementation, adding support for SGD and
              SDCA optimisers and various loss functions (hinge,
              squared hinge, logistic, etc.) and improving the
