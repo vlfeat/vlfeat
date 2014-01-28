@@ -56,7 +56,7 @@ vl_uint8*
 vl_hikm_copy_subset (vl_uint8 const * data,
                      vl_uint32 *ids,
                      vl_size N, vl_size M,
-                     vl_uint id, vl_size *N2)
+                     vl_uint32 id, vl_size *N2)
 {
   vl_uindex i ;
   vl_size count = 0;
@@ -126,7 +126,7 @@ xmeans (VlHIKMTree *tree,
       vl_uint8 *partition ;
 
       partition = vl_hikm_copy_subset
-        (data, ids, N, tree->M, k, &partition_N) ;
+        (data, ids, N, tree->M, (vl_uint32)k, &partition_N) ;
 
       partition_K = VL_MIN (K, partition_N) ;
 

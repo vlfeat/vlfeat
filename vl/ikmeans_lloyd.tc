@@ -50,7 +50,7 @@ vl_ikm_train_lloyd (VlIKMFilt* f, vl_uint8 const* data, vl_size N)
       vl_index best = -1 ;
 
       for (k = 0; k < f->K ; ++k) {
-        vl_index dist = 0;
+        vl_ikmacc_t dist = 0 ;
 
         /* compute distance with this center */
         for (i = 0; i < f->M ; ++i) {
