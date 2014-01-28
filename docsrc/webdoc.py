@@ -246,7 +246,7 @@ class DocBareNode:
     def getPublishURL(self): pass
     def visit(self, generator): pass
     def publish(self, generator, pageNode = None): pass
-    def publishIndex(self, gen, pageNode, openNodeStack): return False
+    def publishIndex(self, gen, inPage, activePageNodes, full=False): return False
 
 # --------------------------------------------------------------------
 class DocNode(DocBareNode):
@@ -409,13 +409,13 @@ class DocNode(DocBareNode):
 
     publish = makeGuard(publish)
 
-    def publishIndex(self, gen, pageNode, openNodeStack):
+    def publishIndex(self, gen, inPage, activePageNodes, full=False):
         """
         Recursively calls PUBLISHINDEX() on its children.
         """
         hasIndexedChildren = False
         for c in self.getChildren():
-            hasIndexedChildren = c.publishIndex(gen, pageNode, openNodeStack) \
+            hasIndexedChildren = c.publishIndex(gen, inPage, activePageNodes, full) \
                 or hasIndexedChildren
         return hasIndexedChildren
 
@@ -606,16 +606,21 @@ class DocHtmlText(DocBareNode):
 
             elif directive == "path":
                 ancPages = [x for x in walkAncestors(pageNode, DocPage)]
-                ancPages.reverse()
-                gen.putString(" - ".join([x.title for x in ancPages]))
+                if ancPages is not None:
+                    for i,p in enumerate(reversed(ancPages)):
+                        if i > 0: gen.putString("<span class='separator'>></span>")
+                        gen.putString("<span class='page'><a href=")
+                        gen.putXMLAttr(
+                            pageNode.expandAttr("%%pathto:%s;" % p.getID(), pageNode))
+                        gen.putString(">%s</a></span>" % p.title)
 
             elif directive == "navigation":
                 gen.putString("<ul>\n")
                 # get the branch of DocPage nodes from the site root to this page
-                openNodeStack = [x for x in walkAncestors(pageNode, DocPage)]
+                activePageNodes = [x for x in walkAncestors(pageNode, DocPage)]
                 # find the root site node and publish the contents
                 siteNode = walkAncestors(pageNode, DocSite).next()
-                siteNode.publishIndex(gen, pageNode, openNodeStack)
+                siteNode.publishIndex(gen, pageNode, activePageNodes, True)
                 gen.putString("</ul>\n")
 
             elif directive == "tableofcontents":
@@ -855,25 +860,31 @@ class DocPage(DocNode):
         # during publishing
         return None
 
-    def publishIndex(self, gen, pageNode, openNodeStack):
-        if self.hide: return
-        active = len(openNodeStack) == 1 and self == openNodeStack[0]
+    def publishIndex(self, gen, inPage, activePageNodes, full=False):
+        if self.hide: return False
+        active = (self in activePageNodes)
+        if active:
+            activeLeaf = (activePageNodes.index(self) == len(activePageNodes)-1)
+        else:
+            activeLeaf = False
         gen.putString("<li")
         if active: gen.putString(" class='active'")
+        if activeLeaf: gen.putString(" class='activeLeaf'")
         gen.putString("><a href=")
         gen.putXMLAttr(
-            self.expandAttr("%%pathto:%s;" % self.getID(), pageNode))
-        if active: gen.putString(" class='active' ")
+            self.expandAttr("%%pathto:%s;" % self.getID(), inPage))
         gen.putString(">")
         gen.putXMLString(self.title)
         gen.putString("</a>\n")
+        # Generate recursively the index of the children
+        # This may or may not produce results; if not we need to backtrack,
+        # so we save the position of the generator.
         pos = gen.tell()
         gen.putString("<ul>\n")
-        hasIndexedChildren = False
-        if len(openNodeStack) > 0 and self == openNodeStack[-1]:
-            openNodeStack.pop()
-            hasIndexedChildren = DocNode.publishIndex(self, gen, pageNode, openNodeStack)
-        if hasIndexedChildren:
+        notEmpty = False
+        if active or full:
+            notEmpty = DocNode.publishIndex(self, gen, inPage, activePageNodes)
+        if notEmpty:
             gen.putString("</ul>")
         else:
             gen.seek(pos)
