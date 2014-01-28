@@ -1710,7 +1710,7 @@ vl_covdet_put_image (VlCovDet * self,
   geom.lastOctave = lastOctave ;
   geom.octaveResolution = self->octaveResolution ;
   geom.octaveFirstSubdivision = octaveFirstSubdivision ;
-  geom.octaveLastSubdivision = octaveLastSubdiv ision ;
+  geom.octaveLastSubdivision = octaveLastSubdivision ;
 
   if (self->gss == NULL ||
       ! vl_scalespacegeometry_is_equal (geom,
