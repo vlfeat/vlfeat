@@ -63,36 +63,77 @@ code a {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 #sidebar {
-    float: left ;
-    width: 180px ;
-    min-height: 100%
-}
-#sidebar ul {
-    margin: 1em 0 ;
+    width: 920px ;
     padding: 0 ;
-    padding-right: 1.1em ;
-    line-height: 1.1em ;
-}
-#sidebar ul ul {
     margin: 0 ;
-}
-#sidebar li {
-    list-style: none ; /* for buggy IE */
-    margin: 1em 0 ;
-    padding: 0 ;
+    margin-left: auto ;
+    margin-right: auto ;
+    color: white ;
+//    background-color: #555 ;
     font-weight: bold ;
 }
-#sidebar li li {
-    margin: 0.5em 0 ;
-    margin-left: 1em ;
-    font-weight: normal ;
-}
-#sidebar li a {
-    color: rgb(40,40,40) ;
+#sidebar a {
+    color: inherit ! important ;
     text-decoration: none ;
 }
-#sidebar li .active a {
-    text-decoration: none ;
+#sidebar ul {
+    margin: 0 ;
+    padding: 0 ;
+}
+#sidebar ul li {
+    display: inline-block ;
+    position: relative ;
+    list-style-type: none ;
+    margin: 0em ;
+    margin-right: 11px ;
+    font-size: 14px ;
+    line-height: 14px ;
+    padding: 10px 15px 10px 0px ;
+}
+#sidebar ul li {
+    //background-color: green ;
+    margin-left: -15px ;
+    padding-left: 15px ;
+}
+#sidebar ul li.active {
+    background-color: rgb(207,122,48) ;
+    margin-left: -15px ;
+    padding-left: 15px ;
+}
+#sidebar ul li ul {
+    visibility: hidden ;
+    position: absolute ;
+    top: 34px ;
+    left: -1px ;
+    width: 225px ;
+ //   background-color: #555 ;
+    background-color: #183a60 ;
+}
+#sidebar ul li ul li {
+    display: block ;
+    margin: 0 ;
+    padding-left: 15px ;
+    border: 1px solid white ;
+    border-bottom: none ;
+}
+#sidebar ul li ul li ul {
+    top: -1px ;
+    left: 223px ;
+    width: 225px ;
+    background-color: #183a60 ;
+}
+#sidebar ul li ul li {
+    //background-color: green ;
+    margin: 0 ;
+    padding-left: 15px ;
+}
+#sidebar ul li ul li.active {
+    background-color: rgb(207,122,48) ;
+    margin: 0 ;
+    padding-left: 15px ;
+}
+#sidebar li:hover > ul {
+    visibility: visible ;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -146,6 +187,16 @@ code a {
     color: #5a5a5a ;
     font-weight: bold ;
     font-size: 15px ;
+}
+#headbanner a {
+    text-decoration: inherit ! important ;
+    color: inherit ! important ;
+}
+#headbanner span.page {
+}
+#headbanner span.separator {
+    padding-left: 10px ;
+    padding-right: 10px ;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

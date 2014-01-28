@@ -13,7 +13,7 @@
   <include src="doc.html"/>
 
   <dir name="matlab">
-   <page id="matlab" name="matlab" title="Matlab API">
+   <page id="matlab" name="matlab" title="MATLAB API">
    </page>
   </dir>
 
