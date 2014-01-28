@@ -40,7 +40,6 @@
 		2D1EED1F1604992B00C63DCE /* scalespace.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D1EED1D1604992A00C63DCE /* scalespace.c */; };
 		2D1EED201604992B00C63DCE /* scalespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1EED1E1604992A00C63DCE /* scalespace.h */; };
 		2D4938AF1895ACE400B775EE /* test_sqrti.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D4938AE1895ACE400B775EE /* test_sqrti.c */; };
-		2D4938B11895BAAA00B775EE /* vl_demo_ikmeans.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D4938B01895BAAA00B775EE /* vl_demo_ikmeans.m */; };
 		2D63C3A917969032001C6AE0 /* vl_liop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D9A805D17745CB500B9A9CD /* vl_liop.c */; };
 		2D81B9B11735666E000706C0 /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2D81B9B717356697000706C0 /* vl_svmtrain.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D81B9A917351EE5000706C0 /* vl_svmtrain.c */; };
@@ -1585,7 +1584,6 @@
 				2D1EECE31603E8E900C63DCE /* kmeans.c in Sources */,
 				2D1EECE41603E8E900C63DCE /* lbp.c in Sources */,
 				2D1EECE51603E8E900C63DCE /* mathop.c in Sources */,
-				2D4938B11895BAAA00B775EE /* vl_demo_ikmeans.m in Sources */,
 				2D1EECE61603E8E900C63DCE /* mathop_sse2.c in Sources */,
 				2D1EECE71603E8E900C63DCE /* mser.c in Sources */,
 				2D1EECE91603E8E900C63DCE /* pgm.c in Sources */,
