@@ -18,8 +18,8 @@
 int
 main (int argc VL_UNUSED, char** argv VL_UNUSED)
 {
-
-  for (vl_index i = 0 ; i < 0xff ; ++i) {
+  vl_index i ;
+  for (i = 0 ; i < 0xff ; ++i) {
     vl_uint8 x = (vl_uint8)i ;
     vl_uint8 r = vl_fast_sqrt_ui8(x) ;
     vl_uint8 r_ = (vl_uint8) floor(sqrt((double)x)) ;
@@ -27,7 +27,7 @@ main (int argc VL_UNUSED, char** argv VL_UNUSED)
     /* printf("sqrt(%5d) = %5d -- %5d\n", i, r, r_) ; */
   }
 
-  for (vl_index i = 0 ; i < 0xffffffff ; ++i) {
+  for (i = 0 ; i < 0xffffffff ; ++i) {
     vl_uint16 x = (vl_uint16)i ;
     vl_uint16 r = vl_fast_sqrt_ui16(x) ;
     vl_uint16 r_ = (vl_uint8) floor(sqrt((double)x)) ;
