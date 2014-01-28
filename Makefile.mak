@@ -24,7 +24,7 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.17
+VER = 0.9.18
 ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
@@ -214,6 +214,7 @@ cmdsrc = \
   src\test_nan.c \
   src\test_qsort-def.c \
   src\test_rand.c \
+  src\test_sqrti.c \
   src\test_stringop.c \
   src\test_svd2.c \
   src\test_threads.c \
@@ -236,6 +237,7 @@ cmdsrc = \
   src\test_nan.c \
   src\test_qsort-def.c \
   src\test_rand.c \
+  src\test_sqrti.c \
   src\test_stringop.c \
   src\test_svd2.c \
   src\test_threads.c \
