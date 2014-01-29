@@ -92,8 +92,12 @@ ifeq ($(ARCH),maci)
 MEX_SUFFIX := mexmaci
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
-MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CLAGS))'
-# a hack to support recent Xcode versions on old MATLABs
+# a hack to support recent Xcode/clang/GCC versions on old MATLABs
+MEX_FLAGS += CFLAGS='\
+-arch i386 \
+-fno-common \
+-fexceptions \
+$(call escape,$(STD_CFLAGS))'
 MEX_FLAGS += LDFLAGS='\
 -arch i386 \
 -Wl,-syslibroot,$(SDKROOT) \
@@ -108,7 +112,11 @@ MEX_SUFFIX := mexmaci64
 MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
-MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
+MEX_FLAGS += CFLAGS='\
+-arch x86_64 \
+-fno-common \
+-fexceptions \
+$(call escape,$(STD_CFLAGS))'
 MEX_FLAGS += LDFLAGS='\
 -arch x86_64 \
 -Wl,-syslibroot,$(SDKROOT) \
@@ -157,6 +165,7 @@ endif
 no_dep_targets += mex-dir mex-info mex-test
 no_dep_targets += mex-clean mex-distclean mex-archclean
 
+mex_sub := $(shell find $(VLDIR)/toolbox -type d)
 mex_src := $(shell find $(VLDIR)/toolbox -name "*.c")
 mex_tgt := $(addprefix $(MEX_BINDIR)/,\
 	   $(notdir $(mex_src:.c=.$(MEX_SUFFIX)) ) )
@@ -169,7 +178,7 @@ comm_bins +=
 deps += $(mex_dep)
 endif
 
-vpath vl_%.c $(shell find $(VLDIR)/toolbox -type d)
+vpath vl_%.c $(mex_sub)
 
 mex-all: $(mex_dll) $(mex_tgt)
 
@@ -183,7 +192,6 @@ $(eval $(call gendir, mex, $(MEX_BINDIR)))
 
 $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	$(call C,CC)                                                            \
-	    -m64								\
 	    -dynamiclib								\
 	    -undefined suppress							\
 	    -flat_namespace							\

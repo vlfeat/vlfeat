@@ -2,6 +2,7 @@
 # description: Build VLFeat DLL
 # author: Andrea Vedaldi
 
+# Copyright (C) 2013-14 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -120,7 +121,6 @@ $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	$(call C,CC)						\
-	  -m64							\
 	  -dynamiclib						\
 	  -undefined suppress					\
 	  -flat_namespace					\

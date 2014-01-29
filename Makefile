@@ -24,15 +24,9 @@
 #
 # > make ARCH=maci64
 #
-# builds VLFeat for Mac OS X Intel 64 bit.
-#
-# !! Unfortunately MATLAB mex script (at least up to version 2009B) has
-# !! a bug that prevents selecting an architecture different from the
-# !! default one for compilation. For instance, compiling maci64 may
-# !! not work as the default architecture is maci if both 32 and 64
-# !! bit MATLAB are installed. This bug is easy to fix, but requires
-# !! patching the mex script. See www.vlfeat.org for detailed
-# !! instructions.
+# builds VLFeat for Mac OS X Intel 64 bit. Pease
+# see http://www.vlfeat.org/compiling.html
+# for troubleshooting and details.
 #
 # Other useful variables are listed below (their default value is in
 # square brackets).
@@ -58,6 +52,18 @@
 #
 #   MKOCTFILE [not defined] - Path to Octave MKOCTFILE compiler. If undefined,
 #       Octave support is disabled.
+#
+# If defined to anything other than "no", the following falgs disable
+# specific features in the library. By defaults, all the features are
+# enabled.  If the makefile finds that the environment is unable to
+# support some of them, it may decide to disable them automatically
+# (in this case it will print a message).  This behaviour can be
+# overriden by defining the flag to be "no".
+#
+#   DISABLE_SSE2 - SSE2 vector instructions support.
+#   DISABLE_AVX - AVX vector instructions support.
+#   DISABLE_THREADS - Supprot for multithreded library client.
+#   DISABLE_OPENMP - OpenMP-based multithreaded computations.
 #
 # To completely remove all build products use
 #
@@ -154,9 +160,53 @@ STD_LDFLAGS = $(LDFLAGS)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Detect compiler
+COMPILER_VER_STRING=$(shell $(CC) --version)
+COMPILER=other
+
+ifeq "$(findstring gcc,$(COMPILER_VER_STRING))" "gcc"
+COMPILER:=gcc
+COMPILER_VER:=$(shell \
+$(CC) -dumpversion | \
+sed -e 's/\.\([0-9][0-9]\)/\1/g' \
+    -e 's/\.\([0-9]\)/0\1/g' \
+    -e 's/^[0-9]\{3,4\}$$/&00/' )
+endif
+
+ifeq "$(findstring clang,$(COMPILER_VER_STRING))" "clang"
+COMPILER:=clang
+COMPILER_VER:=$(shell \
+$(CC) --version | \
+sed -n -e 's/.*version *\([0-9.][0-9.]*\).*/\1/p' | \
+sed -e 's/\.\([0-9][0-9]\)/\1/g' \
+    -e 's/\.\([0-9]\)/0\1/g' \
+    -e 's/^[0-9]\{3,4\}$$/&00/' )
+endif
+
+$(info Detected compiler: $(COMPILER) $(COMPILER_VER))
+ifeq "$(COMPILER_VER)" "other"
+$(warning Unsupported compiler detected, use at your own risk!)
+endif
+
+ifeq "$(COMPILER)" "gcc"
+ifeq "$(shell expr $(COMPILER_VER) \<= 40702)" "1"
+ifneq "$(DISABLE_AVX)" "no"
+$(info GCC <= 4.2.0 detected, disabling AVX.)
+DISABLE_AVX=yes
+endif
+endif
+endif
+
+ifeq "$(COMPILER)" "clang"
+ifneq "$(DISABLE_OPENMP)" "no"
+$(info Clang does not support OpenMP yet, disabling.)
+DISABLE_OPENMP=yes
+endif
+endif
+
 # Mac OS X Intel
-ifeq ($(ARCH),$(filter $(ARCH),maci maci64))
-ifeq ($(ARCH),maci)
+ifeq "$(ARCH)" "$(filter $(ARCH),maci maci64)"
+ifeq "$(ARCH)" "maci"
 march=32
 else
 march=64
@@ -165,21 +215,11 @@ SDKROOT ?= $(shell xcrun -sdk macosx --show-sdk-path)
 MACOSX_DEPLOYMENT_TARGET ?= 10.4
 STD_CFLAGS += -m$(march) -isysroot $(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 STD_LDFLAGS += -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-CC ?= cc
-ifneq ($(shell $(CC) --version | grep clang),)
-$(info info: clang detected -- OpenMP not supported on this complier and hence disabled.)
-DISABLE_OPENMP = yes
-else
-ifndef DISABLE_AVX
-# AVX extensions require the clang assembler
-STD_CFLAGS += -Wa,-q
-endif
-endif
 endif
 
 # Linux
-ifeq ($(ARCH),$(filter $(ARCH),glnx86 glnxa64))
-ifeq ($(ARCH),glnx86)
+ifeq "$(ARCH)" "$(filter $(ARCH),glnx86 glnxa64)"
+ifeq "ARCH" "glnx86"
 march=32
 else
 march=64
@@ -189,8 +229,22 @@ endif
 # 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
 STD_CFLAGS += -m$(march) -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -m$(march) -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
-CC ?= gcc
 endif
+
+# Convert back DISALBE_*="no" flags to undefined flags
+ifeq "$(DISABLE_SSE2)" "no"
+undef DISABLE_SSE2
+endif
+ifeq "$(DISABLE_AVX)" "no"
+undef DISABLE_AVX
+endif
+ifeq "$(DISABLE_THREADS)" "no"
+undef DISABLE_THREADS
+endif
+ifeq "$(DISABLE_OPENMP)" "no"
+undef DISABLE_OPENMP
+endif
+
 
 # --------------------------------------------------------------------
 #                                                            Functions
@@ -292,6 +346,8 @@ info:
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
 	$(call echo-var,CC)
+	$(call echo-var,COMPILER)
+	$(call echo-var,COMPILER_VER)
 	$(call echo-var,STD_CFLAGS)
 	$(call echo-var,STD_LDFLAGS)
 	$(call echo-var,DISABLE_SSE2)
