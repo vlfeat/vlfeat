@@ -161,10 +161,10 @@ STD_LDFLAGS = $(LDFLAGS)
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Detect compiler
-COMPILER_VER_STRING=$(shell $(CC) --version)
-COMPILER=other
+COMPILER_VER_STRING:=$(shell $(CC) --version) $(shell $(CC) -v 2>&1)
+COMPILER:=other
 
-ifeq "$(findstring gcc,$(COMPILER_VER_STRING))" "gcc"
+ifneq ($(shell echo "$(COMPILER_VER_STRING)" | grep "gcc"),)
 COMPILER:=gcc
 COMPILER_VER:=$(shell \
 $(CC) -dumpversion | \
@@ -192,7 +192,7 @@ ifeq "$(COMPILER)" "gcc"
 ifeq "$(shell expr $(COMPILER_VER) \<= 40702)" "1"
 ifneq "$(DISABLE_AVX)" "no"
 $(info GCC <= 4.2.0 detected, disabling AVX.)
-DISABLE_AVX=yes
+DISABLE_AVX:=yes
 endif
 endif
 endif
@@ -200,7 +200,7 @@ endif
 ifeq "$(COMPILER)" "clang"
 ifneq "$(DISABLE_OPENMP)" "no"
 $(info Clang does not support OpenMP yet, disabling.)
-DISABLE_OPENMP=yes
+DISABLE_OPENMP:=yes
 endif
 endif
 
@@ -231,20 +231,19 @@ STD_CFLAGS += -m$(march) -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -m$(march) -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
-# Convert back DISALBE_*="no" flags to undefined flags
+# Convert back DISALBE_*="no" flags to be empty
 ifeq "$(DISABLE_SSE2)" "no"
-undef DISABLE_SSE2
+override DISABLE_SSE2:=
 endif
 ifeq "$(DISABLE_AVX)" "no"
-undef DISABLE_AVX
+override DISABLE_AVX:=
 endif
 ifeq "$(DISABLE_THREADS)" "no"
-undef DISABLE_THREADS
+override DISABLE_THREADS:=
 endif
 ifeq "$(DISABLE_OPENMP)" "no"
-undef DISABLE_OPENMP
+override DISABLE_OPENMP:=
 endif
-
 
 # --------------------------------------------------------------------
 #                                                            Functions
