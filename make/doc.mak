@@ -2,6 +2,7 @@
 # description: Makefile submodule to build the documentation
 # author: Andrea Vedaldi
 
+# Copyright (C) 2013-14 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -170,7 +171,7 @@ doc/build/man/xman.html : $(man_tgt) $(doc-dir)
 
 # Convert the various man pages
 doc/build/man/%.html : src/% $(doc-dir)
-	@$(print-command MAN2HTML, $@)
+	@echo MAN2HTML "$(@)"
 	@( \
 	  echo '<!DOCTYPE group PUBLIC ' ; \
 	  echo '  "-//W3C//DTD XHTML 1.0 Transitional//EN"' ; \
@@ -213,7 +214,7 @@ doc/build/figures/%.pdf doc/build/figures/%.aux doc/build/figures/%.log : \
 	$(call C,PDFLATEX) -shell-escape -interaction=batchmode -output-directory="$(dir $@)" "$<" 2>/dev/null
 
 doc/build/figures/%.tex : $(doc-dir)
-	@$(print-command GEN, $@)
+	@echo GEN "$(@)"
 	@/bin/echo '\documentclass[landscape]{article}'                 >$@
 	@/bin/echo '\usepackage[paper=a2paper,margin=0pt]{geometry}'	>>$@
 	@/bin/echo '\usepackage{graphicx,color}'			>>$@

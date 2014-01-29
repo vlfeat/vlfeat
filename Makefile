@@ -76,6 +76,7 @@
 # components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust parameters.
 
+# Copyright (C) 2014 Andrea Vedaldi.
 # Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -226,37 +227,17 @@ define echo-title
 @printf "** %s\n" "$(1)"
 endef
 
-# $(call print-command, CMD, TGT) prints a message
-define print-command
-@printf "%15s %s\n" "$(strip $(1))" "$(strip $(2))"
-endef
-
 # $(call C, CMD) runs $(CMD) silently
 define C
-@$(call print-command, $(1), "$(@)")
-@quiet ()                                                            \
-{                                                                    \
-    local cmd out err ;					             \
-    cmd="$($(1))";                                                   \
-    out=$$($${cmd} "$${@}" 2>&1) ;                                   \
-    err=$${?} ;                                                      \
-    if test $${err} -gt 0 ; then                                     \
-        echo "******* Offending Command:";                           \
-        printf "%s" "$${cmd}" ;                                      \
-	for i in "$${@}" ; do printf " '%s'" "$$i" ; done ;          \
-	echo ;                                                       \
-        echo "******* Error Code: $${err}";                          \
-	echo "******* Command Output:";                              \
-        echo "$${out}";                                              \
-    fi;                                                              \
-    echo "$${out}" | grep [Ww]arning ;                               \
-    return $${err};                                                  \
-} ; quiet
+@printf "%15s %s\n" "$(1)" "$(@)"
+$(Q)"$($(1))"
 endef
 
 # If verbose print everything
 ifdef VERB
-C = $($(1))
+Q=
+else
+Q=@
 endif
 
 # rule to create a directory
