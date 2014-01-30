@@ -1,6 +1,9 @@
 <!DOCTYPE site PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
  <head>
+  <!-- IE Standards Mode -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
   <!-- Favicon -->
   <link rel="icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
   <link rel="shortcut icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>

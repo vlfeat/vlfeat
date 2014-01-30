@@ -64,12 +64,11 @@ code a {
 
 #sidebar {
     width: 920px ;
-    padding: 0 ;
+    padding: 0 30px ;
     margin: 0 ;
     margin-left: auto ;
     margin-right: auto ;
     color: white ;
-//    background-color: #555 ;
     font-weight: bold ;
 }
 #sidebar a {
@@ -80,25 +79,18 @@ code a {
     margin: 0 ;
     padding: 0 ;
 }
+/* t r b l */
 #sidebar ul li {
     display: inline-block ;
     position: relative ;
     list-style-type: none ;
-    margin: 0em ;
-    margin-right: 11px ;
+    padding: 10px 15px 10px 15px ;
+    margin: 0px 11px 0px -15px ;
     font-size: 14px ;
     line-height: 14px ;
-    padding: 10px 15px 10px 0px ;
-}
-#sidebar ul li {
-    //background-color: green ;
-    margin-left: -15px ;
-    padding-left: 15px ;
 }
 #sidebar ul li.active {
     background-color: rgb(207,122,48) ;
-    margin-left: -15px ;
-    padding-left: 15px ;
 }
 #sidebar ul li ul {
     visibility: hidden ;
@@ -106,7 +98,6 @@ code a {
     top: 34px ;
     left: -1px ;
     width: 225px ;
- //   background-color: #555 ;
     background-color: #183a60 ;
 }
 #sidebar ul li ul li {
@@ -120,17 +111,6 @@ code a {
     top: -1px ;
     left: 223px ;
     width: 225px ;
-    background-color: #183a60 ;
-}
-#sidebar ul li ul li {
-    //background-color: green ;
-    margin: 0 ;
-    padding-left: 15px ;
-}
-#sidebar ul li ul li.active {
-    background-color: rgb(207,122,48) ;
-    margin: 0 ;
-    padding-left: 15px ;
 }
 #sidebar li:hover > ul {
     visibility: visible ;
@@ -144,10 +124,10 @@ code a {
     background-color: #183a60 ;
 }
 #header {
-    width: 920px ;
+    max-width: 920px ;
     margin-left: auto ;
     margin-right: auto ;
-    padding: 20px 1em ;
+    padding: 20px 30px ;
 }
 #header #cse-search-box {
     float: right ;
@@ -180,13 +160,13 @@ code a {
     border-bottom: 1px solid #DDD ;
 }
 #headbanner {
-    width: 920px ;
+    max-width: 920px ;
     margin-left: auto ;
     margin-right: auto ;
-    padding: 7px 1em ;
+    padding: 7px 30px ;
     color: #5a5a5a ;
     font-weight: bold ;
-    font-size: 15px ;
+    font-size: 14px ;
 }
 #headbanner a {
     text-decoration: inherit ! important ;
@@ -207,10 +187,10 @@ code a {
     background-color: white ;
 }
 #content-wrapper {
-    width: 920px ;
+    max-width: 920px ;
     margin-left: auto ;
     margin-right: auto ;
-    padding: 0 1em ;
+    padding: 0 30px ;
 }
 #content {
     overflow: hidden ;
@@ -321,8 +301,8 @@ code a {
 #content table.boxes {
     min-width: 100% ;
     border-collapse: separate ;
-    border-spacing: 4px ;
-/*    margin: -13px ; */
+    border-spacing: 10px ;
+    margin: -10px ;
     padding: 0em ;
     box-sizing:border-box ; /* avoids exceeding 100% width */
 }
