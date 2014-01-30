@@ -55,9 +55,9 @@ if nargin < 2
               results(i).exception.message) ;
     end
   end
+
+  fprintf('vl_test: %d tested, %d succeded, %d failed\n', ...
+          numel(results), sum([results.succeded]), sum(~[results.succeded])) ;
 else
   feval(str2func(sprintf('vl_test_%s', suite)), test) ;
 end
-
-fprintf('vl_test: %d tested, %d succeded, %d failed\n', ...
-        numel(results), sum([results.succeded]), sum(~[results.succeded])) ;
