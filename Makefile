@@ -176,8 +176,8 @@ endif
 ifeq "$(findstring clang,$(COMPILER_VER_STRING))" "clang"
 COMPILER:=clang
 COMPILER_VER:=$(shell \
-$(CC) --version | \
-sed -n -e 's/.*version *\([0-9.][0-9.]*\).*/\1/p' | \
+echo "$(COMPILER_VER_STRING)" | \
+sed -n -e 's/.*version *\([0-9.][0-9.]*\).*/\1/p;' | \
 sed -e 's/\.\([0-9][0-9]\)/\1/g' \
     -e 's/\.\([0-9]\)/0\1/g' \
     -e 's/^[0-9]\{3,4\}$$/&00/' )
