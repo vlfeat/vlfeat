@@ -20,6 +20,7 @@ root = vl_root ;
 demo_path = fullfile(root,'toolbox','demo') ;
 addpath(demo_path) ;
 
+vl_demo_frame ;
 vl_demo_covdet ;
 
 vl_demo_sift_basic ;
