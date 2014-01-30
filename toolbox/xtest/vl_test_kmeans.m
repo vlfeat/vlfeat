@@ -51,15 +51,15 @@ for dataType = dataTypes
 
     vl_assert_almost_equal(centers, centers_, 1e-5) ;
     vl_assert_almost_equal(assignments, assignments_, 1e-5) ;
-    vl_assert_almost_equal(en, en_, 1e-5) ;
+    vl_assert_almost_equal(en, en_, 1e-4) ;
 
     vl_assert_almost_equal(centers, centers__, 1e-5) ;
     vl_assert_almost_equal(assignments, assignments__, 1e-5) ;
-    vl_assert_almost_equal(en, en__, 1e-5) ;
+    vl_assert_almost_equal(en, en__, 1e-4) ;
 
     vl_assert_almost_equal(centers_, centers__, 1e-5) ;
     vl_assert_almost_equal(assignments_, assignments__, 1e-5) ;
-    vl_assert_almost_equal(en_, en__, 1e-5) ;
+    vl_assert_almost_equal(en_, en__, 1e-4) ;
   end
 end
 
