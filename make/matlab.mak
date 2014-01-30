@@ -103,6 +103,7 @@ MEX_FLAGS += LDFLAGS='\
 -Wl,-syslibroot,$(SDKROOT) \
 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
 -bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+$(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/) \
 $(call escape,$(STD_LDFLAGS))'
 endif
 
@@ -122,6 +123,7 @@ MEX_FLAGS += LDFLAGS='\
 -Wl,-syslibroot,$(SDKROOT) \
 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
 -bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+$(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/) \
 $(call escape,$(STD_LDFLAGS))'
 endif
 
