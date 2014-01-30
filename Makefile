@@ -189,9 +189,9 @@ $(warning Unsupported compiler detected, use at your own risk!)
 endif
 
 ifeq "$(COMPILER)" "gcc"
-ifeq "$(shell expr $(COMPILER_VER) \<= 40702)" "1"
+ifeq "$(shell expr $(COMPILER_VER) \<= 40600)" "1"
 ifneq "$(DISABLE_AVX)" "no"
-$(info GCC <= 4.2.0 detected, disabling AVX.)
+$(info GCC <= 4.6.0 detected, disabling AVX.)
 DISABLE_AVX:=yes
 endif
 endif
