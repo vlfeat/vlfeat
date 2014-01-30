@@ -247,6 +247,12 @@ mex-archclean: mex-clean
 mex-distclean:
 	rm -rf "toolbox/mex" ;
 
+mex-test: mex-all
+	cd toolbox ; \
+	$(MATLAB_EXE) \
+	    -$(ARCH) -nodesktop -nosplash \
+	    -r "clear mex;vl_setup test;r=vl_test();if(any(~[r.succeded])),disp('MEX testing failed');end;exit"
+
 # --------------------------------------------------------------------
 #                                                  Prefix-less M files
 # --------------------------------------------------------------------
