@@ -206,6 +206,7 @@ rsync-doc = \
 	      --group=lab                                            \
 	      --chmod=Dg+s,g+w,o-w                                   \
 	      --exclude=build                                        \
+	      --exclude=download                                     \
 	      --delete                                               \
 	      --progress                                             \
 
