@@ -581,12 +581,16 @@ class DocHtmlText(DocBareNode):
         # find occurences of %directive; in the text node and do the
         # appropriate substitutions
         next = 0
-        for m in re.finditer("%(\w+)(:.*)?;", self.text):
+        for m in re.finditer("%(\w+)(?::([-\w._#]+))?;", self.text):
             if next < m.start():
                 gen.putXMLString(self.text[next : m.start()])
             next = m.end()
             directive = self.text[m.start()+1 : m.end()-1]
             directive = m.group(1)
+            if m.group(2):
+                options = [x.strip().lower() for x in m.group(2).split(',')]
+            else:
+                options = []
 
             if directive == "content":
                 pageNode.publish(gen, pageNode)
@@ -606,13 +610,23 @@ class DocHtmlText(DocBareNode):
 
             elif directive == "path":
                 ancPages = [x for x in walkAncestors(pageNode, DocPage)]
+                plain=False
+                for option in options:
+                    if option=="plain":
+                        plain=True
+                    else:
+                        print "warning: ignoring unknown option '%s' while expanding 'path'" % option
                 if ancPages is not None:
                     for i,p in enumerate(reversed(ancPages)):
-                        if i > 0: gen.putString("<span class='separator'>></span>")
-                        gen.putString("<span class='page'><a href=")
-                        gen.putXMLAttr(
-                            pageNode.expandAttr("%%pathto:%s;" % p.getID(), pageNode))
-                        gen.putString(">%s</a></span>" % p.title)
+                        if plain:
+                            if i > 0: gen.putString(" > ")
+                            gen.putString(p.title)
+                        else:
+                            if i > 0: gen.putString("<span class='separator'>></span>")
+                            gen.putString("<span class='page'><a href=")
+                            gen.putXMLAttr(
+                                pageNode.expandAttr("%%pathto:%s;" % p.getID(), pageNode))
+                            gen.putString(">%s</a></span>" % p.title)
 
             elif directive == "navigation":
                 gen.putString("<ul>\n")
@@ -864,7 +878,7 @@ class DocPage(DocNode):
         if self.hide: return False
         active = (self in activePageNodes)
         if active:
-            activeLeaf = (activePageNodes.index(self) == len(activePageNodes)-1)
+            activeLeaf = (activePageNodes.index(self) == 0)#len(activePageNodes)-1)
         else:
             activeLeaf = False
         gen.putString("<li")
@@ -881,9 +895,10 @@ class DocPage(DocNode):
         # so we save the position of the generator.
         pos = gen.tell()
         gen.putString("<ul>\n")
-        notEmpty = False
         if active or full:
-            notEmpty = DocNode.publishIndex(self, gen, inPage, activePageNodes)
+            notEmpty = DocNode.publishIndex(self, gen, inPage, activePageNodes, full)
+        else:
+            notEmpty = False
         if notEmpty:
             gen.putString("</ul>")
         else:
