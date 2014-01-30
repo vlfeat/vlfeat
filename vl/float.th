@@ -1,9 +1,12 @@
 /** @file float.th
  ** @brief Float - Template
- ** @author Andrea Vedaldi, David Novotny
+ ** @author Andrea Vedaldi
+ ** @author David Novotny
  **/
 
 /*
+Copyright (C) 2014 Andrea Vedaldi.
+Copyright (C) 2013 David Novotny.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -18,24 +21,27 @@ the terms of the BSD license (see the COPYING file).
 #undef  VSIZE
 #undef  VSFX
 #undef  VTYPE
-
 #undef  VSIZEavx
 #undef  VSFXavx
 #undef  VTYPEavx
 
 #if (FLT == VL_TYPE_FLOAT)
-#  define T      float
-#  define SFX    f
+#  define T float
+#  define SFX f
 #elif (FLT == VL_TYPE_DOUBLE)
-#  define T      double
-#  define SFX    d
+#  define T double
+#  define SFX d
 #elif (FLT == VL_TYPE_UINT32)
-#  define T      vl_uint32
-#  define SFX    ui32
+#  define T vl_uint32
+#  define SFX ui32
 #elif (FLT == VL_TYPE_INT32)
-#  define T      vl_int32
-#  define SFX    i32
+#  define T vl_int32
+#  define SFX i32
 #endif
+
+/* ---------------------------------------------------------------- */
+/*                                                              AVX */
+/* ---------------------------------------------------------------- */
 
 #ifdef __AVX__
 
@@ -66,10 +72,15 @@ the terms of the BSD license (see the COPYING file).
 #define VPERMavx VL_XCAT(_mm256_permute2f128_p,  VSFX)
 //#define VCSTavx VL_XCAT( _mm256_castps256_ps128,  VSFX)
 #define VCSTavx  VL_XCAT5(_mm256_castp,VSFX,256_p,VSFX,128)
+
 /* __AVX__ */
 #endif
 
-#ifdef  __SSE2__
+/* ---------------------------------------------------------------- */
+/*                                                             SSE2 */
+/* ---------------------------------------------------------------- */
+
+#ifdef __SSE2__
 
 #if (FLT == VL_TYPE_FLOAT)
 #  define VSIZE  4

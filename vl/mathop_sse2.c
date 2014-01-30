@@ -31,6 +31,10 @@ the terms of the BSD license (see the COPYING file).
 #else
 #ifndef VL_DISABLE_SSE2
 
+#ifndef __SSE2__
+#error Compiling SSE2 functions but SSE2 does not to be supported by the compiler.
+#endif
+
 #include <emmintrin.h>
 #include "mathop.h"
 #include "generic.h"

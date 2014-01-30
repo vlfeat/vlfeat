@@ -35,11 +35,6 @@ the terms of the BSD license (see the COPYING file).
 #else
 
 #ifndef VL_DISABLE_AVX
-
-#ifndef __AVX__
-#warning Compiling AVX functions but AVX does not seem to be defined in the compiler
-#endif
-
 #include "generic.h"
 #include "float.th"
 

@@ -31,6 +31,10 @@ the terms of the BSD license (see the COPYING file).
 #else
 #ifndef VL_DISABLE_AVX
 
+#ifndef __AVX__
+#error Compiling AVX functions but AVX does not seem to be supported by the compiler.
+#endif
+
 #include <immintrin.h>
 #include "generic.h"
 #include "mathop.h"
