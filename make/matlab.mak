@@ -79,7 +79,7 @@ escape =$(subst $$,\\$$,$(1))
 
 MEX_ARCH = $(ARCH)
 MEX_CFLAGS = $(LINK_DLL_CFLAGS) -Itoolbox
-MEX_LDFLAGS = $(LINK_DLL_LDFLAGS) -lm
+MEX_LDFLAGS = $(subst bin/$(ARCH),toolbox/mex/$(MEX_SUFFIX),$(LINK_DLL_LDFLAGS)) -lm
 MEX_FLAGS = \
 $(MEXFLAGS) \
 -$(MEX_ARCH) \
@@ -221,7 +221,7 @@ $(MEX_BINDIR)/%.d : %.c $(mex-dir)
 	    -I"$(MATLAB_PATH)/extern/include"					\
 	    $(MEX_CFLAGS) "$(<)"
 
-$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir)
+$(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
 	$(call C,MEX)								\
 	    $(MEX_FLAGS)							\
 	    $(MEX_CFLAGS)							\
