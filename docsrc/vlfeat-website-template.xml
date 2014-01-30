@@ -9,7 +9,7 @@
   <link rel="shortcut icon" href="%pathto:root;images/vl_blue.ico" type="image/x-icon"/>
 
   <!-- Page title -->
-  <title>VLFeat - %path;</title>
+  <title>VLFeat - %path:plain;</title>
 
   <!-- Stylesheets -->
   <link href="%pathto:root;vlfeat.css" rel="stylesheet" type="text/css"/>
