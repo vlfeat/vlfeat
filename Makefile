@@ -219,7 +219,7 @@ endif
 
 # Linux
 ifeq "$(ARCH)" "$(filter $(ARCH),glnx86 glnxa64)"
-ifeq "ARCH" "glnx86"
+ifeq "$(ARCH)" "glnx86"
 march=32
 else
 march=64
