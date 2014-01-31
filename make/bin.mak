@@ -66,7 +66,7 @@ comm_bins +=
 no_dep_targets += bin-dir bin-clean bin-archclean bin-distclean
 no_dep_targets += bin-info
 
-bin-all: $(dll-dir) $(dll_tgt) $(bin_tgt)
+bin-all: $(dll-dir) $(bin_tgt)
 
 # BIN_LDFLAGS includes the libraries to link to and must be
 # specified after the object "$<" that uses them. If not, stricter
@@ -74,7 +74,7 @@ bin-all: $(dll-dir) $(dll_tgt) $(bin_tgt)
 # will break as they will not include the dependencies. See
 # also http://wiki.debian.org/ToolChain/DSOLinking
 
-$(BINDIR)/% : $(VLDIR)/src/%.c
+$(BINDIR)/% : $(VLDIR)/src/%.c $(dll_tgt)
 	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$@"
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)

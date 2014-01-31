@@ -294,9 +294,9 @@ matlab-all: matlab-noprefix
 # generate matlab-noprefix-dir target
 $(eval $(call gendir, matlab-noprefix, toolbox/noprefix))
 
-matlab-noprefix: $(matlab-noprefix-dir) $(m_lnk)
+matlab-noprefix: $(m_lnk)
 
-toolbox/noprefix/%.m : vl_%.m
+toolbox/noprefix/%.m : vl_%.m $(matlab-noprefix-dir)
 	@upperName=`echo "$*" | tr [a-z]  [A-Z]` ;              \
 	echo "function varargout = $*(varargin)" > "$@" ;       \
 	cat "$<" | sed -n -e '/^function/b' -e '/^%.*$$/p'      \
