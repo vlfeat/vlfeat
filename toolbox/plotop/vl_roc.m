@@ -4,7 +4,7 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %   Characteristic (ROC) curve. LABELS are the ground truth labels,
 %   greather than zero for a positive sample and smaller than zero for
 %   a negative one. SCORES are the scores of the samples obtained from
-%   a classifier, where lager scores should correspond to positive
+%   a classifier, where larger scores should correspond to positive
 %   labels.
 %
 %   Samples are ranked by decreasing scores, starting from rank 1.
@@ -15,7 +15,7 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %   positive. Similarly, TPR(1) is the true positive rate when no
 %   samples are predicted to be positive, i.e. the constant 0.
 %
-%   Set the zero the lables of samples that should be ignored in the
+%   Set to zero the labels of samples that should be ignored in the
 %   evaluation. Set to -INF the scores of samples which are not
 %   retrieved. If there are samples with -INF score, then the ROC curve
 %   may have maximum TPR and TNR smaller than 1.
