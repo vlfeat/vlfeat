@@ -95,7 +95,7 @@ VlEnumerator vlCovDetDescriptorTypes [VL_COVDET_DESC_NUM] =
 
 /** ------------------------------------------------------------------
  ** @brief Export scale space into a MATLAB structure
- ** @param ss Pointer to the scale space to be xported
+ ** @param ss Pointer to the scale space to be exported
  ** @return Pointer to matlab structure with the scale space
  **/
 static mxArray *
@@ -148,12 +148,12 @@ _createArrayFromScaleSpace(VlScaleSpace const *ss)
 }
 
 /** ------------------------------------------------------------------
- ** @internal @brief Transpose desriptor
+ ** @internal @brief Transpose descriptor
  ** @param dst destination buffer.
  ** @param src source buffer.
  **
  ** The function writes to @a dst the transpose of the SIFT descriptor
- ** @a src. The tranpsose is defined as the descriptor that one
+ ** @a src. The transpose is defined as the descriptor that one
  ** obtains from computing the normal descriptor on the transposed
  ** image.
  **/
@@ -446,7 +446,7 @@ mexFunction(int nout, mxArray *out[],
     /* process the image */
     vl_covdet_put_image(covdet, image, numRows, numCols) ;
 
-    /* fill with frames: eitehr run the detector of poure them in */
+    /* fill with frames: either run the detector of poure them in */
     if (numUserFrames > 0) {
       vl_index k ;
 
@@ -596,7 +596,7 @@ mexFunction(int nout, mxArray *out[],
 
       numFeaturesAfter = vl_covdet_get_num_features(covdet) ;
       if (verbose && numFeaturesAfter > numFeaturesBefore) {
-        mexPrintf("vl_covdet: %d duplicate features were crated due to ambiguous "
+        mexPrintf("vl_covdet: %d duplicate features were created due to ambiguous "
                   "orientation detection (%d total)\n",
                   numFeaturesAfter - numFeaturesBefore, numFeaturesAfter) ;
       }
@@ -696,8 +696,8 @@ mexFunction(int nout, mxArray *out[],
              However, if NBO is not divisible by 4, then the configuration
              of the SIFT orientations is not symmetric by rotations of pi/2.
              Hence the only option is to rotate the descriptor further by
-             an angle we need to compute the descriptor rotaed by an additional pi/2
-             angle. In this manner, x concides and y is flipped.
+             an angle we need to compute the descriptor rotated by an additional pi/2
+             angle. In this manner, x coincides and y is flipped.
              */
             vl_sift_calc_raw_descriptor (sift,
                                          patchXY,

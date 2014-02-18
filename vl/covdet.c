@@ -2205,7 +2205,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
-   This can be obtained by scanning octaves from smalles to largest
+   This can be obtained by scanning octaves from smallest to largest
    and stopping when no level in the octave satisfies the relation.
 
    Given the range of octave availables, do the best you can.
@@ -2260,7 +2260,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
      Warp the patch domain [x0hat,y0hat,x1hat,y1hat] to the image domain/
      Obtain a box [x0,y0,x1,y1] enclosing that wrapped box, and then
      an integer vertexes version [x0i, y0i, x1i, y1i], making room
-     for one pixel at the boundaty to simplify bilinear interpolation
+     for one pixel at the boundary to simplify bilinear interpolation
      later on.
      */
     vl_index x0i, y0i, x1i, y1i ;
@@ -2410,7 +2410,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
  ** The function considers a patch of extent <code>[-extent,extent]</code>
  ** on each side, with a side counting <code>2*resolution+1</code> pixels.
  ** In attempts to extract from the scale space a patch
- ** baed on the affine warping specified by @a frame in such a way
+ ** based on the affine warping specified by @a frame in such a way
  ** that the resulting smoothing of the image is @a sigma (in the
  ** patch frame).
  **
@@ -2829,7 +2829,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
     }
   }
 
-  /* sort the oritentations by decreasing scores */
+  /* sort the orientations by decreasing scores */
   qsort(self->orientations,
         *numOrientations,
         sizeof(VlCovDetFeatureOrientation),
