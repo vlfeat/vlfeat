@@ -8,7 +8,7 @@
 %   VL_LIOP() accepts the following options:
 %
 %   NumNeighbours:: 4
-%     Set the number of neighbours sampled to consruct the orer
+%     Set the number of neighbours sampled to construct the order
 %     pattern of each image pixel.
 %
 %   Radius:: 5
