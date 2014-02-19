@@ -2824,7 +2824,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
     }
   }
 
-  /* sort the oritentations by decreasing scores */
+  /* sort the orientations by decreasing scores */
   qsort(self->orientations,
         *numOrientations,
         sizeof(VlCovDetFeatureOrientation),
