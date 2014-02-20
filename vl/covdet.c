@@ -2405,7 +2405,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
  ** The function considers a patch of extent <code>[-extent,extent]</code>
  ** on each side, with a side counting <code>2*resolution+1</code> pixels.
  ** In attempts to extract from the scale space a patch
- ** baed on the affine warping specified by @a frame in such a way
+ ** based on the affine warping specified by @a frame in such a way
  ** that the resulting smoothing of the image is @a sigma (in the
  ** patch frame).
  **
