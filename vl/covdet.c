@@ -2200,7 +2200,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
   /*
    Determine the best level (o,s) such that sigma_(o,s) factor <= sigma.
-   This can be obtained by scanning octaves from smalles to largest
+   This can be obtained by scanning octaves from smallest to largest
    and stopping when no level in the octave satisfies the relation.
 
    Given the range of octave availables, do the best you can.
