@@ -2255,7 +2255,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
      Warp the patch domain [x0hat,y0hat,x1hat,y1hat] to the image domain/
      Obtain a box [x0,y0,x1,y1] enclosing that wrapped box, and then
      an integer vertexes version [x0i, y0i, x1i, y1i], making room
-     for one pixel at the boundaty to simplify bilinear interpolation
+     for one pixel at the boundary to simplify bilinear interpolation
      later on.
      */
     vl_index x0i, y0i, x1i, y1i ;
