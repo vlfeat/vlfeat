@@ -555,10 +555,8 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
 
         vl_mser_pix nr_val = 0 ;
         vl_uint     nr_idx = 0 ;
-        int         hgt   = r [ r_idx] .height ;
-        int         n_hgt = r [nr_idx] .height ;
 
-        /*
+         /*
           Now we join the two subtrees rooted at
 
            R_IDX = ROOT(  IDX)
@@ -567,10 +565,13 @@ vl_mser_process (VlMserFilt* f, vl_mser_pix const* im)
           Note that R_IDX = ROOT(IDX) might change as we process more
           neighbors, so we need keep updating it.
         */
-
          r_idx = climb(r,   idx) ;
         nr_idx = climb(r, n_idx) ;
 
+        int         hgt   = r [ r_idx] .height ;
+        int         n_hgt = r [nr_idx] .height ;
+
+       
         /*
           At this point we have three possibilities:
 
