@@ -1,42 +1,48 @@
 function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %VL_ROC   ROC curve.
 %   [TPR,TNR] = VL_ROC(LABELS, SCORES) computes the Receiver Operating
-%   Characteristic (ROC) curve. LABELS are the ground truth labels,
-%   greather than zero for a positive sample and smaller than zero for
-%   a negative one. SCORES are the scores of the samples obtained from
-%   a classifier, where lager scores should correspond to positive
-%   labels.
+%   Characteristic (ROC) curve [1]. LABELS is a row vector of ground
+%   truth labels, greater than zero for a positive sample and smaller
+%   than zero for a negative one. SCORES is a row vector of
+%   corresponding sample scores, usually obtained from a
+%   classifier. The scores induce a ranking of the samples where
+%   larger scores should correspond to positive labels.
 %
-%   Samples are ranked by decreasing scores, starting from rank 1.
-%   TPR(K) and TNR(K) are the true positive and true negative rates
-%   when samples of rank smaller or equal to K-1 are predicted to be
-%   positive. So for example TPR(3) is the true positive rate when the
-%   two samples with largest score are predicted to be
-%   positive. Similarly, TPR(1) is the true positive rate when no
-%   samples are predicted to be positive, i.e. the constant 0.
+%   Without output arguments, the function plots the ROC graph of the
+%   specified data in the current graphical axis.
 %
-%   Set the zero the lables of samples that should be ignored in the
-%   evaluation. Set to -INF the scores of samples which are not
-%   retrieved. If there are samples with -INF score, then the ROC curve
-%   may have maximum TPR and TNR smaller than 1.
+%   Otherwise, the function returns the true positive and true
+%   negative rates TPR and TNR. These are vectors of the same size of
+%   LABELS and SCORES and are computed as follows. Samples are ranked
+%   by decreasing scores, starting from rank 1. TPR(K) and TNR(K) are
+%   the true positive and true negative rates when samples of rank
+%   smaller or equal to K-1 are predicted to be positive. So for
+%   example TPR(3) is the true positive rate when the two samples with
+%   largest score are predicted to be positive. Similarly, TPR(1) is
+%   the true positive rate when no samples are predicted to be
+%   positive, i.e. the constant 0.
+%
+%   Setting a label to zero ignores the corresponding sample in the
+%   calculations, as if the sample was removed from the data. Setting
+%   the score of a sample to -INF causes the function to assume that
+%   that sample was never retrieved. If there are samples with -INF
+%   score, the ROC curve is incomplete as the maximum recall is less
+%   than 1.
 %
 %   [TPR,TNR,INFO] = VL_ROC(...) returns an additional structure INFO
 %   with the following fields:
 %
 %   info.auc:: Area under the ROC curve (AUC).
-%     The ROC curve has a `staircase shape' because for each sample
-%     only TP or TN changes, but not both at the same time. Therefore
-%     there is no approximation involved in the computation of the
-%     area.
+%     This is the area under the ROC plot, the parametric curve
+%     (FPR(S), TPR(S)). The PLOT option can be used to plot variants
+%     of this curve, which affects the calculation of a corresponding
+%     AUC.
 %
 %   info.eer:: Equal error rate (EER).
 %     The equal error rate is the value of FPR (or FNR) when the ROC
 %     curves intersects the line connecting (0,0) to (1,1).
 %
-%   VL_ROC(...) with no output arguments plots the ROC curve in the
-%   current axis.
-%
-%   VL_ROC() acccepts the following options:
+%   VL_ROC() accepts the following options:
 %
 %   Plot:: []
 %     Setting this option turns on plotting unconditionally. The
@@ -45,18 +51,24 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %     tntp:: Plot TPR against TNR (standard ROC plot).
 %     tptn:: Plot TNR against TPR (recall on the horizontal axis).
 %     fptp:: Plot TPR against FPR.
-%     fpfn:: Plot FNR against FPR (similar to DET curve).
+%     fpfn:: Plot FNR against FPR (similar to a DET curve).
+%
+%     Note that this option will affect the INFO.AUC value computation
+%     too.
 %
 %   NumPositives:: []
 %   NumNegatives:: []
-%     If set to a number, pretend that LABELS contains this may
+%     If either of these parameters is set to a number, the function
+%     pretends that LABELS contains the specified number of
 %     positive/negative labels. NUMPOSITIVES/NUMNEGATIVES cannot be
-%     smaller than the actual number of positive/negative entrires in
+%     smaller than the actual number of positive/negative entries in
 %     LABELS. The additional positive/negative labels are appended to
-%     the end of the sequence, as if they had -INF scores (not
-%     retrieved). This is useful to evaluate large retrieval systems in
-%     which one stores ony a handful of top results for efficiency
-%     reasons.
+%     the end of the sequence as if they had -INF scores (as explained
+%     above, the function interprets such samples as `not
+%     retrieved'). This feature can be used to evaluate the
+%     performance of a large-scale retrieval experiment in which only
+%     a subset of highly-scoring results are recorded for efficiency
+%     reason.
 %
 %   About the ROC curve::
 %     Consider a classifier that predicts as positive all samples whose
@@ -79,14 +91,14 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %       TPR = TP(S) / P,      FNR = FN(S) / P,
 %       TNR = TN(S) / N,      FPR = FP(S) / N,
 %
-%     and notice that by definition
+%     and notice that, by definition,
 %
 %       P = TP(S) + FN(S) ,    N = TN(S) + FP(S),
 %       1 = TPR(S) + FNR(S),   1 = TNR(S) + FPR(S).
 %
-%     The ROC curve is the parametric curve (TPR(S), TNR(S)) obtained
+%     The ROC curve is the parametric curve (FPR(S), TPR(S)) obtained
 %     as the classifier threshold S is varied in the reals. The TPR is
-%     also known as recall (see VL_PR()).
+%     the same as `recall' in a PR curve (see VL_PR()).
 %
 %     The ROC curve is contained in the square with vertices (0,0) The
 %     (average) ROC curve of a random classifier is a line which
@@ -118,30 +130,40 @@ fpr = fp / max(n, small) ;
 fnr = 1 - tpr ;
 tnr = 1 - fpr ;
 
+do_plots = ~isempty(opts.plot) || nargout == 0 ;
+if isempty(opts.plot), opts.plot = 'fptp' ; end
+
 % --------------------------------------------------------------------
 %                                                      Additional info
 % --------------------------------------------------------------------
 
-if nargout > 2 || nargout == 0
+if nargout > 2 || do_plots
   % Area under the curve. Since the curve is a staircase (in the
   % sense that for each sample either tn is decremented by one
   % or tp is incremented by one but the other remains fixed),
   % the integral is particularly simple and exact.
 
-  info.auc = sum(tnr .* diff([0 tpr])) ;
+  switch opts.plot
+    case 'tntp', info.auc = -sum(tpr .* diff([0 tnr])) ;
+    case 'fptp', info.auc = +sum(tpr .* diff([0 fpr])) ;
+    case 'tptn', info.auc = +sum(tnr .* diff([0 tpr])) ;
+    case 'fpfn', info.auc = +sum(fnr .* diff([0 fpr])) ;
+    otherwise
+      error('''%s'' is not a valid PLOT type.', opts.plot);
+  end
 
-  % Equal error rate. One must find the index S for which there is a
-  % crossing between TNR(S) and TPR(s). If such a crossing exists,
-  % there are two cases:
+  % Equal error rate. One must find the index S in correspondence of
+  % which TNR(S) and TPR(s) cross. Note that TPR(S) is non-decreasing,
+  % TNR(S) is non-increasing, and from rank S to rank S+1 only one of
+  % the two quantities can change. Hence there are exactly two types
+  % of crossing points:
   %
-  %                  o             tnr o
-  %                 /                   \
-  % 1-eer =  tnr o-x-o     1-eer = tpr o-x-o
-  %               /                       \
-  %          tpr o                         o
+  %  1) TNR(S) = TNR(S+1) = EER and TPR(S) <= EER, TPR(S+1) > EER,
+  %  2) TPR(S) = TPR(S+1) = EER and TNR(S) > EER, TNR(S+1) <= EER.
   %
   % Moreover, if the maximum TPR is smaller than 1, then it is
-  % possible that neither of the two cases realizes (then EER=NaN).
+  % possible that neither of the two cases realizes. In the latter
+  % case, we return EER=NaN.
 
   s = max(find(tnr > tpr)) ;
   if s == length(tpr)
@@ -159,11 +181,10 @@ end
 %                                                                 Plot
 % --------------------------------------------------------------------
 
-if ~isempty(opts.plot) || nargout == 0
-  if isempty(opts.plot), opts.plot = 'fptp' ; end
+if do_plots
   cla ; hold on ;
   switch lower(opts.plot)
-    case {'truenegatives', 'tn', 'tntp'}
+    case 'tntp'
       hroc = plot(tnr, tpr, 'b', 'linewidth', 2) ;
       hrand = spline([0 1], [1 0], 'r--', 'linewidth', 2) ;
       spline([0 1], [0 1], 'k--', 'linewidth', 1) ;
@@ -172,7 +193,7 @@ if ~isempty(opts.plot) || nargout == 0
       ylabel('true positive rate (recall)') ;
       loc = 'sw' ;
 
-    case {'falsepositives', 'fp', 'fptp'}
+    case 'fptp'
       hroc = plot(fpr, tpr, 'b', 'linewidth', 2) ;
       hrand = spline([0 1], [0 1], 'r--', 'linewidth', 2) ;
       spline([1 0], [0 1], 'k--', 'linewidth', 1) ;
@@ -181,7 +202,7 @@ if ~isempty(opts.plot) || nargout == 0
       ylabel('true positive rate (recall)') ;
       loc = 'se' ;
 
-    case {'tptn'}
+    case 'tptn'
       hroc = plot(tpr, tnr, 'b', 'linewidth', 2) ;
       hrand = spline([0 1], [1 0], 'r--', 'linewidth', 2) ;
       spline([0 1], [0 1], 'k--', 'linewidth', 1) ;
@@ -190,7 +211,7 @@ if ~isempty(opts.plot) || nargout == 0
       ylabel('false positive rate') ;
       loc = 'sw' ;
 
-    case {'fpfn'}
+    case 'fpfn'
       hroc = plot(fpr, fnr, 'b', 'linewidth', 2) ;
       hrand = spline([0 1], [1 0], 'r--', 'linewidth', 2) ;
       spline([0 1], [0 1], 'k--', 'linewidth', 1) ;
