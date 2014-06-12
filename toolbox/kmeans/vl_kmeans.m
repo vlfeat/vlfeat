@@ -48,6 +48,10 @@
 %     Maximum number of sample-to-center comparisons when searching
 %     for the closest center.
 %
+%   MaxNumIterations:: [100]
+%     Maximum number of iterations allowed for the kmeans algorithm
+%     to converge.
+%
 %   Example::
 %     VL_KMEANS(X, 10, 'verbose', 'distance', 'l1', 'algorithm',
 %     'elkan') clusters the data point X using 10 centers, l1
