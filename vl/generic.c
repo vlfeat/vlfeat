@@ -149,7 +149,7 @@ This page summarizes some of the conventions used by the library.
 @section conventions-storage Matrix and image storage conventions
 
 If not otherwise specified, matrices in VLFeat are stored in memory in
-<em>column major</em> order. Givean a matrix $[A_{ij}] \in \real^{m
+<em>column major</em> order. Given a matrix $[A_{ij}] \in \real^{m
 \times n}$, this amounts of enumerating the elements one column per
 time: $A_{11}, A_{21}, \dots, A_{m1}, A_{12}, \dots, A_{mn}$. This
 convention is compatible with Fortran, MATLAB, and popular numerical
@@ -205,7 +205,7 @@ start with the <code>vl_<object_name>_</code> suffix
 @section objects-lifecycle Object lifecycle
 <!-- ------------------------------------------------------------  -->
 
-Conceptually, an object undergoes four phases during its lifecylce:
+Conceptually, an object undergoes four phases during its lifecycle:
 allocation, initialization, finalization, and deallocation:
 
 - **Allocation.** The memory to hold the object structure is allocated.
@@ -289,11 +289,11 @@ an exception). Because of the restrictions of the library design
 illustrated in @ref resources, this operation is safe and
 correctly dispose of VLFeat local state. As a consequence, it is
 possible to call @c mexErrMsgTxt at any point in the MEX function
-without worring about leaking resources.
+without worrying about leaking resources.
 
 This however comes at the price of some limitations. Beyond the
-restrictions illustred in @ref resources, here we note that no
-VLFeat local resoruce (memory blocks or objects) can persist across
+restrictions illustrated in @ref resources, here we note that no
+VLFeat local resource (memory blocks or objects) can persist across
 MEX file invocations. This implies that any result produced by a
 VLFeat MEX function must be converted back to a MATLAB object such as
 a vector or a structure. In particular, there is no direct way of
@@ -307,7 +307,7 @@ passing it again to another MEX file.
 @author Andrea Vedaldi
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
-Part of VLFeat code uses a simple form of perprocessor metaprogramming.
+Part of VLFeat code uses a simple form of preprocessor metaprogramming.
 This technique is used, similarly to C++ templates, to instantiate
 multiple version of a given algorithm for different data types
 (e.g. @c float and @c double).
@@ -485,7 +485,7 @@ library module, usually corresponding to a certain header file.
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 
 A library module groups a number of data types and functions that
-implement a certain functionaltiy of VLFeat. The documentation of a
+implement a certain functionality of VLFeat. The documentation of a
 library module is generally organized as follows:
 
 1. A page introducing the module and including a getting started
@@ -520,7 +520,7 @@ has an heading of the type:
 
 @verbinclude example-module-doc.c
 
-This is similar to the declearation file, except for the content of the
+This is similar to the declaration file, except for the content of the
 brief comment.
 </li>
 </ul>
@@ -1062,7 +1062,7 @@ vl_get_num_cpus (void)
  ** @param x @c true if SIMD instructions are used.
  **
  ** Notice that SIMD instructions are used only if the CPU model
- ** supports them. Note alsoc that data alignment may restrict the use
+ ** supports them. Note also that data alignment may restrict the use
  ** of such instructions.
  **
  ** @see ::vl_cpu_has_sse2(), ::vl_cpu_has_sse3(), etc.
@@ -1227,7 +1227,7 @@ vl_set_num_threads (vl_size numThreads VL_UNUSED) { }
  ** The function sets the code and optionally the error message
  ** of the last encountered error. @a errorMessage is the message
  ** format. It uses the @c printf convention and is followed by
- ** the format arguments. The maximum lenght of the error message is
+ ** the format arguments. The maximum length of the error message is
  ** given by ::VL_ERR_MSG_LEN (longer messages are truncated).
  **
  ** Passing @c NULL as @a errorMessage
@@ -1453,7 +1453,7 @@ vl_toc (void)
  ** @return random number generator.
  **
  ** The function returns a pointer to the default
- ** random number genrator.
+ ** random number generator.
  ** There is one such generator per thread.
  **/
 
@@ -1507,7 +1507,7 @@ vl_thread_specific_state_delete (VlThreadState * self)
 /* ---------------------------------------------------------------- */
 /*                                        DLL entry and exit points */
 /* ---------------------------------------------------------------- */
-/* A constructor and a destructor must be called to initalize or dispose of VLFeat
+/* A constructor and a destructor must be called to initialize or dispose of VLFeat
  * state when the DLL is loaded or unloaded. This is obtained
  * in different ways depending on the operating system.
  */
