@@ -8,7 +8,7 @@
 %   VL_LIOP() accepts the following options:
 %
 %   NumNeighbours:: 4
-%     Set the number of neighbours sampled to consruct the orer
+%     Set the number of neighbours sampled to construct the order
 %     pattern of each image pixel.
 %
 %   Radius:: 5
@@ -20,10 +20,10 @@
 %     has dimension factorial(NumNeighbours) * NumSpatialBins.
 %
 %   IntensityThreshold:: -0.02
-%     Set the intensity threshold used to weight oder patterns as they
+%     Set the intensity threshold used to weight order patterns as they
 %     are pooled into a histogram. A negative value is interpreted
 %     as a fraction of the difference between the maximum and minimum
-%     intesity in each local patch.
+%     intensity in each local patch.
 %
 %   Verbose::
 %     If specified, be verbose
