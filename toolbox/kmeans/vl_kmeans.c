@@ -269,7 +269,6 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
   vl_kmeans_set_num_trees (kmeans, numTrees);
   
   if (minEnergyVariation >= 0) {
-    mexPrintf("%f\n\n\n",minEnergyVariation);
     vl_kmeans_set_min_energy_variation (kmeans, minEnergyVariation) ;
   }
 
