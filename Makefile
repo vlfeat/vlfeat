@@ -272,17 +272,17 @@ endif
 # $(call echo-var,VAR) pretty-prints the content of a variable VAR on
 # one line
 define echo-var
-@printf "%15s = %s\n" "$(1)" "$($(1))"
+@printf "%15s = %s\n" '$(1)' '$($(1))'
 endef
 
 # $(call echo-title,TITLE) pretty-prints TITLE as a title
 define echo-title
-@printf "** %s\n" "$(1)"
+@printf "** %s\n" '$(1)'
 endef
 
 # $(call C, CMD) runs $(CMD) silently
 define C
-@printf "%15s %s\n" "$(1)" "$(@)"
+@printf "%15s %s\n" '$(1)' '$(@)'
 $(Q)"$($(1))"
 endef
 
