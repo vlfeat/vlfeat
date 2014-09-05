@@ -71,7 +71,7 @@ vl_kmeans_quantize(kmeans,indexes,dataToEncode,numDataToEncode);
 assignments = vl_malloc(sizeof(float) * numDataToEncode * numCenters);
 memset(assignments, 0, sizeof(float) * numDataToEncode * numCenters);
 for(i = 0; i < numDataToEncode; i++) {
-  assignments[i + numDataToEncode * indexes[i]] = 1.;
+  assignments[i + numCenters * indexes[i]] = 1.;
 }
 
 // allocate space for vlad encoding
