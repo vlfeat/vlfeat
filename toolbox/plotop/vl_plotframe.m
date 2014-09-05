@@ -17,7 +17,7 @@ function h = vl_plotframe(frames,varargin)
 %    center of the circle, FRAME(3) is the radius, and FRAME(4) is the
 %    orientation, expressed as a rotation in radians of the standard
 %    oriented frame (see below). Positive rotations appear clockwise
-%    since the image coordiante system is left-handed.
+%    since the image coordinate system is left-handed.
 %
 %  Ellipse::
 %    FRAME has 5 components. FRAME(1:2) are the x,y coordiantes of the
@@ -34,7 +34,8 @@ function h = vl_plotframe(frames,varargin)
 %
 %  A standard unoriented frame is a circle of unit radius centered at
 %  the origin; a standard oriented frame is the same, but marked with
-%  a radius pointing towards the positive Y axis (downwards) to
+%  a radius pointing towards the positive Y axis (i.e. downwards
+%  according to the standard MATLAB image reference frame) to
 %  represent the frame orientation. All other frames can be obtained
 %  as affine transformations of these two. In the case of unoriented
 %  frames, this transformation is ambiguous up to a rotation.
