@@ -71,6 +71,9 @@ typedef struct
             ((PROMOTE_##MXC) L1_pt[bin]) -                              \
             ((PROMOTE_##MXC) L2_pt[bin]) ;                              \
           acc += delta*delta ;                                          \
+          if (acc >= second_best) {                                     \
+            break ;                                                     \
+          }                                                             \
         }                                                               \
                                                                         \
         /* Filter the best and second best matching point. */           \
@@ -115,9 +118,9 @@ mexFunction(int nout, mxArray *out[],
   enum {L1=0,L2,THRESH} ;
   enum {MATCHES=0,D} ;
 
-  /* ------------------------------------------------------------------
-  **                                                Check the arguments
-  ** --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+  **                                               Check the arguments
+  ** -------------------------------------------------------------- */
   if (nin < 2) {
     mexErrMsgTxt("At least two input arguments required");
   } else if (nout > 2) {
@@ -156,9 +159,9 @@ mexFunction(int nout, mxArray *out[],
     mexErrMsgTxt("At most three arguments are allowed") ;
   }
 
-  /* ------------------------------------------------------------------
-  **                                                         Do the job
-  ** --------------------------------------------------------------- */
+  /* -----------------------------------------------------------------
+  **                                                        Do the job
+  ** -------------------------------------------------------------- */
   {
     Pair* pairs_begin = (Pair*) mxMalloc(sizeof(Pair) * (K1+K2)) ;
     Pair* pairs_iterator = pairs_begin ;
