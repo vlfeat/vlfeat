@@ -136,7 +136,7 @@ VL_EXPORT vl_size vl_gmm_get_dimension (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_data (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_clusters (VlGMM const * self);
-VL_EXPORT double vl_gmm_get_loglikelyhood (VlGMM const * self);
+VL_EXPORT double vl_gmm_get_loglikelihood (VlGMM const * self);
 VL_EXPORT int vl_gmm_get_verbosity (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_max_num_iterations (VlGMM const * self);
 VL_EXPORT vl_size vl_gmm_get_num_repetitions (VlGMM const * self);
