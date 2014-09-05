@@ -458,7 +458,7 @@ vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
   patch_sort(self, self->patchSize) ;
 
   /*
-   * Tune the threshold if needed
+   * Tune the threshold if needed.
    */
 
   if (self->intensityThreshold < 0) {
@@ -492,7 +492,7 @@ vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
       offset += numPermutations ;
     }
 
-    /* get intensities of neighbours of the current patch element and sor them */
+    /* get intensities of neighbours of the current patch element and sort them */
     sx = self->neighSamplesX + self->numNeighbours * self->patchPermutation[i] ;
     sy = self->neighSamplesY + self->numNeighbours * self->patchPermutation[i] ;
     for (t = 0 ; t < self->numNeighbours ; ++t) {
@@ -510,10 +510,10 @@ vl_liopdesc_process (VlLiopDesc * self, float * desc, float const * patch)
 
       int L = (int) self->patchSideLength ;
 
-      if (ix >= 0 && iy >= 0) { a = patch[ix   + iy * L] ; }
-      if (ix <  L && iy >= 0) { b = patch[ix+1 + iy * L] ; }
-      if (ix >= 0 && iy <  L) { c = patch[ix   + (iy+1) * L] ; }
-      if (ix <  L && iy <  L) { d = patch[ix+1 + (iy+1) * L] ; }
+      if (ix >= 0   && iy >= 0  ) { a = patch[ix   + iy * L] ; }
+      if (ix <  L-1 && iy >= 0  ) { b = patch[ix+1 + iy * L] ; }
+      if (ix >= 0   && iy <  L-1) { c = patch[ix   + (iy+1) * L] ; }
+      if (ix <  L-1 && iy <  L-1) { d = patch[ix+1 + (iy+1) * L] ; }
 
       self->neighPermutation[t] = t;
       self->neighIntensities[t] = (1 - wy) * (a + (b - a) * wx) + wy * (c + (d - c) * wx) ;
