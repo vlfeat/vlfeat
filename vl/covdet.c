@@ -352,12 +352,12 @@ comparing neighborhoods of them.
 
 The next difficulty is to guarantee that detection is co-variant with
 image transformations. Hence, if $u$ is the pose of a feature
-extracted from image $\ell$, then the feature of pose $u' = w[u]$ must
-be detected in the transformed image $\ell' = w[\ell]$.
+extracted from image $\ell$, then the transformed pose $u' = w[u]$
+must be detected in the transformed image $\ell' = w[\ell]$.
 
 Since features are extracted in correspondence of the local maxima of
 the cornerness score, a sufficient condition is that corresponding
-features attain the same score in the two images.
+features attain the same score in the two images:
 
 \[
 \forall u\in\mathcal{W}: \quad F(u;\ell) = F(w[u];w[\ell]),
@@ -370,7 +370,7 @@ score *after normalizing the image* by the inverse of the candidate
 feature pose warp $u$, as follows:
 
 \[
-  F(u;\ell) = F(1;u^{-1}[\ell]) = F(1;\ell \circ u) = \mathcal{F}(\ell \circ u).
+  F(u;\ell) = F(1;u^{-1}[\ell]) = F(1;\ell \circ u) = \mathcal{F}(\ell \circ u),
 \]
 
 where $1 = u^{-1} \circ u$ is the identity transformation and
@@ -378,15 +378,20 @@ $\mathcal{F}$ is an arbitrary functional. Intuitively, co-variant
 detection is obtained by looking if the appearance of the feature
 resembles a corner only *after normalization*. Formally:
 
-\[
+@f{align*}
+F(w[u];w[\ell])
+&=
 F(w \circ u ;\ell \circ w^{-1})
-=
-\mathcal{F}(1; \ell \circ w^{-1} \circ w \circ u)
-=
-\mathcal{F}(1; \ell\circ u)
-=
-F(w;\ell).
-\]
+\\
+&=
+F(1; \ell \circ w^{-1} \circ w \circ u)
+\\
+&=
+\mathcal{F}(\ell\circ u)
+\\
+&=
+F(u;\ell).
+@f}
 
 Concrete examples of the functional $\mathcal{F}$ are given in @ref
 covdet-corner-types.
