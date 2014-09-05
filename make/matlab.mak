@@ -14,8 +14,7 @@
 # the empty string disables MATLAB support.
 
 MEX ?= mex
-MATLAB_PATH ?= $(strip $(shell test "$$(command -v '$(MEX)')" && \
-  $(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
+MATLAB_PATH ?= $(subst /bin/mex,,$(realpath $(shell which '$(MEX)')))
 MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
 
 # transform in immediate for efficiency
@@ -102,7 +101,7 @@ MEX_FLAGS += LDFLAGS='\
 -arch i386 \
 -Wl,-syslibroot,$(SDKROOT) \
 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
--bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+-bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/maci/mexFunction.map \
 $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/) \
 $(call escape,$(STD_LDFLAGS))'
 endif
@@ -122,7 +121,7 @@ MEX_FLAGS += LDFLAGS='\
 -arch x86_64 \
 -Wl,-syslibroot,$(SDKROOT) \
 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
--bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/\$$Arch/\$$MAPFILE \
+-bundle -Wl,-exported_symbols_list,$(MATLAB_PATH)/extern/lib/maci64/mexFunction.map \
 $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/) \
 $(call escape,$(STD_LDFLAGS))'
 endif
