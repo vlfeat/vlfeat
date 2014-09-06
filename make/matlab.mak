@@ -34,8 +34,19 @@ endif
 
 info: mex-info matlab-info
 
-# $(call escape, string) escapes the $ symbol for shell
+# With 2014a the new mex uses a revamped configuration system. It also
+# breaks in subtle way how variables need to be escaped when passed to the
+# mex command.
+
+ifeq ($(strip $(shell $(MEX) -v 2>&1 | grep MATLAB)),)
+# new style
+$(info MATLAB 2014a or greater detected)
+escape =$(1)
+else
+# old style
+$(info MATLAB 2013b or earlier detected)
 escape =$(subst $$,\\$$,$(1))
+endif
 
 # --------------------------------------------------------------------
 #                                                  Prepare MEX options
