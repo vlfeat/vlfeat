@@ -25,7 +25,7 @@ the terms of the BSD license (see the COPYING file).
 
 /* option codes */
 enum {
-  // common
+  /* common */
   opt_epsilon,
   opt_max_num_iterations,
   opt_bias_multiplier,
@@ -37,15 +37,15 @@ enum {
   opt_bias,
   opt_weights,
 
-  // switching to SDCA
+  /* switching to SDCA */
   opt_verbose,
   opt_solver,
 
-  // SGD specific
+  /* SGD specific */
   opt_starting_iteration,
   opt_bias_learning_rate
 
-  // DCA specific:
+  /* DCA specific */
 };
 
 
@@ -64,11 +64,11 @@ vlmxOption  options [] = {
   {"Bias",                1,   opt_bias                },
   {"Weights",             1,   opt_weights             },
 
-  // SGD specific
+  /* SGD specific */
   {"StartingIteration",   1,   opt_starting_iteration  },
   {"BiasLearningRate",    1,   opt_bias_learning_rate  },
 
-  // DCA specific:
+  /* DCA specific */
   {0,                     0,   0                       }
 } ;
 

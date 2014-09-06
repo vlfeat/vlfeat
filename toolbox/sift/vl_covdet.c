@@ -624,7 +624,6 @@ mexFunction(int nout, mxArray *out[],
     }
 
     if (nout >= 2) {
-      //      descriptorType = DESC_NONE;
       switch (descriptorType) {
         case VL_COVDET_DESC_NONE:
           OUT(DESCRIPTORS) = mxCreateDoubleMatrix(0,0,mxREAL);
@@ -709,8 +708,6 @@ mexFunction(int nout, mxArray *out[],
                                          patchStep,
                                          VL_PI / 2) ;
 
-            //VL_PRINTF("%g\n", (double)patchRelativeExtent / (3.0 * (4 + 1) / 2)) ;
-
             flip_descriptor (desc, tempDesc) ;
             desc += dimension ;
           }
@@ -718,7 +715,7 @@ mexFunction(int nout, mxArray *out[],
           break ;
         }
         case VL_COVDET_DESC_LIOP :
-        {          // TODO: get parameters form input
+        {          /* TODO: get parameters form input */
           vl_size numFeatures = vl_covdet_get_num_features(covdet) ;
           vl_size dimension ;
           VlCovDetFeature const * feature = vl_covdet_get_features(covdet);
