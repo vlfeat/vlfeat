@@ -5,11 +5,11 @@ function v = vl_matlabversion
 %
 %     MAJOR.MINOR.SERVICEPACK
 %
-%   Then V has the value
+%   The integer V has the value
 %
-%     V = MAJOR * 1e4 + MINOR + 1e2 + SERVICEPACK.
+%     V = MAJOR * 10000 + MINOR * 100 + SERVICEPACK.
 %
-%   For example, in MATLAB 7.10.0 (R2010a), V has the value 7100.
+%   For example, in MATLAB 7.10.0 (R2010a), V equals 70100.
 %
 %   See also: VL_HELP().
 
