@@ -9,25 +9,26 @@ compute <b><a href="%dox:fisher;">Fisher vector</a></b> and
 <b><a href="%dox:vlad;">VLAD</a></b> encodings with VLFeat MATLAB
 interface.</p>
 
-<p>These encoding serve a similar purposes: summarising in a vectorial
+<p>These encoding serve a similar purposes: summarizing in a vectorial
 statistic a number of local feature descriptors
 (e.g. <a href="%dox:sift;">SIFT</a>). Similarly to bag of visual
-words, they compare local descriptor to a dictionary, obtained with
-vectonr quantization (KMeans) in the case of VLAD
-and <a href="%dox:gmm;">Gaussina Mixture Models</a> for Fisher
-Vectors. However, rather than storing visual word occurences only,
-these representation store the difference between dictonary elements
-and pooled local features.</p>
+words, they assign local descriptor to elements in a visual
+dictionary, obtained with vector quantization (KMeans) in the case of
+VLAD or a <a href="%dox:gmm;">Gaussian Mixture Models</a> for Fisher
+Vectors. However, rather than storing visual word occurrences only,
+these representations store a statistics of the difference between
+dictionary elements and pooled local features.</p>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <h1 id="tut.fisher">Fisher encoding</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <p>The Fisher encoding uses GMM to construct a visual word
-dicionary. To exemplify constructing a GMM, we consider a number of 2
+dictionary. To exemplify constructing a GMM, consider a number of 2
 dimensional data points (see also the <a href="%pathto:tut.gmm;">GMM
-tutorial</a>). In practice, these would be a collection of SIFT or
-other local image features:</p>
+tutorial</a>). In practice, these points would be a collection of SIFT
+or other local image features. The following code fits a GMM to the
+points:</p>
 
 <precode type='matlab'>
 numFeatures = 5000 ;
@@ -38,9 +39,9 @@ numClusters = 30 ;
 [means, covariances, priors] = vl_gmm(data, numClusters);
 </precode>
 
-<p>Next we create another random set of vectors, which should be
-encoded using the Fisher vector representation and the GMM just
-obtained.</p>
+<p>Next, we create another random set of vectors, which should be
+encoded using the Fisher Vector representation and the GMM just
+obtained:</p>
 
 <precode type='matlab'>
 numDataToBeEncoded = 1000;
@@ -58,7 +59,7 @@ encoding = vl_fisher(datatoBeEncoded, means, covariances, priors);
 <p>The <code>encoding</code> vector is the Fisher vector
 representation of the data <code>dataToBeEncoded</code>.</p>
 
-<p>Note that Fihser vectors support
+<p>Note that Fisher Vectors support
 several <a href="%dox:fisher-normalization;">normalization options</a>
 that can affect substantially the performance of the
 representation.</p>
@@ -86,10 +87,10 @@ centers = vl_kmeans(dataLearn, numClusters);
 
 <p>Now consider the data <code>dataToBeEncoded</code> and use
 the <code>vl_vlad</code> function to compute the encoding. Differently
-from <code>vl_fhiser</code>, <code>vl_vlad</code> requires the
-data-to-cluster assignments to be passed in. This allows
-using a fast vector quantization technique (e.g. kd-tree) as well as
-switching from soft to hard assignment.</p>
+from <code>vl_fisher</code>, <code>vl_vlad</code> requires the
+data-to-cluster assignments to be passed in. This allows using a fast
+vector quantization technique (e.g. kd-tree) as well as switching from
+soft to hard assignment.</p>
 
 <p>In this example, we use a kd-tree for quantization:</p>
 
@@ -98,7 +99,7 @@ kdtree = vl_kdtreebuild(centers) ;
 nn = vl_kdtreequery(kdtree, centers, dataEncode) ;
 </precode>
 
-<p>Now we have in the <code>nn</code> the indeces of the nearest
+<p>Now we have in the <code>nn</code> the indexes of the nearest
 center to each vector in the matrix <code>dataToBeEncoded</code>. The
 next step is to create an assignment matrix:</p>
 
