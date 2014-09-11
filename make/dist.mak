@@ -21,11 +21,13 @@ GIT ?= git
 RSYNC ?= rsync
 VER ?= $(shell cat vl/generic.h | sed -n \
     's/.*VL_VERSION_STRING.*\"\([0-9.]*\)\".*/\1/p')
+TMPDIR ?= /tmp
 
 NAME := vlfeat
 DIST := $(NAME)-$(VER)
 BINDIST := $(DIST)-bin
 HOST := vlfeat-admin:vlfeat.org/sandbox
+
 
 # --------------------------------------------------------------------
 #                                                 Build source package
