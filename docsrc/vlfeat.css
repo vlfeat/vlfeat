@@ -80,6 +80,7 @@ code a {
 /* t r b l */
 #sidebar ul li {
     display: inline-block ;
+    color: white ;
     position: relative ;
     list-style-type: none ;
     padding: 10px 15px 10px 15px ;
@@ -91,19 +92,21 @@ code a {
     background-color: rgb(207,122,48) ;
 }
 #sidebar ul li ul {
-    visibility: hidden ;
     position: absolute ;
+    width: 513px ;
     top: 34px ;
     left: -1px ;
-    width: 225px ;
-    background-color: #183a60 ;
+    visibility: hidden ;
+    font-size: 0px ;
 }
 #sidebar ul li ul li {
-    display: block ;
+    width: 225px ;
     margin: 0 ;
-    padding-left: 15px ;
+    margin-right: -1px ;
     border: 1px solid white ;
     border-bottom: none ;
+    background-color: #183a60 ;
+    font-size: 12px ;
 }
 #sidebar ul li ul li ul {
     top: -1px ;
@@ -113,6 +116,13 @@ code a {
 #sidebar li:hover > ul {
     visibility: visible ;
 }
+#sidebar li:hover {
+    color: rgb(207,122,48) ;
+}
+#sidebar li.active:hover {
+    color: white ;
+}
+
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                           Header */
