@@ -641,7 +641,7 @@ class DocHtmlText(DocBareNode):
                 pageNode.publishTableOfContents(gen, pageNode)
 
             elif directive == "env":
-                envName = m.group(2)[1:]
+                envName = m.group(2)
                 if envName in os.environ:
                     gen.putString(os.environ[envName])
                 else:
