@@ -48,8 +48,6 @@ code a {
     line-height: 1px ;
 }
 .standout {
-    margin: 1em ! important ;
-    font-family: Helvetica, sans-serif ;
     font-style: italic ;
     color: red ! important ;
 }
