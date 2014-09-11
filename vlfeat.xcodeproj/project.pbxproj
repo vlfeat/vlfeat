@@ -423,7 +423,7 @@
 		2D86B1230F24CC9B00E625D6 /* vl_ubcmatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_ubcmatch.c; path = toolbox/sift/vl_ubcmatch.c; sourceTree = "<group>"; };
 		2D8E1B551371FB23009CDE11 /* .gitattributes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitattributes; sourceTree = "<group>"; };
 		2D8E1B561371FB23009CDE11 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		2D92043C13CDDD860004DC40 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		2D92043C13CDDD860004DC40 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		2D94E6BC148E48440089ADA5 /* slic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = slic.c; sourceTree = "<group>"; };
 		2D94E6BE1490E4120089ADA5 /* slic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slic.h; sourceTree = "<group>"; };
 		2D9941F410ECD04F00502DF6 /* heap-def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "heap-def.h"; sourceTree = "<group>"; };
@@ -456,6 +456,10 @@
 		2DA64CD717329C2400276F3D /* vlad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vlad.c; sourceTree = "<group>"; };
 		2DA64CD817329C2400276F3D /* vlad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vlad.h; sourceTree = "<group>"; };
 		2DA64CE01733089000276F3D /* svm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = svm.c; sourceTree = "<group>"; };
+		2DAB42AB19BB062700735B50 /* vl_demo_frame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_demo_frame.m; path = toolbox/demo/vl_demo_frame.m; sourceTree = "<group>"; };
+		2DAB42AD19BB062700735B50 /* vl_demo_hog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_demo_hog.m; path = toolbox/demo/vl_demo_hog.m; sourceTree = "<group>"; };
+		2DAB42AE19BB066800735B50 /* vl_isoctave.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_isoctave.m; path = toolbox/misc/vl_isoctave.m; sourceTree = "<group>"; };
+		2DAB42AF19BB066800735B50 /* vl_matlabversion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vl_matlabversion.m; path = toolbox/misc/vl_matlabversion.m; sourceTree = "<group>"; };
 		2DAF7CE3139918EA00FA0D07 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = about.html; path = docsrc/about.html; sourceTree = "<group>"; };
 		2DAF7CE4139918EA00FA0D07 /* apps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = apps.html; path = docsrc/apps.html; sourceTree = "<group>"; };
 		2DAF7CE5139918EA00FA0D07 /* compiling.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = compiling.html; path = docsrc/compiling.html; sourceTree = "<group>"; };
@@ -584,7 +588,7 @@
 				2D6102CF111EE22C00470F4C /* make */,
 				2D732DE30CF8C2CB0099B03C /* Makefile */,
 				2DC75D0B0E4B4FE7005223E7 /* Makefile.mak */,
-				2D92043C13CDDD860004DC40 /* README */,
+				2D92043C13CDDD860004DC40 /* README.md */,
 				2D732DE40CF8C2E40099B03C /* src */,
 				2D732EAF0CF8C3950099B03C /* toolbox */,
 				2D66AAAE13AE03B20060594E /* toolbox-mfiles */,
@@ -612,10 +616,12 @@
 				2D66AC7213AE05BD0060594E /* vl_demo_cmd.m */,
 				2D141E30178376CA00E2958B /* vl_demo_covdet.m */,
 				2D66AC7313AE05BD0060594E /* vl_demo_dsift.m */,
+				2DAB42AB19BB062700735B50 /* vl_demo_frame.m */,
 				2D9A8060177476E300B9A9CD /* vl_demo_gmm_2d_rand.m */,
 				2D141E21178376CA00E2958B /* vl_demo_gmm_2d_twist.m */,
 				2D141E1F178376CA00E2958B /* vl_demo_gmm_3d.m */,
 				2D9A8061177476E300B9A9CD /* vl_demo_gmm_convergence.m */,
+				2DAB42AD19BB062700735B50 /* vl_demo_hog.m */,
 				2D4938B01895BAAA00B775EE /* vl_demo_ikmeans.m */,
 				2D66AC7413AE05BD0060594E /* vl_demo_imdisttf.m */,
 				2D66AC7A13AE05BD0060594E /* vl_demo_kdtree.m */,
@@ -830,7 +836,9 @@
 				2D66AC9F13AE05BD0060594E /* vl_ihat.m */,
 				2D141E2F178376CA00E2958B /* vl_imreadbw.m */,
 				2D66ACB213AE05BD0060594E /* vl_irodr.m */,
+				2DAB42AE19BB066800735B50 /* vl_isoctave.m */,
 				2D66ACB913AE05BD0060594E /* vl_localmax.m */,
+				2DAB42AF19BB066800735B50 /* vl_matlabversion.m */,
 				2D66ACBC13AE05BD0060594E /* vl_numder.m */,
 				2D66ACBD13AE05BD0060594E /* vl_numder2.m */,
 				2D66ACBE13AE05BD0060594E /* vl_override.m */,
