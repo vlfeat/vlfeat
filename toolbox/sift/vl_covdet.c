@@ -631,8 +631,8 @@ mexFunction(int nout, mxArray *out[],
 
         case VL_COVDET_DESC_PATCH:
         {
-		  vl_size numFeatures ;
-		  VlCovDetFeature const * feature ;
+		      vl_size numFeatures ;
+		      VlCovDetFeature const * feature ;
           vl_index i ;
           vl_size w = 2*patchResolution + 1 ;
           float * desc ;
@@ -753,6 +753,7 @@ mexFunction(int nout, mxArray *out[],
           }
           mexPrintf("time: %f\n",vl_toc());
           mexPrintf("threshold: %f\n",liop->intensityThreshold);
+          vl_liopdesc_delete(liop);
           break;
         }
 
