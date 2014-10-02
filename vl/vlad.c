@@ -71,7 +71,7 @@ vl_kmeans_quantize(kmeans,indexes,dataToEncode,numDataToEncode);
 assignments = vl_malloc(sizeof(float) * numDataToEncode * numCenters);
 memset(assignments, 0, sizeof(float) * numDataToEncode * numCenters);
 for(i = 0; i < numDataToEncode; i++) {
-  assignments[i + numCenters * indexes[i]] = 1.;
+  assignments[i * numCenters + indexes[i]] = 1.;
 }
 
 // allocate space for vlad encoding
@@ -280,7 +280,7 @@ VL_XCAT(_vl_vlad_encode_, SFX)
  ** @a dimension rows. @a data is the matrix of vectors to be encoded,
  ** with @a dimension rows and @a numData columns. @a assignments is a
  ** matrix with @a numClusters rows and @a numData columns.
- ** All the matrices should be stored in a row major order.
+ ** All the matrices should be stored in column-major order.
  **
  ** @a flag allows controlling further options:
  ** ::VL_VLAD_FLAG_NORMALIZE_COMPONENTS, ::VL_VLAD_FLAG_SQUARE_ROOT,
