@@ -438,12 +438,13 @@ VL_XCAT(_vl_fisher_encode_, SFX)
       }
     }
 
-    uprefix = 1/(numData*sqrt(priors[i_cl]));
-    vprefix = 1/(numData*sqrt(2*priors[i_cl]));
-
-    for(dim = 0; dim < dimension; dim++) {
-      *(uk + dim) = *(uk + dim) * uprefix;
-      *(vk + dim) = *(vk + dim) * vprefix;
+    if (numData > 0) {
+      uprefix = 1/(numData*sqrt(priors[i_cl]));
+      vprefix = 1/(numData*sqrt(2*priors[i_cl]));
+      for(dim = 0; dim < dimension; dim++) {
+        *(uk + dim) = *(uk + dim) * uprefix;
+        *(vk + dim) = *(vk + dim) * vprefix;
+      }
     }
   }
 
@@ -513,24 +514,24 @@ VL_XCAT(_vl_fisher_encode_, SFX)
  ** @param flags options.
  ** @return number of averaging operations.
  **
- ** @a means and @a covariances have @a dimension rows and @a numCluster columns.
- ** @a priors is a vector of size @a numCluster. @a data has @a dimension
- ** rows and @a numData columns. @a enc is a vecotr of size equal
- ** to twice the product of @a dimension and @a numClusters.
- ** All these vectors and matrices have the same class, as specified
- ** by @a dataType.
+ ** @a means and @a covariances have @a dimension rows and @a
+ ** numCluster columns.  @a priors is a vector of size @a
+ ** numCluster. @a data has @a dimension rows and @a numData
+ ** columns. @a enc is a vecotr of size equal to twice the product of
+ ** @a dimension and @a numClusters. All these vectors and matrices
+ ** have the same class, as specified by @a dataType, and must be
+ ** stored in column-major format.
  **
  ** @a flag can be used to control several options:
  ** ::VL_FISHER_FLAG_SQUARE_ROOT, ::VL_FISHER_FLAG_NORMALIZED,
  ** ::VL_FISHER_FLAG_IMPROVED, and ::VL_FISHER_FLAG_FAST.
  **
  ** The function returns the number of averaging operations actually
- ** computed.  The upper bound is the number of input features by the
- ** number of GMM modes; however, in practice assignments are usually
- ** failry sparse, so this number is less. In particular, with the
- ** ::VL_FISHER_FLAG_FAST, this number should be equal to the number
- ** of input features only. This information can be used for
- ** diagnostic purposes.
+ ** performed. The upper bound is the number of input features by the
+ ** number of GMM modes; however, assignments are usually failry
+ ** sparse, so this number is often much smaller. In particular, with
+ ** the ::VL_FISHER_FLAG_FAST, is equal to the number of input
+ ** features. This information can be used for diagnostic purposes.
  **
  ** @sa @ref fisher
  **/

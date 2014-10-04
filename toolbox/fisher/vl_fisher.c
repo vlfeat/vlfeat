@@ -159,7 +159,7 @@ mexFunction (int nout VL_UNUSED, mxArray * out[], int nin, const mxArray * in[])
 
   if (verbosity) {
     mexPrintf("vl_fisher: sparsity of assignments: %.2f%% (%d non-negligible assignments)\n",
-              100.0 * (1.0 - (double)numTerms/((double)numData*(double)numClusters)),
+              100.0 * (1.0 - (double)numTerms/((double)numData*(double)numClusters+1e-12)),
               numTerms) ;
   }
 }
