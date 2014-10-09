@@ -682,6 +682,7 @@ vl_hog_put_image (VlHog * self,
       }
 
       for (o = 0 ; o < 2 ; ++o) {
+        float ow ;
         /*
          Accumulate the gradient. hx is the distance of the
          pixel x to the cell center at its left, in units of cellSize.
@@ -703,24 +704,21 @@ vl_hog_put_image (VlHog * self,
         wx1 = 1.0 - wx2 ;
         wy1 = 1.0 - wy2 ;
 
-        wx1 *= orientationWeights[o] ;
-        wx2 *= orientationWeights[o] ;
-        wy1 *= orientationWeights[o] ;
-        wy2 *= orientationWeights[o] ;
+        ow = orientationWeights[o] ;
 
         /*VL_PRINTF("%d %d - %d %d %f %f - %f %f %f %f - %d \n ",x,y,binx,biny,hx,hy,wx1,wx2,wy1,wy2,o);*/
 
         if (binx >= 0 && biny >=0) {
-          at(binx,biny,orientation) += grad * wx1 * wy1 ;
+          at(binx,biny,orientation) += grad * ow * wx1 * wy1 ;
         }
         if (binx < (signed)self->hogWidth - 1 && biny >=0) {
-          at(binx+1,biny,orientation) += grad * wx2 * wy1 ;
+          at(binx+1,biny,orientation) += grad * ow * wx2 * wy1 ;
         }
         if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
-          at(binx+1,biny+1,orientation) += grad * wx2 * wy2 ;
+          at(binx+1,biny+1,orientation) += grad * ow * wx2 * wy2 ;
         }
         if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
-          at(binx,biny+1,orientation) += grad * wx1 * wy2 ;
+          at(binx,biny+1,orientation) += grad * ow * wx1 * wy2 ;
         }
       } /* next o */
     } /* next x */
