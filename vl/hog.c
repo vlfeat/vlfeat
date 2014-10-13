@@ -617,9 +617,9 @@ vl_hog_put_image (VlHog * self,
     for (x = 1 ; x < (signed)width - 1 ; ++x) {
       float gradx = 0 ;
       float grady = 0 ;
-      float grad ;
-      float orientationWeights [2] = {0,0} ;
-      vl_index orientationBins [2] = {-1,-1} ;
+      float gradNorm ;
+      float orientationWeights [2] = {-1, -1} ;
+      vl_index orientationBins [2] = {-1, -1} ;
       vl_index orientation = 0 ;
       float hx, hy, wx1, wx2, wy1, wy2 ;
       vl_index binx, biny, o ;
@@ -630,21 +630,19 @@ vl_hog_put_image (VlHog * self,
        */
       {
         float const * iter = image + y * width + x ;
-        float grad2 = 0 ;
+        float gradNorm2 = 0 ;
         for (k = 0 ; k < numChannels ; ++k) {
           float gradx_ = *(iter + 1) - *(iter - 1) ;
           float grady_ = *(iter + width)  - *(iter - width) ;
-          float grad2_ = gradx_ * gradx_ + grady_ * grady_ ;
-          if (grad2_ > grad2) {
+          float gradNorm2_ = gradx_ * gradx_ + grady_ * grady_ ;
+          if (gradNorm2_ > gradNorm2) {
             gradx = gradx_ ;
             grady = grady_ ;
-            grad2 = grad2_ ;
+            gradNorm2 = gradNorm2_ ;
           }
           iter += channelStride ;
         }
-        grad = sqrtf(grad2) ;
-        gradx /= VL_MAX(grad, 1e-10) ;
-        grady /= VL_MAX(grad, 1e-10) ;
+        gradNorm = sqrtf(gradNorm2) ;
       }
 
       /*
@@ -673,7 +671,7 @@ vl_hog_put_image (VlHog * self,
 
       if (self->useBilinearOrientationAssigment) {
         /* min(1.0,...) guards against small overflows causing NaNs */
-        float angle0 = acosf(VL_MIN(orientationWeights[0],1.0)) ;
+        float angle0 = acosf(VL_MIN(orientationWeights[0] / VL_MAX(gradNorm, 1e-10),1.0)) ;
         orientationWeights[1] = angle0 / (VL_PI / self->numOrientations) ;
         orientationWeights[0] = 1 - orientationWeights[1] ;
       } else {
@@ -709,16 +707,16 @@ vl_hog_put_image (VlHog * self,
         /*VL_PRINTF("%d %d - %d %d %f %f - %f %f %f %f - %d \n ",x,y,binx,biny,hx,hy,wx1,wx2,wy1,wy2,o);*/
 
         if (binx >= 0 && biny >=0) {
-          at(binx,biny,orientation) += grad * ow * wx1 * wy1 ;
+          at(binx,biny,orientation) += gradNorm * ow * wx1 * wy1 ;
         }
         if (binx < (signed)self->hogWidth - 1 && biny >=0) {
-          at(binx+1,biny,orientation) += grad * ow * wx2 * wy1 ;
+          at(binx+1,biny,orientation) += gradNorm * ow * wx2 * wy1 ;
         }
         if (binx < (signed)self->hogWidth - 1 && biny < (signed)self->hogHeight - 1) {
-          at(binx+1,biny+1,orientation) += grad * ow * wx2 * wy2 ;
+          at(binx+1,biny+1,orientation) += gradNorm * ow * wx2 * wy2 ;
         }
         if (binx >= 0 && biny < (signed)self->hogHeight - 1) {
-          at(binx,biny+1,orientation) += grad * ow * wx1 * wy2 ;
+          at(binx,biny+1,orientation) += gradNorm * ow * wx1 * wy2 ;
         }
       } /* next o */
     } /* next x */
