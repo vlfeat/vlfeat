@@ -151,7 +151,7 @@ orientations are @f$ \mathrm{k} \pi / \mathrm{numOrientations} @f$, where
 @c k is an index that varies in the ingeger
 range @f$ \{0, \dots, 2\mathrm{numOrientations} - 1\} @f$.
 
-Note that the orientations capture the orientation of the gradeint;
+Note that the orientations capture the orientation of the gradient;
 image edges would be oriented at 90 degrees from these.
 
 **/
