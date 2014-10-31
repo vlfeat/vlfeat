@@ -84,7 +84,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %     NUMNEGATIVES.
 %
 %   Stable:: false
-%     If set to true, RECALL and PRECISION are returned the same order
+%     If set to true, RECALL and PRECISION are returned in the same order
 %     of LABELS and SCORES rather than being sorted by decreasing
 %     score (increasing recall). Samples with -INF scores are assigned
 %     RECALL and PRECISION equal to NaN.

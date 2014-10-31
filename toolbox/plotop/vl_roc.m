@@ -42,6 +42,9 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %     The equal error rate is the value of FPR (or FNR) when the ROC
 %     curves intersects the line connecting (0,0) to (1,1).
 %
+%   info.eerThreshold:: EER threshold.
+%     The value of the score for which the EER is attained.
+%
 %   VL_ROC() accepts the following options:
 %
 %   Plot:: []
@@ -69,6 +72,11 @@ function [tpr,tnr,info] = vl_roc(labels, scores, varargin)
 %     performance of a large-scale retrieval experiment in which only
 %     a subset of highly-scoring results are recorded for efficiency
 %     reason.
+%
+%   Stable:: false
+%     If set to true, TPR and TNR are returned in the same order
+%     of LABELS and SCORES rather than being sorted by decreasing
+%     score.
 %
 %   About the ROC curve::
 %     Consider a classifier that predicts as positive all samples whose
@@ -168,12 +176,14 @@ if nargout > 2 || do_plots
   s = max(find(tnr > tpr)) ;
   if s == length(tpr)
     info.eer = NaN ;
+    info.eerThreshold = 0 ;
   else
     if tpr(s) == tpr(s+1)
       info.eer = 1 - tpr(s) ;
     else
       info.eer = 1 - tnr(s) ;
     end
+    info.eerThreshold = scores(perm(s)) ;
   end
 end
 
