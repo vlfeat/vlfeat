@@ -462,7 +462,7 @@ VL_XCAT(_vl_distance_mahalanobis_sq_, SFX)
   T acc = 0.0 ;
   while (X < X_end) {
     T d = *X++ - *MU++ ;
-    acc += d * d / (*S++) ;
+    acc += d * d * (*S++) ;
   }
   return acc ;
 }
