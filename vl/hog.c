@@ -863,10 +863,9 @@ vl_hog_extract (VlHog * self, float * features)
 #define atNorm(x,y) (self->hogNorm[(x) + (y) * self->hogWidth])
 
   /*
-   Computes the squared L2 norm of each HOG cell. This is the norm of the
-   undirected orientation histogram, counting only numOrientations. This
-   histogram is obtained by folding the 2*numOrientations directed
-   orientations that are computed.
+   Compute the squared L2 norm of the unoriented version of each HOG
+   cell histogram. The unoriented version is obtained by folding
+   the 2*numOrientations compotnent into numOrientations only.
    */
   {
     float const * iter = self->hog ;
@@ -886,43 +885,57 @@ vl_hog_extract (VlHog * self, float * features)
   }
 
   /*
-   HOG block-normalisation. For each cell, there are four 2x2 blocks
-   covering it. For example, the cell number 5 in the following scheme
-   is covered by the four blocks 1245, 2356, 4578, 5689.
+   HOG block-normalisation.
 
-                           +---+---+---+
-                           | 1 | 2 | 3 |
-                           +---+---+---+
-                           | 4 | 5 | 6 |
-                           +---+---+---+
-                           | 7 | 8 | 9 |
-                           +---+---+---+
+   The Dalal-Triggs implementation computes a normalized descriptor for
+   each block of 2x2 cells, by stacking the histograms of each cell
+   into a vector and L2-normalizing and truncating the result.
+   
+   Each block-level descriptor is then decomposed back into cells
+   and corresponding parts are stacked into cell-level descritpors.
+   Each HOG cell is contained in exactly
+   four 2x2 cell blocks. For example, the cell number 5 in the following
+   figure is contained in blocks 1245, 2356, 4578, 5689:
 
-   In the Dalal-Triggs implementation, one forms all possible 2x2 blocks
-   of cells, computes a descriptor vector for each by stacking the corresponding
-   2x2 HOG cells, and L2 normalizes (and truncates) the result.
+   +---+---+---+
+   | 1 | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
 
-   Thus each HOG cell appears in four blocks. These are then decomposed
-   again to produce descriptors for each cell. Each descriptor is simply
-   the stacking of the portion of each block descriptor that arised
-   from that cell. This process result in a descriptor
-   of each cell which contains four copies of the original HOG,
-   with four different normalization factors.
+   Hence, when block-level descriptors are decomposed back
+   into cells, each cell receives contributions from four blocks. So,
+   if each cell started with a D-dimensional histogram, it
+   ends up with a 4D dimesional descriptor vector.
 
-   @remark By stacking together the cell descriptors for a large retangular block
-   of cells, one effectively stacks together the block descriptors of
-   an equal number of blocks (except for the boundaries, for which
-   blocks are only partially included). Since blocks are L2 normalized
-   (up to truncation), this implies that the L2 norm of the resulting
-   vector is approximately equal to the area of the region.
+   Note however that this is just a convenient way of rewriting the 
+   blocks as per-cell contributions, but the block information
+   is unchanged. In particular, barring boundary effects,
+   in an array of H x W cells there are approximately HW blocks;
+   hence the L2 norm of all the blocks stacked is approximately HW
+   (because individual blocks are L2-normalized). Since this does
+   not change in the final HOG descriptor,
+   the L2 norm of the HOG descriptor of an image should be approximately
+   the same as the area of the image divided by the
+   area of a HOG cell. This can be used as a sanity check.
 
+   The UoCTTI variant differs in some non-negligible ways. First, 
+   it includes both oriented and unoriented histograms, as well
+   as four components capturing texture. Second, and most importantly, 
+   it merges the four chunks of block-level descirptors landing in
+   each cell into one by taking their average. This makes sense
+   because, ultimately, these four sub-descriptors are identical
+   to the original cell histogram, just with four different normalisations
+   applied.
    */
   {
     float const * iter = self->hog ;
     for (y = 0 ; y < (signed)self->hogHeight ; ++y) {
       for (x = 0 ; x < (signed)self->hogWidth ; ++x) {
 
-        /* norm of upper-left, upper-right, ... blocks */
+        /* norm of upper-left, upper-right, ... cells */
         vl_index xm = VL_MAX(x - 1, 0) ;
         vl_index xp = VL_MIN(x + 1, (signed)self->hogWidth - 1) ;
         vl_index ym = VL_MAX(y - 1, 0) ;
@@ -940,12 +953,12 @@ vl_hog_extract (VlHog * self, float * features)
 
         double factor1, factor2, factor3, factor4 ;
 
-		double t1 = 0 ;
-		double t2 = 0 ;
+        double t1 = 0 ;
+        double t2 = 0 ;
         double t3 = 0 ;
         double t4 = 0 ;
 
-		float * oiter = features + x + self->hogWidth * y ;
+        float * oiter = features + x + self->hogWidth * y ;
 
         /* each factor is the inverse of the l2 norm of one of the 2x2 blocks surrounding
            cell x,y */
