@@ -426,6 +426,15 @@ VL_XCAT(_vl_fisher_encode_, SFX)
     TYPE * uk = enc + i_cl*dimension ;
     TYPE * vk = enc + i_cl*dimension + numClusters * dimension ;
 
+    /*
+    If the GMM component is degenerate and has a null prior, then it
+    must have null posterior as well. Hence it is safe to skip it.  In
+    practice, we skip over it even if the prior is very small; if by
+    any chance a feature is assigned to such a mode, then its weight
+    would be very high due to the division by priors[i_cl] below.
+    */
+    if (priors[i_cl] < 1e-6) { continue ; }
+
     for(i_d = 0; i_d < (signed)numData; i_d++) {
       TYPE p = posteriors[i_cl + i_d * numClusters] ;
       if (p < 1e-6) continue ;
