@@ -56,6 +56,7 @@ ship with pre-built GNU Octave MEX files. To compile them use
 
 # Changes
 
+- **0.9.20** Maintenance release. Bugfixes.
 - **0.9.19** Maintenance release. Minor bugfixes and fixes compilation
   with MATLAB 2014a.
 - **0.9.18** Several bugfixes. Improved documentation, particularly of
