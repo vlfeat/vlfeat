@@ -419,6 +419,8 @@ vl_liopdesc_delete (VlLiopDesc * self)
   vl_free (self->patchPixels) ;
   vl_free (self->patchIntensities) ;
   vl_free (self->patchPermutation) ;
+  vl_free (self->neighPermutation) ;
+  vl_free (self->neighIntensities) ;
   vl_free (self->neighSamplesX) ;
   vl_free (self->neighSamplesY) ;
   vl_free (self) ;
