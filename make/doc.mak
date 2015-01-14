@@ -52,7 +52,7 @@ $(eval $(call gendir, results, results))
 .PHONY: doc-deep
 
 ifdef MATLAB_PATH
-doc-matlab: doc/matlab/helpsearch/deletable
+doc-matlab: doc/matlab/helpsearch-v2/segments.gen
 endif
 
 # use MATLAB to create the figures for the tutorials
@@ -67,11 +67,11 @@ doc-deep: all $(doc-dir) $(results-dir)
 	$(MAKE) doc
 
 # make documentation searchable in MATLAB
-doc/matlab/helpsearch/deletable : doc/build/matlab/helpsearch/deletable $(doc-dir)
+doc/matlab/helpsearch-v2/segments.gen : doc/build/matlab/helpsearch-v2/segments.gen $(doc-dir)
 	cp -v doc/build/matlab/helptoc.xml doc/matlab/
-	cp -rv doc/build/matlab/helpsearch doc/matlab/
+	cp -rv doc/build/matlab/helpsearch-v2 doc/matlab/
 
-doc/build/matlab/helpsearch/deletable: doc/build/matlab/helptoc.xml
+doc/build/matlab/helpsearch-v2/segments.gen: doc/build/matlab/helptoc.xml
 	$(MATLAB_EXE) -$(ARCH) -nodisplay -r "builddocsearchdb('doc/build/matlab/') ; exit"
 
 # --------------------------------------------------------------------
