@@ -24,7 +24,7 @@ the terms of the BSD license (see the COPYING file).
 #include <assert.h>
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.19"
+#define VL_VERSION_STRING "0.9.20"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024
