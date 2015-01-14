@@ -48,8 +48,9 @@
 %     may yield degenerate solutions, including NaNs.
 %
 %   Example::
-%     VL_GMM(X, 10, 'verbose', 'MaxNumIterations', 20) estimates the
-%     mixture of 10 gaussians using at mosst 20 iterations.
+%     VL_GMM(X, 10, 'verbose', 'MaxNumIterations', 20) learns a
+%     mixture of ten Gaussians using at most twenty iterations of the
+%     algorithm.
 %
 %   See also: <a href="matlab:vl_help('gmm')">GMMs</a>, VL_KMEANS(), VL_HELP().
 
