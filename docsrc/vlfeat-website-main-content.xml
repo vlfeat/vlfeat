@@ -51,7 +51,7 @@
 
 <!-- Generate an additional page to hold search results -->
 <page name="search" id="search" title="Search" hide="yes">
-  <gcse:searchresults-only></gcse:searchresults-only>
+  <gcse:searchresults-only/>
 </page>
 
 </group>

@@ -137,7 +137,7 @@ code a {
     margin-right: auto ;
     padding: 20px 30px ;
 }
-#header #cse-search-box {
+#header .search-box {
     float: right ;
     margin-right: 1em ;
     margin-top: auto ;

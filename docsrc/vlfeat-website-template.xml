@@ -60,7 +60,7 @@
     (function() {
     var cx = '003215582122030917471:oq23albfeam';
     var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
-    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+    gcse.src = (document.location.protocol == 'https' ? 'https:' : 'http:') +
     '//www.google.com/cse/cse.js?cx=' + cx;
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
     })();
@@ -84,7 +84,11 @@
   <div id="header-section">
     <div id="header">
       <!-- Google CSE Search Box -->
-      <div class="gcse-searchbox-only" id="google" data-resultsUrl="http://www.vlfeat.org/search.html"></div>
+      <div class="searchbox">
+        <gcse:searchbox-only resultsUrl="http://www.vlfeat.org/search.html"
+                             autoCompleteMaxCompletions="5"
+                             autoCompleteMatchType="any"/>
+      </div>
       <h1><a class="plain" href="%pathto:home;"><span id="vlfeat">VLFeat</span><span id="dotorg">.org</span></a></h1>
     </div>
     <div id="sidebar"> <!-- Navigation Start -->
