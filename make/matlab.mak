@@ -61,8 +61,11 @@ endif
 
 MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
+# generate the mex-dir target
+$(eval $(call gendir, mex, $(MEX_BINDIR)))
+
 # Cache an integer representing MATLAB's version
-$(MEX_BINDIR)/matlabver.mak:
+$(MEX_BINDIR)/matlabver.mak: $(mex-dir)
 	rm -f "$(MEX_BINDIR)/matlabver.mak"
 	$(MATLAB_EXE) -nodesktop -nosplash -nojvm \
 	-r \
@@ -70,7 +73,9 @@ $(MEX_BINDIR)/matlabver.mak:
 "fprintf(f,'MATLAB_VER=%d\n',[1e4 1e2 1]*sscanf(version,'%d.%d.%d'));fclose(f);exit();"
 
 ifdef MATLAB_PATH
+ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(MEX_BINDIR)/matlabver.mak
+endif
 endif
 
 ifeq ($(call gt,$(MATLAB_VER),80300),)
@@ -78,9 +83,13 @@ ifeq ($(call gt,$(MATLAB_VER),80300),)
 $(info Detected MATLAB 2014a or greater: adjusting escape method for MEX)
 escape =$(1)
 else
+ifeq ($(call gt,$(MATLAB_VER),1),)
 # old style
 $(info Detected MATLAB 2013b or earlier: adjusting escape method for MEX)
 escape =$(subst $$,\\$$,$(1))
+else
+$(info The MALTAB version will be detected in the next phase of Make)
+endif
 endif
 
 # --------------------------------------------------------------------
@@ -222,9 +231,6 @@ endif
 vpath vl_%.c $(mex_sub)
 
 mex-all: $(mex_dll) $(mex_tgt)
-
-# generate the mex-dir target
-$(eval $(call gendir, mex, $(MEX_BINDIR)))
 
 # Create a copy of the VLFeat DLL that links to MATLAB OpenMP library
 # (Intel OMP 5) rather than the system one. The Intel library is

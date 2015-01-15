@@ -300,7 +300,7 @@ doc/index.html: $(webdoc_src) $(doc-dir) \
 # --------------------------------------------------------------------
 
 .PHONY: doc-clean, doc-archclean, doc-distclean
-no_dep_targets := doc-clean doc-archclean doc-distclean
+no_dep_targets += doc-clean doc-archclean doc-distclean
 
 VERSION: vl/generic.h
 	echo "$(VER)" > VERSION

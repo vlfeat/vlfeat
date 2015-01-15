@@ -321,15 +321,15 @@ endef
 # inclued by make as auto-dependencies) and the list of files to be
 # added to the binary distribution.
 
+.PHONY: clean, archclean, distclean, info, help
+no_dep_targets := clean archclean distclean info help
+
 include make/dll.mak
 include make/bin.mak
 include make/matlab.mak
 include make/octave.mak
 include make/doc.mak
 include make/dist.mak
-
-.PHONY: clean, archclean, distclean, info, help
-no_dep_targets += clean archclean distclean info help
 
 clean:
 	rm -f  `find . -name '*~'`
