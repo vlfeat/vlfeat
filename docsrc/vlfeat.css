@@ -137,11 +137,12 @@ code a {
     margin-right: auto ;
     padding: 20px 30px ;
 }
-#header .search-box {
+#header .searchbox {
     float: right ;
     margin-right: 1em ;
     margin-top: auto ;
     margin-bottom: auto ;
+    width: 25em ;
 }
 #header h1 {
     margin: 0 ;
