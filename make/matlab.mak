@@ -70,7 +70,7 @@ $(MEX_BINDIR)/matlabver.mak: $(mex-dir)
 	$(MATLAB_EXE) -nodesktop -nosplash -nojvm \
 	-r \
 "f=fopen('$(MEX_BINDIR)/matlabver.mak','w');"\
-"fprintf(f,'MATLAB_VER=%d\n',[1e4 1e2 1]*sscanf(version,'%d.%d.%d'));fclose(f);exit();"
+"fprintf(f,'MATLAB_VER=%d',[1e4 1e2 1]*sscanf(version,'%d.%d.%d'));fclose(f);exit();"
 
 ifdef MATLAB_PATH
 ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
