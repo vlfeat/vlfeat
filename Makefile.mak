@@ -47,7 +47,7 @@ WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v7.0A
 !if "$(ARCH)" == "win32"
 !message === COMPILING FOR 32-BIT
 
-MATLABROOT = C:\Program Files (x86)\MATLAB\R2014b
+MATLABROOT = C:\Program Files (x86)\MATLAB\R2010b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw32
@@ -65,7 +65,7 @@ LFLAGS = /MACHINE:X86 \
 !elseif "$(ARCH)" == "win64"
 !message === COMPILING FOR 64-BIT
 
-MATLABROOT = C:\Program Files\MATLAB\R2014b
+MATLABROOT = C:\Program Files\MATLAB\R2010b
 MEX = "$(MATLABROOT)\bin\mex.bat"
 MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSVER)opts.bat"
 MEXEXT = mexw64
