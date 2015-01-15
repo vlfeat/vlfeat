@@ -16,6 +16,7 @@
 MEX ?= mex
 MATLAB_PATH ?= $(subst /bin/mex,,$(realpath $(shell which '$(MEX)')))
 MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
+MATLAB_VER ?= 0 # will be determined automatically
 
 # transform in immediate for efficiency
 MATLAB_PATH := $(MATLAB_PATH)
@@ -38,13 +39,47 @@ info: mex-info matlab-info
 # breaks in subtle way how variables need to be escaped when passed to the
 # mex command.
 
-ifeq ($(strip $(shell $(MEX) -v 2>&1 | grep MATLAB)),)
+# --------------------------------------------------------------------
+#                                                Obtain MATLAB version
+# --------------------------------------------------------------------
+
+ifeq ($(ARCH),maci)
+MEX_SUFFIX := mexmaci
+endif
+
+ifeq ($(ARCH),maci64)
+MEX_SUFFIX := mexmaci64
+endif
+
+ifeq ($(ARCH),glnx86)
+MEX_SUFFIX := mexglx
+endif
+
+ifeq ($(ARCH),glnxa64)
+MEX_SUFFIX := mexa64
+endif
+
+MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
+
+# Cache an integer representing MATLAB's version
+$(MEX_BINDIR)/matlabver.mak:
+	rm -f "$(MEX_BINDIR)/matlabver.mak"
+	$(MATLAB_EXE) -nodesktop -nosplash -nojvm \
+	-r \
+"f=fopen('$(MEX_BINDIR)/matlabver.mak','w');"\
+"fprintf(f,'MATLAB_VER=%d\n',[1e4 1e2 1]*sscanf(version,'%d.%d.%d'));fclose(f);exit();"
+
+ifdef MATLAB_PATH
+-include $(MEX_BINDIR)/matlabver.mak
+endif
+
+ifeq ($(call gt,$(MATLAB_VER),80300),)
 # new style
-$(info MATLAB 2014a or greater detected)
+$(info Detected MATLAB 2014a or greater: adjusting escape method for MEX)
 escape =$(1)
 else
 # old style
-$(info MATLAB 2013b or earlier detected)
+$(info Detected MATLAB 2013b or earlier: adjusting escape method for MEX)
 escape =$(subst $$,\\$$,$(1))
 endif
 
@@ -99,7 +134,6 @@ $(if $(PROFILE),-g -O,)
 
 # Mac OS X on Intel 32 bit processor
 ifeq ($(ARCH),maci)
-MEX_SUFFIX := mexmaci
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
 # a hack to support recent Xcode/clang/GCC versions on old MATLABs
@@ -119,7 +153,6 @@ endif
 
 # Mac OS X on Intel 64 bit processor
 ifeq ($(ARCH),maci64)
-MEX_SUFFIX := mexmaci64
 MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += CC='$(CC)'
 MEX_FLAGS += LD='$(CC)'
@@ -139,20 +172,16 @@ endif
 
 # Linux on 32 bit processor
 ifeq ($(ARCH),glnx86)
-MEX_SUFFIX := mexglx
 MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
 endif
 
 # Linux on 64 bit processorm
 ifeq ($(ARCH),glnxa64)
-MEX_SUFFIX := mexa64
 MEX_FLAGS += -largeArrayDims
 MEX_FLAGS += CFLAGS='$$CFLAGS $(call escape,$(STD_CFLAGS))'
 MEX_FLAGS += LDFLAGS='$$LDFLAGS $(call escape,$(STD_LDFLAGS))'
 endif
-
-MEX_BINDIR := toolbox/mex/$(MEX_SUFFIX)
 
 # For efficiency reasons, immediately expand this variable once
 MEX_FLAGS := $(MEX_FLAGS)
@@ -252,6 +281,7 @@ mex-info:
 
 mex-clean:
 	rm -f $(mex_dep)
+	rm -f $(MEX_BINDIR)/matlabver.mak
 
 mex-archclean: mex-clean
 	rm -rf $(MEX_BINDIR)
@@ -334,6 +364,7 @@ matlab-info:
 	$(call echo-var,mex_dll)
 	$(call echo-var,MATLAB_PATH)
 	$(call echo-var,MATLAB_EXE)
+	$(call echo-var,MATLAB_VER)
 	$(call echo-var,MEX)
 	$(call echo-var,MEX_FLAGS)
 	$(call echo-var,MEX_CFLAGS)

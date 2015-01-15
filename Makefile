@@ -294,6 +294,10 @@ else
 Q=@
 endif
 
+# Greater or equal: returns the empty string if $1 >= $2, otherwise returns 'false',
+# where the arguments are integer numbers
+gt = $(shell if [ "$(1)" -lt "$(2)" ] ; then echo false ; fi)
+
 # rule to create a directory
 .PRECIOUS: %/.dirstamp
 %/.dirstamp :
