@@ -14,7 +14,8 @@
 # the empty string disables MATLAB support.
 
 MEX ?= mex
-MATLAB_PATH ?= $(subst /bin/mex,,$(realpath $(shell which '$(MEX)')))
+#MATLAB_PATH ?= $(subst /bin/mex,,$(realpath $(shell which '$(MEX)')))
+MATLAB_PATH = /home/mylxiaoyi/MATLAB/R2012a
 MATLAB_EXE ?= "$(MATLAB_PATH)/bin/matlab"
 MATLAB_VER ?= 0 # will be determined automatically
 
@@ -249,7 +250,7 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	    $(dll_obj)								\
 	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
-	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -lgomp)	\
 	   -o $@
 
 $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
@@ -257,7 +258,7 @@ $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	    $(dll_obj)							        \
 	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
-	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)   \
+	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -lgomp)   \
 	   -o $(@)
 
 $(MEX_BINDIR)/%.d : %.c $(mex-dir)
