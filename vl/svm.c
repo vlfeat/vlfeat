@@ -2061,7 +2061,7 @@ void _vl_svm_sgd_train (VlSvm *self)
      are explicitly applied to the model and the bias.
   */
 
-  for (t = 0 ; 1 ; ++t) {
+  for (t = self->iteration; 1 ; ++t) {
 
     if (t % self->numData == 0) {
       /* once a new epoch is reached (all data have been visited),
