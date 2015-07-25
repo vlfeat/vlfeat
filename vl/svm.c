@@ -2099,7 +2099,7 @@ void _vl_svm_sgd_train (VlSvm *self)
     }
 
     /* call diagnostic occasionally */
-    if ((t + 1) % self->diagnosticFrequency == 0 || t + 1 == self->maxNumIterations) {
+    if ((t + 1) % self->diagnosticFrequency == 0 || t + 1 == (self->maxNumIterations + self->iteration)) {
 
       /* realize factor before computing statistics or completing training */
       for (k = 0 ; k < self->dimension ; ++k) self->model[k] *= factor ;
@@ -2123,7 +2123,7 @@ void _vl_svm_sgd_train (VlSvm *self)
       if (self->statistics.scoresVariation < self->epsilon) {
         self->statistics.status = VlSvmStatusConverged ;
       }
-      else if (t + 1 == self->maxNumIterations) {
+      else if (t + 1 == (self->maxNumIterations + self->iteration)) {
         self->statistics.status = VlSvmStatusMaxNumIterationsReached ;
       }
 
