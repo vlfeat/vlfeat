@@ -93,7 +93,7 @@ switch lower(pattern)
     colormap gray ;
     return ;
   otherwise
-    error('Unknown patter ''%s''.', pattern) ;
+    error('Unknown pattern ''%s''.', pattern) ;
 end
 
 if nargout == 0
