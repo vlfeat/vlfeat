@@ -20,7 +20,7 @@ the terms of the BSD license (see the COPYING file).
 
 @ref mser.h implements the *Maximally Stable Extremal Regions* (MSER)
 local feature detector of @cite{matas03robust}. This detector extracts
-as features the the connected components of the level sets of the
+as features the connected components of the level sets of the
 input intensity image. Among all such regions, the ones that are
 locally maximally stable are selected. MSERs are affine co-variant, as
 well as largely co-variant to generic diffeomorphic transformations.
