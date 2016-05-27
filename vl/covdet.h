@@ -231,6 +231,8 @@ vl_covdet_drop_features_outside (VlCovDet * self, double margin) ;
 VL_EXPORT vl_size vl_covdet_get_num_features (VlCovDet const * self) ;
 VL_EXPORT void * vl_covdet_get_features (VlCovDet * self) ;
 VL_EXPORT vl_index vl_covdet_get_first_octave (VlCovDet const * self) ;
+VL_EXPORT vl_size vl_covdet_get_num_octaves (VlCovDet const * self) ;
+VL_EXPORT double vl_covdet_get_base_scale (VlCovDet const * self) ;
 VL_EXPORT vl_size vl_covdet_get_octave_resolution (VlCovDet const * self) ;
 VL_EXPORT double vl_covdet_get_peak_threshold (VlCovDet const * self) ;
 VL_EXPORT double vl_covdet_get_edge_threshold (VlCovDet const * self) ;
@@ -248,6 +250,8 @@ VL_EXPORT vl_size vl_covdet_get_num_non_extrema_suppressed (VlCovDet const * sel
 /** @name Set parameters
  ** @{ */
 VL_EXPORT void vl_covdet_set_first_octave (VlCovDet * self, vl_index o) ;
+VL_EXPORT void vl_covdet_set_num_octaves (VlCovDet * self, vl_size o) ;
+VL_EXPORT void vl_covdet_set_base_scale (VlCovDet * self, double s) ;
 VL_EXPORT void vl_covdet_set_octave_resolution (VlCovDet * self, vl_size r) ;
 VL_EXPORT void vl_covdet_set_peak_threshold (VlCovDet * self, double peakThreshold) ;
 VL_EXPORT void vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThreshold) ;

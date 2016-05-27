@@ -26,6 +26,8 @@ the terms of the BSD license (see the COPYING file).
 enum {
   opt_method = 0,
   opt_octave_resolution,
+  opt_num_octaves,
+  opt_base_scale,
   opt_double_image,
   opt_peak_threshold,
   opt_edge_threshold,
@@ -48,6 +50,8 @@ enum {
 vlmxOption  options [] = {
   {"Method",                1,   opt_method                  },
   {"OctaveResolution",      1,   opt_octave_resolution       },
+  {"NumOctaves",            1,   opt_num_octaves             },
+  {"BaseScale",             1,   opt_base_scale              },
   {"DoubleImage",           1,   opt_double_image            },
   {"PeakThreshold",         1,   opt_peak_threshold          },
   {"EdgeThreshold",         1,   opt_edge_threshold          },
@@ -203,6 +207,8 @@ mexFunction(int nout, mxArray *out[],
 
   vl_bool doubleImage = VL_TRUE ;
   vl_index octaveResolution = -1 ;
+  vl_size numOctaves = -1 ;
+  double baseScale = -1 ;
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
   double lapPeakThreshold = -1 ;
@@ -297,6 +303,18 @@ mexFunction(int nout, mxArray *out[],
     case opt_octave_resolution :
       if (!vlmxIsPlainScalar(optarg) || (octaveResolution = (vl_index)*mxGetPr(optarg)) < 1) {
         vlmxError(vlmxErrInvalidArgument, "OCTAVERESOLUTION must be an integer not smaller than 1.") ;
+      }
+      break ;
+
+    case opt_num_octaves :
+      if (!vlmxIsPlainScalar(optarg) || (numOctaves = (vl_index)*mxGetPr(optarg)) < 1) {
+        vlmxError(vlmxErrInvalidArgument, "NUMOCTAVES must be an integer not smaller than 1.") ;
+      }
+      break ;
+
+    case opt_base_scale :
+      if (!vlmxIsPlainScalar(optarg) || (baseScale = *mxGetPr(optarg)) < 0) {
+        vlmxError(vlmxErrInvalidArgument, "BASESCALE must be a positive real.") ;
       }
       break ;
 
@@ -433,7 +451,9 @@ mexFunction(int nout, mxArray *out[],
     /* set covdet parameters */
     vl_covdet_set_transposed(covdet, VL_TRUE) ;
     vl_covdet_set_first_octave(covdet, doubleImage ? -1 : 0) ;
+    if (numOctaves > 0) vl_covdet_set_num_octaves(covdet, numOctaves);
     if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
+    if (baseScale > 0) vl_covdet_set_base_scale(covdet, baseScale) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
     if (lapPeakThreshold >= 0) vl_covdet_set_laplacian_peak_threshold(covdet, lapPeakThreshold) ;
@@ -441,6 +461,8 @@ mexFunction(int nout, mxArray *out[],
     if (verbose) {
       VL_PRINTF("vl_covdet: doubling image: %s\n",
                 VL_YESNO(vl_covdet_get_first_octave(covdet) < 0)) ;
+      VL_PRINTF("vl_covdet: octave_resolution: %d\n", vl_covdet_get_octave_resolution(covdet));
+      VL_PRINTF("vl_covdet: num_octaves: %d\n", vl_covdet_get_num_octaves(covdet));
     }
 
     /* process the image */

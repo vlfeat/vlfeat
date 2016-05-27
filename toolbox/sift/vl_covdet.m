@@ -151,6 +151,13 @@
 %   In addition to the ones discussed so far, the function supports
 %   the following options:
 %
+%   NumOctaves:: maximum possible
+%     The number of scale levels sampled per octave when constructing
+%     the scale spaces.
+%
+%   BaseScale:: 1.6
+%     Gaussian Scale Space pyramid base scale.
+%
 %   OctaveResolution:: 3
 %     The number of scale levels sampled per octave when constructing
 %     the scale spaces.

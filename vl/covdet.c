@@ -1450,6 +1450,7 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 #define VL_COVDET_HARRIS_DEF_EDGE_THRESHOLD 10.0
 #define VL_COVDET_HESSIAN_DEF_PEAK_THRESHOLD 0.003
 #define VL_COVDET_HESSIAN_DEF_EDGE_THRESHOLD 10.0
+#define VL_COVDET_GSS_BASE_SCALE 1.6
 
 /** @brief Covariant feature detector */
 struct _VlCovDet
@@ -1461,7 +1462,9 @@ struct _VlCovDet
   double edgeThreshold ;     /**< edge threshold. */
   double lapPeakThreshold;   /**< peak threshold for Laplacian scale selection. */
   vl_size octaveResolution ; /**< resolution of each octave. */
+  vl_size numOctaves ;       /**< number of octaves */
   vl_index firstOctave ;     /**< index of the first octave. */
+  double baseScale ;         /**< the base scale of the gss. */
 
   double nonExtremaSuppression ;
   vl_size numNonExtremaSuppressed ;
@@ -1509,7 +1512,9 @@ vl_covdet_new (VlCovDetMethod method)
   VlCovDet * self = vl_calloc(sizeof(VlCovDet),1) ;
   self->method = method ;
   self->octaveResolution = 3 ;
+  self->numOctaves = -1 ;
   self->firstOctave = -1 ;
+  self->baseScale = VL_COVDET_GSS_BASE_SCALE ;
   switch (self->method) {
     case VL_COVDET_METHOD_DOG :
       self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
@@ -1697,6 +1702,9 @@ vl_covdet_put_image (VlCovDet * self,
 
   /* (minOctaveSize - 1) 2^lastOctave <= min(width,height) - 1 */
   lastOctave = vl_floor_d(vl_log2_d(VL_MIN((double)width-1,(double)height-1) / (minOctaveSize - 1))) ;
+  if (self->numOctaves > 0) {
+      lastOctave = VL_MIN((vl_index)self->numOctaves - self->firstOctave - 1, lastOctave);
+  }
 
   if (self->method == VL_COVDET_METHOD_DOG) {
     octaveFirstSubdivision = -1 ;
@@ -1714,6 +1722,7 @@ vl_covdet_put_image (VlCovDet * self,
   geom.firstOctave = self->firstOctave ;
   geom.lastOctave = lastOctave ;
   geom.octaveResolution = self->octaveResolution ;
+  geom.baseScale = self->baseScale * pow(2.0, 1.0 / self->octaveResolution) ;
   geom.octaveFirstSubdivision = octaveFirstSubdivision ;
   geom.octaveLastSubdivision = octaveLastSubdivision ;
 
@@ -3241,6 +3250,54 @@ void
 vl_covdet_set_first_octave (VlCovDet * self, vl_index o)
 {
   self->firstOctave = o ;
+  vl_covdet_reset(self) ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get the max number of octaves
+ ** @param self object.
+ ** @return maximal number of octaves.
+ **/
+vl_size
+vl_covdet_get_num_octaves (VlCovDet const * self)
+{
+  return self->numOctaves ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Get the GSS base scale
+ ** @param self object.
+ ** @return The base scale.
+ **/
+double
+vl_covdet_get_base_scale (VlCovDet const * self)
+{
+  return self->baseScale ;
+}
+
+/** @brief Set the max number of octaves
+ ** @param self object.
+ ** @param o max number of octaves.
+ **
+ ** Calling this function resets the detector.
+ **/
+void
+vl_covdet_set_num_octaves (VlCovDet * self, vl_size o)
+{
+  self->numOctaves = o ;
+  vl_covdet_reset(self) ;
+}
+
+/** @brief Set the GSS base scale
+ ** @param self object.
+ ** @param s the base scale.
+ **
+ ** Calling this function resets the detector.
+ **/
+void
+vl_covdet_set_base_scale (VlCovDet * self, double s)
+{
+  self->baseScale = s ;
   vl_covdet_reset(self) ;
 }
 
