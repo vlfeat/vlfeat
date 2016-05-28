@@ -1462,7 +1462,7 @@ struct _VlCovDet
   double edgeThreshold ;     /**< edge threshold. */
   double lapPeakThreshold;   /**< peak threshold for Laplacian scale selection. */
   vl_size octaveResolution ; /**< resolution of each octave. */
-  vl_size numOctaves ;       /**< number of octaves */
+  vl_index numOctaves ;       /**< number of octaves */
   vl_index firstOctave ;     /**< index of the first octave. */
   double baseScale ;         /**< the base scale of the gss. */
 
