@@ -78,15 +78,14 @@ ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
 endif
 endif
 
-ifeq ($(call gt,$(MATLAB_VER),80300),)
-# new style
-$(info Detected MATLAB 2014a or greater: adjusting escape method for MEX)
-escape =$(1)
-else
-ifeq ($(call gt,$(MATLAB_VER),1),)
-# old style
-$(info Detected MATLAB 2013b or earlier: adjusting escape method for MEX)
+ifeq ($(shell test $(MATLAB_VER) -gt 80500 || test $(MATLAB_VER) -lt 80300; echo $$?),0)
+$(info Detected MATLAB >2014b or <2014a: adjusting escape method for MEX)
 escape =$(subst $$,\\$$,$(1))
+else
+ifeq ($(call gt,$(MATLAB_VER),80300),)
+# MATLAB 2014 style
+$(info Detected MATLAB 2014x: adjusting escape method for MEX)
+escape =$(1)
 else
 $(info The MALTAB version will be detected in the next phase of Make)
 endif
