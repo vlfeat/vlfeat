@@ -1489,6 +1489,8 @@ struct _VlCovDet
   float lapPatch [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)] ;
   float laplacians [(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*(2*VL_COVDET_LAP_PATCH_RESOLUTION+1)*VL_COVDET_LAP_NUM_LEVELS] ;
   vl_size numFeaturesWithNumScales [VL_COVDET_MAX_NUM_LAPLACIAN_SCALES + 1] ;
+
+  vl_bool allowPaddedWarping ;
 }  ;
 
 VlEnumerator vlCovdetMethods [VL_COVDET_METHOD_NUM] = {
@@ -1546,6 +1548,7 @@ vl_covdet_new (VlCovDetMethod method)
   self->patchBufferSize = 0 ;
   self->transposed = VL_FALSE ;
   self->aaAccurateSmoothing = VL_COVDET_AA_ACCURATE_SMOOTHING ;
+  self->allowPaddedWarping = VL_TRUE ;
 
   {
     vl_index const w = VL_COVDET_AA_PATCH_RESOLUTION ;
@@ -2303,6 +2306,10 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
     if (x0i < 0 || x1i > (signed)width-1 ||
         y0i < 0 || y1i > (signed)height-1) {
+       if (!self->allowPaddedWarping){
+	return VL_TRUE;
+      }
+     
       vl_index xi, yi ;
 
       /* compute the amount of l,r,t,b padding needed to complete the patch */
@@ -3446,4 +3453,27 @@ vl_covdet_get_laplacian_scales_statistics (VlCovDet const * self,
 {
   *numScales = VL_COVDET_MAX_NUM_LAPLACIAN_SCALES ;
   return self->numFeaturesWithNumScales ;
+}
+
+
+
+/* ---------------------------------------------------------------- */
+/** @brief Get wether to compute padded warped patches  
+ ** @param self object.
+ ** @return whether padded warped patches are computed.
+ **/
+vl_bool
+vl_covdet_get_allow_padded_warping (VlCovDet const  * self)
+{
+  return self->allowPaddedWarping ;
+}
+
+/** @brief Set wether to compute padded warped patches  
+ ** @param self object.
+ ** @param t whether padded warped patches are computed.
+ **/
+void
+vl_covdet_set_allow_padded_warping (VlCovDet * self, vl_bool t)
+{
+  self->allowPaddedWarping = t ;
 }
