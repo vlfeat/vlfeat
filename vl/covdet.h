@@ -244,7 +244,7 @@ VL_EXPORT vl_bool vl_covdet_get_aa_accurate_smoothing (VlCovDet const * self) ;
 VL_EXPORT vl_size const * vl_covdet_get_laplacian_scales_statistics (VlCovDet const * self, vl_size * numScales) ;
 VL_EXPORT double vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self) ;
 VL_EXPORT vl_size vl_covdet_get_num_non_extrema_suppressed (VlCovDet const * self) ;
-
+VL_EXPORT vl_bool vl_covdet_get_allow_padded_warping (VlCovDet const * self) ;
 /** @} */
 
 /** @name Set parameters
@@ -259,6 +259,7 @@ VL_EXPORT void vl_covdet_set_laplacian_peak_threshold (VlCovDet * self, double p
 VL_EXPORT void vl_covdet_set_transposed (VlCovDet * self, vl_bool t) ;
 VL_EXPORT void vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x) ;
 VL_EXPORT void vl_covdet_set_non_extrema_suppression_threshold (VlCovDet * self, double x) ;
+VL_EXPORT void vl_covdet_set_allow_padded_warping (VlCovDet * self, vl_bool x) ;
 /** @} */
 
 /* VL_COVDET_H */
