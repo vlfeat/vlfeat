@@ -2306,8 +2306,8 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
     if (x0i < 0 || x1i > (signed)width-1 ||
         y0i < 0 || y1i > (signed)height-1) {
-       if (!self->allowPaddedWarping){
-	return VL_TRUE;
+      if (!self->allowPaddedWarping) {
+        return VL_ERR_EOF;
       }
      
       vl_index xi, yi ;
