@@ -37,7 +37,7 @@ function [conf, args] = vl_argparse(conf, args, varargin)
 
 if ~isstruct(conf), error('CONF must be a structure') ; end
 
-if length(varargin) > 0, args = {args, varargin{:}} ; end
+if length(varargin) > 0, args = {args{:}, varargin{:}} ; end
 
 remainingArgs = {} ;
 names = fieldnames(conf) ;
