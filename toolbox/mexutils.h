@@ -28,8 +28,9 @@ the terms of the BSD license (see the COPYING file).
 #define vsnprintf _vsnprintf
 #endif
 
-#if (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && \
-  (! defined(HAVE_OCTAVE))
+#if (! defined(MEX_INFORMATION_VERSION)) && \
+    (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && \
+    (! defined(HAVE_OCTAVE))
 typedef vl_uint32 mwSize ;
 typedef vl_int32 mwIndex ;
 #endif
