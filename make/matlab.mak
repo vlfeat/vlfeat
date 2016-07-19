@@ -78,18 +78,7 @@ ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
 endif
 endif
 
-ifeq ($(shell test $(MATLAB_VER) -gt 80500 || test $(MATLAB_VER) -lt 80300; echo $$?),0)
-$(info Detected MATLAB >2014b or <2014a: adjusting escape method for MEX)
-escape =$(subst $$,\\$$,$(1))
-else
-ifeq ($(call gt,$(MATLAB_VER),80300),)
-# MATLAB 2014 style
-$(info Detected MATLAB 2014x: adjusting escape method for MEX)
 escape =$(1)
-else
-$(info The MALTAB version will be detected in the next phase of Make)
-endif
-endif
 
 # --------------------------------------------------------------------
 #                                                  Prepare MEX options
@@ -274,6 +263,7 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
 	    "$(<)"								\
 	    $(MEX_LDFLAGS)							\
 	       -outdir "$(dir $(@))"
+	$(call C,CHRPATH) -r '$$ORIGIN/' $(@)
 
 mex-info:
 	$(call echo-title,MATLAB support)
