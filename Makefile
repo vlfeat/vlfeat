@@ -99,7 +99,7 @@ all:
 # DISABLE_SSE2=yes
 # DISABLE_AVX=yes
 # DISABLE_THREADS=yes
-# DISABLE_OPENMP=yes
+DISABLE_OPENMP=yes
 
 # --------------------------------------------------------------------
 #                                                       Error Messages
