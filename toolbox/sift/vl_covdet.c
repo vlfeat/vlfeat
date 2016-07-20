@@ -33,6 +33,7 @@ enum {
   opt_edge_threshold,
   opt_laplacian_peak_threshold,
   opt_estimate_orientation,
+  opt_max_num_orientations,
   opt_estimate_affine_shape,
   opt_frames,
   opt_descriptor,
@@ -58,6 +59,7 @@ vlmxOption  options [] = {
   {"LaplacianPeakThreshold",1,   opt_laplacian_peak_threshold},
 
   {"EstimateOrientation",   1,   opt_estimate_orientation    },
+  {"MaxNumOrientations",    1,   opt_max_num_orientations    },
   {"EstimateAffineShape",   1,   opt_estimate_affine_shape   },
 
   {"Frames",                1,   opt_frames                  },
@@ -204,10 +206,11 @@ mexFunction(int nout, mxArray *out[],
   VlCovDetMethod method = VL_COVDET_METHOD_DOG;
   vl_bool estimateAffineShape = VL_FALSE ;
   vl_bool estimateOrientation = VL_FALSE ;
+  vl_size maxNumOrientations = 0 ;
 
   vl_bool doubleImage = VL_TRUE ;
   vl_index octaveResolution = -1 ;
-  vl_size numOctaves = -1 ;
+  vl_size numOctaves = 0 ;
   double baseScale = -1 ;
   double edgeThreshold = -1 ;
   double peakThreshold = -1 ;
@@ -289,6 +292,12 @@ mexFunction(int nout, mxArray *out[],
         vlmxError(vlmxErrInvalidArgument, "ESTIMATEORIENTATION must be a logical scalar value.") ;
       } else {
         estimateOrientation = *mxGetLogicals(optarg);
+      }
+      break ;
+
+    case opt_max_num_orientations :
+      if (!vlmxIsPlainScalar(optarg) || (maxNumOrientations = (vl_index)*mxGetPr(optarg)) < 1) {
+        vlmxError(vlmxErrInvalidArgument, "MAXNUMORIENTATIONS must be an integer not smaller than 1.") ;
       }
       break ;
 
@@ -454,6 +463,7 @@ mexFunction(int nout, mxArray *out[],
     if (numOctaves > 0) vl_covdet_set_num_octaves(covdet, numOctaves);
     if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
     if (baseScale > 0) vl_covdet_set_base_scale(covdet, baseScale) ;
+    if (maxNumOrientations > 0) vl_covdet_set_max_num_orientations(covdet, maxNumOrientations) ;
     if (peakThreshold >= 0) vl_covdet_set_peak_threshold(covdet, peakThreshold) ;
     if (edgeThreshold >= 0) vl_covdet_set_edge_threshold(covdet, edgeThreshold) ;
     if (lapPeakThreshold >= 0) vl_covdet_set_laplacian_peak_threshold(covdet, lapPeakThreshold) ;
@@ -463,6 +473,7 @@ mexFunction(int nout, mxArray *out[],
                 VL_YESNO(vl_covdet_get_first_octave(covdet) < 0)) ;
       VL_PRINTF("vl_covdet: octave_resolution: %d\n", vl_covdet_get_octave_resolution(covdet));
       VL_PRINTF("vl_covdet: num_octaves: %d\n", vl_covdet_get_num_octaves(covdet));
+      VL_PRINTF("vl_covdet: max_num_orientations: %d\n", vl_covdet_get_max_num_orientations(covdet));
     }
 
     /* process the image */

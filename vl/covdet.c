@@ -1455,16 +1455,17 @@ vl_refine_local_extreum_2 (VlCovDetExtremum2 * refined,
 /** @brief Covariant feature detector */
 struct _VlCovDet
 {
-  VlScaleSpace *gss ;        /**< Gaussian scale space. */
-  VlScaleSpace *css ;        /**< Cornerness scale space. */
-  VlCovDetMethod method ;    /**< feature extraction method. */
-  double peakThreshold ;     /**< peak threshold. */
-  double edgeThreshold ;     /**< edge threshold. */
-  double lapPeakThreshold;   /**< peak threshold for Laplacian scale selection. */
-  vl_size octaveResolution ; /**< resolution of each octave. */
-  vl_index numOctaves ;       /**< number of octaves */
-  vl_index firstOctave ;     /**< index of the first octave. */
-  double baseScale ;         /**< the base scale of the gss. */
+  VlScaleSpace *gss ;          /**< Gaussian scale space. */
+  VlScaleSpace *css ;          /**< Cornerness scale space. */
+  VlCovDetMethod method ;      /**< feature extraction method. */
+  double peakThreshold ;       /**< peak threshold. */
+  double edgeThreshold ;       /**< edge threshold. */
+  double lapPeakThreshold;     /**< peak threshold for Laplacian scale selection. */
+  vl_size octaveResolution ;   /**< resolution of each octave. */
+  vl_index numOctaves ;        /**< number of octaves */
+  vl_index firstOctave ;       /**< index of the first octave. */
+  double baseScale ;           /**< the base scale of the gss. */
+  vl_size maxNumOrientations ; /**< max number of detected orientations. */
 
   double nonExtremaSuppression ;
   vl_size numNonExtremaSuppressed ;
@@ -1517,6 +1518,7 @@ vl_covdet_new (VlCovDetMethod method)
   self->numOctaves = -1 ;
   self->firstOctave = -1 ;
   self->baseScale = VL_COVDET_GSS_BASE_SCALE ;
+  self->maxNumOrientations = VL_COVDET_MAX_NUM_ORIENTATIONS ;
   switch (self->method) {
     case VL_COVDET_METHOD_DOG :
       self->peakThreshold = VL_COVDET_DOG_DEF_PEAK_THRESHOLD ;
@@ -2841,7 +2843,7 @@ vl_covdet_extract_orientations_for_frame (VlCovDet * self,
       *numOrientations += 1 ;
       //VL_PRINTF("%d %g\n", *numOrientations, th) ;
 
-      if (*numOrientations >= VL_COVDET_MAX_NUM_ORIENTATIONS) break ;
+      if (*numOrientations >= self->maxNumOrientations) break ;
     }
   }
 
@@ -3309,6 +3311,20 @@ vl_covdet_set_base_scale (VlCovDet * self, double s)
 }
 
 /* ---------------------------------------------------------------- */
+
+/** @brief Set the max number of orientations
+ ** @param self object.
+ ** @param m the max number of orientations.
+ **
+ ** Calling this function resets the detector.
+ **/
+void
+vl_covdet_set_max_num_orientations (VlCovDet * self, vl_size m)
+{
+  self->maxNumOrientations = m ;
+}
+
+/* ---------------------------------------------------------------- */
 /** @brief Get the octave resolution.
  ** @param self object.
  ** @return octave resolution.
@@ -3356,6 +3372,18 @@ vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x)
 {
   self->aaAccurateSmoothing = x ;
 }
+
+/* ---------------------------------------------------------------- */
+/** @brief Get the max number of orientations
+ ** @param self object.
+ ** @return maximal number of orientations.
+ **/
+vl_size
+vl_covdet_get_max_num_orientations( VlCovDet const * self)
+{
+  return self->maxNumOrientations ;
+}
+
 
 /* ---------------------------------------------------------------- */
 /** @brief Get the non-extrema suppression threshold
