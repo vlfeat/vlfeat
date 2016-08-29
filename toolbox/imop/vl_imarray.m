@@ -59,13 +59,13 @@ if ndims(A) <= 3
   numChannels = 1 ;
   [height,width,numImages] = size(A) ;
 else
-  if ndims(A) == 4 && size(A,3) == 3
+  if ndims(A) == 4 && (size(A,3) == 3 || size(A,3) == 1)
     [height,width,numChannels,numImages] = size(A) ;
   elseif ndims(A) == 4 && size(A,4) == 3 ;
     swap3 = true ;
     [height,width,numImages,numChannels] = size(A) ;
   else
-    error('A is neither M*N*K, nor M*N*3*K, nor M*N*K*3.') ;
+    error('A is neither M*N*K, nor M*N*1*K, nor M*N*3*K, nor M*N*K*3.') ;
   end
 end
 
