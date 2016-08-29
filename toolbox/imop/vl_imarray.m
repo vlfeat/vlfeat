@@ -126,8 +126,8 @@ end
 
 if ~ opts.movie
   if nargout == 0
-    image(cdata) ;
-    colormap(opts.cmap) ;
+    imshow(cdata) ;
+    if ~isempty(opts.cmap), colormap(opts.cmap) ; end
     return ;
   else
     J = cdata ;
