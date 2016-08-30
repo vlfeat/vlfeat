@@ -2294,6 +2294,11 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
       y1 = VL_MAX(y1, y) ;
     }
 
+    if ((x0 < 0 || x1 > (signed)width-1 || y0 < 0 || y1 > (signed)height-1) &&
+        !self->allowPaddedWarping) {
+      return vl_set_last_error(VL_ERR_EOF, "Frame out of image.");
+    }
+
     /* Leave one pixel border for bilinear interpolation. */
     x0i = floor(x0) - 1 ;
     y0i = floor(y0) - 1 ;
@@ -2308,9 +2313,6 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
 
     if (x0i < 0 || x1i > (signed)width-1 ||
         y0i < 0 || y1i > (signed)height-1) {
-      if (!self->allowPaddedWarping) {
-        return VL_ERR_EOF;
-      }
      
       vl_index xi, yi ;
 
@@ -2326,7 +2328,7 @@ vl_covdet_extract_patch_helper (VlCovDet * self,
       vl_size patchBufferSize = patchWidth * patchHeight * sizeof(float) ;
       if (patchBufferSize > self->patchBufferSize) {
         int err = _vl_resize_buffer((void**)&self->patch, &self->patchBufferSize, patchBufferSize) ;
-        if (err) return vl_set_last_error(VL_ERR_ALLOC, NULL) ;
+        if (err) return vl_set_last_error(VL_ERR_ALLOC, "Unable to allocate data.") ;
       }
 
       if (pady0 < patchHeight - pady1) {

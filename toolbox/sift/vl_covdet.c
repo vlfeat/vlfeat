@@ -44,6 +44,7 @@ enum {
   opt_patch_resolution,
   opt_patch_relative_smoothing,
   opt_patch_relative_extent,
+  opt_allow_padded_warping,
   opt_verbose
 } ;
 
@@ -72,6 +73,7 @@ vlmxOption  options [] = {
   {"PatchResolution",       1,   opt_patch_resolution        },
   {"PatchRelativeExtent",   1,   opt_patch_relative_extent   },
   {"PatchRelativeSmoothing",1,   opt_patch_relative_smoothing},
+  {"AllowPaddedWarping",    1,   opt_allow_padded_warping    },
   {"Verbose",               0,   opt_verbose                 },
   {0,                       0,   0                           }
 } ;
@@ -227,6 +229,7 @@ mexFunction(int nout, mxArray *out[],
   vl_int liopNumNeighbours = 4;
   float liopRadius = 6.0;
   float liopIntensityThreshold = VL_NAN_F ;
+  vl_bool allowPaddedWarping = VL_TRUE;
 
   double boundaryMargin = 2.0 ;
 
@@ -388,6 +391,14 @@ mexFunction(int nout, mxArray *out[],
       liopIntensityThreshold = *mxGetPr(optarg) ;
       break ;
 
+    case opt_allow_padded_warping :
+      if (!mxIsLogicalScalar(optarg)) {
+        vlmxError(vlmxErrInvalidArgument, "ALLOWPADDEDWARPING must be a logical scalar value.") ;
+      } else {
+        allowPaddedWarping = *mxGetLogicals(optarg);
+      }
+      break ;
+
     case opt_frames:
       if (!vlmxIsPlainMatrix(optarg,-1,-1)) {
         vlmxError(vlmxErrInvalidArgument, "FRAMES must be a palin matrix.") ;
@@ -460,7 +471,7 @@ mexFunction(int nout, mxArray *out[],
     /* set covdet parameters */
     vl_covdet_set_transposed(covdet, VL_TRUE) ;
     vl_covdet_set_first_octave(covdet, doubleImage ? -1 : 0) ;
-    if (numOctaves > 0) vl_covdet_set_num_octaves(covdet, numOctaves);
+    if (numOctaves > 0) vl_covdet_set_num_octaves(covdet, numOctaves) ;
     if (octaveResolution >= 0) vl_covdet_set_octave_resolution(covdet, octaveResolution) ;
     if (baseScale > 0) vl_covdet_set_base_scale(covdet, baseScale) ;
     if (maxNumOrientations > 0) vl_covdet_set_max_num_orientations(covdet, maxNumOrientations) ;
@@ -471,10 +482,15 @@ mexFunction(int nout, mxArray *out[],
     if (verbose) {
       VL_PRINTF("vl_covdet: doubling image: %s\n",
                 VL_YESNO(vl_covdet_get_first_octave(covdet) < 0)) ;
-      VL_PRINTF("vl_covdet: octave_resolution: %d\n", vl_covdet_get_octave_resolution(covdet));
-      VL_PRINTF("vl_covdet: num_octaves: %d\n", vl_covdet_get_num_octaves(covdet));
-      VL_PRINTF("vl_covdet: max_num_orientations: %d\n", vl_covdet_get_max_num_orientations(covdet));
+      VL_PRINTF("vl_covdet: octave_resolution: %d\n", vl_covdet_get_octave_resolution(covdet)) ;
+      VL_PRINTF("vl_covdet: num_octaves: %d\n", vl_covdet_get_num_octaves(covdet)) ;
+      VL_PRINTF("vl_covdet: max_num_orientations: %d\n", vl_covdet_get_max_num_orientations(covdet)) ;
     }
+
+    /* Drop features which reach out of image. The property allow_padded_wrapping
+       is not used as it would complicate the memory management for the output
+       descriptors array. This way it drops all the features ahead. */
+    if (!allowPaddedWarping) boundaryMargin = patchRelativeExtent;
 
     /* process the image */
     vl_covdet_put_image(covdet, image, numRows, numCols) ;
@@ -681,12 +697,15 @@ mexFunction(int nout, mxArray *out[],
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(w*w, numFeatures, mxSINGLE_CLASS, mxREAL) ;
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           for (i = 0 ; i < (signed)numFeatures ; ++i) {
-            vl_covdet_extract_patch_for_frame(covdet,
-                                    desc,
-                                    patchResolution,
-                                    patchRelativeExtent,
-                                    patchRelativeSmoothing,
-                                    feature[i].frame) ;
+            vl_bool res = vl_covdet_extract_patch_for_frame(covdet,
+                                                            desc,
+                                                            patchResolution,
+                                                            patchRelativeExtent,
+                                                            patchRelativeSmoothing,
+                                                            feature[i].frame) ;
+            if (res != VL_ERR_OK) {
+              vlmxError(vlmxErrInconsistentData, vl_get_last_error_message()) ;
+            }
             desc += w*w ;
           }
           break ;
@@ -712,13 +731,15 @@ mexFunction(int nout, mxArray *out[],
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           vl_sift_set_magnif(sift, 3.0) ;
           for (i = 0 ; i < (signed)numFeatures ; ++i) {
-            vl_covdet_extract_patch_for_frame(covdet,
-                                              patch,
-                                              patchResolution,
-                                              patchRelativeExtent,
-                                              patchRelativeSmoothing,
-                                              feature[i].frame) ;
-
+            vl_bool res = vl_covdet_extract_patch_for_frame(covdet,
+                                                            patch,
+                                                            patchResolution,
+                                                            patchRelativeExtent,
+                                                            patchRelativeSmoothing,
+                                                            feature[i].frame) ;
+            if (res != VL_ERR_OK) {
+              vlmxError(vlmxErrInconsistentData, vl_get_last_error_message()) ;
+            }
             vl_imgradient_polar_f (patchXY, patchXY +1,
                                    2, 2 * patchSide,
                                    patch, patchSide, patchSide, patchSide) ;
@@ -771,17 +792,17 @@ mexFunction(int nout, mxArray *out[],
           OUT(DESCRIPTORS) = mxCreateNumericMatrix(dimension, numFeatures, mxSINGLE_CLASS, mxREAL);
           desc = mxGetData(OUT(DESCRIPTORS)) ;
           for(i = 0; i < (signed)numFeatures; i++){
-              vl_covdet_extract_patch_for_frame(covdet,
-                                                patch,
-                                                patchResolution,
-                                                patchRelativeExtent,
-                                                patchRelativeSmoothing,
-                                                feature[i].frame);
-
-              vl_liopdesc_process(liop, desc, patch);
-
-              desc += dimension;
-
+            vl_bool res = vl_covdet_extract_patch_for_frame(covdet,
+                                                            patch,
+                                                            patchResolution,
+                                                            patchRelativeExtent,
+                                                            patchRelativeSmoothing,
+                                                            feature[i].frame);
+            if (res != VL_ERR_OK) {
+              vlmxError(vlmxErrInconsistentData, vl_get_last_error_message()) ;
+            }
+            vl_liopdesc_process(liop, desc, patch);
+            desc += dimension;
           }
           vl_liopdesc_delete(liop);
           break;

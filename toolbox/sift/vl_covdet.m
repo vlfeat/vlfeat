@@ -176,6 +176,10 @@
 %     Maximum number of orientations per feature when EstimateOrientation
 %     is true.
 %
+%   AllowPaddedWarping:: true
+%     Set to `false` to drop all features where measurement region gets out
+%     of the input image.
+%
 %   Verbose::
 %     If specified, it increases the verbosity level.
 %
