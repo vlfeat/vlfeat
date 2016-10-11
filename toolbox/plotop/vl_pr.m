@@ -4,7 +4,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   precision-recall (PR) curve. LABELS are the ground truth labels,
 %   greather than zero for a positive sample and smaller than zero for
 %   a negative one. SCORES are the scores of the samples obtained from
-%   a classifier, where lager scores should correspond to positive
+%   a classifier, where larger scores should correspond to positive
 %   samples.
 %
 %   Samples are ranked by decreasing scores, starting from rank 1.
