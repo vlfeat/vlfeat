@@ -582,6 +582,69 @@ VL_XCAT(_vl_kmeans_init_centers_with_rand_data_, SFX)
 }
 
 /* ---------------------------------------------------------------- */
+/*                                              Random seeding fast */
+/* ---------------------------------------------------------------- */
+
+static void
+VL_XCAT(_vl_kmeans_init_centers_with_randfast_data_, SFX)
+(VlKMeans * self,
+ TYPE const * data,
+ vl_size dimension,
+ vl_size numData,
+ vl_size numCenters)
+{
+  vl_uindex i, j, k, d ;
+  VlRand * rand = vl_get_rand () ;
+
+  self->dimension = dimension ;
+  self->numCenters = numCenters ;
+  self->centers = vl_malloc (sizeof(TYPE) * dimension * numCenters) ;
+
+  {
+    vl_uindex * perm = vl_malloc (sizeof(vl_uindex) * numData) ;
+    TYPE * distances = vl_malloc (sizeof(TYPE) * numCenters) ;
+    TYPE * centers_sum = vl_malloc (sizeof(TYPE) * numCenters) ;
+
+    /* get a random permutation of the data point */
+    for (i = 0 ; i < numData ; ++i) perm[i] = i ;
+    _vl_kmeans_shuffle (perm, numData, rand) ;
+
+    for (k = 0, i = 0 ; k < numCenters ; ++ i) {
+
+      const TYPE * cur_feat = data + dimension * perm[i] ;
+      TYPE cur_feat_sum = 0 ;
+      for (d = 0 ; d < dimension ; ++d) {
+        cur_feat_sum += cur_feat[d] ; 
+      }
+      /* compare the next data point to all centers collected so far
+       to detect duplicates (if there are enough left)
+       */
+      if (numCenters - k < numData - i) {
+        vl_bool duplicateDetected = VL_FALSE ;
+        for (j = 0 ; j < k ; ++j) {
+          if (centers_sum[j] == cur_feat_sum) {
+            duplicateDetected = VL_TRUE ;
+            break ;
+          }
+        }
+        if (duplicateDetected) continue ;
+      }
+
+      /* ok, it is not a duplicate so we can accept it! */
+      memcpy ((TYPE*)self->centers + dimension * k,
+              cur_feat,
+              sizeof(TYPE) * dimension) ;
+      centers_sum[k] = cur_feat_sum ;
+      VL_PRINTF("Detected center's sum %d=%f\n", k, cur_feat_sum) ;
+      k ++ ;
+    }
+    vl_free(distances) ;
+    vl_free(perm) ;
+    vl_free(centers_sum) ;
+  }
+}
+
+/* ---------------------------------------------------------------- */
 /*                                                 kmeans++ seeding */
 /* ---------------------------------------------------------------- */
 
@@ -1861,6 +1924,30 @@ vl_kmeans_init_centers_with_rand_data
   }
 }
 
+VL_EXPORT void
+vl_kmeans_init_centers_with_randfast_data
+(VlKMeans * self,
+ void const * data,
+ vl_size dimension,
+ vl_size numData,
+ vl_size numCenters)
+{
+  vl_kmeans_reset (self) ;
+
+  switch (self->dataType) {
+    case VL_TYPE_FLOAT :
+      _vl_kmeans_init_centers_with_randfast_data_f
+      (self, (float const *)data, dimension, numData, numCenters) ;
+      break ;
+    case VL_TYPE_DOUBLE :
+      _vl_kmeans_init_centers_with_randfast_data_d
+      (self, (double const *)data, dimension, numData, numCenters) ;
+      break ;
+    default:
+      abort() ;
+  }
+}
+
 /** ------------------------------------------------------------------
  ** @brief Seed centers by the KMeans++ algorithm
  ** @param self KMeans object.
@@ -2045,6 +2132,11 @@ vl_kmeans_cluster (VlKMeans * self,
         vl_kmeans_init_centers_with_rand_data (self,
                                                data, dimension, numData,
                                                numCenters) ;
+        break ;
+      case VlKMeansRandomFast :
+        vl_kmeans_init_centers_with_randfast_data (self,
+                                                   data, dimension, numData,
+                                                   numCenters) ;
         break ;
       case VlKMeansPlusPlus :
         vl_kmeans_init_centers_plus_plus (self,
