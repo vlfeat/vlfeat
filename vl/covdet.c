@@ -944,6 +944,9 @@ $\ell_{(\kappa\sigma)^2}$ and $\ell_{\sigma^2}$.
 
 #include "covdet.h"
 #include <string.h>
+#ifdef VLFEAT_USE_FLANN
+#include <flann/flann.h>
+#endif
 
 /** @brief Reallocate buffer
  ** @param buffer
@@ -1465,6 +1468,10 @@ struct _VlCovDet
 
   double nonExtremaSuppression ;
   vl_size numNonExtremaSuppressed ;
+#ifdef VLFEAT_USE_FLANN
+  struct FLANNParameters *flannParameters ; /**< if non-null, FLANN will be used for non extrema suppression */
+  int flannSearchMaximumResults ; /**< maximum number of results when searching for neighbors with FLANN */
+#endif
 
   VlCovDetFeature *features ;
   vl_size numFeatures ;
@@ -1534,6 +1541,10 @@ vl_covdet_new (VlCovDetMethod method)
   }
 
   self->nonExtremaSuppression = 0.5 ;
+#ifdef VLFEAT_USE_FLANN
+  self->flannParameters = NULL;
+  self->flannSearchMaximumResults = 1000;
+#endif
   self->features = NULL ;
   self->numFeatures = 0 ;
   self->numFeatureBufferSize = 0 ;
@@ -1910,6 +1921,24 @@ _vl_dog_response (float * dog,
 /*                                                  Detect features */
 /* ---------------------------------------------------------------- */
 
+static inline void
+_vl_non_extrema_suppression_process_other_feature(VlCovDet * self, double tol, double x, double y, double sigma, double score, vl_index j)
+{
+  double dx_ = self->features[j].frame.x - x ;
+  double dy_ = self->features[j].frame.y - y ;
+  double sigma_ = self->features[j].frame.a11 ;
+  double score_ = self->features[j].peakScore ;
+  if (score_ &&
+      sigma < (1+tol) * sigma_ &&
+      sigma_ < (1+tol) * sigma &&
+      vl_abs_d(dx_) < tol * sigma &&
+      vl_abs_d(dy_) < tol * sigma &&
+      vl_abs_d(score) > vl_abs_d(score_)) {
+    self->features[j].peakScore = 0 ;
+    self->numNonExtremaSuppressed ++ ;
+  }
+}
+
 /** @brief Detect scale-space features
  ** @param self object.
  **
@@ -2094,6 +2123,61 @@ vl_covdet_detect (VlCovDet * self)
       break ;
   }
 
+#ifdef VLFEAT_USE_FLANN
+  if (self->nonExtremaSuppression && self->flannParameters) {
+    // Build array to store centers
+    double *featuresCenters = vl_malloc(sizeof(double) * self->numFeatures * 2) ;
+    {
+      vl_index i;
+      for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
+        featuresCenters[i*2] = self->features[i].frame.x ;
+        featuresCenters[i*2 + 1] = self->features[i].frame.y ;
+      }
+    }
+    // Build FLANN index
+    flann_set_distance_type(FLANN_DIST_EUCLIDEAN, 0);
+    float speedup;
+    flann_index_t flannIndex = flann_build_index_double(featuresCenters, self->numFeatures, 2, &speedup, self->flannParameters) ;
+    // Finally, loop
+    {
+      vl_index i;
+      double tol = self->nonExtremaSuppression ;
+      self->numNonExtremaSuppressed = 0 ;
+      assert(self->flannSearchMaximumResults > 0);
+      int *indices = vl_malloc(sizeof(int) * self->flannSearchMaximumResults);
+      double *dists = vl_malloc(sizeof(double) * self->flannSearchMaximumResults);
+
+      for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
+        double x = self->features[i].frame.x ;
+        double y = self->features[i].frame.y ;
+        double sigma = self->features[i].frame.a11 ;
+        double score = self->features[i].peakScore ;
+
+        // Since the inner condition dictates
+        //   |dx| < tol*sigma && |dy| < tol*sigma,
+        // it follows that
+        //   dx^2 < (tol*sigma)^2 && dy^2 < (tol*sigma)^2
+        // for every valid feature and thus
+        //   dx^2 + dy^2 < (tol*sigma)^2
+        // for every valid feature also.
+        // Thus we can use (tol*sigma)^2 as squared radius.
+        double center[2] = {x, y};
+        double sqradius = (tol * sigma) * (tol * sigma);
+        int results = flann_radius_search_double(flannIndex, center, indices, dists, self->flannSearchMaximumResults, sqradius, self->flannParameters);
+        int index;
+        for (index = 0 ; index < results ; ++index) {
+          _vl_non_extrema_suppression_process_other_feature(self, tol, x, y, sigma, score, indices[index]);
+        }
+      }
+
+      vl_free(dists);
+      vl_free(indices);
+    }
+    // Free stuff
+    flann_free_index(flannIndex, self->flannParameters) ;
+    vl_free(featuresCenters) ;
+  } else
+#endif
   if (self->nonExtremaSuppression) {
     vl_index i, j ;
     double tol = self->nonExtremaSuppression ;
@@ -2105,22 +2189,13 @@ vl_covdet_detect (VlCovDet * self)
       double score = self->features[i].peakScore ;
 
       for (j = 0 ; j < (signed)self->numFeatures ; ++j) {
-        double dx_ = self->features[j].frame.x - x ;
-        double dy_ = self->features[j].frame.y - y ;
-        double sigma_ = self->features[j].frame.a11 ;
-        double score_ = self->features[j].peakScore ;
-        if (score_ == 0) continue ;
-        if (sigma < (1+tol) * sigma_ &&
-            sigma_ < (1+tol) * sigma &&
-            vl_abs_d(dx_) < tol * sigma &&
-            vl_abs_d(dy_) < tol * sigma &&
-            vl_abs_d(score) > vl_abs_d(score_)) {
-          self->features[j].peakScore = 0 ;
-          self->numNonExtremaSuppressed ++ ;
-        }
+        _vl_non_extrema_suppression_process_other_feature(self, tol, x, y, sigma, score, j);
       }
     }
-    j = 0 ;
+  }
+  // Common step, whether FLANN or not flann
+  if (self->nonExtremaSuppression) {
+    vl_index i, j = 0 ;
     for (i = 0 ; i < (signed)self->numFeatures ; ++i) {
       VlCovDetFeature feature = self->features[i] ;
       if (self->features[i].peakScore != 0) {
@@ -3315,6 +3390,56 @@ vl_covdet_set_non_extrema_suppression_threshold (VlCovDet * self, double x)
 {
   self->nonExtremaSuppression = x ;
 }
+
+#ifdef VLFEAT_USE_FLANN
+
+/* ---------------------------------------------------------------- */
+/** @brief Gets the current FLANN parameters
+ ** @param self object.
+ ** @return FLANN parameters
+ **/
+
+struct FLANNParameters *
+vl_covdet_get_flann_parameters (VlCovDet const * self)
+{
+  return self->flannParameters ;
+}
+
+/** @brief Set the flann parameters
+ ** @param self object.
+ ** @param flann parameters.
+ **/
+
+void
+vl_covdet_set_flann_parameters (VlCovDet * self, struct FLANNParameters *flannParameters)
+{
+  self->flannParameters = flannParameters ;
+}
+
+/* ---------------------------------------------------------------- */
+/** @brief Gets the current maximum for the FLANN search in non-extrema suppression.
+ ** @param self object.
+ ** @return maximum results in FLANN search
+ **/
+
+int
+vl_covdet_get_flann_search_maximum_results (VlCovDet const * self)
+{
+  return self->flannSearchMaximumResults ;
+}
+
+/** @brief Sets the current maximum for the FLANN search in non-extrema suppression.
+ ** @param self object.
+ ** @param maximum results in FLANN search
+ **/
+
+void
+vl_covdet_set_flann_search_maximum_results (VlCovDet * self, int x)
+{
+  self->flannSearchMaximumResults = x ;
+}
+
+#endif
 
 /** @brief Get the number of non-extrema suppressed
  ** @param self object.

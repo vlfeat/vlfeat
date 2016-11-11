@@ -241,6 +241,10 @@ VL_EXPORT VlScaleSpace *  vl_covdet_get_css (VlCovDet const * self) ;
 VL_EXPORT vl_bool vl_covdet_get_aa_accurate_smoothing (VlCovDet const * self) ;
 VL_EXPORT vl_size const * vl_covdet_get_laplacian_scales_statistics (VlCovDet const * self, vl_size * numScales) ;
 VL_EXPORT double vl_covdet_get_non_extrema_suppression_threshold (VlCovDet const * self) ;
+#ifdef VLFEAT_USE_FLANN
+VL_EXPORT struct FLANNParameters *vl_covdet_get_flann_parameters (VlCovDet const * self) ;
+VL_EXPORT int vl_covdet_get_flann_search_maximum_results (VlCovDet const * self) ;
+#endif
 VL_EXPORT vl_size vl_covdet_get_num_non_extrema_suppressed (VlCovDet const * self) ;
 
 /** @} */
@@ -254,6 +258,10 @@ VL_EXPORT void vl_covdet_set_edge_threshold (VlCovDet * self, double edgeThresho
 VL_EXPORT void vl_covdet_set_laplacian_peak_threshold (VlCovDet * self, double peakThreshold) ;
 VL_EXPORT void vl_covdet_set_transposed (VlCovDet * self, vl_bool t) ;
 VL_EXPORT void vl_covdet_set_aa_accurate_smoothing (VlCovDet * self, vl_bool x) ;
+#ifdef VLFEAT_USE_FLANN
+VL_EXPORT void vl_covdet_set_flann_parameters (VlCovDet * self, struct FLANNParameters *flannParameters) ;
+VL_EXPORT void vl_covdet_set_flann_search_maximum_results (VlCovDet * self, int x) ;
+#endif
 VL_EXPORT void vl_covdet_set_non_extrema_suppression_threshold (VlCovDet * self, double x) ;
 /** @} */
 

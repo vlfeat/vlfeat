@@ -54,6 +54,9 @@
 #   MKOCTFILE [not defined] - Path to Octave MKOCTFILE compiler. If undefined,
 #       Octave support is disabled.
 #
+#   FLANN [not defined] - If defined, FLANN support for non extrema suppression
+#       will be enabled.
+#
 # If defined to anything other than "no", the following falgs disable
 # specific features in the library. By defaults, all the features are
 # enabled.  If the makefile finds that the environment is unable to
@@ -156,8 +159,10 @@ STD_CFLAGS += -Wall -Wextra
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
 STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
 STD_CFLAGS += $(if $(PROFILE), -g)
+STD_CFLAGS += $(if $(FLANN), -DVLFEAT_USE_FLANN)
 
 STD_LDFLAGS = $(LDFLAGS)
+STD_LDFLAGS += $(if $(FLANN), -lflann)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -347,6 +352,7 @@ info:
 	$(call dump-var,deps)
 	$(call echo-var,PROFILE)
 	$(call echo-var,DEBUG)
+	$(call echo-var,FLANN)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
 	$(call echo-var,CC)
