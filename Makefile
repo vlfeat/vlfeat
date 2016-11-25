@@ -149,6 +149,12 @@ endif
 
 VLDIR ?= .
 LIBTOOL ?= libtool
+CC ?= cc
+AR ?= ar
+RANLIB ?= ranlib
+
+FEATUREFLAGS += $(ifeq ($(DISABLE_THREADS),yes),-DVL_DISABLE_THREADS)
+FEATUREFLAGS += $(ifeq ($(DISABLE_SSE2),yes),-DVL_DISABLE_SSE2)
 
 STD_CLFAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99
@@ -325,6 +331,7 @@ endef
 no_dep_targets := clean archclean distclean info help
 
 include make/dll.mak
+include make/lib.mak
 include make/bin.mak
 include make/matlab.mak
 include make/octave.mak
