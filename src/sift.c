@@ -735,10 +735,12 @@ main(int argc, char **argv)
 
           if (out.active) {
             int l ;
-            vl_file_meta_put_double (&out, k -> x     ) ;
-            vl_file_meta_put_double (&out, k -> y     ) ;
-            vl_file_meta_put_double (&out, k -> sigma ) ;
-            vl_file_meta_put_double (&out, angles [q] ) ;
+            vl_file_meta_put_double (&out, k -> x          ) ;
+            vl_file_meta_put_double (&out, k -> y          ) ;
+            vl_file_meta_put_double (&out, k -> sigma      ) ;
+            vl_file_meta_put_double (&out, k -> peak_score ) ;
+            vl_file_meta_put_double (&out, k -> edge_score ) ;
+            vl_file_meta_put_double (&out, angles [q]      ) ;
             for (l = 0 ; l < 128 ; ++l) {
               vl_file_meta_put_uint8 (&out, (vl_uint8) (512.0 * descr [l])) ;
             }
@@ -746,10 +748,12 @@ main(int argc, char **argv)
           }
 
           if (frm.active) {
-            vl_file_meta_put_double (&frm, k -> x     ) ;
-            vl_file_meta_put_double (&frm, k -> y     ) ;
-            vl_file_meta_put_double (&frm, k -> sigma ) ;
-            vl_file_meta_put_double (&frm, angles [q] ) ;
+            vl_file_meta_put_double (&frm, k -> x          ) ;
+            vl_file_meta_put_double (&frm, k -> y          ) ;
+            vl_file_meta_put_double (&frm, k -> sigma      ) ;
+            vl_file_meta_put_double (&frm, k -> peak_score ) ;
+            vl_file_meta_put_double (&frm, k -> edge_score ) ;
+            vl_file_meta_put_double (&frm, angles [q]      ) ;
             if (frm.protocol == VL_PROT_ASCII) fprintf(frm.file, "\n") ;
           }
 
