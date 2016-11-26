@@ -412,13 +412,13 @@ info:
 
 # create directory if missing
 $(bindir) :
-	mkdir $(bindir)
+	mkdir -p $(bindir)
 
 $(objdir) :
-	mkdir $(objdir)
+	mkdir -p $(objdir)
 
 $(mexdir) :
-	mkdir $(mexdir)
+	mkdir -p $(mexdir)
 
 # --------------------------------------------------------------------
 #                                      Rules to compile the VLFeat DLL
