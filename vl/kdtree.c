@@ -284,7 +284,7 @@ vl_kdtree_build_recursively
 
   /* determine split threshold */
   switch (forest->thresholdingMethod) {
-    case VL_KDTREE_MEAN :
+    case VL_KDTREE_MEDIAN :
       node->splitThreshold = splitDimension->mean ;
       for (splitIndex = dataBegin ;
            splitIndex < dataEnd && tree->dataIndex[splitIndex].value <= node->splitThreshold ;
@@ -298,7 +298,7 @@ vl_kdtree_build_recursively
        * points. */
       if (dataBegin <= splitIndex && splitIndex + 1 < dataEnd) break ;
 
-    case VL_KDTREE_MEDIAN :
+    case VL_KDTREE_MEAN :
       medianIndex = (dataBegin + dataEnd - 1) / 2 ;
       splitIndex = medianIndex ;
       node -> splitThreshold = tree->dataIndex[medianIndex].value ;
