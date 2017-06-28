@@ -548,10 +548,12 @@ snprintf(compilerString, 1024,
 #ifdef VL_COMPILER_MSC
   "Microsoft Visual C++ %d"
 #define v VL_COMPILER_MSC
-#endif
-#ifdef VL_COMPILER_GNUC
+#elif defined( VL_COMPILER_GNUC )
   "GNU C %d"
 #define v VL_COMPILER_GNUC
+#else
+  "Unknown compiler %d"
+#define v 0
 #endif
   " "
 #ifdef VL_COMPILER_LP64

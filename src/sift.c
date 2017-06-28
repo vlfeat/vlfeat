@@ -560,8 +560,15 @@ main(int argc, char **argv)
 
         /* make enough space */
         if (ikeys_size < nikeys + 1) {
+          double* old_ikeys = ikeys ;
           ikeys_size += 10000 ;
           ikeys       = realloc (ikeys, 4 * sizeof(double) * ikeys_size) ;
+          if( ikeys == 0 )
+          {
+            ikeys = old_ikeys ; //Will be deallocated at function exit
+            err = VL_ERR_ALLOC ;
+            QERR ;
+          }
         }
 
         /* add the guy to the buffer */

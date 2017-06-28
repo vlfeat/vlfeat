@@ -1029,6 +1029,8 @@ vl_get_thread_specific_state (void)
   threadState = (VlThreadState *) pthread_getspecific(state->threadKey) ;
 #elif defined(VL_THREADS_WIN)
   threadState = (VlThreadState *) TlsGetValue(state->tlsIndex) ;
+#else
+  threadState = NULL;
 #endif
 
   if (! threadState) {
