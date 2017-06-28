@@ -1,16 +1,35 @@
-sudo: required
-dist: trusty
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    compiler: gcc
+    language: cpp
+    sudo: false
+    env:
+      - BUILD_NAME="trusty-gcc"
+    script:
+      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
 
-language:
-  - cpp
+  - os: linux
+    dist: trusty
+    compiler: clang
+    language: cpp
+    sudo: false
+    env:
+      - BUILD_NAME="trusty-clang"
+    script:
+      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
 
-addons:
-  apt:
-    packages:
-    - g++
-
-before_script:
-  - gcc --version
-
-script:
-   - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
+  - os: linux
+    dist: trusty
+    compiler: gcc
+    language: cpp
+    sudo: required
+    addons:
+      apt:
+        packages:
+          - cppcheck
+    env:
+      - BUILD_NAME="trusty-cppcheck"
+    script:
+      - cppcheck --relative-paths --quiet --template=gcc --enable=warning,performance ./
