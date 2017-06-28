@@ -8,7 +8,8 @@ matrix:
     env:
       - BUILD_NAME="trusty-gcc"
     script:
-      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
+      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin-all
+      - .travis/tests.sh
 
   - os: linux
     dist: trusty
@@ -18,7 +19,8 @@ matrix:
     env:
       - BUILD_NAME="trusty-clang"
     script:
-      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
+      - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin-all
+      - .travis/tests.sh
 
   - os: linux
     dist: trusty
