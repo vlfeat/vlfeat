@@ -1,0 +1,16 @@
+sudo: required
+dist: trusty
+
+language:
+  - cpp
+
+addons:
+  apt:
+    packages:
+    - g++
+
+before_script:
+  - gcc --version
+
+script:
+   - make -j2 ARCH=glnxa64 DISABLE_OPENMP=yes bin
