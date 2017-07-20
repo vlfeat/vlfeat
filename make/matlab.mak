@@ -21,9 +21,10 @@ MATLAB_VER ?= 0 # will be determined automatically
 # transform in immediate for efficiency
 MATLAB_PATH := $(MATLAB_PATH)
 CHRPATH := chrpath
+CHRPATH_VERSION := $(shell $(CHRPATH) --version 2>/dev/null)
 
-ifeq (, $(shell which $(CHRPATH)))
-	$(error "No chrpath in $(PATH), consider doing apt-get install chrpath")
+ifndef CHRPATH_VERSION
+$(warning "No chrpath found, consider doing apt-get install chrpath")
 endif
 
 # if expand to empty string, set to empty string for use with ifdef
@@ -268,7 +269,9 @@ $(MEX_BINDIR)/%.$(MEX_SUFFIX) : %.c $(mex-dir) $(mex_dll)
 	    "$(<)"								\
 	    $(MEX_LDFLAGS)							\
 	       -outdir "$(dir $(@))"
+ifdef CHRPATH_VERSION
 	$(call C,CHRPATH) -r '$$ORIGIN/' $(@)
+endif
 
 mex-info:
 	$(call echo-title,MATLAB support)
