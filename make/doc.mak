@@ -52,8 +52,14 @@ $(eval $(call gendir, results, results))
 .PHONY: doc-deep
 
 ifdef MATLAB_PATH
+ifeq ($(call gt,$(MATLAB_VER),90000),)
 ifeq ($(call gt,$(MATLAB_VER),80300),)
+#TODO fix for newer matlabs, ends up with and error: 
+# "Error: There is no installed product with this help location."
+doc-matlab:
+else
 doc-matlab: doc/matlab/helpsearch-v2/segments.gen
+endif
 else
 doc-matlab: doc/matlab/helpsearch/deletable
 endif
