@@ -229,7 +229,7 @@ endif
 # 1) _GNU_SOURCE avoids using isoc99_fscanf, limiting binary portability to recent GLIBC.
 # 2) -fno-stack-protector avoids using a feature requiring GLBIC 2.4
 STD_CFLAGS += -m$(march) -D_GNU_SOURCE -fno-stack-protector
-STD_LDFLAGS += -m$(march) -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
+STD_LDFLAGS += -m$(march) -Wl,--rpath,XORIGIN/ -Wl,--as-needed
 endif
 
 # Convert back DISALBE_*="no" flags to be empty

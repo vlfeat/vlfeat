@@ -57,6 +57,24 @@ the Makefile, which might allow you do debug any potential issue.</p>
 <h2>Compiling MATLAB support</h2>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
+<p>For MATLAB compilation on unix platform, a <code>chrpath</code>
+must be present at the path. This can be usually installed with:</p>
+
+<precode type='sh'>
+sudo apt-get install chrpath
+</precode>
+
+<p>For Debian-based distributions, or:</p>
+
+<precode type='sh'>
+sudo yum install chrpath
+</precode>
+
+<p>For RHEL-based distributions. If the <code>chrpath</code> command
+is not present, path to compiled <code>vlfeat.so</code> library must
+be in <code>LD_LIBRARY_PATH</code> environment variable such that
+the linker can find it (or it must be installed to a system path).</p>
+
 <p>In order for MATLAB support to be compiled, the
 MATLAB <code>mex</code> script must be in the current path. If it is
 not, its location must be passed to <code>make</code> as
