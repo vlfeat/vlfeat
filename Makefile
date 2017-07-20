@@ -149,7 +149,6 @@ endif
 
 VLDIR ?= .
 LIBTOOL ?= libtool
-CHRPATH ?= chrpath
 
 STD_CLFAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99

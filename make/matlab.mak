@@ -20,6 +20,11 @@ MATLAB_VER ?= 0 # will be determined automatically
 
 # transform in immediate for efficiency
 MATLAB_PATH := $(MATLAB_PATH)
+CHRPATH := chrpath
+
+ifeq (, $(shell which $(CHRPATH)))
+	$(error "No chrpath in $(PATH), consider doing apt-get install chrpath")
+endif
 
 # if expand to empty string, set to empty string for use with ifdef
 ifeq ($(MATLAB_PATH),)
