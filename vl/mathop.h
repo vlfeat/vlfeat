@@ -224,6 +224,18 @@ vl_round_d (double x)
 #endif
 }
 
+/** @brief @c max(a, b)
+ ** @param a first arg.
+ ** @param b second arg.
+ ** @return @c the maximum of two values
+ **/
+
+VL_INLINE double
+vl_max_d (double a, double b)
+{
+  return a > b ? a : b;
+}
+
 /** @brief Fast @c abs(x)
  ** @param x argument.
  ** @return @c abs(x)
