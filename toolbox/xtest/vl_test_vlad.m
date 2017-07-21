@@ -25,7 +25,7 @@ vl_assert_equal(phi, [2 2 2]') ;
 function test_rand (s)
 phi_ = simple_vlad(s.x, s.mu, s.assignments) ;
 phi = vl_vlad(s.x, s.mu, s.assignments, 'unnormalized') ;
-vl_assert_equal(phi, phi_) ;
+vl_assert_almost_equal(phi, phi_, 1e-12) ;
 
 function test_norm (s)
 phi_ = simple_vlad(s.x, s.mu, s.assignments) ;
