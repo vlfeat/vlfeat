@@ -72,7 +72,11 @@ end
 if numel(fillValue) > 1 && numel(fillValue) ~= numChannels
   error('Incorrect size of `fillValue`.');
 end
-fillValue = reshape(fillValue, 1, 1, numChannels);
+if isscalar(fillValue) && numChannels > 1
+  fillValue = fillValue * ones(1, 1, numChannels);
+else
+  fillValue = reshape(fillValue, 1, 1, numChannels);
+end
 
 % compute layout
 if isempty(opts.layout)
