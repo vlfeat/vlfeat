@@ -75,7 +75,14 @@ bin-all: $(dll-dir) $(bin_tgt)
 # also http://wiki.debian.org/ToolChain/DSOLinking
 
 $(BINDIR)/% : $(VLDIR)/src/%.c $(dll_tgt)
-	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$@"
+	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$(@)"
+ifdef BIN_RELINK_OMP
+	make/macos_relink_omp.sh "$(@)"
+endif
+
+ifdef BIN_RELINK_OMP
+arch_bins += $(BINDIR)/libomp.dylib
+endif
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
 	$(call C,CC) $(BIN_CFLAGS) -M -MT  \

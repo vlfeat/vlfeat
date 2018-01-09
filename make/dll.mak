@@ -131,6 +131,9 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	  $(DLL_LDFLAGS)					\
 	  $(^)							\
 	  -o "$(@)"
+ifdef BIN_RELINK_OMP
+	make/macos_relink_omp.sh "$(@)"
+endif
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 	$(call C,CC) -shared                                    \
