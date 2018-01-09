@@ -2,7 +2,7 @@
 # description: Build everything
 # author: Andrea Vedaldi
 
-# Copyright (C) 2014 Andrea Vedaldi.
+# Copyright (C) 2014,18 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -83,7 +83,7 @@
 # components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust parameters.
 
-# Copyright (C) 2014 Andrea Vedaldi.
+# Copyright (C) 2014,18 Andrea Vedaldi.
 # Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #

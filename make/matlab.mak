@@ -247,10 +247,10 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	    -current_version $(VER)						\
 	    -isysroot $(SDKROOT)						\
 	    $(dll_obj)								\
-	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
-	   -o $@
+            $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
+	    -o $@
 
 $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	$(call C,CC) -shared							\

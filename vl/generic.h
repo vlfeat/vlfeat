@@ -4,7 +4,7 @@
  **/
 
 /*
-Copyright (C) 2013 Andrea Vedaldi.
+Copyright (C) 2013,18 Andrea Vedaldi.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -24,7 +24,7 @@ the terms of the BSD license (see the COPYING file).
 #include <assert.h>
 
 /** @brief Library version string */
-#define VL_VERSION_STRING "0.9.20"
+#define VL_VERSION_STRING "0.9.21"
 
 /** @brief Maximum length (in characters) of an error message */
 #define VL_ERR_MSG_LEN 1024
