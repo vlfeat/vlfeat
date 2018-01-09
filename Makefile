@@ -200,7 +200,8 @@ endif
 
 ifeq "$(COMPILER)" "clang"
 ifneq "$(DISABLE_OPENMP)" "no"
-$(info Clang does not support OpenMP yet, disabling.)
+$(info Apple Clang does not support OpenMP yet, disabling.)
+$(info Alternatively, use brew llvm clang and specify DISABLE_OPENMP=no.)
 DISABLE_OPENMP:=yes
 endif
 endif
