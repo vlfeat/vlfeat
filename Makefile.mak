@@ -24,7 +24,7 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.20
+VER = 0.9.21
 ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
