@@ -36,13 +36,13 @@ screen_dpi := 95
 
 doc: doc-api doc-man doc-matlab
 
-# generate doc-dir: target
+# generate $(doc-dir) target
 $(eval $(call gendir, doc, \
 	 doc \
 	 doc/build doc/build/api doc/build/man doc/build/figures \
          doc/demo doc/figures doc/matlab doc/api))
 
-# generate results-dir: target
+# generate results-dir target
 $(eval $(call gendir, results, results))
 
 # --------------------------------------------------------------------
@@ -55,15 +55,15 @@ doc-matlab : toolbox/doc/matlab/helptoc.xml
 doc-matlab : toolbox/doc/matlab/helpsearch-v3/segments.gen
 
 ifdef MATLAB_PATH
-ifeq ($(call gt,$(MATLAB_VER),80300),)
-#doc-matlab: doc/matlab/helpsearch-v2/segments.gen
+ifeq ($(call gt,$(MATLAB_VER),80500),)
+doc-matlab : toolbox/doc/matlab/helpsearch-v3/segments.gen
 else
-#doc-matlab: doc/matlab/helpsearch/deletable
+doc-matlab : toolbox/doc/matlab/helpsearch-v2/segments.gen
 endif
 endif
 
 # use MATLAB to create the figures for the tutorials
-doc-deep: all $(doc-dir) $(results-dir)
+doc-deep: $(doc-dir) $(results-dir) all
 	cd toolbox ; \
 	VL_DEMO_PRINT=y $(MATLAB_EXE) \
 	    -$(ARCH) -nodesktop -nosplash \
