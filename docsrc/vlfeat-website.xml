@@ -28,6 +28,7 @@
       <pagescript type="text/javascript" src="$relpath$dynsections.js"/>
       <!-- <pagestyle href="%pathto:root;api/tabs.css"/> -->
       <pagestyle href="doxygen.css"/>
+      <pagestyle href="tabs.css"/>
       <div class="doxygen">
         <!-- Doc Here -->
       </div>

@@ -98,6 +98,7 @@ code a {
     left: -1px ;
     visibility: hidden ;
     font-size: 0px ;
+    z-index: 10000 ; /* for Doxygen tabs */
 }
 #sidebar ul li ul li {
     width: 225px ;
