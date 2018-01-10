@@ -33,7 +33,7 @@ HOST := vlfeat-admin:vlfeat.org/sandbox
 # --------------------------------------------------------------------
 
 .PHONY: dist-src, dist-src-clean, dist-src-info
-no_dep_targets += dist-src, dist-src-clean, dist-src-info
+no_dep_targets += dist-src dist-src-clean dist-src-info
 
 dist-src:
 	COPYFILE_DISABLE=1 \

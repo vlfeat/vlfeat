@@ -323,7 +323,7 @@ endef
 # added to the binary distribution.
 
 .PHONY: clean, archclean, distclean, info, help
-no_dep_targets := clean archclean distclean info help
+no_dep_targets := clean archclean distclean help
 
 include make/dll.mak
 include make/bin.mak
@@ -380,6 +380,6 @@ help:
 
 .PRECIOUS: $(deps)
 
-ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
+ifneq ($(filter-out $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(deps)
 endif
