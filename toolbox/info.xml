@@ -1,12 +1,9 @@
 <productinfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:noNamespaceSchemaLocation="optional">
-    <?xml-stylesheet type="text/xsl"href="optional"?>
-
-    <matlabrelease>2012a</matlabrelease>
-    <name>VLFeat</name>
-    <type>toolbox</type>
-    <icon>../doc/images/vl_blue.png</icon>
-    <help_location>../doc/matlab/</help_location>
-    <help_contents_icon>../doc/images/vl_blue.png</help_contents_icon>
-
+             xsi:noNamespaceSchemaLocation="optional">
+  <?xml-stylesheet type="text/xsl"href="optional"?>
+  <matlabrelease>2014a</matlabrelease>
+  <name>VLFeat</name>
+  <type>toolbox</type>
+  <icon>$toolbox/matlab/icons/bookicon.gif</icon>
+  <help_location>doc/matlab</help_location>
 </productinfo>
