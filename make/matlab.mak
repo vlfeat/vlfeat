@@ -2,7 +2,7 @@
 # description: Build MATALB toolbox
 # author: Andrea Vedaldi
 
-# Copyright (C) 2013-14 Andrea Vedaldi.
+# Copyright (C) 2013-14,18 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
