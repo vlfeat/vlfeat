@@ -4,6 +4,7 @@
  **/
 
 /*
+Copyright (C) 2018 Andrea Vedaldi.
 Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
@@ -28,10 +29,9 @@ the terms of the BSD license (see the COPYING file).
 #define vsnprintf _vsnprintf
 #endif
 
-#if (! defined(MX_API_VER) || (MX_API_VER < 0x07030000)) && \
-  (! defined(HAVE_OCTAVE))
-typedef vl_uint32 mwSize ;
-typedef vl_int32 mwIndex ;
+#ifndef MWSIZE_MAX
+typedef int unsigned mwSize ;
+typedef int mwIndex ;
 #endif
 
 /** @brief Access MEX input argument */
