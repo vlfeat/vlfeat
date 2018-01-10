@@ -118,7 +118,7 @@ dist-bin-commit-common: dist-bin-release
 	@echo Adding products to $(branch)
 	cd "$(tmp-dir)" ; $(GIT) add -f $(m_lnk)
 	cd "$(tmp-dir)" ; $(GIT) add -f $$(find doc \
-	-name '*.html' -or -name '*.jpg' -or -name '*.png' -or -name '*.css')
+	-name '*.html' -or -name '*.jpg' -or -name '*.png' -or -name '*.css') $(m_doc_lnk)
 	cd "$(tmp-dir)" ; \
 	if test -z "$$($(GIT) diff --cached)" ; \
 	then \

@@ -74,6 +74,8 @@ doc-deep: all $(doc-dir) $(results-dir)
 	$(MAKE) doc
 
 # make documentation searchable in MATLAB
+m_doc_lnk := toolbox/doc
+
 toolbox/doc/matlab/helptoc.xml : doc/build/matlab/helptoc.xml doc/index.html
 	ln -sf ../doc toolbox/doc
 	cp -v "$<" "$@"
