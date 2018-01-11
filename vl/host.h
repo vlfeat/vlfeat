@@ -5,7 +5,7 @@
  **/
 
 /*
-Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
+Copyright (C) 2007-12,18 Andrea Vedaldi and Brian Fulkerson.
 All rights reserved.
 
 This file is part of the VLFeat library and is made available under
@@ -657,6 +657,11 @@ vl_swap_host_big_endianness_2 (void *dst, void* src)
     dst_ [1] = src_ [0] ;
 #endif
 }
+
+/* Linux: limit glibc to old versions for compatibility */
+#if defined(VL_COMPILER_GNUC) & defined(VL_OS_LINUX) & ! defined(__DOXYGEN__)
+__asm__(".symver memcpy,memcpy@GLIBC_2.2.5");
+#endif
 
 /* VL_HOST_H */
 #endif
