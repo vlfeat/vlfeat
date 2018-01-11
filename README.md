@@ -1,6 +1,6 @@
 # VLFeat -- Vision Lab Features Library
 
-> Version 0.9.20
+> Version 0.9.21
 
 The VLFeat open source library implements popular computer vision
 algorithms specialising in image understanding and local featurexs
