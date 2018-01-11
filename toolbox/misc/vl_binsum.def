@@ -163,7 +163,7 @@ VL_XCAT4(_vl_binsum_,__VALUE_T__,_,__INDEX_T__)
      */
 
     if (HD != BD) {
-      if (! d == HD - 1 && BD == HD - 1) {
+      if (! (d == HD - 1) && BD == HD - 1) {
         vlmxError(vlmxErrInconsistentData,
                   "ACCUMULATOR and INDEXES do not have the same number of dimensions.") ;
       }
