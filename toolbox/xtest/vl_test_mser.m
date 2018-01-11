@@ -1,11 +1,21 @@
-function results = vl_test_mser(varargin)
-% VL_TEST_MSER
-vl_test_init ;
+classdef vl_test_mser < matlab.unittest.TestCase
+  properties
+    im
+  end
+  
+  methods (TestClassSetup)
+    function ssetup(t)
+     t.im = im2uint8(rgb2gray(vl_impattern('roofs1'))) ;
+    end
+  end
+   
+  methods (Test)
+    function test_mser(t)
+      [regions,frames] = vl_mser(t.im) ;
+      mask = vl_erfill(t.im, regions(1)) ;
+      t.verifyTrue(true) ;
+    end
+  end
+end
 
-function s = setup()
-s.im = im2uint8(rgb2gray(vl_impattern('roofs1'))) ;
-
-function test_mser(s)
-[regions,frames] = vl_mser(s.im) ;
-mask = vl_erfill(s.im, regions(1)) ;
 

@@ -1,23 +1,32 @@
-function results = vl_test_phow(varargin)
-% VL_TEST_PHOPW
-vl_test_init ;
+classdef vl_test_phow < matlab.unittest.TestCase
+  properties
+    I
+  end
+  
+  methods (TestClassSetup)
+    function ssetup(t)
+      t.I = im2double(imread(fullfile(vl_root,'data','spots.jpg'))) ;
+      t.I = single(t.I) ;
+    end
+  end
+  
+  methods (Test)
+    function test_gray(t)
+      [f,d] = vl_phow(t.I, 'color', 'gray') ;
+      t.verifyEqual(size(d,1),128) ;
+    end
+    function test_rgb(t)
+      [f,d] = vl_phow(t.I, 'color', 'rgb') ;
+      t.verifyEqual(size(d,1),128*3) ;
+    end
+    function test_hsv(t)
+      [f,d] = vl_phow(t.I, 'color', 'hsv') ;
+      t.verifyEqual(size(d,1),128*3) ;
+    end
+    function test_opponent(t)
+      [f,d] = vl_phow(t.I, 'color', 'opponent') ;
+      t.verifyEqual(size(d,1),128*3) ;
+    end
+  end
+end
 
-function s = setup()
-s.I = im2double(imread(fullfile(vl_root,'data','spots.jpg'))) ;
-s.I = single(s.I) ;
-
-function test_gray(s)
-[f,d] = vl_phow(s.I, 'color', 'gray') ;
-assert(size(d,1) == 128) ;
-
-function test_rgb(s)
-[f,d] = vl_phow(s.I, 'color', 'rgb') ;
-assert(size(d,1) == 128*3) ;
-
-function test_hsv(s)
-[f,d] = vl_phow(s.I, 'color', 'hsv') ;
-assert(size(d,1) == 128*3) ;
-
-function test_opponent(s)
-[f,d] = vl_phow(s.I, 'color', 'opponent') ;
-assert(size(d,1) == 128*3) ;
