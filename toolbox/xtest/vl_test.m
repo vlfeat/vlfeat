@@ -30,7 +30,7 @@ function results = vl_test(varargin)
 
 opts.break = false ;
 opts.tapFile = [] ;
-opts.command = [] ;
+opts.command = 'vl_test_' ;
 opts = vl_argparse(opts,varargin) ;
 
 import matlab.unittest.constraints.* ;
