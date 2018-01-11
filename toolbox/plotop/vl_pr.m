@@ -2,13 +2,13 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %VL_PR   Precision-recall curve.
 %   [RECALL, PRECISION] = VL_PR(LABELS, SCORES) computes the
 %   precision-recall (PR) curve. LABELS are the ground truth labels,
-%   greather than zero for a positive sample and smaller than zero for
+%   greater than zero for a positive sample and smaller than zero for
 %   a negative one. SCORES are the scores of the samples obtained from
-%   a classifier, where lager scores should correspond to positive
+%   a classifier, where larger scores should correspond to positive
 %   samples.
 %
 %   Samples are ranked by decreasing scores, starting from rank 1.
-%   PRECISION(K) and RECALL(K) are the precison and recall when
+%   PRECISION(K) and RECALL(K) are the precision and recall when
 %   samples of rank smaller or equal to K-1 are predicted to be
 %   positive and the remaining to be negative. So for example
 %   PRECISION(3) is the percentage of positive samples among the two
@@ -16,7 +16,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   samples are predicted to be positive and is conventionally set to
 %   the value 1.
 %
-%   Set to zero the lables of samples that should be ignored in the
+%   Set to zero the labels of samples that should be ignored in the
 %   evaluation. Set to -INF the scores of samples which are not
 %   retrieved. If there are samples with -INF score, then the PR curve
 %   may have maximum recall smaller than 1, unless the INCLUDEINF
@@ -48,7 +48,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   info.ap_interp_11::
 %     11-points interpolated average precision as defined by TREC.
 %     This is the average of the maximum precision for recall levels
-%     greather than 0.0, 0.1, 0.2, ..., 1.0. This measure was used in
+%     greater than 0.0, 0.1, 0.2, ..., 1.0. This measure was used in
 %     the PASCAL VOC challenge up to the 2008 edition.
 %
 %   info.auc_pa08::
@@ -62,18 +62,18 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %   Interpolate:: false
 %     If set to true, use interpolated precision. The interpolated
 %     precision is defined as the maximum precision for a given recall
-%     level and onwards. Here it is implemented as the culumative
+%     level and onwards. Here it is implemented as the cumulative
 %     maximum from low to high scores of the precision.
 %
 %   NumPositives:: []
 %   NumNegatives:: []
 %     If set to a number, pretend that LABELS contains this may
 %     positive/negative labels. NUMPOSITIVES/NUMNEGATIVES cannot be
-%     smaller than the actual number of positive/negative entrires in
+%     smaller than the actual number of positive/negative entries in
 %     LABELS. The additional positive/negative labels are appended to
 %     the end of the sequence, as if they had -INF scores (not
 %     retrieved). This is useful to evaluate large retrieval systems
-%     for which one stores ony a handful of top results for efficiency
+%     for which one stores only a handful of top results for efficiency
 %     reasons.
 %
 %   IncludeInf:: false
@@ -101,7 +101,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 %       PRECISION(S) = TP(S) / (TP(S) + FP(S))
 %       RECALL(S) = TPR(S) = TP(S) / P
 %
-%     The precision is the fraction of positivie predictions which are
+%     The precision is the fraction of positive predictions which are
 %     correct, and the recall is the fraction of positive labels that
 %     have been correctly classified (recalled). Notice that the recall
 %     is also equal to the true positive rate for the ROC curve (see
@@ -123,7 +123,7 @@ function [recall, precision, info] = vl_pr(labels, scores, varargin)
 % This file is part of the VLFeat library and is made available under
 % the terms of the BSD license (see the COPYING file).
 
-% TP and FP are the vectors of true positie and false positve label
+% TP and FP are the vectors of true positive and false positive label
 % counts for decreasing scores, P and N are the total number of
 % positive and negative labels. Note that if certain options are used
 % some labels may actually not be stored explicitly by LABELS, so P+N

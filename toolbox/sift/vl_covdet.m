@@ -68,7 +68,9 @@
 %   for one or more dominant orientations of the gradient in a patch
 %   around the feature as in [1]. Note that more than one orientation
 %   can be associated to each detected feature, creating multiple
-%   versions of the same feature with different orientations.
+%   versions of the same feature with different orientations. The maximum
+%   number of orientations per feature can be set with MaxNumOrientations
+%   option.
 %
 %   VL_COVDET(..., 'Frames', F) uses the user specified frames F
 %   instead of running a detector. The estimation of the affine shape
@@ -151,6 +153,15 @@
 %   In addition to the ones discussed so far, the function supports
 %   the following options:
 %
+%   NumOctaves:: maximum possible
+%     The number of scale levels sampled per octave when constructing
+%     the scale spaces.
+%
+%   BaseScale:: 1.6
+%     Gaussian Scale Space pyramid base scale. Sets up the blur which is
+%     being applied to the image as sqrt(BS^2 - 0.5^2) where BS is the
+%     value of the base scale and 0.5 is the initial image blur.
+%
 %   OctaveResolution:: 3
 %     The number of scale levels sampled per octave when constructing
 %     the scale spaces.
@@ -160,6 +171,14 @@
 %     allows to detect features at minimum smoothing level (scale) of
 %     0.5 pixels rather than 1.0, resulting in many more small
 %     features being detected.
+%
+%   MaxNumOrientations:: 4
+%     Maximum number of orientations per feature when EstimateOrientation
+%     is true.
+%
+%   AllowPaddedWarping:: true
+%     Set to `false` to drop all features where measurement region gets out
+%     of the input image.
 %
 %   Verbose::
 %     If specified, it increases the verbosity level.

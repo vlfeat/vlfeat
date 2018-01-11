@@ -4,7 +4,7 @@ classdef vl_test_vlad < matlab.unittest.TestCase
     mu
     assignments
   end
-  
+
   methods (TestClassSetup)
     function setup(t)
       randn('state',0) ;
@@ -14,14 +14,14 @@ classdef vl_test_vlad < matlab.unittest.TestCase
       t.assignments = bsxfun(@times, assignments, 1 ./ sum(assignments,1)) ;
     end
   end
-  
-  methods (Test)    
+
+  methods (Test)
     function test_basic(t)
       x = [1, 2, 3] ;
       mu = [0, 0, 0] ;
       assignments = eye(3) ;
       phi = vl_vlad(x, mu, assignments, 'unnormalized') ;
-      t.verifyEqual(phi, [1 2 3]') ;      
+      t.verifyEqual(phi, [1 2 3]') ;
       mu = [0, 1, 2] ;
       phi = vl_vlad(x, mu, assignments, 'unnormalized') ;
       t.verifyEqual(phi, [1 1 1]') ;
@@ -63,7 +63,7 @@ classdef vl_test_vlad < matlab.unittest.TestCase
       t.verifyEqual(phi, phi_, 'AbsTo', 1e-4) ;
     end
   end
-  
+
   methods (Static)
     function enc = simple_vlad(x, mu, assign)
       for i = 1:size(assign,1)
@@ -73,4 +73,3 @@ classdef vl_test_vlad < matlab.unittest.TestCase
     end
   end
 end
-
