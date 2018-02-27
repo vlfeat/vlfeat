@@ -80,7 +80,7 @@ enc = vl_malloc(sizeof(TYPE) * dimension * numCenters);
 // do the encoding job
 vl_vlad_encode (enc, VL_F_TYPE,
                 vl_kmeans_get_centers(kmeans), dimension, numCenters,
-                data, numData,
+                dataToEncode, numDataToEncode,
                 assignments,
                 0) ;
 @endcode
