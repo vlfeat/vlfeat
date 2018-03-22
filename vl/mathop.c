@@ -726,7 +726,7 @@ vl_lapack_dlasv2 (double *smin,
   int pmax = 1 ; /* pointer to max abs entry */
   int swap = 0 ; /* is swapped */
   int glarge = 0 ; /* is g very large */
-  int tsign ; /* tmp sign */
+  int tsign = 0; /* tmp sign */
   double fmh ; /* |f| -|h| */
   double d ; /* (|f| -|h|)/|f| */
   double dd ; /* d*d */

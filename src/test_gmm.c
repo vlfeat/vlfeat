@@ -231,10 +231,10 @@ void saveResults(const char * dataFileData, const char * dataFileResults, VlGMM 
   vl_size dimension = vl_gmm_get_dimension(gmm) ;
   vl_size numClusters = vl_gmm_get_num_clusters(gmm) ;
   vl_type dataType = vl_gmm_get_data_type(gmm) ;
-  double const * sigmas = vl_gmm_get_covariances(gmm) ;
-  double const * means = vl_gmm_get_means(gmm) ;
-  double const * weights = vl_gmm_get_priors(gmm) ;
-  double const * posteriors = vl_gmm_get_posteriors(gmm) ;
+  void const * sigmas = vl_gmm_get_covariances(gmm) ;
+  void const * means = vl_gmm_get_means(gmm) ;
+  void const * weights = vl_gmm_get_priors(gmm) ;
+  void const * posteriors = vl_gmm_get_posteriors(gmm) ;
 
   ofp = fopen(dataFileData, mode);
   for(i_d = 0; i_d < numData; i_d++) {

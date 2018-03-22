@@ -48,7 +48,7 @@ int main()
       /*  parents always has size 2*nrows-1 */
       parents = vl_aib_get_parents(aib);
       for(r=0; r<2*nrows-1; r++)
-        printf("%d => %d\n", r, parents[r]);
+        printf("%u => %u\n", r, parents[r]);
 
       vl_aib_delete(aib);
     }

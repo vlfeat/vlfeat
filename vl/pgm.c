@@ -407,6 +407,7 @@ int vl_pgm_read_new (char const *name, VlPgmImage *im, vl_uint8** data)
   }
 
   if (vl_pgm_get_bpp(im) > 1) {
+    fclose (f) ;
     return vl_set_last_error(VL_ERR_BAD_ARG, "PGM with BPP > 1 not supported") ;
   }
 
@@ -415,7 +416,6 @@ int vl_pgm_read_new (char const *name, VlPgmImage *im, vl_uint8** data)
 
   if (err) {
     vl_free (data) ;
-    fclose (f) ;
   }
 
   fclose (f) ;

@@ -111,14 +111,14 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
       /* check no node points outside the tree */
       if (node > P) {
         snprintf(buf, sizeof(buf),
-                 "Out of bounds link PARENTS[%d] = %u > %u", i, node, P) ;
+                 "Out of bounds link PARENTS[%u] = %u > %u", i, node, P) ;
         mexErrMsgTxt (buf) ;
       }
 
       /* check node points to something above him */
       if ((node != 0) & (node != 1) & (node < i)) {
         snprintf(buf, sizeof(buf),
-                 "Backward link PARENTS[%d] = %u < %d", i, node, i) ;
+                 "Backward link PARENTS[%u] = %u < %u", i, node, i) ;
         mexErrMsgTxt (buf) ;
       }
       if (node == 0) ++ nnull ;

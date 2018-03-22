@@ -161,33 +161,33 @@ VL_EXPORT void vl_svm_train (VlSvm * self) ;
  ** @{ */
 
 /* hinge */
-VL_EXPORT double vl_svm_hinge_loss (double label, double inner) ;
-VL_EXPORT double vl_svm_hinge_loss_derivative (double label, double inner) ;
-VL_EXPORT double vl_svm_hinge_conjugate_loss (double label, double u) ;
+VL_EXPORT double vl_svm_hinge_loss (double inner, double label) ;
+VL_EXPORT double vl_svm_hinge_loss_derivative (double inner, double label) ;
+VL_EXPORT double vl_svm_hinge_conjugate_loss (double u, double label) ;
 VL_EXPORT double vl_svm_hinge_dca_update (double alpha, double inner, double norm2, double label) ;
 
 /* square hinge */
-VL_EXPORT double vl_svm_hinge2_loss (double label, double inner) ;
-VL_EXPORT double vl_svm_hinge2_loss_derivative (double label, double inner) ;
-VL_EXPORT double vl_svm_hinge2_conjugate_loss (double label, double u) ;
+VL_EXPORT double vl_svm_hinge2_loss (double inner, double label) ;
+VL_EXPORT double vl_svm_hinge2_loss_derivative (double inner, double label) ;
+VL_EXPORT double vl_svm_hinge2_conjugate_loss (double u, double label) ;
 VL_EXPORT double vl_svm_hinge2_dca_update (double alpha, double inner, double norm2, double label) ;
 
 /* l1 */
-VL_EXPORT double vl_svm_l1_loss (double label, double inner) ;
-VL_EXPORT double vl_svm_l1_loss_derivative (double label, double inner) ;
-VL_EXPORT double vl_svm_l1_conjugate_loss (double label, double u) ;
+VL_EXPORT double vl_svm_l1_loss (double inner, double label) ;
+VL_EXPORT double vl_svm_l1_loss_derivative (double inner, double label) ;
+VL_EXPORT double vl_svm_l1_conjugate_loss (double u, double label) ;
 VL_EXPORT double vl_svm_l1_dca_update (double alpha, double inner, double norm2, double label) ;
 
 /* l2 */
-VL_EXPORT double vl_svm_l2_loss (double label, double inner) ;
-VL_EXPORT double vl_svm_l2_loss_derivative (double label, double inner) ;
-VL_EXPORT double vl_svm_l2_conjugate_loss (double label, double u) ;
+VL_EXPORT double vl_svm_l2_loss (double inner, double label) ;
+VL_EXPORT double vl_svm_l2_loss_derivative (double inner, double label) ;
+VL_EXPORT double vl_svm_l2_conjugate_loss (double u, double label) ;
 VL_EXPORT double vl_svm_l2_dca_update (double alpha, double inner, double norm2, double label) ;
 
 /* logistic */
-VL_EXPORT double vl_svm_logistic_loss (double label, double inner) ;
-VL_EXPORT double vl_svm_logistic_loss_derivative (double label, double inner) ;
-VL_EXPORT double vl_svm_logistic_conjugate_loss (double label, double u) ;
+VL_EXPORT double vl_svm_logistic_loss (double inner, double label) ;
+VL_EXPORT double vl_svm_logistic_loss_derivative (double inner, double label) ;
+VL_EXPORT double vl_svm_logistic_conjugate_loss (double u, double label) ;
 VL_EXPORT double vl_svm_logistic_dca_update (double alpha, double inner, double norm2, double label) ;
 /** } */
 
