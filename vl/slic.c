@@ -176,6 +176,32 @@ vl_slic_segment (vl_uint32 * segmentation,
                  float regularization,
                  vl_size minRegionSize)
 {
+    vl_slic_segment2( segmentation,
+                      image,
+                      width,
+                      height,
+                      width,
+                      width,
+                      width*height,
+                      numChannels,
+                      regionSize,
+                      regularization,
+                      minRegionSize );
+}
+
+void
+vl_slic_segment2 (vl_uint32 * segmentation,
+                 float const * image,
+                 vl_size width,
+                 vl_size height,
+                 vl_intptr segScanlinePitch,
+                 vl_intptr imgScanlinePitch,
+                 vl_intptr imgChannelPitch,
+                 vl_size numChannels,
+                 vl_size regionSize,
+                 float regularization,
+                 vl_size minRegionSize)
+{
   vl_index i, x, y, u, v, k, region ;
   vl_uindex iter ;
   vl_size const numRegionsX = (vl_size) ceil((double) width / regionSize) ;
@@ -197,8 +223,11 @@ vl_slic_segment (vl_uint32 * segmentation,
   assert(regionSize >= 1) ;
   assert(regularization >= 0) ;
 
-#define atimage(x,y,k) image[(x)+(y)*width+(k)*width*height]
+#define atimage(x,y,k) image[(x)+(y)*imgScanlinePitch+(k)*imgChannelPitch]
 #define atEdgeMap(x,y) edgeMap[(x)+(y)*width]
+#define segIdx(x,y) ((x)+(y)*segScanlinePitch)
+#define atSeg(x,y) segmentation[segIdx((x),(y))]
+#define atCleaned( x, y ) cleaned[segIdx((x),(y))]
 
   edgeMap = vl_calloc(numPixels, sizeof(float)) ;
   masses = vl_malloc(sizeof(vl_uint32) * numPixels) ;
@@ -283,7 +312,7 @@ vl_slic_segment (vl_uint32 * segmentation,
             distance = appearance + factor * spatial ;
             if (minDistance > distance) {
               minDistance = distance ;
-              segmentation[x + y * width] = (vl_uint32)region ;
+              atSeg(x,y) = (vl_uint32)region ;
             }
           }
         }
@@ -311,8 +340,7 @@ vl_slic_segment (vl_uint32 * segmentation,
 
     for (y = 0 ; y < (signed)height ; ++y) {
       for (x = 0 ; x < (signed)width ; ++x) {
-        vl_index pixel = x + y * width ;
-        vl_index region = segmentation[pixel] ;
+        vl_index region = atSeg(x, y) ;
         masses[region] ++ ;
         centers[region * (2 + numChannels) + 0] += x ;
         centers[region * (2 + numChannels) + 1] += y ;
@@ -336,9 +364,9 @@ vl_slic_segment (vl_uint32 * segmentation,
   vl_free(centers) ;
   vl_free(edgeMap) ;
 
-  /* elimiate small regions */
+  /* eliminate small regions */
   {
-    vl_uint32 * cleaned = vl_calloc(numPixels, sizeof(vl_uint32)) ;
+    vl_uint32 * cleaned = vl_calloc(height * segScanlinePitch, sizeof(vl_uint32)) ;
     vl_uindex * segment = vl_malloc(sizeof(vl_uindex) * numPixels) ;
     vl_size segmentSize ;
     vl_uint32 label ;
@@ -347,48 +375,45 @@ vl_slic_segment (vl_uint32 * segmentation,
     vl_index const dx [] = {+1, -1,  0,  0} ;
     vl_index const dy [] = { 0,  0, +1, -1} ;
     vl_index direction ;
-    vl_index pixel ;
 
-    for (pixel = 0 ; pixel < (signed)numPixels ; ++pixel) {
-      if (cleaned[pixel]) continue ;
-      label = segmentation[pixel] ;
+    for (y = 0 ; y < (vl_index)height ; ++y) {
+    for (x = 0 ; x < (vl_index)width ; ++x) {
+      if (atCleaned(x,y)) continue ;
+      label = atSeg(x,y) ;
       numExpanded = 0 ;
       segmentSize = 0 ;
-      segment[segmentSize++] = pixel ;
+      segment[segmentSize++] = segIdx(x,y) ;
 
       /*
        find cleanedLabel as the label of an already cleaned
        region neihbour of this pixel
        */
       cleanedLabel = label + 1 ;
-      cleaned[pixel] = label + 1 ;
-      x = pixel % width ;
-      y = pixel / width ;
+      atCleaned(x,y) = label + 1 ;
       for (direction = 0 ; direction < 4 ; ++direction) {
         vl_index xp = x + dx[direction] ;
         vl_index yp = y + dy[direction] ;
-        vl_index neighbor = xp + yp * width ;
         if (0 <= xp && xp < (signed)width &&
             0 <= yp && yp < (signed)height &&
-            cleaned[neighbor]) {
-          cleanedLabel = cleaned[neighbor] ;
+            atCleaned(xp,yp)) {
+          cleanedLabel = atCleaned(xp,yp) ;
         }
       }
 
       /* expand the segment */
       while (numExpanded < segmentSize) {
         vl_index open = segment[numExpanded++] ;
-        x = open % width ;
-        y = open / width ;
+        x = open % segScanlinePitch ;
+        y = open / segScanlinePitch ;
         for (direction = 0 ; direction < 4 ; ++direction) {
           vl_index xp = x + dx[direction] ;
           vl_index yp = y + dy[direction] ;
-          vl_index neighbor = xp + yp * width ;
+          vl_index neighbor = segIdx(xp, yp) ;
           if (0 <= xp && xp < (signed)width &&
               0 <= yp && yp < (signed)height &&
-              cleaned[neighbor] == 0 &&
-              segmentation[neighbor] == label) {
-            cleaned[neighbor] = label + 1 ;
+              atCleaned(xp,yp) == 0 &&
+              atSeg(xp,yp) == label) {
+            atCleaned(xp,yp) = label + 1 ;
             segment[segmentSize++] = neighbor ;
           }
         }
@@ -401,10 +426,13 @@ vl_slic_segment (vl_uint32 * segmentation,
         }
       }
     }
+    }
     /* restore base 0 indexing of the regions */
-    for (pixel = 0 ; pixel < (signed)numPixels ; ++pixel) cleaned[pixel] -- ;
+    for (y = 0 ; y < (vl_index)height ; ++y)
+		for (x = 0 ; x < (vl_index)width ; ++x)
+			atCleaned(x,y) -- ;
 
-    memcpy(segmentation, cleaned, numPixels * sizeof(vl_uint32)) ;
+    memcpy(segmentation, cleaned, height * segScanlinePitch * sizeof(vl_uint32)) ;
     vl_free(cleaned) ;
     vl_free(segment) ;
   }
