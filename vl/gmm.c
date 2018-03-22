@@ -377,7 +377,7 @@ vl_gmm_new (vl_type dataType, vl_size dimension, vl_size numComponents)
   self->covariances = vl_calloc (numComponents * dimension, size) ;
   self->sigmaLowBound = vl_calloc (dimension, sizeof(double)) ;
 
-  for (i = 0 ; i < (unsigned)self->dimension ; ++i)  { self->sigmaLowBound[i] = 1e-4 ; }
+  for (i = 0 ; i < (vl_index)self->dimension ; ++i)  { self->sigmaLowBound[i] = 1e-4 ; }
   return self ;
 }
 
