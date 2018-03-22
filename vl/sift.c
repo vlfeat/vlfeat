@@ -1411,7 +1411,13 @@ vl_sift_detect (VlSiftFilt * f)
         sn              >= s_min              &&
         sn              <= s_max ;
 
-      if (good) {
+      if (good) 
+      {
+        k-> quality = tp/vl_max_d( FLT_MIN, vl_abs_d (val));
+        k-> quality*= score/vl_max_d( FLT_MIN, (te+1)*(te+1)/te);
+        k-> quality*= vl_abs_d (b[0])/1.5;
+        k-> quality*= vl_abs_d (b[1])/1.5;
+        k-> quality*= vl_abs_d (b[2])/1.5;
         k-> o     = f->o_cur ;
         k-> ix    = x ;
         k-> iy    = y ;
