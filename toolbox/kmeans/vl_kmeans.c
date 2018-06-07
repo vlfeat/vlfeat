@@ -182,6 +182,8 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
           initialization = VlKMeansPlusPlus ;
         } else if (vlmxCompareStringsI("randsel", buf) == 0) {
           initialization = VlKMeansRandomSelection ;
+        } else if (vlmxCompareStringsI("randfast", buf) == 0) {
+          initialization = VlKMeansRandomFast ;
         } else {
           vlmxError (vlmxErrInvalidArgument,
                     "Invalid value %s for INITIALISATION.", buf) ;
@@ -285,6 +287,7 @@ mexFunction (int nout, mxArray * out[], int nin, const mxArray * in[])
     switch (vl_kmeans_get_initialization(kmeans)) {
       case VlKMeansPlusPlus : initializationName = "plusplus" ; break ;
       case VlKMeansRandomSelection : initializationName = "randsel" ; break ;
+      case VlKMeansRandomFast : initializationName = "randfast" ; break ;
       default: abort() ;
     }
     mexPrintf("kmeans: Initialization = %s\n", initializationName) ;

@@ -35,6 +35,7 @@ typedef enum _VlKMeansAlgorithm {
 
 typedef enum _VlKMeansInitialization {
   VlKMeansRandomSelection,  /**< Randomized selection */
+  VlKMeansRandomFast,       /**< Randomized selection (fast) */
   VlKMeansPlusPlus          /**< Plus plus raondomized selection */
 } VlKMeansInitialization ;
 
@@ -109,6 +110,13 @@ VL_EXPORT void vl_kmeans_set_centers (VlKMeans * self,
                                       vl_size numCenters) ;
 
 VL_EXPORT void vl_kmeans_init_centers_with_rand_data
+                  (VlKMeans * self,
+                   void const * data,
+                   vl_size dimensions,
+                   vl_size numData,
+                   vl_size numCenters) ;
+
+VL_EXPORT void vl_kmeans_init_centers_with_randfast_data
                   (VlKMeans * self,
                    void const * data,
                    vl_size dimensions,
