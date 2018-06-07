@@ -635,7 +635,7 @@ VL_XCAT(_vl_kmeans_init_centers_with_randfast_data_, SFX)
               cur_feat,
               sizeof(TYPE) * dimension) ;
       centers_sum[k] = cur_feat_sum ;
-      VL_PRINTF("Detected center's sum %d=%f\n", k, cur_feat_sum) ;
+      //VL_PRINTF("Detected center's sum %d=%f\n", k, cur_feat_sum) ;
       k ++ ;
     }
     vl_free(distances) ;
