@@ -93,83 +93,17 @@ $ make MKOCTFILE=/path/to/mkoctfile
 <h1>Mac OS X troubleshooting</h1>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h2>OS X 10.9 Mavericks, Xcode 5, clang, and GCC</h2>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<p>Recent changes to Mac OS X toolkit that ships with Xcode have made
-compilation of VLFeat slightly more complex. Out of the box, Xcode 5.0
-on Mac OS X Mavericks, for example, incorporates the clang compiler
-but not the GCC compiler. While VLFeat has been updated to use clang
-in this case, it is worth noting that this compiler does not yet
-support the OpenMP standard, meaning that multi-core computations
-would be disabled in this case.</p>
-
-<p>Compiling OpenMP can be achieved by using the GCC compiler, for
-example obtaining it from MacPorts. However, anything more recent that
-GCC 4.2 will use the MacPorts runtime (C and C++). Since MATLAB links
-to the OS X native C and C++ runtime, this breaks the compatibility of
-VLFeat MEX files with MATLAB. In particular, while VLFeat does not use
-C++, MEX files do as the MEX API is coded in C++ internally (in
-particular MEX files are coded with the <code>-fexception</code>
-option as MEX API calls can throw exceptions, even though they look
-like regular C functions). In short, mixing C++ runtimes will cause
-MATLAB MEX files to crash every time an error is generated.</p>
-
-<p>The easiest solution at present is to use
-the <code>gcc-apple-4.2</code> from MacPorts. Unfortunately, this
-version does not support AVX instructions, but supports OpenMP and
-creates binaries that are MATLAB compatible.</p>
-
+<p>Since macOS CLang compiler does not support OpenMP, this is
+  disabled by default on this platform. To use it,
+  install <a href="brew.sh">Brew</a> llvm:</p>
 <precode type='sh'>
-# Compile VLFeat in a manner compatible with MATLAB and OpenMP support
-$ sudo port install apple-gcc42 # Install MacPort's distribution of apple-gcc-42
-$ make CC=/opt/local/bin/gcc-apple-42 # compile VLFeat using MacPort's GCC
+$ brew install llvm
 </precode>
-
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-<h2>OS X 10.6 Snow Leopard, 64-bit, and MATLAB 2009b.</h2>
-<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-<p>MATLAB 2009b for Snow Leopard has added 64 bit mex support and a
-corresponding extension <code>mexmaci64</code>. VLFeat now supports
-compiling for this platform, but the architecture must be specified
-manually when compiling, either like:</p>
-
+<p>Then, use the Brew CLang compiler to compile VLFeat, as follows::</p>
 <precode type='sh'>
-$ make ARCH=maci64
+$ make CC=BREWROOT/opt/llvm/bin/clang DISABLE_OPENMP=no
 </precode>
-
-<p>or</p>
-
-<precode type='sh'>
-$ make ARCH=maci
-</precode>
-
-<p>Unfortunately, MATLAB 2009b's <code>mex</code> script has a bug
-that must be manually fixed in order for this procedure to work
-correctly. It is recommend to make backup of the <code>mex</code>
-script before attempting this. Th fix the bug, edit the
-<code>MATLABROOT/bin/mex</code> script by cutting the line:</p>
-
-<precode type='sh'>
-get_arch    # Call $MATLAB/bin/util/arch.sh
-</precode>
-
-<p>and pasting it after the processing of options:</p>
-
-<precode type='sh'>
-...
-shift
-done
-
-#PASTE get_arch call here
-get_arch    # Call $MATLAB/bin/util/arch.sh
-
-if [ $v7_compat -eq 1 ] ; then
-fc_flags="$fc_flags -DMX_COMPAT_32"
-...
-</precode>
+<p>Here <code>BREWROOT</code> is the path to Brew installation.</p>
 </page>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

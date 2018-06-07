@@ -1,6 +1,6 @@
 # VLFeat -- Vision Lab Features Library
 
-> Version 0.9.20
+> Version 0.9.21
 
 The VLFeat open source library implements popular computer vision
 algorithms specialising in image understanding and local featurexs
@@ -56,6 +56,7 @@ ship with pre-built GNU Octave MEX files. To compile them use
 
 # Changes
 
+- **0.9.21** Maintenance release. Bugfixes.
 - **0.9.20** Maintenance release. Bugfixes.
 - **0.9.19** Maintenance release. Minor bugfixes and fixes compilation
   with MATLAB 2014a.

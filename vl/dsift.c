@@ -262,7 +262,7 @@ _vl_dsift_new_kernel (int binSize, int numBins, int binIndex, double windowSize)
 
   for (x = - binSize + 1 ; x <= + binSize - 1 ; ++ x) {
     float z = (x - delta) / sigma ;
-    *kerIter++ = (1.0F - fabsf(x) / binSize) *
+    *kerIter++ = (1.0F - fabsf((float)x) / binSize) *
       ((binIndex >= 0) ? expf(- 0.5F * z*z) : 1.0F) ;
   }
   return ker ;

@@ -2,7 +2,7 @@
 # description: Build everything
 # author: Andrea Vedaldi
 
-# Copyright (C) 2014 Andrea Vedaldi.
+# Copyright (C) 2014,18 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -83,7 +83,7 @@
 # components, located in make/*.mak. Please check out the
 # corresponding files in order to adjust parameters.
 
-# Copyright (C) 2014 Andrea Vedaldi.
+# Copyright (C) 2014,18 Andrea Vedaldi.
 # Copyright (C) 2007-13 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -200,7 +200,8 @@ endif
 
 ifeq "$(COMPILER)" "clang"
 ifneq "$(DISABLE_OPENMP)" "no"
-$(info Clang does not support OpenMP yet, disabling.)
+$(info Apple Clang does not support OpenMP yet, disabling.)
+$(info Alternatively, use brew llvm clang and specify DISABLE_OPENMP=no.)
 DISABLE_OPENMP:=yes
 endif
 endif
@@ -322,7 +323,7 @@ endef
 # added to the binary distribution.
 
 .PHONY: clean, archclean, distclean, info, help
-no_dep_targets := clean archclean distclean info help
+no_dep_targets := clean archclean distclean help
 
 include make/dll.mak
 include make/bin.mak
@@ -379,6 +380,6 @@ help:
 
 .PRECIOUS: $(deps)
 
-ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
+ifneq ($(filter-out $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(deps)
 endif

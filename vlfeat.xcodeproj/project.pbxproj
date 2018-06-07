@@ -59,8 +59,6 @@
 		2DD9AD2017F9C44A00C1FC78 /* vl_fisher.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D141E20178376CA00E2958B /* vl_fisher.c */; };
 		2DE607611785722900E1A24E /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2DE607671785725200E1A24E /* vl_vlad.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D141E2B178376CA00E2958B /* vl_vlad.c */; };
-		2DE7563D16D543A90016C1DC /* svm_dca.h.disabled in Headers */ = {isa = PBXBuildFile; fileRef = 2DE7563916D543A90016C1DC /* svm_dca.h.disabled */; };
-		2DE7563F16D543A90016C1DC /* svm_sgd.h.disabled in Headers */ = {isa = PBXBuildFile; fileRef = 2DE7563B16D543A90016C1DC /* svm_sgd.h.disabled */; };
 		2DFA2399173B7D0F0065603E /* libvl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D1EECD21603E85200C63DCE /* libvl.dylib */; };
 		2DFA23A1173B7E730065603E /* vl_gmm.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DFA239F173B7DFB0065603E /* vl_gmm.c */; };
 		2DFA23A4173B7F1C0065603E /* liop.c in Sources */ = {isa = PBXBuildFile; fileRef = 2DFA23A2173B7F1C0065603E /* liop.c */; };
@@ -498,8 +496,6 @@
 		2DE5B37E0FDC2BE9008CEB1D /* dsift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsift.h; sourceTree = "<group>"; };
 		2DE5B3A80FDC3471008CEB1D /* vl_dsift.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_dsift.c; path = toolbox/sift/vl_dsift.c; sourceTree = "<group>"; };
 		2DE607661785722900E1A24E /* vl_vlad.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = vl_vlad.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
-		2DE7563916D543A90016C1DC /* svm_dca.h.disabled */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = svm_dca.h.disabled; sourceTree = "<group>"; };
-		2DE7563B16D543A90016C1DC /* svm_sgd.h.disabled */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = svm_sgd.h.disabled; sourceTree = "<group>"; };
 		2DE765220FF23EE9006347E0 /* kdtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kdtree.h; path = toolbox/misc/kdtree.h; sourceTree = "<group>"; };
 		2DF4565610ADB9010083F316 /* vl_homkermap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vl_homkermap.c; path = toolbox/misc/vl_homkermap.c; sourceTree = "<group>"; };
 		2DFA239E173B7D0F0065603E /* vl_gmm.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = vl_gmm.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1275,8 +1271,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D1EED201604992B00C63DCE /* scalespace.h in Headers */,
-				2DE7563D16D543A90016C1DC /* svm_dca.h.disabled in Headers */,
-				2DE7563F16D543A90016C1DC /* svm_sgd.h.disabled in Headers */,
 				2DA64CDA17329C2400276F3D /* fisher.h in Headers */,
 				2DA64CDC17329C2400276F3D /* gmm.h in Headers */,
 				2DA64CDD17329C2400276F3D /* svm.h in Headers */,
@@ -1885,7 +1879,6 @@
 					"$(SRCROOT)/toolbox",
 					"$(MATLABROOT)/extern/include",
 				);
-				INKSCAPE = /Applications/Inkscape.app/Contents/Resources/bin/inkscape;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2013A.app;
@@ -1958,7 +1951,6 @@
 					"$(SRCROOT)/toolbox",
 					"$(MATLABROOT)/extern/include",
 				);
-				INKSCAPE = /Applications/Inkscape.app/Contents/Resources/bin/inkscape;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				MATLABEXE = "$(MATLABROOT)/bin/matlab";
 				MATLABROOT = /Applications/Matlab_R2013A.app;

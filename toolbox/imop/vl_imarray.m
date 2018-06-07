@@ -13,7 +13,11 @@ function J = vl_imarray(A,varargin)
 %
 %   Spacing:: 0
 %     Separate the images by a border of the specified width (the
-%     border is assigned 0 value, which usually corresponds to black).
+%     border is assigned `FillValue`).
+%
+%   FillValue:: 0
+%     Value used fill in the spacing. Must be either a scalar or a vector
+%     of size 3 for RGB images.
 %
 %   Layout:: empty
 %     Specify a vector [TM TN] with the number of rows and columns of
@@ -41,26 +45,37 @@ function J = vl_imarray(A,varargin)
 
 opts.reverse = false ;
 opts.spacing = 0 ;
+opts.fillValue = 0 ;
 opts.layout = [] ;
 opts.movie = false ;
 opts.cmap = [] ;
 opts = vl_argparse(opts, varargin) ;
 
 swap3 = false ;
+fillValue = opts.fillValue;
 
 % retrieve image dimensions
 if ndims(A) <= 3
   numChannels = 1 ;
   [height,width,numImages] = size(A) ;
 else
-  if ndims(A) == 4 && size(A,3) == 3
+  if ndims(A) == 4 && (size(A,3) == 3 || size(A,3) == 1)
     [height,width,numChannels,numImages] = size(A) ;
   elseif ndims(A) == 4 && size(A,4) == 3 ;
     swap3 = true ;
     [height,width,numImages,numChannels] = size(A) ;
   else
-    error('A is neither M*N*K, nor M*N*3*K, nor M*N*K*3.') ;
+    error('A is neither M*N*K, nor M*N*1*K, nor M*N*3*K, nor M*N*K*3.') ;
   end
+end
+
+if numel(fillValue) > 1 && numel(fillValue) ~= numChannels
+  error('Incorrect size of `fillValue`.');
+end
+if isscalar(fillValue) && numChannels > 1
+  fillValue = fillValue * ones(1, 1, numChannels);
+else
+  fillValue = reshape(fillValue, 1, 1, numChannels);
 end
 
 % compute layout
@@ -75,10 +90,10 @@ end
 
 % make storage for composite image
 if ~ opts.movie
-  cdata = zeros(height * M + opts.spacing * (M-1), ...
+  cdata = bsxfun(@times, ones(height * M + opts.spacing * (M-1), ...
                 width  * N + opts.spacing * (N-1), ...
                 numChannels, ...
-                class(A)) ;
+                class(A)), fillValue) ;
 end
 
 % add one image per time
@@ -115,8 +130,8 @@ end
 
 if ~ opts.movie
   if nargout == 0
-    image(cdata) ;
-    colormap(opts.cmap) ;
+    imshow(cdata) ;
+    if ~isempty(opts.cmap), colormap(opts.cmap) ; end
     return ;
   else
     J = cdata ;

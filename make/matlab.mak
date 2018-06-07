@@ -2,7 +2,7 @@
 # description: Build MATALB toolbox
 # author: Andrea Vedaldi
 
-# Copyright (C) 2013-14 Andrea Vedaldi.
+# Copyright (C) 2013-14,18 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -73,14 +73,16 @@ $(MEX_BINDIR)/matlabver.mak: $(mex-dir)
 "fprintf(f,'MATLAB_VER=%d',[1e4 1e2 1]*sscanf(version,'%d.%d.%d'));fclose(f);exit();"
 
 ifdef MATLAB_PATH
-ifeq ($(filter $(no_dep_targets), $(MAKECMDGOALS)),)
+ifneq ($(filter-out $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(MEX_BINDIR)/matlabver.mak
 endif
+else
+$(info MATLAB support disabled)
 endif
 
-ifeq ($(call gt,$(MATLAB_VER),80300),)
+ifeq ($(call gt,$(MATLAB_VER),80400),)
 # new style
-$(info Detected MATLAB 2014a or greater: adjusting escape method for MEX)
+$(info Detected MATLAB 2014b or greater: adjusting escape method for MEX)
 escape =$(1)
 else
 ifeq ($(call gt,$(MATLAB_VER),1),)
@@ -247,10 +249,10 @@ $(MEX_BINDIR)/lib$(DLL_NAME).dylib : $(mex-dir) $(dll_obj)
 	    -current_version $(VER)						\
 	    -isysroot $(SDKROOT)						\
 	    $(dll_obj)								\
-	    $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/bin/$(ARCH)/)              \
 	    $(if $(DISABLE_OPENMP),,-L$(MATLAB_PATH)/sys/os/$(ARCH)/ -liomp5)	\
-	   -o $@
+            $(filter-out -fopenmp, $(DLL_LDFLAGS))                              \
+	    -o $@
 
 $(MEX_BINDIR)/lib$(DLL_NAME).so : $(mex-dir) $(dll_obj)
 	$(call C,CC) -shared							\

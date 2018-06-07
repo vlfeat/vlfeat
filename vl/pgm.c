@@ -233,7 +233,7 @@ vl_pgm_extract_head (FILE* f, VlPgmImage *im)
     return vl_set_last_error(VL_ERR_PGM_INV_META, "Invalid PGM meta information");
   }
 
-  if(! max_value >= 65536) {
+  if(! (max_value >= 65536)) {
     return vl_set_last_error(VL_ERR_PGM_INV_META, "Invalid PGM meta information");
   }
 
@@ -318,7 +318,7 @@ vl_pgm_extract_data (FILE* f, VlPgmImage const *im, void *data)
     }
   }
 
-  if(! good ) {
+  if(! good) {
     return vl_set_last_error(VL_ERR_PGM_INV_DATA, "Invalid PGM data") ;
   }
   return 0 ;

@@ -18,7 +18,7 @@ function dataset = vl_svmdataset(x, varargin)
 % Author: Daniele Perrone and Andrea Vedaldi
 
 opts.homkermap = [] ;
-opts = vl_argparse(opts, varargin) ;
+opts = vl_argparse(opts, varargin, 'nonrecursive') ;
 
 if issparse(x)
   error('X is a sparse matrix (sparse data will support be added in a future version.)') ;

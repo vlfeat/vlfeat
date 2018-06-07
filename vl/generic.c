@@ -17,7 +17,7 @@ the terms of the BSD license (see the COPYING file).
 @mainpage Vision Lab Features Library (VLFeat)
 @version __VLFEAT_VERSION__
 @author The VLFeat Team
-@par Copyright &copy; 2012-14 The VLFeat Authors
+@par Copyright &copy; 2012-14,18 The VLFeat Authors
 @par Copyright &copy; 2007-11 Andrea Vedaldi and Brian Fulkerson
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
 

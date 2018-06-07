@@ -17,6 +17,7 @@
 # ARCH: Either win32 or win64 [win64]
 # DEBUG: Set to yes to ativate debugging [no]
 # MATLABROOT: Path to MATLAB
+# MATLABVER: MATLAB version (e.g. 90200 for 9.2.0 - 2017a)
 # MSVSVER: Visual Studio version (e.g. 80, 90, 100) [90 for VS 9.0]
 # MSVCROOT: Visual C++ location [$(VCInstallDir)].
 # WINSDKROOT: Windows SDK location [$(WindowsSdkDir)]
@@ -24,7 +25,7 @@
 # Note that some of these variables depend on the architecture
 # (either win32 or win64).
 
-VER = 0.9.20
+VER = 0.9.21
 ARCH = win64
 DEBUG = no
 BRANCH = v$(VER)-$(ARCH)
@@ -43,13 +44,18 @@ WINSDKROOT = C:\Program Files\Microsoft SDKs\Windows\v7.0A
 
 !include make/nmake_helper.mak
 
+MATLABROOT = C:\Program Files\MATLAB\R2017a
+MATLABVER = 90200
+MEX = "$(MATLABROOT)\bin\mex.bat"
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 32-bit
 !if "$(ARCH)" == "win32"
 !message === COMPILING FOR 32-BIT
-
-MATLABROOT = C:\Program Files (x86)\MATLAB\R2010b
-MEX = "$(MATLABROOT)\bin\mex.bat"
+!if $(MATLABVER) <= 80500
 MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSVER)opts.bat"
+!else
+MEXOPT = "$(MATLABROOT)\bin\win32\mexopts\msvc$(MSVSYEAR).xml"
+!endif
 MEXEXT = mexw32
 MEX_FLAGS =
 
@@ -64,10 +70,12 @@ LFLAGS = /MACHINE:X86 \
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 64-bit
 !elseif "$(ARCH)" == "win64"
 !message === COMPILING FOR 64-BIT
-
-MATLABROOT = C:\Program Files\MATLAB\R2010b
 MEX = "$(MATLABROOT)\bin\mex.bat"
+!if $(MATLABVER) <= 80500
 MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSVER)opts.bat"
+!else
+MEXOPT = "$(MATLABROOT)\bin\win64\mexopts\msvc$(MSVSYEAR).xml"
+!endif
 MEXEXT = mexw64
 MEX_FLAGS = -largeArrayDims
 
@@ -340,9 +348,14 @@ MSVCR = Microsoft.VC$(MSVSVER).CRT
 # VS <= 2008 needs a manifest too
 bincrt = $(bindir)\msvcr$(MSVSVER).dll $(bindir)\$(MSVCR).manifest
 mexcrt = $(mexdir)\msvcr$(MSVSVER).dll $(mexdir)\$(MSVCR).manifest
-!else
+!else if $(MSVSVER) <= 120
 bincrt = $(bindir)\msvcr$(MSVSVER).dll
 mexcrt = $(mexdir)\msvcr$(MSVSVER).dll
+!else
+# With Visual Studio 2015 the universal run time does not need to be redistributed?
+# https://blogs.msdn.microsoft.com/vcblog/2015/03/03/introducing-the-universal-crt/
+bincrt =
+mexcrt =
 !endif
 
 !ifdef MATLABROOT

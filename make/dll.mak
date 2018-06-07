@@ -2,7 +2,7 @@
 # description: Build VLFeat DLL
 # author: Andrea Vedaldi
 
-# Copyright (C) 2013-14 Andrea Vedaldi.
+# Copyright (C) 2013-14,18 Andrea Vedaldi.
 # Copyright (C) 2007-12 Andrea Vedaldi and Brian Fulkerson.
 # All rights reserved.
 #
@@ -131,6 +131,9 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	  $(DLL_LDFLAGS)					\
 	  $(^)							\
 	  -o "$(@)"
+ifdef BIN_RELINK_OMP
+	make/macos_relink_omp.sh "$(@)"
+endif
 
 $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 	$(call C,CC) -shared                                    \

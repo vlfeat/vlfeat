@@ -429,6 +429,9 @@ vlmxError(vlmxErrInvalidArgument, VL_STRINGIFY(NAME) " is negative.") ; \
     } else {
       vlmxError (vlmxErrInvalidArgument, "X is not of class SINGLE or DOUBLE.") ;
     }
+    if (mxGetNumberOfElements(samples_array) == 0) {
+      vlmxError (vlmxErrInvalidArgument, "X is empty.") ;
+    }
     data = mxGetData(samples_array) ;
     dimension = mxGetM(samples_array) ;
     numSamples = mxGetN(samples_array) ;

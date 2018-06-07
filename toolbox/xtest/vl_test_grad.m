@@ -1,19 +1,27 @@
-function results = vl_test_grad(varargin)
-% VL_TEST_GRAD
-vl_test_init ;
-
-function s = setup()
-s.I = rand(150,253) ;
-s.I_small = rand(2,2) ;
-
-function test_equiv(s)
-vl_assert_equal(gradient(s.I), vl_grad(s.I)) ;
-
-function test_equiv_small(s)
-vl_assert_equal(gradient(s.I_small), vl_grad(s.I_small)) ;
-
-function test_equiv_forward(s)
-Ix = diff(s.I,2,1) ;
-Iy = diff(s.I,2,1) ;
-
-vl_assert_equal(gradient(s.I_small), vl_grad(s.I_small)) ;
+classdef vl_test_grad < matlab.unittest.TestCase
+  properties
+    I
+    I_small
+  end
+  
+  methods (TestClassSetup)
+    function setup(t)
+      t.I = rand(150,253) ;
+      t.I_small = rand(2,2) ;
+    end
+  end
+  
+  methods (Test)
+    function test_equiv(t)
+      t.verifyEqual(gradient(t.I), vl_grad(t.I)) ;
+    end
+    function test_equiv_small(t)
+      t.verifyEqual(gradient(t.I_small), vl_grad(t.I_small)) ;
+    end
+    function test_equiv_forward(t)
+      Ix = diff(t.I,2,1) ;
+      Iy = diff(t.I,2,1) ;
+      t.verifyEqual(gradient(t.I_small), vl_grad(t.I_small)) ;
+    end
+  end
+end
