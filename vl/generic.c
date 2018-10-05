@@ -1312,7 +1312,14 @@ vl_set_alloc_func (void *(*malloc_func)  (size_t),
 void *
 vl_malloc (size_t n)
 {
-  return (vl_get_state()->malloc_func)(n) ;
+  void *buffer = (vl_get_state()->malloc_func)(n) ;
+
+  if (!buffer) {
+    perror ("vl_malloc") ;
+    exit (EXIT_FAILURE) ;
+  }
+
+  return buffer ;
   //return (memalign)(32,n) ;
 }
 
@@ -1329,7 +1336,14 @@ vl_malloc (size_t n)
 void *
 vl_realloc (void* ptr, size_t n)
 {
-  return (vl_get_state()->realloc_func)(ptr, n) ;
+  void *buffer = (vl_get_state()->realloc_func)(ptr, n) ;
+
+  if (!buffer) {
+    perror ("vl_realloc") ;
+    exit (EXIT_FAILURE) ;
+  }
+
+  return buffer ;
 }
 
 /** @brief Free and clear a memory block
@@ -1344,7 +1358,14 @@ vl_realloc (void* ptr, size_t n)
 void *
 vl_calloc (size_t n, size_t size)
 {
-  return (vl_get_state()->calloc_func)(n, size) ;
+  void *buffer = (vl_get_state()->calloc_func)(n, size) ;
+
+  if (!buffer) {
+    perror ("vl_calloc") ;
+    exit (EXIT_FAILURE) ;
+  }
+
+  return buffer ;
 }
 
 /** @brief Free a memory block
