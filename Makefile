@@ -150,7 +150,7 @@ endif
 VLDIR ?= .
 LIBTOOL ?= libtool
 
-STD_CLFAGS = $(CFLAGS)
+STD_CFLAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99
 STD_CFLAGS += -Wall -Wextra
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
