@@ -90,7 +90,7 @@ ifeq ($(call gt,$(MATLAB_VER),1),)
 $(info Detected MATLAB 2013b or earlier: adjusting escape method for MEX)
 escape =$(subst $$,\\$$,$(1))
 else
-$(info The MALTAB version will be detected in the next phase of Make)
+$(info The MATLAB version will be detected in the next phase of make)
 endif
 endif
 
