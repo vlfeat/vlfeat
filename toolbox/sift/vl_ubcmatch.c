@@ -163,7 +163,7 @@ mexFunction(int nout, mxArray *out[],
   **                                                        Do the job
   ** -------------------------------------------------------------- */
   {
-    Pair* pairs_begin = (Pair*) mxMalloc(sizeof(Pair) * (K1+K2)) ;
+    Pair* pairs_begin = (Pair*) mxMalloc(sizeof(Pair) * (K1 > K2 ? K1 : K2)) ;
     Pair* pairs_iterator = pairs_begin ;
 
 
