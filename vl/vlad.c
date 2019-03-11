@@ -55,7 +55,7 @@ float * enc
 int i;
 
 // create a KMeans object and run clustering to get vocabulary words (centers)
-kmeans = vl_kmeans_new (VLDistanceL2, VL_TYPE_FLOAT) ;
+kmeans = vl_kmeans_new (VL_TYPE_FLOAT, VLDistanceL2) ;
 vl_kmeans_cluster (kmeans,
                    data,
                    dimension,

@@ -47,7 +47,7 @@ double energy ;
 double * centers ;
 
 // Use float data and the L2 distance for clustering
-KMeans * kmeans = vl_kmeans_new (VLDistanceL2, VL_TYPE_FLOAT) ;
+KMeans * kmeans = vl_kmeans_new (VL_TYPE_FLOAT, VLDistanceL2) ;
 
 // Use Lloyd algorithm
 vl_kmeans_set_algorithm (kmeans, VlKMeansLloyd) ;
