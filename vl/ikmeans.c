@@ -259,15 +259,15 @@ vl_ikm_get_max_niters (VlIKMFilt const* f)
   return f->max_niters ;
 }
 
-/** @brief Get maximum number of iterations
+/** @brief Get the assigned centers
  ** @param f IKM filter.
- ** @return maximum number of iterations.
+ ** @return centers the assigned centers.
  **/
 
 vl_ikmacc_t const *
 vl_ikm_get_centers (VlIKMFilt const* f)
 {
-  return f-> centers ;
+  return f->centers ;
 }
 
 /** @brief Set verbosity level
