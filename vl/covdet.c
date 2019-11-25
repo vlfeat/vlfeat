@@ -1936,9 +1936,6 @@ vl_covdet_detect (VlCovDet * self)
 {
   VlScaleSpaceGeometry geom = vl_scalespace_get_geometry(self->gss) ;
   VlScaleSpaceGeometry cgeom ;
-  float * levelxx = NULL ;
-  float * levelyy = NULL ;
-  float * levelxy = NULL ;
   vl_index o, s ;
 
   assert (self) ;
@@ -1958,13 +1955,6 @@ vl_covdet_detect (VlCovDet * self)
   {
     if (self->css) vl_scalespace_delete(self->css) ;
     self->css = vl_scalespace_new_with_geometry(cgeom) ;
-  }
-  if (self->method == VL_COVDET_METHOD_HARRIS_LAPLACE ||
-      self->method == VL_COVDET_METHOD_MULTISCALE_HARRIS) {
-    VlScaleSpaceOctaveGeometry oct = vl_scalespace_get_octave_geometry(self->gss, geom.firstOctave) ;
-    levelxx = vl_malloc(oct.width * oct.height * sizeof(float)) ;
-    levelyy = vl_malloc(oct.width * oct.height * sizeof(float)) ;
-    levelxy = vl_malloc(oct.width * oct.height * sizeof(float)) ;
   }
 
   /* compute cornerness ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -2143,10 +2133,6 @@ vl_covdet_detect (VlCovDet * self)
     }
     self->numFeatures = j ;
   }
-
-  if (levelxx) vl_free(levelxx) ;
-  if (levelyy) vl_free(levelyy) ;
-  if (levelxy) vl_free(levelxy) ;
 }
 
 /* ---------------------------------------------------------------- */
