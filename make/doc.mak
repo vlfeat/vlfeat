@@ -23,6 +23,7 @@ DOXYGEN    ?= doxygen
 PDFLATEX   ?= pdflatex
 FIG2DEV    ?= fig2dev
 CONVERT    ?= convert
+PDFTOCAIRO ?= pdftocairo
 
 PYTHON     ?= python
 GROFF      ?= groff
@@ -210,8 +211,11 @@ $(subst docsrc/,doc/,$(doc_svg_src:.svg=.png))
 .PRECIOUS: doc/build/figures/%.pdf
 .PRECIOUS: doc/build/figures/%.tex
 
-doc/figures/%.png : doc/build/figures/%.pdf
-	$(call C,CONVERT) -units PixelsPerInch -density $(screen_dpi) -resample $(screen_dpi) -trim "$<" "$@"
+doc/build/figures/%-untrimmed.png : doc/build/figures/%.pdf
+	$(call C,PDFTOCAIRO) -png -singlefile -r $(screen_dpi) "$<" "$(patsubst %.png,%,$@)"
+
+doc/figures/%.png : doc/build/figures/%-untrimmed.png
+	$(call C,CONVERT) -trim "$<" "$@"
 
 doc/figures/%.png : docsrc/figures/%.svg
 	$(call C,CONVERT) -units PixelsPerInch -density $(screen_dpi) -resample $(screen_dpi) -trim "$<" "$@"
