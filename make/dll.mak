@@ -110,14 +110,14 @@ $(eval $(call gendir, dll, $(BINDIR) $(BINDIR)/objs))
 $(BINDIR)/objs/%.o : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC)                                            \
 	     -c -o "$(@)"                                       \
-	     $(DLL_CFLAGS) "$(<)"
+	     $(DLL_CFLAGS) $(USER_CFLAGS) "$(<)"
 
 $(BINDIR)/objs/%.d : $(VLDIR)/vl/%.c $(dll-dir)
 	$(call C,CC)						\
 	     -MM						\
 	     -MF "$(@)"						\
 	     -MT '$(BINDIR)/objs/$*.o $(BINDIR)/objs/$*.d'      \
-	     $(DLL_CFLAGS) "$(<)"
+	     $(DLL_CFLAGS) $(USER_CFLAGS) "$(<)"
 
 $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	$(call C,CC)						\
@@ -129,6 +129,7 @@ $(BINDIR)/lib$(DLL_NAME).dylib : $(dll_obj)
 	  -current_version $(VER)				\
 	  -isysroot $(SDKROOT)					\
 	  $(DLL_LDFLAGS)					\
+	  $(USER_CFLAGS)					\
 	  $(^)							\
 	  -o "$(@)"
 ifdef BIN_RELINK_OMP
@@ -139,6 +140,7 @@ $(BINDIR)/lib$(DLL_NAME).so : $(dll_obj)
 	$(call C,CC) -shared                                    \
 	    $(^)                                                \
 	    $(DLL_LDFLAGS)	                                \
+	    $(USER_LDFLAGS)	                                \
 	    -o "$(@)"
 
 dll-clean:
@@ -159,7 +161,9 @@ dll-info:
 	$(call echo-var,BINDIR)
 	$(call echo-var,DLL_NAME)
 	$(call echo-var,LINK_DLL_CFLAGS)
+	$(call echo-var,USER_CFLAGS)
 	$(call echo-var,LINK_DLL_LDFLAGS)
+	$(call echo-var,USER_LDFLAGS)
 	$(call echo-var,DLL_CFLAGS)
 	$(call echo-var,DLL_LDFLAGS)
 	$(call echo-var,DLL_SUFFIX)
