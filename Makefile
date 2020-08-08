@@ -42,6 +42,8 @@
 #   DEBUG [not defined] - If defined, turns on debugging symbols and
 #       turns off optimizations
 #
+#   ASSERTIONS [not defined] - If defined, turns on assertions
+#
 #   PROFILE [not defined] - If defined, turns on debugging symbols but
 #       does NOT turn off optimizations.
 #
@@ -153,7 +155,8 @@ LIBTOOL ?= libtool
 STD_CFLAGS = -std=c99
 STD_CFLAGS += -Wall -Wextra
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
+STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -O3)
+STD_CFLAGS += $(if $(ASSERTIONS), , -DNDEBUG)
 STD_CFLAGS += $(if $(PROFILE), -g)
 # User-provided CFLAGS to be put at the end of all compiler invocations so
 # that they can override our defaults.
@@ -352,6 +355,7 @@ info:
 	$(call echo-title,General settings)
 	$(call dump-var,deps)
 	$(call echo-var,PROFILE)
+	$(call echo-var,ASSERTIONS)
 	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
