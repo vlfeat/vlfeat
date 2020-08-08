@@ -109,14 +109,14 @@ endif
 #
 # where
 #
-# * MEX_CLFAGS are standard compiler flags such as -I (include path).
+# * MEX_CFLAGS are standard compiler flags such as -I (include path).
 # * MEX_LDFLAGS are standard linker flags such as -L (library path)
 #   and -l (link library)
 # * MEX_FLAGS are other MEX flags such as -v (verbose). This variable
 #   is also used to contain overrides for the variables used
 #   internally by MEX.
 #
-# The variables STD_CLFAGS and STD_LDFLAGS contain settings which are
+# The variables STD_CFLAGS and STD_LDFLAGS contain settings which are
 # specific to one complier (e.g. GCC or clang). To pass these to MEX,
 # the following is appended to MEX_FLAGS, and ultimately to the MEX
 # command line:
@@ -124,13 +124,13 @@ endif
 #   CFLAGS='$$CFLAGS $(STD_CFLAGS)'
 #   LDFLAGS='$$LDFLAGS $(STD_LDFLAGS)'
 #
-# This causes MEX to append $(STD_CLFAGS) and $(STD_LDFLAGS) to its
+# This causes MEX to append $(STD_CFLAGS) and $(STD_LDFLAGS) to its
 # default settings.
 #
 # While this usually achieves the desired effects, some versions of
 # MATLAB may not be compatible with certain compilers (e.g. MATLAB
 # 2013a and Xcode 5.0 and Mac OS X 10.9). Fixing this requires
-# changing CLFAGS and LDFLAGS completely (i.e.  not just appending to
+# changing CFLAGS and LDFLAGS completely (i.e.  not just appending to
 # their default values).
 
 MEX_ARCH = $(ARCH)

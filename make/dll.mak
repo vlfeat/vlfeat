@@ -19,8 +19,8 @@ info: dll-info
 #                                                        Configuration
 # --------------------------------------------------------------------
 
-# LINK_DLL_CLFAGS and LINK_DLL_LDFLAGS are the compiler options needed
-# to link to the VLFeat DLL. DLL_CLFAGS and DLL_LDFLAGS the options to
+# LINK_DLL_CFLAGS and LINK_DLL_LDFLAGS are the compiler options needed
+# to link to the VLFeat DLL. DLL_CFLAGS and DLL_LDFLAGS the options to
 # build the DLL.
 
 DLL_NAME = vl
