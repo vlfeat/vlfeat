@@ -42,6 +42,8 @@
 #   DEBUG [not defined] - If defined, turns on debugging symbols and
 #       turns off optimizations
 #
+#   ASSERTIONS [not defined] - If defined, turns on assertions
+#
 #   PROFILE [not defined] - If defined, turns on debugging symbols but
 #       does NOT turn off optimizations.
 #
@@ -150,14 +152,20 @@ endif
 VLDIR ?= .
 LIBTOOL ?= libtool
 
-STD_CLFAGS = $(CFLAGS)
-STD_CFLAGS += -std=c99
+STD_CFLAGS = -std=c99
 STD_CFLAGS += -Wall -Wextra
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
-STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -DNDEBUG -O3)
+STD_CFLAGS += $(if $(DEBUG), -DDEBUG -O0 -g, -O3)
+STD_CFLAGS += $(if $(ASSERTIONS), , -DNDEBUG)
 STD_CFLAGS += $(if $(PROFILE), -g)
+# User-provided CFLAGS to be put at the end of all compiler invocations so
+# that they can override our defaults.
+USER_CFLAGS = $(CFLAGS)
 
-STD_LDFLAGS = $(LDFLAGS)
+STD_LDFLAGS =
+# User-provided LDFLAGS to be put at the end of all linker invocations so
+# that they can override our defaults.
+USER_LDFLAGS = $(LDFLAGS)
 
 # Architecture specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -347,6 +355,7 @@ info:
 	$(call echo-title,General settings)
 	$(call dump-var,deps)
 	$(call echo-var,PROFILE)
+	$(call echo-var,ASSERTIONS)
 	$(call echo-var,DEBUG)
 	$(call echo-var,VER)
 	$(call echo-var,ARCH)
@@ -354,7 +363,9 @@ info:
 	$(call echo-var,COMPILER)
 	$(call echo-var,COMPILER_VER)
 	$(call echo-var,STD_CFLAGS)
+	$(call echo-var,USER_CFLAGS)
 	$(call echo-var,STD_LDFLAGS)
+	$(call echo-var,USER_LDFLAGS)
 	$(call echo-var,DISABLE_SSE2)
 	$(call echo-var,DISABLE_AVX)
 	$(call echo-var,DISABLE_THREADS)

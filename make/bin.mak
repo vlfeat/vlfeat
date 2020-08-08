@@ -75,7 +75,7 @@ bin-all: $(dll-dir) $(bin_tgt)
 # also http://wiki.debian.org/ToolChain/DSOLinking
 
 $(BINDIR)/% : $(VLDIR)/src/%.c $(dll_tgt)
-	$(call C,CC) $(BIN_CFLAGS) "$<" $(BIN_LDFLAGS) -o "$(@)"
+	$(call C,CC) $(BIN_CFLAGS) $(USER_CFLAGS) "$<" $(BIN_LDFLAGS) $(USER_LDFLAGS) -o "$(@)"
 ifdef BIN_RELINK_OMP
 	make/macos_relink_omp.sh "$(@)"
 endif
@@ -85,7 +85,7 @@ arch_bins += $(BINDIR)/libomp.dylib
 endif
 
 $(BINDIR)/%.d : $(VLDIR)/src/%.c $(dll-dir)
-	$(call C,CC) $(BIN_CFLAGS) -M -MT  \
+	$(call C,CC) $(BIN_CFLAGS) $(USER_CFLAGS) -M -MT  \
 	       '$(BINDIR)/$* $(BINDIR)/$*.d' \
 	       "$<" -MF "$@"
 
@@ -102,7 +102,9 @@ bin-info:
 	$(call dump-var,bin_tgt)
 	$(call dump-var,bin_dep)
 	$(call echo-var,BIN_CFLAGS)
+	$(call echo-var,USER_CFLAGS)
 	$(call echo-var,BIN_LDFLAGS)
+	$(call echo-var,USER_LDLAGS)
 	@echo
 
 # Local variables:
