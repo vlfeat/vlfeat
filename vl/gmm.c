@@ -417,6 +417,7 @@ vl_gmm_delete (VlGMM * self)
   if(self->covariances) vl_free(self->covariances);
   if(self->priors) vl_free(self->priors);
   if(self->posteriors) vl_free(self->posteriors);
+  if(self->sigmaLowBound) vl_free(self->sigmaLowBound);
   if(self->kmeansInit && self->kmeansInitIsOwner) {
     vl_kmeans_delete(self->kmeansInit);
   }
