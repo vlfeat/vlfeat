@@ -3317,8 +3317,6 @@ vl_covdet_set_base_scale (VlCovDet * self, double s)
 /** @brief Set the max number of orientations
  ** @param self object.
  ** @param m the max number of orientations.
- **
- ** Calling this function resets the detector.
  **/
 void
 vl_covdet_set_max_num_orientations (VlCovDet * self, vl_size m)
