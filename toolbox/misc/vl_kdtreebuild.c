@@ -27,7 +27,7 @@ enum {
 } ;
 
 /* options */
-vlmxOption  options [] = {
+vlmxOption  options_build[] = {
 {"Verbose",          0,   opt_verbose          },
 {"ThresholdMethod",  1,   opt_threshold_method },
 {"NumTrees",         1,   opt_num_trees        },
@@ -91,7 +91,7 @@ mexFunction(int nout, mxArray *out[],
                "DATA must be either SINGLE or DOUBLE") ;
   }
 
-  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options_build, &next, &optarg)) >= 0) {
     char buffer [1024] ;
     switch (opt) {
       case opt_threshold_method :

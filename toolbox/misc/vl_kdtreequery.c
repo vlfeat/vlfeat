@@ -26,7 +26,7 @@ enum {
 } ;
 
 /* options */
-vlmxOption  options [] = {
+vlmxOption  options_query[] = {
   {"Verbose",           0,   opt_verbose             },
   {"NumNeighbors",      1,   opt_num_neighs          },
   {"MaxComparisons",    1,   opt_max_num_comparisons },
@@ -93,7 +93,7 @@ mexFunction(int nout, mxArray *out[],
               "QUERY must be a matrix with TREE.NUMDIMENSIONS rows.") ;
   }
 
-  while ((opt = vlmxNextOption (in, nin, options, &next, &optarg)) >= 0) {
+  while ((opt = vlmxNextOption (in, nin, options_query, &next, &optarg)) >= 0) {
     switch (opt) {
       case opt_num_neighs :
         if (! vlmxIsScalar(optarg) ||
