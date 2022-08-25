@@ -54,6 +54,18 @@ ship with pre-built GNU Octave MEX files. To compile them use
     > cd <vlfeat directory>
     > make MKOCTFILE=<path to the mkoctfile program>
 
+## Building vlfeat - Using vcpkg
+
+You can download and install vlfeat using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    ./vcpkg install vlfeat
+
+The vlfeat port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+    
 # Changes
 
 - **0.9.21** Maintenance release. Bugfixes.
