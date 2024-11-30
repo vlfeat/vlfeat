@@ -9,6 +9,12 @@
 # This file is part of the VLFeat library and is made available under
 # the terms of the BSD license (see the COPYING file).
 
+# Installation paths
+PREFIX ?= /usr/local
+LIBDIR ?= $(PREFIX)/lib
+BINDIR ?= $(PREFIX)/bin
+INCLUDEDIR ?= $(PREFIX)/include/vlfeat
+
 # VLFEAT BUILDING INSTRUCTIONS
 #
 # This makefile builds VLFeat on standard Unix installations with the
@@ -92,7 +98,14 @@
 
 SHELL = /bin/bash
 
-.PHONY : all
+
+# Each Makefile submodule appends appropriate dependencies to the all,
+# clean, archclean, distclean, and info targets. In addition, it
+# appends to the deps and bins variables the list of .d files (to be
+# inclued by make as auto-dependencies) and the list of files to be
+# added to the binary distribution.
+
+.PHONY : all install uninstall clean archclean distclean info help
 all:
 
 # Select which features to disable
@@ -150,7 +163,7 @@ endif
 VLDIR ?= .
 LIBTOOL ?= libtool
 
-STD_CLFAGS = $(CFLAGS)
+STD_CFLAGS = $(CFLAGS)
 STD_CFLAGS += -std=c99
 STD_CFLAGS += -Wall -Wextra
 STD_CFLAGS += -Wno-unused-function -Wno-long-long -Wno-variadic-macros
@@ -233,7 +246,7 @@ STD_CFLAGS += -m$(march) -D_GNU_SOURCE -fno-stack-protector
 STD_LDFLAGS += -m$(march) -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed
 endif
 
-# Convert back DISALBE_*="no" flags to be empty
+# Convert back DISABLE_*="no" flags to be empty
 ifeq "$(DISABLE_SSE2)" "no"
 override DISABLE_SSE2:=
 endif
@@ -316,21 +329,69 @@ endef
 #                                                                Build
 # --------------------------------------------------------------------
 
-# Each Makefile submodule appends appropriate dependencies to the all,
-# clean, archclean, distclean, and info targets. In addition, it
-# appends to the deps and bins variables the list of .d files (to be
-# inclued by make as auto-dependencies) and the list of files to be
-# added to the binary distribution.
-
-.PHONY: clean, archclean, distclean, info, help
-no_dep_targets := clean archclean distclean help
-
 include make/dll.mak
 include make/bin.mak
-include make/matlab.mak
-include make/octave.mak
+# include make/matlab.mak
+# include make/octave.mak
 include make/doc.mak
 include make/dist.mak
+
+# --------------------------------------------------------------------
+#                                                          Installation
+# --------------------------------------------------------------------
+
+install: all
+	@echo "** Installing VLFeat"
+	# Create directories if they don't exist
+	mkdir -p $(DESTDIR)$(LIBDIR)
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)/usr/local/vlfeat/bin
+	mkdir -p $(DESTDIR)/usr/local/lib/pkgconfig
+	mkdir -p $(DESTDIR)$(INCLUDEDIR)
+
+	# Install shared library
+	if [ -f "bin/glnxa64/libvl.so" ]; then \
+		cp bin/glnxa64/libvl.so $(DESTDIR)$(LIBDIR); \
+	else \
+		echo "** 'libvl.so' not found, skipping shared library installation."; \
+	fi
+
+	# Install executables (excluding shared library)
+	if [ -d "bin/glnxa64" ]; then \
+		find bin/glnxa64 -type f -not -name 'libvl.so' -exec cp {} $(DESTDIR)/usr/local/vlfeat/bin \; ; \
+	else \
+		echo "** 'bin/glnxa64' directory not found, skipping executables installation."; \
+	fi
+
+	# Install headers (only if 'vl' directory exists)
+	if [ -d "vl" ]; then \
+		find vl -type f -exec cp {} $(DESTDIR)$(INCLUDEDIR) \; ; \
+	else \
+		echo "** 'vl' directory not found, skipping header installation."; \
+	fi
+
+	# Generate pkg-config file
+	echo "prefix=/usr/local" > vlfeat.pc
+	echo "exec_prefix=\$${prefix}" >> vlfeat.pc
+	echo "libdir=\$${exec_prefix}/lib" >> vlfeat.pc
+	echo "includedir=\$${exec_prefix}/include/vlfeat" >> vlfeat.pc
+	echo "" >> vlfeat.pc
+	echo "Name: VLFeat" >> vlfeat.pc
+	echo "Description: The VLFeat open source library for computer vision" >> vlfeat.pc
+	echo "Version: 0.9.21" >> vlfeat.pc
+	echo "Libs: -L\$${libdir} -lvl" >> vlfeat.pc
+	echo "Cflags: -I\$${includedir}" >> vlfeat.pc
+	cp vlfeat.pc $(DESTDIR)/usr/local/lib/pkgconfig/
+	rm vlfeat.pc
+
+	@echo "** Installation complete."
+
+uninstall:
+	@echo "** Uninstalling VLFeat"
+	# Remove installed files
+	rm -rf $(DESTDIR)$(LIBDIR)/libvlfeat.*
+	rm -rf $(DESTDIR)$(BINDIR)/vlfeat*
+	rm -rf $(DESTDIR)$(INCLUDEDIR)
 
 clean:
 	rm -f  `find . -name '*~'`
@@ -360,7 +421,8 @@ info:
 	$(call echo-var,DISABLE_THREADS)
 	$(call echo-var,DISABLE_OPENMP)
 	@printf "\nThere are %s lines of code.\n" \
-	`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
+    `cat $(m_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
+	#`cat $(m_src) $(mex_src) $(dll_src) $(dll_hdr) $(bin_src) | wc -l`
 
 # Holw help works: cat this file,
 # skip the first block until an empty line is found (twice)
@@ -383,3 +445,4 @@ help:
 ifneq ($(filter-out $(no_dep_targets), $(MAKECMDGOALS)),)
 -include $(deps)
 endif
+

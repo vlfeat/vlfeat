@@ -51,45 +51,17 @@ the terms of the BSD license (see the COPYING file).
    last paragraph.
 */
 
-/** @internal @brief IEEE single precision quiet NaN constant */
-static union { vl_uint32 raw ; float value ; }
-  const vl_nan_f =
-    { 0x7FC00000UL } ;
-
-/** @internal @brief IEEE single precision infinity constant */
-static union { vl_uint32 raw ; float value ; }
-  const vl_infinity_f =
-    { 0x7F800000UL } ;
-
-/** @internal @brief IEEE double precision quiet NaN constant */
-static union { vl_uint64 raw ; double value ; }
-  const vl_nan_d =
-#ifdef VL_COMPILER_MSC
-    { 0x7FF8000000000000ui64 } ;
-#else
-    { 0x7FF8000000000000ULL } ;
-#endif
-
-/** @internal @brief IEEE double precision infinity constant */
-static union { vl_uint64 raw ; double value ; }
-  const vl_infinity_d =
-#ifdef VL_COMPILER_MSC
-    { 0x7FF0000000000000ui64 } ;
-#else
-    { 0x7FF0000000000000ULL } ;
-#endif
-
 /** @brief IEEE single precision NaN (not signaling) */
-#define VL_NAN_F (vl_nan_f.value)
+#define VL_NAN_F (NAN)
 
 /** @brief IEEE single precision positive infinity (not signaling) */
-#define VL_INFINITY_F (vl_infinity_f.value)
+#define VL_INFINITY_F (INFINITY)
 
 /** @brief IEEE double precision NaN (not signaling) */
-#define VL_NAN_D (vl_nan_d.value)
+#define VL_NAN_D (NAN)
 
 /** @brief IEEE double precision positive infinity (not signaling) */
-#define VL_INFINITY_D (vl_infinity_d.value)
+#define VL_INFINITY_D (INFINITY)
 
 /* ---------------------------------------------------------------- */
 
